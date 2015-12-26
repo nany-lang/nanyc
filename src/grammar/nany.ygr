@@ -1,0 +1,994 @@
+// ----------------------------------------------------------------------------
+// NANY GRAMMAR
+// https://nany.io
+//
+// Format: (yuni's grammar file)
+// ----------------------------------------------------------------------------
+
+
+
+
+
+// --- SPACES ---
+
+wp: hidden
+	[ \t\n\r]* ((tk-comment-line | tk-comment-block) [ \t\n\r]*)*
+
+punc: hidden
+	[!"#$%&'()*+,\\-./:;<=>?@[\]^_`{|}~]
+
+sp: notext, hidden
+	([ \t\r\n] | punc^) wp
+
+
+
+// --- COMMENTS ---
+
+tk-comment-line-content:
+	[^\n\r]*
+tk-comment-start-inline:
+	'//'
+tk-comment-start-block:
+	'/*'
+tk-comment-end-block:
+	'*/'
+
+tk-comment-subbk: notext, hidden
+	(tk-comment-block tk-comment-subbk) | tk-comment-end-block^ | ([^] [^*/]* tk-comment-subbk)
+tk-comment-block-content:
+	tk-comment-subbk
+
+tk-comment-block: notext
+	tk-comment-start-block tk-comment-block-content tk-comment-end-block
+tk-comment-line: notext
+	tk-comment-start-inline tk-comment-line-content
+
+
+
+
+// --- SHEBANG ---
+
+shebang-directive:
+	[^\r\n]*
+shebang: notext important
+	tk-shebang shebang-directive
+
+
+
+
+
+// --- ERRORS tokens ---
+
+error:
+	[^ \t\r\n]+
+
+error-eol:
+	[^\r\n]+
+
+error-semicolon:
+	[^;\r\n]+ [;]*
+
+error-template:
+	[^:>\r\n]+
+
+error-parenthese:
+	[^)\r\n]+
+
+error-bracket:
+	[^\[\]\r\n]+
+
+error-parenthese-or-bracket:
+	[^()\[\]\r\n]+
+
+error-equal-or-semicolon:
+	[^;=\r\n]+
+
+
+
+
+
+
+
+// --- TOKENS ---
+
+tk-template-open: notext
+	'<:'
+tk-template-close: notext
+	':>'
+
+tk-sharp: notext
+	'#'
+tk-arobase: notext
+	'@'
+
+//tk-not: notext
+//	'not'
+
+tk-equal: notext
+	'=' [^=]^
+tk-semicolon: notext
+	';'
+tk-colon: notext
+	':' [^>\[\]]^
+tk-comma: notext
+	','
+
+//tk-question: notext
+//	'?'
+
+tk-dollar: notext
+	'$'
+tk-double-quote: notext
+	'"'
+tk-class: notext
+	'class' sp
+tk-func: notext
+	'func' sp
+tk-function: notext
+	'function' sp //piko
+tk-view: notext
+	'view' sp
+tk-for: notext
+	'for' sp
+tk-do: notext
+	'do' sp
+tk-in: notext
+	'in' sp
+tk-while: notext
+	'while' sp
+tk-each: notext
+	'each' sp
+
+tk-if: notext
+	'if' sp
+tk-then: notext
+	'then' sp
+tk-else: notext
+	'else' sp
+
+tk-arrow:
+	'->'
+tk-return: notext
+	'return' sp
+tk-raise: notext
+	'raise' sp
+tk-pipe:
+	'|'
+
+tk-shebang: notext
+	'#!'
+tk-namespace: notext
+	'namespace' sp
+//tk-uses: notext
+//	'uses'
+
+tk-brace-open: notext
+	'{'
+tk-brace-close: notext
+	'}'
+
+tk-bracket-open: notext
+	'['
+tk-bracket-close: notext
+	']'
+
+tk-parenthese-open: notext
+	'('
+
+tk-parenthese-close: notext
+	')'
+
+
+tk-new: notext
+	'new' sp
+
+tk-dot: notext
+	'.'
+tk-dot-dot: notext
+	'..'
+
+//tk-ampersand: notext
+//	'&'
+
+tk-operator: notext
+	'operator' sp
+
+tk-string-var-open: notext
+	'\\('
+
+tk-string-var-close: notext
+	')'
+
+tk-typedef: notext
+	'typedef' sp
+tk-switch: notext
+	'switch' sp
+tk-case: notext
+	'case' sp
+tk-on: notext
+	'on' sp
+tk-default: notext
+	'default' sp
+tk-typeof: notext
+	'typeof' sp
+
+
+
+
+const: notext
+	'const' sp
+cref: notext
+	'cref' sp
+ref: notext
+	'ref' sp
+
+var-by-value: notext
+	'var' sp
+
+visibility:
+	('published' | 'public' | 'protected' | 'private' | 'internal') sp
+
+
+
+
+
+
+
+
+
+// --- OPERATORS ---
+//
+// If new rules are added, they should be added as exceptions when
+// normalizing expressions
+// (pass/build-ast-normalize/ast-normalize.cpp)
+
+operator-comparison:
+	// transformed into a global func call
+	| '!=' | '==' | '<=' | '>=' | ('<' [^:<]^)  | ('>' [^>:]^)
+
+operator-assignment:
+	// transformed into method calls
+	| ('=' [^=]^) | '+=' | '-=' | '*=' | '/=' | '^=' | '~=' | '>>=' | '<<='
+
+operator-add: // operators with priority like + - ...
+	// transformed into a global func call
+	//| '!=' | '==' | '<=' | '>=' | ('<' [^<]^)  | ('>' [^>]^)
+	[+-] [^=>+-]^
+
+operator-factor: // operators with priority like * / ...
+	// transformed into a global func call
+	//| '!=' | '==' | '<=' | '>=' | ('<' [^<]^)  | ('>' [^>]^)
+	([*/] [^=]^) | 'mod'
+
+operator-stream: // operators with priority like << >>
+	// transformed into a global func call
+	//| '!=' | '==' | '<=' | '>=' | ('<' [^<]^)  | ('>' [^>]^)
+	'<<' | '>>'
+
+operator-power: // operators with priority like ^
+	// transformed into a global func call
+	//| '!=' | '==' | '<=' | '>=' | ('<' [^<]^)  | ('>' [^>]^)
+	[~^] [^=]^
+
+operator-logic: // operators with priority like and, or...
+	// transformed into a global func call
+	//| '!=' | '==' | '<=' | '>=' | ('<' [^<]^)  | ('>' [^>]^)
+	('and' | 'or') sp
+
+operator-not: // operators with priority like not
+	'not' sp
+
+operator-all: hidden
+	| operator-stream
+	| operator-comparison
+	| operator-assignment
+	| operator-factor
+	| operator-add
+	| operator-logic
+	| operator-power
+	| operator-not
+
+operator-kind: // like operator-all, but not hidden
+	operator-all
+
+
+
+
+
+
+
+
+
+
+
+// --- STRINGS ---
+
+char-extended: hidden, notext
+	[abcdefghijklmnopqrstuvwxyz\\"%$] | (([xuU]) hex+) | integer
+
+string-interpolation: notext
+	tk-string-var-open  expr  tk-string-var-close
+
+single-char: hidden, notext
+	| ('\\' char-extended)
+	| string-interpolation
+	| [^"\n]
+
+string-literal:
+	single-char*
+
+string: notext
+	tk-double-quote (string-literal tk-double-quote) | error-eol
+
+char:
+	single-char
+
+char-value: hidden notext
+	['] char [']
+
+
+
+
+
+// --- NUMBERS ---
+
+digit: notext, hidden
+	[0123456789]
+
+integer:
+	digit+
+
+hex: hidden notext
+	[0123456789ABCDEFabcdef]
+
+number-qualifier-type:
+	[iuf]+
+
+number-percent: notext
+	'%'
+
+number-qualifier: notext
+	number-qualifier-type integer?
+
+number-sign:
+	[+-]
+
+number-exponent: notext
+	number-sign? integer
+
+number-value:
+	integer (tk-dot integer)? ([eE] number-exponent)?
+
+number-hexa:
+	'0x' hex+
+
+number: notext
+	(number-sign wp)? (number-hexa | number-value) number-qualifier? number-percent?
+
+number-def: hidden
+	number sp
+
+
+
+
+
+
+
+
+symbol-name: notext
+	identifier
+
+identifier:
+	[^ \t\r\n!"#$%&'()*+,\\-./:;<=>?@[\]^`{|}~0123456789] [^ \t\r\n!"#$%&'()*+,\\-./:;<=>?@[\]^`{|}~]*
+
+entity: notext
+	identifier (wp tk-dot wp identifier)*
+
+
+
+
+// --- USES ---
+
+//uses: notext important
+//	wp tk-uses sp (entity (wp tk-semicolon)?) | error-semicolon
+//uses-list: notext
+//	uses+
+
+// --- NAMESPACE ---
+
+namespace: notext important
+	tk-namespace (entity (wp tk-semicolon)?) | error-semicolon
+
+
+
+
+
+
+
+
+// --- TEMPLATES ---
+
+call-template-parameter: notext
+	expr
+
+call-template-named-parameter: notext
+	identifier wp tk-colon wp   (expr wp) | error-parenthese-or-bracket
+
+call-template-parameters: notext
+	call-template-named-parameter | call-template-parameter
+	(
+		wp tk-comma wp
+		(call-template-named-parameter|call-template-parameter) | error-parenthese-or-bracket
+	)*
+
+call-template-decl: hidden
+	tk-template-open wp
+	(call-template-parameters? wp tk-template-close) | (error-template wp tk-template-close?)
+
+
+class-template-params: notext
+	tk-template-open wp (((func-params-decl?) | error-template)  wp tk-template-close) | error-eol
+
+
+
+
+
+
+
+type-constraint: notext
+	tk-pipe wp expr
+
+type-qualifier: notext
+	const | cref | ref
+
+//type-decl-value: hidden
+//	| if
+//	| switch
+//	| class
+//	| ex-value
+
+type-decl-can-continue: notext hidden
+	(
+		| (tk-parenthese-open wp type-decl wp tk-parenthese-close)
+		//| inspect
+		| typeof
+		| identifier
+	)
+	type-continuation?
+
+type-decl: notext
+	// without continuation
+	//| if
+	//| switch
+	//| class
+	// continuation
+	| type-decl-can-continue 
+	// ex-compound
+
+type: notext
+	((type-qualifier (wp type-decl)?) | type-decl)
+	(wp type-constraint)?
+
+
+
+intrinsic: notext, important
+	'!!' wp (entity (wp call)?) | error
+
+call-parameter: notext
+	expr
+
+call-named-parameter: notext
+	identifier wp tk-colon wp (expr wp) | error-parenthese-or-bracket
+
+call-parameters: notext hidden
+	call-named-parameter|call-parameter
+	(
+		wp tk-comma wp
+		(call-named-parameter | call-parameter) | error-parenthese-or-bracket
+	)*
+
+call: notext
+	tk-parenthese-open
+	((wp call-parameters)? wp tk-parenthese-close)
+		| (error-parenthese wp tk-parenthese-close?)
+
+
+
+
+
+
+
+attributes-parameter: notext
+	// entity | expr : optimization trick (expr can be very slow when confronted to ]])
+	entity (wp tk-colon wp (entity | expr) | error)?
+
+attributes: notext
+	tk-bracket-open tk-bracket-open
+	(
+		(wp attributes-parameter (wp tk-comma wp attributes-parameter | error-bracket)*)?
+		wp tk-bracket-close tk-bracket-close
+	)
+	| (error-bracket ']'*)
+
+
+
+interval-bound-start:
+	'[:' | ']:'
+interval-bound-end:
+	':]' | ':['
+
+interval: notext
+	interval-bound-start
+		(wp expr wp tk-dot-dot wp expr wp interval-bound-end)
+		| error-bracket
+
+array: notext
+	tk-bracket-open
+		(wp call-parameters? wp tk-bracket-close)
+		| error-bracket
+
+
+new-init: notext
+	object
+
+new: notext important
+	tk-new (type-decl (wp call)? (wp new-init)?) | error-semicolon
+
+
+
+
+env-var: notext
+	tk-dollar identifier?
+
+inspect: notext
+	tk-sharp
+	(identifier | (tk-parenthese-open wp expr-group wp tk-parenthese-close))
+		| error
+
+typeof: notext
+	tk-typeof call?
+
+ldo: notext
+	tk-arobase
+	(identifier | (tk-parenthese-open wp expr-group wp tk-parenthese-close))
+		| error
+
+
+
+
+
+object-entry: notext
+	wp identifier wp tk-colon wp expr
+
+object: notext
+	tk-brace-open
+	(object-entry (wp tk-comma wp object-entry)* (wp tk-comma)?)?
+	wp
+	tk-brace-close
+
+dict-entry: notext
+	expr wp tk-colon wp expr wp
+
+dict: notext
+	tk-bracket-open
+	wp dict-entry (tk-comma wp dict-entry)*
+	tk-bracket-close
+
+
+
+
+
+
+
+
+
+
+
+// --- IF ---
+
+if-then: notext
+	wp tk-then wp expr-with-semicolon | error-semicolon
+
+if-else: notext
+	wp tk-else wp expr-with-semicolon
+
+if: notext, important
+	tk-if
+		(expr if-then if-else?)
+		| error-eol
+
+
+
+
+
+// --- WHILE ---
+
+while: notext, important
+	tk-while
+		(expr wp tk-do wp expr-with-semicolon (wp tk-else wp expr-with-semicolon)?)
+		| error-eol
+
+do-while: notext, important
+	tk-do wp
+		(expr-with-semicolon wp tk-while expr wp tk-semicolon?)
+		| error-eol
+
+
+
+
+
+
+// --- FOR ---
+
+for-do: notext
+	tk-do wp expr-with-semicolon
+
+for-else: notext
+	tk-else wp expr-with-semicolon
+
+for: notext, important
+	tk-for
+		(in  wp for-do  (wp for-else)?)
+		| error-eol
+
+
+
+
+
+// --- RETURN ---
+
+return-inline: notext, important
+	tk-arrow wp (expr wp tk-semicolon) | error-semicolon
+
+return-raise: notext
+	tk-raise
+
+return: notext, important
+	(tk-return | return-raise) (expr (wp tk-comma wp expr | error-semicolon)? )?
+
+
+
+
+// --- VARS ---
+
+var-qualifier: notext, hidden
+	var-by-value | ref | cref | const
+
+var-type-separator: notext hidden
+	tk-colon
+var-type: notext
+	tk-colon wp type | error-equal-or-semicolon
+
+var-assign: notext
+	operator-kind wp (expr | error-semicolon)
+
+var-property: notext
+	tk-arrow wp object
+
+var-decl: hidden
+	identifier func-param-variadic?
+	(wp var-type)?
+	(wp var-assign)?
+
+var: notext, important
+	wp
+	(attributes wp)?
+	(visibility sp)?
+	var-qualifier
+	(var-decl (wp var-property)?) | error-semicolon
+
+
+
+
+
+// --- SET | EACH ---
+
+in-vars: notext
+	identifier (wp tk-comma wp identifier)*
+
+in-container: notext
+	// expr optional to make the grammar more flexible
+	| (ex-compound) // to reduce the priority of 'each i in ...'
+	| (tk-parenthese-open wp expr-no-node? wp tk-parenthese-close)
+
+in-filter: notext
+	tk-pipe wp expr
+
+in: important, notext
+	(tk-in | (in-vars wp tk-in)) in-container (wp in-filter)?
+
+each: important, notext
+	tk-each in
+
+
+
+
+
+
+
+// --- TYPEDEF ---
+
+typedef: notext, important
+	(attributes wp)?
+	(visibility sp)? tk-typedef identifier (wp class-template-params)?
+	(wp tk-colon wp type)?
+	(wp tk-semicolon)?
+
+
+
+// --- SWITCH ---
+
+switch-case: notext
+	tk-case expr wp tk-colon wp expr (wp tk-semicolon)?
+
+switch-default: notext
+	tk-default tk-colon wp expr (wp tk-semicolon)?
+
+switch-expr: notext
+	expr
+
+switch: notext
+	tk-switch
+	(
+		switch-expr wp tk-on
+		(
+			tk-brace-open
+			(wp (switch-case | switch-default))* wp
+			tk-brace-close
+		)
+		| error-eol
+	)
+	| error-eol
+
+
+
+scope: notext
+	tk-brace-open wp
+	(wp [^}]^ expr-with-semicolon)* wp tk-brace-close
+
+
+
+
+
+// --- CLASSDEF ---
+
+class-inherits: notext
+	tk-colon wp type
+
+class-inherits-copy: notext
+	tk-equal wp type
+
+class-visibility: notext
+	visibility tk-colon
+
+class-body: notext
+	tk-brace-open wp
+	(wp [^}]^ (class-visibility | expr-with-semicolon))* wp
+	tk-brace-close
+
+class: notext important
+	(attributes wp)?
+	(visibility sp)?
+	tk-class
+		(wp symbol-name)?
+		(wp class-template-params)?
+		(wp (class-inherits | class-inherits-copy))?
+	wp (class-body | object) | error-eol
+
+
+
+
+
+// --- FUNCDEF ---
+
+func-body: notext
+	| return-inline
+	| scope
+	| error
+
+func-param-variadic: notext
+	'...'
+
+//func-param-defval: notext
+//	tk-equal wp expr | error-parenthese
+
+func-param-self: notext
+	'self' sp
+
+func-param: notext // follow rule 'var' - the begining is slightly different
+	wp
+	(attributes wp)?
+	func-param-self?
+	var-qualifier?
+	var-decl
+
+func-params-decl: notext hidden
+	func-param (wp tk-comma wp func-param | error-eol)*
+
+func-params: notext
+	tk-parenthese-open wp (((func-params-decl?) | error-parenthese)  wp tk-parenthese-close) | error-eol
+
+func-return-type: notext
+	tk-colon wp  (type | error-eol)
+
+func-qualifier: notext
+	(tk-class)
+
+function-kind-function: notext
+	(tk-function | tk-func) (symbol-name wp)?
+
+function-kind-view: notext
+	tk-view (symbol-name wp)?
+
+function-kind-opname:
+	| '()=' | '[]=' | '()' | '[]'
+	| [^ (:\t\n\r]+
+
+function-kind-operator: notext
+	tk-operator (function-kind-opname | error-parenthese-or-bracket) sp
+
+function-kind: notext
+	function-kind-function | function-kind-operator | function-kind-view
+
+function: notext, important
+	(attributes wp)?
+	(visibility wp)? (func-qualifier wp)?
+	function-kind wp
+	(
+		(class-template-params wp)?
+		(func-params wp)? (func-return-type wp)?
+		tk-semicolon | func-body
+	)
+	| error-eol
+
+
+
+
+
+
+
+// --- EXPR ---
+
+expr-with-semicolon: hidden
+	expr | error-semicolon (wp tk-semicolon)?
+
+expr: notext
+	expr-no-node
+
+expr-group: notext
+	expr-no-node
+
+expr-no-node: hidden
+	ex-stream (wp expr-stream)*
+
+expr-stream: notext
+	operator-stream wp ex-stream | error-semicolon
+ex-stream: hidden
+	ex-comparison (wp expr-comparison)*
+
+expr-comparison: notext
+	operator-comparison wp ex-comparison | error-semicolon
+ex-comparison: hidden
+	ex-assignment (wp expr-assignment)*
+
+expr-assignment: notext
+	operator-assignment wp ex-assignment | error-semicolon
+ex-assignment: hidden
+	ex-logic (wp expr-logic)*
+
+
+expr-logic: notext
+	operator-logic wp ex-logic | error-semicolon
+ex-logic: hidden
+	ex-add (wp expr-add)*
+
+
+expr-add: notext
+	operator-add wp ex-add | error-semicolon
+ex-add: hidden
+	ex-factor (wp expr-factor)*
+
+expr-factor: notext
+	operator-factor wp ex-factor | error-semicolon
+ex-factor: hidden
+	ex-power (wp expr-power)*
+
+expr-power: notext
+	operator-power sp ex-power | error-semicolon
+ex-power: hidden
+	ex-not
+
+expr-not: notext
+	operator-not sp ex-not | error-semicolon
+ex-not: hidden
+	expr-not | ex-compound
+
+
+ex-compound: hidden
+	// all expr which can not be continued without using groups (...)
+	| if
+	| new
+	| switch
+	| var
+	| for
+	| while
+	| do-while
+	| class
+	| typedef
+	| return
+	| each
+	| in
+	| intrinsic
+	| scope
+	| function
+	| ex-value
+
+ex-value: hidden
+	// all expr which can be continued
+	( (
+		| (tk-parenthese-open wp expr-group wp tk-parenthese-close)
+		| char-value
+		| typeof
+		| identifier
+		| number-def
+		| string
+		| dict
+		| interval
+		| array
+		| env-var
+		| object
+		| inspect
+		| ldo
+	)
+	expr-continuation?
+	)
+
+
+expr-continuation: notext hidden
+	// update type-decl if any modifications
+	wp
+	(expr-sub-dot | expr-sub-array | expr-call | expr-template)
+
+type-continuation: notext hidden
+	// update type-decl if any modifications
+	wp
+	(type-sub-dot | expr-type-template)
+
+
+//expr-sub: notext
+//	ex-value
+
+expr-sub-dot: notext
+	tk-dot (wp identifier  expr-continuation?) | error-semicolon
+
+expr-sub-array: notext
+	interval | array   expr-continuation?
+
+expr-template: notext
+	call-template-decl expr-continuation?
+
+expr-type-template: notext
+	call-template-decl type-continuation?
+
+expr-call: notext hidden
+	call expr-continuation?
+
+type-sub-dot: notext
+	tk-dot (wp identifier  type-continuation?) | error-semicolon
+
+
+
+
+
+
+
+
+
+
+start: notext
+	shebang?
+	wp
+	// uses-list?
+	namespace?
+	(wp expr-with-semicolon)*
+	wp
