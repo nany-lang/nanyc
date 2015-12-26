@@ -115,16 +115,6 @@ set(CMAKE_CXX_FLAGS_DEBUG   "${YN_FLAGS_CXX_DEBUG}")
 set(CMAKE_CXX_FLAGS_RELEASE "${YN_FLAGS_CXX_RELEASE}")
 
 
-#
-# config.h
-#
-message(STATUS "generating config.h")
-if (NOT EXISTS "config.h")
-	configure_file("cmake/config.h.cmake" "config.h")
-else()
-	nmessage("ignoring config.h: already exists")
-endif()
-
 
 
 
