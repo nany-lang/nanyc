@@ -1,28 +1,23 @@
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+# hidden / vim files
+.*
+# Ninja files
+*.ninja
+# Visual Studio
+Debug
+Release
 
-# Precompiled Headers
-*.gch
-*.pch
+a.out
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
+# CMake stuff
+CMakeFiles
+Makefile
+CMakeCache.txt
+src/ProfileBuild.cmake
+src/build/
+cmake_install.cmake
 
-# Fortran module files
-*.mod
+# Nany generated files
+.nanyc
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
+# OSX Debug
+*.dSYM
