@@ -1,0 +1,13 @@
+// Global settings for compiling Nany Compiler
+// (both CMake & nany)
+
+// <major>.<minor>.<patch>-<prerelease>+<metadata>
+version_major: 0
+version_minor: 1
+version_patch: 0
+version_prerelease: beta
+version_metadata:
+
+// Web site
+website_url: http://nany.io
+contact: contact@nany.io
