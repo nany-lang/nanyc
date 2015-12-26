@@ -1,0 +1,3 @@
+[submodule "src/bootstrap/ext/yuni"]
+	path = src/bootstrap/ext/yuni
+	url = https://git.iwi.me/yuni/yuni.git
