@@ -234,7 +234,7 @@ namespace // anonymous
 
 
 
-	static bool batchCheckIfFilenamesConformToGrammar(String::Vector& filenames, bool errorsOnly)
+	static bool batchCheckIfFilenamesConformToGrammar(String::Vector& filenames, bool printAll)
 	{
 		Report logs;
 		if (not ExpandFilelist(logs, filenames))
@@ -250,9 +250,14 @@ namespace // anonymous
 			bool success = nany_utility_validator_check_file_n(filename.c_str(), filename.size());
 			duration = DateTime::NowMilliSeconds() - start;
 
+			String barefilename;
+			IO::ExtractFileName(barefilename, filename);
+			bool expected = (barefilename.startsWith("ok-"));
+			success = (success == expected);
+
 			if (success and duration < 300)
 			{
-				if (not errorsOnly)
+				if (printAll)
 					logs.info() << AnyString{filename, commonFolder} << " [" << duration << "ms]";
 				return true;
 			}
@@ -280,7 +285,7 @@ int main(int argc, char** argv)
 	// all input filenames
 	String::Vector filenames;
 	// errors only
-	bool errorsOnly = false;
+	bool printAll = false;
 	// no colors
 	bool noColors = false;
 
@@ -298,7 +303,7 @@ int main(int argc, char** argv)
 		options.addFlag(noColors, ' ', "no-color", "Disable color output");
 
 		// errors only
-		options.addFlag(errorsOnly, ' ', "errors-only", "Only print errors");
+		options.addFlag(printAll, ' ', "print-all", "Print all tests");
 
 		// HELP
 		// help
@@ -337,7 +342,7 @@ int main(int argc, char** argv)
 
 
 	// Print AST or check for Nany Grammar
-	bool success = batchCheckIfFilenamesConformToGrammar(filenames, errorsOnly);
+	bool success = batchCheckIfFilenamesConformToGrammar(filenames, printAll);
 	return success ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
