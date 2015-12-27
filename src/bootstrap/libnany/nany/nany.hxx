@@ -57,13 +57,6 @@ inline nybool_t  nany_utility_validator_check_file(const char* filename)
 }
 
 
-inline nytarget_type_t  nany_cstring_to_target_type(const char* text)
-{
-	size_t length = (text ? strlen(text) : 0u);
-	return nany_cstring_to_target_type_n(text, length);
-}
-
-
 inline nyvisibility_t  nany_cstring_to_visibility(const char* text)
 {
 	size_t length = (text ? (uint32_t) strlen(text) : 0u);

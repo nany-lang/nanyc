@@ -563,17 +563,6 @@ inline nybool_t nany_utility_validator_check_file(const char* filename);
 */
 NY_EXPORT nybool_t nany_utility_validator_check_file_n(const char* filename, size_t length);
 
-/*!
-** \brief Convert a C-String into a target type
-** \param text Arbitrary text (may contains spaces at the end of the begining)
-*/
-inline nytarget_type_t  nany_cstring_to_target_type(const char* text);
-/*!
-** \brief Convert a C-String into a target type (with length provided)
-** \param text Arbitrary text (may contains spaces at the end of the begining)
-*/
-NY_EXPORT nytarget_type_t  nany_cstring_to_target_type_n(const char* text, size_t length);
-
 
 /*!
 ** \brief Convert a C-String representing a visibility level
