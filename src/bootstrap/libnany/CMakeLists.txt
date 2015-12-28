@@ -131,7 +131,10 @@ addsrc(
 	GROUP "details/vm"
 	FILES
 	"details/vm/vm.cpp"
-	"details/vm/backtrace.h"
+	"details/vm/memchecker.h"
+	"details/vm/memchecker.cpp"
+	"details/vm/stacktrace.h"
+	"details/vm/stacktrace.cpp"
 	"details/vm/vm.h")
 
 

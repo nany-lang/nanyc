@@ -1,37 +1,24 @@
 #include "vm.h"
 #include "details/ir/isa/data.h"
 #include "details/atom/atom.h"
-#include "backtrace.h"
+#include "stacktrace.h"
+#include "memchecker.h"
 #include <iostream>
 
 using namespace Yuni;
 
-//! Memory leaks
-#ifndef NDEBUG
-#define NANY_VM_WITH_MEMORY_LEAKS_DETECTION 1
-#else
-#define NANY_VM_WITH_MEMORY_LEAKS_DETECTION 0
-#endif
-
 //! Print opcodes executed by the vm
 #define NANY_VM_PRINT_OPCODES 0
 
-//! Keep stack traces
-#define NANY_VM_STACK_TRACES 1
 
 
 
-
-
-#if NANY_VM_WITH_MEMORY_LEAKS_DETECTION != 0
-#define VM_CHECK_POINTER(P,LVID) do { if (!(P) or ownedPointers.count(P) == 0) { \
+#define VM_CHECK_POINTER(P,LVID) do { if (YUNI_UNLIKELY(not memchecker.has((P)))) { \
 	/*assert(false and "invalid pointer");*/ \
 	throw (String{"invalid pointer "} << (P) << " not found, opc: " << (Nany::IR::ISA::print(program.get(), operands, &map)) \
-		<< '\n' << dumpBacktrace()); \
+		<< '\n' << stacktrace.dump(map)); \
 	} } while (0)
-#else
-#define VM_CHECK_POINTER(P,LVID)
-#endif
+
 
 
 #if NANY_VM_PRINT_OPCODES != 0
@@ -58,12 +45,10 @@ namespace VM
 		{
 		public:
 			Engine(const AtomMap& map, nycontext_t&, const IR::Program& program);
+			~Engine();
 
 			uint64_t call(const IR::Program& program);
 
-			void checkForMemoryLeaks() const;
-
-			String dumpBacktrace() const;
 
 		public:
 			//! Registers for the current stack frame
@@ -74,18 +59,22 @@ namespace VM
 			//! all pushed parameters
 			uint64_t funcparams[Config::maxPushedParameters];
 
-			nycontext_t& context;
-			std::reference_wrapper<const IR::Program> program;
-			const AtomMap& map;
+			//! Stack trace
+			Stacktrace<true> stacktrace;
 
 			#ifndef NDEBUG
-			uint32_t stackframeSize = 0;
-			uint32_t stackframe = 0;
+			//! Total number of registers in the current frame
+			uint32_t registerCount = 0;
 			#endif
 
-			#if NANY_VM_STACK_TRACES != 0
-			Stack::List stack;
-			#endif
+			//! Atom collection references
+			const AtomMap& map;
+
+			//! Source program
+			std::reference_wrapper<const IR::Program> program;
+
+			//! User context
+			nycontext_t& context;
 
 			//! Reference to the current iterator
 			const IR::Instruction** cursor = nullptr;
@@ -107,68 +96,34 @@ namespace VM
 			void visit(const IR::ISA::Operand<IR::ISA::Op::storeConstant>&);
 			void visit(const IR::ISA::Operand<IR::ISA::Op::store>&);
 			void visit(const IR::ISA::Operand<IR::ISA::Op::storeText>&);
-			#ifndef NDEBUG // accept those opcode for debugging purposes
+
+			// accept those opcode for debugging purposes
 			void visit(const IR::ISA::Operand<IR::ISA::Op::comment>&) {}
 			void visit(const IR::ISA::Operand<IR::ISA::Op::scope>&) {}
 			void visit(const IR::ISA::Operand<IR::ISA::Op::end>&) {}
-			#endif
 			template<enum IR::ISA::Op O> void visit(const IR::ISA::Operand<O>& operands);
 
 			void destroy(uint64_t* object, uint32_t dtorid, uint32_t instanceid);
 			void call(uint32_t retlvid, uint32_t atomfunc, uint32_t instanceid);
 
 		private:
-			#if NANY_VM_WITH_MEMORY_LEAKS_DETECTION != 0
-			std::unordered_map<uint64_t*,uint64_t> ownedPointers;
-			#endif
+			MemChecker<true> memchecker;
+
 		}; // class Engine
 
 
 
 
 		inline Engine::Engine(const AtomMap& map, nycontext_t& context, const IR::Program& program)
-			: context(context)
+			: map(map)
 			, program(std::cref(program))
-			, map(map)
+			, context(context)
 		{}
 
 
-		inline String Engine::dumpBacktrace() const
+		inline Engine::~Engine()
 		{
-			#if NANY_VM_STACK_TRACES != 0
-			return stack.dump(map);
-			#else
-			return String{};
-			#endif
-		}
-
-
-		inline void Engine::checkForMemoryLeaks() const
-		{
-			#if NANY_VM_WITH_MEMORY_LEAKS_DETECTION != 0
-			if (unlikely(not ownedPointers.empty()))
-			{
-				String msg;
-				msg.reserve(64 + (uint32_t) ownedPointers.size() * 36); // arbitrary
-
-				msg << "\n\n=== nany vm: memory leaks detected in ";
-				msg << ownedPointers.size() << " blocks ===\n";
-				std::unordered_map<uint64_t, uint64_t> loses;
-				for (auto& pair: ownedPointers)
-					loses[pair.second]++;
-
-				for (auto& pair: loses)
-				{
-					msg << "    block " << pair.first << " bytes * " << pair.second;
-					msg << " = ";
-					msg << (pair.second * pair.first);
-					msg << " bytes\n";
-				}
-
-				msg << '\n';
-				context.console.write_stderr(&context, msg.c_str(), msg.size());
-			}
-			#endif
+			memchecker.printLeaksIfAny(context);
 		}
 
 
@@ -197,27 +152,22 @@ namespace VM
 
 			// sandbox release
 			context.memory.release(&context, object, classsizeof);
-
-			#if NANY_VM_WITH_MEMORY_LEAKS_DETECTION != 0
-			ownedPointers.erase(object);
-			#endif
+			memchecker.forget(object);
 		}
 
 
 		inline void Engine::call(uint32_t retlvid, uint32_t atomfunc, uint32_t instanceid)
 		{
-			assert(retlvid < stackframeSize);
+			assert(retlvid < registerCount);
 			// save the current stack frame
 			auto* storestackptr = registers;
 			auto storeprogram = program;
 			auto* storecursor = cursor;
 			#ifndef NDEBUG
-			auto  storestckfrmsize = stackframeSize;
+			auto  storestckfrmsize = registerCount;
 			#endif
 
-			#if NANY_VM_STACK_TRACES != 0
-			stack.push(atomfunc, instanceid);
-			#endif
+			stacktrace.push(atomfunc, instanceid);
 
 			// call
 			uint64_t ret = call(map.program(atomfunc, instanceid));
@@ -228,11 +178,9 @@ namespace VM
 			program = storeprogram;
 			cursor = storecursor;
 			#ifndef NDEBUG
-			stackframeSize = storestckfrmsize;
+			registerCount = storestckfrmsize;
 			#endif
-			#if NANY_VM_STACK_TRACES != 0
-			stack.pop();
-			#endif
+			stacktrace.pop();
 		}
 
 
@@ -240,7 +188,7 @@ namespace VM
 		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::ref>& operands)
 		{
 			VM_PRINT_OPCODE(operands);
-			assert(operands.lvid < stackframeSize);
+			assert(operands.lvid < registerCount);
 
 			uint64_t* object = reinterpret_cast<uint64_t*>(registers[operands.lvid]);
 			VM_CHECK_POINTER(object, operands);
@@ -251,7 +199,7 @@ namespace VM
 		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::unref>& operands)
 		{
 			VM_PRINT_OPCODE(operands);
-			assert(operands.lvid < stackframeSize);
+			assert(operands.lvid < registerCount);
 
 			uint64_t* object = reinterpret_cast<uint64_t*>(registers[operands.lvid]);
 			VM_CHECK_POINTER(object, operands);
@@ -263,7 +211,7 @@ namespace VM
 		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::dispose>& operands)
 		{
 			VM_PRINT_OPCODE(operands);
-			assert(operands.lvid < stackframeSize);
+			assert(operands.lvid < registerCount);
 
 			uint64_t* object = reinterpret_cast<uint64_t*>(registers[operands.lvid]);
 			VM_CHECK_POINTER(object, operands);
@@ -275,7 +223,7 @@ namespace VM
 		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::stackalloc>& operands)
 		{
 			VM_PRINT_OPCODE(operands);
-			assert(operands.lvid < stackframeSize);
+			assert(operands.lvid < registerCount);
 			(void) operands;
 		}
 
@@ -283,58 +231,54 @@ namespace VM
 		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::memalloc>& operands)
 		{
 			VM_PRINT_OPCODE(operands);
-			assert(operands.lvid < stackframeSize);
-			assert(operands.regsize < stackframeSize);
+			assert(operands.lvid < registerCount);
+			assert(operands.regsize < registerCount);
 
-			uint64 size = registers[operands.regsize];
+			auto size = registers[operands.regsize];
 			size += sizeof(uint64_t); // reference counter
 
 			uint64_t* pointer = (uint64_t*) context.memory.allocate(&context, size);
 			if (unlikely(!pointer))
 				throw std::bad_alloc();
 
-			#if NANY_VM_WITH_MEMORY_LEAKS_DETECTION != 0
+			#ifndef NDEBUG
 			memset(pointer, 0xEF, size);
 			#endif
 
 			pointer[0] = 0; // init ref counter
 			registers[operands.lvid] = reinterpret_cast<uint64_t>(pointer);
 
-			#if NANY_VM_WITH_MEMORY_LEAKS_DETECTION != 0
-			ownedPointers.insert(std::make_pair(pointer, size));
-			#endif
+			memchecker.hold(pointer, static_cast<size_t>(size));
 		}
 
 
 		void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::memfree>& operands)
 		{
 			VM_PRINT_OPCODE(operands);
-			assert(operands.lvid < stackframeSize);
-			assert(operands.regsize < stackframeSize);
+			assert(operands.lvid < registerCount);
+			assert(operands.regsize < registerCount);
 
 			uint64_t* object = reinterpret_cast<uint64_t*>(registers[operands.lvid]);
 			VM_CHECK_POINTER(object, operands);
 			uint64 size = registers[operands.regsize];
 			size += sizeof(uint64_t); // reference counter
 
-			#if NANY_VM_WITH_MEMORY_LEAKS_DETECTION != 0
-			if (size != ownedPointers[object])
-				throw (String{"pointer size mismatch: got "} << size << ", expected " << ownedPointers[object]);
+			if (YUNI_UNLIKELY(not memchecker.checkObjectSize(object, static_cast<size_t>(size))))
+				throw (String{"pointer "} << (void*) object << " size mismatch: got " << size);
+
+			#ifndef NDEBUG
 			memset(object, 0xCD, size);
 			#endif
 
 			context.memory.release(&context, object, size);
-
-			#if NANY_VM_WITH_MEMORY_LEAKS_DETECTION != 0
-			ownedPointers.erase(object);
-			#endif
+			memchecker.forget(object);
 		}
 
 
 		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::push>& operands)
 		{
 			VM_PRINT_OPCODE(operands);
-			assert(operands.lvid < stackframeSize);
+			assert(operands.lvid < registerCount);
 			funcparams[funcparamCount++] = registers[operands.lvid];
 		}
 
@@ -342,7 +286,7 @@ namespace VM
 		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::ret>& operands)
 		{
 			VM_PRINT_OPCODE(operands);
-			assert(operands.lvid < stackframeSize);
+			assert(operands.lvid < registerCount);
 			retRegister = registers[operands.lvid];
 			program.get().invalidateCursor(*cursor);
 		}
@@ -351,8 +295,8 @@ namespace VM
 		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::store>& operands)
 		{
 			VM_PRINT_OPCODE(operands);
-			assert(operands.lvid   < stackframeSize);
-			assert(operands.source < stackframeSize);
+			assert(operands.lvid   < registerCount);
+			assert(operands.source < registerCount);
 			registers[operands.lvid] = registers[operands.source];
 		}
 
@@ -360,7 +304,7 @@ namespace VM
 		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::storeText>& operands)
 		{
 			VM_PRINT_OPCODE(operands);
-			assert(operands.lvid   < stackframeSize);
+			assert(operands.lvid   < registerCount);
 			registers[operands.lvid] = reinterpret_cast<uint64_t>(program.get().stringrefs[operands.text].c_str());
 		}
 
@@ -368,7 +312,7 @@ namespace VM
 		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::storeConstant>& operands)
 		{
 			VM_PRINT_OPCODE(operands);
-			assert(operands.lvid < stackframeSize);
+			assert(operands.lvid < registerCount);
 			registers[operands.lvid] = operands.value.u64;
 		}
 
@@ -376,7 +320,7 @@ namespace VM
 		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::classdefsizeof>& operands)
 		{
 			VM_PRINT_OPCODE(operands);
-			assert(operands.lvid < stackframeSize);
+			assert(operands.lvid < registerCount);
 			assert(map.findAtom(operands.type) != nullptr);
 			registers[operands.lvid] = map.findAtom(operands.type)->runtimeSizeof();
 		}
@@ -384,7 +328,7 @@ namespace VM
 
 		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::call>& operands)
 		{
-			assert(operands.lvid < stackframeSize);
+			assert(operands.lvid < registerCount);
 			VM_PRINT_OPCODE(operands);
 			call(operands.lvid, operands.ptr2func, operands.instanceid);
 		}
@@ -392,8 +336,8 @@ namespace VM
 
 		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::fieldset>& operands)
 		{
-			assert(operands.self < stackframeSize);
-			assert(operands.lvid < stackframeSize);
+			assert(operands.self < registerCount);
+			assert(operands.lvid < registerCount);
 
 			uint64_t* object = reinterpret_cast<uint64_t*>(registers[operands.self]);
 			VM_CHECK_POINTER(object, operands);
@@ -403,8 +347,8 @@ namespace VM
 
 		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::fieldget>& operands)
 		{
-			assert(operands.self < stackframeSize);
-			assert(operands.lvid < stackframeSize);
+			assert(operands.self < registerCount);
+			assert(operands.lvid < registerCount);
 
 			uint64_t* object = reinterpret_cast<uint64_t*>(registers[operands.self]);
 			VM_CHECK_POINTER(object, operands);
@@ -423,33 +367,55 @@ namespace VM
 
 		uint64_t Engine::call(const IR::Program& callee)
 		{
-			const uint32_t framesize = callee.at<IR::ISA::Op::stacksize>(0).add + 1; // 1-based
-			#ifndef NDEBUG
-			++stackframe;
-			assert(framesize < 1024 * 1024);
-			stackframeSize = framesize;
-			assert(callee.at<IR::ISA::Op::stacksize>(0).opcode == (uint32_t) IR::ISA::Op::stacksize);
-			#endif
+			try
+			{
+				const uint32_t framesize = callee.at<IR::ISA::Op::stacksize>(0).add + 1; // 1-based
+				#ifndef NDEBUG
+				assert(framesize < 1024 * 1024);
+				registerCount = framesize;
+				assert(callee.at<IR::ISA::Op::stacksize>(0).opcode == (uint32_t) IR::ISA::Op::stacksize);
+				#endif
 
-			uint64_t stackvalues[framesize];
-			#if NANY_VM_WITH_MEMORY_LEAKS_DETECTION != 0
-			memset(stackvalues, 0xDE, sizeof(stackvalues));
-			#endif
-			stackvalues[0] = 0;
-			registers = stackvalues;
-			program = std::cref(callee);
+				uint64_t stackvalues[framesize];
+				#ifndef NDEBUG
+				memset(stackvalues, 0xDE, sizeof(stackvalues));
+				#endif
 
-			// retrieve parameters for the func
-			for (uint32_t i = 0; i != funcparamCount; ++i)
-				stackvalues[i + 2] = funcparams[i]; // 2-based
-			funcparamCount = 0;
+				stackvalues[0] = 0;
+				registers = stackvalues;
+				program = std::cref(callee);
 
-			callee.each(*this, 1); // offset: 1, avoid blueprint pragma
+				// retrieve parameters for the func
+				for (uint32_t i = 0; i != funcparamCount; ++i)
+					stackvalues[i + 2] = funcparams[i]; // 2-based
+				funcparamCount = 0;
 
-			#ifndef NDEBUG
-			--stackframe;
-			#endif
-			return retRegister;
+				callee.each(*this, 1); // offset: 1, avoid blueprint pragma
+				return retRegister;
+			}
+			catch (const std::bad_alloc&)
+			{
+				context.memory.on_not_enough_memory(&context);
+			}
+			catch (const std::exception& e)
+			{
+				String txt; txt << "error: ICE: " << e.what() << '\n';
+				context.console.write_stderr(&context, txt.c_str(), txt.size());
+			}
+			catch (const String& msg)
+			{
+				String txt; txt << "error: ICE: " << msg << '\n';
+				context.console.write_stderr(&context, txt.c_str(), txt.size());
+			}
+			catch (...)
+			{
+				String txt; txt << "error: ICE: unexpected error\n";
+				context.console.write_stderr(&context, txt.c_str(), txt.size());
+			}
+
+			const auto& txt = stacktrace.dump(map);
+			context.console.write_stderr(&context, txt.c_str(), txt.size());
+			return static_cast<uint64_t>(-1);
 		}
 
 
@@ -471,8 +437,6 @@ namespace VM
 			Engine engine{map, context, program};
 			returnvalue = engine.call(program);
 			success = true;
-
-			engine.checkForMemoryLeaks();
 		}
 		catch (const std::bad_alloc&)
 		{
@@ -490,7 +454,8 @@ namespace VM
 		}
 		catch (...)
 		{
-			String txt; txt << "error: ICE: unexpected error\n";
+			String txt;
+			txt << "error: ICE: unexpected error\n";
 			context.console.write_stderr(&context, txt.c_str(), txt.size());
 		}
 
