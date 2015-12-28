@@ -23,3 +23,7 @@ script:
     - cd src/bootstrap
     - cmake . -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DCOMMIT="${TRAVIS_COMMIT}"
     - make -j ${NPROC}
+notifications:
+    slack:
+        rooms:
+            - nany-lang:NDhqNi6nrPziAo9ciYkQy3h3#nany-qa
