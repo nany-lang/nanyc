@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+
+error() {
+	echo "error: $1"
+	status=1
+}
+die() {
+	error "$1"
+	exit 1
+}
+
+usage() {
+	echo "usage: <github repository> <remote branch>"
+	echo "ex:"
+	echo "    # apply-pr milipili/nany.git  remote-feature-branch"
+	exit 1
+}
+
+
+git="git"
+
+remote_github="$1"
+remote_branch="$2"
+status=0
+
+[ ! "${remote_github}x" = 'x' ] || usage
+[ ! "${remote_branch}x" = 'x' ] || usage
+
+pr_local_name="pr-merge-${USER}-$(date +%s)"
+"${git}" remote add "${pr_local_name}" "https://github.com/${remote_github}" \
+	|| die "failed to set the remote"
+
+"${git}" fetch "${pr_local_name}" \
+	|| die "failed to fetch"
+
+"${git}" merge "${pr_local_name}/${remote_branch}" \
+	|| die "failed to merge"
+
+"${git}" remote remove "${pr_local_name}"
+
+echo ${status}
