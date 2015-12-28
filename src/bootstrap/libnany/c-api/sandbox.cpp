@@ -55,8 +55,8 @@ static inline int fsync(int fd)
 
 extern "C" void nanysdbx_not_enough_memory(nycontext_t* ctx)
 {
-	constexpr const char* const msg = "error: not enough memory";
-	size_t len = strlen(msg);
+	constexpr const char* const msg = "error: not enough memory\n";
+	auto len = strlen(msg);
 	ctx->console.write_stderr(ctx, msg, len);
 	ctx->console.flush_stderr(ctx);
 }
