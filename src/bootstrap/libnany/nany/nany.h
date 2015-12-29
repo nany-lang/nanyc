@@ -242,24 +242,17 @@ typedef enum /* nyerr_level_t */
 } nyerr_level_t;
 
 
-/*! Intrinsic definition */
-typedef struct nyintrinsic_t
+
+/*! Flags for intrinsic callbacks */
+typedef enum
 {
-	/*! name of the intrinsic (!! myname)*/
-	const char* name;
-	/*! return type */
-	nytype_t rettype;
+	nyintr_flag_default          = (1 << 0),
+	/*! The parameters will be used from another thread */
+	nyintr_flag_params_in_thread = (1 << 1),
+	/*! The callback will never return */
+	nyintr_flag_never_return     = (1 << 2),
 
-	/*! total number of parameters */
-	uint32_t paramcount;
-	/*! list of parameter types */
-	const nytype_t* parameters;
-	/*! C callback */
-	void* callback;
-}
-nyintrinsic_t;
-
-
+} nyintrinsic_flag_t;
 
 
 
@@ -476,6 +469,39 @@ NY_EXPORT nybool_t nany_report_print_stderr(const nyreport_t* report);
 
 /*! Print information about the nany library */
 NY_EXPORT nybool_t nany_report_add_compiler_headerinfo(nyreport_t* report);
+/*@}*/
+
+
+
+
+/*! \name Intrinsics */
+/*@{*/
+/*!
+** \briefe Register a new intrinsic function
+**
+** \param name Name of the intrinsic (ex: 'myprogram.hello.world')
+** \param flags List of flags (see nyintrinsic_flag_t). nyintr_flag_default or 0 if unsure
+** \param callback C callback at runtime
+** \param ret The return type
+** \param ret... List of parameter types, followed by 'nyt_void'
+** \return nytrue if the operation succeeded
+*/
+NY_EXPORT nybool_t
+nany_add_intrinsic(nycontext_t*, const char* name, uint32_t flags, void* callback, nytype_t ret, ...);
+
+/*!
+** \briefe Register a new intrinsic function
+**
+** \param name Name of the intrinsic (ex: 'myprogram.hello.world')
+** \param length Length of the intrinsic name
+** \param flags List of flags (see nyintrinsic_flag_t). nyintr_flag_default or 0 if unsure
+** \param callback C callback at runtime
+** \param ret The return type
+** \param ret... List of parameter types, followed by 'nyt_void'
+** \return nytrue if the operation succeeded
+*/
+NY_EXPORT nybool_t
+nany_add_intrinsic_n(nycontext_t*, const char* name, size_t length, uint32_t flags, void* callback, nytype_t ret, ...);
 /*@}*/
 
 

@@ -57,6 +57,9 @@ namespace Nany
 		//! Attached context
 		nycontext_t& usercontext;
 
+		//! All intrinsics
+		IntrinsicTable intrinsics;
+
 
 	private:
 		//! Copy constructor (import a template)
@@ -68,9 +71,6 @@ namespace Nany
 		CTarget::Ptr pDefaultTarget;
 		//! All other targets
 		std::unordered_map<AnyString, CTarget::Ptr> pTargets;
-
-		//! All intrinsics
-		IntrinsicTable pIntrinsics;
 
 		//! Queue service
 		Yuni::Job::QueueService::Ptr pQueueservice;

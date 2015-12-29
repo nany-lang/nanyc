@@ -21,7 +21,7 @@ namespace Nany
 
 	Context::Context(nycontext_t& context, const Context& rhs)
 		: usercontext(context)
-		, pIntrinsics(rhs.pIntrinsics)
+		, intrinsics(rhs.intrinsics)
 		, pQueueservice(rhs.pQueueservice)
 	{
 		// import targets

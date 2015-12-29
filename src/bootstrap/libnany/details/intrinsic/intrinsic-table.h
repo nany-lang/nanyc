@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <vector>
 #include <memory>
+#include <stdarg.h>
 
 
 
@@ -25,6 +26,8 @@ namespace Nany
 		** \brief Add a new intrinsic
 		*/
 		template<class T> bool add(const AnyString& name, T callback);
+
+		bool add(const AnyString& name, uint32_t flags, void* callback, nytype_t ret, va_list argp);
 
 		/*!
 		** \brief Get if an intrinsic exists
