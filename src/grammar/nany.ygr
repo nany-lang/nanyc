@@ -259,7 +259,7 @@ operator-add: // operators with priority like + - ...
 operator-factor: // operators with priority like * / ...
 	// transformed into a global func call
 	//| '!=' | '==' | '<=' | '>=' | ('<' [^<]^)  | ('>' [^>]^)
-	([*/] [^=]^) | 'mod'
+	([*/] [^=]^) | ('mod' sp)
 
 operator-stream: // operators with priority like << >>
 	// transformed into a global func call
@@ -906,12 +906,12 @@ ex-factor: hidden
 	ex-power (wp expr-power)*
 
 expr-power: notext
-	operator-power sp ex-power | error-semicolon
+	operator-power ex-power | error-semicolon
 ex-power: hidden
 	ex-not
 
 expr-not: notext
-	operator-not sp ex-not | error-semicolon
+	operator-not ex-not | error-semicolon
 ex-not: hidden
 	expr-not | ex-compound
 
