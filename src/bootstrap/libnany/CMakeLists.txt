@@ -288,6 +288,7 @@ addsrc(
 	"c-api/queueservice.cpp"
 	"c-api/report.cpp"
 	"c-api/sandbox.cpp"
+	"c-api/intrinsics.cpp"
 	"c-api/source.cpp"
 	"c-api/utilities.cpp"
 	"c-api/validator.cpp"

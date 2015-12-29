@@ -86,24 +86,27 @@ namespace Nany
 	template<class T>
 	inline bool IntrinsicTable::add(const AnyString& name, T callback)
 	{
+		if (YUNI_UNLIKELY(name.empty() or (0 == pByNames.count(name))))
+			return false;
+
 		typedef Yuni::Bind<T> B;
-		if (not name.empty())
+		if (YUNI_UNLIKELY(B::argumentCount > Config::maxPushedParameters))
+			return false;
+
+		pIntrinsics.emplace_back(new Intrinsic(name, reinterpret_cast<void*>(callback)));
+		auto& intrinsic = *(pIntrinsics.back());
+		pByNames.insert(std::make_pair(AnyString{intrinsic.name}, std::ref(intrinsic)));
+
+		// return type / parameters
+		if (B::hasReturnValue)
+			intrinsic.rettype = CTypeToNanyType<typename B::ReturnType>::type;
+
+		if (B::argumentCount > 0)
 		{
-			pIntrinsics.emplace_back(new Intrinsic(name));
-			auto& intrinsic = *(pIntrinsics.back());
-			pByNames.insert(std::make_pair(AnyString{intrinsic.name}, std::ref(intrinsic)));
-
-			// return type / parameters
-			if (B::hasReturnValue)
-				intrinsic.rettype = CTypeToNanyType<typename B::ReturnType>::type;
-
-			if (B::argumentCount > 0)
-				IntrinsicPushParameter<0, B::argumentCount, B>::push(intrinsic);
-			intrinsic.paramcount = static_cast<uint>(B::argumentCount);
-			intrinsic.callback = reinterpret_cast<void*>(callback);
-			return true;
+			IntrinsicPushParameter<0, B::argumentCount, B>::push(intrinsic);
+			intrinsic.paramcount = static_cast<uint32_t>(B::argumentCount);
 		}
-		return false;
+		return true;
 	}
 
 
