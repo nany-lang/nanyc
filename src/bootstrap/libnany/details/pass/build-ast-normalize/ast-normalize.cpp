@@ -294,6 +294,7 @@ namespace Nany
 									}
 
 									// do not re-parent nodes related to the structure of expressions
+									// ('operators as exceptions')
 									case Nany::rgOperatorAll:
 									case Nany::rgOperatorKind:
 									case Nany::rgOperatorAdd:
@@ -301,6 +302,7 @@ namespace Nany
 									case Nany::rgOperatorComparison:
 									case Nany::rgOperatorFactor:
 									case Nany::rgOperatorLogic:
+									case Nany::rgOperatorLogicAnd:
 									case Nany::rgOperatorPower:
 									case Nany::rgOperatorNot:
 									case Nany::rgOperatorStream:
