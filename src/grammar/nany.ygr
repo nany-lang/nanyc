@@ -241,6 +241,7 @@ visibility:
 // If new rules are added, they should be added as exceptions when
 // normalizing expressions
 // (pass/build-ast-normalize/ast-normalize.cpp)
+// grep: 'operators as exceptions'
 
 operator-comparison:
 	// transformed into a global func call
@@ -270,10 +271,15 @@ operator-power: // operators with priority like ^
 	//| '!=' | '==' | '<=' | '>=' | ('<' [^<]^)  | ('>' [^>]^)
 	[~^] [^=]^
 
+operator-logic-and: // operators with priority like and, or...
+	// transformed into a global func call
+	//| '!=' | '==' | '<=' | '>=' | ('<' [^<]^)  | ('>' [^>]^)
+	'and' sp
+
 operator-logic: // operators with priority like and, or...
 	// transformed into a global func call
 	//| '!=' | '==' | '<=' | '>=' | ('<' [^<]^)  | ('>' [^>]^)
-	('and' | 'or') sp
+	'or' sp
 
 operator-not: // operators with priority like not
 	'not' sp
@@ -284,6 +290,7 @@ operator-all: hidden
 	| operator-assignment
 	| operator-factor
 	| operator-add
+	| operator-logic-and
 	| operator-logic
 	| operator-power
 	| operator-not
@@ -880,6 +887,11 @@ ex-assignment: hidden
 expr-logic: notext
 	operator-logic wp ex-logic | error-semicolon
 ex-logic: hidden
+	ex-logic-and (wp expr-logic-and)*
+
+expr-logic-and: notext
+	operator-logic-and wp ex-logic-and | error-semicolon
+ex-logic-and: hidden
 	ex-add (wp expr-add)*
 
 
