@@ -2,7 +2,7 @@
 #include "classdef-table-view.h"
 #include <yuni/core/tribool.h>
 #include "nany/nany.h"
-#include "libnany-config.h"
+#include "libnany-traces.h"
 #include <cassert>
 #include <iostream>
 

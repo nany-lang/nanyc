@@ -6,7 +6,7 @@
 #include "details/context/build-info.h"
 #include "details/atom/classdef-table-view.h"
 #include "details/reporting/report.h"
-#include "libnany-config.h"
+#include "libnany-traces.h"
 #include <memory>
 
 using namespace Yuni;

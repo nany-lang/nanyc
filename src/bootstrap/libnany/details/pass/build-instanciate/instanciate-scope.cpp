@@ -1,4 +1,5 @@
 #include "instanciate.h"
+#include "libnany-traces.h"
 
 using namespace Yuni;
 

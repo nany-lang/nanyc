@@ -5,7 +5,7 @@
 #include "details/atom/func-overload-match.h"
 #include "details/reporting/message.h"
 #include "details/utils/origin.h"
-#include "libnany-config.h"
+#include "libnany-traces.h"
 
 using namespace Yuni;
 

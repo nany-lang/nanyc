@@ -4,6 +4,7 @@
 #include "details/context/build-info.h"
 #include "details/reporting/report.h"
 #include "libnany-config.h"
+#include "libnany-traces.h"
 #include <functional>
 
 using namespace Yuni;

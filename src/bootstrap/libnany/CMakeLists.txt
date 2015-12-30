@@ -11,6 +11,13 @@ else()
 	nmessage("ignoring libnany-config.h ${libnany_config_folder}/libnany-config.h (already exists)")
 endif()
 
+if (NOT EXISTS "${libnany_config_folder}/libnany-traces.h")
+	nmessage("generating 'libnany-traces.h' in ${libnany_config_folder}/libnany-traces.h")
+	configure_file("traces.h.cmake" "${libnany_config_folder}/libnany-traces.h" @ONLY)
+else()
+	nmessage("ignoring libnany-traces.h ${libnany_config_folder}/libnany-traces.h (already exists)")
+endif()
+
 
 macro(addsrc)
 	set(options)
