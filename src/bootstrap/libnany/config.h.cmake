@@ -67,6 +67,20 @@ namespace Config
 		//! Enable all traces
 		static constexpr bool all = false;
 
+
+
+		//! Print all AST
+		static constexpr bool ast = all or false;
+
+		//! Print AST before normalization
+		static constexpr bool printASTBeforeNormalize = ast or false;
+
+		//! Print AST after normalization
+		static constexpr bool printASTAfterNormalize  = ast or false;
+
+
+
+
 		//! Print ATOM table
 		static constexpr bool printAtomTable = all or false;
 

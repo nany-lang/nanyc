@@ -596,10 +596,24 @@ namespace Nany
 
 		if (parser.root and (parser.root->rule == Nany::rgStart))
 		{
+			if (Config::Traces::printASTBeforeNormalize)
+			{
+				Clob out;
+				Node::Export(out, *parser.root);
+				report.trace() << "before normalization:\n" << out;
+			}
+
 			ASTReplicator cloner(ast, report);
 			success = cloner.run(*parser.root, *(buildinfo.parsing.rootnode));
 			// retrieve data
 			buildinfo.parsing.nmspc.swap(cloner.nmspc);
+
+			if (Config::Traces::printASTAfterNormalize)
+			{
+				Clob out;
+				Node::Export(out, *(buildinfo.parsing.rootnode));
+				report.trace() << "after normalization:\n" << out;
+			}
 		}
 		return success;
 	}
