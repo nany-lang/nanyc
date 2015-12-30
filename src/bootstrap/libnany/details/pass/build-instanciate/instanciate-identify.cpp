@@ -126,13 +126,30 @@ namespace Instanciate
 					if (name[1] == '_')
 					{
 						multipleResults.clear();
-						nytype_t type = nany_cstring_to_type_n(name.c_str(), (uint)name.size());
-						if (unlikely(type == nyt_void))
-							return complainUnknownBuiltinType(name);
+						frame.resolvePerCLID[cdef.clid].clear(); // just in case
 
-						frame.resolvePerCLID[cdef.clid].clear();
-						cdeftable.substitute(operands.lvid).mutateToBuiltin(type);
-						return true;
+						if (name == "__false")
+						{
+							cdeftable.substitute(operands.lvid).mutateToBuiltin(nyt_bool);
+							out.emitStore_u64(operands.lvid, 0);
+							return true;
+						}
+						if (name == "__true")
+						{
+							cdeftable.substitute(operands.lvid).mutateToBuiltin(nyt_bool);
+							out.emitStore_u64(operands.lvid, 1);
+							return true;
+						}
+						else
+						{
+							nytype_t type = nany_cstring_to_type_n(name.c_str(), (uint)name.size());
+							if (unlikely(type == nyt_void))
+								return complainUnknownBuiltinType(name);
+
+							cdeftable.substitute(operands.lvid).mutateToBuiltin(type);
+							return true;
+						}
+						return false;
 					}
 					break;
 				}
