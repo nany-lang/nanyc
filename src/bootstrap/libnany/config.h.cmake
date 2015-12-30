@@ -10,37 +10,6 @@
 
 
 
-
-/*! Nany default website */
-#define LIBNANY_WEBSITE  "@nany_website_url@"
-
-/*! C++ compiler */
-#define LIBNANY_BOOTSTRAP_CXX_COMPILER   "@CMAKE_CXX_COMPILER@"
-
-
-/*! Nany version version major */
-#define LIBNANY_VERSION_MAJOR  @nany_version_major@
-
-/*! Nany version version minor */
-#define LIBNANY_VERSION_MINOR  @nany_version_minor@
-
-/*! Nany version version patch */
-#define LIBNANY_VERSION_PATCH  @nany_version_patch@
-
-/*! Nany version prerelease */
-#define LIBNANY_VERSION_PRERELEASE "@nany_version_prerelease@"
-
-/*! Nany version metadata */
-#define LIBNANY_VERSION_METADATA "@nany_version_metadata@"
-
-/*! Nany version string */
-#define LIBNANY_VERSION_STR "@nany_version_string@"
-
-
-
-
-#ifdef __cplusplus
-
 namespace Nany
 {
 namespace Config
@@ -65,9 +34,6 @@ namespace Config
 
 
 
-
 } // namespace Config
 } // namespace Nany
-
-#endif /* C++ */
 /* vim: set ft=cpp: */

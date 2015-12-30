@@ -5,7 +5,7 @@
 #include <yuni/core/math.h>
 #include "details/context/context.h"
 #include "details/reporting/report.h"
-#include "libnany-config.h"
+#include "libnany-version.h"
 #include "common-debuginfo.hxx"
 #include <iostream>
 

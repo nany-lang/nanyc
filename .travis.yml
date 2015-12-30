@@ -21,7 +21,7 @@ install:
 script:
     - env
     - cd src/bootstrap
-    - cmake . -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DCOMMIT="${TRAVIS_COMMIT}"
+    - cmake . -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
     - make -j ${NPROC}
 notifications:
     slack:

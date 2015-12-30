@@ -4,6 +4,15 @@ project(libnany)
 get_filename_component(libnany_config_folder "${CMAKE_CURRENT_BINARY_DIR}" REALPATH)
 file(MAKE_DIRECTORY "${libnany_config_folder}")
 
+if (NOT "${nany_version_string}" STREQUAL "${__LIBNANY_CONFIG_HEADER_CACHE}"
+	OR NOT EXISTS "${libnany_config_folder}/libnany-version.h")
+	nmessage("generating 'libnany-version.h' in ${libnany_config_folder}/libnany-version.h")
+	configure_file("version.h.cmake" "${libnany_config_folder}/libnany-version.h" @ONLY)
+	set(__LIBNANY_CONFIG_HEADER_CACHE "${nany_version_string}" CACHE STRING "" FORCE)
+else()
+	nmessage("ignoring libnany-version.h ${libnany_config_folder}/libnany-version.h (cache)")
+endif()
+
 if (NOT EXISTS "${libnany_config_folder}/libnany-config.h")
 	nmessage("generating 'libnany-config.h' in ${libnany_config_folder}/libnany-config.h")
 	configure_file("config.h.cmake" "${libnany_config_folder}/libnany-config.h" @ONLY)
@@ -351,7 +360,9 @@ add_library(libnany ${mode_libnany}
 	details/fwd.h
 
 	# misc
-	"${libnany_config_folder}/libnany-config.h")
+	"${libnany_config_folder}/libnany-config.h"
+	"${libnany_config_folder}/libnany-traces.h"
+	"${libnany_config_folder}/libnany-version.h")
 
 
 

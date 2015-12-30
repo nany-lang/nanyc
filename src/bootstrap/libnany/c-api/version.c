@@ -1,5 +1,5 @@
 #include "nany/nany.h"
-#include "libnany-config.h"
+#include "libnany-version.h"
 
 
 

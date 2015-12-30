@@ -3,7 +3,7 @@
 #include <yuni/io/file.h>
 #include <yuni/core/math.h>
 #include <yuni/core/process/program.h>
-#include "libnany-config.h"
+#include "libnany-version.h"
 #include "common-debuginfo.hxx"
 #include <string.h>
 

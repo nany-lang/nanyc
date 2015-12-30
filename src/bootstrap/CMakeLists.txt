@@ -11,15 +11,16 @@ include(CMakeParseArguments)
 include("cmake/messages.cmake")
 
 nmessage("Nany Compiler Suite c++/bootstrap")
-include("cmake/utils.cmake")
-include("cmake/settings.cmake")
-
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "" OR (NOT "${CMAKE_BUILD_TYPE}" STREQUAL "release" AND NOT "${CMAKE_BUILD_TYPE}" STREQUAL "debug"))
 	# release by default
 	set(CMAKE_BUILD_TYPE "debug")
 endif()
 nmessage("configuration: ${CMAKE_BUILD_TYPE}")
+
+include("cmake/utils.cmake")
+include("cmake/settings.cmake")
+
 
 
 
