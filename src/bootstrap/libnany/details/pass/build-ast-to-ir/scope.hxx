@@ -137,14 +137,14 @@ namespace Producer
 	inline LVID Scope::createLocalBuiltinFloat64(const Node& node, nytype_t type, double value)
 	{
 		emitDebugpos(node);
-		return program().emitStackallocConstant(nextvar(), type, value);
+		return program().emitStackalloc_f64(nextvar(), type, value);
 	}
 
 
 	inline LVID Scope::createLocalBuiltinInt64(const Node& node, nytype_t type, yuint64 value)
 	{
 		emitDebugpos(node);
-		return program().emitStackallocConstant(nextvar(), type, value);
+		return program().emitStackalloc_u64(nextvar(), type, value);
 	}
 
 

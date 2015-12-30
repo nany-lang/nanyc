@@ -221,14 +221,14 @@ namespace IR
 	}
 
 
-	inline void Program::emitStoreConstant(uint32_t lvid, uint64_t value)
+	inline void Program::emitStore_u64(uint32_t lvid, uint64_t value)
 	{
 		auto& operands = emit<ISA::Op::storeConstant>();
 		operands.lvid  = lvid;
 		operands.value.u64 = value;
 	}
 
-	inline void Program::emitStoreConstant(uint32_t lvid, double value)
+	inline void Program::emitStore_f64(uint32_t lvid, double value)
 	{
 		auto& operands = emit<ISA::Op::storeConstant>();
 		operands.lvid  = lvid;
@@ -255,17 +255,17 @@ namespace IR
 	}
 
 
-	inline uint32_t Program::emitStackallocConstant(uint32_t lvid, nytype_t type, uint64_t value)
+	inline uint32_t Program::emitStackalloc_u64(uint32_t lvid, nytype_t type, uint64_t value)
 	{
 		emitStackalloc(lvid, type);
-		emitStoreConstant(lvid, value);
+		emitStore_u64(lvid, value);
 		return lvid;
 	}
 
-	inline uint32_t Program::emitStackallocConstant(uint32_t lvid, nytype_t type, double value)
+	inline uint32_t Program::emitStackalloc_f64(uint32_t lvid, nytype_t type, double value)
 	{
 		emitStackalloc(lvid, type);
-		emitStoreConstant(lvid, value);
+		emitStore_f64(lvid, value);
 		return lvid;
 	}
 

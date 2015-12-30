@@ -33,7 +33,7 @@ namespace Instanciate
 			else
 			{
 				uint64_t size = nany_type_sizeof(cdef.kind);
-				out.emitStoreConstant(operands.lvid, size);
+				out.emitStore_u64(operands.lvid, size);
 			}
 		}
 	}

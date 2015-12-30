@@ -15,7 +15,7 @@ namespace Instanciate
 	void ProgramBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::storeConstant>& operands)
 	{
 		assert(not atomStack.empty());
-		out.emitStoreConstant(operands.lvid, operands.value.u64);
+		out.emitStore_u64(operands.lvid, operands.value.u64);
 	}
 
 

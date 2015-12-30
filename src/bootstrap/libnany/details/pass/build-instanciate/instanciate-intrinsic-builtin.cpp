@@ -97,7 +97,7 @@ namespace Instanciate
 			if (canBeAcquired(objlvid))
 				out.emitStore(lvid, objlvid);
 			else
-				out.emitStoreConstant(lvid, (uint64_t) 0);
+				out.emitStore_u64(lvid, 0);
 		}
 		return true;
 	}
@@ -138,7 +138,7 @@ namespace Instanciate
 			else
 			{
 				uint64_t size = nany_type_sizeof(cdef.kind);
-				out.emitStoreConstant(lvid, size);
+				out.emitStore_u64(lvid, size);
 			}
 		}
 		return true;
