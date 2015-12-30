@@ -65,6 +65,13 @@ namespace IR
 		//! Get the upper limit
 		void invalidateCursor(Instruction*& cusror) const;
 
+		//! Go to the next label
+		void jumpToLabelForward(const Instruction*& cursor, uint32_t label) const;
+		//! Go to a previous label
+		void jumpToLabelBackward(const Instruction*& cursor, uint32_t label) const;
+
+
+
 		//! Allocate a new variable on the stack and get the register
 		uint32_t emitStackalloc(uint32_t lvid, nytype_t);
 		//! Allocate a new variable on the stack and assign a value to it and get the register
@@ -182,6 +189,9 @@ namespace IR
 
 		//! Emit a return opcode
 		void emitReturn(uint32_t lvid = 0);
+
+		//! Emit an unconditional jump
+		void emitJmp(uint32_t label);
 
 
 		//! Visit each instruction (const)

@@ -224,6 +224,19 @@ namespace // anonymous
 			printString(operands.text);
 		}
 
+
+		void print(const Operand<Op::label>& operands)
+		{
+			out << tabs << "label " << operands.label << ":";
+		}
+
+
+		void print(const Operand<Op::jmp>& operands)
+		{
+			out << tabs << "jmp " << operands.label;
+		}
+
+
 		void print(const Operand<Op::scope>&)
 		{
 			out << tabs << '{';

@@ -67,6 +67,9 @@ namespace VM
 			uint32_t registerCount = 0;
 			#endif
 
+			//! upper label id encountered so far
+			uint32_t upperLabelID = 0;
+
 			//! Atom collection references
 			const AtomMap& map;
 
@@ -96,6 +99,9 @@ namespace VM
 			void visit(const IR::ISA::Operand<IR::ISA::Op::storeConstant>&);
 			void visit(const IR::ISA::Operand<IR::ISA::Op::store>&);
 			void visit(const IR::ISA::Operand<IR::ISA::Op::storeText>&);
+
+			void visit(const IR::ISA::Operand<IR::ISA::Op::label>&);
+			void visit(const IR::ISA::Operand<IR::ISA::Op::jmp>&);
 
 			// accept those opcode for debugging purposes
 			void visit(const IR::ISA::Operand<IR::ISA::Op::comment>&) {}
@@ -353,6 +359,22 @@ namespace VM
 			uint64_t* object = reinterpret_cast<uint64_t*>(registers[operands.self]);
 			VM_CHECK_POINTER(object, operands);
 			registers[operands.lvid] = object[1 + operands.var];
+		}
+
+
+		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::label>& operands)
+		{
+			if (operands.label > upperLabelID)
+				upperLabelID = operands.label;
+		}
+
+
+		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::jmp>& operands)
+		{
+			if (operands.label > upperLabelID)
+				program.get().jumpToLabelForward(*cursor, operands.label);
+			else
+				program.get().jumpToLabelBackward(*cursor, operands.label);
 		}
 
 

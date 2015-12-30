@@ -449,6 +449,12 @@ namespace IR
 	}
 
 
+	inline void Program::emitJmp(uint32_t label)
+	{
+		emit<ISA::Op::jmp>().label = label;
+	}
+
+
 	inline void Program::emitQualifierRef(uint32_t lvid, bool flag)
 	{
 		auto& operands = emit<ISA::Op::qualifiers>();
@@ -517,6 +523,39 @@ namespace IR
 	inline void Program::invalidateCursor(Instruction*& cursor) const
 	{
 		cursor = pBody.get() + pSize;
+	}
+
+
+	inline void Program::jumpToLabelForward(const Instruction*& cursor, uint32_t label) const
+	{
+		auto* end = pBody.get() + pSize;
+		while (++cursor < end)
+		{
+			if (cursor->opcodes[0] == static_cast<uint32_t>(IR::ISA::Op::label))
+			{
+				auto& operands = reinterpret_cast<const IR::ISA::Operand<IR::ISA::Op::label>&>(*cursor);
+				if (operands.label == label)
+					return;
+			}
+		}
+		// not found - the cursor is alreayd invalidated
+	}
+
+
+	inline void Program::jumpToLabelBackward(const Instruction*& cursor, uint32_t label) const
+	{
+		auto* base = pBody.get();
+		while (cursor-- > base)
+		{
+			if (cursor->opcodes[0] == static_cast<uint32_t>(IR::ISA::Op::label))
+			{
+				auto& operands = reinterpret_cast<const IR::ISA::Operand<IR::ISA::Op::label>&>(*cursor);
+				if (operands.label == label)
+					return;
+			}
+		}
+		// not found - invalidate
+		invalidateCursor(cursor);
 	}
 
 

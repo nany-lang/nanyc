@@ -188,6 +188,25 @@ namespace ISA
 
 
 
+	template<> struct Operand<Op::label> final
+	{
+		constexpr static const char* opname() { return "label"; }
+		uint32_t opcode;
+		uint32_t label;
+	};
+
+
+	template<> struct Operand<Op::jmp> final
+	{
+		constexpr static const char* opname() { return "jmp"; }
+		uint32_t opcode;
+		uint32_t label;
+	};
+
+
+
+
+
 	template<> struct Operand<Op::memalloc> final
 	{
 		constexpr static const char* opname() { return "memalloc"; }
