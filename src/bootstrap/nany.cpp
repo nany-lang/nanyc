@@ -21,9 +21,10 @@ static int printUsage(const char* const argv0)
 	std::cout
 		<< "Usage: " << argv0 << " [options] file...\n"
 		<< "Options:\n"
-		<< "  --print-bugreport-info   Display some useful information for bug reporting\n"
-		<< "  --help, -h               Display this information\n"
-		<< "  --version, -v            Print the version\n\n";
+		<< "  --bugreport       Display some useful information to report a bug\n"
+		<< "                    (https://github.com/nany-lang/nany/issues/new)\n"
+		<< "  --help, -h        Display this information\n"
+		<< "  --version, -v     Print the version\n\n";
 	return EXIT_SUCCESS;
 }
 
@@ -151,7 +152,7 @@ YUNI_MAIN_CONSOLE(argc, argv)
 							return printUsage(argv[0]);
 						if (arg == "--version")
 							return printVersion();
-						if (arg == "--print-bugreport-info")
+						if (arg == "--bugreport")
 							return printBugReportInfo();
 						if (arg == "--verbose")
 						{

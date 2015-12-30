@@ -3,7 +3,7 @@
 #include <yuni/io/file.h>
 #include <yuni/core/math.h>
 #include <yuni/core/process/program.h>
-#include "libnany-version.h"
+#include "libnany-config.h"
 #include "common-debuginfo.hxx"
 #include <string.h>
 
@@ -16,9 +16,8 @@ extern "C" char* nany_get_info_for_bugreport()
 {
 	try
 	{
-		String string;
-
-		string << "> nanyc {c++/bootstrap} v" << LIBNANY_VERSION_STR;
+		Clob string;
+		string << "> nanyc {c++/bootstrap} v" << nany_version();
 		if (debugmode)
 			string << " {debug}";
 		string << '\n';
@@ -26,6 +25,20 @@ extern "C" char* nany_get_info_for_bugreport()
 		string << "> compiled with ";
 		nany_details_export_compiler_version(string);
 		string << '\n';
+
+		bool custombuild = Nany::Config::maxSymbolNameLength != 64
+			or Nany::Config::maxNamespaceDepth != 32
+			or Nany::Config::maxFuncDeclParameterCount != 7
+			or Nany::Config::maxPushedParameters != 32;
+		if (custombuild)
+		{
+			string << "> !! nany.build.config: "
+				<< "pp:" << Nany::Config::maxPushedParameters
+				<< ", p:" << Nany::Config::maxFuncDeclParameterCount
+				<< ", nd:" << Nany::Config::maxNamespaceDepth
+				<< ", sl:" << Nany::Config::maxSymbolNameLength
+				<< '\n';
+		}
 
 		string << "> os: ";
 		#ifdef YUNI_OS_LINUX
