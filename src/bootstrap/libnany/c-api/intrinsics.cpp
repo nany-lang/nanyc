@@ -39,7 +39,7 @@ nany_add_intrinsic_n(nycontext_t* ctx, const char* name, size_t length, uint32_t
 		{
 			auto& context = *(reinterpret_cast<Nany::Context*>(ctx->build.internal));
 
-			AnyString intrname{name, length};
+			AnyString intrname{name, static_cast<uint32_t>(length)};
 			va_list argp;
 			va_start(argp, ret);
 			bool success = context.intrinsics.add(intrname, flags, callback, ret, argp);
