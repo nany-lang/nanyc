@@ -97,6 +97,39 @@ namespace IR
 	}
 
 
+	inline void Program::emitAND(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	{
+		auto& operands = emit<ISA::Op::opand>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+	inline void Program::emitOR(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	{
+		auto& operands = emit<ISA::Op::opor>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+	inline void Program::emitXOR(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	{
+		auto& operands = emit<ISA::Op::opxor>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+	inline void Program::emitMOD(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	{
+		auto& operands = emit<ISA::Op::opmod>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+
 	inline void Program::emitTypeIsObject(uint32_t lvid)
 	{
 		emit<ISA::Op::typeisobject>().lvid = lvid;

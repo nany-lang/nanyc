@@ -44,6 +44,28 @@ namespace // anonymous
 		}
 
 
+		void print(const Operand<Op::opand>& operands)
+		{
+			out << tabs << '%' << operands.lvid << " = %" << operands.lhs << " and %" << operands.rhs;
+		}
+
+		void print(const Operand<Op::opor>& operands)
+		{
+			out << tabs << '%' << operands.lvid << " = %" << operands.lhs << " or %" << operands.rhs;
+		}
+
+		void print(const Operand<Op::opxor>& operands)
+		{
+			out << tabs << '%' << operands.lvid << " = %" << operands.lhs << " xor %" << operands.rhs;
+		}
+
+		void print(const Operand<Op::opmod>& operands)
+		{
+			out << tabs << '%' << operands.lvid << " = %" << operands.lhs << " mod %" << operands.rhs;
+		}
+
+
+
 		void print(const Operand<Op::qualifiers>& operands)
 		{
 			out << tabs << "qualifier %" << operands.lvid << ": ";

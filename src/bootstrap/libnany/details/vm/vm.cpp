@@ -103,6 +103,11 @@ namespace VM
 			void visit(const IR::ISA::Operand<IR::ISA::Op::label>&);
 			void visit(const IR::ISA::Operand<IR::ISA::Op::jmp>&);
 
+			void visit(const IR::ISA::Operand<IR::ISA::Op::opand>&);
+			void visit(const IR::ISA::Operand<IR::ISA::Op::opor>&);
+			void visit(const IR::ISA::Operand<IR::ISA::Op::opxor>&);
+			void visit(const IR::ISA::Operand<IR::ISA::Op::opmod>&);
+
 			// accept those opcode for debugging purposes
 			void visit(const IR::ISA::Operand<IR::ISA::Op::comment>&) {}
 			void visit(const IR::ISA::Operand<IR::ISA::Op::scope>&) {}
@@ -187,6 +192,35 @@ namespace VM
 			registerCount = storestckfrmsize;
 			#endif
 			stacktrace.pop();
+		}
+
+
+		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::opand>& opr)
+		{
+			VM_PRINT_OPCODE(operands);
+			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
+			registers[opr.lvid] = registers[opr.lhs] & registers[opr.rhs];
+		}
+
+		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::opor>& opr)
+		{
+			VM_PRINT_OPCODE(operands);
+			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
+			registers[opr.lvid] = registers[opr.lhs] | registers[opr.rhs];
+		}
+
+		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::opxor>& opr)
+		{
+			VM_PRINT_OPCODE(operands);
+			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
+			registers[opr.lvid] = registers[opr.lhs] ^ registers[opr.rhs];
+		}
+
+		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::opmod>& opr)
+		{
+			VM_PRINT_OPCODE(operands);
+			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
+			registers[opr.lvid] = registers[opr.lhs] % registers[opr.rhs];
 		}
 
 

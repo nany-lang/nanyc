@@ -27,6 +27,49 @@ namespace ISA
 	};
 
 
+
+
+	template<> struct Operand<Op::opand> final
+	{
+		constexpr static const char* opname() { return "and"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		uint32_t lhs;
+		uint32_t rhs;
+	};
+
+	template<> struct Operand<Op::opor> final
+	{
+		constexpr static const char* opname() { return "or"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		uint32_t lhs;
+		uint32_t rhs;
+	};
+
+	template<> struct Operand<Op::opxor> final
+	{
+		constexpr static const char* opname() { return "xor"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		uint32_t lhs;
+		uint32_t rhs;
+	};
+
+
+	template<> struct Operand<Op::opmod> final
+	{
+		constexpr static const char* opname() { return "mod"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		uint32_t lhs;
+		uint32_t rhs;
+	};
+
+
+
+
+
 	template<> struct Operand<Op::fieldget> final
 	{
 		constexpr static const char* opname() { return "fieldget"; }

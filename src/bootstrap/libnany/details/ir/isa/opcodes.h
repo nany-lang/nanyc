@@ -56,6 +56,16 @@ namespace ISA //!< Instruction Set Architecture
 	{
 		//! nop opcode (or unknown)
 		nop = 0,
+
+		//! and
+		opand,
+		//! or
+		opor,
+		//! xor
+		opxor,
+		//! mod
+		opmod,
+
 		//! Store a constant value in a register
 		storeConstant,
 		//! Store value from another register
@@ -155,6 +165,11 @@ namespace ISA //!< Instruction Set Architecture
 		{ \
 			switch ((ISA::Op) opc) \
 			{ \
+				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::opand) \
+				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::opor) \
+				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::opxor) \
+				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::opmod) \
+				\
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::storeConstant) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::store) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::storeText) \
