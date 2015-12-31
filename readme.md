@@ -8,8 +8,18 @@ Nany is a high-productivity language, meant to be either compiled to native
 code or bytecode, or to be run as script.
 
 
+Contributing
+------------
+
+**Note**: this project uses [Zenhub](https://www.zenhub.io/) for ticket management and upvoting
+
+
+
+
 Overview of the Nany Programming Language
 -----------------------------------------
+
+Here are some of the features of the Nany Language.
 
 *note*: the current implementation of the Nany compiler may not implement all the
 features required for compiling the following examples.
