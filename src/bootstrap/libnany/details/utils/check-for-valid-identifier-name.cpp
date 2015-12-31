@@ -4,6 +4,7 @@
 #include "details/fwd.h"
 #include <yuni/io/file.h>
 #include <unordered_set>
+#include <unordered_map>
 
 using namespace Yuni;
 
@@ -36,15 +37,56 @@ namespace Nany
 	{
 		"new", "dispose",
 		"and", "or", "mod", "xor", "not",
-		"+", "-", "*", "/", "^",
+		"+", "-", "*", "/", "^", "--", "++"
 		"<<", ">>", "!=", "==", "<", ">", "<=", ">=",
 		// "=", operator copy should be used instead
 		"+=", "-=", "*=", "/=", "^=",
 		"()", "[]"
 	};
 
+	static const std::unordered_map<AnyString, AnyString> opnormalize =
+	{
+		{ "and", "^and" },
+		{ "or",  "^or"  },
+		{ "mod", "^mod" },
+		{ "xor", "^xor" },
+		{ "not", "^not" },
+		{ "+",   "^+"   }, { "++",  "^++"  },
+		{ "-",   "^-"   }, { "--",  "^--"  },
+		{ "*",   "^*"   }, { "/",   "^/"   },
+		{ "^",   "^^"   },
+		{ "<<",  "^<<"  }, { ">>",  "^>>"  },
+		{ "<=",  "^<="  }, { ">=",  "^>="  },
+		{ "<",   "^<"   }, { ">",   "^>"   },
+		{ "==",  "^=="  }, { "!=",  "^!="  },
+		{ "+=",  "^+="  }, { "-=",  "^-="  },
+		{ "*=",  "^*="  }, { "/=",  "^/="  },
+		{ "^=",  "^^="  },
+		{ "()",  "^()"  }, { "[]",  "^[]"  }
+	};
 
 
+
+
+
+
+
+	AnyString normalizeOperatorName(AnyString name)
+	{
+		// to deal with grammar's potential glitches when eating tokens
+		// (it would considerably slow down the parsing to improve it)
+		name.trimRight();
+
+		if (YUNI_UNLIKELY(name.empty())) // bug within the AST parser for + -
+			return "^+";
+
+		auto tit = opnormalize.find(name);
+		if (YUNI_LIKELY(tit != opnormalize.end()))
+			return tit->second;
+
+		assert(false and "unknown identifier for normalization");
+		return name;
+	}
 
 
 	bool checkForValidIdentifierName(Logs::Report& report, const Nany::Node& node, const AnyString& name, bool isOperator)

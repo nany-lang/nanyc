@@ -235,7 +235,7 @@ namespace Instanciate
 
 		switch (multipleResults.size())
 		{
-			case 1:
+			case 1: // unique match count
 			{
 				auto& atom = multipleResults[0].get();
 				if (unlikely(atom.hasErrors))
@@ -309,7 +309,7 @@ namespace Instanciate
 				return true;
 			}
 
-			default:
+			default: // multiple solutions
 			{
 				// checking integrity (debug only) - verifying that all results are functions
 				if (debugmode)
@@ -325,7 +325,7 @@ namespace Instanciate
 				return true;
 			}
 
-			case 0:
+			case 0: // no identifier found from 'atom map'
 			{
 				return complainUnknownIdentifier(selfAtom, frame.atom, name);
 			}

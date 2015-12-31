@@ -5,6 +5,7 @@
 #include "details/reporting/report.h"
 #include "libnany-config.h"
 #include "libnany-traces.h"
+#include "details/utils/check-for-valid-identifier-name.h"
 #include <functional>
 
 using namespace Yuni;
@@ -126,9 +127,11 @@ namespace Nany
 			uint32_t opIndex  = 1;
 			uint32_t rhsIndex = 2;
 
-			AnyString opname = node.children[opIndex]->text;
-			if (opname.empty() or (opname.size() == 1 and opname[0] == ' ')) // bug within the AST parser for + -
-				opname = "+";
+			// operator name normalization
+			// nany uses a special character '^' to distinguish functions from operators
+			// (since operators may have a real name)
+			// reminder: strings are not owned by the AST
+			AnyString opname = normalizeOperatorName(node.children[opIndex]->text);
 
 			// not an assignment, the input will be transformed into a global func call:
 			//
@@ -191,6 +194,9 @@ namespace Nany
 			//
 			ast.nodeRulePromote(node, rgExprSubDot);
 			ast.nodeRulePromote(operatorNode, rgIdentifier);
+			// to deal with grammar's potential glitches when eating tokens
+			// (it would considerably slow down the parsing to improve it)
+			operatorNode.text.trimRight();
 
 			auto& call = *ast.nodeAppend(operatorNode, rgCall);
 			auto& expr = *ast.nodeAppend(call, {rgCallParameter, rgExpr});
@@ -215,6 +221,7 @@ namespace Nany
 					case Nany::rgExprStream:
 					case Nany::rgExprComparison:
 					case Nany::rgExprLogic:
+					case Nany::rgExprLogicAnd:
 					case Nany::rgExprFactor:
 					case Nany::rgExprPower:
 					{
@@ -278,6 +285,7 @@ namespace Nany
 						case Nany::rgExprStream:
 						case Nany::rgExprComparison:
 						case Nany::rgExprLogic:
+						case Nany::rgExprLogicAnd:
 						case Nany::rgExprFactor:
 						case Nany::rgExprPower:
 						case Nany::rgExprNot:
