@@ -88,7 +88,7 @@ namespace Nany
 			// checking if the id name is not from one of reserved keywords
 			if (unlikely(reservedKeywords.count(name) != 0))
 			{
-				auto err = report.error() << "invalid identifier name: '" << name << "' is reserved";
+				auto err = report.error() << "'" << name << "' is a reserved keyword";
 				err.message.origins.location.pos.offsetEnd = err.message.origins.location.pos.offset + name.size();
 				return false;
 			}
