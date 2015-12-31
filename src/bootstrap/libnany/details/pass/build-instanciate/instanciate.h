@@ -77,6 +77,17 @@ namespace Instanciate
 
 		void printClassdefTable(Logs::Report trace, const AtomStackFrame& frame) const;
 
+		void instanciateInstrinsicCall();
+		bool instanciateUserDefinedIntrinsic(const IR::ISA::Operand<IR::ISA::Op::intrinsic>& operands);
+		bool instanciateBuiltinIntrinsic(const AnyString& name, uint32_t lvid);
+		bool instanciateIntrinsicFieldset(uint32_t lvid);
+		bool instanciateIntrinsicRef(uint32_t lvid);
+		bool instanciateIntrinsicUnref(uint32_t lvid);
+		bool instanciateIntrinsicAddressof(uint32_t lvid);
+		bool instanciateIntrinsicSizeof(uint32_t lvid);
+		bool instanciateIntrinsicMemalloc(uint32_t lvid);
+		bool instanciateIntrinsicMemFree(uint32_t lvid);
+
 
 	public:
 		// exit status
@@ -167,17 +178,6 @@ namespace Instanciate
 		void acquireObject(LVID lvid); // without checking
 
 		void tryUnrefObject(uint32_t lvid);
-
-		void instanciateInstrinsicCall();
-		bool instanciateUserDefinedIntrinsic(const IR::ISA::Operand<IR::ISA::Op::intrinsic>& operands);
-		bool instanciateBuiltinIntrinsic(const AnyString& name, uint32_t lvid);
-		bool instanciateIntrinsicFieldset(uint32_t lvid);
-		bool instanciateIntrinsicRef(uint32_t lvid);
-		bool instanciateIntrinsicUnref(uint32_t lvid);
-		bool instanciateIntrinsicAddressof(uint32_t lvid);
-		bool instanciateIntrinsicSizeof(uint32_t lvid);
-		bool instanciateIntrinsicMemalloc(uint32_t lvid);
-		bool instanciateIntrinsicMemFree(uint32_t lvid);
 		//@}
 
 

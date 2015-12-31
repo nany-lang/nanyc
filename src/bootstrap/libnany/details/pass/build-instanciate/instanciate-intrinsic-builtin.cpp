@@ -12,13 +12,9 @@ namespace Pass
 namespace Instanciate
 {
 
-	bool ProgramBuilder::instanciateIntrinsicFieldset(uint32_t lvid)
+	inline bool ProgramBuilder::instanciateIntrinsicFieldset(uint32_t lvid)
 	{
-		// no return value
 		cdeftable.substitute(lvid).kind = nyt_void;
-		// params
-		if (unlikely(not checkForIntrinsicParamCount("__nanyc_fieldset", 2)))
-			return false;
 
 		auto& frame = atomStack.back();
 		uint32_t lvidsid = lastPushedIndexedParameters[1].lvid;
@@ -55,41 +51,27 @@ namespace Instanciate
 	}
 
 
-	bool ProgramBuilder::instanciateIntrinsicRef(uint32_t lvid)
+	inline bool ProgramBuilder::instanciateIntrinsicRef(uint32_t lvid)
 	{
-		// no return value
 		cdeftable.substitute(lvid).kind = nyt_void;
-		// params
-		if (unlikely(not checkForIntrinsicParamCount("ref", 1)))
-			return false;
-
 		if (canGenerateCode())
 			tryToAcquireObject(lastPushedIndexedParameters[0].lvid);
 		return true;
 	}
 
 
-	bool ProgramBuilder::instanciateIntrinsicUnref(uint32_t lvid)
+	inline bool ProgramBuilder::instanciateIntrinsicUnref(uint32_t lvid)
 	{
-		// no return value
 		cdeftable.substitute(lvid).kind = nyt_void;
-		// params
-		if (unlikely(not checkForIntrinsicParamCount("unref", 1)))
-			return false;
-
 		if (canGenerateCode())
 			tryUnrefObject(lastPushedIndexedParameters[0].lvid);
 		return true;
 	}
 
 
-	bool ProgramBuilder::instanciateIntrinsicAddressof(uint32_t lvid)
+	inline bool ProgramBuilder::instanciateIntrinsicAddressof(uint32_t lvid)
 	{
-		// no return value
 		cdeftable.substitute(lvid).kind = nyt_u64;
-		// params
-		if (unlikely(not checkForIntrinsicParamCount("addressof", 1)))
-			return false;
 
 		if (canGenerateCode())
 		{
@@ -103,13 +85,9 @@ namespace Instanciate
 	}
 
 
-	bool ProgramBuilder::instanciateIntrinsicSizeof(uint32_t lvid)
+	inline bool ProgramBuilder::instanciateIntrinsicSizeof(uint32_t lvid)
 	{
-		// no return value
 		cdeftable.substitute(lvid).kind = nyt_u64;
-		// params
-		if (unlikely(not checkForIntrinsicParamCount("sizeof", 1)))
-			return false;
 
 		uint32_t objlvid = lastPushedIndexedParameters[0].lvid;
 		auto& frame = atomStack.back();
@@ -145,13 +123,9 @@ namespace Instanciate
 	}
 
 
-	bool ProgramBuilder::instanciateIntrinsicMemalloc(uint32_t lvid)
+	inline bool ProgramBuilder::instanciateIntrinsicMemalloc(uint32_t lvid)
 	{
-		// no return value
 		cdeftable.substitute(lvid).kind = nyt_u64;
-		// paramates
-		if (unlikely(not checkForIntrinsicParamCount("memory.allocate", 1)))
-			return false;
 
 		uint32_t objlvid = lastPushedIndexedParameters[0].lvid;
 		auto& frame = atomStack.back();
@@ -165,13 +139,9 @@ namespace Instanciate
 	}
 
 
-	bool ProgramBuilder::instanciateIntrinsicMemFree(uint32_t lvid)
+	inline bool ProgramBuilder::instanciateIntrinsicMemFree(uint32_t lvid)
 	{
-		// no return value
 		cdeftable.substitute(lvid).kind = nyt_void;
-		// paramates
-		if (unlikely(not checkForIntrinsicParamCount("memory.dispose", 2)))
-			return false;
 
 		auto& frame = atomStack.back();
 
@@ -182,7 +152,7 @@ namespace Instanciate
 
 		uint32_t size = lastPushedIndexedParameters[1].lvid;
 		auto& cdefsize = cdeftable.classdefFollowClassMember(CLID{frame.atomid, size});
-		if (not cdefsize.isBuiltingUnsigned())
+		if (unlikely(not cdefsize.isBuiltingUnsigned()))
 			return complainIntrinsicParameter("memory.dispose", 1, cdef, "'__u64'");
 
 		if (canGenerateCode())
@@ -192,53 +162,36 @@ namespace Instanciate
 
 
 
+	typedef bool (ProgramBuilder::* BuiltinIntrinsic)(uint32_t);
 
-
-
+	static const std::unordered_map<AnyString, std::pair<BuiltinIntrinsic, uint32_t>> builtinDispatch =
+	{
+		{"__nanyc_fieldset", { &ProgramBuilder::instanciateIntrinsicFieldset,  2 }},
+		{"addressof",        { &ProgramBuilder::instanciateIntrinsicAddressof, 1 }},
+		{"memory.allocate",  { &ProgramBuilder::instanciateIntrinsicMemalloc,  1 }},
+		{"memory.dispose",   { &ProgramBuilder::instanciateIntrinsicMemFree,   2 }},
+		{"ref",              { &ProgramBuilder::instanciateIntrinsicRef,       1 }},
+		{"unref",            { &ProgramBuilder::instanciateIntrinsicUnref,     1 }},
+		{"sizeof",           { &ProgramBuilder::instanciateIntrinsicSizeof,    1 }},
+	};
 
 	bool ProgramBuilder::instanciateBuiltinIntrinsic(const AnyString& name, uint32_t lvid)
 	{
 		assert(not name.empty());
-		switch (name[0])
+		auto it = builtinDispatch.find(name);
+		if (likely(it != builtinDispatch.end()))
 		{
-			case '_':
-			{
-				if (name == "__nanyc_fieldset")
-					return instanciateIntrinsicFieldset(lvid);
-				break;
-			}
-			case 'a':
-			{
-				if (name == "addressof")
-					return instanciateIntrinsicAddressof(lvid);
-				break;
-			}
-			case 'm':
-			{
-				if (name == "memory.allocate")
-					return instanciateIntrinsicMemalloc(lvid);
-				if (name == "memory.dispose")
-					return instanciateIntrinsicMemFree(lvid);
-				break;
-			}
-			case 'r':
-			{
-				if (name == "ref")
-					return instanciateIntrinsicRef(lvid);
-				break;
-			}
-			case 's':
-			{
-				if (name == "sizeof")
-					return instanciateIntrinsicSizeof(lvid);
-				break;
-			}
-			case 'u':
-			{
-				if (name == "unref")
-					return instanciateIntrinsicUnref(lvid);
-				break;
-			}
+			// check for parameter count
+			if (unlikely(not checkForIntrinsicParamCount(name, it->second.second)))
+				return false;
+
+			// specific code for the intrinsic
+			bool success = (this->*(it->second.first))(lvid);
+
+			// annotate any error
+			if (unlikely(not success))
+				atomStack.back().lvids[lvid].errorReported = true;
+			return success;
 		}
 		return (error() << "unknown intrinsic '" << name << '\'');
 	}
