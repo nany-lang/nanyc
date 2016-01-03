@@ -55,6 +55,8 @@ addsrc(
 	FILES ${NANY_GRAMMAR_H} ${NANY_GRAMMAR_HXX} ${NANY_GRAMMAR_CPP})
 
 
+
+
 addsrc(
 	NAME  nysrc_details_pass_build_ast_normalize
 	GROUP "details/pass/build-ast-normalize"
@@ -323,13 +325,15 @@ if ("${NANY_STATIC}")
 endif()
 
 
+add_library(libnany-grammar STATIC
+	${nysrc_grammar}
+	${nysrc_details_grammar})
+
+
 add_library(libnany ${mode_libnany}
 	# public headers
 	nany/nany.h
 	nany/nany.hxx
-
-	${nysrc_grammar}
-	${nysrc_details_grammar}
 
 	${nysrc_details_pass_build_ast_from_source}
 	${nysrc_details_pass_build_ast_normalize}
@@ -370,12 +374,23 @@ set_target_properties(libnany PROPERTIES
 	VERSION   "${nany_version_major}.${nany_version_minor}.${nany_version_patch}"
 	SOVERSION "${nany_version_major}")
 
+set_target_properties(libnany-grammar PROPERTIES
+	VERSION   "${nany_version_major}.${nany_version_minor}.${nany_version_patch}"
+	SOVERSION "${nany_version_major}")
+
 target_link_libraries(libnany PRIVATE yuni-static-core)
+target_link_libraries(libnany PRIVATE libnany-grammar)
+
 set_property(TARGET libnany PROPERTY MACOSX_RPATH true)
-set_property(TARGET libnany PROPERTY LIBRARY_OUTPUT_NAME "nanyc")
-set_property(TARGET libnany PROPERTY ARCHIVE_OUTPUT_NAME "nanyc")
+set_property(TARGET libnany PROPERTY LIBRARY_OUTPUT_NAME "nany")
+set_property(TARGET libnany PROPERTY ARCHIVE_OUTPUT_NAME "nany")
 set_property(TARGET libnany PROPERTY LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/../")
 set_property(TARGET libnany PROPERTY RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/../")
+
+set_property(TARGET libnany-grammar PROPERTY MACOSX_RPATH true)
+set_property(TARGET libnany-grammar PROPERTY LIBRARY_OUTPUT_NAME "nany-grammar")
+set_property(TARGET libnany-grammar PROPERTY ARCHIVE_OUTPUT_NAME "nany-grammar")
+
 
 target_compile_definitions(libnany PRIVATE "LIBNANY_DLL_EXPORT=1")
 
