@@ -121,7 +121,6 @@ namespace Instanciate
 		void visit(const IR::ISA::Operand<IR::ISA::Op::identify>&);
 		void visit(const IR::ISA::Operand<IR::ISA::Op::debugfile>&);
 		void visit(const IR::ISA::Operand<IR::ISA::Op::debugpos>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::comment>&);
 		void visit(const IR::ISA::Operand<IR::ISA::Op::pragma>&);
 		void visit(const IR::ISA::Operand<IR::ISA::Op::stacksize>&);
 		void visit(const IR::ISA::Operand<IR::ISA::Op::namealias>&);
@@ -137,6 +136,12 @@ namespace Instanciate
 		void visit(const IR::ISA::Operand<IR::ISA::Op::inherit>&);
 		void visit(const IR::ISA::Operand<IR::ISA::Op::nop>&);
 		void visit(const IR::ISA::Operand<IR::ISA::Op::label>&);
+
+		void visit(const IR::ISA::Operand<IR::ISA::Op::jmp>&);
+		void visit(const IR::ISA::Operand<IR::ISA::Op::jz>&);
+		void visit(const IR::ISA::Operand<IR::ISA::Op::jnz>&);
+		void visit(const IR::ISA::Operand<IR::ISA::Op::comment>&) {}
+
 		//! visitor - fallback
 		template<enum IR::ISA::Op O> void visit(const IR::ISA::Operand<O>&);
 		//@}

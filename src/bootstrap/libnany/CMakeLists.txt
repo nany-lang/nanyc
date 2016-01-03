@@ -144,6 +144,7 @@ addsrc(
 	"details/pass/build-ast-to-ir/scope.h"
 	"details/pass/build-ast-to-ir/scope.hxx"
 	"details/pass/build-ast-to-ir/scope.cpp"
+	"details/pass/build-ast-to-ir/scope-if.cpp"
 	"details/pass/build-ast-to-ir/scope-func.cpp"
 	"details/pass/build-ast-to-ir/scope-typeof.cpp"
 	"details/pass/build-ast-to-ir/scope-new.cpp"

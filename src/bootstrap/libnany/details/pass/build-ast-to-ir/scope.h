@@ -66,6 +66,7 @@ namespace Producer
 		bool visitASTExprTypeDecl(Node&, LVID& localvar);
 		bool visitASTExprTypeof(Node&, LVID& localvar);
 		bool visitASTExprStringLiteral(Node&, LVID& localvar);
+		bool visitASTExprIf(Node&, LVID& localvar);
 		//@}
 
 

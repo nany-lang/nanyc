@@ -58,10 +58,12 @@ namespace Producer
 				case rgTypeof:     success &= visitASTExprTypeof(child, localvar); break;
 				case rgIntrinsic:  success &= visitASTExprIntrinsic(child, localvar); break;
 
+				case rgIf:         success &= visitASTExprIf(child, localvar); break;
+
 				// scope may appear in expr (when expr are actually statements)
 				case rgScope:  if (allowScope) { success &= visitASTExprScope(child); break; }; // if not > unexpected
 				default:
-					success = ICEUnexpectedNode(child, "[ir/expr/piko]");
+					success = ICEUnexpectedNode(child, "[ir/expr/continuation]");
 			}
 		}
 		return success;
@@ -78,6 +80,7 @@ namespace Producer
 
 		// always creating a new scope for a expr
 		IR::Producer::Scope scope{*this};
+		scope.emitDebugpos(node);
 		return scope.visitASTExprContinuation(node, localvar, allowScope);
 	}
 

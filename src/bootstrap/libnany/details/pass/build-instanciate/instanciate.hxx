@@ -166,12 +166,6 @@ namespace Instanciate
 	}
 
 
-	inline void ProgramBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::comment>& /*operands*/)
-	{
-		// out.emitComment(currentProgram.stringrefs[operands.text]);
-	}
-
-
 	inline void ProgramBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::qualifiers>& operands)
 	{
 		assert(not atomStack.empty());
@@ -195,6 +189,21 @@ namespace Instanciate
 		}
 	}
 
+
+	inline void ProgramBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::jmp>& opc)
+	{
+		out.emit<IR::ISA::Op::jmp>() = opc;
+	}
+
+	inline void ProgramBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::jz>& opc)
+	{
+		out.emit<IR::ISA::Op::jz>() = opc;
+	}
+
+	inline void ProgramBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::jnz>& opc)
+	{
+		out.emit<IR::ISA::Op::jnz>() = opc;
+	}
 
 
 

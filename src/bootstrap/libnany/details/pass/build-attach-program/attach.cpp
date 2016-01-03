@@ -680,6 +680,9 @@ namespace Nany
 					case IR::ISA::Op::assign:
 					case IR::ISA::Op::inherit:
 					case IR::ISA::Op::label:
+					case IR::ISA::Op::jmp:
+					case IR::ISA::Op::jz:
+					case IR::ISA::Op::jnz:
 					case IR::ISA::Op::nop:
 						break;
 					default:
