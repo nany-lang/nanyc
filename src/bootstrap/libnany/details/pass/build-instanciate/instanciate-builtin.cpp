@@ -18,8 +18,6 @@ namespace Instanciate
 		if (not frame.verify(operands.lvid))
 			return;
 
-		frame.lvids[operands.lvid].scope = frame.scope;
-
 		nytype_t type = (nytype_t) operands.type;
 		if (type != nyt_any)
 		{
@@ -36,9 +34,15 @@ namespace Instanciate
 			}
 		}
 
+		auto& lvidinfo = frame.lvids[operands.lvid];
+		lvidinfo.scope = frame.scope;
+
 		// copy only variable instances
 		if (canGenerateCode())
+		{
+			lvidinfo.offsetDeclOut = out.opcodeCount();
 			out.emitStackalloc(operands.lvid, type);
+		}
 	}
 
 

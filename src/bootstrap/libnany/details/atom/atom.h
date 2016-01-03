@@ -325,6 +325,10 @@ namespace Nany
 			//! Var def
 			const Vardef& vardef(uint index) const;
 
+			//! Shortcircuit value (if applicable)
+			// \TODO ishortcircuitvalue: this property is only used twice...
+			bool shortcircuitValue = false;
+
 		private:
 			yuint32 pCount = 0u;
 			std::pair<AnyString, Vardef> pParams[Config::maxFuncDeclParameterCount];
@@ -349,6 +353,9 @@ namespace Nany
 		}
 		opcodes;
 
+		//! Builtin alias (empty if none)
+		// \TODO builtinalias: this property is only used twice
+		AnyString builtinalias;
 
 		//! A different scope for name resolution, if not null
 		Atom* scopeForNameResolution = nullptr;

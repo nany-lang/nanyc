@@ -61,6 +61,16 @@ namespace IR
 	}
 
 
+	template<enum ISA::Op O> inline ISA::Operand<O>& Program::emitraw()
+	{
+		static_assert(sizeof(Instruction) >= sizeof(ISA::Operand<O>), "pSize mismatch");
+		assert(pSize + 1 < pCapacity);
+		auto& result = at<O>(pSize++);
+		result.opcode = static_cast<uint32_t>(O);
+		return result;
+	}
+
+
 	template<enum ISA::Op O> inline ISA::Operand<O>& Program::emit()
 	{
 		reserve(pSize + 1);
@@ -70,6 +80,12 @@ namespace IR
 		auto& result = at<O>(pSize++);
 		result.opcode = static_cast<uint32_t>(O);
 		return result;
+	}
+
+
+	inline void Program::emitNop()
+	{
+		emit<ISA::Op::nop>();
 	}
 
 
@@ -145,11 +161,32 @@ namespace IR
 	}
 
 
+	inline void Program::emitPragmaBuiltinAlias(const AnyString& name)
+	{
+		auto& opc = emit<ISA::Op::pragma>();
+		opc.pragma = static_cast<uint32_t>(IR::ISA::Pragma::builtinalias);
+		opc.value.builtinalias.namesid = stringrefs.ref(name);
+	}
+
+
 	inline void Program::emitPragmaShortcircuit(bool evalvalue)
 	{
 		auto& opc = emit<ISA::Op::pragma>();
 		opc.pragma = static_cast<uint32_t>(IR::ISA::Pragma::shortcircuit);
 		opc.value.shortcircuit = static_cast<uint32_t>(evalvalue);
+	}
+
+	inline void Program::emitPragmaShortcircuitMetadata(uint32_t label)
+	{
+		auto& opc = emit<ISA::Op::pragma>();
+		opc.pragma = static_cast<uint32_t>(IR::ISA::Pragma::shortcircuitOpNopOffset);
+		opc.value.shortcircuitMetadata.label = label;
+	}
+
+
+	inline void Program::emitLabel(uint32_t labelid)
+	{
+		emit<IR::ISA::Op::label>().label = labelid;
 	}
 
 

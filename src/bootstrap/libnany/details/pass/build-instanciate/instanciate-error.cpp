@@ -166,7 +166,6 @@ namespace Instanciate
 				<< " instead of " << count << ')';
 			return false;
 		}
-
 		return true;
 	}
 

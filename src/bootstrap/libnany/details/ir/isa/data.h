@@ -305,6 +305,8 @@ namespace ISA
 			uint32_t visibility;
 			uint32_t blueprintsize;
 			uint32_t shortcircuit;
+			struct { uint32_t namesid; } builtinalias;
+			struct { uint32_t label; } shortcircuitMetadata;
 			struct { uint32_t name; uint32_t atomid; } blueprint;
 			struct { uint32_t name; uint32_t lvid;   } param;
 			struct { uint32_t name; uint32_t lvid;   } vardef;

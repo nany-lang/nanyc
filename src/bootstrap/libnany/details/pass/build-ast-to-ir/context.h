@@ -59,8 +59,6 @@ namespace Producer
 		Logs::Report report;
 		//! Has debug info ?
 		bool debuginfo = true;
-		//! has IR debug info ?
-		bool debuginfoIR = true;
 
 		//! Debug source filename
 		Yuni::String dbgSourceFilename;

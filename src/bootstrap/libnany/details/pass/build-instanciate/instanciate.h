@@ -135,6 +135,8 @@ namespace Instanciate
 		void visit(const IR::ISA::Operand<IR::ISA::Op::self>&);
 		void visit(const IR::ISA::Operand<IR::ISA::Op::qualifiers>&);
 		void visit(const IR::ISA::Operand<IR::ISA::Op::inherit>&);
+		void visit(const IR::ISA::Operand<IR::ISA::Op::nop>&);
+		void visit(const IR::ISA::Operand<IR::ISA::Op::label>&);
 		//! visitor - fallback
 		template<enum IR::ISA::Op O> void visit(const IR::ISA::Operand<O>&);
 		//@}
@@ -170,6 +172,8 @@ namespace Instanciate
 		void generateMemberVarDefaultInitialization();
 		void generateMemberVarDefaultDispose();
 		void generateMemberVarDefaultClone();
+
+		bool generateShortCircuitInstrs(uint32_t retlvid);
 
 		//! \name Help for memory management
 		//@{
@@ -283,6 +287,11 @@ namespace Instanciate
 
 		//! Flag to skip code instanciation as soon as the opcode blueprint size is encountered
 		bool shouldSkipCurrentAtom = false;
+
+		struct {
+			uint32_t label = 0;
+			bool compareTo = false;
+		} shortcircuit;
 
 		friend class Nany::IR::Program;
 

@@ -154,12 +154,6 @@ namespace Producer
 	}
 
 
-	inline bool Scope::hasIRDebuginfo() const
-	{
-		return pContext.debuginfoIR;
-	}
-
-
 	inline bool Scope::isWithinClass() const
 	{
 		Scope* scope = parentScope;

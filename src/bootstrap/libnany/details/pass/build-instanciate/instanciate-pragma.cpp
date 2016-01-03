@@ -167,7 +167,8 @@ namespace Instanciate
 		if (unlikely(not (operands.pragma < static_cast<uint32_t>(IR::ISA::Pragma::max))))
 			return (void)(ICE() << "invalid pragma");
 
-		switch ((IR::ISA::Pragma) operands.pragma)
+		auto pragma = static_cast<IR::ISA::Pragma>(operands.pragma);
+		switch (pragma)
 		{
 			case IR::ISA::Pragma::codegen:
 			{
@@ -278,19 +279,18 @@ namespace Instanciate
 				break;
 			}
 
-			case IR::ISA::Pragma::shortcircuit:
+			case IR::ISA::Pragma::shortcircuitOpNopOffset:
 			{
+				shortcircuit.label = operands.value.shortcircuitMetadata.label;
 				break;
 			}
 
+			case IR::ISA::Pragma::builtinalias:
+			case IR::ISA::Pragma::shortcircuit:
 			case IR::ISA::Pragma::namespacedef:
 			case IR::ISA::Pragma::unknown:
 			case IR::ISA::Pragma::max:
-			default:
-			{
-				ICE() << "invalid pragma value " << reinterpret_cast<void*>(operands.pragma);
 				break;
-			}
 		}
 	}
 

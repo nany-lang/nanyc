@@ -241,10 +241,26 @@ namespace Nany
 						break;
 					}
 
+					case IR::ISA::Pragma::builtinalias:
+					{
+						assert(not atomStack.empty());
+						Atom& atom = atomStack.back().atom;
+						atom.builtinalias = currentProgram.stringrefs[operands.value.builtinalias.namesid];
+						break;
+					}
+
+					case IR::ISA::Pragma::shortcircuit:
+					{
+						assert(not atomStack.empty());
+						Atom& atom = atomStack.back().atom;
+						atom.parameters.shortcircuitValue = (0 != operands.value.shortcircuit);
+						break;
+					}
+
 					case IR::ISA::Pragma::blueprintsize:
 					case IR::ISA::Pragma::visibility:
 					case IR::ISA::Pragma::bodystart:
-					case IR::ISA::Pragma::shortcircuit:
+					case IR::ISA::Pragma::shortcircuitOpNopOffset:
 					case IR::ISA::Pragma::unknown:
 					case IR::ISA::Pragma::max:
 					{
@@ -663,6 +679,8 @@ namespace Nany
 					case IR::ISA::Op::unref:
 					case IR::ISA::Op::assign:
 					case IR::ISA::Op::inherit:
+					case IR::ISA::Op::label:
+					case IR::ISA::Op::nop:
 						break;
 					default:
 						printError(operands);

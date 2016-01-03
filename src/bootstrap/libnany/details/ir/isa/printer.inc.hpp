@@ -261,13 +261,13 @@ namespace // anonymous
 		void print(const Operand<Op::jz>& operands)
 		{
 			out << tabs << "jz %" << operands.lvid << " == 0, %" << operands.result;
-			out << ", label: " << operands.label;
+			out << ", goto lbl " << operands.label;
 		}
 
 		void print(const Operand<Op::jnz>& operands)
 		{
 			out << tabs << "jnz %" << operands.lvid << " != 0, %" << operands.result;
-			out << ", label: " << operands.label;
+			out << ", goto lbl " << operands.label;
 		}
 
 
@@ -463,6 +463,21 @@ namespace // anonymous
 					{
 						out << tabs << "pragma shortcircuit ";
 						out << ((operands.value.shortcircuit) ? "__true" : "__false");
+						break;
+					}
+					case Pragma::shortcircuitOpNopOffset:
+					{
+						out << tabs << "pragma shortcircuit metadata: label: ";
+						out << operands.value.shortcircuitMetadata.label;
+						out << ", tmpvar: ";
+						out << (1 + operands.value.shortcircuitMetadata.label);
+						break;
+					}
+
+					case Pragma::builtinalias:
+					{
+						out << tabs << "pragma builtinalias ";
+						printString(operands.value.builtinalias.namesid);
 						break;
 					}
 

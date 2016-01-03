@@ -18,11 +18,14 @@ namespace Instanciate
 	{
 		// the current frame
 		auto& frame = atomStack.back();
+		// alias (to make it local)
+		uint32_t lvid = operands.lvid;
+
+		if (not frame.verify(operands.ptr2func) or not frame.verify(lvid))
+			return false;
+
 		// assignment should be handled somewhere else
 		assert(not frame.lvids[operands.ptr2func].isAssignment);
-
-		if (not frame.verify(operands.ptr2func) or not frame.verify(operands.lvid))
-			return false;
 
 		if (unlikely(frame.lvids[operands.ptr2func].markedAsAny))
 			return error() << "can not perform member lookup on 'any'";
@@ -37,14 +40,15 @@ namespace Instanciate
 		// all pushed parameters
 		decltype(FuncOverloadMatch::result.params) params;
 
+		// whatever the result of this func, 'lvid' is a returned value
+		frame.lvids[lvid].origin.returnedValue = true;
 
 		// preparing the overload matcher
 		overloadMatch.clear();
-		overloadMatch.input.rettype.push_back(CLID{atomid, operands.lvid});
+		overloadMatch.input.rettype.push_back(CLID{atomid, lvid});
 
 
 		// inserting the 'self' variable if a referer exists
-		assert(operands.ptr2func < frame.lvids.size());
 		LVID referer = frame.lvids[operands.ptr2func].referer;
 		if (referer != 0)
 		{
@@ -150,30 +154,91 @@ namespace Instanciate
 			params.swap(overloadMatch.result.params);
 		}
 
+		if (not atom->builtinalias.empty())
+		{
+			if (unlikely(lastPushedIndexedParameters.size() != params.size()))
+				return (error() << "builtin alias not allowed for methods");
+			// update each lvid, since they may have been changed (via implicit ctors)
+			for (uint32_t i = 0; i != params.size(); ++i)
+			{
+				assert(lastPushedIndexedParameters[i].lvid == params[i].clid.lvid());
+				lastPushedIndexedParameters[i].lvid = params[i].clid.lvid();
+			}
+			shortcircuit.compareTo = atom->parameters.shortcircuitValue;
+			return instanciateBuiltinIntrinsic(atom->builtinalias, lvid);
+		}
+
 		// instanciate the called func
 		Logs::Message::Ptr subreport;
 		InstanciateData info{subreport, *atom, cdeftable, intrinsics, params};
-		bool instok = doInstanciateAtomFunc(subreport, info, operands.lvid);
+		bool instok = doInstanciateAtomFunc(subreport, info, lvid);
 		if (unlikely(not instok))
 			return false;
 
 		// opcodes
 		if (canGenerateCode())
 		{
-			// push all parameters
-			for (auto& element: params)
+			for (auto& element: params) // push all parameters
 				out.emitPush(element.clid.lvid());
 
-			out.emitCall(operands.lvid, atom->atomid, info.instanceid);
-
-			auto& lvidinfo = frame.lvids[operands.lvid];
-			lvidinfo.origin.returnedValue = true;
+			out.emitCall(lvid, atom->atomid, info.instanceid);
 
 			// the function is responsible for acquiring the returned object
 			// however we must release it
-			if (canBeAcquired(operands.lvid))
-				lvidinfo.autorelease = true;
+			if (canBeAcquired(lvid))
+				frame.lvids[lvid].autorelease = true;
 		}
+		return true;
+	}
+
+
+	inline bool ProgramBuilder::generateShortCircuitInstrs(uint32_t retlvid)
+	{
+		// insert some code after the computation of the first argument but before
+		// the computation of the second one to achieve minimal evaluation
+
+		// during the transformation of the AST into opcodes, a label has been
+		// generated (shortcircuit.label) and a local variable as well in the same
+		// (with the exact value shortcircuit.label + 1), followed by a few 'nop' opcodes
+		uint32_t label = shortcircuit.label;
+		uint32_t lvid  = label + 1;
+
+		auto& frame = atomStack.back();
+		if (not frame.verify(lvid))
+			return false;
+		uint32_t offset = frame.lvids[lvid].offsetDeclOut;
+		if (unlikely(not (offset < out.opcodeCount())))
+			return (ICE() << "invalid opcode offset for generating shortcircuit");
+
+		// checking if the referenced offset is really a stackalloc
+		assert(out.at(offset).opcodes[0] == static_cast<uint32_t>(IR::ISA::Op::stackalloc));
+
+		// go to the first nop
+		++offset;
+		assert(out.at(offset).opcodes[0] == static_cast<uint32_t>(IR::ISA::Op::nop));
+
+		// lvid of the first parameter
+		uint32_t value = lastPushedIndexedParameters[0].lvid;
+
+		if (not shortcircuit.compareTo) // if true then
+		{
+			auto& condjmp  = out.at<IR::ISA::Op::jz>(offset);
+			condjmp.opcode = static_cast<uint32_t>(IR::ISA::Op::jz); // promotion
+			condjmp.lvid   = value;
+			condjmp.result = retlvid; // func return
+			condjmp.label  = label;
+		}
+		else // if false then
+		{
+			auto& condjmp  = out.at<IR::ISA::Op::jnz>(offset);
+			condjmp.opcode = static_cast<uint32_t>(IR::ISA::Op::jnz); // promotion
+			condjmp.lvid   = value;
+			condjmp.result = retlvid; // func return
+			condjmp.label  = label;
+		}
+
+		// reset
+		shortcircuit.label = 0;
 		return true;
 	}
 
@@ -188,10 +253,19 @@ namespace Instanciate
 			? instanciateFuncCall(operands)
 			: instanciateAssignment(operands));
 
+		if (checkpoint)
+		{
+			if (shortcircuit.label != 0 and canGenerateCode())
+				checkpoint = generateShortCircuitInstrs(operands.lvid);
+		}
+
 		if (unlikely(not checkpoint))
 		{
-			frame.invalidate(operands.lvid);
 			success = false;
+			frame.invalidate(operands.lvid);
+			// invalidate metadata from shortcircuit, just in case something bad
+			// happened before reaching the code responsible for minimal evaluation
+			shortcircuit.label = 0;
 		}
 
 		// always remove pushed parameters, whatever the result

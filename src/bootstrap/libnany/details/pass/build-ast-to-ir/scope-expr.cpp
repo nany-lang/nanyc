@@ -43,7 +43,7 @@ namespace Producer
 			{
 				case rgIdentifier: success &= visitASTExprIdentifier(child, localvar); break;
 				case rgExprGroup:  success &= visitASTExpr(child, localvar); break;
-				case rgCall:       success &= visitASTExprCall(&child, localvar); break;
+				case rgCall:       success &= visitASTExprCall(&child, localvar, &node); break;
 				case rgExprSubDot: success &= visitASTExprSubDot(child, localvar); break;
 				case rgNumber:     success &= visitASTExprNumber(child, localvar); break;
 				case rgNew:        success &= visitASTExprNew(child, localvar); break;

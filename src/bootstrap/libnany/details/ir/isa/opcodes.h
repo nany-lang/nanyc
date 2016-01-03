@@ -46,8 +46,12 @@ namespace ISA //!< Instruction Set Architecture
 		visibility,
 		//! body start,
 		bodystart,
-		//! shortcircuit
+		//! shortcircuit attribute
 		shortcircuit,
+		//! shortcircuit program offset of 'nop' instructions
+		shortcircuitOpNopOffset,
+		//! Builtin alias
+		builtinalias,
 		//! The maximum number of elements, for integrity check
 		max,
 	};
@@ -78,8 +82,6 @@ namespace ISA //!< Instruction Set Architecture
 		//! alloca (on the stack)
 		stackalloc,
 
-		//! label
-		label,
 		//! unconditional jump
 		jmp,
 		//! jump if local variable is zero
@@ -115,6 +117,8 @@ namespace ISA //!< Instruction Set Architecture
 		//! Free a region of memory previously allocated by 'memalloc'
 		memfree,
 
+		//! label
+		label,
 
 		// --- opcodes for compilation only
 
@@ -183,7 +187,6 @@ namespace ISA //!< Instruction Set Architecture
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::storeText) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::stackalloc) \
 				\
-				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::label) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::jmp) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::jz) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::jnz) \
@@ -201,6 +204,8 @@ namespace ISA //!< Instruction Set Architecture
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::pragma) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::memalloc) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::memfree) \
+				\
+				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::label) \
 				\
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::follow) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::classdefsizeof) \

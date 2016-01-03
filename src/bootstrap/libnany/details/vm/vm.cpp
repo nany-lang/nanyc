@@ -102,6 +102,8 @@ namespace VM
 
 			void visit(const IR::ISA::Operand<IR::ISA::Op::label>&);
 			void visit(const IR::ISA::Operand<IR::ISA::Op::jmp>&);
+			void visit(const IR::ISA::Operand<IR::ISA::Op::jnz>&);
+			void visit(const IR::ISA::Operand<IR::ISA::Op::jz>&);
 
 			void visit(const IR::ISA::Operand<IR::ISA::Op::opand>&);
 			void visit(const IR::ISA::Operand<IR::ISA::Op::opor>&);
@@ -112,10 +114,13 @@ namespace VM
 			void visit(const IR::ISA::Operand<IR::ISA::Op::comment>&) {}
 			void visit(const IR::ISA::Operand<IR::ISA::Op::scope>&) {}
 			void visit(const IR::ISA::Operand<IR::ISA::Op::end>&) {}
+			void visit(const IR::ISA::Operand<IR::ISA::Op::nop>&) {}
 			template<enum IR::ISA::Op O> void visit(const IR::ISA::Operand<O>& operands);
+
 
 			void destroy(uint64_t* object, uint32_t dtorid, uint32_t instanceid);
 			void call(uint32_t retlvid, uint32_t atomfunc, uint32_t instanceid);
+			void gotoLabel(uint32_t label);
 
 		private:
 			MemChecker<true> memchecker;
@@ -192,6 +197,15 @@ namespace VM
 			registerCount = storestckfrmsize;
 			#endif
 			stacktrace.pop();
+		}
+
+
+		inline void Engine::gotoLabel(uint32_t label)
+		{
+			if (label > upperLabelID)
+				program.get().jumpToLabelForward(*cursor, label);
+			else
+				program.get().jumpToLabelBackward(*cursor, label);
 		}
 
 
@@ -405,10 +419,25 @@ namespace VM
 
 		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::jmp>& operands)
 		{
-			if (operands.label > upperLabelID)
-				program.get().jumpToLabelForward(*cursor, operands.label);
-			else
-				program.get().jumpToLabelBackward(*cursor, operands.label);
+			gotoLabel(operands.label);
+		}
+
+		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::jnz>& operands)
+		{
+			if (registers[operands.lvid] != 0)
+			{
+				registers[operands.result] = 1;
+				gotoLabel(operands.label);
+			}
+		}
+
+		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::jz>& operands)
+		{
+			if (registers[operands.lvid] == 0)
+			{
+				registers[operands.result] = 0;
+				gotoLabel(operands.label);
+			}
 		}
 
 

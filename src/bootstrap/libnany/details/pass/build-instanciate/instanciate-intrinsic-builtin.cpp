@@ -236,33 +236,35 @@ namespace Instanciate
 	bool ProgramBuilder::instanciateBuiltinIntrinsic(const AnyString& name, uint32_t lvid)
 	{
 		assert(not name.empty());
+		if (unlikely(not lastPushedNamedParameters.empty()))
+			return (error() << "intrinsics do not accept named parameters");
+
 		auto it = builtinDispatch.find(name);
-		if (likely(it != builtinDispatch.end()))
+		if (unlikely(it == builtinDispatch.end()))
+			return (error() << "unknown intrinsic '" << name << '\'');
+
+		// check for parameters
 		{
-			// check for parameters
+			auto& frame = atomStack.back();
+			uint32_t count = it->second.second;
+			if (unlikely(not checkForIntrinsicParamCount(name, count)))
+				return false;
+
+			// checking if one parameter was already flag as 'error'
+			for (uint32_t i = 0u; i != count; ++i)
 			{
-				auto& frame = atomStack.back();
-				uint32_t count = it->second.second;
-				if (unlikely(not checkForIntrinsicParamCount(name, count)))
+				if (unlikely(not frame.verify(lastPushedIndexedParameters[i].lvid)))
 					return false;
-
-				// checking if one parameter was already flag as 'error'
-				for (uint32_t i = 0; i != count; ++i)
-				{
-					if (unlikely(not frame.verify(lastPushedIndexedParameters[i].lvid)))
-						return false;
-				}
 			}
-
-			// specific code for the intrinsic
-			bool success = (this->*(it->second.first))(lvid);
-
-			// annotate any error
-			if (unlikely(not success))
-				atomStack.back().lvids[lvid].errorReported = true;
-			return success;
 		}
-		return (error() << "unknown intrinsic '" << name << '\'');
+
+		// specific code for the intrinsic
+		bool success = (this->*(it->second.first))(lvid);
+
+		// annotate any error
+		if (unlikely(not success))
+			atomStack.back().lvids[lvid].errorReported = true;
+		return success;
 	}
 
 

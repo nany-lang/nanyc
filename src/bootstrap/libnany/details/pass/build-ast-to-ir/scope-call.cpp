@@ -15,7 +15,7 @@ namespace IR
 namespace Producer
 {
 
-	inline bool Scope::visitASTExprCallParameters(const Node& node)
+	inline bool Scope::visitASTExprCallParameters(const Node& node, uint32_t shortcircuitlabel)
 	{
 		assert(node.rule == rgCall);
 		// parameter index
@@ -29,6 +29,10 @@ namespace Producer
 			AnyString name; // acquired named
 		}
 		pushedIndexedParam[Config::maxPushedParameters];
+
+		// the program
+		auto& out = program();
+
 
 		for (auto& childptr: node.children)
 		{
@@ -68,11 +72,30 @@ namespace Producer
 						{
 							case rgExpr:
 							{
+								// this func call may be used by some boolean operators so we may
+								// want to evaluate the second argument only if the first argument
+								// does not suffice to determine the value of the expression
+								//
+								// the code to execute can not be decided yet (needs typing) so
+								// some 'nop' will be inserted to avoid unwanted code/offset shifts
+								if (0 != shortcircuitlabel and paramCount == 1) // 2nd argument
+								{
+									// remember the current offset for inserting code later if needed
+									// (+1 to put the offset after 'stackalloc')
+									out.reserve(out.opcodeCount() + 4);
+
+									// this temporary variable is exactly 'label id + 1' and already reserved
+									// (see below) and can be used for reading a variable member
+									out.emitStackalloc(shortcircuitlabel + 1, nyt_any);
+									out.emitraw<IR::ISA::Op::nop>();
+									out.emitraw<IR::ISA::Op::nop>();
+								}
+
 								bool visited = visitASTExpr(paramchild, paraminfo.localvar);
 								if (unlikely(not visited))
 									return false;
 
-								if ((unlikely(isNamed and name.empty())))
+								if (unlikely(isNamed and name.empty()))
 								{
 									ICE(paramchild) << "got an empty name for a named parameter";
 									return false;
@@ -105,49 +128,79 @@ namespace Producer
 		} // each child
 
 
+		if (0 != shortcircuitlabel)
+			out.emitPragmaShortcircuitMetadata(shortcircuitlabel);
+
 		// push all parameters, indexed and named
 		for (uint i = 0; i != paramCount; ++i)
 		{
 			const auto& info = pushedIndexedParam[i];
 			if (info.name.empty())
-				program().emitPush(info.localvar);
+				out.emitPush(info.localvar);
 			else
-				program().emitPush(info.localvar, info.name);
+				out.emitPush(info.localvar, info.name);
 		}
-
 		return true;
 	}
 
 
 
-	bool Scope::visitASTExprCall(const Node* node, LVID& localvar)
+	bool Scope::visitASTExprCall(const Node* node, LVID& localvar, const Node* parent)
 	{
 		assert(!node or node->rule == rgCall);
 
 		emitDebugpos(node);
 
+		auto& out = program();
 		// ask to resolve the call to operator ()
-		auto func = program().emitStackalloc(nextvar(), nyt_any);
-		program().emitIdentify(func, "^()", localvar);
+		auto func = out.emitStackalloc(nextvar(), nyt_any);
+		out.emitIdentify(func, "^()", localvar);
 
-		auto callret = program().emitStackalloc(nextvar(), nyt_any);
+		auto callret = out.emitStackalloc(nextvar(), nyt_any);
 		localvar = callret; // the new expression value
-
 
 		if (!node or node->children.empty()) // no pushed parameter - direct call
 		{
-			program().emitCall(callret, func);
+			out.emitCall(callret, func);
 			return true;
 		}
 		else
 		{
+			// short-circuit only applies to func call with 2 parameters
+			// but the code for minimal evaluation can not be determined yet (some
+			// member may have to be read, or maybe it should not be done at all)
+			//
+			// this flag will only prepare some room for additional opcodes if required
+			bool shortcircuit = (parent != nullptr and parent->rule == rgIdentifier)
+				and (node->children.size() == 2)
+				and (parent->text == "^and" or parent->text == "^or");
+
 			// some parameters must be pushed
-			OpcodeScopeLocker opscope{program()};
-			// visit all parameters
-			bool success = visitASTExprCallParameters(*node);
-			emitDebugpos(node);
-			program().emitCall(callret, func);
-			return success;
+			OpcodeScopeLocker opscope{out};
+
+			if (not shortcircuit)
+			{
+				bool success = visitASTExprCallParameters(*node);
+				emitDebugpos(*node);
+				out.emitCall(callret, func);
+				return success;
+			}
+			else
+			{
+				// instanciate a label for potential jumps (minimal evaluation)
+				uint32_t shortcircuitlabel = nextvar();
+				// instanciate a temporary variable, if needed for reading a variable
+				// member (from the class 'bool' for example)
+				// (thus the lvid for this will be exactly (shortcircuitlabel + 1))
+				nextvar();
+
+				bool success = visitASTExprCallParameters(*node, shortcircuitlabel);
+				emitDebugpos(*node);
+				out.emitCall(callret, func);
+				out.emitLabel(shortcircuitlabel);
+				return success;
+			}
+			return false;
 		}
 	}
 

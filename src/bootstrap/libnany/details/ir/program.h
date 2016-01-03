@@ -54,6 +54,8 @@ namespace IR
 
 		//! emit a new Instruction
 		template<enum ISA::Op O> ISA::Operand<O>& emit();
+		//! emit a new Instruction (without reserving data if needed)
+		template<enum ISA::Op O> ISA::Operand<O>& emitraw();
 
 		//! Get the offset of an instruction within the program
 		template<enum ISA::Op O> uint32_t offsetOf(const ISA::Operand<O>& instr) const;
@@ -71,6 +73,8 @@ namespace IR
 		void jumpToLabelBackward(const Instruction*& cursor, uint32_t label) const;
 
 
+		//! Emit a NOP instruction
+		void emitNop();
 
 		//! Emit AND
 		void emitAND(uint32_t lvid, uint32_t lhs, uint32_t rhs);
@@ -182,11 +186,18 @@ namespace IR
 		void emitPragmaFuncBody();
 		//! Emit pragma shortcircuit
 		void emitPragmaShortcircuit(bool evalvalue);
+		//! Emit pragma shortcircuit opcode 'nop' offset
+		void emitPragmaShortcircuitMetadata(uint32_t label);
+		//! Emit pragma builtinalias
+		void emitPragmaBuiltinAlias(const AnyString& name);
 		//! Emit visibility opcode
 		void emitVisibility(nyvisibility_t);
 
 		//! Emit qualifiers copy
 		void emitInheritQualifiers(uint32_t lhs, uint32_t rhs);
+
+		//! Emit a label
+		void emitLabel(uint32_t labelid);
 
 		//! Emit a new scope
 		void emitScope();

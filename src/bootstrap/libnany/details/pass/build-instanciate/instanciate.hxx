@@ -152,6 +152,20 @@ namespace Instanciate
 	}
 
 
+	inline void ProgramBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::nop>&)
+	{
+		// duplicate nop as well since they can be used to insert code
+		// (for shortcircuit for example)
+		out.emitNop();
+	}
+
+
+	inline void ProgramBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::label>& operands)
+	{
+		out.emitLabel(operands.label);
+	}
+
+
 	inline void ProgramBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::comment>& /*operands*/)
 	{
 		// out.emitComment(currentProgram.stringrefs[operands.text]);

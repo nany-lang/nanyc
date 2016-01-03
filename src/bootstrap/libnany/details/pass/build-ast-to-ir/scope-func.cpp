@@ -50,9 +50,6 @@ namespace Producer
 			// number of parameters of the function
 			uint paramCount = 0;
 
-			// IR debuginfo
-			bool hasIRDebuginfo = false;
-
 
 		private:
 			bool inspectVisibility(Node&);
@@ -314,10 +311,6 @@ namespace Producer
 				return true;
 
 
-			// some comments for debugging
-			if (unlikely(hasIRDebuginfo))
-				scope.comment("raw input parameters");
-
 			bool success = true;
 
 			if (unlikely(paramCount > Config::maxFuncDeclParameterCount - 1)) // too many parameters ?
@@ -382,7 +375,7 @@ namespace Producer
 		inline bool FuncInspector::inspectReturnType(Node& node)
 		{
 			assert(node.rule == rgFuncReturnType and "invalid return type node");
-			if (unlikely(hasIRDebuginfo))
+			if (debugmode)
 				scope.comment("return type"); // comment for clarity in code
 
 			bool success = true;
@@ -448,7 +441,17 @@ namespace Producer
 						scope.error(*child.children[1]) << "invalid shortcircuit value, expected '__false' or '__true'";
 						return false;
 					}
-					scope.program().emitPragmaShortcircuit((value == "__true"));
+					scope.program().emitPragmaShortcircuit((value == "__true") ? 1 : 0);
+					continue;
+				}
+
+				if (attrname == "builtinalias")
+				{
+					ShortString64 value;
+					if (YUNI_UNLIKELY(child.children[1]->rule == rgEntity))
+						AST::retrieveEntityString(value, *(child.children[1]));
+
+					scope.program().emitPragmaBuiltinAlias(value);
 					continue;
 				}
 
@@ -537,14 +540,12 @@ namespace Producer
 
 
 		bool success = true;
-		bool hasIRDebuginfo = scope.hasIRDebuginfo();
 		bool isOperator = false;
 
 		// evaluate the whole function, and grab the node body for continuing evaluation
 		Node* body = ([&]() -> Node*
 		{
 			FuncInspector inspector{scope};
-			inspector.hasIRDebuginfo = hasIRDebuginfo;
 			success = inspector.inspect(node);
 
 			isOperator = (inspector.funcname.first() == '^');
@@ -559,7 +560,7 @@ namespace Producer
 
 		if (likely(body != nullptr))
 		{
-			if (unlikely(hasIRDebuginfo))
+			if (debugmode)
 				scope.comment("\nfunc body"); // comment for clarity in code
 
 			// continue evaluating the func body independantly of the previous data and results

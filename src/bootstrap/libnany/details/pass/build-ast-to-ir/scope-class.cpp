@@ -40,8 +40,6 @@ namespace Producer
 			//! name of the class (if any)
 			ClassnameType classname;
 
-			// IR debuginfo
-			bool hasIRDebuginfo = false;
 
 		private:
 			bool inspectClassname(Node&);
@@ -131,13 +129,11 @@ namespace Producer
 		scope.emitDebugpos(node);
 
 		bool success = true;
-		bool hasIRDebuginfo = scope.hasIRDebuginfo();
 
 		// evaluate the whole function, and grab the node body for continuing evaluation
 		Node* body = ([&]() -> Node*
 		{
 			ClassInspector inspector{scope};
-			inspector.hasIRDebuginfo = hasIRDebuginfo;
 			success = inspector.inspect(node);
 
 			auto& operands = program().at<ISA::Op::pragma>(bpoffset);
@@ -147,7 +143,7 @@ namespace Producer
 
 		if (likely(body != nullptr))
 		{
-			if (unlikely(hasIRDebuginfo))
+			if (debugmode)
 				scope.comment("\nclass body"); // comment for clarity in code
 
 			// continue evaluating the func body independantly of the previous data and results

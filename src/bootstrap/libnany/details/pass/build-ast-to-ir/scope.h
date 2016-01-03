@@ -57,8 +57,8 @@ namespace Producer
 		bool visitASTExprReturn(Node&);
 		bool visitASTExprContinuation(Node&, LVID& localvar, bool allowScope = false);
 		bool visitASTExprIdentifier(Node&, LVID& localvar);
-		bool visitASTExprCall(const Node*, LVID& localvar); // func call
-		bool visitASTExprCallParameters(const Node&); // parameters of a func call
+		bool visitASTExprCall(const Node*, LVID& localvar, const Node* parent = nullptr); // func call
+		bool visitASTExprCallParameters(const Node&, uint32_t shortcircuitlabel = 0); // parameters of a func call
 		bool visitASTExprSubDot(Node&, LVID& localvar);
 		bool visitASTExprScope(Node&);
 		bool visitASTExprNumber(Node&, LVID& localvar);
@@ -117,8 +117,6 @@ namespace Producer
 
 		//! Get if debuginfo should be used
 		bool hasDebuginfo() const;
-		//! Get if debuginfo for IR generation should be used
-		bool hasIRDebuginfo() const;
 
 		//! Get the name from a 'symbol-name' node (empty if error)
 		AnyString getSymbolNameFromASTNode(Node& node);

@@ -39,8 +39,8 @@ namespace Instanciate
 					auto* atom = table.findClassdefAtom(cdef);
 					if (atom != nullptr)
 					{
+						assert(opc.atomid == 0 or opc.atomid == (uint32_t) -1 or opc.atomid == atom->atomid);
 						opc.type = static_cast<uint32_t>(nyt_pointer);
-						assert(opc.atomid == 0 or opc.atomid == atom->atomid);
 						opc.atomid = atom->atomid;
 					}
 				}
