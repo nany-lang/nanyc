@@ -18,22 +18,17 @@ namespace Producer
 	inline bool Scope::visitASTExprCallParameters(const Node& node)
 	{
 		assert(node.rule == rgCall);
-		// parameter name
-		AnyString name;
 		// parameter index
 		uint paramCount = 0;
 		// at least one named-parameter has been encountered ?
 		bool namedParameterFound = false;
 
 		// information related to all pushed parameters
-		struct ParamInfo final
-		{
+		struct {
 			LVID localvar = 0;
-			const char* name = nullptr; // acquired named
-		};
-
-		// indexed parameters
-		ParamInfo pushedIndexedParam[Config::maxPushedParameters];
+			AnyString name; // acquired named
+		}
+		pushedIndexedParam[Config::maxPushedParameters];
 
 		for (auto& childptr: node.children)
 		{
@@ -43,27 +38,28 @@ namespace Producer
 				case rgCallParameter:
 				case rgCallNamedParameter:
 				{
-					if (paramCount >= Config::maxPushedParameters)
+					if (unlikely(paramCount >= Config::maxPushedParameters))
 					{
 						error(child) << "too many pushed parameters";
-						break;
+						return false;
 					}
-
-					// get the temporary parameter info
-					auto& paraminfo = pushedIndexedParam[paramCount];
 
 					// is the parameter named ?
 					bool isNamed = (child.rule == rgCallNamedParameter);
+					// detect mixed-up named and indexed parameters
 					if (not isNamed)
 					{
 						if (unlikely(namedParameterFound))
-						{
-							error(node) << "got mixed indexed and named parameters";
-							return false;
-						}
+							return (error(node) << "got mixed indexed and named parameters");
 					}
 					else
 						namedParameterFound = true;
+
+
+					// get the temporary parameter info
+					auto& paraminfo = pushedIndexedParam[paramCount];
+					// parameter name
+					AnyString name;
 
 					for (auto& paramChildptr: child.children)
 					{
@@ -76,8 +72,11 @@ namespace Producer
 								if (unlikely(not visited))
 									return false;
 
-								if (isNamed and (unlikely(name.empty())))
+								if ((unlikely(isNamed and name.empty())))
+								{
 									ICE(paramchild) << "got an empty name for a named parameter";
+									return false;
+								}
 								break;
 							}
 							case rgIdentifier:
@@ -85,7 +84,7 @@ namespace Producer
 								if (likely(isNamed))
 								{
 									name = paramchild.text;
-									paraminfo.name = acquireString(name).c_str();
+									paraminfo.name = acquireString(name);
 									break;
 								}
 								// no break here - to go to unexecped node
@@ -100,21 +99,17 @@ namespace Producer
 				}
 
 				//case rgCallNamedParameter:
-
 				default:
 					return ICEUnexpectedNode(child, "[ir/expr/call]");
 			}
-
-			if (paramCount >= Config::maxPushedParameters)
-				break;
-		}
+		} // each child
 
 
 		// push all parameters, indexed and named
 		for (uint i = 0; i != paramCount; ++i)
 		{
 			const auto& info = pushedIndexedParam[i];
-			if (info.name == nullptr)
+			if (info.name.empty())
 				program().emitPush(info.localvar);
 			else
 				program().emitPush(info.localvar, info.name);

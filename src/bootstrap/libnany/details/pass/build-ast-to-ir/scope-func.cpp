@@ -339,7 +339,7 @@ namespace Producer
 			{
 				uint32_t selfid = scope.nextvar();
 				out.emitBlueprintParam(selfid, "self");
-				out.emitSelf(selfid); // must be resolved as 'self'
+				out.emitSelf(selfid); // to resolve the type as 'self'
 			}
 
 			// iterating through all other user-defined parameters
@@ -358,7 +358,6 @@ namespace Producer
 				}
 
 				// reserve registers as many as parameters for cloning parameters
-				out.emitComment("START !!");
 				for (uint32_t i = 0; i != paramCount; ++i)
 					out.emitStore(scope.nextvar(), nyt_any);
 
