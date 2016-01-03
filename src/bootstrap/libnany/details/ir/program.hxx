@@ -495,6 +495,22 @@ namespace IR
 		emit<ISA::Op::jmp>().label = label;
 	}
 
+	inline void Program::emitJz(uint32_t lvid, uint32_t result, uint32_t label)
+	{
+		auto& opc  = emit<ISA::Op::jz>();
+		opc.lvid   = lvid;
+		opc.result = result;
+		opc.label  = label;
+	}
+
+	inline void Program::emitJnz(uint32_t lvid, uint32_t result, uint32_t label)
+	{
+		auto& opc  = emit<ISA::Op::jnz>();
+		opc.lvid   = lvid;
+		opc.result = result;
+		opc.label  = label;
+	}
+
 
 	inline void Program::emitQualifierRef(uint32_t lvid, bool flag)
 	{

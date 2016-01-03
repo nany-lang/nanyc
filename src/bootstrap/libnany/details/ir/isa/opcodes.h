@@ -82,6 +82,11 @@ namespace ISA //!< Instruction Set Architecture
 		label,
 		//! unconditional jump
 		jmp,
+		//! jump if local variable is zero
+		jz,
+		//! jump if local variable is not zero
+		jnz,
+
 
 		//! acquire object
 		ref,
@@ -180,6 +185,8 @@ namespace ISA //!< Instruction Set Architecture
 				\
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::label) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::jmp) \
+				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::jz) \
+				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::jnz) \
 				\
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::ref) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::unref) \

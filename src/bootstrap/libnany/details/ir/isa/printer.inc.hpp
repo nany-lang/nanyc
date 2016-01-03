@@ -258,6 +258,19 @@ namespace // anonymous
 			out << tabs << "jmp " << operands.label;
 		}
 
+		void print(const Operand<Op::jz>& operands)
+		{
+			out << tabs << "jz %" << operands.lvid << " == 0, %" << operands.result;
+			out << ", label: " << operands.label;
+		}
+
+		void print(const Operand<Op::jnz>& operands)
+		{
+			out << tabs << "jnz %" << operands.lvid << " != 0, %" << operands.result;
+			out << ", label: " << operands.label;
+		}
+
+
 
 		void print(const Operand<Op::scope>&)
 		{

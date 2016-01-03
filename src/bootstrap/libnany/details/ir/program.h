@@ -203,6 +203,10 @@ namespace IR
 
 		//! Emit an unconditional jump
 		void emitJmp(uint32_t label);
+		//! Emit jump if zero
+		void emitJz(uint32_t lvid, uint32_t result, uint32_t label);
+		//! Emit jump if not zero
+		void emitJnz(uint32_t lvid, uint32_t result, uint32_t label);
 
 
 		//! Visit each instruction (const)

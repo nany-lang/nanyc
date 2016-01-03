@@ -246,6 +246,26 @@ namespace ISA
 		uint32_t label;
 	};
 
+	template<> struct Operand<Op::jz> final
+	{
+		constexpr static const char* opname() { return "jz"; }
+		uint32_t opcode;
+		uint32_t lvid;   // the local variable
+		uint32_t result; // local variable to set to 1 if jump
+		uint32_t label;
+	};
+
+	template<> struct Operand<Op::jnz> final
+	{
+		constexpr static const char* opname() { return "jnz"; }
+		uint32_t opcode;
+		uint32_t lvid;   // the local variable
+		uint32_t result; // local variable to set to 1 if jump
+		uint32_t label;
+	};
+
+
+
 
 
 
