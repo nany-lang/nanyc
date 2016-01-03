@@ -390,6 +390,8 @@ add_library(libnany-grammar STATIC
 	${nysrc_grammar}
 	${nysrc_details_grammar})
 
+add_dependencies(libnany-grammar nany-grammar-cpp)
+
 
 add_library(libnany ${mode_libnany}
 	# public headers
@@ -444,8 +446,7 @@ set_target_properties(libnany-grammar PROPERTIES
 	VERSION   "${nany_version_major}.${nany_version_minor}.${nany_version_patch}"
 	SOVERSION "${nany_version_major}")
 
-target_link_libraries(libnany PRIVATE yuni-static-core)
-target_link_libraries(libnany PRIVATE libnany-grammar)
+target_link_libraries(libnany PRIVATE yuni-static-core libnany-grammar)
 
 set_property(TARGET libnany PROPERTY MACOSX_RPATH true)
 set_property(TARGET libnany PROPERTY LIBRARY_OUTPUT_NAME "nany")
