@@ -21,6 +21,56 @@ namespace Pass
 namespace Instanciate
 {
 
+	namespace // anonymous
+	{
+
+		struct PostProcessStackAllocWalker final
+		{
+			PostProcessStackAllocWalker(ClassdefTableView& table, uint32_t atomid)
+				: table(table)
+				, atomid(atomid)
+			{}
+
+			void visit(IR::ISA::Operand<IR::ISA::Op::stackalloc>& opc)
+			{
+				auto& cdef = table.classdef(CLID{atomid, opc.lvid});
+				if (not cdef.isBuiltinOrVoid())
+				{
+					auto* atom = table.findClassdefAtom(cdef);
+					if (atom != nullptr)
+					{
+						opc.type = static_cast<uint32_t>(nyt_pointer);
+						assert(opc.atomid == 0 or opc.atomid == atom->atomid);
+						opc.atomid = atom->atomid;
+					}
+				}
+				else
+					opc.type = static_cast<uint32_t>(cdef.kind);
+			}
+
+			template<enum IR::ISA::Op O> void visit(const IR::ISA::Operand<O>&)
+			{
+				// nothing to do
+			}
+
+			ClassdefTableView& table;
+			uint32_t atomid;
+			IR::Instruction** cursor = nullptr;
+		};
+
+		static void postProcessStackAlloc(IR::Program& out, ClassdefTableView& table, uint32_t atomid)
+		{
+			PostProcessStackAllocWalker walker{table, atomid};
+			out.each(walker);
+		}
+
+
+	} // anonymous namespace
+
+
+
+
+
 
 	bool ProgramBuilder::instanciateAtomClassClone(Atom& atom, uint32_t lvid, uint32_t rhs)
 	{
@@ -348,6 +398,11 @@ namespace Instanciate
 
 			// instanciate the atom !
 			bool success = builder->readAndInstanciate(info.atom.opcodes.offset);
+
+			// post-process the output program to update the type of all
+			// stack-allocated variables
+			// (always update, easier for debugging)
+			postProcessStackAlloc(*out, newView, info.atom.atomid);
 
 			// keep the types deduced
 			if (likely(success) and info.shouldMergeLayer)
