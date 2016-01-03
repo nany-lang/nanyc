@@ -242,18 +242,9 @@ namespace Nany
 					}
 
 					case IR::ISA::Pragma::blueprintsize:
-					{
-						break;
-					}
 					case IR::ISA::Pragma::visibility:
-					{
-						break;
-					}
 					case IR::ISA::Pragma::bodystart:
-					{
-						break;
-					}
-
+					case IR::ISA::Pragma::shortcircuit:
 					case IR::ISA::Pragma::unknown:
 					case IR::ISA::Pragma::max:
 					{

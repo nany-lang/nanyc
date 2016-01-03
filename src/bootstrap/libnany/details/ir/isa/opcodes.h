@@ -25,6 +25,7 @@ namespace ISA //!< Instruction Set Architecture
 		//! Code generation flag
 		codegen,
 
+
 		// --- pragma for compilation only
 
 		//! Namespace definition (one part of it)
@@ -45,6 +46,8 @@ namespace ISA //!< Instruction Set Architecture
 		visibility,
 		//! body start,
 		bodystart,
+		//! shortcircuit
+		shortcircuit,
 		//! The maximum number of elements, for integrity check
 		max,
 	};

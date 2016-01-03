@@ -446,6 +446,13 @@ namespace // anonymous
 						break;
 					}
 
+					case Pragma::shortcircuit:
+					{
+						out << tabs << "pragma shortcircuit ";
+						out << ((operands.value.shortcircuit) ? "__true" : "__false");
+						break;
+					}
+
 					default: out << tabs << "<unknown pragma>";
 				}
 			}

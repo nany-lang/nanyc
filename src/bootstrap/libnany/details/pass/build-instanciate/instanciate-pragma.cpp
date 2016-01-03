@@ -278,6 +278,11 @@ namespace Instanciate
 				break;
 			}
 
+			case IR::ISA::Pragma::shortcircuit:
+			{
+				break;
+			}
+
 			case IR::ISA::Pragma::namespacedef:
 			case IR::ISA::Pragma::unknown:
 			case IR::ISA::Pragma::max:

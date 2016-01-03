@@ -1,5 +1,6 @@
 #pragma once
 #include <yuni/yuni.h>
+#include <yuni/core/string.h>
 #include "details/sema/metadata.h"
 #include "details/grammar/nany.h"
 
@@ -38,6 +39,8 @@ namespace AST
 	Node* createNodeFuncCrefParam(const AnyString& name, const AnyString& paramname);
 
 
+	//! Extract the complete identifier string (from an entity node)
+	template<class S> bool retrieveEntityString(S& out, const Node&);
 
 
 

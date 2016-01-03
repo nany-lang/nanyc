@@ -145,6 +145,14 @@ namespace IR
 	}
 
 
+	inline void Program::emitPragmaShortcircuit(bool evalvalue)
+	{
+		auto& opc = emit<ISA::Op::pragma>();
+		opc.pragma = static_cast<uint32_t>(IR::ISA::Pragma::shortcircuit);
+		opc.value.shortcircuit = static_cast<uint32_t>(evalvalue);
+	}
+
+
 	inline void Program::emitPragmaFuncBody()
 	{
 		emit<ISA::Op::pragma>().pragma = static_cast<uint32_t>(IR::ISA::Pragma::bodystart);

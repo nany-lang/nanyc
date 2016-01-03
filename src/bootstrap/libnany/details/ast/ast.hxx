@@ -64,6 +64,23 @@ namespace AST
 
 
 
+	template<class S> bool retrieveEntityString(S& out, const Node& node)
+	{
+		assert(node.rule == rgEntity);
+		out.clear();
+		for (auto& ptr: node.children)
+		{
+			auto& child = *ptr;
+			if (YUNI_UNLIKELY(child.rule != rgIdentifier))
+				return false;
+			if (not out.empty())
+				out += '.';
+			out += child.text;
+		}
+		return true;
+	}
+
+
 
 } // namespace AST
 } // namespace Nany

@@ -180,6 +180,8 @@ namespace IR
 		void emitPragmaAllowCodeGeneration(bool enabled);
 		//! Emit opcode that indicates the begining of a func body
 		void emitPragmaFuncBody();
+		//! Emit pragma shortcircuit
+		void emitPragmaShortcircuit(bool evalvalue);
 		//! Emit visibility opcode
 		void emitVisibility(nyvisibility_t);
 

@@ -1,8 +1,10 @@
 #include <yuni/yuni.h>
 #include <yuni/core/noncopyable.h>
+#include <yuni/core/tribool.h>
 #include "details/pass/build-ast-to-ir/scope.h"
 #include "details/utils/check-for-valid-identifier-name.h"
 #include "details/grammar/nany.h"
+#include "details/ast/ast.h"
 #include "libnany-config.h"
 
 using namespace Yuni;
@@ -51,12 +53,14 @@ namespace Producer
 			// IR debuginfo
 			bool hasIRDebuginfo = false;
 
+
 		private:
 			bool inspectVisibility(Node&);
 			bool inspectKind(Node&);
 			bool inspectParameters(Node*);
 			bool inspectReturnType(Node&);
 			bool inspectSingleParameter(uint pindex, Node&, uint32_t paramoffset);
+			bool inspectAttributes(Node&);
 
 		private:
 			bool pWithinClass = false;
@@ -416,6 +420,48 @@ namespace Producer
 		}
 
 
+		bool FuncInspector::inspectAttributes(Node& node)
+		{
+			assert(node.rule == rgAttributes);
+			for (auto& childptr: node.children)
+			{
+				auto& child = *childptr;
+				if (YUNI_UNLIKELY(child.rule != rgAttributesParameter))
+					return scope.ICEUnexpectedNode(child, "invalid node, not attribute parameter");
+				if (YUNI_UNLIKELY(child.children.size() != 2))
+					return scope.ICEUnexpectedNode(child, "invalid attribute parameter node");
+				if (YUNI_UNLIKELY(ASTRuleIsError(child.children[1]->rule)))
+					return false;
+				if (YUNI_UNLIKELY(child.children[0]->rule != rgEntity))
+					return scope.ICEUnexpectedNode(child, "invalid attribute parameter name");
+
+				ShortString64 attrname;
+				if (not AST::retrieveEntityString(attrname, *(child.children[0])))
+					return scope.ICEUnexpectedNode(child, "invalid entity");
+
+				if (attrname == "shortcircuit")
+				{
+					ShortString64 value;
+					if (YUNI_UNLIKELY(child.children[1]->rule == rgEntity))
+						AST::retrieveEntityString(value, *(child.children[1]));
+					if (value.empty() or (value != "__true" and value != "__false"))
+					{
+						scope.error(*child.children[1]) << "invalid shortcircuit value, expected '__false' or '__true'";
+						return false;
+					}
+					scope.program().emitPragmaShortcircuit((value == "__true"));
+					continue;
+				}
+
+				scope.error(child) << "unknown attribute '" << attrname << '\'';
+				return false;
+			}
+			return true;
+		}
+
+
+
+
 		inline bool FuncInspector::inspect(Node& node)
 		{
 			// exit status
@@ -435,6 +481,7 @@ namespace Producer
 					case rgVisibility:     { success &= inspectVisibility(child); break; }
 					case rgFuncReturnType: { nodeReturnType = &child; break; }
 					case rgFuncBody:       { body = &child; break; }
+					case rgAttributes:     { success = inspectAttributes(child); break; }
 					default:
 						success &= scope.ICEUnexpectedNode(child, "[func]");
 				}
