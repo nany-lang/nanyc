@@ -5,7 +5,6 @@
 #include "details/context/build-info.h"
 #include "details/fwd.h"
 #include <memory>
-
 using namespace Yuni;
 
 
@@ -148,7 +147,7 @@ namespace Nany
 			ThreadingPolicy::MutexLocker locker{*this};
 
 			auto it = pSourcesByName.find(source->pFilename);
-			if (it != pSourcesByName.end())
+			if (it == pSourcesByName.end())
 				pSourcesByName.insert(std::make_pair(AnyString{source->pFilename}, std::ref(*source)));
 			else
 				it->second = std::ref(*source);
@@ -163,6 +162,8 @@ namespace Nany
 		if (not filename.empty())
 		{
 			auto source = std::make_unique<Source>(this, Source::Type::file, filename, AnyString());
+
+			ThreadingPolicy::MutexLocker locker{*this};
 
 			auto it = pSourcesByFilename.find(source->pFilename);
 			if (it == pSourcesByFilename.end())

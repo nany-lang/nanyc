@@ -4,6 +4,7 @@
 #include "details/context/build-info.h"
 #include "details/vm/vm.h"
 #include <memory>
+#include "details/nsl/import-stdcore.h"
 
 using namespace Yuni;
 
@@ -16,7 +17,9 @@ namespace Nany
 
 	Context::Context(nycontext_t& context)
 		: usercontext(context)
-	{}
+	{
+		importNSLCore(*this);
+	}
 
 
 	Context::Context(nycontext_t& context, const Context& rhs)
