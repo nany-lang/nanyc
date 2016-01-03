@@ -12,9 +12,9 @@ namespace Pass
 namespace Instanciate
 {
 
-	inline bool ProgramBuilder::instanciateIntrinsicFieldset(uint32_t lvid)
+	bool  ProgramBuilder::instanciateIntrinsicFieldset(uint32_t lvid)
 	{
-		cdeftable.substitute(lvid).kind = nyt_void;
+		cdeftable.substitute(lvid).mutateToVoid();
 
 		auto& frame = atomStack.back();
 		uint32_t lvidsid = lastPushedIndexedParameters[1].lvid;
@@ -51,27 +51,27 @@ namespace Instanciate
 	}
 
 
-	inline bool ProgramBuilder::instanciateIntrinsicRef(uint32_t lvid)
+	bool  ProgramBuilder::instanciateIntrinsicRef(uint32_t lvid)
 	{
-		cdeftable.substitute(lvid).kind = nyt_void;
+		cdeftable.substitute(lvid).mutateToVoid();
 		if (canGenerateCode())
 			tryToAcquireObject(lastPushedIndexedParameters[0].lvid);
 		return true;
 	}
 
 
-	inline bool ProgramBuilder::instanciateIntrinsicUnref(uint32_t lvid)
+	bool  ProgramBuilder::instanciateIntrinsicUnref(uint32_t lvid)
 	{
-		cdeftable.substitute(lvid).kind = nyt_void;
+		cdeftable.substitute(lvid).mutateToVoid();
 		if (canGenerateCode())
 			tryUnrefObject(lastPushedIndexedParameters[0].lvid);
 		return true;
 	}
 
 
-	inline bool ProgramBuilder::instanciateIntrinsicAddressof(uint32_t lvid)
+	bool  ProgramBuilder::instanciateIntrinsicAddressof(uint32_t lvid)
 	{
-		cdeftable.substitute(lvid).kind = nyt_u64;
+		cdeftable.substitute(lvid).mutateToBuiltin(nyt_u64);
 
 		if (canGenerateCode())
 		{
@@ -85,9 +85,9 @@ namespace Instanciate
 	}
 
 
-	inline bool ProgramBuilder::instanciateIntrinsicSizeof(uint32_t lvid)
+	bool  ProgramBuilder::instanciateIntrinsicSizeof(uint32_t lvid)
 	{
-		cdeftable.substitute(lvid).kind = nyt_u64;
+		cdeftable.substitute(lvid).mutateToBuiltin(nyt_u64);
 
 		uint32_t objlvid = lastPushedIndexedParameters[0].lvid;
 		auto& frame = atomStack.back();
@@ -123,9 +123,9 @@ namespace Instanciate
 	}
 
 
-	inline bool ProgramBuilder::instanciateIntrinsicMemalloc(uint32_t lvid)
+	bool  ProgramBuilder::instanciateIntrinsicMemalloc(uint32_t lvid)
 	{
-		cdeftable.substitute(lvid).kind = nyt_u64;
+		cdeftable.substitute(lvid).mutateToBuiltin(nyt_u64);
 
 		uint32_t objlvid = lastPushedIndexedParameters[0].lvid;
 		auto& frame = atomStack.back();
@@ -139,9 +139,9 @@ namespace Instanciate
 	}
 
 
-	inline bool ProgramBuilder::instanciateIntrinsicMemFree(uint32_t lvid)
+	bool  ProgramBuilder::instanciateIntrinsicMemFree(uint32_t lvid)
 	{
-		cdeftable.substitute(lvid).kind = nyt_void;
+		cdeftable.substitute(lvid).mutateToVoid();
 
 		auto& frame = atomStack.back();
 
@@ -161,6 +161,59 @@ namespace Instanciate
 	}
 
 
+	template<void (IR::Program::* M)(uint32_t, uint32_t, uint32_t)>
+	inline bool ProgramBuilder::instanciateIntrinsicLogic(uint32_t lvid, const char* const name)
+	{
+		auto& frame = atomStack.back();
+		uint32_t lhs  = lastPushedIndexedParameters[0].lvid;
+		auto& cdeflhs = cdeftable.classdefFollowClassMember(CLID{frame.atomid, lhs});
+		uint32_t rhs  = lastPushedIndexedParameters[1].lvid;
+		auto& cdefrhs = cdeftable.classdefFollowClassMember(CLID{frame.atomid, rhs});
+
+		if (unlikely(not cdeflhs.isBuiltin()))
+			return complainIntrinsicParameter(name, 0, cdeflhs, "'__u64'");
+		if (unlikely(not cdefrhs.isBuiltin()))
+			return complainIntrinsicParameter(name, 1, cdefrhs, "'__u64'");
+
+		if (unlikely(cdeflhs.kind != cdefrhs.kind))
+		{
+			return complainIntrinsicParameter(name, 0, cdeflhs, "'__u64'");
+			return complainIntrinsicParameter(name, 1, cdefrhs, "'__u64'");
+		}
+
+		cdeftable.substitute(lvid).mutateToBuiltin(cdeflhs.kind);
+		if (canGenerateCode())
+			(out.*M)(lvid, lhs, rhs);
+		return true;
+	}
+
+	bool  ProgramBuilder::instanciateIntrinsicAND(uint32_t lvid)
+	{
+		return instanciateIntrinsicLogic<&IR::Program::emitAND>(lvid, "and");
+	}
+
+	bool  ProgramBuilder::instanciateIntrinsicOR(uint32_t lvid)
+	{
+		return instanciateIntrinsicLogic<&IR::Program::emitOR>(lvid, "or");
+	}
+
+	bool  ProgramBuilder::instanciateIntrinsicXOR(uint32_t lvid)
+	{
+		return instanciateIntrinsicLogic<&IR::Program::emitXOR>(lvid, "xor");
+	}
+
+	bool  ProgramBuilder::instanciateIntrinsicMOD(uint32_t lvid)
+	{
+		return instanciateIntrinsicLogic<&IR::Program::emitMOD>(lvid, "mod");
+	}
+
+
+
+
+
+
+
+
 
 	typedef bool (ProgramBuilder::* BuiltinIntrinsic)(uint32_t);
 
@@ -173,6 +226,11 @@ namespace Instanciate
 		{"ref",              { &ProgramBuilder::instanciateIntrinsicRef,       1 }},
 		{"unref",            { &ProgramBuilder::instanciateIntrinsicUnref,     1 }},
 		{"sizeof",           { &ProgramBuilder::instanciateIntrinsicSizeof,    1 }},
+		//
+		{"and",              { &ProgramBuilder::instanciateIntrinsicAND,       2 }},
+		{"or",               { &ProgramBuilder::instanciateIntrinsicOR,        2 }},
+		{"xor",              { &ProgramBuilder::instanciateIntrinsicXOR,       2 }},
+		{"mod",              { &ProgramBuilder::instanciateIntrinsicMOD,       2 }},
 	};
 
 	bool ProgramBuilder::instanciateBuiltinIntrinsic(const AnyString& name, uint32_t lvid)
@@ -181,9 +239,20 @@ namespace Instanciate
 		auto it = builtinDispatch.find(name);
 		if (likely(it != builtinDispatch.end()))
 		{
-			// check for parameter count
-			if (unlikely(not checkForIntrinsicParamCount(name, it->second.second)))
-				return false;
+			// check for parameters
+			{
+				auto& frame = atomStack.back();
+				uint32_t count = it->second.second;
+				if (unlikely(not checkForIntrinsicParamCount(name, count)))
+					return false;
+
+				// checking if one parameter was already flag as 'error'
+				for (uint32_t i = 0; i != count; ++i)
+				{
+					if (unlikely(not frame.verify(lastPushedIndexedParameters[i].lvid)))
+						return false;
+				}
+			}
 
 			// specific code for the intrinsic
 			bool success = (this->*(it->second.first))(lvid);
