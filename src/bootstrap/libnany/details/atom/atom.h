@@ -169,8 +169,14 @@ namespace Nany
 
 		//! \name Instances
 		//@{
-		//! Fetch the program for a given signature (if any)
-		uint32_t findInstance(IR::Program*& program, const Signature& signature);
+		/*!
+		** \brief Fetch the program for a given signature (if any) and update the signature
+		**
+		** \param[out] Pointer to the program attached to the given signature
+		** \param[in,out] The signature. If the instance is found, its return type
+		**  will be updated accordingly
+		*/
+		uint32_t findInstance(IR::Program*& program, Signature& signature);
 		//! Find Instance ID
 		uint32_t findInstanceID(const IR::Program&) const;
 

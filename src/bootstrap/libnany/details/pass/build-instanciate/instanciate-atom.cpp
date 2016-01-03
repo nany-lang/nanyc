@@ -468,12 +468,12 @@ namespace Instanciate
 					signature.returnType.mutateToVoid();
 					info.returnType.mutateToVoid();
 				}
-			}
 
-			if (success)
-			{
-				info.instanceid = info.atom.assignInstance(signature, out.get(), symbolName);
-				return out.release();
+				if (likely(success))
+				{
+					info.instanceid = info.atom.assignInstance(signature, out.get(), symbolName);
+					return out.release();
+				}
 			}
 		}
 

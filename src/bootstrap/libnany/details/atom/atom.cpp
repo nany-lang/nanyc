@@ -36,12 +36,16 @@ namespace Nany
 	}
 
 
-	uint32_t Atom::findInstance(IR::Program*& program, const Signature& signature)
+	uint32_t Atom::findInstance(IR::Program*& program, Signature& signature)
 	{
 		auto it = pInstancesBySign.find(signature);
 		if (it != pInstancesBySign.end())
 		{
 			program = it->second.second;
+
+			auto& storedRetType = it->first.returnType;
+			signature.returnType.import(storedRetType);
+			signature.returnType.qualifiers = storedRetType.qualifiers;
 			return it->second.first;
 		}
 		return (uint32_t) -1;
