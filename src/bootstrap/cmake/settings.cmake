@@ -23,6 +23,7 @@ if ("${nany_version_metadata}" STREQUAL "")
 	if (NOT "$ENV{TRAVIS_TAG}" STREQUAL "")
 		# do not append a metadata when compiled from a tag
 	else()
+		set(GIT_COMMIT_HASH "")
 		if(NOT "$ENV{TRAVIS_COMMIT_RANGE}" STREQUAL "")
 			string(REPLACE "..." ";" GIT_COMMIT_HASH "$ENV{TRAVIS_COMMIT_RANGE}")
 			list(GET GIT_COMMIT_HASH 0 __start)
@@ -33,16 +34,21 @@ if ("${nany_version_metadata}" STREQUAL "")
 		elseif(NOT "$ENV{TRAVIS_COMMIT}" STREQUAL "")
 			string(SUBSTRING "$ENV{TRAVIS_COMMIT}" 0 7 GIT_COMMIT_HASH)
 		else()
-			execute_process(COMMAND git log -1 --format=%h
-				WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}" OUTPUT_VARIABLE GIT_COMMIT_HASH
-				OUTPUT_STRIP_TRAILING_WHITESPACE)
+			find_program(bin_git NAMES "git")
+			if (bin_git)
+				execute_process(COMMAND "${bin_git}" log -1 --format=%h
+					WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}" OUTPUT_VARIABLE GIT_COMMIT_HASH
+					OUTPUT_STRIP_TRAILING_WHITESPACE)
+			endif()
 		endif()
 
-		if (NOT "$ENV{TRAVIS_PULL_REQUEST}" STREQUAL "" AND NOT "$ENV{TRAVIS_PULL_REQUEST}" STREQUAL "false")
-			set(GIT_COMMIT_HASH "github-$ENV{TRAVIS_PULL_REQUEST}-${GIT_COMMIT_HASH}")
-		endif()
+		if (NOT "${GIT_COMMIT_HASH}" STREQUAL "")
+			if (NOT "$ENV{TRAVIS_PULL_REQUEST}" STREQUAL "" AND NOT "$ENV{TRAVIS_PULL_REQUEST}" STREQUAL "false")
+				set(GIT_COMMIT_HASH "github-$ENV{TRAVIS_PULL_REQUEST}-${GIT_COMMIT_HASH}")
+			endif()
 
-		set(nany_version_metadata "${GIT_COMMIT_HASH}" CACHE STRING "" FORCE)
+			set(nany_version_metadata "${GIT_COMMIT_HASH}" CACHE STRING "" FORCE)
+		endif()
 	endif()
 endif()
 
