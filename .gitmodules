@@ -4,3 +4,6 @@
 [submodule "tests"]
 	path = tests
 	url = https://github.com/nany-lang/nany-tests
+[submodule "src/nsl"]
+	path = src/nsl
+	url = https://github.com/nany-lang/nany-nsl
