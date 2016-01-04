@@ -58,7 +58,7 @@ namespace Producer
 			scopeThen.emitDebugpos(thenClause);
 
 			for (auto& stmt: thenClause.children)
-				scopeThen.visitASTStmt(*stmt);
+				success &= scopeThen.visitASTStmt(*stmt);
 		}
 		if (hasElseClause)
 		{
@@ -75,7 +75,7 @@ namespace Producer
 			scopeElse.emitDebugpos(elseClause);
 
 			for (auto& stmt: elseClause.children)
-				scopeElse.visitASTStmt(*stmt);
+				success &= scopeElse.visitASTStmt(*stmt);
 		}
 
 		out.emitLabel(labelEnd);
