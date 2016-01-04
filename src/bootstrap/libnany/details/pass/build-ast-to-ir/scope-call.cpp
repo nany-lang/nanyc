@@ -113,7 +113,7 @@ namespace Producer
 								// no break here - to go to unexecped node
 							}
 							default:
-								return ICEUnexpectedNode(child, "[ir/expr/call-parameter]");
+								return ICEUnexpectedNode(paramchild, "[ir/expr/call-parameter]");
 						}
 					}
 
