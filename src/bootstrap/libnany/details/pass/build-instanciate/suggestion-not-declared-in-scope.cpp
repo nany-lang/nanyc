@@ -106,7 +106,8 @@ namespace Instanciate
 			return false;
 
 		auto err = error();
-		if (name.first() == '^')
+		bool unknownIsOperator = (name.first() == '^');
+		if (unknownIsOperator)
 		{
 			AnyString rname{name.c_str() + 1, name.size() - 1};
 			if (self)
@@ -135,7 +136,7 @@ namespace Instanciate
 
 
 		// trying local variables first
-		if (self == nullptr)
+		if (self == nullptr and not unknownIsOperator)
 		{
 			uint note;
 			auto& frame = atomStack.back();
@@ -174,12 +175,12 @@ namespace Instanciate
 		{
 			std::map<size_t, std::vector<std::reference_wrapper<const Atom>>> dict;
 
-			if (name.first() != '^')
+			if (not unknownIsOperator)
 			{
 				// not an operator, can be anything
 				parentAtom->eachChild([&](const Atom& child) -> bool
 				{
-					if (&child != &atom)
+					if (&child != &atom and (not child.isOperator()))
 					{
 						uint note;
 						if (stringsAreCloseEnough(note, name, child.name))
