@@ -50,10 +50,12 @@ namespace Producer
 				return visitASTExpr(node, localvar, /*allowScope:*/true);
 			}
 
-			case rgScope:  return visitASTExprScope(node);
-			case rgVar:    return visitASTVar(node);
-			case rgReturn: return visitASTExprReturn(node);
-			case rgClass:  return visitASTClass(node);
+			case rgScope:   return visitASTExprScope(node);
+			case rgWhile:   return visitASTExprWhile(node);
+			case rgDoWhile: return visitASTExprDoWhile(node);
+			case rgVar:     return visitASTVar(node);
+			case rgReturn:  return visitASTExprReturn(node);
+			case rgClass:   return visitASTClass(node);
 
 			default: return ICEUnexpectedNode(node, "[ir/stmt]");
 		}
