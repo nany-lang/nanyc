@@ -139,7 +139,7 @@ set_target_properties(nany PROPERTIES
 
 
 add_executable(nyt-print-ast  print-ast.cpp)
-target_link_libraries(nyt-print-ast PRIVATE libnany yuni-static-core)
+target_link_libraries(nyt-print-ast PRIVATE libnany-grammar yuni-static-core)
 
 add_executable(nyt-check-syntax  check-syntax.cpp)
 target_link_libraries(nyt-check-syntax PRIVATE libnany yuni-static-core)

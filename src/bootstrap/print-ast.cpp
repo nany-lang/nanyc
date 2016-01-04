@@ -2,12 +2,31 @@
 #include <yuni/io/file.h>
 #include <yuni/core/system/console.h>
 #include <yuni/core/getopt.h>
-#include <nany/nany.h>
+#include "details/grammar/nany.h"
 #include <iostream>
 
 using namespace Yuni;
 
 
+
+static bool  printAST(const AnyString filename, bool unixcolors)
+{
+	if (filename.empty())
+		return false;
+
+	Nany::Parser parser;
+	if (not parser.loadFromFile(filename))
+		return false;
+
+	if (nullptr == parser.root)
+		return false;
+
+	Clob out;
+	Nany::Node::Export(out, *parser.root, unixcolors);
+
+	std::cout.write(out.c_str(), out.size());
+	return true;
+}
 
 
 
@@ -75,7 +94,7 @@ int main(int argc, char** argv)
 	bool withColors = ((not noColors) and System::Console::IsStdoutTTY());
 
 	for (auto& path: filenames)
-		nany_print_ast_from_file(path.c_str(), 1, (withColors ? nytrue : nyfalse));
+		printAST(path, withColors);
 
 	return EXIT_SUCCESS;
 }

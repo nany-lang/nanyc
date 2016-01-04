@@ -465,7 +465,8 @@ target_compile_definitions(libnany PRIVATE "LIBNANY_DLL_EXPORT=1")
 
 
 target_include_directories(libnany PRIVATE "${libnany_config_folder}")
-target_include_directories(libnany PUBLIC  ".")
+target_include_directories(libnany PUBLIC  "${CMAKE_CURRENT_LIST_DIR}")
+target_include_directories(libnany-grammar PUBLIC "${CMAKE_CURRENT_LIST_DIR}")
 
 add_dependencies(libnany nany-grammar-cpp)
 add_dependencies(libnany nyt-nanyfile-to-cstring)
