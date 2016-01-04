@@ -14,34 +14,23 @@ namespace IR
 namespace Producer
 {
 
-
-	bool Scope::visitASTExprIf(Node& node, LVID& localvar)
+	bool Scope::generateIf(Node& expr, Node& thenc, Node* elsec, uint32_t jmpthen, uint32_t jmpelse)
 	{
-		assert(node.rule == rgIf);
-		assert(not node.children.empty());
-
-		localvar = 0;
-		uint32_t childcount = static_cast<uint32_t>(node.children.size());
-		if (unlikely(childcount != 2 and childcount != 3))
-		{
-			ICE(node) << "if: invalid number of children";
-			return false;
-		}
-
-		auto& out = program();
-		bool success = true;
 		// new scope for the condition
 		IR::Producer::Scope scopeIf{*this};
+		// output program
+		auto& out = scopeIf.program();
+
 		// evalation of the condition
 		uint32_t condlvid = out.emitStackalloc(scopeIf.nextvar(), nyt_bool);
 
-		bool hasElseClause = (childcount == 3);
+		bool hasElseClause = (elsec != nullptr);
+		bool success = true;
 
 		// expression
 		{
-			auto& condition = *(node.children[0]);
 			uint32_t exprEval = 0;
-			success &= scopeIf.visitASTExpr(condition, exprEval, false);
+			success &= scopeIf.visitASTExpr(expr, exprEval, false);
 			out.emitAssign(condlvid, exprEval, false);
 		}
 
@@ -53,33 +42,72 @@ namespace Producer
 
 		// if-then...
 		{
-			IR::Producer::Scope scopeThen{scopeIf};
-			auto& thenClause = *(node.children[1]);
-			scopeThen.emitDebugpos(thenClause);
+			{
+				IR::Producer::Scope scopeThen{scopeIf};
+				scopeThen.emitDebugpos(thenc);
 
-			for (auto& stmt: thenClause.children)
-				success &= scopeThen.visitASTStmt(*stmt);
-		}
-		if (hasElseClause)
-		{
+				for (auto& stmt: thenc.children)
+					success &= scopeThen.visitASTStmt(*stmt);
+			}
+
 			// jump to the end to not execute the 'else' clause
-			out.emitJmp(labelEnd);
+			if (jmpthen == 0)
+				out.emitJmp(labelEnd);
+			else
+				out.emitJmp(jmpthen);
 		}
 
 		// ...else
 		if (hasElseClause)
 		{
-			IR::Producer::Scope scopeElse{scopeIf};
-			out.emitLabel(labelElse);
-			auto& elseClause = *(node.children[2]);
-			scopeElse.emitDebugpos(elseClause);
+			{
+				IR::Producer::Scope scopeElse{scopeIf};
+				out.emitLabel(labelElse);
+				scopeElse.emitDebugpos(*elsec);
 
-			for (auto& stmt: elseClause.children)
-				success &= scopeElse.visitASTStmt(*stmt);
+				for (auto& stmt: elsec->children)
+					success &= scopeElse.visitASTStmt(*stmt);
+			}
+			if (jmpelse != 0)
+				out.emitJmp(jmpelse);
 		}
 
 		out.emitLabel(labelEnd);
 		return success;
+	}
+
+
+	bool Scope::visitASTExprIf(Node& node, LVID& localvar)
+	{
+		assert(node.rule == rgIf);
+		assert(not node.children.empty());
+
+		localvar = 0;
+
+		// the condition to evaluate
+		auto& condition  = *(node.children[0]);
+		auto& thenc = *(node.children[1]);
+
+		switch (node.children.size())
+		{
+			case 2:
+			{
+				// if-then
+				auto* elsec = Node::Ptr::WeakPointer(node.children[2]);
+				return generateIf(condition, thenc, elsec);
+			}
+			case 3:
+			{
+				// if-then-else
+				return generateIf(condition, thenc);
+			}
+			default:
+			{
+				ICE(node) << "if: invalid number of children";
+				return false;
+			}
+		}
+		return false;
 	}
 
 

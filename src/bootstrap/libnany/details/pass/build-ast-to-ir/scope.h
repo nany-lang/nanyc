@@ -109,6 +109,7 @@ namespace Producer
 		void addDebugCurrentFilename(const AnyString& filename);
 		void addDebugCurrentPosition(uint line, uint offset);
 		void fetchLineAndOffsetFromNode(const Node& node, yuint32& line, yuint32& offset) const;
+		bool generateIf(Node& expr, Node& thenc, Node* elsec = nullptr, uint32_t jmpthen = 0, uint32_t jmpelse = 0);
 
 
 		//! \name Utilities
