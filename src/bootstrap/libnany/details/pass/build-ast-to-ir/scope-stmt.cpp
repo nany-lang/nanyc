@@ -31,6 +31,13 @@ namespace Producer
 				if (node.children.size() == 1)
 				{
 					auto& child = *(node.children[0]);
+
+					if (child.rule == rgIf)
+					{
+						uint32_t localvar = 0;
+						return visitASTExprIf(child, localvar);
+					}
+
 					if (child.rule == rgFunction)
 						return visitASTFunc(child);
 				}

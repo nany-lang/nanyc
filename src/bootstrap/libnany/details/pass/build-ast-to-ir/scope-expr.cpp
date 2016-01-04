@@ -58,7 +58,7 @@ namespace Producer
 				case rgTypeof:     success &= visitASTExprTypeof(child, localvar); break;
 				case rgIntrinsic:  success &= visitASTExprIntrinsic(child, localvar); break;
 
-				case rgIf:         success &= visitASTExprIf(child, localvar); break;
+				case rgWhile:      success &= visitASTExprWhile(child); break;
 
 				// scope may appear in expr (when expr are actually statements)
 				case rgScope:  if (allowScope) { success &= visitASTExprScope(child); break; }; // if not > unexpected
