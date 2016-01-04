@@ -60,6 +60,9 @@ namespace Producer
 
 				case rgWhile:      success &= visitASTExprWhile(child); break;
 
+				// special for internal AST manipulation
+				case rgRegister:   localvar = child.text.to<uint32_t>(); break;
+
 				// scope may appear in expr (when expr are actually statements)
 				case rgScope:  if (allowScope) { success &= visitASTExprScope(child); break; }; // if not > unexpected
 				default:

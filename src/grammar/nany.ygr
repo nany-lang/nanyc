@@ -230,6 +230,11 @@ visibility:
 
 
 
+// --- SPECIAL ---
+
+// this special token is not used in the grammar
+register: notext
+	wp // unused rule
 
 
 
@@ -740,8 +745,9 @@ switch: notext
 		switch-expr wp tk-on
 		(
 			tk-brace-open
-			(wp (switch-case | switch-default))* wp
+			(wp switch-case)* wp
 			tk-brace-close
+			(wp if-else)?
 		)
 		| error-eol
 	)
