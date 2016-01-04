@@ -57,6 +57,8 @@ namespace Instanciate
 
 	inline bool AtomStackFrame::verify(uint32_t lvid) const
 	{
+		if (not (lvid != 0 and lvid < lvids.size()))
+			throw "piko";
 		assert(lvid != 0 and lvid < lvids.size());
 		return likely(not lvids[lvid].errorReported);
 	}

@@ -30,22 +30,28 @@ namespace Producer
 		auto& out = program();
 		bool success = true;
 
+		if (debugmode)
+			out.emitComment("while");
+
 		// new scope for the 'while' statement
-		IR::Producer::Scope scopeWhile{*this};
+		OpcodeScopeLocker opscopeWhile{out};
 
 		// the label at the very begining, to loop back
-		uint32_t labelWhile = scopeWhile.nextvar();
+		uint32_t labelWhile = nextvar();
 		out.emitLabel(labelWhile);
 
+		if (debugmode)
+			out.emitComment("while-condition");
+
 		// a temporary variable for the result of the condition evaluation
-		uint32_t condlvid = scopeWhile.nextvar();
+		uint32_t condlvid = nextvar();
 		out.emitStackalloc(condlvid, nyt_bool);
 		// generating the code for the condition itself
 		{
-			IR::Producer::Scope scopeCond{*this};
+			OpcodeScopeLocker opscopeCond{out};
 			auto& condition = *(node.children[0]);
 			uint32_t exprEval = 0;
-			success &= scopeCond.visitASTExpr(condition, exprEval, false);
+			success &= visitASTExpr(condition, exprEval, false);
 			out.emitAssign(condlvid, exprEval, false);
 		}
 
@@ -56,8 +62,11 @@ namespace Producer
 
 		// 'while' body
 		{
-			IR::Producer::Scope scopeBody{scopeWhile};
-			success &= scopeBody.visitASTStmt(*(node.children[1]));
+			if (debugmode)
+				out.emitComment("while-body");
+
+			OpcodeScopeLocker opscopeBody{out};
+			success &= visitASTStmt(*(node.children[1]));
 		}
 
 		// loop back to the condition evaluation
@@ -65,7 +74,7 @@ namespace Producer
 
 		// end of while, if the condition evaluation failed
 		// (and update the label id in the original jump)
-		uint32_t labelEnd = scopeWhile.nextvar();
+		uint32_t labelEnd = nextvar();
 		out.emitLabel(labelEnd);
 		out.at<IR::ISA::Op::jz>(jumpOffset).label = labelEnd;
 
@@ -88,28 +97,37 @@ namespace Producer
 		auto& out = program();
 		bool success = true;
 
+		if (debugmode)
+			out.emitComment("do-while");
+
 		// new scope for the 'while' statement
-		IR::Producer::Scope scopeWhile{*this};
+		OpcodeScopeLocker opscopeWhile{out};
 
 		// the label at the very begining, to loop back
-		uint32_t labelWhile = scopeWhile.nextvar();
+		uint32_t labelWhile = nextvar();
 		out.emitLabel(labelWhile);
 
 		// 'while' body
 		{
-			IR::Producer::Scope scopeBody{scopeWhile};
-			success &= scopeBody.visitASTStmt(*(node.children[0]));
+			if (debugmode)
+				out.emitComment("do-while-body");
+
+			OpcodeScopeLocker opscopeBody{out};
+			success &= visitASTStmt(*(node.children[0]));
 		}
 
+		if (debugmode)
+			out.emitComment("do-while-condition");
+
 		// a temporary variable for the result of the condition evaluation
-		uint32_t condlvid = scopeWhile.nextvar();
+		uint32_t condlvid = nextvar();
 		out.emitStackalloc(condlvid, nyt_bool);
 		// generating the code for the condition itself
 		{
-			IR::Producer::Scope scopeCond{*this};
+			OpcodeScopeLocker opscopeCond{out};
 			auto& condition = *(node.children[1]);
 			uint32_t exprEval = 0;
-			success &= scopeCond.visitASTExpr(condition, exprEval, false);
+			success &= visitASTExpr(condition, exprEval, false);
 			out.emitAssign(condlvid, exprEval, false);
 		}
 

@@ -21,6 +21,7 @@ namespace Producer
 
 		bool success = true;
 		bool hasReturnValue = false;
+		auto& out = program();
 
 		for (auto& childptr: node.children)
 		{
@@ -30,7 +31,7 @@ namespace Producer
 			{
 				case rgExpr:
 				{
-					IR::OpcodeScopeLocker opscope{program()};
+					IR::OpcodeScopeLocker opscope{out};
 					LVID localvar;
 					success &= visitASTExpr(child, localvar);
 
@@ -44,11 +45,10 @@ namespace Producer
 						operands.lvid     = 1; // return type
 						operands.symlink  = 0; // true
 					}
-					program().emitInheritQualifiers(copy, /*ret*/1);
 
-					program().emitAssign(copy, localvar, false);
-
-					program().emitReturn(copy);
+					out.emitInheritQualifiers(copy, /*ret*/1);
+					out.emitAssign(copy, localvar, false);
+					out.emitReturn(copy);
 					hasReturnValue = true;
 					break;
 				}
@@ -61,7 +61,7 @@ namespace Producer
 		if (not hasReturnValue)
 		{
 			emitDebugpos(node);
-			program().emitReturn();
+			out.emitReturn();
 		}
 		return success;
 	}

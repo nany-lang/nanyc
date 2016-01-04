@@ -31,15 +31,24 @@ namespace Producer
 				if (node.children.size() == 1)
 				{
 					auto& child = *(node.children[0]);
-
-					if (child.rule == rgIf)
+					switch (child.rule)
 					{
-						uint32_t localvar = 0;
-						return visitASTExprIf(child, localvar);
+						case rgIf:
+						{
+							uint32_t localvar = 0;
+							return visitASTExprIf(child, localvar);
+						}
+						case rgFunction:
+						{
+							return visitASTFunc(child);
+						}
+						case rgSwitch:
+						{
+							return visitASTExprSwitch(child);
+						}
+						default:
+						{}
 					}
-
-					if (child.rule == rgFunction)
-						return visitASTFunc(child);
 				}
 				// no break here - same as `expr-group`
 			}

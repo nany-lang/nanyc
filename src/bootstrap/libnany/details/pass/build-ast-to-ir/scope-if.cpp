@@ -14,62 +14,79 @@ namespace IR
 namespace Producer
 {
 
-	bool Scope::generateIf(Node& expr, Node& thenc, Node* elsec, uint32_t jmpthen, uint32_t jmpelse)
+
+	bool Scope::generateIf(Node& expr, Node& thenc, Node* elsec, uint32_t* customjmpthenOffset)
 	{
-		// new scope for the condition
-		IR::Producer::Scope scopeIf{*this};
 		// output program
-		auto& out = scopeIf.program();
+		auto& out = program();
+
+		if (debugmode)
+			out.emitComment("if");
+
+		OpcodeScopeLocker opscopeIf{out};
 
 		// evalation of the condition
-		uint32_t condlvid = out.emitStackalloc(scopeIf.nextvar(), nyt_bool);
+		uint32_t condlvid = out.emitStackalloc(nextvar(), nyt_bool);
 
 		bool hasElseClause = (elsec != nullptr);
 		bool success = true;
 
 		// expression
 		{
+			if (debugmode)
+				out.emitComment("if-cond");
+			OpcodeScopeLocker opscopeCond{out};
 			uint32_t exprEval = 0;
-			success &= scopeIf.visitASTExpr(expr, exprEval, false);
+			success &= visitASTExpr(expr, exprEval, false);
 			out.emitAssign(condlvid, exprEval, false);
 		}
 
-		uint32_t labelElse = (hasElseClause ? scopeIf.nextvar() : 0);
-		uint32_t labelEnd  = scopeIf.nextvar();
+		uint32_t labelElse = (hasElseClause ? nextvar() : 0);
+		uint32_t labelEnd  = nextvar();
 
 		// jump to the 'else' clause if false (or end)
 		out.emitJz(condlvid, 0, (hasElseClause ? labelElse : labelEnd));
 
 		// if-then...
 		{
+			if (debugmode)
+				out.emitComment("if-then");
+
 			{
-				IR::Producer::Scope scopeThen{scopeIf};
-				scopeThen.emitDebugpos(thenc);
+				OpcodeScopeLocker opscopeThen{out};
+				emitDebugpos(thenc);
 
 				for (auto& stmt: thenc.children)
-					success &= scopeThen.visitASTStmt(*stmt);
+					success &= visitASTStmt(*stmt);
 			}
 
 			// jump to the end to not execute the 'else' clause
-			if (jmpthen == 0)
-				out.emitJmp(labelEnd);
+			if (customjmpthenOffset == nullptr)
+			{
+				if (hasElseClause)
+					out.emitJmp(labelEnd);
+			}
 			else
-				out.emitJmp(jmpthen);
+			{
+				*customjmpthenOffset = out.opcodeCount();
+				out.emitJmp(0); // will be filled later
+			}
 		}
 
 		// ...else
 		if (hasElseClause)
 		{
+			if (debugmode)
+				out.emitComment("if-else");
+
 			{
-				IR::Producer::Scope scopeElse{scopeIf};
+				OpcodeScopeLocker opscopeElse{out};
 				out.emitLabel(labelElse);
-				scopeElse.emitDebugpos(*elsec);
+				emitDebugpos(*elsec);
 
 				for (auto& stmt: elsec->children)
-					success &= scopeElse.visitASTStmt(*stmt);
+					success &= visitASTStmt(*stmt);
 			}
-			if (jmpelse != 0)
-				out.emitJmp(jmpelse);
 		}
 
 		out.emitLabel(labelEnd);

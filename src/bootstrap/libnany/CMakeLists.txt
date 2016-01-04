@@ -146,6 +146,7 @@ addsrc(
 	"details/pass/build-ast-to-ir/scope.cpp"
 	"details/pass/build-ast-to-ir/scope-if.cpp"
 	"details/pass/build-ast-to-ir/scope-while.cpp"
+	"details/pass/build-ast-to-ir/scope-switch.cpp"
 	"details/pass/build-ast-to-ir/scope-func.cpp"
 	"details/pass/build-ast-to-ir/scope-typeof.cpp"
 	"details/pass/build-ast-to-ir/scope-new.cpp"
