@@ -16,9 +16,9 @@ namespace Instanciate
 	inline void AtomStackFrame::LVIDInfo::fillLogEntryWithLocation(Logs::Report& entry) const
 	{
 		auto& origins = entry.origins();
-		origins.location.pos.line   = origin.file.line;
-		origins.location.pos.offset = origin.file.offset;
-		origins.location.filename   = origin.file.url;
+		origins.location.pos.line   = file.line;
+		origins.location.pos.offset = file.offset;
+		origins.location.filename   = file.url;
 	}
 
 

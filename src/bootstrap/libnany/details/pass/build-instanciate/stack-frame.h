@@ -67,18 +67,18 @@ namespace Instanciate
 					uint32_t field = 0u;
 				}
 				varMember;
-
-				//! File origin
-				struct {
-					const char* url = nullptr;
-					//! Line in the associated file
-					uint32_t line = 1;
-					//! Offset in the associated file
-					uint32_t offset = 1;
-				}
-				file;
 			}
 			origin;
+
+			//! File origin
+			struct {
+				const char* url = nullptr;
+				//! Line in the associated file
+				uint32_t line = 1;
+				//! Offset in the associated file
+				uint32_t offset = 1;
+			}
+			file;
 
 			//! warnings (valid only if userDefinedName is valid)
 			struct {

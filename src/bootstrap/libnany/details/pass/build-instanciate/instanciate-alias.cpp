@@ -22,13 +22,13 @@ namespace Instanciate
 
 		if (likely(0 == found))
 		{
-			lr.scope              = frame.scope;
-			lr.userDefinedName    = name;
-			lr.origin.file.line   = currentLine;
-			lr.origin.file.offset = currentOffset;
-			lr.origin.file.url    = currentFilename;
-			lr.hasBeenUsed        = false;
-			lr.scope              = frame.scope;
+			lr.scope           = frame.scope;
+			lr.userDefinedName = name;
+			lr.file.line       = currentLine;
+			lr.file.offset     = currentOffset;
+			lr.file.url        = currentFilename;
+			lr.hasBeenUsed     = false;
+			lr.scope           = frame.scope;
 
 			CLID clid{frame.atomid, lvid};
 			autoreleased   &= frame.verify(lvid); // suppress spurious errors from previous ones

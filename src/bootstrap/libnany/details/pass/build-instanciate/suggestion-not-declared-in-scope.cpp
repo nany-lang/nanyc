@@ -163,9 +163,9 @@ namespace Instanciate
 					varAtom->appendCaption(suggest.data().message, cdeftable);
 				}
 
-				suggest.origins().location.pos.line   = crlcvr.origin.file.line;
-				suggest.origins().location.pos.offset = crlcvr.origin.file.offset;
-				suggest.origins().location.filename   = crlcvr.origin.file.url;
+				suggest.origins().location.pos.line   = crlcvr.file.line;
+				suggest.origins().location.pos.offset = crlcvr.file.offset;
+				suggest.origins().location.filename   = crlcvr.file.url;
 			}
 		}
 
