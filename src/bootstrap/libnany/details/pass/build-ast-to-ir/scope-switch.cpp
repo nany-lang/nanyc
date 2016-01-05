@@ -91,7 +91,7 @@ namespace Producer
 						bodyScope.children.push_back(child.children[1]);
 
 						labels.emplace_back();
-						success &= generateIf(*exprCase, bodyScope, /*else*/nullptr, &(labels.back()));
+						success &= generateIfStmt(*exprCase, bodyScope, /*else*/nullptr, &(labels.back()));
 					}
 					break;
 				}

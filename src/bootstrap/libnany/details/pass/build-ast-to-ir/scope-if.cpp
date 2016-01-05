@@ -15,23 +15,20 @@ namespace Producer
 {
 
 
-	bool Scope::generateIf(Node& expr, Node& thenc, Node* elsec, uint32_t* customjmpthenOffset)
+	bool Scope::generateIfStmt(Node& expr, Node& thenc, Node* elseptr, uint32_t* customjmpthenOffset)
 	{
 		// output program
 		auto& out = program();
 
 		if (debugmode)
-			out.emitComment("if");
+			out.emitComment("*** if-stmt");
 
-		OpcodeScopeLocker opscopeIf{out};
-
-		// evalation of the condition
-		uint32_t condlvid = out.emitStackalloc(nextvar(), nyt_bool);
-
-		bool hasElseClause = (elsec != nullptr);
+		bool hasElseClause = (elseptr != nullptr);
 		bool success = true;
 
 		// expression
+		// evalation of the condition
+		uint32_t condlvid = out.emitStackalloc(nextvar(), nyt_bool);
 		{
 			if (debugmode)
 				out.emitComment("if-cond");
@@ -50,14 +47,18 @@ namespace Producer
 		// if-then...
 		{
 			if (debugmode)
-				out.emitComment("if-then");
+				out.emitComment("if-stmt-then");
 
+			// stmt
 			{
 				OpcodeScopeLocker opscopeThen{out};
 				emitDebugpos(thenc);
 
-				for (auto& stmt: thenc.children)
-					success &= visitASTStmt(*stmt);
+				if (unlikely(thenc.children.size() != 1))
+					return (ICE(thenc) << "invalid if-then branch");
+				auto& thenNode = *(thenc.children[0]);
+
+				success &= visitASTStmt(thenNode);
 			}
 
 			// jump to the end to not execute the 'else' clause
@@ -76,16 +77,22 @@ namespace Producer
 		// ...else
 		if (hasElseClause)
 		{
+			assert(elseptr != nullptr);
 			if (debugmode)
-				out.emitComment("if-else");
+				out.emitComment("if-stmt-else");
 
+			// stmt
 			{
-				OpcodeScopeLocker opscopeElse{out};
 				out.emitLabel(labelElse);
-				emitDebugpos(*elsec);
+				OpcodeScopeLocker opscopeElse{out};
+				auto& elsec = *elseptr;
+				emitDebugpos(elsec);
 
-				for (auto& stmt: elsec->children)
-					success &= visitASTStmt(*stmt);
+				if (unlikely(elsec.children.size() != 1))
+					return (ICE(elsec) << "invalid if-then branch");
+				auto& elseNode = *(elsec.children[0]);
+
+				success &= visitASTStmt(elseNode);
 			}
 		}
 
@@ -94,39 +101,160 @@ namespace Producer
 	}
 
 
-	bool Scope::visitASTExprIf(Node& node, LVID& localvar)
+	bool Scope::generateIfExpr(uint32_t& ifret, Node& expr, Node& thenc, Node& elsec)
+	{
+		// output program
+		auto& out = program();
+
+		if (debugmode)
+			out.emitComment("*** if-expr");
+
+		// result of the expression
+		ifret = out.emitStackalloc(nextvar(), nyt_any);
+		out.emitQualifierRef(ifret, true);
+
+		bool hasElseClause = true;
+		bool success = true;
+
+		// expression
+		// evalation of the condition
+		uint32_t condlvid = out.emitStackalloc(nextvar(), nyt_bool);
+		{
+			if (debugmode)
+				out.emitComment("if-cond");
+			OpcodeScopeLocker opscopeCond{out};
+			uint32_t exprEval = 0;
+			success &= visitASTExpr(expr, exprEval, false);
+			out.emitAssign(condlvid, exprEval, false);
+		}
+
+		uint32_t labelElse = (hasElseClause ? nextvar() : 0);
+		uint32_t labelEnd  = nextvar();
+
+		// jump to the 'else' clause if false (or end)
+		out.emitJz(condlvid, 0, (hasElseClause ? labelElse : labelEnd));
+
+		// if-then...
+		{
+			if (debugmode)
+				out.emitComment("if-expr-then");
+
+			{
+				OpcodeScopeLocker opscopeThen{out};
+				emitDebugpos(thenc);
+
+				if (unlikely(thenc.children.size() != 1))
+					return (ICE(thenc) << "invalid if-then branch");
+				auto& thenNode = *(thenc.children[0]);
+
+				uint32_t thenlvid;
+				success &= visitASTExpr(thenNode, thenlvid);
+				out.emitAssign(ifret, thenlvid, false);
+			}
+
+			if (hasElseClause)
+				out.emitJmp(labelEnd);
+		}
+
+		// ...else
+		if (hasElseClause)
+		{
+			if (debugmode)
+				out.emitComment("if-expr-else");
+
+			{
+				out.emitLabel(labelElse);
+				OpcodeScopeLocker opscopeElse{out};
+				emitDebugpos(elsec);
+
+				if (unlikely(elsec.children.size() != 1))
+					return (ICE(elsec) << "invalid if-then branch");
+				auto& elseNode = *(elsec.children[0]);
+
+				uint32_t elselvid;
+				success &= visitASTExpr(elseNode, elselvid);
+				out.emitAssign(ifret, elselvid, false);
+			}
+		}
+
+		out.emitLabel(labelEnd);
+		return success;
+	}
+
+
+
+
+
+
+
+
+	bool Scope::visitASTExprIfStmt(Node& node)
 	{
 		assert(node.rule == rgIf);
-		assert(not node.children.empty());
-
-		localvar = 0;
+		assert(node.children.size() >= 2);
 
 		// the condition to evaluate
-		auto& condition  = *(node.children[0]);
-		auto& thenc = *(node.children[1]);
 
 		switch (node.children.size())
 		{
 			case 2:
 			{
 				// if-then
-				auto* elsec = Node::Ptr::WeakPointer(node.children[2]);
-				return generateIf(condition, thenc, elsec);
+				auto& condition  = *(node.children[0]);
+				auto& thenc = *(node.children[1]);
+				return generateIfStmt(condition, thenc);
 			}
 			case 3:
 			{
 				// if-then-else
-				return generateIf(condition, thenc);
+				auto& condition  = *(node.children[0]);
+				auto& thenc = *(node.children[1]);
+				auto* elsec = Node::Ptr::WeakPointer(node.children[2]);
+				return generateIfStmt(condition, thenc, elsec);
 			}
 			default:
 			{
-				ICE(node) << "if: invalid number of children";
+				ICE(node) << "if: invalid ast node";
 				return false;
 			}
 		}
 		return false;
 	}
 
+
+	bool Scope::visitASTExprIfExpr(Node& node, LVID& localvar)
+	{
+		assert(node.rule == rgIf);
+		assert(node.children.size() >= 2);
+
+		localvar = 0;
+
+		// the condition to evaluate
+
+		switch (node.children.size())
+		{
+			case 3:
+			{
+				// if-then-else
+				auto& condition = *(node.children[0]);
+				auto& thenc     = *(node.children[1]);
+				auto& elsec     = *(node.children[2]);
+				return generateIfExpr(localvar, condition, thenc, elsec);
+			}
+			case 2:
+			{
+				error(node) << "'else' value expected";
+				return false;
+			}
+
+			default:
+			{
+				ICE(node) << "if: invalid ast node";
+				return false;
+			}
+		}
+		return false;
+	}
 
 
 

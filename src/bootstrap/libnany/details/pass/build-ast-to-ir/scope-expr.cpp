@@ -58,6 +58,7 @@ namespace Producer
 				case rgTypeof:     success &= visitASTExprTypeof(child, localvar); break;
 				case rgIntrinsic:  success &= visitASTExprIntrinsic(child, localvar); break;
 
+				case rgIf:         success &= visitASTExprIfExpr(child, localvar); break;
 				case rgWhile:      success &= visitASTExprWhile(child); break;
 
 				// special for internal AST manipulation

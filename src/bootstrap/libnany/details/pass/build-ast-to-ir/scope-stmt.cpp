@@ -35,8 +35,7 @@ namespace Producer
 					{
 						case rgIf:
 						{
-							uint32_t localvar = 0;
-							return visitASTExprIf(child, localvar);
+							return visitASTExprIfStmt(child);
 						}
 						case rgFunction:
 						{

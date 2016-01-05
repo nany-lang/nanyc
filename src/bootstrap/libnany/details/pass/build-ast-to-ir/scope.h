@@ -66,7 +66,8 @@ namespace Producer
 		bool visitASTExprTypeDecl(Node&, LVID& localvar);
 		bool visitASTExprTypeof(Node&, LVID& localvar);
 		bool visitASTExprStringLiteral(Node&, LVID& localvar);
-		bool visitASTExprIf(Node&, LVID& localvar);
+		bool visitASTExprIfStmt(Node&);
+		bool visitASTExprIfExpr(Node&, LVID& localvar);
 		bool visitASTExprWhile(Node&);
 		bool visitASTExprDoWhile(Node&);
 		bool visitASTExprSwitch(Node&);
@@ -110,7 +111,9 @@ namespace Producer
 		void addDebugCurrentFilename(const AnyString& filename);
 		void addDebugCurrentPosition(uint line, uint offset);
 		void fetchLineAndOffsetFromNode(const Node& node, yuint32& line, yuint32& offset) const;
-		bool generateIf(Node& expr, Node& thenc, Node* elsec = nullptr, uint32_t* customjmpthenOffset = nullptr);
+
+		bool generateIfStmt(Node& expr, Node& thenc, Node* elsec = nullptr, uint32_t* customjmpthenOffset = nullptr);
+		bool generateIfExpr(uint32_t& ifret, Node& expr, Node& thenc, Node& elsec);
 
 
 		//! \name Utilities
