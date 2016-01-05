@@ -21,8 +21,14 @@ namespace Instanciate
 	};
 
 
+	namespace // anonymous
+	{
+	} // anonymous namespace
 
-	bool ProgramBuilder::instanciateAssignment(AtomStackFrame& frame, LVID lhs, LVID rhs, bool canDisposeLHS, bool checktype, bool forceDeepcopy)
+
+
+	bool ProgramBuilder::instanciateAssignment(AtomStackFrame& frame, LVID lhs, LVID rhs, bool canDisposeLHS,
+		bool checktype, bool forceDeepcopy)
 	{
 		// lhs and rhs can not be null, but they can be identical, to force a clone
 		// when required for example
@@ -36,6 +42,23 @@ namespace Instanciate
 		// RHS cdef
 		auto& cdefrhs = cdeftable.classdefFollowClassMember(CLID{atomid, rhs});
 
+		// flag for implicitly converting objects (bool, i32...) into builtin (__bool, __i32...)
+		bool implicitBuiltin = cdeflhs.isBuiltin() and (not cdefrhs.isBuiltinOrVoid());
+		if (implicitBuiltin)
+		{
+			assert(cdeftable.atoms().core.object[cdeflhs.kind] != nullptr);
+
+			// checking if an implicit can be performed (if rhs is a 'builtin' type)
+			auto* atomrhs = (cdeftable.findClassdefAtom(cdefrhs));
+			if (cdeftable.atoms().core.object[cdeflhs.kind] == atomrhs)
+			{
+				// read the first field, assuming that the first one if actually the same type
+				if (canGenerateCode())
+					out.emitFieldget(lhs, rhs, 0);
+				return true;
+			}
+		}
+
 		if (checktype)
 		{
 			auto similarity = cdeftable.isSimilarTo(nullptr, cdeflhs, cdefrhs, false);
@@ -45,7 +68,7 @@ namespace Instanciate
 				cdefrhs.print(err.data().message, cdeftable, false);
 				err << "' to '";
 				cdeflhs.print(err.data().message, cdeftable, false);
-				err << "' in initialization";
+				err << "' in variable assignment";
 				return false;
 			}
 		}
@@ -95,14 +118,14 @@ namespace Instanciate
 		bool isMemberVariable = (origin.atomid != 0);
 
 
-		if (debugmode)
+		if (debugmode and canGenerateCode())
 		{
 			String comment;
 			switch (strategy)
 			{
 				case AssignStrategy::rawregister: comment << "raw copy "; break;
-				case AssignStrategy::ref: comment << "assign ref "; break;
-				case AssignStrategy::deepcopy: comment << "deep copy "; break;
+				case AssignStrategy::ref:         comment << "assign ref "; break;
+				case AssignStrategy::deepcopy:    comment << "deep copy "; break;
 			}
 			comment << "%" << lhs << " = %" << rhs << " aka '";
 			cdeflhs.print(comment, cdeftable, false);

@@ -78,11 +78,7 @@ namespace Nany
 		StringRefs& stringrefs;
 
 		struct {
-			struct {
-				//! The atom representing boolean values
-				Atom::Ptr boolean;
-			}
-			object;
+			Atom::Ptr object[nyt_count];
 		}
 		core;
 

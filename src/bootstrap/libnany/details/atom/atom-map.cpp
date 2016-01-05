@@ -50,9 +50,20 @@ namespace Nany
 			Atom* atom;
 			switch (root.findClassAtom(atom, name))
 			{
-				case 1:  out = atom; return true;
-				case 0:  report.error() << "failed to find ' class" << name << "'"; break;
-				default: report.error() << "multiple definition for 'class" << name << "'";
+				case 1:
+				{
+					out = atom;
+					return true;
+				}
+				case 0:
+				{
+					report.error() << "failed to find ' class" << name << "'";
+					break;
+				}
+				default:
+				{
+					report.error() << "multiple definition for 'class" << name << "'";
+				}
 			}
 			return false;
 		}
@@ -63,12 +74,12 @@ namespace Nany
 	bool AtomMap::fetchAndIndexCoreObjects(Logs::Report& report)
 	{
 		bool success = true;
-		if (core.object.boolean != nullptr)
+		if (core.object[nyt_bool] == nullptr)
 		{
-			success &= findCoreObject(core.object.boolean, "bool", report, root);
+			success &= findCoreObject(core.object[nyt_bool], "bool", report, root);
 
 			if (unlikely(not success))
-				core.object.boolean = nullptr;
+				core.object[nyt_bool] = nullptr;
 		}
 		return success;
 	}
