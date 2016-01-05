@@ -145,6 +145,7 @@ namespace Nany
 		template<class C> void eachChild(const AnyString& needle, const C& callback);
 		template<class C> void eachChild(const AnyString& needle, const C& callback) const;
 
+		uint32_t findClassAtom(Atom*& out, const AnyString& name);
 		uint32_t findFuncAtom(Atom*& out, const AnyString& name);
 		uint32_t findVarAtom(Atom*& out, const AnyString& name);
 

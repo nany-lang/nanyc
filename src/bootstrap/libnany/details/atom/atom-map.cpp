@@ -1,4 +1,5 @@
 #include "atom-map.h"
+#include "details/reporting/report.h"
 
 using namespace Yuni;
 
@@ -41,6 +42,36 @@ namespace Nany
 		return AnyString{};
 	}
 
+
+	namespace // anonymous
+	{
+		static inline bool findCoreObject(Atom::Ptr& out, const AnyString& name, Logs::Report& report, Atom& root)
+		{
+			Atom* atom;
+			switch (root.findClassAtom(atom, name))
+			{
+				case 1:  out = atom; return true;
+				case 0:  report.error() << "failed to find ' class" << name << "'"; break;
+				default: report.error() << "multiple definition for 'class" << name << "'";
+			}
+			return false;
+		}
+
+	} // anonymous namespace
+
+
+	bool AtomMap::fetchAndIndexCoreObjects(Logs::Report& report)
+	{
+		bool success = true;
+		if (core.object.boolean != nullptr)
+		{
+			success &= findCoreObject(core.object.boolean, "bool", report, root);
+
+			if (unlikely(not success))
+				core.object.boolean = nullptr;
+		}
+		return success;
+	}
 
 
 

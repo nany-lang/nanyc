@@ -2,6 +2,7 @@
 #include "atom.h"
 #include "details/utils/stringrefs.h"
 #include "details/ir/fwd.h"
+#include "details/fwd.h"
 
 
 
@@ -64,6 +65,10 @@ namespace Nany
 		Atom* findAtom(uint32_t atomid);
 
 
+		/*!
+		** \brief Try to retrieve the corresponding classes for core objects (bool, i32...)
+		*/
+		bool fetchAndIndexCoreObjects(Logs::Report& report);
 
 
 	public:
@@ -72,6 +77,14 @@ namespace Nany
 		//! String catalog
 		StringRefs& stringrefs;
 
+		struct {
+			struct {
+				//! The atom representing boolean values
+				Atom::Ptr boolean;
+			}
+			object;
+		}
+		core;
 
 	private:
 		//! Default constructor

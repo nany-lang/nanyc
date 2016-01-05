@@ -404,6 +404,41 @@ namespace Nany
 	}
 
 
+	uint32_t Atom::findClassAtom(Atom*& out, const AnyString& name)
+	{
+		// first, try to find the dtor function
+		Atom* atomA = nullptr;
+		uint32_t count = 0;
+
+		eachChild([&](Atom& child) -> bool
+		{
+			if (child.isClass())
+			{
+				if (child.name == name)
+				{
+					if (likely(atomA == nullptr))
+					{
+						atomA = &child;
+					}
+					else
+					{
+						count = 2;
+						return false;
+					}
+				}
+			}
+			return true;
+		});
+
+		if (count != 0)
+			return count;
+
+		out = atomA;
+		return atomA ? 1 : 0;
+	}
+
+
+
 	uint32_t Atom::findFuncAtom(Atom*& out, const AnyString& name)
 	{
 		// first, try to find the dtor function

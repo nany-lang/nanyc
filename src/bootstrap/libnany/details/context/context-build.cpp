@@ -109,9 +109,11 @@ namespace Nany
 				queueservice.stop();
 		}
 
+		auto& cdeftable = buildinfo.isolate.classdefTable;
+
 		// debug
 		if (Config::Traces::printAtomTable or Config::Traces::printClassdefTable)
-			printDebugInfoClassdefAtomTable(report, buildinfo.isolate.classdefTable);
+			printDebugInfoClassdefAtomTable(report, cdeftable);
 		if (Config::Traces::printSourceOpcodeProgram)
 			buildinfo.isolate.print(report);
 
@@ -123,17 +125,17 @@ namespace Nany
 		//	report.warning() << "build failed";
 
 		// report.info() << "intermediate name resolution";
-		bool successNameLookup = buildinfo.isolate.classdefTable.performNameLookup();
-		if (not successNameLookup and buildinfo.success)
+		bool successNameLookup = cdeftable.performNameLookup();
+		if (unlikely(not successNameLookup and buildinfo.success))
 			report.warning() << "name lookup failed";
 
-		// report.info() << "instanciating intermediate code";
-		buildinfo.success &= buildinfo.isolate.instanciate(report, "main");
+		buildinfo.success &= successNameLookup
+			and cdeftable.atoms.fetchAndIndexCoreObjects(report)
+			and buildinfo.isolate.instanciate(report, "main");
 
 		yint64 endTime = DateTime::NowMilliSeconds();
 		duration = endTime - buildinfo.buildtime;
 
-		buildinfo.success &= successNameLookup;
 		if (unlikely(not buildinfo.success))
 		{
 			report.info(); // empty line for beauty (some other errors are already displayed)
