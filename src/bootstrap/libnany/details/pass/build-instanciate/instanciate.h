@@ -140,7 +140,7 @@ namespace Instanciate
 		void visit(const IR::ISA::Operand<IR::ISA::Op::jmp>&);
 		void visit(const IR::ISA::Operand<IR::ISA::Op::jz>&);
 		void visit(const IR::ISA::Operand<IR::ISA::Op::jnz>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::comment>&) {}
+		void visit(const IR::ISA::Operand<IR::ISA::Op::comment>&);
 
 		//! visitor - fallback
 		template<enum IR::ISA::Op O> void visit(const IR::ISA::Operand<O>&);

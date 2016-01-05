@@ -205,6 +205,12 @@ namespace Instanciate
 		out.emit<IR::ISA::Op::jnz>() = opc;
 	}
 
+	inline void ProgramBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::comment>& opc)
+	{
+		// keep the comments in debug
+		if (Yuni::debugmode)
+			out.emitComment(currentProgram.stringrefs[opc.text]);
+	}
 
 
 
