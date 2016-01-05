@@ -125,6 +125,9 @@ namespace Instanciate
 
 			case AssignStrategy::ref:
 			{
+				// preserve the origin of the value
+				lhsLvidinfo.origin = frame.lvids[rhs].origin;
+
 				if (canGenerateCode())
 				{
 					// acquire first the right value to make sure that all data are alive
