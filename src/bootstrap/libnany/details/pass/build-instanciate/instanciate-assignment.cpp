@@ -116,37 +116,32 @@ namespace Instanciate
 		{
 			case AssignStrategy::rawregister:
 			{
-				if (lhs != rhs)
-				{
-					out.emitStore(lhs, rhs);
-					if (isMemberVariable)
-						out.emitFieldset(lhs, origin.self, origin.field);
-				}
+				out.emitStore(lhs, rhs);
+				if (isMemberVariable)
+					out.emitFieldset(lhs, origin.self, origin.field);
 				break;
 			}
 
 			case AssignStrategy::ref:
 			{
-				if (lhs != rhs)
+				// acquire first the right value to make sure that all data are alive
+				// example: a = a
+				out.emitRef(rhs);
+				// release the old left value
+				if (canDisposeLHS)
 				{
-					// acquire first the right value to make sure that all data are alive
-					// example: a = a
-					out.emitRef(rhs);
-					// release the old left value
-					if (canDisposeLHS)
-					{
-						tryUnrefObject(lhs);
-						if (isMemberVariable)
-							tryUnrefObject(lhs);
-					}
-					// copy the pointer
-					out.emitStore(lhs, rhs);
-
+					tryUnrefObject(lhs);
 					if (isMemberVariable)
-					{
-						out.emitRef(lhs); // re-acquire for the object
-						out.emitFieldset(lhs, origin.self, origin.field);
-					}
+						tryUnrefObject(lhs);
+				}
+
+				// copy the pointer
+				out.emitStore(lhs, rhs);
+
+				if (isMemberVariable)
+				{
+					out.emitRef(lhs); // re-acquire for the object
+					out.emitFieldset(lhs, origin.self, origin.field);
 				}
 				break;
 			}
