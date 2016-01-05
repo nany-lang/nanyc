@@ -58,10 +58,13 @@ namespace Instanciate
 			return true;
 
 
+		// can lhs be acquires ?
+		bool lhsCanBeAcquired = canBeAcquired(cdeflhs);
+
 		// deep copy by default
 		auto strategy = AssignStrategy::deepcopy;
 
-		if (canBeAcquired(cdeflhs))
+		if (lhsCanBeAcquired)
 		{
 			if (not forceDeepcopy)
 			{
@@ -85,7 +88,12 @@ namespace Instanciate
 		else
 			strategy = AssignStrategy::rawregister;
 
-		auto& origin = frame.lvids[lhs].origin.varMember;
+
+		auto& lhsLvidinfo = frame.lvids[lhs];
+		if (lhsCanBeAcquired)
+			lhsLvidinfo.autorelease = true;
+
+		auto& origin = lhsLvidinfo.origin.varMember;
 		bool isMemberVariable = (origin.atomid != 0);
 
 
