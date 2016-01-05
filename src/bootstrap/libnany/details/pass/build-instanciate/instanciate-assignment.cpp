@@ -54,9 +54,6 @@ namespace Instanciate
 		if (not canDisposeLHS)
 			cdeftable.substitute(lhs).import(cdefrhs);
 
-		if (unlikely(not canGenerateCode()))
-			return true;
-
 
 		// can lhs be acquires ?
 		bool lhsCanBeAcquired = canBeAcquired(cdeflhs);
@@ -70,7 +67,8 @@ namespace Instanciate
 			{
 				// NOTE: the qualifiers from `cdeflhs` are not valid and correspond to nothing
 				auto& originalcdef = cdeftable.classdef(CLID{atomid, lhs});
-				out.emitComment(originalcdef.print(cdeftable) << originalcdef.clid);
+				if (debugmode and canGenerateCode())
+					out.emitComment(originalcdef.print(cdeftable) << originalcdef.clid);
 
 				if (originalcdef.qualifiers.ref)
 				{
@@ -116,32 +114,38 @@ namespace Instanciate
 		{
 			case AssignStrategy::rawregister:
 			{
-				out.emitStore(lhs, rhs);
-				if (isMemberVariable)
-					out.emitFieldset(lhs, origin.self, origin.field);
+				if (canGenerateCode())
+				{
+					out.emitStore(lhs, rhs);
+					if (isMemberVariable)
+						out.emitFieldset(lhs, origin.self, origin.field);
+				}
 				break;
 			}
 
 			case AssignStrategy::ref:
 			{
-				// acquire first the right value to make sure that all data are alive
-				// example: a = a
-				out.emitRef(rhs);
-				// release the old left value
-				if (canDisposeLHS)
+				if (canGenerateCode())
 				{
-					tryUnrefObject(lhs);
-					if (isMemberVariable)
+					// acquire first the right value to make sure that all data are alive
+					// example: a = a
+					out.emitRef(rhs);
+					// release the old left value
+					if (canDisposeLHS)
+					{
 						tryUnrefObject(lhs);
-				}
+						if (isMemberVariable)
+							tryUnrefObject(lhs);
+					}
 
-				// copy the pointer
-				out.emitStore(lhs, rhs);
+					// copy the pointer
+					out.emitStore(lhs, rhs);
 
-				if (isMemberVariable)
-				{
-					out.emitRef(lhs); // re-acquire for the object
-					out.emitFieldset(lhs, origin.self, origin.field);
+					if (isMemberVariable)
+					{
+						out.emitRef(lhs); // re-acquire for the object
+						out.emitFieldset(lhs, origin.self, origin.field);
+					}
 				}
 				break;
 			}
@@ -159,51 +163,54 @@ namespace Instanciate
 						return false;
 				}
 
-				// acquire first the right value to make sure that all data are alive
-				// example: a = a
-				out.emitRef(rhs);
-				// release the old left value
-				if (canDisposeLHS)
+				if (canGenerateCode())
 				{
-					tryUnrefObject(lhs);
-					if (isMemberVariable)
+					// acquire first the right value to make sure that all data are alive
+					// example: a = a
+					out.emitRef(rhs);
+					// release the old left value
+					if (canDisposeLHS)
+					{
 						tryUnrefObject(lhs);
-				}
+						if (isMemberVariable)
+							tryUnrefObject(lhs);
+					}
 
-				// note: do not keep a reference on 'out.at...', since the internal buffer might be reized
-				assert(lastOpcodeStacksizeOffset != (uint32_t) -1);
-				auto& operands = out.at<IR::ISA::Op::stacksize>(lastOpcodeStacksizeOffset);
-				uint32_t lvid = operands.add;
-				uint32_t retcall = operands.add + 1;
-				operands.add += 2;
-				frame.resizeRegisterCount(lvid + 2, cdeftable);
+					// note: do not keep a reference on 'out.at...', since the internal buffer might be reized
+					assert(lastOpcodeStacksizeOffset != (uint32_t) -1);
+					auto& operands = out.at<IR::ISA::Op::stacksize>(lastOpcodeStacksizeOffset);
+					uint32_t lvid = operands.add;
+					uint32_t retcall = operands.add + 1;
+					operands.add += 2;
+					frame.resizeRegisterCount(lvid + 2, cdeftable);
 
-				uint32_t rsizof  = out.emitStackalloc(lvid, nyt_u64);
-				out.emitSizeof(rsizof, rhsAtom->atomid);
+					uint32_t rsizof  = out.emitStackalloc(lvid, nyt_u64);
+					out.emitSizeof(rsizof, rhsAtom->atomid);
 
-				// re-allocate some memory
-				out.emitMemalloc(lhs, rsizof);
-				out.emitRef(lhs);
-				assert(lhs < frame.lvids.size());
-				frame.lvids[lhs].origin.memalloc = true;
-
-				out.emitStackalloc(retcall, nyt_void);
-				// call operator 'clone'
-				out.emitPush(lhs); // self
-				out.emitPush(rhs); // rhs, the object to copy
-				out.emitCall(retcall, rhsAtom->classinfo.clone.atomid, rhsAtom->classinfo.clone.instanceid);
-
-				// release rhs - copy is done
-				tryUnrefObject(rhs);
-
-				if (isMemberVariable)
-				{
+					// re-allocate some memory
+					out.emitMemalloc(lhs, rsizof);
 					out.emitRef(lhs);
-					out.emitFieldset(lhs, origin.self, origin.field);
+					assert(lhs < frame.lvids.size());
+					frame.lvids[lhs].origin.memalloc = true;
+
+					out.emitStackalloc(retcall, nyt_void);
+					// call operator 'clone'
+					out.emitPush(lhs); // self
+					out.emitPush(rhs); // rhs, the object to copy
+					out.emitCall(retcall, rhsAtom->classinfo.clone.atomid, rhsAtom->classinfo.clone.instanceid);
+
+					// release rhs - copy is done
+					tryUnrefObject(rhs);
+
+					if (isMemberVariable)
+					{
+						out.emitRef(lhs);
+						out.emitFieldset(lhs, origin.self, origin.field);
+					}
 				}
 				break;
 			}
-		}
+		} // switch strategy
 
 		return true;
 	}
