@@ -46,7 +46,7 @@ namespace Nany
 
 			// checking for each parameter
 			auto match = overloadMatch.validate(atomsol);
-			if (match == Match::none) // hum no. sorry.
+			if (match == TypeCheck::Match::none) // hum no. sorry.
 				continue;
 
 			// ok, the solution is "suitable"
@@ -60,7 +60,7 @@ namespace Nany
 
 			// Found a perfect match ! Keeping traces of it to reuse it later if it is _the_ solution
 			// (and if unique)
-			if (match == Match::strictEqual)
+			if (match == TypeCheck::Match::strictEqual)
 			{
 				perfectMatch = atom;
 				perfectMatchParams = params;

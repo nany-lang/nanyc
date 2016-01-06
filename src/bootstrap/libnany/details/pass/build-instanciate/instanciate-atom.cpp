@@ -225,8 +225,8 @@ namespace Instanciate
 		// if there is no error.
 		overloadMatch.canGenerateReport = false;
 
-		Match match = overloadMatch.validate(funcAtom);
-		if (unlikely(Match::none == match))
+		TypeCheck::Match match = overloadMatch.validate(funcAtom);
+		if (unlikely(TypeCheck::Match::none == match))
 		{
 			// fail - try again to produce error message, hint, and any suggestion
 			auto err = (error() << "cannot call '" << funcAtom.keyword() << ' ');

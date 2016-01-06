@@ -57,15 +57,15 @@ namespace Instanciate
 
 				// determining if the expression returned matched the return type of the current func
 				{
-					auto similarity = cdeftable.isSimilarTo(nullptr, cdef, expectedCdef);
+					auto similarity = TypeCheck::isSimilarTo(cdeftable, nullptr, cdef, expectedCdef);
 					switch (similarity)
 					{
-						case Match::strictEqual:
+						case TypeCheck::Match::strictEqual:
 						{
 							returnCLIDForReference = cdef.clid;
 							break;
 						}
-						case Match::equal:
+						case TypeCheck::Match::equal:
 						{
 							auto err = (error() << "implicit conversions are not allowed in 'return'");
 							auto hint = err.hint();
@@ -74,18 +74,13 @@ namespace Instanciate
 							hint << '\'';
 							return;
 						}
-						case Match::none:
+						case TypeCheck::Match::none:
 						{
 							auto err = (error() << "type mismatch in 'return' statement");
 							auto hint = err.hint();
 							cdef.print((hint << "got '"), cdeftable);
 							expectedCdef.print((hint << "', expected '"), cdeftable);
 							hint << '\'';
-							return;
-						}
-						default:
-						{
-							ICE() << "unexpected state while resolving 'return'";
 							return;
 						}
 					}
@@ -97,14 +92,14 @@ namespace Instanciate
 				{
 					auto& marker = frame.returnValues.front();
 					auto& cdefPreviousReturn = cdeftable.classdef(marker.clid);
-					auto similarity = cdeftable.isSimilarTo(nullptr, cdef, cdefPreviousReturn);
+					auto similarity = TypeCheck::isSimilarTo(cdeftable, nullptr, cdef, cdefPreviousReturn);
 					switch (similarity)
 					{
-						case Match::strictEqual:
+						case TypeCheck::Match::strictEqual:
 						{
 							break; // nice ! they share the same exact type !
 						}
-						case Match::equal:
+						case TypeCheck::Match::equal:
 						{
 							auto err = (error() << "implicit conversions are not allowed in 'return'\n");
 							auto hint = err.hint();
@@ -115,7 +110,7 @@ namespace Instanciate
 							hint.origins().location.pos.offset = marker.offset;
 							return;
 						}
-						case Match::none:
+						case TypeCheck::Match::none:
 						{
 							auto err = (error() << "multiple return value with different types\n");
 							auto hint = err.hint();
@@ -125,10 +120,6 @@ namespace Instanciate
 							hint.origins().location.pos.line   = marker.line;
 							hint.origins().location.pos.offset = marker.offset;
 							return;
-						}
-						default:
-						{
-							ICE() << "unexpected state while resolving 'return'";
 						}
 					}
 				}

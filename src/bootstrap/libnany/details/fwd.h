@@ -35,13 +35,6 @@ namespace Nany
 
 	class Intrinsic;
 
-	enum class Match
-	{
-		none,
-		equal,
-		strictEqual,
-	};
-
 
 
 } // namespace Nany

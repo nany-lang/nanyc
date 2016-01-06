@@ -22,7 +22,6 @@ namespace Nany
 
 		Atom* findClassdefAtom(const Classdef& classdef) const;
 		Atom* findRawClassdefAtom(const Classdef&) const;
-		Match isSimilarTo(const CTarget* target, const Classdef& cdef, const Classdef& to, bool allowImplicit = false) const;
 
 		/*!
 		** \brief Get the keyword associated to an atom (class, func, var, cref, namespace...)
@@ -61,7 +60,7 @@ namespace Nany
 		void printClassdef(Yuni::String& out, const CLID&, const Classdef&) const;
 		//@}
 
-
+		const ClassdefTable& originalTable() const;
 
 	private:
 		ClassdefTable& table;

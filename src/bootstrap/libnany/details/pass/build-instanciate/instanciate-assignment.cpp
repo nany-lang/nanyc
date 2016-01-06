@@ -61,8 +61,8 @@ namespace Instanciate
 
 		if (checktype)
 		{
-			auto similarity = cdeftable.isSimilarTo(nullptr, cdeflhs, cdefrhs, false);
-			if (unlikely(Match::strictEqual != similarity))
+			auto similarity = TypeCheck::isSimilarTo(cdeftable, nullptr, cdeflhs, cdefrhs, false);
+			if (unlikely(TypeCheck::Match::strictEqual != similarity))
 			{
 				auto err = (error() << "cannot convert '");
 				cdefrhs.print(err.data().message, cdeftable, false);

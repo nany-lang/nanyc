@@ -67,7 +67,8 @@ namespace Nany
 	}
 
 
-	inline Match FuncOverloadMatch::pushParameter(Atom& atom, yuint32 index, const CLID& clid)
+	inline TypeCheck::Match
+	FuncOverloadMatch::pushParameter(Atom& atom, yuint32 index, const CLID& clid)
 	{
 		// force reset
 		auto& cdef = table.classdef(clid);
@@ -77,8 +78,8 @@ namespace Nany
 		// type checking
 		auto& paramdef = table.classdef(atom.parameters.vardef(index).clid);
 
-		auto similarity = table.isSimilarTo(nullptr, cdef, paramdef, pAllowImplicit);
-		if (similarity == Match::none and canGenerateReport)
+		auto similarity = TypeCheck::isSimilarTo(table, nullptr, cdef, paramdef, pAllowImplicit);
+		if (similarity == TypeCheck::Match::none and canGenerateReport)
 		{
 			//report.get().trace() << "failed to push value " << cdef.clid << " to parameter "
 			//	<< (CLID{atom.atomid,0})
@@ -112,14 +113,14 @@ namespace Nany
 	}
 
 
-	Match FuncOverloadMatch::validate(Atom& atom, bool allowImplicit)
+	TypeCheck::Match FuncOverloadMatch::validate(Atom& atom, bool allowImplicit)
 	{
 		// some reset
 		result.params.clear();
 		result.funcToCall = &atom;
 
 		if (not atom.isFunction())
-			return Match::none;
+			return TypeCheck::Match::none;
 
 		// trivial check, too many parameters for this overload
 		if (atom.parameters.size() < (uint32_t) input.indexedParams.size())
@@ -131,7 +132,7 @@ namespace Nany
 				report.get().hint() << "too many parameters. Got " << (input.indexedParams.size() - selfidx)
 					<< ", expected: " << (atom.parameters.size() - selfidx);
 			}
-			return Match::none;
+			return TypeCheck::Match::none;
 		}
 
 		pAllowImplicit = allowImplicit;
@@ -149,9 +150,9 @@ namespace Nany
 			{
 				switch (pushParameter(atom, i, input.indexedParams[i]))
 				{
-					case Match::equal:       perfectMatch = false; break;
-					case Match::strictEqual: break;
-					case Match::none:        return Match::none;
+					case TypeCheck::Match::equal:       perfectMatch = false; break;
+					case TypeCheck::Match::strictEqual: break;
+					case TypeCheck::Match::none:        return TypeCheck::Match::none;
 				}
 			}
 
@@ -169,14 +170,14 @@ namespace Nany
 						//	<< "' not found after started from index " << offset << " in " << (CLID{atom.atomid,0});
 						if (canGenerateReport)
 							report.get().hint() << "named parameter '" << pair.first << "' not found after indexed parameters";
-						return Match::none;
+						return TypeCheck::Match::none;
 					}
 
 					switch (pushParameter(atom, index, pair.second))
 					{
-						case Match::equal:       perfectMatch = false; break;
-						case Match::strictEqual: break;
-						case Match::none:        return Match::none;
+						case TypeCheck::Match::equal:       perfectMatch = false; break;
+						case TypeCheck::Match::strictEqual: break;
+						case TypeCheck::Match::none:        return TypeCheck::Match::none;
 					}
 				}
 			}
@@ -189,7 +190,7 @@ namespace Nany
 					// std::cout << "the parameter " << i << " is missing - default value not implemented\n";
 					if (canGenerateReport)
 						report.get().hint() << "the parameter " << i << " is missing";
-					return Match::none;
+					return TypeCheck::Match::none;
 				}
 			}
 		}
@@ -209,7 +210,7 @@ namespace Nany
 				if (wantedRettype.isBuiltinOrVoid() or wantedRettype.hasConstraints())
 				{
 					auto& atomRettype = table.classdef(atom.returnType.clid);
-					if (Match::none == table.isSimilarTo(nullptr, wantedRettype, atomRettype, pAllowImplicit))
+					if (TypeCheck::Match::none == TypeCheck::isSimilarTo(table, nullptr, wantedRettype, atomRettype, pAllowImplicit))
 					{
 						if (canGenerateReport)
 						{
@@ -219,7 +220,7 @@ namespace Nany
 							wantedRettype.print(err.message.message, table, false);
 							err << '\'';
 						}
-						return Match::none;
+						return TypeCheck::Match::none;
 					}
 				}
 				break;
@@ -238,7 +239,7 @@ namespace Nany
 							atomRettype.print(err.message.message, table, false);
 							err << "', expected 'void'";
 						}
-						return Match::none;
+						return TypeCheck::Match::none;
 					}
 				}
 				break;
@@ -246,10 +247,10 @@ namespace Nany
 			default:
 			{
 				assert(false and "not implemented");
-				return Match::none;
+				return TypeCheck::Match::none;
 			}
 		}
-		return perfectMatch ? Match::strictEqual : Match::equal;
+		return perfectMatch ? TypeCheck::Match::strictEqual : TypeCheck::Match::equal;
 	}
 
 

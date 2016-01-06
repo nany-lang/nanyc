@@ -272,7 +272,6 @@ addsrc(
 	"details/atom/classdef-table.h"
 	"details/atom/classdef-table.hxx"
 	"details/atom/classdef-table.cpp"
-	"details/atom/classdef-table-is-similar.cpp"
 	"details/atom/classdef-table-view.h"
 	"details/atom/classdef-table-view.hxx"
 	"details/atom/classdef-table-view.cpp"
@@ -282,6 +281,16 @@ addsrc(
 	"details/atom/classdef-overloads.h"
 	"details/atom/classdef-overloads.hxx"
 	"details/atom/classdef-overloads.cpp")
+
+
+addsrc(
+	NAME nysrc_details_type_system
+	GROUP "details/type"
+	FILES
+	"details/type/builtin.h"
+	"details/type/builtin.cpp"
+	"details/type/type-check.cpp"
+	"details/type/type-check.h")
 
 
 addsrc(
@@ -414,15 +423,13 @@ add_library(libnany ${mode_libnany}
 	${nysrc_details_ir}
 	${nysrc_details_atom_classdef}
 	${nysrc_details_atom}
+	${nysrc_details_type_system}
 	${nysrc_details_intrinsic}
 	${nysrc_details_context}
 	${nysrc_details_reporting}
 
 	${nysrc_c_api}
 
-	# Type
-	details/type/builtin.h
-	details/type/builtin.cpp
 	# Semantic Analysis
 	details/sema/metadata.cpp
 	details/sema/metadata.h

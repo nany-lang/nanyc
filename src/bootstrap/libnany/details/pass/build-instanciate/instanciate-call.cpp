@@ -138,7 +138,7 @@ namespace Instanciate
 			// any error can be directly reported (since no overload is present)
 			overloadMatch.canGenerateReport = false;
 			// try to validate the func call
-			if (unlikely(Match::none == overloadMatch.validate(*atom)))
+			if (unlikely(TypeCheck::Match::none == overloadMatch.validate(*atom)))
 			{
 				// no match, re-launching the process with error-enabled logging
 				overloadMatch.canGenerateReport = true;

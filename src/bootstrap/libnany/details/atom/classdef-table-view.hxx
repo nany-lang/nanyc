@@ -68,12 +68,6 @@ namespace Nany
 	}
 
 
-	inline Match ClassdefTableView::isSimilarTo(const CTarget* target, const Classdef& cdef, const Classdef& to, bool allowImplicit) const
-	{
-		return table.isSimilarTo(target, cdef, to, allowImplicit);
-	}
-
-
 	inline const Classdef& ClassdefTableView::classdef(const CLID& clid) const
 	{
 		return table.classdef(clid);
@@ -130,6 +124,12 @@ namespace Nany
 	inline void ClassdefTableView::mergeSubstitutes()
 	{
 		table.mergeSubstitutes();
+	}
+
+
+	inline const ClassdefTable& ClassdefTableView::originalTable() const
+	{
+		return table;
 	}
 
 

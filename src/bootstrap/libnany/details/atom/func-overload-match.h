@@ -3,6 +3,7 @@
 #include "details/fwd.h"
 #include "details/atom/classdef.h"
 #include "details/atom/classdef-table.h"
+#include "details/type/type-check.h"
 #include <functional>
 #include <vector>
 
@@ -37,7 +38,7 @@ namespace Nany
 
 		void clear();
 
-		Match validate(Atom& atom, bool allowImplicit = true);
+		TypeCheck::Match validate(Atom& atom, bool allowImplicit = true);
 
 
 		void printInputParameters(YString& out) const;
@@ -72,7 +73,7 @@ namespace Nany
 
 	private:
 		inline bool hasAtLeastOneParameter(Atom& atom) const;
-		inline Match pushParameter(Atom& atom, yuint32 index, const CLID& clid);
+		inline TypeCheck::Match pushParameter(Atom& atom, yuint32 index, const CLID& clid);
 
 	private:
 		const ClassdefTableView& table;

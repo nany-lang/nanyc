@@ -89,16 +89,6 @@ namespace Nany
 		Funcdef& addClassdefInterfaceSelf(const Classdef&);
 
 		/*!
-		** \brief Try to tell if the classdef 'cdef' is similar to another one
-		**
-		** \param target The target where the resolution occurs [optional]
-		** \param cdef Any classdef
-		** \param to Only a well-known classdef, with no interface and no follow-ups (and a valid atom)
-		** \return True if similar
-		*/
-		Match isSimilarTo(const CTarget* target, const Classdef& cdef, const Classdef& to, bool allowImplicit = false) const;
-
-		/*!
 		** \brief Make a target class ID share the same definition than a source class ID
 		** \return True if the operation succeeded, false if source was not found
 		*/
@@ -178,7 +168,6 @@ namespace Nany
 	private:
 		inline bool nameLookupForClassdef(Classdef& classdef);
 		inline bool nameLookupForSelfInterface(Classdef& classdef);
-		inline Match isAtomSimilarTo(const CTarget*, const Atom& atom, const Atom& to) const;
 
 	private:
 		struct LayerItem final
