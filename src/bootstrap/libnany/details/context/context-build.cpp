@@ -94,7 +94,7 @@ namespace Nany
 		{
 			buildinfo.buildtime = DateTime::NowMilliSeconds();
 
-			Job::Taskgroup task{queueservice};
+			Job::Taskgroup task{queueservice, false};
 			for (auto& ptr: buildinfo.sources)
 				ptr->build(buildinfo, task, report);
 
@@ -105,6 +105,7 @@ namespace Nany
 			// launch all jobs and wait for them
 			task.start();
 			task.wait();
+
 			if (not queuestarted) // stop the queueservice if it was not already started
 				queueservice.stop();
 		}
