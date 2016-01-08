@@ -295,46 +295,11 @@ namespace Nany
 			}
 
 
-			/*
-			void visit(IR::ISA::Operand<IR::ISA::Op::blueprintClassVar>& operands)
-			{
-				// registering the blueprint into the outline...
-				Atom* parentAtom = atomStack.back().atom;
-				if (unlikely(nullptr == parentAtom))
-					return printError(operands, "invalid parent atom");
-
-				if (unlikely(parentAtom->type != Atom::Type::classdef))
-					return printError(operands, "invalid parent atom");
-
-				if (unlikely(operands.isProperty))
-				{
-					error() << "property not implemented: '" << operands.name << "'";
-					return;
-				}
-
-				MutexLocker locker{isolate.mutex};
-
-				// create a new atom in the global type table
-				auto* newVarAtom = isolate.classdefTable.atoms.createVardef(*parentAtom, operands.name);
-				newVarAtom->usedDefined      = true;
-				newVarAtom->origin.filename  = operands.originFilename;
-				newVarAtom->origin.line      = operands.originLine;
-				newVarAtom->origin.offset    = operands.originOffset;
-
-				// create a pseudo classdef to easily retrieve the real atom from a clid
-				isolate.classdefTable.registerAtom(newVarAtom);
-				// update the operands
-				operands.atomid = newVarAtom->atomid;
-
-				// special case for class-variables
-				//newVarAtom->returnType.clid.reclass(newVarAtom->atomid, operands.lvid);
-			}
-		*/
-
-
 			void visit(IR::ISA::Operand<IR::ISA::Op::scope>&)
 			{
-				assert(atomStack.size() > 1 and "invalid stack"); // >1 to not remove the very first element
+				if (unlikely(not (atomStack.size() > 0)))
+					throw (String{} << currentFilename << ':' << currentLine << ": invalid stack");
+
 				if (not atomStack.empty())
 					++(atomStack.back().scope);
 
@@ -344,11 +309,12 @@ namespace Nany
 
 			void visit(IR::ISA::Operand<IR::ISA::Op::end>&)
 			{
-				assert(atomStack.size() > 1 and "invalid stack"); // >1 to not remove the very first element
-
 				// reset the last lvid
 				lastLVID = 0;
 				// pop the stack
+
+				if (unlikely(not (atomStack.size() > 1)))
+					throw (String{} << currentFilename << ':' << currentLine << ": invalid stack");
 
 				if (likely(not atomStack.empty()))
 				{
