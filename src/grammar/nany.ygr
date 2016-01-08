@@ -835,10 +835,10 @@ function-kind-view: notext
 
 function-kind-opname:
 	| '()=' | '[]=' | '()' | '[]'
-	| [^ (:\t\n\r]+
+	| [^ ;(){}:\t\n\r]+
 
 function-kind-operator: notext
-	tk-operator (function-kind-opname | error-parenthese-or-bracket) sp
+	tk-operator function-kind-opname sp
 
 function-kind: notext
 	function-kind-function | function-kind-operator | function-kind-view
