@@ -75,6 +75,7 @@ namespace Producer
 				{
 					case rgSymbolName:  { success &= inspectClassname(child); break; }
 					case rgClassBody:   { body = &child; break; }
+					case rgVisibility:  { /*currently ignore */ break; }
 					default:
 						success &= scope.ICEUnexpectedNode(child, "[class]");
 				}

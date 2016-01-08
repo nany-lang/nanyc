@@ -61,6 +61,8 @@ namespace Producer
 			case rgReturn:  return visitASTExprReturn(node);
 			case rgClass:   return visitASTClass(node);
 
+			case rgClassVisibility: /*currently ignored */ return true;
+
 			default: return ICEUnexpectedNode(node, "[ir/stmt]");
 		}
 	}
