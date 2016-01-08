@@ -39,11 +39,11 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 	o << "/// \\ingroup std.core\n";
 	o << "public class " << suffix << '\n';
 	o << "{\n";
-	o << "\toperator new {}\n";
+	o << "\toperator new;\n";
 	craftOperator([&](uint32_t b, char targetsign)
 	{
 		for ( ; b >= 8; b /= 2)
-			o << "\toperator new (self pod: __" << targetsign << b << ") {}\n";
+			o << "\toperator new (self pod: __" << targetsign << b << ");\n";
 	});
 
 	o << '\n';

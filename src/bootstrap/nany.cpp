@@ -91,7 +91,7 @@ static inline int execute(int argc, char** argv)
 	nany_source_add_from_file_n(&ctx, scriptfile.c_str(), scriptfile.size());
 
 	bool buildstatus = buildProgram(ctx);
-	int exitstatus = 42;
+	int exitstatus = 66;
 
 	if (buildstatus)
 	{

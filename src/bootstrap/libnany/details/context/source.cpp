@@ -121,9 +121,8 @@ namespace Nany
 						constexpr const char* arrow = nullptr;
 						#endif
 
-						auto entry = report.info();
+						auto entry = (report.info() << "compile " << pFilename);
 						entry.message.prefix = arrow;
-						entry << "compile " << pFilename;
 					}
 
 					// assuming it will succeed, will be reverted to false as soon as something goes wrong
