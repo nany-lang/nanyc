@@ -26,7 +26,7 @@ namespace Nany
 			report.info(); // for beauty
 			report.info();
 
-			if (Config::Traces::printAtomTable)
+			if (Config::Traces::printPreAtomTable)
 			{
 				auto trace = report.trace();
 				trace.message.prefix = "ATOMS";
@@ -113,7 +113,7 @@ namespace Nany
 		auto& cdeftable = buildinfo.isolate.classdefTable;
 
 		// debug
-		if (Config::Traces::printAtomTable or Config::Traces::printClassdefTable)
+		if (Config::Traces::printPreAtomTable or Config::Traces::printClassdefTable)
 			printDebugInfoClassdefAtomTable(report, cdeftable);
 		if (Config::Traces::printSourceOpcodeProgram)
 			buildinfo.isolate.print(report);
@@ -136,6 +136,16 @@ namespace Nany
 
 		yint64 endTime = DateTime::NowMilliSeconds();
 		duration = endTime - buildinfo.buildtime;
+
+		if (Config::Traces::printAtomTable)
+		{
+			auto trace = report.trace();
+			trace.message.prefix = "ATOMS";
+			cdeftable.atoms.root.print(report, ClassdefTableView{cdeftable});
+			report.info(); // for beauty
+			report.info(); // for beauty
+		}
+
 
 		if (unlikely(not buildinfo.success))
 		{

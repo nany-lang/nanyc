@@ -17,13 +17,13 @@ namespace Config
 namespace Traces
 {
 
-	//! Enable all traces
+	//! Enable all traces (very verbose)
 	static constexpr bool all = false;
 
 
 
 	//! Print all AST
-	static constexpr bool ast = all or false;
+	static constexpr bool ast = false;
 
 	//! Print AST before normalization
 	static constexpr bool printASTBeforeNormalize = ast or false;
@@ -36,6 +36,9 @@ namespace Traces
 
 	//! Print ATOM table
 	static constexpr bool printAtomTable = all or false;
+
+	//! Print ATOM table
+	static constexpr bool printPreAtomTable = all or false;
 
 	//! Print classdef table
 	static constexpr bool printClassdefTable = all or false;
