@@ -209,4 +209,18 @@ namespace Nany
 	}
 
 
+	inline uint32_t Atom::size() const
+	{
+		return (uint32_t) pChildren.size();
+	}
+
+
+	inline bool Atom::empty() const
+	{
+		return pChildren.empty();
+	}
+
+
+
+
 } // namespace Nany

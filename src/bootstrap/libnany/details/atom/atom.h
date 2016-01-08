@@ -158,6 +158,12 @@ namespace Nany
 		** the string representing its name
 		*/
 		void renameChild(const AnyString& from, const AnyString& to);
+
+		//! Get the number of children
+		uint32_t size() const;
+
+		//! Get if the atom is empty (no child)
+		bool empty() const;
 		//@}
 
 
