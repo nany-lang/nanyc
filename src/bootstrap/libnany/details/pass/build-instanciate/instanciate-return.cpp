@@ -37,6 +37,8 @@ namespace Instanciate
 		auto& expectedReturnClid = frame.atom.returnType.clid;
 		// even with a return value, it can be void
 		bool isVoid = (not hasReturnValue);
+		// strategy for the returned value
+		auto strategy = TypeCheck::Match::strictEqual;
 
 		if (not expectedReturnClid.isVoid())
 		{
@@ -165,14 +167,30 @@ namespace Instanciate
 
 		if (canGenerateCode())
 		{
-			// acquire the returned object (before releasing variable of the current scope)
-			if (not isVoid)
-				tryToAcquireObject(operands.lvid, spare);
+			uint32_t retlvid;
+			switch (strategy)
+			{
+				case TypeCheck::Match::strictEqual:
+				case TypeCheck::Match::equal:
+				{
+					// acquire the returned object (before releasing variable of the current scope)
+					retlvid = operands.lvid;
+					if (not isVoid)
+						tryToAcquireObject(retlvid, spare);
+					break;
+				}
+				case TypeCheck::Match::none:
+				{
+					assert(false and "invalid return value strategy");
+					ICE() << "invalid return value";
+					return;
+				}
+			}
 
 			// release all variables declared in the function
 			releaseScopedVariables(0);
 			// the return value
-			out.emitReturn(operands.lvid);
+			out.emitReturn(retlvid);
 		}
 	}
 

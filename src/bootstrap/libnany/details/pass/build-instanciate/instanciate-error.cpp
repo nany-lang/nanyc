@@ -170,14 +170,20 @@ namespace Instanciate
 	}
 
 
-	bool ProgramBuilder::complainIntrinsicParameter(const AnyString& name, uint32_t pindex, const Classdef& got, const AnyString& expected)
+	bool ProgramBuilder::complainIntrinsicParameter(const AnyString& name, uint32_t pindex, const Classdef& got,
+		const AnyString& expected)
 	{
 		success = false;
 		auto& element = lastPushedIndexedParameters[pindex];
 
 		auto err = (error() << "intrinsic '" << name << "': invalid type for parameter " << (1 + pindex) << ", got '");
 		got.print(err, cdeftable);
-		err << "', expected " << expected;
+		err << "', expected ";
+		if (not expected.empty())
+			err << expected;
+		else
+			err << "non-void builtin (__bool, __i32, ...)";
+
 		err.message.origins.location.filename   = currentFilename;
 		err.message.origins.location.pos.line   = element.line;
 		err.message.origins.location.pos.offset = element.offset;

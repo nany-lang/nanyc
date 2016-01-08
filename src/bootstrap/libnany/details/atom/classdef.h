@@ -56,9 +56,6 @@ namespace Nany
 		//! Get if the classdef is a builtin unsigned int (u32, u64...)
 		bool isBuiltingUnsigned() const;
 
-		//! Get if the classdef is a bool (builtin to class 'bool')
-		bool isBool() const;
-
 		//! Get if the classdef is void
 		bool isVoid() const;
 		//! Get if the type is defined by an atom (an 'atom' is provided)

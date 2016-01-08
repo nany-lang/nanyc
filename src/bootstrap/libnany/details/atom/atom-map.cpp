@@ -45,7 +45,7 @@ namespace Nany
 
 	namespace // anonymous
 	{
-		static inline bool findCoreObject(Atom::Ptr& out, const AnyString& name, Logs::Report& report, Atom& root)
+		static inline bool findCoreObject(Atom::Ptr& out, nytype_t kind, const AnyString& name, Logs::Report& report, Atom& root)
 		{
 			Atom* atom;
 			switch (root.findClassAtom(atom, name))
@@ -53,6 +53,7 @@ namespace Nany
 				case 1:
 				{
 					out = atom;
+					atom->builtinMapping = kind;
 					return true;
 				}
 				case 0:
@@ -76,7 +77,7 @@ namespace Nany
 		bool success = true;
 		if (core.object[nyt_bool] == nullptr)
 		{
-			success &= findCoreObject(core.object[nyt_bool], "bool", report, root);
+			success &= findCoreObject(core.object[nyt_bool], nyt_bool, "bool", report, root);
 
 			if (unlikely(not success))
 				core.object[nyt_bool] = nullptr;

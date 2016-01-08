@@ -160,7 +160,7 @@ namespace Instanciate
 		bool instanciateAtomFunc(uint32_t& instanceid, Atom& funcAtom, uint32_t retlvid, uint32_t p1 = 0, uint32_t p2 = 0);
 
 
-		bool instanciateFuncCall(const IR::ISA::Operand<IR::ISA::Op::call>& operands);
+		bool emitFuncCall(const IR::ISA::Operand<IR::ISA::Op::call>& operands);
 
 		bool instanciateAssignment(const IR::ISA::Operand<IR::ISA::Op::call>& operands);
 		bool instanciateAssignment(AtomStackFrame& frame, LVID lhs, LVID rhs, bool canDisposeLHS = true,
@@ -225,7 +225,8 @@ namespace Instanciate
 
 		bool complainRedeclared(const AnyString& name, uint32_t previousDeclaration);
 
-		bool complainIntrinsicParameter(const AnyString& name, uint32_t pindex, const Classdef& got, const AnyString& expected);
+		bool complainIntrinsicParameter(const AnyString& name, uint32_t pindex, const Classdef& got,
+			const AnyString& expected = "");
 
 		//! Emit a new error message with additional information on the given operand
 		bool complainOperand(const IR::Instruction& operands, AnyString msg = nullptr);

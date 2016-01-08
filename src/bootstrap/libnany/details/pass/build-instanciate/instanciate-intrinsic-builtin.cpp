@@ -166,22 +166,49 @@ namespace Instanciate
 	{
 		auto& frame = atomStack.back();
 		uint32_t lhs  = lastPushedIndexedParameters[0].lvid;
-		auto& cdeflhs = cdeftable.classdefFollowClassMember(CLID{frame.atomid, lhs});
+		auto& cdeflhs   = cdeftable.classdefFollowClassMember(CLID{frame.atomid, lhs});
 		uint32_t rhs  = lastPushedIndexedParameters[1].lvid;
 		auto& cdefrhs = cdeftable.classdefFollowClassMember(CLID{frame.atomid, rhs});
 
-		if (unlikely(not cdeflhs.isBuiltin()))
-			return complainIntrinsicParameter(name, 0, cdeflhs, "'__u64'");
-		if (unlikely(not cdefrhs.isBuiltin()))
-			return complainIntrinsicParameter(name, 1, cdefrhs, "'__u64'");
-
-		if (unlikely(cdeflhs.kind != cdefrhs.kind))
+		nytype_t builtinlhs = cdeflhs.kind;
+		if (builtinlhs == nyt_any)
 		{
-			return complainIntrinsicParameter(name, 0, cdeflhs, "'__u64'");
-			return complainIntrinsicParameter(name, 1, cdefrhs, "'__u64'");
+			auto* atom = cdeftable.findClassdefAtom(cdeflhs);
+			if (atom != nullptr and atom->builtinMapping != nyt_void)
+			{
+				builtinlhs = atom->builtinMapping;
+				uint32_t newlvid = createLocalVariables();
+				out.emitFieldget(newlvid, lhs, 0);
+				lhs = newlvid;
+			}
 		}
 
-		cdeftable.substitute(lvid).mutateToBuiltin(cdeflhs.kind);
+		nytype_t builtinrhs = cdefrhs.kind;
+		if (builtinrhs == nyt_any)
+		{
+			auto* atom = cdeftable.findClassdefAtom(cdefrhs);
+			if (atom != nullptr and atom->builtinMapping != nyt_void)
+			{
+				builtinrhs = atom->builtinMapping;
+				uint32_t newlvid = createLocalVariables();
+				out.emitFieldget(newlvid, rhs, 0);
+				rhs = newlvid;
+			}
+		}
+
+		if (unlikely(builtinlhs != builtinrhs))
+		{
+			return complainIntrinsicParameter(name, 0, cdeflhs);
+			return complainIntrinsicParameter(name, 1, cdefrhs);
+		}
+
+		if (unlikely(builtinlhs == nyt_void or builtinlhs == nyt_any or builtinlhs == nyt_pointer))
+			return complainIntrinsicParameter(name, 0, cdeflhs);
+		if (unlikely(builtinrhs == nyt_void or builtinrhs == nyt_any or builtinrhs == nyt_pointer))
+			return complainIntrinsicParameter(name, 1, cdefrhs);
+
+
+		cdeftable.substitute(lvid).mutateToBuiltin(builtinlhs);
 		if (canGenerateCode())
 			(out.*M)(lvid, lhs, rhs);
 		return true;

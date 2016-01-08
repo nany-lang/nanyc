@@ -363,6 +363,8 @@ namespace Nany
 		//! Builtin alias (empty if none)
 		// \TODO builtinalias: this property is only used twice
 		AnyString builtinalias;
+		//! Builtin type (!= nyt_void if this atom represents a builtin)
+		nytype_t builtinMapping = nyt_void;
 
 		//! A different scope for name resolution, if not null
 		Atom* scopeForNameResolution = nullptr;

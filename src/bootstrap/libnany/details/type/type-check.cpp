@@ -120,11 +120,7 @@ namespace TypeCheck
 
 		// same builtin, identity as weel
 		if (to.isBuiltinOrVoid() or cdef.isBuiltinOrVoid())
-		{
-			if (cdef.kind == to.kind)
-				return Match::strictEqual;
-			return Match::none;
-		}
+			return (cdef.kind == to.kind) ? Match::strictEqual : Match::none;
 
 
 		const Atom* toAtom = table.findClassdefAtom(to);

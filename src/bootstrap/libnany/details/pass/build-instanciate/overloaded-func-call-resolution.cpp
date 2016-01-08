@@ -40,7 +40,7 @@ namespace Nany
 		overloadMatch.canGenerateReport = false;
 
 		// trying to find all suitable solutions
-		for (uint r = 0; r != (uint) solutions.size(); ++r)
+		for (uint32_t r = 0; r != (uint32_t) solutions.size(); ++r)
 		{
 			Atom& atomsol = solutions[r].get();
 
@@ -128,7 +128,10 @@ namespace Nany
 					// actually only a part of the initial solutions can be instanciated, so
 					// there is no real error, just an ambigious call
 					for (uint r = 0; r != (uint)suitable.size(); ++r)
-						suitable[r] = suitable[r] and solutionsThatCanBeInstanciated[r]; // keeping only results that can be instanciated
+					{
+						// keeping only results that can be instanciated
+						suitable[r] = suitable[r] and solutionsThatCanBeInstanciated[r];
+					}
 				}
 
 				// the total number of suitable strictly follows the number of func calls

@@ -23,6 +23,8 @@ namespace Nany
 			CLID clid;
 			//! The lvid to push as parameter (clid/lvid are linked)
 			const Classdef* cdef = nullptr;
+
+			TypeCheck::Match strategy = TypeCheck::Match::none;
 			//! implicit constructor, if any
 			Atom* implicitCtor = nullptr;
 		};

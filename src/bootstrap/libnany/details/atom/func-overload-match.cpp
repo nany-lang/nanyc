@@ -72,44 +72,42 @@ namespace Nany
 	{
 		// force reset
 		auto& cdef = table.classdef(clid);
-		result.params[index].clid = clid;
-		result.params[index].cdef = &cdef;
+		auto& resultinfo = result.params[index];
+		resultinfo.clid = clid;
+		resultinfo.cdef = &cdef;
 
 		// type checking
 		auto& paramdef = table.classdef(atom.parameters.vardef(index).clid);
 
-		auto similarity = TypeCheck::isSimilarTo(table, nullptr, cdef, paramdef, pAllowImplicit);
-		if (similarity == TypeCheck::Match::none and canGenerateReport)
+		resultinfo.strategy = TypeCheck::isSimilarTo(table, nullptr, cdef, paramdef, pAllowImplicit);
+		if (resultinfo.strategy == TypeCheck::Match::none and canGenerateReport)
 		{
-			//report.get().trace() << "failed to push value " << cdef.clid << " to parameter "
-			//	<< (CLID{atom.atomid,0})
-			//	<< " '" << atom.name << "' index " << index;
+			report.get().trace() << "failed to push value " << cdef.clid << " to parameter "
+				<< (CLID{atom.atomid,0})
+				<< " '" << atom.name << "' index " << index;
 
-			if (canGenerateReport)
+			String atomName;
+			atom.appendCaption(atomName, table);
+			auto err = report.get().hint();
+			switch (index)
 			{
-				String atomName;
-				atom.appendCaption(atomName, table);
-				auto err = report.get().hint();
-				switch (index)
-				{
-					case 0: err << "1st"; break;
-					case 1: err << "2nd"; break;
-					case 2: err << "3rd"; break;
-					default: err << (index + 1) << "th";
-				}
-				err << " parameter, got '";
-				cdef.print(err.message.message, table, false);
-				if (debugmode)
-					err << ' ' << cdef.clid;
-
-				err << "', expected '";
-				paramdef.print(err.message.message, table, false);
-				if (debugmode)
-					err << ' ' << paramdef.clid;
-				err << '\'';
+				case 0: err << "1st"; break;
+				case 1: err << "2nd"; break;
+				case 2: err << "3rd"; break;
+				default: err << (index + 1) << "th";
 			}
+			err << " parameter, got '";
+			cdef.print(err.message.message, table, false);
+			if (debugmode)
+				err << ' ' << cdef.clid;
+
+			err << "', expected '";
+			paramdef.print(err.message.message, table, false);
+			if (debugmode)
+				err << ' ' << paramdef.clid;
+			err << '\'';
 		}
-		return similarity;
+		return resultinfo.strategy;
 	}
 
 

@@ -100,12 +100,6 @@ namespace Nany
 
 
 
-	inline bool Classdef::isBool() const
-	{
-		return (kind == nyt_bool) or isClass("bool");
-	}
-
-
 	inline bool Classdef::hasConstraints() const
 	{
 		return not isAny() or not interface.empty() or not followup.empty(); // TODO qualifiers ???

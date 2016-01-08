@@ -14,7 +14,8 @@ namespace Pass
 namespace Instanciate
 {
 
-	inline bool ProgramBuilder::instanciateFuncCall(const IR::ISA::Operand<IR::ISA::Op::call>& operands)
+
+	inline bool ProgramBuilder::emitFuncCall(const IR::ISA::Operand<IR::ISA::Op::call>& operands)
 	{
 		// the current frame
 		auto& frame = atomStack.back();
@@ -192,8 +193,9 @@ namespace Instanciate
 	}
 
 
-	inline bool ProgramBuilder::generateShortCircuitInstrs(uint32_t retlvid)
+	bool ProgramBuilder::generateShortCircuitInstrs(uint32_t retlvid)
 	{
+		assert(canGenerateCode());
 		// insert some code after the computation of the first argument but before
 		// the computation of the second one to achieve minimal evaluation
 
@@ -207,24 +209,45 @@ namespace Instanciate
 		if (not frame.verify(lvid))
 			return false;
 		uint32_t offset = frame.lvids[lvid].offsetDeclOut;
-		if (unlikely(not (offset < out.opcodeCount())))
+		if (unlikely(not (offset > 0 and offset < out.opcodeCount())))
 			return (ICE() << "invalid opcode offset for generating shortcircuit");
 
 		// checking if the referenced offset is really a stackalloc
 		assert(out.at(offset).opcodes[0] == static_cast<uint32_t>(IR::ISA::Op::stackalloc));
 
-		// go to the first nop
+		// lvid of the first parameter
+		uint32_t lvidvalue = lastPushedIndexedParameters[0].lvid;
+		auto& cdef = cdeftable.classdef(CLID{frame.atomid, lvidvalue});
+		if (cdef.kind != nyt_bool)
+		{
+			auto* atom = cdeftable.findClassdefAtom(cdef);
+			if (unlikely(cdeftable.atoms().core.object[nyt_bool] != atom))
+			{
+				error() << "boolean expected";
+				return false;
+			}
+
+			uint32_t newlvid = out.at<IR::ISA::Op::stackalloc>(offset).lvid;
+			++offset;
+			assert(out.at(offset).opcodes[0] == static_cast<uint32_t>(IR::ISA::Op::nop));
+
+			auto& fieldget  = out.at<IR::ISA::Op::fieldget>(offset);
+			fieldget.opcode = static_cast<uint32_t>(IR::ISA::Op::fieldget);
+			fieldget.lvid   = newlvid;
+			fieldget.self   = lvidvalue;
+			fieldget.var    = 0;
+			lvidvalue = newlvid;
+		}
+
+		// go to the next nop (can be first one if the parameter was __bool)
 		++offset;
 		assert(out.at(offset).opcodes[0] == static_cast<uint32_t>(IR::ISA::Op::nop));
-
-		// lvid of the first parameter
-		uint32_t value = lastPushedIndexedParameters[0].lvid;
 
 		if (not shortcircuit.compareTo) // if true then
 		{
 			auto& condjmp  = out.at<IR::ISA::Op::jz>(offset);
 			condjmp.opcode = static_cast<uint32_t>(IR::ISA::Op::jz); // promotion
-			condjmp.lvid   = value;
+			condjmp.lvid   = lvidvalue;
 			condjmp.result = retlvid; // func return
 			condjmp.label  = label;
 		}
@@ -232,7 +255,7 @@ namespace Instanciate
 		{
 			auto& condjmp  = out.at<IR::ISA::Op::jnz>(offset);
 			condjmp.opcode = static_cast<uint32_t>(IR::ISA::Op::jnz); // promotion
-			condjmp.lvid   = value;
+			condjmp.lvid   = lvidvalue;
 			condjmp.result = retlvid; // func return
 			condjmp.label  = label;
 		}
@@ -250,7 +273,7 @@ namespace Instanciate
 		// a real func call and it is intercepted to be handled differently
 		auto& frame = atomStack.back();
 		bool checkpoint = ((not frame.lvids[operands.ptr2func].isAssignment)
-			? instanciateFuncCall(operands)
+			? emitFuncCall(operands)
 			: instanciateAssignment(operands));
 
 		if (checkpoint)
