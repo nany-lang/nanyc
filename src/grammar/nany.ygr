@@ -475,7 +475,7 @@ type-decl: notext
 	//| class
 	// continuation
 	| type-decl-can-continue 
-	// ex-compound
+	// expr-value
 
 type: notext
 	((type-qualifier (wp type-decl)?) | type-decl)
@@ -700,7 +700,7 @@ in-vars: notext
 
 in-container: notext
 	// expr optional to make the grammar more flexible
-	| (ex-compound) // to reduce the priority of 'each i in ...'
+	| (expr-value) // to reduce the priority of 'each i in ...'
 	| (tk-parenthese-open wp expr-no-node? wp tk-parenthese-close)
 
 in-filter: notext
@@ -919,10 +919,12 @@ ex-power: hidden
 expr-not: notext
 	operator-not ex-not | error-semicolon
 ex-not: hidden
-	expr-not | ex-compound
+	expr-not | expr-value
 
 
-ex-compound: hidden
+// this node is not hidden to make sure to have a single node
+// to have proper partitioning (example: `a.foo.bar and b`)
+expr-value: notext
 	// all expr which can not be continued without using groups (...)
 	| if
 	| new

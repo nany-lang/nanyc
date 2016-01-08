@@ -14,12 +14,18 @@ namespace Producer
 {
 
 
-	bool Scope::visitASTStmt(Node& node)
+	bool Scope::visitASTStmt(Node& orignode)
 	{
+		auto& node = (orignode.rule == rgExpr
+			and orignode.children.size() == 1 and orignode.children[0]->rule == rgExprValue)
+			? *(orignode.children[0])
+			: orignode;
+
 		switch (node.rule)
 		{
 			// expressions
 			case rgExpr:
+			case rgExprValue:
 			{
 				// Special case: Standalone function
 				// Normal functions are defined within a generic expression (but only from a stmt)
@@ -33,20 +39,10 @@ namespace Producer
 					auto& child = *(node.children[0]);
 					switch (child.rule)
 					{
-						case rgIf:
-						{
-							return visitASTExprIfStmt(child);
-						}
-						case rgFunction:
-						{
-							return visitASTFunc(child);
-						}
-						case rgSwitch:
-						{
-							return visitASTExprSwitch(child);
-						}
-						default:
-						{}
+						case rgIf:       return visitASTExprIfStmt(child);
+						case rgFunction: return visitASTFunc(child);
+						case rgSwitch:   return visitASTExprSwitch(child);
+						default: {}
 					}
 				}
 				// no break here - same as `expr-group`

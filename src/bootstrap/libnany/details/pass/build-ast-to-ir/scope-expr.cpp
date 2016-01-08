@@ -42,6 +42,7 @@ namespace Producer
 			switch (child.rule)
 			{
 				case rgIdentifier: success &= visitASTExprIdentifier(child, localvar); break;
+				case rgExprValue:
 				case rgExprGroup:  success &= visitASTExpr(child, localvar); break;
 				case rgCall:       success &= visitASTExprCall(&child, localvar, &node); break;
 				case rgExprSubDot: success &= visitASTExprSubDot(child, localvar); break;
@@ -74,13 +75,20 @@ namespace Producer
 	}
 
 
-	bool Scope::visitASTExpr(Node& node, LVID& localvar, bool allowScope)
+	bool Scope::visitASTExpr(Node& orignode, LVID& localvar, bool allowScope)
 	{
-		assert(node.rule == rgExpr or node.rule == rgExprGroup or node.rule == rgTypeDecl);
-		assert(not node.children.empty());
+		assert(not orignode.children.empty());
 
 		// reset the value of the localvar, result of the expr
 		localvar = 0;
+
+		auto& node = (orignode.rule == rgExpr
+			and orignode.children.size() == 1 and orignode.children[0]->rule == rgExprValue)
+			? *(orignode.children[0])
+			: orignode;
+
+		assert(node.rule == rgExpr or node.rule == rgExprValue or node.rule == rgExprGroup or node.rule == rgTypeDecl);
+		assert(not node.children.empty());
 
 		// always creating a new scope for a expr
 		IR::Producer::Scope scope{*this};

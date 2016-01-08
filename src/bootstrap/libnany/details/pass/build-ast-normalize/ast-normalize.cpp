@@ -433,7 +433,10 @@ namespace Nany
 				case rgExpr:
 				{
 					assert(not node.children.empty());
-					auto& firstChild = node.firstChild();
+					auto& firstChild = (((node.children.size() == 1 and node.firstChild().rule == rgExprValue)
+						? node.firstChild() : node))
+							.firstChild();
+
 					switch (firstChild.rule) // avoid the creation of some useless nodes
 					{
 						case rgClass:
@@ -529,12 +532,14 @@ namespace Nany
 				}
 
 				case Nany::rgExpr:
+				case Nany::rgExprValue:
 				{
 					// some expr might be statements
 					if (likely(not node.children.empty()))
 					{
-						iterateThroughChildren(node, *newNode);
-						normalizeExpression(*newNode);
+						auto& exprnode = *newNode;
+						iterateThroughChildren(node, exprnode);
+						normalizeExpression(exprnode);
 					}
 					break;
 				}
