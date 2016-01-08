@@ -37,11 +37,12 @@ namespace Nany
 	{
 		"new", "dispose",
 		"and", "or", "mod", "xor", "not",
-		"+", "-", "*", "/", "^", "--", "++"
+		"+", "-", "*", "/", "^",
 		"<<", ">>", "!=", "==", "<", ">", "<=", ">=",
 		// "=", operator copy should be used instead
 		"+=", "-=", "*=", "/=", "^=",
-		"()", "[]"
+		"()", "[]",
+		"++self", "self++", "--self", "self--"
 	};
 
 	static const std::unordered_map<AnyString, AnyString> opnormalize =
@@ -62,7 +63,9 @@ namespace Nany
 		{ "+=",  "^+="  }, { "-=",  "^-="  },
 		{ "*=",  "^*="  }, { "/=",  "^/="  },
 		{ "^=",  "^^="  },
-		{ "()",  "^()"  }, { "[]",  "^[]"  }
+		{ "()",  "^()"  }, { "[]",  "^[]"  },
+		{ "self++", "^self++" }, { "++self", "^++self" },
+		{ "self--", "^self--" }, { "--self", "^--self" },
 	};
 
 
