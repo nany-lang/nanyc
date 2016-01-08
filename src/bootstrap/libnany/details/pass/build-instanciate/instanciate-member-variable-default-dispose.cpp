@@ -20,7 +20,6 @@ namespace Instanciate
 
 		// special location: in a constructor - initializing all variables with their def value
 		// note: do not keep a reference on 'out.at...', since the internal buffer might be reized
-		uint32_t lvid = out.at<IR::ISA::Op::stacksize>(lastOpcodeStacksizeOffset).add;
 		auto& parentAtom = *(atomStack.back().atom.parent);
 
 
@@ -44,21 +43,18 @@ namespace Instanciate
 			return;
 
 		// resize
-		uint32_t lvidinc = (uint32_t) atomvars.size();
-		if (userDefinedDispose)
-			++lvidinc;
-
-		auto& frame = atomStack.back();
-		frame.resizeRegisterCount(lvid + (uint32_t)atomvars.size() + lvidinc + 1, cdeftable);
+		uint32_t more = (uint32_t)atomvars.size() + (userDefinedDispose ? 1 : 0);
+		uint32_t lvid = createLocalVariables(more);
 
 		// call to user-defined operator dispose
 		if (userDefinedDispose)
 		{
-			out.emitStackalloc(lvid, nyt_any);
 			out.emitPush(2); // self
 			out.emitCall(lvid, userDefinedDispose->atomid, 0);
 			++lvid;
 		}
+
+		auto& frame = atomStack.back();
 
 		// ... then release all variables !
 		for (auto& subatomref: atomvars)
@@ -107,9 +103,6 @@ namespace Instanciate
 				// out.emitComment(String() << "builtin dispose for " << subatom.name);
 			}
 		}
-
-		// updating the stack size
-		out.at<IR::ISA::Op::stacksize>(lastOpcodeStacksizeOffset).add = lvid;
 	}
 
 

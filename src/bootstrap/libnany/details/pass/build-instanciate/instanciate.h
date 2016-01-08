@@ -194,6 +194,9 @@ namespace Instanciate
 		void acquireObject(LVID lvid); // without checking
 
 		void tryUnrefObject(uint32_t lvid);
+
+		//! Create 'count' new local variables and return the first lvid
+		uint32_t createLocalVariables(uint32_t count = 1);
 		//@}
 
 

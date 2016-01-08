@@ -113,6 +113,38 @@ namespace Instanciate
 	}
 
 
+	uint32_t ProgramBuilder::createLocalVariables(uint32_t count)
+	{
+		assert(lastOpcodeStacksizeOffset != (uint32_t) -1);
+		assert(not atomStack.empty());
+		assert(count > 0);
+
+		auto& operands = out.at<IR::ISA::Op::stacksize>(lastOpcodeStacksizeOffset);
+		uint32_t startOffset = operands.add;
+		operands.add += count;
+
+		auto& frame = atomStack.back();
+		frame.resizeRegisterCount(operands.add, cdeftable);
+
+		if (canGenerateCode())
+		{
+			for (uint32_t i = 0; i != count; ++i)
+			{
+				auto& lvidinfo = frame.lvids[startOffset + i];
+				lvidinfo.scope = frame.scope;
+				lvidinfo.offsetDeclOut = out.opcodeCount();
+				out.emitStackalloc(startOffset + i, nyt_any);
+			}
+		}
+		else
+		{
+			for (uint32_t i = 0; i != count; ++i)
+				frame.lvids[startOffset + i].scope = frame.scope;
+		}
+
+		return startOffset;
+	}
+
 
 	void ProgramBuilder::printClassdefTable(Logs::Report trace, const AtomStackFrame& frame) const
 	{

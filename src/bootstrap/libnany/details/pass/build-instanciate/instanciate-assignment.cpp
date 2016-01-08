@@ -203,12 +203,8 @@ namespace Instanciate
 					}
 
 					// note: do not keep a reference on 'out.at...', since the internal buffer might be reized
-					assert(lastOpcodeStacksizeOffset != (uint32_t) -1);
-					auto& operands = out.at<IR::ISA::Op::stacksize>(lastOpcodeStacksizeOffset);
-					uint32_t lvid = operands.add;
-					uint32_t retcall = operands.add + 1;
-					operands.add += 2;
-					frame.resizeRegisterCount(lvid + 2, cdeftable);
+					uint32_t lvid = createLocalVariables(/*count*/ 2);
+					uint32_t retcall = lvid + 1;
 
 					uint32_t rsizof  = out.emitStackalloc(lvid, nyt_u64);
 					out.emitSizeof(rsizof, rhsAtom->atomid);

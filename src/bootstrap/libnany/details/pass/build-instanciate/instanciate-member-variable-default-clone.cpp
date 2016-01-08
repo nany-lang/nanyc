@@ -49,14 +49,9 @@ namespace Instanciate
 		if (atomvars.empty() and userDefinedClone == nullptr)
 			return;
 
-		// resize
-		uint32_t more = (uint32_t) atomvars.size() * 2;
-		if (userDefinedClone)
-			++more;
-		uint32_t lvid = out.at<IR::ISA::Op::stacksize>(lastOpcodeStacksizeOffset).add;
-		frame.resizeRegisterCount(lvid + more + 1, cdeftable);
-		out.at<IR::ISA::Op::stacksize>(lastOpcodeStacksizeOffset).add = lvid + more + 1;
-
+		// create new local variables for performing the cline
+		uint32_t more = (uint32_t)atomvars.size() * 2 + (userDefinedClone ? 1 : 0);
+		uint32_t lvid = createLocalVariables(more);
 
 		for (auto& subatomref: atomvars)
 		{
@@ -69,7 +64,6 @@ namespace Instanciate
 				// read the pointer rhs
 				uint32_t rhsptr = lvid++;
 				uint32_t lhsptr = lvid++;
-				out.emitStackalloc(rhsptr, nyt_any);
 				out.emitFieldget(rhsptr, /*rhs*/ 3, subatom.varinfo.effectiveFieldIndex);
 
 				auto& origin  = frame.lvids[rhsptr].origin.varMember;
@@ -90,7 +84,6 @@ namespace Instanciate
 			}
 			else
 			{
-				out.emitStackalloc(lvid, cdef.kind);
 				out.emitFieldget(lvid,  /*rhs*/  3, subatom.varinfo.effectiveFieldIndex);
 				out.emitFieldset(lvid, /*self*/ 2, subatom.varinfo.effectiveFieldIndex);
 				++lvid;
@@ -100,7 +93,6 @@ namespace Instanciate
 		// call to user-defined operator dispose
 		if (userDefinedClone)
 		{
-			out.emitStackalloc(lvid, nyt_any);
 			out.emitPush(2); // self
 			out.emitPush(3); // rhs
 			out.emitCall(lvid, userDefinedClone->atomid, 0);

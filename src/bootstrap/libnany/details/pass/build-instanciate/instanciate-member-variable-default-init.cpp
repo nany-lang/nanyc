@@ -24,9 +24,13 @@ namespace Instanciate
 		auto& funcAtom = atomStack.back().atom;
 		if (unlikely(funcAtom.parent == nullptr))
 			return (void)(ICE() << "invalid parent atom for variable initialization in ctor");
+
 		auto& parentAtom = *(funcAtom.parent);
+		if (parentAtom.empty())
+			return;
 
 		std::vector<std::reference_wrapper<Atom>> atomvars;
+		atomvars.reserve(parentAtom.size());
 
 		parentAtom.eachChild([&](Atom& subatom) -> bool
 		{
@@ -37,11 +41,9 @@ namespace Instanciate
 		if (atomvars.empty())
 			return;
 
-		auto& frame = atomStack.back();
-		uint32_t lvid = out.at<IR::ISA::Op::stacksize>(lastOpcodeStacksizeOffset).add;
-		uint32_t morelvid = (uint32_t)atomvars.size() + 1;
-		frame.resizeRegisterCount(lvid + morelvid, cdeftable);
-		out.at<IR::ISA::Op::stacksize>(lastOpcodeStacksizeOffset).add += morelvid;
+
+		// more variables for calling init funcs
+		uint32_t lvid = createLocalVariables((uint32_t) atomvars.size());
 
 		// there are two solutions for initializing a variable member:
 		// - the default value
@@ -50,6 +52,7 @@ namespace Instanciate
 		// In both cases, the default value (thus the func for initializing the var)
 		// must be valid (thus instanciated for being checked)
 
+		auto& frame = atomStack.back();
 		if (frame.selfParameters.get() == nullptr)
 		{
 			for (auto& subatomref: atomvars)
@@ -63,11 +66,10 @@ namespace Instanciate
 
 				if (likely(localSuccess))
 				{
-					out.emitStackalloc(lvid, nyt_void);
 					out.emitPush(2); // %2 -> self
 					out.emitCall(lvid, subatom.atomid, instanceid);
-					++lvid;
 				}
+				++lvid; // always increment it to ease debugging
 			}
 		}
 		else
@@ -95,7 +97,6 @@ namespace Instanciate
 				{
 					if (localSuccess)
 					{
-						out.emitStackalloc(lvid, nyt_void);
 						out.emitPush(2); // %2 -> self
 						out.emitCall(lvid, subatom.atomid, instanceid);
 					}
@@ -108,7 +109,6 @@ namespace Instanciate
 						uint32_t paramlvid = selfIT->second.first;
 
 						// set the type of 'lvid' to allow assignment
-						out.emitStackalloc(lvid, nyt_void);
 						auto& cdef  = cdeftable.classdef(CLID{frame.atomid, paramlvid});
 						auto& spare = cdeftable.substitute(lvid);
 						spare.import(cdef);
@@ -132,7 +132,7 @@ namespace Instanciate
 					selfIT->second.second = true;
 				}
 
-				++lvid;
+				++lvid; // always increment it to ease debugging
 			}
 
 			// checking for non used self parameters
