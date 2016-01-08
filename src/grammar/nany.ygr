@@ -781,7 +781,7 @@ class-body: notext
 
 class: notext important
 	(attributes wp)?
-	(visibility sp)?
+	(visibility wp)?
 	tk-class
 		(wp symbol-name)?
 		(wp class-template-params)?
