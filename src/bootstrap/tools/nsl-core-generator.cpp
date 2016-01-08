@@ -122,19 +122,19 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 			for ( ; b >= 8; b /= 2)
 			{
 				o << "public operator ";
-				o << op << " (a: __" << suffix << ", b: __" << targetsign << b << "): bool\n";
+				o << op << " (a: __" << suffix << ", b: __" << targetsign << b << "): ref bool\n";
 				o << "\t-> !!" << intrinsic << suffix << "__" << targetsign << b << "(a, b);\n\n";
 
 				o << "public operator ";
-				o << op << " (cref a: " << suffix << ", cref b: " << targetsign << b << "): bool\n";
+				o << op << " (cref a: " << suffix << ", cref b: " << targetsign << b << "): ref bool\n";
 				o << "\t-> a.pod " << op << " b.pod;\n\n";
 
 				o << "public operator ";
-				o << op << " (cref a: " << suffix << ", cref b: __" << targetsign << b << "): bool\n";
+				o << op << " (cref a: " << suffix << ", cref b: __" << targetsign << b << "): ref bool\n";
 				o << "\t-> a.pod " << op << " b;\n\n";
 
 				o << "public operator ";
-				o << op << " (cref a: __" << suffix << ", cref b: " << targetsign << b << "): bool\n";
+				o << op << " (cref a: __" << suffix << ", cref b: " << targetsign << b << "): ref bool\n";
 				o << "\t-> a " << op << " b.pod;\n\n";
 
 				o << '\n';
@@ -155,7 +155,7 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 	auto craftGlobalOperator = [&](const AnyString& op)
 	{
 		o << "public operator ";
-		o << op << " (cref a: " << suffix << ", cref b): " << suffix << '\n';
+		o << op << " (cref a: " << suffix << ", cref b): ref " << suffix << '\n';
 		o << "\t-> (new a) " << op << "= b;\n\n";
 
 		craftOperator([&](uint32_t b, char targetsign)
@@ -163,7 +163,7 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 			for ( ; b >= 8; b /= 2)
 			{
 				o << "public operator ";
-				o << op << " (cref a: __" << targetsign << b << ", cref b: " << suffix << "): " << suffix << '\n';
+				o << op << " (cref a: __" << targetsign << b << ", cref b: " << suffix << "): ref " << suffix << '\n';
 				o << "\t-> (new " << suffix << "(a)) " << op << "= b;\n\n";
 			}
 			o << '\n';
