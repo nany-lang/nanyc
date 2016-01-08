@@ -47,12 +47,12 @@ namespace Nany
 			void transformExprNodeToFuncCall(Nany::Node& node);
 			void transformExprAssignmentToFuncCall(Nany::Node& node);
 
+			void appendNewBoolNode(Node& parent, bool onoff);
+
 
 		private:
 			struct Frame final
 			{
-				Frame()
-				{}
 				nyvisibility_t visibility = nyv_default;
 			};
 
@@ -404,6 +404,31 @@ namespace Nany
 		}
 
 
+		void ASTReplicator::appendNewBoolNode(Node& parent, bool onoff)
+		{
+			// expr-group
+			// |   new (+2)
+			// |       type-decl
+			// |       |   identifier: bool
+			// |       call
+			// |           call-parameter
+			// |               expr
+			// |                   identifier: __true
+			auto& group   = *ast.nodeAppend(parent, rgExprGroup);
+			auto& newnode = *ast.nodeAppend(group, rgNew);
+
+			auto& typeDecl = *ast.nodeAppend(newnode, rgTypeDecl);
+			auto& id       = *ast.nodeAppend(typeDecl, rgIdentifier);
+			id.text = "bool";
+
+			if (onoff)
+			{
+				auto& value = *ast.nodeAppend(newnode, {rgCall, rgCallParameter, rgExpr, rgIdentifier});
+				value.text = "__true";
+			}
+		}
+
+
 		bool ASTReplicator::duplicateNode(Nany::Node& parent, const Nany::Node& node)
 		{
 			// rule of the current node
@@ -428,6 +453,19 @@ namespace Nany
 				{
 					collectNamespace(node);
 					return true; // ignore the node
+				}
+
+				case rgIdentifier:
+				{
+					if ((parent.rule == rgExpr or parent.rule == rgExprValue))
+					{
+						if (node.text == "true" or node.text == "false")
+						{
+							appendNewBoolNode(parent, (node.text[0] == 't'));
+							return true;
+						}
+					}
+					break;
 				}
 
 				case rgExpr:

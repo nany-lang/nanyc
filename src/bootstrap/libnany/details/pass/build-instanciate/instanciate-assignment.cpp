@@ -46,8 +46,6 @@ namespace Instanciate
 		bool implicitBuiltin = cdeflhs.isBuiltin() and (not cdefrhs.isBuiltinOrVoid());
 		if (implicitBuiltin)
 		{
-			assert(cdeftable.atoms().core.object[cdeflhs.kind] != nullptr);
-
 			// checking if an implicit can be performed (if rhs is a 'builtin' type)
 			auto* atomrhs = (cdeftable.findClassdefAtom(cdefrhs));
 			if (cdeftable.atoms().core.object[cdeflhs.kind] == atomrhs)

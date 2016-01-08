@@ -39,6 +39,10 @@ namespace AST
 	Node* createNodeFuncCrefParam(const AnyString& name, const AnyString& paramname);
 
 
+
+
+
+
 	//! Extract the complete identifier string (from an entity node)
 	template<class S> bool retrieveEntityString(S& out, const Node&);
 
