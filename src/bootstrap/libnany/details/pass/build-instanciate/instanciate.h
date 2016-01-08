@@ -169,7 +169,6 @@ namespace Instanciate
 		//! Declare a named variable (and checks for multiple declarations)
 		void declareNamedVariable(const AnyString& name, LVID lvid, bool autorelease = true);
 
-		bool complainUnknownIdentifier(const Atom* self, const Atom& atom, const AnyString& name);
 
 		void releaseScopedVariables(int scope, bool forget = false);
 
@@ -219,6 +218,10 @@ namespace Instanciate
 
 
 		bool checkForIntrinsicParamCount(const AnyString& name, uint32_t count);
+
+		bool complainUnknownIdentifier(const Atom* self, const Atom& atom, const AnyString& name);
+
+		bool complainInvalidType(const Classdef& from, const Classdef& to);
 
 		bool complainMultipleOverloads(LVID lvid, const std::vector<std::reference_wrapper<Atom>>& solutions,
 			const OverloadedFuncCallResolver& resolver);

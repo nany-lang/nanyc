@@ -117,7 +117,7 @@ namespace Producer
 			//           |       <expr B>
 			Node::Ptr intrinsic = new Node{rgIntrinsic};
 			expr->children.push_back(intrinsic);
-			intrinsic->children.push_back(AST::createNodeIdentifier("__nanyc_fieldset"));
+			intrinsic->children.push_back(AST::createNodeIdentifier("^fieldset"));
 
 			Node::Ptr call = new Node{rgCall};
 			intrinsic->children.push_back(call);
@@ -164,6 +164,7 @@ namespace Producer
 		bool constant = false;
 		Node* varnodeDecl = nullptr;
 		Node* varAssign = nullptr;
+		Node* varType = nullptr;
 		bool isProperty = false;
 
 		for (auto& childptr: node.children)
@@ -185,7 +186,6 @@ namespace Producer
 					varAssign = &child;
 					break;
 				}
-
 				case rgVarProperty:
 				{
 					isProperty = true;
@@ -195,23 +195,22 @@ namespace Producer
 
 				case rgVarType:
 				{
-					if (varnodeDecl)
-						error(*varnodeDecl) << "variable '" << varname << "': type declaration not implemented";
+					varType = &child;
+					if (child.children.size() == 1 and child.children[0]->rule == rgType)
+						varType = Node::Ptr::WeakPointer(child.children[0]);
 					else
-						error(node) << "variable '" << varname << "': type declaration not implemented";
-					return false;
+						error(child) << "invalid type definition";
+					break;
 				}
 
 				case rgVarByValue:
 				{
 					break; // nothing to do
 				}
-
 				case rgConst:
 				{
 					constant = true;
 					warning(child) << "'const' in var declaration is currently not supported";
-					(void) constant;
 					break;
 				}
 				case rgRef:
@@ -244,6 +243,8 @@ namespace Producer
 			return false;
 		}
 
+		auto& out = program();
+
 		if (not isProperty)
 		{
 			switch (kind)
@@ -252,36 +253,45 @@ namespace Producer
 				{
 					if (debugmode)
 					{
-						program().emitComment();
-						program().emitComment(String{"class var "} << varname);
+						out.emitComment();
+						out.emitComment(String{"class var "} << varname);
 					}
 					// the new member variable
 					auto mbvar = nextvar();
-					program().emitStackalloc(mbvar, nyt_any);
+					out.emitStackalloc(mbvar, nyt_any);
 
 					// the type of the expression
-					LVID lvid;
-					// type definition, via typeof(varAssign)
-					if (not generateTypeofForClassVar(lvid, *varAssign))
-						return false;
-					if (0 == lvid)
+					LVID lvid = 0;
+
+					if (varType != nullptr)
+					{
+						if (not visitASTType(*varType, lvid))
+							return false;
+					}
+					else
+					{
+						// type definition, via typeof(varAssign)
+						if (not generateTypeofForClassVar(lvid, *varAssign))
+							return false;
+					}
+					if (unlikely(0 == lvid))
 						return false;
 
 					// follow
 					{
-						auto& operands	= program().emit<ISA::Op::follow>();
+						auto& operands    = out.emit<ISA::Op::follow>();
 						operands.follower = mbvar;
-						operands.lvid	 = lvid;
+						operands.lvid     = lvid;
 						operands.symlink  = 0;
 					}
 					// preserve var / ref / const
-					program().emitQualifierRef(mbvar, ref);
+					out.emitQualifierRef(mbvar, ref);
 					if (constant)
-						program().emitQualifierConst(mbvar, true);
+						out.emitQualifierConst(mbvar, true);
 
 					// variable definition
 					emitDebugpos(*varnodeDecl);
-					program().emitBlueprintVardef(mbvar, varname);
+					out.emitBlueprintVardef(mbvar, varname);
 
 					// generating an INIT func for the variable
 					if (not generateInitFuncForClassVar(varname, mbvar, *varAssign))
@@ -291,32 +301,48 @@ namespace Producer
 				case Kind::kfunc:
 				{
 					// create the variable itself
-					uint32_t varlvid  = program().emitStackalloc(nextvar(), nyt_any);
-					program().emitQualifierRef(varlvid, ref);
-					program().emitQualifierConst(varlvid, constant);
+					uint32_t varlvid  = out.emitStackalloc(nextvar(), nyt_any);
+
+					if (varType != nullptr)
+					{
+						uint32_t lvidtype;
+						if (not visitASTType(*varType, lvidtype) or lvidtype == 0)
+							return false;
+
+						// follow
+						auto& operands    = out.emit<ISA::Op::follow>();
+						operands.follower = varlvid;
+						operands.lvid	  = lvidtype;
+						operands.symlink  = 0;
+					}
+
+					// preserve var / ref / const
+					out.emitQualifierRef(varlvid, ref);
+					if (constant)
+						out.emitQualifierConst(varlvid, true);
 
 					{
 						LVID rhs = 0;
-						IR::OpcodeScopeLocker opscope{program()};
+						IR::OpcodeScopeLocker opscope{out};
 						if (not visitASTVarValueInitialization(rhs, *varAssign, *varnodeDecl, varname))
 							return false;
 
 						assert(rhs != 0);
 						if (not ref)
 						{
-							program().emitAssign(varlvid, rhs, false);
+							out.emitAssign(varlvid, rhs, false);
 						}
 						else
 						{
-							program().emitStore(varlvid, rhs); // re-acquire to keep the value alive
-							program().emitRef(varlvid);
+							out.emitStore(varlvid, rhs); // re-acquire to keep the value alive
+							out.emitRef(varlvid);
 						}
 					}
 
 					// important: the alias must be declared *after* the right value
 					// (otherwise it may be used by the code)
 					emitDebugpos(*varnodeDecl); // reset the debug position
-					program().emitNameAlias(varlvid, varname);
+					out.emitNameAlias(varlvid, varname);
 					break;
 				}
 				default:

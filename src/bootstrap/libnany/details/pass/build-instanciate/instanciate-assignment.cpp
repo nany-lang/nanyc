@@ -61,14 +61,7 @@ namespace Instanciate
 		{
 			auto similarity = TypeCheck::isSimilarTo(cdeftable, nullptr, cdeflhs, cdefrhs, false);
 			if (unlikely(TypeCheck::Match::strictEqual != similarity))
-			{
-				auto err = (error() << "cannot convert '");
-				cdefrhs.print(err.data().message, cdeftable, false);
-				err << "' to '";
-				cdeflhs.print(err.data().message, cdeftable, false);
-				err << "' in variable assignment";
-				return false;
-			}
+				return complainInvalidType(cdefrhs, cdeflhs);
 		}
 
 		// type propagation

@@ -264,6 +264,18 @@ namespace Instanciate
 	}
 
 
+	bool ProgramBuilder::complainInvalidType(const Classdef& from, const Classdef& to)
+	{
+		auto err = (error() << "cannot convert '");
+		from.print(err.data().message, cdeftable, false);
+		err << "' to '";
+		to.print(err.data().message, cdeftable, false);
+		err << "' in variable assignment";
+		return false;
+	}
+
+
+
 
 
 } // namespace Instanciate

@@ -1,4 +1,5 @@
 #include "instanciate.h"
+#include "details/type/type-check.h"
 
 using namespace Yuni;
 
@@ -40,12 +41,39 @@ namespace Instanciate
 		if (unlikely(!varatom))
 			return (ICE() << "invalid variable member atom for __nanyc_fieldset");
 
+		uint32_t objlvid = lastPushedIndexedParameters[0].lvid;
+		auto& cdefvar = cdeftable.classdefFollowClassMember(varatom->returnType.clid);
+		auto& cdef    = cdeftable.classdef(CLID{frame.atomid, objlvid});
+
+		// flag for implicitly converting objects (bool, i32...) into builtin (__bool, __i32...)
+		bool implicitBuiltin = cdefvar.isBuiltin() and (not cdef.isBuiltinOrVoid());
+		if (implicitBuiltin)
+		{
+			// checking if an implicit can be performed (if rhs is a 'builtin' type)
+			auto* atomrhs = (cdeftable.findClassdefAtom(cdef));
+			implicitBuiltin = (cdeftable.atoms().core.object[cdefvar.kind] == atomrhs);
+		}
+
+		if (not implicitBuiltin)
+		{
+			auto similarity = TypeCheck::isSimilarTo(cdeftable, nullptr, cdef, cdefvar);
+			if (unlikely(TypeCheck::Match::none == similarity))
+				return complainInvalidType(cdef, cdefvar);
+		}
 
 		if (canGenerateCode())
 		{
-			uint32_t objlvid = lastPushedIndexedParameters[0].lvid;
-			tryToAcquireObject(objlvid);
-			out.emitFieldset(objlvid, /*self*/ 2, varatom->varinfo.effectiveFieldIndex);
+			if (not implicitBuiltin)
+			{
+				tryToAcquireObject(objlvid);
+				out.emitFieldset(objlvid, /*self*/ 2, varatom->varinfo.effectiveFieldIndex);
+			}
+			else
+			{
+				uint32_t lvidvalue = createLocalVariables();
+				out.emitFieldget(lvidvalue, objlvid, 0);
+				out.emitFieldset(lvidvalue, /*self*/ 2, varatom->varinfo.effectiveFieldIndex);
+			}
 		}
 		return true;
 	}
@@ -246,18 +274,18 @@ namespace Instanciate
 
 	static const std::unordered_map<AnyString, std::pair<BuiltinIntrinsic, uint32_t>> builtinDispatch =
 	{
-		{"__nanyc_fieldset", { &ProgramBuilder::instanciateIntrinsicFieldset,  2 }},
-		{"addressof",        { &ProgramBuilder::instanciateIntrinsicAddressof, 1 }},
-		{"memory.allocate",  { &ProgramBuilder::instanciateIntrinsicMemalloc,  1 }},
-		{"memory.dispose",   { &ProgramBuilder::instanciateIntrinsicMemFree,   2 }},
-		{"ref",              { &ProgramBuilder::instanciateIntrinsicRef,       1 }},
-		{"unref",            { &ProgramBuilder::instanciateIntrinsicUnref,     1 }},
-		{"sizeof",           { &ProgramBuilder::instanciateIntrinsicSizeof,    1 }},
+		{"^fieldset",       { &ProgramBuilder::instanciateIntrinsicFieldset,  2 }},
+		{"addressof",       { &ProgramBuilder::instanciateIntrinsicAddressof, 1 }},
+		{"memory.allocate", { &ProgramBuilder::instanciateIntrinsicMemalloc,  1 }},
+		{"memory.dispose",  { &ProgramBuilder::instanciateIntrinsicMemFree,   2 }},
+		{"ref",             { &ProgramBuilder::instanciateIntrinsicRef,       1 }},
+		{"unref",           { &ProgramBuilder::instanciateIntrinsicUnref,     1 }},
+		{"sizeof",          { &ProgramBuilder::instanciateIntrinsicSizeof,    1 }},
 		//
-		{"and",              { &ProgramBuilder::instanciateIntrinsicAND,       2 }},
-		{"or",               { &ProgramBuilder::instanciateIntrinsicOR,        2 }},
-		{"xor",              { &ProgramBuilder::instanciateIntrinsicXOR,       2 }},
-		{"mod",              { &ProgramBuilder::instanciateIntrinsicMOD,       2 }},
+		{"and",             { &ProgramBuilder::instanciateIntrinsicAND,       2 }},
+		{"or",              { &ProgramBuilder::instanciateIntrinsicOR,        2 }},
+		{"xor",             { &ProgramBuilder::instanciateIntrinsicXOR,       2 }},
+		{"mod",             { &ProgramBuilder::instanciateIntrinsicMOD,       2 }},
 	};
 
 	bool ProgramBuilder::instanciateBuiltinIntrinsic(const AnyString& name, uint32_t lvid)
