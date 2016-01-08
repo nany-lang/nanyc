@@ -38,6 +38,7 @@ int main(int argc, char** argv)
 	String str;
 	nanyfile.words("\r\n", [&](const AnyString& line) -> bool {
 		str = line;
+		str.replace("\\", "\\\\");
 		str.replace("\"", "\\\"");
 		out << "\t\t\"" << str << "\\n\" \\\n";
 		return true;
