@@ -130,13 +130,17 @@ namespace Instanciate
 
 						if (name == "__false")
 						{
-							cdeftable.substitute(operands.lvid).mutateToBuiltin(nyt_bool);
+							auto& opc = cdeftable.substitute(operands.lvid);
+							opc.mutateToBuiltin(nyt_bool);
+							opc.qualifiers.ref = false;
 							out.emitStore_u64(operands.lvid, 0);
 							return true;
 						}
 						if (name == "__true")
 						{
-							cdeftable.substitute(operands.lvid).mutateToBuiltin(nyt_bool);
+							auto& opc = cdeftable.substitute(operands.lvid);
+							opc.mutateToBuiltin(nyt_bool);
+							opc.qualifiers.ref = false;
 							out.emitStore_u64(operands.lvid, 1);
 							return true;
 						}
