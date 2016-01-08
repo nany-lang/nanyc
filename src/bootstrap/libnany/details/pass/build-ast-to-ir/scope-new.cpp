@@ -19,7 +19,8 @@ namespace Producer
 	bool Scope::visitASTExprNew(const Node& node, LVID& localvar)
 	{
 		assert(node.rule == rgNew);
-		assert(not node.children.empty());
+		if (unlikely(node.children.empty()))
+			return false;
 
 		bool success = true;
 
