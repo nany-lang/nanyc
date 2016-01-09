@@ -198,12 +198,15 @@ namespace Instanciate
 		uint32_t rhs  = lastPushedIndexedParameters[1].lvid;
 		auto& cdefrhs = cdeftable.classdefFollowClassMember(CLID{frame.atomid, rhs});
 
+		Atom* atomBuiltinCast = nullptr;
+
 		nytype_t builtinlhs = cdeflhs.kind;
 		if (builtinlhs == nyt_any)
 		{
 			auto* atom = cdeftable.findClassdefAtom(cdeflhs);
 			if (atom != nullptr and atom->builtinMapping != nyt_void)
 			{
+				atomBuiltinCast = atom;
 				builtinlhs = atom->builtinMapping;
 				uint32_t newlvid = createLocalVariables();
 				out.emitFieldget(newlvid, lhs, 0);
@@ -217,6 +220,7 @@ namespace Instanciate
 			auto* atom = cdeftable.findClassdefAtom(cdefrhs);
 			if (atom != nullptr and atom->builtinMapping != nyt_void)
 			{
+				atomBuiltinCast = atom;
 				builtinrhs = atom->builtinMapping;
 				uint32_t newlvid = createLocalVariables();
 				out.emitFieldget(newlvid, rhs, 0);
@@ -235,10 +239,32 @@ namespace Instanciate
 		if (unlikely(builtinrhs == nyt_void or builtinrhs == nyt_any or builtinrhs == nyt_pointer))
 			return complainIntrinsicParameter(name, 1, cdefrhs);
 
+		if (atomBuiltinCast != nullptr)
+		{
+			auto& opc = cdeftable.substitute(lvid);
+			opc.mutateToAtom(atomBuiltinCast);
+			opc.qualifiers.ref = true;
 
-		cdeftable.substitute(lvid).mutateToBuiltin(builtinlhs);
-		if (canGenerateCode())
-			(out.*M)(lvid, lhs, rhs);
+			if (canGenerateCode())
+			{
+				uint32_t intermlvid = createLocalVariables(2);
+				cdeftable.substitute(intermlvid).mutateToBuiltin(builtinlhs);
+
+				(out.*M)(intermlvid, lhs, rhs);
+
+				cdeftable.substitute(intermlvid + 1).mutateToBuiltin(nyt_u64);
+				out.emitSizeof(intermlvid + 1, atomBuiltinCast->atomid);
+
+				out.emitMemalloc(lvid, intermlvid + 1);
+				out.emitFieldset(intermlvid, lvid, 0); // builtin
+			}
+		}
+		else
+		{
+			cdeftable.substitute(lvid).mutateToBuiltin(builtinlhs);
+			if (canGenerateCode())
+				(out.*M)(lvid, lhs, rhs);
+		}
 		return true;
 	}
 
