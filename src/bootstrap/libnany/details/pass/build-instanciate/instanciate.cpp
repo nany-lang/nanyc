@@ -121,27 +121,43 @@ namespace Instanciate
 
 		auto& operands = out.at<IR::ISA::Op::stacksize>(lastOpcodeStacksizeOffset);
 		uint32_t startOffset = operands.add;
-		operands.add += count;
-
 		auto& frame = atomStack.back();
-		frame.resizeRegisterCount(operands.add, cdeftable);
 
-		if (canGenerateCode())
+		if (count == 1)
 		{
-			for (uint32_t i = 0; i != count; ++i)
+			frame.resizeRegisterCount((++operands.add), cdeftable);
+
+			if (canGenerateCode())
 			{
-				auto& lvidinfo = frame.lvids[startOffset + i];
+				auto& lvidinfo = frame.lvids[startOffset];
 				lvidinfo.scope = frame.scope;
 				lvidinfo.offsetDeclOut = out.opcodeCount();
-				out.emitStackalloc(startOffset + i, nyt_any);
+				out.emitStackalloc(startOffset, nyt_any);
 			}
+			else
+				frame.lvids[startOffset].scope = frame.scope;
 		}
 		else
 		{
-			for (uint32_t i = 0; i != count; ++i)
-				frame.lvids[startOffset + i].scope = frame.scope;
-		}
+			operands.add += count;
+			frame.resizeRegisterCount(operands.add, cdeftable);
 
+			if (canGenerateCode())
+			{
+				for (uint32_t i = 0; i != count; ++i)
+				{
+					auto& lvidinfo = frame.lvids[startOffset + i];
+					lvidinfo.scope = frame.scope;
+					lvidinfo.offsetDeclOut = out.opcodeCount();
+					out.emitStackalloc(startOffset + i, nyt_any);
+				}
+			}
+			else
+			{
+				for (uint32_t i = 0; i != count; ++i)
+					frame.lvids[startOffset + i].scope = frame.scope;
+			}
+		}
 		return startOffset;
 	}
 
