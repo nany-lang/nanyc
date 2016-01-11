@@ -192,11 +192,10 @@ namespace Instanciate
 	template<void (IR::Program::* M)(uint32_t, uint32_t, uint32_t)>
 	inline bool ProgramBuilder::instanciateIntrinsicLogic(uint32_t lvid, const char* const name)
 	{
+		assert(lastPushedIndexedParameters.size() == 2);
 		auto& frame = atomStack.back();
 		uint32_t lhs  = lastPushedIndexedParameters[0].lvid;
 		auto& cdeflhs   = cdeftable.classdefFollowClassMember(CLID{frame.atomid, lhs});
-		uint32_t rhs  = lastPushedIndexedParameters[1].lvid;
-		auto& cdefrhs = cdeftable.classdefFollowClassMember(CLID{frame.atomid, rhs});
 
 		Atom* atomBuiltinCast = nullptr;
 
@@ -214,7 +213,10 @@ namespace Instanciate
 			}
 		}
 
+		uint32_t rhs  = lastPushedIndexedParameters[1].lvid;
+		auto& cdefrhs = cdeftable.classdefFollowClassMember(CLID{frame.atomid, rhs});
 		nytype_t builtinrhs = cdefrhs.kind;
+
 		if (builtinrhs == nyt_any)
 		{
 			auto* atom = cdeftable.findClassdefAtom(cdefrhs);
