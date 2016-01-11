@@ -92,7 +92,16 @@ namespace Instanciate
 
 			if (not varname.empty())
 				varname.prepend(".");
-			varname.prepend(part);
+
+			if (part.first() != '^')
+			{
+				varname.prepend(part);
+			}
+			else
+			{
+				varname += "operator ";
+				varname += AnyString{part, 1, part.size() - 1};
+			}
 		}
 
 		auto err = error();
