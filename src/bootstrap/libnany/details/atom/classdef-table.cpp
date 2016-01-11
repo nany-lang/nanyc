@@ -47,7 +47,6 @@ namespace Nany
 			//}
 			//return true;
 		}
-
 		return false;
 	}
 
@@ -68,7 +67,7 @@ namespace Nany
 		auto it = pClassdefs.find(clid);
 		if (unlikely(it == pClassdefs.end()))
 		{
-			throw "classdef not found";
+			assert(false and "classdef not found");
 			it = pClassdefs.find(CLID{});
 		}
 		auto& result = *(it->second);
@@ -117,8 +116,7 @@ namespace Nany
 		auto it = pClassdefs.find(clid);
 		if (unlikely(it == pClassdefs.end()))
 		{
-			assert(false);
-			throw "classdef not found";
+			assert(false and "classdef not found");
 			it = pClassdefs.find(CLID{});
 		}
 		auto& result = *(it->second);
