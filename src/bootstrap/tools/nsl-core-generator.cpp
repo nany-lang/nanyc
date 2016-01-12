@@ -200,7 +200,14 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 	craft("or", "or", genGlobalOperator);
 	craft("xor", "xor", genGlobalOperator);
 
-	o.trimRight();
+	o << '\n';
+	o << '\n';
+	o << '\n';
+	o << '\n';
+	o << "// -*- mode: nany;-*-\n";
+	o << "// vim: set filetype=nany:";
+
+
 	IO::File::SetContent(filename, o);
 }
 
