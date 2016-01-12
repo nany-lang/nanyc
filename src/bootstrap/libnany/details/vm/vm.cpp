@@ -105,6 +105,13 @@ namespace VM
 			void visit(const IR::ISA::Operand<IR::ISA::Op::jnz>&);
 			void visit(const IR::ISA::Operand<IR::ISA::Op::jz>&);
 
+			void visit(const IR::ISA::Operand<IR::ISA::Op::add>&);
+			void visit(const IR::ISA::Operand<IR::ISA::Op::sub>&);
+			void visit(const IR::ISA::Operand<IR::ISA::Op::mul>&);
+			void visit(const IR::ISA::Operand<IR::ISA::Op::imul>&);
+			void visit(const IR::ISA::Operand<IR::ISA::Op::div>&);
+			void visit(const IR::ISA::Operand<IR::ISA::Op::idiv>&);
+
 			void visit(const IR::ISA::Operand<IR::ISA::Op::opand>&);
 			void visit(const IR::ISA::Operand<IR::ISA::Op::opor>&);
 			void visit(const IR::ISA::Operand<IR::ISA::Op::opxor>&);
@@ -207,6 +214,57 @@ namespace VM
 			else
 				program.get().jumpToLabelBackward(*cursor, label);
 		}
+
+
+		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::add>& opr)
+		{
+			VM_PRINT_OPCODE(operands);
+			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
+			registers[opr.lvid] = registers[opr.lhs] + registers[opr.rhs];
+		}
+
+		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::sub>& opr)
+		{
+			VM_PRINT_OPCODE(operands);
+			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
+			registers[opr.lvid] = registers[opr.lhs] - registers[opr.rhs];
+		}
+
+		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::mul>& opr)
+		{
+			VM_PRINT_OPCODE(operands);
+			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
+			registers[opr.lvid] = registers[opr.lhs] * registers[opr.rhs];
+		}
+
+		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::div>& opr)
+		{
+			VM_PRINT_OPCODE(operands);
+			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
+			auto r = registers[opr.rhs];
+			if (YUNI_UNLIKELY(r == 0))
+				throw std::overflow_error("Divide by zero exception");
+			registers[opr.lvid] = registers[opr.lhs] / r;
+		}
+
+		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::imul>& opr)
+		{
+			VM_PRINT_OPCODE(operands);
+			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
+			registers[opr.lvid] = static_cast<uint64_t>(
+				static_cast<int64_t>(registers[opr.lhs]) * static_cast<int64_t>(registers[opr.rhs]) );
+		}
+
+		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::idiv>& opr)
+		{
+			VM_PRINT_OPCODE(operands);
+			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
+			auto r = static_cast<int64_t>(registers[opr.rhs]);
+			if (YUNI_UNLIKELY(r == 0))
+				throw std::overflow_error("Divide by zero exception");
+			registers[opr.lvid] = static_cast<uint64_t>(static_cast<int64_t>(registers[opr.lhs]) / r);
+		}
+
 
 
 		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::opand>& opr)
@@ -484,17 +542,17 @@ namespace VM
 			}
 			catch (const std::exception& e)
 			{
-				String txt; txt << "error: ICE: " << e.what() << '\n';
+				String txt; txt << "exception: " << e.what() << '\n';
 				context.console.write_stderr(&context, txt.c_str(), txt.size());
 			}
 			catch (const String& msg)
 			{
-				String txt; txt << "error: ICE: " << msg << '\n';
+				String txt; txt << "exception: " << msg << '\n';
 				context.console.write_stderr(&context, txt.c_str(), txt.size());
 			}
 			catch (...)
 			{
-				String txt; txt << "error: ICE: unexpected error\n";
+				String txt; txt << "exception: unexpected error\n";
 				context.console.write_stderr(&context, txt.c_str(), txt.size());
 			}
 

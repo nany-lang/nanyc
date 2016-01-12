@@ -73,6 +73,19 @@ namespace ISA //!< Instruction Set Architecture
 		//! mod
 		opmod,
 
+		//! +
+		add,
+		//! -
+		sub,
+		//! *
+		mul,
+		//! /
+		div,
+		//! * (signed)
+		imul,
+		//! / (signed)
+		idiv,
+
 		//! Store a constant value in a register
 		storeConstant,
 		//! Store value from another register
@@ -181,6 +194,13 @@ namespace ISA //!< Instruction Set Architecture
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::opor) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::opxor) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::opmod) \
+				\
+				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::add) \
+				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::sub) \
+				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::mul) \
+				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::div) \
+				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::imul) \
+				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::idiv) \
 				\
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::storeConstant) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::store) \

@@ -113,6 +113,56 @@ namespace IR
 	}
 
 
+	inline void Program::emitADD(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	{
+		auto& operands = emit<ISA::Op::add>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+	inline void Program::emitSUB(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	{
+		auto& operands = emit<ISA::Op::sub>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+	inline void Program::emitDIV(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	{
+		auto& operands = emit<ISA::Op::div>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+	inline void Program::emitMUL(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	{
+		auto& operands = emit<ISA::Op::mul>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+	inline void Program::emitIMUL(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	{
+		auto& operands = emit<ISA::Op::imul>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+	inline void Program::emitIDIV(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	{
+		auto& operands = emit<ISA::Op::idiv>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+
+
 	inline void Program::emitAND(uint32_t lvid, uint32_t lhs, uint32_t rhs)
 	{
 		auto& operands = emit<ISA::Op::opand>();

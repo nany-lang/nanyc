@@ -85,6 +85,19 @@ namespace IR
 		//! Emit AND
 		void emitMOD(uint32_t lvid, uint32_t lhs, uint32_t rhs);
 
+		//! Emit +
+		void emitADD(uint32_t lvid, uint32_t lhs, uint32_t rhs);
+		//! Emit -
+		void emitSUB(uint32_t lvid, uint32_t lhs, uint32_t rhs);
+		//! Emit *
+		void emitMUL(uint32_t lvid, uint32_t lhs, uint32_t rhs);
+		//! Emit * (signed)
+		void emitIMUL(uint32_t lvid, uint32_t lhs, uint32_t rhs);
+		//! Emit /
+		void emitDIV(uint32_t lvid, uint32_t lhs, uint32_t rhs);
+		//! Emit / (signed)
+		void emitIDIV(uint32_t lvid, uint32_t lhs, uint32_t rhs);
+
 		//! Allocate a new variable on the stack and get the register
 		uint32_t emitStackalloc(uint32_t lvid, nytype_t);
 		//! Allocate a new variable on the stack and assign a value to it and get the register

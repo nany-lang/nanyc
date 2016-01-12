@@ -44,26 +44,60 @@ namespace // anonymous
 		}
 
 
+		template<class T> void printOperator(const T& operands, const AnyString& opname)
+		{
+			out << tabs << '%' << operands.lvid << " = %" << operands.lhs << ' ' << opname << " %" << operands.rhs;
+		}
+
 		void print(const Operand<Op::opand>& operands)
 		{
-			out << tabs << '%' << operands.lvid << " = %" << operands.lhs << " and %" << operands.rhs;
+			printOperator(operands, "and");
 		}
 
 		void print(const Operand<Op::opor>& operands)
 		{
-			out << tabs << '%' << operands.lvid << " = %" << operands.lhs << " or %" << operands.rhs;
+			printOperator(operands, "or");
 		}
 
 		void print(const Operand<Op::opxor>& operands)
 		{
-			out << tabs << '%' << operands.lvid << " = %" << operands.lhs << " xor %" << operands.rhs;
+			printOperator(operands, "xor");
 		}
 
 		void print(const Operand<Op::opmod>& operands)
 		{
-			out << tabs << '%' << operands.lvid << " = %" << operands.lhs << " mod %" << operands.rhs;
+			printOperator(operands, "mod");
 		}
 
+		void print(const Operand<Op::add>& operands)
+		{
+			printOperator(operands, "add");
+		}
+
+		void print(const Operand<Op::sub>& operands)
+		{
+			printOperator(operands, "sub");
+		}
+
+		void print(const Operand<Op::mul>& operands)
+		{
+			printOperator(operands, "mul");
+		}
+
+		void print(const Operand<Op::imul>& operands)
+		{
+			printOperator(operands, "imul");
+		}
+
+		void print(const Operand<Op::div>& operands)
+		{
+			printOperator(operands, "div");
+		}
+
+		void print(const Operand<Op::idiv>& operands)
+		{
+			printOperator(operands, "idiv");
+		}
 
 
 		void print(const Operand<Op::qualifiers>& operands)

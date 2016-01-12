@@ -23,7 +23,7 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 		o << '\n';
 	};
 
-	auto piko = [&](const AnyString& op, const AnyString& builtin, auto callback)
+	auto craft = [&](const AnyString& op, const AnyString& builtin, auto callback)
 	{
 		char sign = issigned ? 'i' : 'u';
 		for (uint32_t b = bits; b >= 8; b /= 2)
@@ -104,31 +104,32 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 	o << '\n';
 
 
-	auto craftMemberOperator = [&](const AnyString& op, const AnyString& intrinsic)
+	auto craftMemberOperator = [&](const AnyString& op, const AnyString& intrinsic, bool prefix)
 	{
+		AnyString pr = (prefix and issigned) ? "i" : "";
 		craftOperator([&](uint32_t b, char targetsign)
 		{
 			for ( ; b >= 8; b /= 2)
 			{
 				o << "\toperator " << op << " (cref x: " << targetsign << b << "): ref " << suffix << '\n';
 				o << "\t{\n";
-				o << "\t\tpod = !!" << intrinsic << "(pod, x.pod);\n";
+				o << "\t\tpod = !!" << pr << intrinsic << "(pod, x.pod);\n";
 				o << "\t\treturn self;\n";
 				o << "\t}\n\n";
 
 				o << "\toperator " << op << " (x: __" << targetsign << b << "): ref " << suffix << '\n';
 				o << "\t{\n";
-				o << "\t\tpod = !!" << intrinsic << "(pod, x);\n";
+				o << "\t\tpod = !!" << pr << intrinsic << "(pod, x);\n";
 				o << "\t\treturn self;\n";
 				o << "\t}\n\n";
 			}
 		});
 	};
 
-	craftMemberOperator("+=", "add");
-	craftMemberOperator("-=", "sub");
-	craftMemberOperator("*=", "mult");
-	craftMemberOperator("/=", "div");
+	craftMemberOperator("+=", "add", false);
+	craftMemberOperator("-=", "sub", false);
+	craftMemberOperator("*=", "mul", true);
+	craftMemberOperator("/=", "div", true);
 
 	o << "private:\n";
 	o << "\t//! The real integer representation\n";
@@ -152,18 +153,18 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 		o << ((prefixA.first() != '_' or prefixB.first() != '_') ? "ref " : "__");
 		o << "bool;\n";
 	};
-	piko(">",  "gt",  genGlobalCompareOperator);
-	piko(">=", "gte", genGlobalCompareOperator);
-	piko("<",  "lt",  genGlobalCompareOperator);
-	piko("<=", "lte", genGlobalCompareOperator);
+	craft(">",  "gt",  genGlobalCompareOperator);
+	craft(">=", "gte", genGlobalCompareOperator);
+	craft("<",  "lt",  genGlobalCompareOperator);
+	craft("<=", "lte", genGlobalCompareOperator);
 
 	o << '\n';
 	o << '\n';
 	o << '\n';
 	o << '\n';
 
-	piko("==",  "eq",  genGlobalCompareOperator);
-	piko("!=",  "neq", genGlobalCompareOperator);
+	craft("==",  "eq",  genGlobalCompareOperator);
+	craft("!=",  "neq", genGlobalCompareOperator);
 
 	o << '\n';
 	o << '\n';
@@ -177,19 +178,27 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 		o << ((prefixA.first() != '_' or prefixB.first() != '_') ? "ref " : "__");
 		o << suffix << ";\n";
 	};
-	piko("+", "add", genGlobalOperator);
-	piko("-", "add", genGlobalOperator);
-	piko("/", "add", genGlobalOperator);
-	piko("*", "add", genGlobalOperator);
+	craft("+", "add", genGlobalOperator);
+	craft("-", "sub", genGlobalOperator);
+	if (issigned)
+	{
+		craft("/", "idiv", genGlobalOperator);
+		craft("*", "imul", genGlobalOperator);
+	}
+	else
+	{
+		craft("/", "div", genGlobalOperator);
+		craft("*", "mul", genGlobalOperator);
+	}
 
 	o << '\n';
 	o << '\n';
 	o << '\n';
 	o << '\n';
 
-	piko("and", "and", genGlobalOperator);
-	piko("or", "or", genGlobalOperator);
-	piko("xor", "xor", genGlobalOperator);
+	craft("and", "and", genGlobalOperator);
+	craft("or", "or", genGlobalOperator);
+	craft("xor", "xor", genGlobalOperator);
 
 	o.trimRight();
 	IO::File::SetContent(filename, o);
