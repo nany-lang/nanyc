@@ -23,6 +23,31 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 		o << '\n';
 	};
 
+	auto piko = [&](const AnyString& op, const AnyString& builtin, auto callback)
+	{
+		char sign = issigned ? 'i' : 'u';
+		for (uint32_t b = bits; b >= 8; b /= 2)
+		{
+			callback(op, builtin, sign, b, "cref ", "cref ");
+			callback(op, builtin, sign, b, "cref ", "__");
+			callback(op, builtin, sign, b, "__", "cref ");
+			callback(op, builtin, sign, b, "__", "__");
+		}
+
+		if (issigned)
+		{
+			sign = 'u';
+			for (uint32_t b = bits / 2; b >= 8; b /= 2)
+			{
+				callback(op, builtin, sign, b, "cref ", "cref ");
+				callback(op, builtin, sign, b, "cref ", "__");
+				callback(op, builtin, sign, b, "__", "cref ");
+				callback(op, builtin, sign, b, "__", "__");
+			}
+		}
+		o << '\n';
+	};
+
 
 	o << license;
 	o << "/// \\file    " << suffix << ".ny\n";
@@ -43,33 +68,36 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 	craftOperator([&](uint32_t b, char targetsign)
 	{
 		for ( ; b >= 8; b /= 2)
+		{
 			o << "\toperator new (self pod: __" << targetsign << b << ");\n";
+			o << "\toperator new (self cref pod: " << targetsign << b << ");\n";
+		}
 	});
 
 	o << '\n';
 	o << "\toperator ++self: ref " << suffix << '\n';
 	o << "\t{\n";
-	o << "\t\tpod = !!nany_inc_" << suffix << "(pod);\n";
+	o << "\t\tpod = !!inc(pod);\n";
 	o << "\t\treturn self;\n";
 	o << "\t}\n";
 	o << '\n';
 	o << "\toperator self++: ref " << suffix << '\n';
 	o << "\t{\n";
 	o << "\t\tvar tmp = self;\n";
-	o << "\t\tpod = !!nany_inc_" << suffix << "(pod);\n";
+	o << "\t\tpod = !!inc(pod);\n";
 	o << "\t\treturn tmp;\n";
 	o << "\t}\n";
 	o << '\n';
 	o << "\toperator --self: ref " << suffix << '\n';
 	o << "\t{\n";
-	o << "\t\tpod = !!nany_dec_" << suffix << "(pod);\n";
+	o << "\t\tpod = !!dec(pod);\n";
 	o << "\t\treturn self;\n";
 	o << "\t}\n";
 	o << '\n';
 	o << "\toperator self--: ref " << suffix << '\n';
 	o << "\t{\n";
 	o << "\t\tvar tmp = self;\n";
-	o << "\t\tpod = !!nany_dec_" << suffix << "(pod);\n";
+	o << "\t\tpod = !!dec(pod);\n";
 	o << "\t\treturn tmp;\n";
 	o << "\t}\n";
 	o << '\n';
@@ -84,26 +112,27 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 			{
 				o << "\toperator " << op << " (cref x: " << targetsign << b << "): ref " << suffix << '\n';
 				o << "\t{\n";
-				o << "\t\tpod = !!" << intrinsic << suffix << '_' << targetsign << b << "(pod, x.pod);\n";
+				o << "\t\tpod = !!" << intrinsic << "(pod, x.pod);\n";
 				o << "\t\treturn self;\n";
 				o << "\t}\n\n";
 
-				o << "\toperator " << op << " (cref x: __" << targetsign << b << "): ref " << suffix << '\n';
+				o << "\toperator " << op << " (x: __" << targetsign << b << "): ref " << suffix << '\n';
 				o << "\t{\n";
-				o << "\t\tpod = !!" << intrinsic << suffix << '_' << targetsign << b << "(pod, x);\n";
+				o << "\t\tpod = !!" << intrinsic << "(pod, x);\n";
 				o << "\t\treturn self;\n";
 				o << "\t}\n\n";
 			}
 		});
 	};
 
-	craftMemberOperator("+=", "nany_add_");
-	craftMemberOperator("-=", "nany_sub_");
-	craftMemberOperator("*=", "nany_mult_");
-	craftMemberOperator("/=", "nany_div_");
+	craftMemberOperator("+=", "add");
+	craftMemberOperator("-=", "sub");
+	craftMemberOperator("*=", "mult");
+	craftMemberOperator("/=", "div");
 
+	o << "private:\n";
 	o << "\t//! The real integer representation\n";
-	o << "\tvar pod: __" << suffix << " = 0" << suffix << ";\n";
+	o << "\tvar pod: __" << suffix << " = 0__" << suffix << ";\n";
 	o << "}\n";
 	o << '\n';
 	o << '\n';
@@ -115,66 +144,52 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 	o << '\n';
 	o << '\n';
 
-	auto craftGlobalBoolOperator = [&](const AnyString& op, const AnyString& intrinsic)
+
+	auto genGlobalCompareOperator = [&](AnyString op, AnyString builtin, char sign, uint32_t b, AnyString prefixA, AnyString prefixB)
 	{
-		craftOperator([&](uint32_t b, char targetsign)
-		{
-			for ( ; b >= 8; b /= 2)
-			{
-				o << "public operator ";
-				o << op << " (a: __" << suffix << ", b: __" << targetsign << b << "): ref bool\n";
-				o << "\t-> !!" << intrinsic << suffix << "__" << targetsign << b << "(a, b);\n\n";
-
-				o << "public operator ";
-				o << op << " (cref a: " << suffix << ", cref b: " << targetsign << b << "): ref bool\n";
-				o << "\t-> a.pod " << op << " b.pod;\n\n";
-
-				o << "public operator ";
-				o << op << " (cref a: " << suffix << ", cref b: __" << targetsign << b << "): ref bool\n";
-				o << "\t-> a.pod " << op << " b;\n\n";
-
-				o << "public operator ";
-				o << op << " (cref a: __" << suffix << ", cref b: " << targetsign << b << "): ref bool\n";
-				o << "\t-> a " << op << " b.pod;\n\n";
-
-				o << '\n';
-			}
-			o << '\n';
-		});
+		o << "[[builtinalias: " << builtin << "]] public operator ";
+		o << op << " (a: " << prefixA << suffix << ", b: " << prefixB << sign << b << "): ";
+		o << ((prefixA.first() != '_' or prefixB.first() != '_') ? "ref " : "__");
+		o << "bool;\n";
 	};
+	piko(">",  "gt",  genGlobalCompareOperator);
+	piko(">=", "gte", genGlobalCompareOperator);
+	piko("<",  "lt",  genGlobalCompareOperator);
+	piko("<=", "lte", genGlobalCompareOperator);
 
-	craftGlobalBoolOperator("==", "nany_is_equal_");
-	craftGlobalBoolOperator("!=", "nany_is_not_equal_");
-	craftGlobalBoolOperator("<",  "nany_is_less_");
-	craftGlobalBoolOperator("<=", "nany_is_less_or_equal_");
-	craftGlobalBoolOperator(">",  "nany_is_greater_");
-	craftGlobalBoolOperator(">=", "nany_is_greater_or_equal_");
+	o << '\n';
+	o << '\n';
+	o << '\n';
+	o << '\n';
 
+	piko("==",  "eq",  genGlobalCompareOperator);
+	piko("!=",  "neq", genGlobalCompareOperator);
 
+	o << '\n';
+	o << '\n';
+	o << '\n';
+	o << '\n';
 
-	auto craftGlobalOperator = [&](const AnyString& op)
+	auto genGlobalOperator = [&](AnyString op, AnyString builtin, char sign, uint32_t b, AnyString prefixA, AnyString prefixB)
 	{
-		o << "public operator ";
-		o << op << " (cref a: " << suffix << ", cref b): ref " << suffix << '\n';
-		o << "\t-> (new a) " << op << "= b;\n\n";
-
-		craftOperator([&](uint32_t b, char targetsign)
-		{
-			for ( ; b >= 8; b /= 2)
-			{
-				o << "public operator ";
-				o << op << " (cref a: __" << targetsign << b << ", cref b: " << suffix << "): ref " << suffix << '\n';
-				o << "\t-> (new " << suffix << "(a)) " << op << "= b;\n\n";
-			}
-			o << '\n';
-		});
+		o << "[[builtinalias: " << builtin << "]] public operator ";
+		o << op << " (a: " << prefixA << suffix << ", b: " << prefixB << sign << b << "): ";
+		o << ((prefixA.first() != '_' or prefixB.first() != '_') ? "ref " : "__");
+		o << suffix << ";\n";
 	};
+	piko("+", "add", genGlobalOperator);
+	piko("-", "add", genGlobalOperator);
+	piko("/", "add", genGlobalOperator);
+	piko("*", "add", genGlobalOperator);
 
-	craftGlobalOperator("+");
-	craftGlobalOperator("-");
-	craftGlobalOperator("*");
-	craftGlobalOperator("/");
+	o << '\n';
+	o << '\n';
+	o << '\n';
+	o << '\n';
 
+	piko("and", "and", genGlobalOperator);
+	piko("or", "or", genGlobalOperator);
+	piko("xor", "xor", genGlobalOperator);
 
 	o.trimRight();
 	IO::File::SetContent(filename, o);

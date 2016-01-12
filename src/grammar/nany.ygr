@@ -354,7 +354,7 @@ hex: hidden notext
 	[0123456789ABCDEFabcdef]
 
 number-qualifier-type:
-	[iuf]+
+	'__'? [iuf]+
 
 number-percent: notext
 	'%'
@@ -650,7 +650,7 @@ for: notext, important
 // --- RETURN ---
 
 return-inline: notext, important
-	tk-arrow wp (expr wp tk-semicolon) | error-semicolon
+	tk-arrow wp expr-with-semicolon
 
 return-raise: notext
 	tk-raise

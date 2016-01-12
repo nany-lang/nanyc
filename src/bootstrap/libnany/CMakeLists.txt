@@ -43,25 +43,46 @@ endmacro()
 #
 # generate nsl:std.core
 #
-get_filename_component(nsl_stdcore_root "${CMAKE_CURRENT_LIST_DIR}/../../nsl/std.core/" REALPATH CACHE)
+get_filename_component(nsl_stdcore_root "${CMAKE_CURRENT_LIST_DIR}/../../nsl/std.core/" REALPATH)
+get_filename_component(nsl_root "${CMAKE_CURRENT_LIST_DIR}/../../nsl/" REALPATH)
 file(GLOB_RECURSE ny_core_files "${nsl_stdcore_root}/*.ny")
+
+set(ny_core_files
+	# std.core
+	"${nsl_root}/std.core/bool.ny"
+	"${nsl_root}/std.core/i8.ny"
+	"${nsl_root}/std.core/i16.ny"
+	"${nsl_root}/std.core/i32.ny"
+	"${nsl_root}/std.core/i64.ny"
+	"${nsl_root}/std.core/u8.ny"
+	"${nsl_root}/std.core/u16.ny"
+	"${nsl_root}/std.core/u32.ny"
+	"${nsl_root}/std.core/u64.ny"
+
+	# std.math
+	"${nsl_root}/std.math/math.ny"
+	)
+
 set(__nany_stdcore)
 set(nysrc_nsl_stdcore)
 foreach (filename ${ny_core_files})
-	string(REPLACE "${nsl_stdcore_root}/" "nany_nsl_stdcore_" __funcname "${filename}")
+	string(REPLACE "/std." "/std" __funcname "${filename}")
+	string(REPLACE "${nsl_root}/" "nany_nsl_" __funcname "${__funcname}")
 	string(REPLACE ".ny" "" __funcname "${__funcname}")
 	string(REPLACE "/" "_" __funcname "${__funcname}")
 	string(REPLACE "\\" "_" __funcname "${__funcname}")
 
+	set(target_filename "generated-${__funcname}.c")
+	string(REPLACE "_" "-" target_filename "${target_filename}")
 	list(APPEND __nany_stdcore "${__funcname}")
-	list(APPEND nysrc_nsl_stdcore "${CMAKE_CURRENT_LIST_DIR}/details/nsl/${__funcname}.c")
+	list(APPEND nysrc_nsl_stdcore "${CMAKE_CURRENT_LIST_DIR}/details/nsl/${target_filename}")
 
 	add_custom_command(
-		OUTPUT "${CMAKE_CURRENT_LIST_DIR}/details/nsl/${__funcname}.c"
-		COMMAND  "$<TARGET_FILE:nyt-nanyfile-to-cstring>"
+		OUTPUT  "${CMAKE_CURRENT_LIST_DIR}/details/nsl/${target_filename}"
+		COMMAND "$<TARGET_FILE:nyt-nanyfile-to-cstring>"
 			"${__funcname}"
 			"${filename}"
-			"${CMAKE_CURRENT_LIST_DIR}/details/nsl/${__funcname}.c"
+			"${CMAKE_CURRENT_LIST_DIR}/details/nsl/${target_filename}"
 		DEPENDS
 			nyt-nanyfile-to-cstring
 			"${filename}"
@@ -102,8 +123,8 @@ endforeach()
 
 set(__nsl_stdcore_cpp "${__nsl_stdcore_cpp}\t}\n")
 set(__nsl_stdcore_cpp "${__nsl_stdcore_cpp}\n\n} // namespace Nany\n")
-file(WRITE "${CMAKE_CURRENT_LIST_DIR}/details/nsl/import-stdcore.cpp" "${__nsl_stdcore_cpp}")
-
+file(WRITE "${CMAKE_CURRENT_LIST_DIR}/details/nsl/generated-import-stdcore.cpp" "${__nsl_stdcore_cpp}")
+list(APPEND nysrc_nsl_stdcore "${CMAKE_CURRENT_LIST_DIR}/details/nsl/generated-import-stdcore.cpp")
 
 
 
@@ -406,7 +427,7 @@ if ("${NANY_STATIC}")
 endif()
 
 
-add_library(libnany-grammar STATIC
+add_library(libnany-grammar STATIC EXCLUDE_FROM_ALL
 	${nysrc_grammar}
 	${nysrc_details_grammar})
 
@@ -446,7 +467,6 @@ add_library(libnany ${mode_libnany}
 
 	# NSL - std.core
 	details/nsl/import-stdcore.h
-	details/nsl/import-stdcore.cpp
 	${nysrc_nsl_stdcore}
 
 	# misc

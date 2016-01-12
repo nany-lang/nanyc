@@ -1,5 +1,7 @@
 #include "details/pass/build-ast-to-ir/scope.h"
 #include "details/grammar/nany.h"
+#include "details/ast/ast.h"
+#include <limits>
 
 using namespace Yuni;
 
@@ -15,6 +17,25 @@ namespace Producer
 
 	namespace // anonymous
 	{
+
+		struct NumberDef final
+		{
+			// Is the number signed or unsigned ?
+			bool isUnsigned = false;
+			// Is the number a floating-point number ?
+			bool isFloat = false;
+			// how many bits used by the number ? (32 by default)
+			uint bits = 32;
+			// Sign of the number: ' ', '+', '-'
+			char sign = ' ';
+
+			//! The first part of the number
+			uint64_t part1 = 0;
+			//! Second part of the number
+			AnyString part2; // the second part may have additional zero
+		};
+
+
 
 		static bool convertASTNumberToDouble(double& value, uint64 part1, const AnyString& part2, char sign)
 		{
@@ -46,27 +67,179 @@ namespace Producer
 
 
 
+
+
+	template<bool BuiltinT, class DefT>
+	inline bool Scope::generateNumberCode(uint32_t& localvar, const DefT& numdef, const Node& node)
+	{
+		// checking for invalid float values
+		nytype_t type = nyt_void;
+		// class name
+		AnyString cn;
+		uint32_t hardcodedlvid;
+
+		if (not numdef.isFloat)
+		{
+			if (not numdef.isUnsigned)
+			{
+				switch (numdef.bits)
+				{
+					case 64: type = nyt_i64; if (not BuiltinT) cn = "i64"; break;
+					case 32: type = nyt_i32; if (not BuiltinT) cn = "i32"; break;
+					case 16: type = nyt_i16; if (not BuiltinT) cn = "i16"; break;
+					case  8: type = nyt_i8;  if (not BuiltinT) cn = "i8";  break;
+				}
+			}
+			else
+			{
+				switch (numdef.bits)
+				{
+					case 64: type = nyt_u64; if (not BuiltinT) cn = "u64"; break;
+					case 32: type = nyt_u32; if (not BuiltinT) cn = "u32"; break;
+					case 16: type = nyt_u16; if (not BuiltinT) cn = "u16"; break;
+					case  8: type = nyt_u8;  if (not BuiltinT) cn = "u8";  break;
+				}
+			}
+
+			nytype_t implicitcast = type;
+
+			if (numdef.part1 != 0)
+			{
+				bool invalidcast = false;
+
+				if (numdef.sign == ' ' or numdef.sign == '+')
+				{
+					if (not numdef.isUnsigned)
+					{
+						switch (numdef.bits)
+						{
+							case 64: invalidcast = (numdef.part1 > std::numeric_limits<int32_t>::max()); break;
+							case 32: invalidcast = (numdef.part1 > std::numeric_limits<int32_t>::max()); break;
+							case 16: invalidcast = (numdef.part1 > std::numeric_limits<int16_t>::max()); break;
+							case  8: invalidcast = (numdef.part1 > std::numeric_limits<int8_t>::max()); break;
+						}
+					}
+					else
+					{
+						switch (numdef.bits)
+						{
+							case 64: break;
+							case 32: invalidcast = (numdef.part1 > std::numeric_limits<uint32_t>::max()); break;
+							case 16: invalidcast = (numdef.part1 > std::numeric_limits<uint16_t>::max()); break;
+							case  8: invalidcast = (numdef.part1 > std::numeric_limits<uint8_t>::max()); break;
+						}
+					}
+				}
+				else
+				{
+					if (not numdef.isUnsigned)
+					{
+						if (numdef.part1 < std::numeric_limits<int64_t>::max())
+						{
+							int64_t sv = static_cast<int64_t>(numdef.part1);
+							switch (numdef.bits)
+							{
+								case 64: invalidcast = (sv < std::numeric_limits<int32_t>::min()); break;
+								case 32: invalidcast = (sv < std::numeric_limits<int32_t>::min()); break;
+								case 16: invalidcast = (sv < std::numeric_limits<int16_t>::min()); break;
+								case  8: invalidcast = (sv < std::numeric_limits<int8_t>::min()); break;
+							}
+						}
+						else
+							invalidcast = true;
+					}
+					else
+						invalidcast = true;
+				}
+
+				if (unlikely(invalidcast))
+				{
+					error(node) << "invalid " << ((numdef.isUnsigned) ? "unsigned " : "signed ")
+						<< numdef.bits << "bits integer";
+					return false;
+				}
+			}
+
+			hardcodedlvid = createLocalBuiltinInt64(node, implicitcast, numdef.part1);
+		}
+		else
+		{
+			// converting the number into a double
+			double value;
+			if (unlikely(not convertASTNumberToDouble(value, numdef.part1, numdef.part2, numdef.sign)))
+				return (error(node) << "invalid floating point number");
+
+			type = (numdef.bits == 32) ? nyt_f32 : nyt_f64;
+			if (not BuiltinT)
+				cn.adapt((numdef.bits == 32) ? "f32" : "f64", 3);
+			hardcodedlvid = createLocalBuiltinFloat64(node, type, value);
+		}
+
+
+		if (BuiltinT)
+		{
+			localvar = hardcodedlvid;
+			return true;
+		}
+		else
+		{
+			if (!pContext.reuse.literal.node)
+			{
+				// new (+2)
+				//     type-decl
+				//     |   identifier: i64
+				//     call (+3)
+				//         call-parameter
+				//             expr
+				//                 register: <lvid>
+				auto& cache = pContext.reuse.literal;
+				cache.node = new Node{rgNew};
+				Node::Ptr typeDecl = new Node{rgTypeDecl};
+				cache.node->children.push_back(typeDecl);
+				cache.classname = new Node{rgIdentifier};
+				typeDecl->children.push_back(cache.classname);
+
+				Node::Ptr call = new Node{rgCall};
+				cache.node->children.push_back(call);
+				Node::Ptr callParam = new Node{rgCallParameter};
+				call->children.push_back(callParam);
+				Node::Ptr expr = new Node{rgExpr};
+				callParam->children.push_back(expr);
+				cache.lvidnode = new Node{rgRegister};
+				expr->children.push_back(cache.lvidnode);
+			}
+
+			pContext.reuse.literal.classname->text = cn;
+			ShortString16 lvidstr;
+			lvidstr = hardcodedlvid;
+			pContext.reuse.literal.lvidnode->text = lvidstr;
+
+
+			bool success = visitASTExprNew(*(pContext.reuse.literal.node), localvar);
+
+			if (debugmode)
+			{
+				pContext.reuse.literal.classname->text.clear();
+				pContext.reuse.literal.lvidnode->text.clear();
+			}
+			return success;
+		}
+	}
+
+
+
+
 	bool Scope::visitASTExprNumber(Node& node, yuint32& localvar)
 	{
 		assert(node.rule == rgNumber);
 		assert(not node.children.empty());
 
-		bool success = true;
+		// Number definition
+		NumberDef numdef;
+		// is a builtin ? (__i32, __f64...)
+		bool builtin = false;
 
-		//! Is the number signed or unsigned ?
-		bool isUnsigned = false;
-		//! Is the number a floating-point number ?
-		bool isFloat = false;
-		//! how many bits used by the number ? (32 by default)
-		uint bits = 32;
-		//! Sign of the number: ' ', '+', '-'
-		char sign = ' ';
-
-		//! The first part of the number
-		uint64 part1 = 0;
-		//! Second part of the number
-		AnyString part2; // the second part may have additional zero
-
+		emitDebugpos(node);
 
 		for (auto& childptr: node.children)
 		{
@@ -83,15 +256,19 @@ namespace Producer
 							{
 								if (likely(firstPart))
 								{
-									part1 = subnodeptr->text.to<uint64>();
+									if (not subnodeptr->text.to<uint64>(numdef.part1))
+									{
+										error(*subnodeptr) << "invalid integer value";
+										return false;
+									}
 									firstPart = false;
 								}
 								else
 								{
-									part2 = subnodeptr->text;
+									numdef.part2 = subnodeptr->text;
+									numdef.part2.trimRight('0'); // remove useless zeros
 									// as far as we know, it is a float64 by default
-									isFloat = true;
-									bits = 64;
+									numdef.isFloat = true;
 								}
 								break;
 							}
@@ -99,7 +276,7 @@ namespace Producer
 							default:
 							{
 								ICE(*subnodeptr) << "[expr-number]";
-								success = false;
+								return false;
 							}
 						}
 					}
@@ -109,8 +286,8 @@ namespace Producer
 				case rgNumberSign: // + -
 				{
 					assert(not childptr->text.empty() and "invalid ast");
-					sign = childptr->text[0];
-					assert(sign == '+' or sign == '-');
+					numdef.sign = childptr->text[0];
+					assert(numdef.sign == '+' or numdef.sign == '-');
 					break;
 				}
 
@@ -123,14 +300,22 @@ namespace Producer
 						{
 							case rgNumberQualifierType:
 							{
-								for (uint i = subnode.text.size(); i--; )
+								assert(not subnode.text.empty());
+								uint offset = 0;
+								if (subnode.text.first() == '_' and subnode.text[1] == '_')
+								{
+									offset = 2;
+									builtin = true;
+								}
+								for (uint i = offset; i < subnode.text.size(); ++i)
 								{
 									switch (subnode.text[i])
 									{
-										case 'i': isUnsigned = false; break;
-										case 'u': isUnsigned = true; break;
-										case 'f': isFloat = true; break;
-										default: success = false; error(subnode) << "invalid number qualifier";
+										case 'i': numdef.isUnsigned = false; break;
+										case 'u': numdef.isUnsigned = true; break;
+										case 'f': numdef.isFloat = true; break;
+										default: error(node) << "invalid number qualifier. Got '"
+											<< subnode.text.first() << "', expected 'i', 'u' or 'f'";
 									}
 								}
 								break;
@@ -139,24 +324,24 @@ namespace Producer
 							{
 								if (likely(subnode.text.size() < 10))
 								{
-									bits = subnode.text.to<uint>();
-									if (unlikely(bits != 8 and bits != 16 and bits != 32 and bits != 64))
+									numdef.bits = subnode.text.to<uint>();
+									if (unlikely(numdef.bits != 64 and numdef.bits != 32 and numdef.bits != 16 and numdef.bits != 8))
 									{
 										error(subnode) << "invalid integer size";
-										success = false;
+										return false;
 									}
 								}
 								else
 								{
 									error(subnode) << "integer too large";
-									success = false;
+									return false;
 								}
 								break;
 							}
 							default:
 							{
 								ICE(subnode) << "[expr-number]";
-								success = false;
+								return false;
 							}
 						}
 					}
@@ -167,49 +352,17 @@ namespace Producer
 				default:
 				{
 					ICE(*childptr) << "[expr-number]";
-					success = false;
+					return false;
 				}
 			}
 		}
 
 
-		// checking for invalid float values
+		assert(numdef.bits == 64 or numdef.bits == 32 or numdef.bits == 16 or numdef.bits == 8);
 
-		if (not isFloat)
-		{
-			nytype_t type = nyt_void;
-			switch (bits)
-			{
-				case 64: type = (isUnsigned) ? nyt_u64 : nyt_i64; break;
-				case 32: type = (isUnsigned) ? nyt_u32 : nyt_i32; break;
-				case 16: type = (isUnsigned) ? nyt_u16 : nyt_i16; break;
-				case  8: type = (isUnsigned) ? nyt_u8  : nyt_i8; break;
-			}
-
-			localvar = createLocalBuiltinInt64(node, type, part1);
-		}
-		else
-		{
-			if (bits != 32 and bits != 64)
-			{
-				error(node) << "a floatting point number can only be 32 or 64 bits";
-				success = false;
-				bits = 64; // default value
-			}
-
-			// converting the number into a double
-			double value;
-			if (unlikely(not convertASTNumberToDouble(value, part1, part2, sign)))
-			{
-				error(node) << "invalid floating point number";
-				success = false;
-			}
-
-			nytype_t type = (bits == 32) ? nyt_f32 : nyt_f64;
-			localvar = createLocalBuiltinFloat64(node, type, value);
-		}
-
-		return success;
+		return (not builtin)
+			? generateNumberCode<false>(localvar, numdef, node)
+			: generateNumberCode<true> (localvar, numdef, node);
 	}
 
 

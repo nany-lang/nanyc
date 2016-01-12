@@ -4,6 +4,7 @@
 #include "details/fwd.h"
 #include "details/ir/program.h"
 #include "details/reporting/report.h"
+#include "details/grammar/nany.h"
 #include <map>
 #include <cassert>
 
@@ -65,6 +66,15 @@ namespace Producer
 		//! Map contet offset (0-based - bytes) -> lines (1-based, from source input)
 		std::map<uint, uint> offsetToLine;
 
+		struct {
+			struct {
+				Node::Ptr node;
+				Node::Ptr classname;
+				Node::Ptr lvidnode;
+			}
+			literal;
+		}
+		reuse;
 
 	private:
 		friend class Scope;

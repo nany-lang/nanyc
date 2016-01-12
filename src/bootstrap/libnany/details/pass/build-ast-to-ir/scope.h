@@ -160,6 +160,7 @@ namespace Producer
 	private:
 		bool generateInitFuncForClassVar(const AnyString& varname, LVID, const Node& varAssign);
 		bool generateTypeofForClassVar(LVID&, const Node& varAssign);
+		template<bool BuiltinT, class DefT> bool generateNumberCode(uint32_t& localvar, const DefT& numdef, const Node&);
 
 	private:
 		//! Context
