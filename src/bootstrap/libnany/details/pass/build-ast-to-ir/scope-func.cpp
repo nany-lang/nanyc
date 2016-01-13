@@ -415,6 +415,8 @@ namespace Producer
 		bool FuncInspector::inspectAttributes(Node& node)
 		{
 			assert(node.rule == rgAttributes);
+			auto& out = scope.program();
+
 			for (auto& childptr: node.children)
 			{
 				auto& child = *childptr;
@@ -441,7 +443,7 @@ namespace Producer
 						scope.error(*child.children[1]) << "invalid shortcircuit value, expected '__false' or '__true'";
 						return false;
 					}
-					scope.program().emitPragmaShortcircuit((value == "__true") ? 1 : 0);
+					out.emitPragmaShortcircuit((value == "__true") ? 1 : 0);
 					continue;
 				}
 
@@ -451,7 +453,23 @@ namespace Producer
 					if (YUNI_UNLIKELY(child.children[1]->rule == rgEntity))
 						AST::retrieveEntityString(value, *(child.children[1]));
 
-					scope.program().emitPragmaBuiltinAlias(value);
+					out.emitPragmaBuiltinAlias(value);
+					continue;
+				}
+
+				if (attrname == "suggest")
+				{
+					ShortString64 value;
+					if (YUNI_UNLIKELY(child.children[1]->rule == rgEntity))
+						AST::retrieveEntityString(value, *(child.children[1]));
+					bool onoff = true;
+					if (value.empty() or not value.to(onoff))
+					{
+						scope.error(*child.children[1]) << "invalid attribute 'suggest' value, expected 'false' or 'true'";
+						return false;
+					}
+					if (not onoff)
+						out.emitPragmaSuggest(false);
 					continue;
 				}
 

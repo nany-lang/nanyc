@@ -64,16 +64,19 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 	o << "/// \\ingroup std.core\n";
 	o << "public class " << suffix << '\n';
 	o << "{\n";
-	o << "\toperator new;\n";
+	o << "\toperator new;\n\n";
 	craftOperator([&](uint32_t b, char targetsign)
 	{
 		for ( ; b >= 8; b /= 2)
-		{
-			o << "\toperator new (self pod: __" << targetsign << b << ");\n";
 			o << "\toperator new (self cref pod: " << targetsign << b << ");\n";
-		}
+	});
+	craftOperator([&](uint32_t b, char targetsign)
+	{
+		for ( ; b >= 8; b /= 2)
+			o << "\t[[suggest: false]] operator new (self pod: __" << targetsign << b << ");\n";
 	});
 
+	o << '\n';
 	o << '\n';
 	o << "\toperator ++self: ref " << suffix << '\n';
 	o << "\t{\n";
@@ -83,7 +86,7 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 	o << '\n';
 	o << "\toperator self++: ref " << suffix << '\n';
 	o << "\t{\n";
-	o << "\t\tvar tmp = self;\n";
+	o << "\t\tref tmp = new " << suffix << "(pod);\n";
 	o << "\t\tpod = !!inc(pod);\n";
 	o << "\t\treturn tmp;\n";
 	o << "\t}\n";
@@ -96,7 +99,7 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 	o << '\n';
 	o << "\toperator self--: ref " << suffix << '\n';
 	o << "\t{\n";
-	o << "\t\tvar tmp = self;\n";
+	o << "\t\tref tmp = new " << suffix << "(pod);\n";
 	o << "\t\tpod = !!dec(pod);\n";
 	o << "\t\treturn tmp;\n";
 	o << "\t}\n";
@@ -117,13 +120,14 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 				o << "\t\treturn self;\n";
 				o << "\t}\n\n";
 
-				o << "\toperator " << op << " (x: __" << targetsign << b << "): ref " << suffix << '\n';
+				o << "\t[[suggest: false]] operator " << op << " (x: __" << targetsign << b << "): ref " << suffix << '\n';
 				o << "\t{\n";
 				o << "\t\tpod = !!" << pr << intrinsic << "(pod, x);\n";
 				o << "\t\treturn self;\n";
 				o << "\t}\n\n";
 			}
 		});
+		o << '\n';
 	};
 
 	craftMemberOperator("+=", "add", false);
@@ -132,9 +136,9 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 	craftMemberOperator("/=", "div", true);
 
 	o << "private:\n";
-	o << "\t//! The real integer representation\n";
-	o << "\tvar pod: __" << suffix << " = 0__" << suffix << ";\n";
-	o << "}\n";
+	o << "\tvar pod = 0__" << suffix << ";\n";
+	o << '\n';
+	o << "} // class " << suffix << '\n';
 	o << '\n';
 	o << '\n';
 	o << '\n';
@@ -148,9 +152,13 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 
 	auto genGlobalCompareOperator = [&](AnyString op, AnyString builtin, char sign, uint32_t b, AnyString prefixA, AnyString prefixB)
 	{
-		o << "[[builtinalias: " << builtin << "]] public operator ";
+		bool atLeastOneBuiltin = (prefixA.first() == '_' or prefixB.first() == '_');
+		o << "[[builtinalias: " << builtin;
+		if (prefixA.first() == '_' or prefixB.first() == '_')
+			o << ", suggest: false";
+		o << "]] public operator ";
 		o << op << " (a: " << prefixA << suffix << ", b: " << prefixB << sign << b << "): ";
-		o << ((prefixA.first() != '_' or prefixB.first() != '_') ? "ref " : "__");
+		o << (atLeastOneBuiltin ? "ref " : "__");
 		o << "bool;\n";
 	};
 	craft(">",  "gt",  genGlobalCompareOperator);
@@ -173,10 +181,17 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 
 	auto genGlobalOperator = [&](AnyString op, AnyString builtin, char sign, uint32_t b, AnyString prefixA, AnyString prefixB)
 	{
-		o << "[[builtinalias: " << builtin << "]] public operator ";
+		bool atLeastOneBuiltin = (prefixA.first() != '_' or prefixB.first() != '_');
+		o << "[[builtinalias: " << builtin;
+		if (prefixA.first() == '_' or prefixB.first() == '_')
+			o << ", suggest: false";
+		o << "]] public operator ";
 		o << op << " (a: " << prefixA << suffix << ", b: " << prefixB << sign << b << "): ";
-		o << ((prefixA.first() != '_' or prefixB.first() != '_') ? "ref " : "__");
+		o << ((atLeastOneBuiltin) ? "ref " : "__");
 		o << suffix << ";\n";
+
+		if (not atLeastOneBuiltin)
+			o << '\n';
 	};
 	craft("+", "add", genGlobalOperator);
 	craft("-", "sub", genGlobalOperator);

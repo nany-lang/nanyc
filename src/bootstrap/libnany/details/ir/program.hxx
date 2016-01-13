@@ -211,6 +211,13 @@ namespace IR
 	}
 
 
+	inline void Program::emitPragmaSuggest(bool onoff)
+	{
+		auto& opc = emit<ISA::Op::pragma>();
+		opc.pragma = static_cast<uint32_t>(IR::ISA::Pragma::suggest);
+		opc.value.suggest = static_cast<uint32_t>(onoff);
+	}
+
 	inline void Program::emitPragmaBuiltinAlias(const AnyString& name)
 	{
 		auto& opc = emit<ISA::Op::pragma>();

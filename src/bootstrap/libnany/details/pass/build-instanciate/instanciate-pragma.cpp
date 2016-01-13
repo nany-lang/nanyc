@@ -285,6 +285,7 @@ namespace Instanciate
 				break;
 			}
 
+			case IR::ISA::Pragma::suggest:
 			case IR::ISA::Pragma::builtinalias:
 			case IR::ISA::Pragma::shortcircuit:
 			case IR::ISA::Pragma::namespacedef:

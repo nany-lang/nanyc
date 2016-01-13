@@ -208,13 +208,16 @@ namespace Instanciate
 				for (auto& candidateptr: pair.second)
 				{
 					auto& candidate = candidateptr.get();
-					auto suggest = (err.suggest() << '\'' << cdeftable.keyword(candidate) << ' ');
-					candidate.appendCaption(suggest.data().message, cdeftable);
-					suggest << '\'';
+					if (candidate.canBeSuggestedInErrReporting)
+					{
+						auto suggest = (err.suggest() << '\'' << cdeftable.keyword(candidate) << ' ');
+						candidate.appendCaption(suggest.data().message, cdeftable);
+						suggest << '\'';
 
-					suggest.origins().location.pos.line   = candidate.origin.line;
-					suggest.origins().location.pos.offset = candidate.origin.offset;
-					suggest.origins().location.filename   = candidate.origin.filename;
+						suggest.origins().location.pos.line   = candidate.origin.line;
+						suggest.origins().location.pos.offset = candidate.origin.offset;
+						suggest.origins().location.filename   = candidate.origin.filename;
+					}
 				}
 			}
 		}

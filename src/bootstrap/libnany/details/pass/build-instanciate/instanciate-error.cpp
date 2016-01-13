@@ -141,17 +141,20 @@ namespace Instanciate
 			for (uint i = 0; i != solutions.size(); ++i)
 			{
 				auto& atom = solutions[i].get();
-				auto hint  = (err.hint() << "see ");
-				hint.message.origins.location.filename   = atom.origin.filename;
-				hint.message.origins.location.pos.line   = atom.origin.line;
-				hint.message.origins.location.pos.offset = atom.origin.offset;
+				if (atom.canBeSuggestedInErrReporting)
+				{
+					auto hint  = (err.hint() << "see ");
+					hint.message.origins.location.filename   = atom.origin.filename;
+					hint.message.origins.location.pos.line   = atom.origin.line;
+					hint.message.origins.location.pos.offset = atom.origin.offset;
 
-				hint << '\'';
-				hint << cdeftable.keyword(atom) << ' ';
-				atom.appendCaption(hint.text(), cdeftable);
-				hint << '\'';
+					hint << '\'';
+					hint << cdeftable.keyword(atom) << ' ';
+					atom.appendCaption(hint.text(), cdeftable);
+					hint << '\'';
 
-				hint.appendEntry(resolver.subreports[i]); // subreport can be null
+					hint.appendEntry(resolver.subreports[i]); // subreport can be null
+				}
 			}
 		}
 		return false;

@@ -5,6 +5,7 @@
 #include <utility>
 #include <vector>
 #include <unordered_map>
+#include <iostream>
 
 using namespace Yuni;
 
@@ -252,8 +253,13 @@ namespace Nany
 					case IR::ISA::Pragma::shortcircuit:
 					{
 						assert(not atomStack.empty());
-						Atom& atom = atomStack.back().atom;
-						atom.parameters.shortcircuitValue = (0 != operands.value.shortcircuit);
+						atomStack.back().atom.parameters.shortcircuitValue = (0 != operands.value.shortcircuit);
+						break;
+					}
+					case IR::ISA::Pragma::suggest:
+					{
+						assert(not atomStack.empty());
+						atomStack.back().atom.canBeSuggestedInErrReporting = (0 != operands.value.suggest);
 						break;
 					}
 

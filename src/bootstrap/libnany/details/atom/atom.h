@@ -378,6 +378,9 @@ namespace Nany
 		//! Flag to suppress spurious error messages and code generation
 		bool hasErrors = false;
 
+		//! Can be used for error reporting
+		bool canBeSuggestedInErrReporting = true;
+
 
 	private:
 		//! Default constructor
