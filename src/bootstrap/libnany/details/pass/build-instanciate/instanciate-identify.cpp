@@ -110,6 +110,21 @@ namespace Instanciate
 					}
 					break;
 				}
+				case 'n':
+				{
+					if (name == "null")
+					{
+						multipleResults.clear();
+						frame.resolvePerCLID[cdef.clid].clear(); // just in case
+
+						auto& opc = cdeftable.substitute(operands.lvid);
+						opc.mutateToBuiltin(nyt_pointer);
+						opc.qualifiers.ref = false;
+						out.emitStore_u64(operands.lvid, 0);
+						return true;
+					}
+					break;
+				}
 				case 'v':
 				{
 					if (name == "void")
