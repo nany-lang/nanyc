@@ -88,7 +88,7 @@ namespace Instanciate
 		bool instanciateIntrinsicMemalloc(uint32_t lvid);
 		bool instanciateIntrinsicMemFree(uint32_t lvid);
 
-		template<bool AcceptBool, bool AcceptInt, bool AcceptFloat,
+		template<nytype_t R, bool AcceptBool, bool AcceptInt, bool AcceptFloat,
 			void (IR::Program::* M)(uint32_t, uint32_t, uint32_t)>
 		bool instanciateIntrinsicOperator(uint32_t lvid, const char* const name);
 
@@ -106,6 +106,8 @@ namespace Instanciate
 		bool instanciateIntrinsicFSUB(uint32_t lvid);
 		bool instanciateIntrinsicFDIV(uint32_t lvid);
 		bool instanciateIntrinsicFMUL(uint32_t lvid);
+		bool instanciateIntrinsicEQ(uint32_t lvid);
+		bool instanciateIntrinsicNEQ(uint32_t lvid);
 
 
 	public:

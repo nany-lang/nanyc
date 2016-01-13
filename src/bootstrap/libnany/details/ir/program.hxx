@@ -194,6 +194,23 @@ namespace IR
 	}
 
 
+	inline void Program::emitEQ(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	{
+		auto& operands = emit<ISA::Op::eq>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+	inline void Program::emitNEQ(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	{
+		auto& operands = emit<ISA::Op::neq>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+
 
 	inline void Program::emitAND(uint32_t lvid, uint32_t lhs, uint32_t rhs)
 	{

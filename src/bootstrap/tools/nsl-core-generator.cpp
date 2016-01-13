@@ -132,13 +132,12 @@ static void craftClassFloat(Clob& o, uint32_t bits, const AnyString& license, co
 
 	auto genGlobalCompareOperator = [&](AnyString op, AnyString builtin, char sign, uint32_t b, AnyString prefixA, AnyString prefixB)
 	{
-		bool atLeastOneBuiltin = (prefixA.first() == '_' or prefixB.first() == '_');
 		o << "[[builtinalias: " << builtin;
 		if (prefixA.first() == '_' or prefixB.first() == '_')
 			o << ", suggest: false";
 		o << "]] public operator ";
 		o << op << " (a: " << prefixA << suffix << ", b: " << prefixB << sign << b << "): ";
-		o << (atLeastOneBuiltin ? "ref " : "__");
+		o << ((prefixA.first() == '_' and prefixB.first() == '_') ? "__" : "ref ");
 		o << "bool;\n";
 	};
 	craft(">",  "fgt",  genGlobalCompareOperator);
@@ -326,13 +325,12 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 
 	auto genGlobalCompareOperator = [&](AnyString op, AnyString builtin, char sign, uint32_t b, AnyString prefixA, AnyString prefixB)
 	{
-		bool atLeastOneBuiltin = (prefixA.first() == '_' or prefixB.first() == '_');
 		o << "[[builtinalias: " << builtin;
 		if (prefixA.first() == '_' or prefixB.first() == '_')
 			o << ", suggest: false";
 		o << "]] public operator ";
 		o << op << " (a: " << prefixA << suffix << ", b: " << prefixB << sign << b << "): ";
-		o << (atLeastOneBuiltin ? "ref " : "__");
+		o << ((prefixA.first() == '_' and prefixB.first() == '_') ? "__" : "ref ");
 		o << "bool;\n";
 	};
 	craft(">",  "gt",  genGlobalCompareOperator);

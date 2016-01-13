@@ -28,6 +28,25 @@ namespace ISA
 
 
 
+	template<> struct Operand<Op::eq> final
+	{
+		constexpr static const char* opname() { return "eq"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		uint32_t lhs;
+		uint32_t rhs;
+	};
+
+	template<> struct Operand<Op::neq> final
+	{
+		constexpr static const char* opname() { return "neq"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		uint32_t lhs;
+		uint32_t rhs;
+	};
+
+
 
 	template<> struct Operand<Op::opand> final
 	{

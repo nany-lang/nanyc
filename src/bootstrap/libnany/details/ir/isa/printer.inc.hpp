@@ -49,6 +49,17 @@ namespace // anonymous
 			out << tabs << '%' << operands.lvid << " = %" << operands.lhs << ' ' << opname << " %" << operands.rhs;
 		}
 
+		void print(const Operand<Op::eq>& operands)
+		{
+			printOperator(operands, "eq");
+		}
+
+		void print(const Operand<Op::neq>& operands)
+		{
+			printOperator(operands, "neq");
+		}
+
+
 		void print(const Operand<Op::opand>& operands)
 		{
 			printOperator(operands, "and");

@@ -77,6 +77,11 @@ namespace IR
 		//! Emit a NOP instruction
 		void emitNop();
 
+		//! Emit equal
+		void emitEQ(uint32_t lvid, uint32_t lhs, uint32_t rhs);
+		//! Emit not equal
+		void emitNEQ(uint32_t lvid, uint32_t lhs, uint32_t rhs);
+
 		//! Emit AND
 		void emitAND(uint32_t lvid, uint32_t lhs, uint32_t rhs);
 		//! Emit AND

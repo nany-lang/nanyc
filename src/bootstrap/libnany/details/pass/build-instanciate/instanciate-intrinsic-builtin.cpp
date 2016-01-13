@@ -189,7 +189,7 @@ namespace Instanciate
 	}
 
 
-	template<bool AcceptBool, bool AcceptInt, bool AcceptFloat,
+	template<nytype_t R, bool AcceptBool, bool AcceptInt, bool AcceptFloat,
 		void (IR::Program::* M)(uint32_t, uint32_t, uint32_t)>
 	inline bool ProgramBuilder::instanciateIntrinsicOperator(uint32_t lvid, const char* const name)
 	{
@@ -221,7 +221,7 @@ namespace Instanciate
 		if (builtinrhs == nyt_any)
 		{
 			auto* atom = cdeftable.findClassdefAtom(cdefrhs);
-			if (atom != nullptr and atom->builtinMapping != nyt_void)
+			if (atom != nullptr and (atom->builtinMapping != nyt_void))
 			{
 				atomBuiltinCast = atom;
 				builtinrhs = atom->builtinMapping;
@@ -274,29 +274,53 @@ namespace Instanciate
 			}
 		}
 
+		// --- result of the operator
+
+		nytype_t rettype = (R == nyt_any) ? builtinlhs : R;
+
 		if (atomBuiltinCast != nullptr)
 		{
+			// implicit convertion from builtin (__i32...) to object (i32...)
+			if (R != nyt_any) // force the result type
+			{
+				atomBuiltinCast = Atom::Ptr::WeakPointer(cdeftable.atoms().core.object[R]);
+				assert(atomBuiltinCast != nullptr);
+			}
+
+			if (unlikely(not instanciateAtomClass(*atomBuiltinCast)))
+				return false;
+
 			auto& opc = cdeftable.substitute(lvid);
 			opc.mutateToAtom(atomBuiltinCast);
 			opc.qualifiers.ref = true;
 
 			if (canGenerateCode())
 			{
-				uint32_t intermlvid = createLocalVariables(2);
-				cdeftable.substitute(intermlvid).mutateToBuiltin(builtinlhs);
+				// creating two variables on the stack
+				uint32_t opresult   = createLocalVariables(2);
+				uint32_t sizeoflvid = opresult + 1;
 
-				(out.*M)(intermlvid, lhs, rhs);
+				// RESULT: opresult: the first one is the result of the operation (and, +, -...)
+				cdeftable.substitute(opresult).mutateToBuiltin(rettype);
+				(out.*M)(opresult, lhs, rhs);
 
-				cdeftable.substitute(intermlvid + 1).mutateToBuiltin(nyt_u64);
-				out.emitSizeof(intermlvid + 1, atomBuiltinCast->atomid);
+				// SIZEOF: the second variable on the stack is `sizeof(<object>)`
+				// (sizeof the object to allocate)
+				cdeftable.substitute(sizeoflvid).mutateToBuiltin(nyt_u64);
+				out.emitSizeof(sizeoflvid, atomBuiltinCast->atomid);
 
-				out.emitMemalloc(lvid, intermlvid + 1);
-				out.emitFieldset(intermlvid, lvid, 0); // builtin
+				// ALLOC: memory allocation of the new temporary object
+				out.emitMemalloc(lvid, sizeoflvid);
+				out.emitRef(lvid);
+				atomStack.back().lvids[lvid].autorelease = true;
+				// reset the internal value of the object
+				out.emitFieldset(opresult, /*self*/lvid, 0); // builtin
 			}
 		}
 		else
 		{
-			cdeftable.substitute(lvid).mutateToBuiltin(builtinlhs);
+			// no convertion to perform, direct call
+			cdeftable.substitute(lvid).mutateToBuiltin(rettype);
 			if (canGenerateCode())
 				(out.*M)(lvid, lhs, rhs);
 		}
@@ -306,73 +330,88 @@ namespace Instanciate
 
 	bool  ProgramBuilder::instanciateIntrinsicAND(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<true, true, false, &IR::Program::emitAND>(lvid, "and");
+		return instanciateIntrinsicOperator<nyt_any, 1, 1, 0, &IR::Program::emitAND>(lvid, "and");
 	}
 
 	bool  ProgramBuilder::instanciateIntrinsicOR(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<true, true, false, &IR::Program::emitOR>(lvid, "or");
+		return instanciateIntrinsicOperator<nyt_any, 1, 1, 0, &IR::Program::emitOR>(lvid, "or");
 	}
 
 	bool  ProgramBuilder::instanciateIntrinsicXOR(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<true, true, false, &IR::Program::emitXOR>(lvid, "xor");
+		return instanciateIntrinsicOperator<nyt_any, 1, 1, 0, &IR::Program::emitXOR>(lvid, "xor");
 	}
 
 	bool  ProgramBuilder::instanciateIntrinsicMOD(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<true, true, false, &IR::Program::emitMOD>(lvid, "mod");
+		return instanciateIntrinsicOperator<nyt_any, 1, 1, 0, &IR::Program::emitMOD>(lvid, "mod");
 	}
 
 	bool  ProgramBuilder::instanciateIntrinsicADD(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<false, true, false, &IR::Program::emitADD>(lvid, "add");
+		return instanciateIntrinsicOperator<nyt_any, 0, 1, 0, &IR::Program::emitADD>(lvid, "add");
 	}
 
 	bool  ProgramBuilder::instanciateIntrinsicSUB(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<false, true, false, &IR::Program::emitSUB>(lvid, "sub");
+		return instanciateIntrinsicOperator<nyt_any, 0, 1, 0, &IR::Program::emitSUB>(lvid, "sub");
 	}
 
 	bool  ProgramBuilder::instanciateIntrinsicDIV(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<false, true, false, &IR::Program::emitDIV>(lvid, "div");
+		return instanciateIntrinsicOperator<nyt_any, 0, 1, 0, &IR::Program::emitDIV>(lvid, "div");
 	}
 
 	bool  ProgramBuilder::instanciateIntrinsicMUL(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<false, true, false, &IR::Program::emitMUL>(lvid, "mul");
+		return instanciateIntrinsicOperator<nyt_any, 0, 1, 0, &IR::Program::emitMUL>(lvid, "mul");
 	}
 
 	bool  ProgramBuilder::instanciateIntrinsicIDIV(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<false, true, false, &IR::Program::emitIDIV>(lvid, "idiv");
+		return instanciateIntrinsicOperator<nyt_any, 0, 1, 0, &IR::Program::emitIDIV>(lvid, "idiv");
 	}
 
 	bool  ProgramBuilder::instanciateIntrinsicIMUL(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<false, true, false, &IR::Program::emitIMUL>(lvid, "imul");
+		return instanciateIntrinsicOperator<nyt_any, 0, 1, 0, &IR::Program::emitIMUL>(lvid, "imul");
 	}
 
 	bool  ProgramBuilder::instanciateIntrinsicFADD(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<false, false, true, &IR::Program::emitFADD>(lvid, "fadd");
+		return instanciateIntrinsicOperator<nyt_any, 0, 0, 1, &IR::Program::emitFADD>(lvid, "fadd");
 	}
 
 	bool  ProgramBuilder::instanciateIntrinsicFSUB(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<false, false, true, &IR::Program::emitFSUB>(lvid, "fsub");
+		return instanciateIntrinsicOperator<nyt_any, 0, 0, 1, &IR::Program::emitFSUB>(lvid, "fsub");
 	}
 
 	bool  ProgramBuilder::instanciateIntrinsicFDIV(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<false, false, true, &IR::Program::emitFDIV>(lvid, "fdiv");
+		return instanciateIntrinsicOperator<nyt_any, 0, 0, 1, &IR::Program::emitFDIV>(lvid, "fdiv");
 	}
 
 	bool  ProgramBuilder::instanciateIntrinsicFMUL(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<false, false, true, &IR::Program::emitFMUL>(lvid, "fmul");
+		return instanciateIntrinsicOperator<nyt_any, 0, 0, 1, &IR::Program::emitFMUL>(lvid, "fmul");
 	}
+
+
+
+	bool  ProgramBuilder::instanciateIntrinsicEQ(uint32_t lvid)
+	{
+		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Program::emitEQ>(lvid, "eq");
+	}
+
+	bool  ProgramBuilder::instanciateIntrinsicNEQ(uint32_t lvid)
+	{
+		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Program::emitNEQ>(lvid, "neq");
+	}
+
+
+
 
 
 
@@ -409,6 +448,9 @@ namespace Instanciate
 		{"fsub",            { &ProgramBuilder::instanciateIntrinsicFSUB,      2 }},
 		{"fdiv",            { &ProgramBuilder::instanciateIntrinsicFDIV,      2 }},
 		{"fmul",            { &ProgramBuilder::instanciateIntrinsicFMUL,      2 }},
+		//
+		{"eq",              { &ProgramBuilder::instanciateIntrinsicEQ,        2 }},
+		{"neq",             { &ProgramBuilder::instanciateIntrinsicNEQ,       2 }},
 	};
 
 	bool ProgramBuilder::instanciateBuiltinIntrinsic(const AnyString& name, uint32_t lvid)

@@ -130,6 +130,9 @@ namespace VM
 			void visit(const IR::ISA::Operand<IR::ISA::Op::opxor>&);
 			void visit(const IR::ISA::Operand<IR::ISA::Op::opmod>&);
 
+			void visit(const IR::ISA::Operand<IR::ISA::Op::eq>&);
+			void visit(const IR::ISA::Operand<IR::ISA::Op::neq>&);
+
 			// accept those opcode for debugging purposes
 			void visit(const IR::ISA::Operand<IR::ISA::Op::comment>&) {}
 			void visit(const IR::ISA::Operand<IR::ISA::Op::scope>&) {}
@@ -255,7 +258,7 @@ namespace VM
 			VM_PRINT_OPCODE(operands);
 			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
 			auto r = registers[opr.rhs].f64;
-			if (YUNI_UNLIKELY(r == 0.))
+			if (YUNI_UNLIKELY((uint64_t)r == 0))
 				throw std::overflow_error("Divide by zero exception");
 			registers[opr.lvid].f64 = registers[opr.lhs].f64 / r;
 		}
@@ -307,6 +310,22 @@ namespace VM
 			if (YUNI_UNLIKELY(r == 0))
 				throw std::overflow_error("Divide by zero exception");
 			registers[opr.lvid].u64 = static_cast<uint64_t>(static_cast<int64_t>(registers[opr.lhs].u64) / r);
+		}
+
+
+
+		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::eq>& opr)
+		{
+			VM_PRINT_OPCODE(operands);
+			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
+			registers[opr.lvid].u64 = (registers[opr.lhs].u64 == registers[opr.rhs].u64) ? 1 : 0;
+		}
+
+		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::neq>& opr)
+		{
+			VM_PRINT_OPCODE(operands);
+			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
+			registers[opr.lvid].u64 = (registers[opr.lhs].u64 != registers[opr.rhs].u64) ? 1 : 0;
 		}
 
 
