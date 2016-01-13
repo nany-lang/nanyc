@@ -92,22 +92,34 @@ namespace Instanciate
 			void (IR::Program::* M)(uint32_t, uint32_t, uint32_t)>
 		bool instanciateIntrinsicOperator(uint32_t lvid, const char* const name);
 
-		bool instanciateIntrinsicAND(uint32_t lvid);
-		bool instanciateIntrinsicOR(uint32_t lvid);
-		bool instanciateIntrinsicXOR(uint32_t lvid);
-		bool instanciateIntrinsicMOD(uint32_t lvid);
-		bool instanciateIntrinsicADD(uint32_t lvid);
-		bool instanciateIntrinsicSUB(uint32_t lvid);
-		bool instanciateIntrinsicIDIV(uint32_t lvid);
-		bool instanciateIntrinsicIMUL(uint32_t lvid);
-		bool instanciateIntrinsicDIV(uint32_t lvid);
-		bool instanciateIntrinsicMUL(uint32_t lvid);
-		bool instanciateIntrinsicFADD(uint32_t lvid);
-		bool instanciateIntrinsicFSUB(uint32_t lvid);
-		bool instanciateIntrinsicFDIV(uint32_t lvid);
-		bool instanciateIntrinsicFMUL(uint32_t lvid);
-		bool instanciateIntrinsicEQ(uint32_t lvid);
-		bool instanciateIntrinsicNEQ(uint32_t lvid);
+		bool instanciateIntrinsicAND(uint32_t);
+		bool instanciateIntrinsicOR(uint32_t);
+		bool instanciateIntrinsicXOR(uint32_t);
+		bool instanciateIntrinsicMOD(uint32_t);
+		bool instanciateIntrinsicADD(uint32_t);
+		bool instanciateIntrinsicSUB(uint32_t);
+		bool instanciateIntrinsicIDIV(uint32_t);
+		bool instanciateIntrinsicIMUL(uint32_t);
+		bool instanciateIntrinsicDIV(uint32_t);
+		bool instanciateIntrinsicMUL(uint32_t);
+		bool instanciateIntrinsicFADD(uint32_t);
+		bool instanciateIntrinsicFSUB(uint32_t);
+		bool instanciateIntrinsicFDIV(uint32_t);
+		bool instanciateIntrinsicFMUL(uint32_t);
+		bool instanciateIntrinsicEQ(uint32_t);
+		bool instanciateIntrinsicNEQ(uint32_t);
+		bool instanciateIntrinsicFLT(uint32_t);
+		bool instanciateIntrinsicFLTE(uint32_t);
+		bool instanciateIntrinsicFGT(uint32_t);
+		bool instanciateIntrinsicFGTE(uint32_t);
+		bool instanciateIntrinsicLT(uint32_t);
+		bool instanciateIntrinsicLTE(uint32_t);
+		bool instanciateIntrinsicILT(uint32_t);
+		bool instanciateIntrinsicILTE(uint32_t);
+		bool instanciateIntrinsicGT(uint32_t);
+		bool instanciateIntrinsicGTE(uint32_t);
+		bool instanciateIntrinsicIGT(uint32_t);
+		bool instanciateIntrinsicIGTE(uint32_t);
 
 
 	public:

@@ -410,6 +410,68 @@ namespace Instanciate
 		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Program::emitNEQ>(lvid, "neq");
 	}
 
+	bool  ProgramBuilder::instanciateIntrinsicFLT(uint32_t lvid)
+	{
+		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Program::emitFLT>(lvid, "flt");
+	}
+
+	bool  ProgramBuilder::instanciateIntrinsicFLTE(uint32_t lvid)
+	{
+		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Program::emitFLTE>(lvid, "flte");
+	}
+
+	bool  ProgramBuilder::instanciateIntrinsicFGT(uint32_t lvid)
+	{
+		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Program::emitFGT>(lvid, "fgt");
+	}
+
+	bool  ProgramBuilder::instanciateIntrinsicFGTE(uint32_t lvid)
+	{
+		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Program::emitFGTE>(lvid, "fgte");
+	}
+
+	bool  ProgramBuilder::instanciateIntrinsicLT(uint32_t lvid)
+	{
+		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Program::emitLT>(lvid, "lt");
+	}
+
+	bool  ProgramBuilder::instanciateIntrinsicLTE(uint32_t lvid)
+	{
+		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Program::emitLTE>(lvid, "lte");
+	}
+
+	bool  ProgramBuilder::instanciateIntrinsicILT(uint32_t lvid)
+	{
+		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Program::emitILT>(lvid, "ilt");
+	}
+
+	bool  ProgramBuilder::instanciateIntrinsicILTE(uint32_t lvid)
+	{
+		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Program::emitILTE>(lvid, "ilte");
+	}
+
+	bool  ProgramBuilder::instanciateIntrinsicGT(uint32_t lvid)
+	{
+		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Program::emitGT>(lvid, "gt");
+	}
+
+	bool  ProgramBuilder::instanciateIntrinsicGTE(uint32_t lvid)
+	{
+		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Program::emitGTE>(lvid, "gte");
+	}
+
+	bool  ProgramBuilder::instanciateIntrinsicIGT(uint32_t lvid)
+	{
+		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Program::emitIGT>(lvid, "igt");
+	}
+
+	bool  ProgramBuilder::instanciateIntrinsicIGTE(uint32_t lvid)
+	{
+		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Program::emitIGTE>(lvid, "igte");
+	}
+
+
+
 
 
 
@@ -451,6 +513,18 @@ namespace Instanciate
 		//
 		{"eq",              { &ProgramBuilder::instanciateIntrinsicEQ,        2 }},
 		{"neq",             { &ProgramBuilder::instanciateIntrinsicNEQ,       2 }},
+		{"flt",             { &ProgramBuilder::instanciateIntrinsicFLT,       2 }},
+		{"flte",            { &ProgramBuilder::instanciateIntrinsicFLTE,      2 }},
+		{"fgt",             { &ProgramBuilder::instanciateIntrinsicFGT,       2 }},
+		{"fgte",            { &ProgramBuilder::instanciateIntrinsicFGTE,      2 }},
+		{"lt",              { &ProgramBuilder::instanciateIntrinsicLT,        2 }},
+		{"lte",             { &ProgramBuilder::instanciateIntrinsicLTE,       2 }},
+		{"ilt",             { &ProgramBuilder::instanciateIntrinsicILT,       2 }},
+		{"ilte",            { &ProgramBuilder::instanciateIntrinsicILTE,      2 }},
+		{"gt",              { &ProgramBuilder::instanciateIntrinsicGT,        2 }},
+		{"gte",             { &ProgramBuilder::instanciateIntrinsicGTE,       2 }},
+		{"igt",             { &ProgramBuilder::instanciateIntrinsicIGT,       2 }},
+		{"igte",            { &ProgramBuilder::instanciateIntrinsicIGTE,      2 }},
 	};
 
 	bool ProgramBuilder::instanciateBuiltinIntrinsic(const AnyString& name, uint32_t lvid)

@@ -36,6 +36,30 @@ namespace ISA //!< Instruction Set Architecture
 		eq,
 		//! not equal
 		neq,
+		//! less than
+		lt,
+		//! less than (signed)
+		ilt,
+		//! less than or equal
+		lte,
+		//! less than or equal (signed)
+		ilte,
+		//! greater than
+		gt,
+		//! greater than (signed)
+		igt,
+		//! greater than or equal
+		gte,
+		//! greaterthan or equal (signed)
+		igte,
+		//! less than (floating point bumber)
+		flt,
+		//! less than or equal (floating point bumber)
+		flte,
+		//! greater than (floating point bumber)
+		fgt,
+		//! greater than or equal (floating point bumber)
+		fgte,
 
 		//! +
 		add,
@@ -170,6 +194,18 @@ namespace ISA //!< Instruction Set Architecture
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::opmod) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::eq) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::neq) \
+				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::lt) \
+				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::lte) \
+				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::ilt) \
+				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::ilte) \
+				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::gt) \
+				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::gte) \
+				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::igt) \
+				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::igte) \
+				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::flt) \
+				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::fgt) \
+				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::flte) \
+				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::fgte) \
 				\
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::add) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::sub) \

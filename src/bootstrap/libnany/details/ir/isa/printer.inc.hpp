@@ -59,6 +59,66 @@ namespace // anonymous
 			printOperator(operands, "neq");
 		}
 
+		void print(const Operand<Op::lt>& operands)
+		{
+			printOperator(operands, "lt");
+		}
+
+		void print(const Operand<Op::lte>& operands)
+		{
+			printOperator(operands, "lte");
+		}
+
+		void print(const Operand<Op::ilt>& operands)
+		{
+			printOperator(operands, "ilt");
+		}
+
+		void print(const Operand<Op::ilte>& operands)
+		{
+			printOperator(operands, "ilte");
+		}
+
+		void print(const Operand<Op::gt>& operands)
+		{
+			printOperator(operands, "gt");
+		}
+
+		void print(const Operand<Op::gte>& operands)
+		{
+			printOperator(operands, "gte");
+		}
+
+		void print(const Operand<Op::igt>& operands)
+		{
+			printOperator(operands, "igt");
+		}
+
+		void print(const Operand<Op::igte>& operands)
+		{
+			printOperator(operands, "igte");
+		}
+
+		void print(const Operand<Op::flt>& operands)
+		{
+			printOperator(operands, "flt");
+		}
+
+		void print(const Operand<Op::flte>& operands)
+		{
+			printOperator(operands, "flte");
+		}
+
+		void print(const Operand<Op::fgt>& operands)
+		{
+			printOperator(operands, "fgt");
+		}
+
+		void print(const Operand<Op::fgte>& operands)
+		{
+			printOperator(operands, "fgte");
+		}
+
 
 		void print(const Operand<Op::opand>& operands)
 		{

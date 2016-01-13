@@ -207,7 +207,7 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 			callback(op, builtin, sign, b, "__", "__");
 		}
 
-		if (issigned)
+		/*if (issigned)
 		{
 			sign = 'u';
 			for (uint32_t b = bits / 2; b >= 8; b /= 2)
@@ -217,7 +217,7 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 				callback(op, builtin, sign, b, "__", "cref ");
 				callback(op, builtin, sign, b, "__", "__");
 			}
-		}
+		}*/
 		o << '\n';
 	};
 
@@ -325,7 +325,7 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 
 	auto genGlobalCompareOperator = [&](AnyString op, AnyString builtin, char sign, uint32_t b, AnyString prefixA, AnyString prefixB)
 	{
-		o << "[[builtinalias: " << builtin;
+		o << "[[builtinalias: " << (issigned ? "i" : "") << builtin;
 		if (prefixA.first() == '_' or prefixB.first() == '_')
 			o << ", suggest: false";
 		o << "]] public operator ";

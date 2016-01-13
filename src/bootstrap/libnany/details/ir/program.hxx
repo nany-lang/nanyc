@@ -211,6 +211,103 @@ namespace IR
 	}
 
 
+	inline void Program::emitFLT(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	{
+		auto& operands = emit<ISA::Op::flt>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+	inline void Program::emitFLTE(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	{
+		auto& operands = emit<ISA::Op::flte>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+	inline void Program::emitFGT(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	{
+		auto& operands = emit<ISA::Op::fgt>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+	inline void Program::emitFGTE(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	{
+		auto& operands = emit<ISA::Op::fgte>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+
+	inline void Program::emitLT(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	{
+		auto& operands = emit<ISA::Op::lt>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+	inline void Program::emitLTE(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	{
+		auto& operands = emit<ISA::Op::lte>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+	inline void Program::emitILT(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	{
+		auto& operands = emit<ISA::Op::ilt>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+	inline void Program::emitILTE(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	{
+		auto& operands = emit<ISA::Op::ilte>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+	inline void Program::emitGT(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	{
+		auto& operands = emit<ISA::Op::gt>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+	inline void Program::emitGTE(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	{
+		auto& operands = emit<ISA::Op::gte>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+	inline void Program::emitIGT(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	{
+		auto& operands = emit<ISA::Op::igt>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+	inline void Program::emitIGTE(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	{
+		auto& operands = emit<ISA::Op::igte>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
 
 	inline void Program::emitAND(uint32_t lvid, uint32_t lhs, uint32_t rhs)
 	{

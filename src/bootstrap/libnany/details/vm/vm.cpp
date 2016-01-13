@@ -128,6 +128,18 @@ namespace VM
 			void visit(const IR::ISA::Operand<IR::ISA::Op::opor>&);
 			void visit(const IR::ISA::Operand<IR::ISA::Op::opxor>&);
 			void visit(const IR::ISA::Operand<IR::ISA::Op::opmod>&);
+			void visit(const IR::ISA::Operand<IR::ISA::Op::lt>&);
+			void visit(const IR::ISA::Operand<IR::ISA::Op::lte>&);
+			void visit(const IR::ISA::Operand<IR::ISA::Op::ilt>&);
+			void visit(const IR::ISA::Operand<IR::ISA::Op::ilte>&);
+			void visit(const IR::ISA::Operand<IR::ISA::Op::gt>&);
+			void visit(const IR::ISA::Operand<IR::ISA::Op::gte>&);
+			void visit(const IR::ISA::Operand<IR::ISA::Op::igt>&);
+			void visit(const IR::ISA::Operand<IR::ISA::Op::igte>&);
+			void visit(const IR::ISA::Operand<IR::ISA::Op::flt>&);
+			void visit(const IR::ISA::Operand<IR::ISA::Op::flte>&);
+			void visit(const IR::ISA::Operand<IR::ISA::Op::fgt>&);
+			void visit(const IR::ISA::Operand<IR::ISA::Op::fgte>&);
 
 			void visit(const IR::ISA::Operand<IR::ISA::Op::eq>&);
 			void visit(const IR::ISA::Operand<IR::ISA::Op::neq>&);
@@ -329,6 +341,90 @@ namespace VM
 			registers[opr.lvid].u64 = (registers[opr.lhs].u64 != registers[opr.rhs].u64) ? 1 : 0;
 		}
 
+
+		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::lt>& opr)
+		{
+			VM_PRINT_OPCODE(operands);
+			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
+			registers[opr.lvid].u64 = (registers[opr.lhs].u64 < registers[opr.rhs].u64) ? 1 : 0;
+		}
+
+		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::lte>& opr)
+		{
+			VM_PRINT_OPCODE(operands);
+			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
+			registers[opr.lvid].u64 = (registers[opr.lhs].u64 <= registers[opr.rhs].u64) ? 1 : 0;
+		}
+
+		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::ilt>& opr)
+		{
+			VM_PRINT_OPCODE(operands);
+			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
+			registers[opr.lvid].u64 = (registers[opr.lhs].i64 < registers[opr.rhs].i64) ? 1 : 0;
+		}
+
+		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::ilte>& opr)
+		{
+			VM_PRINT_OPCODE(operands);
+			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
+			registers[opr.lvid].u64 = (registers[opr.lhs].i64 <= registers[opr.rhs].i64) ? 1 : 0;
+		}
+
+		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::gt>& opr)
+		{
+			VM_PRINT_OPCODE(operands);
+			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
+			registers[opr.lvid].u64 = (registers[opr.lhs].u64 > registers[opr.rhs].u64) ? 1 : 0;
+		}
+
+		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::gte>& opr)
+		{
+			VM_PRINT_OPCODE(operands);
+			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
+			registers[opr.lvid].u64 = (registers[opr.lhs].u64 >= registers[opr.rhs].u64) ? 1 : 0;
+		}
+
+		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::igt>& opr)
+		{
+			VM_PRINT_OPCODE(operands);
+			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
+			registers[opr.lvid].u64 = (registers[opr.lhs].i64 > registers[opr.rhs].i64) ? 1 : 0;
+		}
+
+		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::igte>& opr)
+		{
+			VM_PRINT_OPCODE(operands);
+			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
+			registers[opr.lvid].u64 = (registers[opr.lhs].i64 >= registers[opr.rhs].i64) ? 1 : 0;
+		}
+
+		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::flt>& opr)
+		{
+			VM_PRINT_OPCODE(operands);
+			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
+			registers[opr.lvid].u64 = (registers[opr.lhs].f64 < registers[opr.rhs].f64) ? 1 : 0;
+		}
+
+		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::flte>& opr)
+		{
+			VM_PRINT_OPCODE(operands);
+			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
+			registers[opr.lvid].u64 = (registers[opr.lhs].f64 <= registers[opr.rhs].f64) ? 1 : 0;
+		}
+
+		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::fgt>& opr)
+		{
+			VM_PRINT_OPCODE(operands);
+			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
+			registers[opr.lvid].u64 = (registers[opr.lhs].f64 > registers[opr.rhs].f64) ? 1 : 0;
+		}
+
+		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::fgte>& opr)
+		{
+			VM_PRINT_OPCODE(operands);
+			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
+			registers[opr.lvid].u64 = (registers[opr.lhs].f64 >= registers[opr.rhs].f64) ? 1 : 0;
+		}
 
 
 		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::opand>& opr)

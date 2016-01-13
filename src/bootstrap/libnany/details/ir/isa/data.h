@@ -47,6 +47,116 @@ namespace ISA
 	};
 
 
+	template<> struct Operand<Op::flt> final
+	{
+		constexpr static const char* opname() { return "flt"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		uint32_t lhs;
+		uint32_t rhs;
+	};
+
+	template<> struct Operand<Op::flte> final
+	{
+		constexpr static const char* opname() { return "flte"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		uint32_t lhs;
+		uint32_t rhs;
+	};
+
+	template<> struct Operand<Op::fgt> final
+	{
+		constexpr static const char* opname() { return "fgt"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		uint32_t lhs;
+		uint32_t rhs;
+	};
+
+	template<> struct Operand<Op::fgte> final
+	{
+		constexpr static const char* opname() { return "fgte"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		uint32_t lhs;
+		uint32_t rhs;
+	};
+
+
+	template<> struct Operand<Op::lt> final
+	{
+		constexpr static const char* opname() { return "lt"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		uint32_t lhs;
+		uint32_t rhs;
+	};
+
+	template<> struct Operand<Op::lte> final
+	{
+		constexpr static const char* opname() { return "lte"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		uint32_t lhs;
+		uint32_t rhs;
+	};
+
+	template<> struct Operand<Op::ilt> final
+	{
+		constexpr static const char* opname() { return "ilt"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		uint32_t lhs;
+		uint32_t rhs;
+	};
+
+	template<> struct Operand<Op::ilte> final
+	{
+		constexpr static const char* opname() { return "ilte"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		uint32_t lhs;
+		uint32_t rhs;
+	};
+
+	template<> struct Operand<Op::gt> final
+	{
+		constexpr static const char* opname() { return "gt"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		uint32_t lhs;
+		uint32_t rhs;
+	};
+
+	template<> struct Operand<Op::gte> final
+	{
+		constexpr static const char* opname() { return "gte"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		uint32_t lhs;
+		uint32_t rhs;
+	};
+
+	template<> struct Operand<Op::igt> final
+	{
+		constexpr static const char* opname() { return "igt"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		uint32_t lhs;
+		uint32_t rhs;
+	};
+
+	template<> struct Operand<Op::igte> final
+	{
+		constexpr static const char* opname() { return "igte"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		uint32_t lhs;
+		uint32_t rhs;
+	};
+
+
 
 	template<> struct Operand<Op::opand> final
 	{
