@@ -300,7 +300,7 @@ operator-all: hidden
 	| operator-power
 	| operator-not
 
-operator-kind: // like operator-all, but not hidden
+operator-kind: notext // like operator-all, but not hidden
 	operator-all
 
 
