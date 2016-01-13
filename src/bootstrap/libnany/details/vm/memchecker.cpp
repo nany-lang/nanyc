@@ -17,18 +17,14 @@ namespace VM
 
 		msg << "\n\n=== nany vm: memory leaks detected in ";
 		msg << ownedPointers.size() << " blocks ===\n";
-		std::unordered_map<uint64_t, uint64_t> loses;
+
 		for (auto& pair: ownedPointers)
-			loses[pair.second]++;
-
-		for (auto& pair: loses)
 		{
-			msg << "    block " << pair.first << " bytes * " << pair.second;
-			msg << " = ";
-			msg << (pair.second * pair.first);
-			msg << " bytes\n";
+			msg << "    block " << (void*) pair.first << ' ';
+			msg << pair.second.objsize << " bytes at ";
+			msg << pair.second.origin;
+			msg << '\n';
 		}
-
 		msg << '\n';
 		context.console.write_stderr(&context, msg.c_str(), msg.size());
 	}

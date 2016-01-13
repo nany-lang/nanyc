@@ -78,18 +78,17 @@ namespace VM
 
 			//! upper label id encountered so far
 			uint32_t upperLabelID = 0;
-
 			//! Atom collection references
 			const AtomMap& map;
 
 			//! Source program
 			std::reference_wrapper<const IR::Program> program;
-
 			//! User context
 			nycontext_t& context;
 
 			//! Reference to the current iterator
 			const IR::Instruction** cursor = nullptr;
+
 
 		private:
 			friend class IR::Program;
@@ -206,6 +205,7 @@ namespace VM
 			auto  storestckfrmsize = registerCount;
 			#endif
 
+			uint32_t memcheckPreviousAtomid = memchecker.atomid();
 			stacktrace.push(atomfunc, instanceid);
 
 			// call
@@ -220,6 +220,7 @@ namespace VM
 			registerCount = storestckfrmsize;
 			#endif
 			stacktrace.pop();
+			memchecker.atomid(memcheckPreviousAtomid);
 		}
 
 
@@ -423,7 +424,7 @@ namespace VM
 			pointer[0] = 0; // init ref counter
 			registers[operands.lvid].u64 = reinterpret_cast<uint64_t>(pointer);
 
-			memchecker.hold(pointer, static_cast<size_t>(size));
+			memchecker.hold(pointer, static_cast<size_t>(size), operands.lvid);
 		}
 
 
