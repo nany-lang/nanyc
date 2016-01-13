@@ -69,6 +69,26 @@ namespace // anonymous
 			printOperator(operands, "mod");
 		}
 
+		void print(const Operand<Op::fadd>& operands)
+		{
+			printOperator(operands, "fadd");
+		}
+
+		void print(const Operand<Op::fsub>& operands)
+		{
+			printOperator(operands, "fsub");
+		}
+
+		void print(const Operand<Op::fmul>& operands)
+		{
+			printOperator(operands, "fmul");
+		}
+
+		void print(const Operand<Op::fdiv>& operands)
+		{
+			printOperator(operands, "fdiv");
+		}
+
 		void print(const Operand<Op::add>& operands)
 		{
 			printOperator(operands, "add");

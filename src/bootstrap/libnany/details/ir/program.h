@@ -98,6 +98,14 @@ namespace IR
 		void emitDIV(uint32_t lvid, uint32_t lhs, uint32_t rhs);
 		//! Emit / (signed)
 		void emitIDIV(uint32_t lvid, uint32_t lhs, uint32_t rhs);
+		//! Emit +
+		void emitFADD(uint32_t lvid, uint32_t lhs, uint32_t rhs);
+		//! Emit -
+		void emitFSUB(uint32_t lvid, uint32_t lhs, uint32_t rhs);
+		//! Emit *
+		void emitFMUL(uint32_t lvid, uint32_t lhs, uint32_t rhs);
+		//! Emit * (signed)
+		void emitFDIV(uint32_t lvid, uint32_t lhs, uint32_t rhs);
 
 		//! Allocate a new variable on the stack and get the register
 		uint32_t emitStackalloc(uint32_t lvid, nytype_t);

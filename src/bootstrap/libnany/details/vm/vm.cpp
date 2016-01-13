@@ -41,6 +41,15 @@ namespace VM
 	namespace // anonymous
 	{
 
+		union DataRegister
+		{
+			uint64_t u64;
+			int64_t i64;
+			double f64;
+		};
+
+
+
 		class Engine final
 		{
 		public:
@@ -52,7 +61,7 @@ namespace VM
 
 		public:
 			//! Registers for the current stack frame
-			uint64_t* registers = nullptr;
+			DataRegister* registers = nullptr;
 			uint64_t  retRegister = 0;
 			//! Number of pushed parameters
 			uint32_t funcparamCount = 0; // parameters are 2-based
@@ -111,6 +120,10 @@ namespace VM
 			void visit(const IR::ISA::Operand<IR::ISA::Op::imul>&);
 			void visit(const IR::ISA::Operand<IR::ISA::Op::div>&);
 			void visit(const IR::ISA::Operand<IR::ISA::Op::idiv>&);
+			void visit(const IR::ISA::Operand<IR::ISA::Op::fadd>&);
+			void visit(const IR::ISA::Operand<IR::ISA::Op::fsub>&);
+			void visit(const IR::ISA::Operand<IR::ISA::Op::fmul>&);
+			void visit(const IR::ISA::Operand<IR::ISA::Op::fdiv>&);
 
 			void visit(const IR::ISA::Operand<IR::ISA::Op::opand>&);
 			void visit(const IR::ISA::Operand<IR::ISA::Op::opor>&);
@@ -197,7 +210,7 @@ namespace VM
 
 			// restore the previous stack frame and store the result of the call
 			registers = storestackptr;
-			registers[retlvid] = ret;
+			registers[retlvid].u64 = ret;
 			program = storeprogram;
 			cursor = storecursor;
 			#ifndef NDEBUG
@@ -216,53 +229,84 @@ namespace VM
 		}
 
 
+		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::fadd>& opr)
+		{
+			VM_PRINT_OPCODE(operands);
+			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
+			registers[opr.lvid].f64 = registers[opr.lhs].f64 + registers[opr.rhs].f64;
+		}
+
+		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::fsub>& opr)
+		{
+			VM_PRINT_OPCODE(operands);
+			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
+			registers[opr.lvid].f64 = registers[opr.lhs].f64 - registers[opr.rhs].f64;
+		}
+
+		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::fmul>& opr)
+		{
+			VM_PRINT_OPCODE(operands);
+			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
+			registers[opr.lvid].f64 = registers[opr.lhs].f64 * registers[opr.rhs].f64;
+		}
+
+		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::fdiv>& opr)
+		{
+			VM_PRINT_OPCODE(operands);
+			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
+			auto r = registers[opr.rhs].f64;
+			if (YUNI_UNLIKELY(r == 0.))
+				throw std::overflow_error("Divide by zero exception");
+			registers[opr.lvid].f64 = registers[opr.lhs].f64 / r;
+		}
+
 		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::add>& opr)
 		{
 			VM_PRINT_OPCODE(operands);
 			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
-			registers[opr.lvid] = registers[opr.lhs] + registers[opr.rhs];
+			registers[opr.lvid].u64 = registers[opr.lhs].u64 + registers[opr.rhs].u64;
 		}
 
 		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::sub>& opr)
 		{
 			VM_PRINT_OPCODE(operands);
 			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
-			registers[opr.lvid] = registers[opr.lhs] - registers[opr.rhs];
+			registers[opr.lvid].u64 = registers[opr.lhs].u64 - registers[opr.rhs].u64;
 		}
 
 		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::mul>& opr)
 		{
 			VM_PRINT_OPCODE(operands);
 			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
-			registers[opr.lvid] = registers[opr.lhs] * registers[opr.rhs];
+			registers[opr.lvid].u64 = registers[opr.lhs].u64 * registers[opr.rhs].u64;
 		}
 
 		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::div>& opr)
 		{
 			VM_PRINT_OPCODE(operands);
 			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
-			auto r = registers[opr.rhs];
+			auto r = registers[opr.rhs].u64;
 			if (YUNI_UNLIKELY(r == 0))
 				throw std::overflow_error("Divide by zero exception");
-			registers[opr.lvid] = registers[opr.lhs] / r;
+			registers[opr.lvid].u64 = registers[opr.lhs].u64 / r;
 		}
 
 		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::imul>& opr)
 		{
 			VM_PRINT_OPCODE(operands);
 			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
-			registers[opr.lvid] = static_cast<uint64_t>(
-				static_cast<int64_t>(registers[opr.lhs]) * static_cast<int64_t>(registers[opr.rhs]) );
+			registers[opr.lvid].u64 = static_cast<uint64_t>(
+				static_cast<int64_t>(registers[opr.lhs].u64) * static_cast<int64_t>(registers[opr.rhs].u64) );
 		}
 
 		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::idiv>& opr)
 		{
 			VM_PRINT_OPCODE(operands);
 			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
-			auto r = static_cast<int64_t>(registers[opr.rhs]);
+			auto r = static_cast<int64_t>(registers[opr.rhs].u64);
 			if (YUNI_UNLIKELY(r == 0))
 				throw std::overflow_error("Divide by zero exception");
-			registers[opr.lvid] = static_cast<uint64_t>(static_cast<int64_t>(registers[opr.lhs]) / r);
+			registers[opr.lvid].u64 = static_cast<uint64_t>(static_cast<int64_t>(registers[opr.lhs].u64) / r);
 		}
 
 
@@ -271,28 +315,28 @@ namespace VM
 		{
 			VM_PRINT_OPCODE(operands);
 			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
-			registers[opr.lvid] = registers[opr.lhs] & registers[opr.rhs];
+			registers[opr.lvid].u64 = registers[opr.lhs].u64 & registers[opr.rhs].u64;
 		}
 
 		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::opor>& opr)
 		{
 			VM_PRINT_OPCODE(operands);
 			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
-			registers[opr.lvid] = registers[opr.lhs] | registers[opr.rhs];
+			registers[opr.lvid].u64 = registers[opr.lhs].u64 | registers[opr.rhs].u64;
 		}
 
 		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::opxor>& opr)
 		{
 			VM_PRINT_OPCODE(operands);
 			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
-			registers[opr.lvid] = registers[opr.lhs] ^ registers[opr.rhs];
+			registers[opr.lvid].u64 = registers[opr.lhs].u64 ^ registers[opr.rhs].u64;
 		}
 
 		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::opmod>& opr)
 		{
 			VM_PRINT_OPCODE(operands);
 			assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
-			registers[opr.lvid] = registers[opr.lhs] % registers[opr.rhs];
+			registers[opr.lvid].u64 = registers[opr.lhs].u64 % registers[opr.rhs].u64;
 		}
 
 
@@ -302,7 +346,7 @@ namespace VM
 			VM_PRINT_OPCODE(operands);
 			assert(operands.lvid < registerCount);
 
-			uint64_t* object = reinterpret_cast<uint64_t*>(registers[operands.lvid]);
+			uint64_t* object = reinterpret_cast<uint64_t*>(registers[operands.lvid].u64);
 			VM_CHECK_POINTER(object, operands);
 			++(object[0]);
 		}
@@ -313,7 +357,7 @@ namespace VM
 			VM_PRINT_OPCODE(operands);
 			assert(operands.lvid < registerCount);
 
-			uint64_t* object = reinterpret_cast<uint64_t*>(registers[operands.lvid]);
+			uint64_t* object = reinterpret_cast<uint64_t*>(registers[operands.lvid].u64);
 			VM_CHECK_POINTER(object, operands);
 			if (0 == --(object[0]))
 				destroy(object, operands.atomid, operands.instanceid);
@@ -325,7 +369,7 @@ namespace VM
 			VM_PRINT_OPCODE(operands);
 			assert(operands.lvid < registerCount);
 
-			uint64_t* object = reinterpret_cast<uint64_t*>(registers[operands.lvid]);
+			uint64_t* object = reinterpret_cast<uint64_t*>(registers[operands.lvid].u64);
 			VM_CHECK_POINTER(object, operands);
 			destroy(object, operands.atomid, operands.instanceid);
 		}
@@ -346,7 +390,7 @@ namespace VM
 			assert(operands.lvid < registerCount);
 			assert(operands.regsize < registerCount);
 
-			auto size = registers[operands.regsize];
+			auto size = registers[operands.regsize].u64;
 			size += sizeof(uint64_t); // reference counter
 
 			uint64_t* pointer = (uint64_t*) context.memory.allocate(&context, size);
@@ -358,7 +402,7 @@ namespace VM
 			#endif
 
 			pointer[0] = 0; // init ref counter
-			registers[operands.lvid] = reinterpret_cast<uint64_t>(pointer);
+			registers[operands.lvid].u64 = reinterpret_cast<uint64_t>(pointer);
 
 			memchecker.hold(pointer, static_cast<size_t>(size));
 		}
@@ -370,9 +414,9 @@ namespace VM
 			assert(operands.lvid < registerCount);
 			assert(operands.regsize < registerCount);
 
-			uint64_t* object = reinterpret_cast<uint64_t*>(registers[operands.lvid]);
+			uint64_t* object = reinterpret_cast<uint64_t*>(registers[operands.lvid].u64);
 			VM_CHECK_POINTER(object, operands);
-			uint64 size = registers[operands.regsize];
+			uint64 size = registers[operands.regsize].u64;
 			size += sizeof(uint64_t); // reference counter
 
 			if (YUNI_UNLIKELY(not memchecker.checkObjectSize(object, static_cast<size_t>(size))))
@@ -391,7 +435,7 @@ namespace VM
 		{
 			VM_PRINT_OPCODE(operands);
 			assert(operands.lvid < registerCount);
-			funcparams[funcparamCount++] = registers[operands.lvid];
+			funcparams[funcparamCount++] = registers[operands.lvid].u64;
 		}
 
 
@@ -399,7 +443,7 @@ namespace VM
 		{
 			VM_PRINT_OPCODE(operands);
 			assert(operands.lvid < registerCount);
-			retRegister = registers[operands.lvid];
+			retRegister = registers[operands.lvid].u64;
 			program.get().invalidateCursor(*cursor);
 		}
 
@@ -417,7 +461,8 @@ namespace VM
 		{
 			VM_PRINT_OPCODE(operands);
 			assert(operands.lvid   < registerCount);
-			registers[operands.lvid] = reinterpret_cast<uint64_t>(program.get().stringrefs[operands.text].c_str());
+			registers[operands.lvid].u64 =
+				reinterpret_cast<uint64_t>(program.get().stringrefs[operands.text].c_str());
 		}
 
 
@@ -425,7 +470,7 @@ namespace VM
 		{
 			VM_PRINT_OPCODE(operands);
 			assert(operands.lvid < registerCount);
-			registers[operands.lvid] = operands.value.u64;
+			registers[operands.lvid].u64 = operands.value.u64;
 		}
 
 
@@ -434,7 +479,7 @@ namespace VM
 			VM_PRINT_OPCODE(operands);
 			assert(operands.lvid < registerCount);
 			assert(map.findAtom(operands.type) != nullptr);
-			registers[operands.lvid] = map.findAtom(operands.type)->runtimeSizeof();
+			registers[operands.lvid].u64 = map.findAtom(operands.type)->runtimeSizeof();
 		}
 
 
@@ -451,9 +496,9 @@ namespace VM
 			assert(operands.self < registerCount);
 			assert(operands.lvid < registerCount);
 
-			uint64_t* object = reinterpret_cast<uint64_t*>(registers[operands.self]);
+			uint64_t* object = reinterpret_cast<uint64_t*>(registers[operands.self].u64);
 			VM_CHECK_POINTER(object, operands);
-			object[1 + operands.var] = registers[operands.lvid];
+			object[1 + operands.var] = registers[operands.lvid].u64;
 		}
 
 
@@ -462,9 +507,9 @@ namespace VM
 			assert(operands.self < registerCount);
 			assert(operands.lvid < registerCount);
 
-			uint64_t* object = reinterpret_cast<uint64_t*>(registers[operands.self]);
+			uint64_t* object = reinterpret_cast<uint64_t*>(registers[operands.self].u64);
 			VM_CHECK_POINTER(object, operands);
-			registers[operands.lvid] = object[1 + operands.var];
+			registers[operands.lvid].u64 = object[1 + operands.var];
 		}
 
 
@@ -482,18 +527,18 @@ namespace VM
 
 		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::jnz>& operands)
 		{
-			if (registers[operands.lvid] != 0)
+			if (registers[operands.lvid].u64 != 0)
 			{
-				registers[operands.result] = 1;
+				registers[operands.result].u64 = 1;
 				gotoLabel(operands.label);
 			}
 		}
 
 		inline void Engine::visit(const IR::ISA::Operand<IR::ISA::Op::jz>& operands)
 		{
-			if (registers[operands.lvid] == 0)
+			if (registers[operands.lvid].u64 == 0)
 			{
-				registers[operands.result] = 0;
+				registers[operands.result].u64 = 0;
 				gotoLabel(operands.label);
 			}
 		}
@@ -519,18 +564,18 @@ namespace VM
 				assert(callee.at<IR::ISA::Op::stacksize>(0).opcode == (uint32_t) IR::ISA::Op::stacksize);
 				#endif
 
-				uint64_t stackvalues[framesize];
+				DataRegister stackvalues[framesize];
 				#ifndef NDEBUG
 				memset(stackvalues, 0xDE, sizeof(stackvalues));
 				#endif
 
-				stackvalues[0] = 0;
+				stackvalues[0].u64 = 0;
 				registers = stackvalues;
 				program = std::cref(callee);
 
 				// retrieve parameters for the func
 				for (uint32_t i = 0; i != funcparamCount; ++i)
-					stackvalues[i + 2] = funcparams[i]; // 2-based
+					stackvalues[i + 2].u64 = funcparams[i]; // 2-based
 				funcparamCount = 0;
 
 				callee.each(*this, 1); // offset: 1, avoid blueprint pragma

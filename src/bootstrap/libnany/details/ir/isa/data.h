@@ -66,6 +66,43 @@ namespace ISA
 		uint32_t rhs;
 	};
 
+	template<> struct Operand<Op::fadd> final
+	{
+		constexpr static const char* opname() { return "fadd"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		uint32_t lhs;
+		uint32_t rhs;
+	};
+
+	template<> struct Operand<Op::fsub> final
+	{
+		constexpr static const char* opname() { return "fsub"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		uint32_t lhs;
+		uint32_t rhs;
+	};
+
+	template<> struct Operand<Op::fmul> final
+	{
+		constexpr static const char* opname() { return "fmul"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		uint32_t lhs;
+		uint32_t rhs;
+	};
+
+	template<> struct Operand<Op::fdiv> final
+	{
+		constexpr static const char* opname() { return "fdiv"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		uint32_t lhs;
+		uint32_t rhs;
+	};
+
+
 	template<> struct Operand<Op::add> final
 	{
 		constexpr static const char* opname() { return "add"; }

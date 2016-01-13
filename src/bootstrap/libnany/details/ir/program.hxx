@@ -113,6 +113,38 @@ namespace IR
 	}
 
 
+	inline void Program::emitFADD(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	{
+		auto& operands = emit<ISA::Op::fadd>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+	inline void Program::emitFSUB(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	{
+		auto& operands = emit<ISA::Op::fsub>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+	inline void Program::emitFDIV(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	{
+		auto& operands = emit<ISA::Op::fdiv>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+	inline void Program::emitFMUL(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	{
+		auto& operands = emit<ISA::Op::fmul>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
 	inline void Program::emitADD(uint32_t lvid, uint32_t lhs, uint32_t rhs)
 	{
 		auto& operands = emit<ISA::Op::add>();

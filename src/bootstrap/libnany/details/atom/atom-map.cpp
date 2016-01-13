@@ -89,6 +89,9 @@ namespace Nany
 			success &= findCoreObject(core.object[nyt_u32], nyt_u32, "u32", report, root);
 			success &= findCoreObject(core.object[nyt_u64], nyt_u64, "u64", report, root);
 
+			success &= findCoreObject(core.object[nyt_f32], nyt_f32, "f32", report, root);
+			success &= findCoreObject(core.object[nyt_f64], nyt_f64, "f64", report, root);
+
 			if (unlikely(not success))
 				core.object[nyt_bool] = nullptr;
 		}

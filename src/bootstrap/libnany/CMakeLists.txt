@@ -58,6 +58,8 @@ set(ny_core_files
 	"${nsl_root}/std.core/u16.ny"
 	"${nsl_root}/std.core/u32.ny"
 	"${nsl_root}/std.core/u64.ny"
+	"${nsl_root}/std.core/f32.ny"
+	"${nsl_root}/std.core/f64.ny"
 
 	# std.math
 	"${nsl_root}/std.math/math.ny"

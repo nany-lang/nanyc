@@ -189,7 +189,8 @@ namespace Instanciate
 	}
 
 
-	template<bool BoolAccepted, void (IR::Program::* M)(uint32_t, uint32_t, uint32_t)>
+	template<bool AcceptBool, bool AcceptInt, bool AcceptFloat,
+		void (IR::Program::* M)(uint32_t, uint32_t, uint32_t)>
 	inline bool ProgramBuilder::instanciateIntrinsicOperator(uint32_t lvid, const char* const name)
 	{
 		assert(lastPushedIndexedParameters.size() == 2);
@@ -236,17 +237,40 @@ namespace Instanciate
 			return complainIntrinsicParameter(name, 1, cdefrhs);
 		}
 
-		if (unlikely(builtinlhs == nyt_void or builtinlhs == nyt_any or builtinlhs == nyt_pointer))
-			return complainIntrinsicParameter(name, 0, cdeflhs);
-		if (unlikely(builtinrhs == nyt_void or builtinrhs == nyt_any or builtinrhs == nyt_pointer))
-			return complainIntrinsicParameter(name, 1, cdefrhs);
-
-		if (not BoolAccepted)
+		switch (builtinlhs)
 		{
-			if (unlikely(builtinlhs == nyt_bool))
+			case nyt_bool:
 			{
-				complainIntrinsicParameter(name, 0, cdeflhs);
-				return complainIntrinsicParameter(name, 1, cdefrhs);
+				if (not AcceptBool)
+					return (error() << "intrinsic '" << name << "' do not accept booleans");
+				break;
+			}
+			case nyt_i8:
+			case nyt_i16:
+			case nyt_i32:
+			case nyt_i64:
+			case nyt_u8:
+			case nyt_u16:
+			case nyt_u32:
+			case nyt_u64:
+			{
+				if (not AcceptInt)
+					return (error() << "intrinsic '" << name << "' do not accept integer literals");
+				break;
+			}
+			case nyt_f32:
+			case nyt_f64:
+			{
+				if (not AcceptFloat)
+					return (error() << "intrinsic '" << name << "' do not accept floating-point numbers");
+				break;
+			}
+			case nyt_void:
+			case nyt_any:
+			case nyt_pointer:
+			case nyt_count:
+			{
+				return complainIntrinsicParameter(name, 0, cdeflhs);
 			}
 		}
 
@@ -282,54 +306,73 @@ namespace Instanciate
 
 	bool  ProgramBuilder::instanciateIntrinsicAND(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<true, &IR::Program::emitAND>(lvid, "and");
+		return instanciateIntrinsicOperator<true, true, false, &IR::Program::emitAND>(lvid, "and");
 	}
 
 	bool  ProgramBuilder::instanciateIntrinsicOR(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<true, &IR::Program::emitOR>(lvid, "or");
+		return instanciateIntrinsicOperator<true, true, false, &IR::Program::emitOR>(lvid, "or");
 	}
 
 	bool  ProgramBuilder::instanciateIntrinsicXOR(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<true, &IR::Program::emitXOR>(lvid, "xor");
+		return instanciateIntrinsicOperator<true, true, false, &IR::Program::emitXOR>(lvid, "xor");
 	}
 
 	bool  ProgramBuilder::instanciateIntrinsicMOD(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<true, &IR::Program::emitMOD>(lvid, "mod");
+		return instanciateIntrinsicOperator<true, true, false, &IR::Program::emitMOD>(lvid, "mod");
 	}
 
 	bool  ProgramBuilder::instanciateIntrinsicADD(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<false, &IR::Program::emitADD>(lvid, "add");
+		return instanciateIntrinsicOperator<false, true, false, &IR::Program::emitADD>(lvid, "add");
 	}
 
 	bool  ProgramBuilder::instanciateIntrinsicSUB(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<false, &IR::Program::emitSUB>(lvid, "sub");
+		return instanciateIntrinsicOperator<false, true, false, &IR::Program::emitSUB>(lvid, "sub");
 	}
 
 	bool  ProgramBuilder::instanciateIntrinsicDIV(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<false, &IR::Program::emitDIV>(lvid, "div");
+		return instanciateIntrinsicOperator<false, true, false, &IR::Program::emitDIV>(lvid, "div");
 	}
 
 	bool  ProgramBuilder::instanciateIntrinsicMUL(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<false, &IR::Program::emitMUL>(lvid, "mul");
+		return instanciateIntrinsicOperator<false, true, false, &IR::Program::emitMUL>(lvid, "mul");
 	}
 
 	bool  ProgramBuilder::instanciateIntrinsicIDIV(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<false, &IR::Program::emitIDIV>(lvid, "idiv");
+		return instanciateIntrinsicOperator<false, true, false, &IR::Program::emitIDIV>(lvid, "idiv");
 	}
 
 	bool  ProgramBuilder::instanciateIntrinsicIMUL(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<false, &IR::Program::emitIMUL>(lvid, "imul");
+		return instanciateIntrinsicOperator<false, true, false, &IR::Program::emitIMUL>(lvid, "imul");
 	}
 
+	bool  ProgramBuilder::instanciateIntrinsicFADD(uint32_t lvid)
+	{
+		return instanciateIntrinsicOperator<false, false, true, &IR::Program::emitFADD>(lvid, "fadd");
+	}
+
+	bool  ProgramBuilder::instanciateIntrinsicFSUB(uint32_t lvid)
+	{
+		return instanciateIntrinsicOperator<false, false, true, &IR::Program::emitFSUB>(lvid, "fsub");
+	}
+
+	bool  ProgramBuilder::instanciateIntrinsicFDIV(uint32_t lvid)
+	{
+		return instanciateIntrinsicOperator<false, false, true, &IR::Program::emitFDIV>(lvid, "fdiv");
+	}
+
+	bool  ProgramBuilder::instanciateIntrinsicFMUL(uint32_t lvid)
+	{
+		return instanciateIntrinsicOperator<false, false, true, &IR::Program::emitFMUL>(lvid, "fmul");
+	}
 
 
 
@@ -362,6 +405,10 @@ namespace Instanciate
 		{"mul",             { &ProgramBuilder::instanciateIntrinsicMUL,       2 }},
 		{"idiv",            { &ProgramBuilder::instanciateIntrinsicIDIV,      2 }},
 		{"imul",            { &ProgramBuilder::instanciateIntrinsicIMUL,      2 }},
+		{"fadd",            { &ProgramBuilder::instanciateIntrinsicFADD,      2 }},
+		{"fsub",            { &ProgramBuilder::instanciateIntrinsicFSUB,      2 }},
+		{"fdiv",            { &ProgramBuilder::instanciateIntrinsicFDIV,      2 }},
+		{"fmul",            { &ProgramBuilder::instanciateIntrinsicFMUL,      2 }},
 	};
 
 	bool ProgramBuilder::instanciateBuiltinIntrinsic(const AnyString& name, uint32_t lvid)
