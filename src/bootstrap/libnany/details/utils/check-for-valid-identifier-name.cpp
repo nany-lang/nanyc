@@ -80,8 +80,7 @@ namespace Nany
 		// (it would considerably slow down the parsing to improve it)
 		name.trimRight();
 
-		if (YUNI_UNLIKELY(name.empty())) // bug within the AST parser for + -
-			return "^+";
+		assert(not name.empty());
 
 		// TODO normalize operator name: find a mecanism to not rely on a map
 		auto tit = opnormalize.find(name);
