@@ -165,6 +165,7 @@ namespace Instanciate
 			{
 				// the variable is used, whatever it is (error or not)
 				frame.lvids[lvidVar].hasBeenUsed = true;
+				frame.lvids[operands.lvid].alias = lvidVar;
 
 				if (not frame.verify(lvidVar)) // suppress spurious errors from previous ones
 					return false;

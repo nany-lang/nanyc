@@ -44,6 +44,9 @@ namespace Instanciate
 			//! unref at the end of the scope
 			bool autorelease = false;
 
+			//! lvid alias
+			uint32_t alias = 0;
+
 			//! Resolve name
 			AnyString resolvedName;
 			//! User-defined name for the local variable

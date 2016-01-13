@@ -257,6 +257,10 @@ namespace Instanciate
 		{
 			assert(lhs < frame.lvids.size());
 			lhs  = frame.lvids[lhs].referer;
+
+			uint32_t alias = frame.lvids[lhs].alias;
+			if (alias != 0)
+				lhs = alias;
 		}
 
 		// -- RHS
