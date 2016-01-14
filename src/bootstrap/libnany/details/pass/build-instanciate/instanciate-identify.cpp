@@ -279,27 +279,25 @@ namespace Instanciate
 					if (atomvar)
 						spare.mutateToAtom(atomvar);
 
+					uint32_t self = operands.self;
+					if (self == 0) // implicit 'self'
+					{
+						// retrieving the local self
+						if (unlikely(not frame.atom.isClassMember()))
+							return (ICE() << "invalid 'self' object");
+						self = 2; // 1: return type, 2: self parameter
+					}
+
 					auto& origin  = frame.lvids[operands.lvid].origin.varMember;
-					origin.self   = operands.self;
+					assert(self != 0);
+					assert(atom.atomid != 0);
+					origin.self   = self;
 					origin.atomid = atom.atomid;
 					origin.field  = atom.varinfo.effectiveFieldIndex;
 
 					if (canGenerateCode())
 					{
 						// read the address
-						uint32_t self = operands.self;
-						if (self == 0)
-						{
-							// retrieving the local self
-							if (likely(frame.atom.isClassMember()))
-								self = 2; // 1: return type, 2: self parameter
-							else
-							{
-								ICE() << "invalid 'self' object";
-								return false;
-							}
-						}
-
 						out.emitFieldget(operands.lvid, self, atom.varinfo.effectiveFieldIndex);
 						tryToAcquireObject(operands.lvid, cdefvar);
 					}
