@@ -242,7 +242,7 @@ namespace Instanciate
 			case nyt_bool:
 			{
 				if (not AcceptBool)
-					return (error() << "intrinsic '" << name << "' do not accept booleans");
+					return complainBuiltinIntrinsicDoesNotAccept(name, "booleans");
 				break;
 			}
 			case nyt_i8:
@@ -255,14 +255,14 @@ namespace Instanciate
 			case nyt_u64:
 			{
 				if (not AcceptInt)
-					return (error() << "intrinsic '" << name << "' do not accept integer literals");
+					return complainBuiltinIntrinsicDoesNotAccept(name, "integer literals");
 				break;
 			}
 			case nyt_f32:
 			case nyt_f64:
 			{
 				if (not AcceptFloat)
-					return (error() << "intrinsic '" << name << "' do not accept floating-point numbers");
+					return complainBuiltinIntrinsicDoesNotAccept(name, "floating-point numbers");
 				break;
 			}
 			case nyt_void:
@@ -530,30 +530,34 @@ namespace Instanciate
 	bool ProgramBuilder::instanciateBuiltinIntrinsic(const AnyString& name, uint32_t lvid)
 	{
 		assert(not name.empty());
-		if (unlikely(not lastPushedNamedParameters.empty()))
-			return (error() << "intrinsics do not accept named parameters");
 
-		auto it = builtinDispatch.find(name);
-		if (unlikely(it == builtinDispatch.end()))
-			return (error() << "unknown intrinsic '" << name << '\'');
-
-		// check for parameters
+		bool success = ([&]()
 		{
-			auto& frame = atomStack.back();
-			uint32_t count = it->second.second;
-			if (unlikely(not checkForIntrinsicParamCount(name, count)))
-				return false;
+			if (unlikely(not lastPushedNamedParameters.empty()))
+				return complainIntrinsicWithNamedParameters(name);
 
-			// checking if one parameter was already flag as 'error'
-			for (uint32_t i = 0u; i != count; ++i)
+			auto it = builtinDispatch.find(name);
+			if (unlikely(it == builtinDispatch.end()))
+				return complainUnknownIntrinsic(name);
+
+			// check for parameters
 			{
-				if (unlikely(not frame.verify(lastPushedIndexedParameters[i].lvid)))
+				auto& frame = atomStack.back();
+				uint32_t count = it->second.second;
+				if (unlikely(not checkForIntrinsicParamCount(name, count)))
 					return false;
-			}
-		}
 
-		// specific code for the intrinsic
-		bool success = (this->*(it->second.first))(lvid);
+				// checking if one parameter was already flag as 'error'
+				for (uint32_t i = 0u; i != count; ++i)
+				{
+					if (unlikely(not frame.verify(lastPushedIndexedParameters[i].lvid)))
+						return false;
+				}
+			}
+
+			// specific code for the intrinsic
+			return (this->*(it->second.first))(lvid);
+		})();
 
 		// annotate any error
 		if (unlikely(not success))

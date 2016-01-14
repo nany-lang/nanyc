@@ -12,6 +12,7 @@ namespace Pass
 namespace Instanciate
 {
 
+
 	Logs::Report ProgramBuilder::error() const
 	{
 		success = false;
@@ -161,6 +162,36 @@ namespace Instanciate
 	}
 
 
+	bool ProgramBuilder::complainMultipleDefinitions(const Atom& atom, const AnyString& funcOrOpName)
+	{
+		auto err = (error() << atom.keyword() << ' ');
+		atom.printFullname(err.data().message, false);
+		err << ": multiple definition for " << funcOrOpName;
+		return false;
+	}
+
+
+	bool ProgramBuilder::complainBuiltinIntrinsicDoesNotAccept(const AnyString& name, const AnyString& what)
+	{
+		error() << "builtin intrinsic '" << name << "' does not accept " << what;
+		return false;
+	}
+
+
+	bool ProgramBuilder::complainUnknownIntrinsic(const AnyString& name)
+	{
+		error() << "unknown intrinsic '" << name << '\'';
+		return false;
+	}
+
+
+	bool ProgramBuilder::complainIntrinsicWithNamedParameters(const AnyString& name)
+	{
+		error() << "intrinsic '" << name << "': named parameters are not accepted";
+		return false;
+	}
+
+
 	bool ProgramBuilder::checkForIntrinsicParamCount(const AnyString& name, uint32_t count)
 	{
 		if (unlikely(lastPushedIndexedParameters.size() > count))
@@ -242,8 +273,7 @@ namespace Instanciate
 			e << "operator " << AnyString{name, 1, name.size() - 1};
 		else
 			e << name;
-		e << "' on a non-class type '"
-			<< nany_type_to_cstring(kind) << '\'';
+		e << "' on a non-class type '" << nany_type_to_cstring(kind) << '\'';
 		return false;
 	}
 

@@ -245,6 +245,7 @@ namespace Instanciate
 
 		bool checkForIntrinsicParamCount(const AnyString& name, uint32_t count);
 
+
 		bool complainUnknownIdentifier(const Atom* self, const Atom& atom, const AnyString& name);
 
 		bool complainInvalidType(const Classdef& from, const Classdef& to);
@@ -254,8 +255,29 @@ namespace Instanciate
 
 		bool complainRedeclared(const AnyString& name, uint32_t previousDeclaration);
 
+		/*!
+		** \brief Complain about an unknown intrinsic
+		** \param name Intrinsic name
+		*/
+		bool complainUnknownIntrinsic(const AnyString& name);
+
+		/*!
+		** \brief Restriction on builtin intrinsics
+		*/
+		bool complainBuiltinIntrinsicDoesNotAccept(const AnyString& name, const AnyString& what);
+
+		/*!
+		** \brief Complain about named parameters used with an intrinsic
+		*/
+		bool complainIntrinsicWithNamedParameters(const AnyString& name);
+
 		bool complainIntrinsicParameter(const AnyString& name, uint32_t pindex, const Classdef& got,
 			const AnyString& expected = "");
+
+		/*!
+		**
+		*/
+		bool complainMultipleDefinitions(const Atom&, const AnyString& funcOrOpName);
 
 		//! Emit a new error message with additional information on the given operand
 		bool complainOperand(const IR::Instruction& operands, AnyString msg = nullptr);

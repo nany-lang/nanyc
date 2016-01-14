@@ -90,7 +90,7 @@ namespace Instanciate
 					return false;
 				break;
 			}
-			default: return (error() << "multiple definition for operator 'clone'");
+			default: return complainMultipleDefinitions(atom, "operator 'clone'");
 		}
 
 
@@ -111,10 +111,9 @@ namespace Instanciate
 			}
 			case 0:
 			{
-				complainMissingOperator(atom, "clone");
-				break;
+				return complainMissingOperator(atom, "clone");
 			}
-			default: return (error() << "multiple definition for operator 'clone'");
+			default: return complainMultipleDefinitions(atom, "operator 'obj-clone'");
 		}
 		return false;
 	}
@@ -138,7 +137,7 @@ namespace Instanciate
 					return false;
 				break;
 			}
-			default: return (error() << "multiple definition for operator 'dispose'");
+			default: return complainMultipleDefinitions(atom, "operator 'dispose'");
 		}
 
 
@@ -159,10 +158,9 @@ namespace Instanciate
 			}
 			case 0:
 			{
-				complainMissingOperator(atom, "obj-dispose");
-				break;
+				return complainMissingOperator(atom, "obj-dispose");
 			}
-			default: return (error() << "multiple definition for operator 'dispose'");
+			default: return complainMultipleDefinitions(atom, "operator 'obj-dispose'");
 		}
 		return false;
 	}
