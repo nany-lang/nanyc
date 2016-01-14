@@ -49,7 +49,7 @@ namespace Nany
 		std::array<nytype_t, Config::maxPushedParameters> params;
 
 		//! Flags
-		uint32_t flags = static_cast<uint32_t>(nyintr_flag_default);
+		uint32_t flags = (uint32_t) nybind_default;
 
 	}; // class Intrinsic
 

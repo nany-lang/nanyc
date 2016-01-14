@@ -84,30 +84,38 @@ namespace Nany
 			intrinsics.registerStdCore();
 
 		// preparing the queue service if not already present
-		if (!pQueueservice)
-			pQueueservice = new Job::QueueService();
+		auto* qs = usercontext.mt.queueservice;
+		auto* queueservice = reinterpret_cast<Job::QueueService*>(qs);
+		bool qsWasStarted = false;
+		if (queueservice)
+		{
+			queueservice->addRef();
+			qsWasStarted = queueservice->started();
+			if (not qsWasStarted)
+				queueservice->start();
+		}
 
-		auto& queueservice = *pQueueservice;
-		queueservice.maximumThreadCount(1);
 
 		// run all tasks
+		if (qs)
 		{
-			buildinfo.buildtime = DateTime::NowMilliSeconds();
-
-			Job::Taskgroup task{queueservice, false};
+			Job::Taskgroup task{*queueservice, false};
 			for (auto& ptr: buildinfo.sources)
 				ptr->build(buildinfo, task, report);
 
-			bool queuestarted = queueservice.started();
-			if (not queuestarted)
-				queueservice.start();
+
+			buildinfo.buildtime = DateTime::NowMilliSeconds();
 
 			// launch all jobs and wait for them
 			task.start();
 			task.wait();
+		}
+		else
+		{
+			buildinfo.buildtime = DateTime::NowMilliSeconds();
 
-			if (not queuestarted) // stop the queueservice if it was not already started
-				queueservice.stop();
+			for (auto& ptr: buildinfo.sources)
+				ptr->build(buildinfo, report);
 		}
 
 		auto& cdeftable = buildinfo.isolate.classdefTable;
@@ -144,6 +152,13 @@ namespace Nany
 			cdeftable.atoms.root.print(report, ClassdefTableView{cdeftable});
 			report.info(); // for beauty
 			report.info(); // for beauty
+		}
+
+		if (qs)
+		{
+			if (not qsWasStarted) // stop the queueservice if it was not already started
+				queueservice->stop();
+			nany_queueservice_unref(&qs);
 		}
 
 

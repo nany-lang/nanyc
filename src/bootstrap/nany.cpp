@@ -85,8 +85,12 @@ static inline int execute(int argc, char** argv)
 	String scriptfile;
 	IO::Canonicalize(scriptfile, argv[0]);
 
+	// nany context
 	nycontext_t ctx;
 	nany_initialize(&ctx, nullptr);
+
+	// for concurrent build
+	//ctx.mt.queueservice = nany_queueservice_create();
 
 	nany_source_add_from_file_n(&ctx, scriptfile.c_str(), scriptfile.size());
 

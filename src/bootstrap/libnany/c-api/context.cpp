@@ -22,6 +22,7 @@ extern "C" nycontext_t* nany_create(const nycontext_t* inherit)
 		nybool_t success = nany_initialize(ctx, inherit);
 		if (YUNI_UNLIKELY(success == nyfalse))
 		{
+			memset(ctx, 0x0, sizeof(nycontext_t));
 			free(ctx);
 			ctx = nullptr;
 		}
@@ -38,6 +39,10 @@ extern "C" nybool_t nany_initialize(nycontext_t* ctx, const nycontext_t* inherit
 	{
 		if (inherit)
 		{
+			auto* inheritInternal = reinterpret_cast<Nany::Context*>(inherit->internal);
+			if (YUNI_UNLIKELY(!inheritInternal))
+				return nyfalse;
+
 			memcpy(ctx, inherit, sizeof(nycontext_t));
 
 			if (ctx->io.chroot_path_size != 0)
@@ -52,11 +57,10 @@ extern "C" nybool_t nany_initialize(nycontext_t* ctx, const nycontext_t* inherit
 				ctx->io.chroot_path = nullptr; // just in case
 
 			// re-acquire the queueservice (if any)
-			if (ctx->queueservice)
-				reinterpret_cast<Job::QueueService*>(ctx->queueservice)->addRef();
+			if (ctx->mt.queueservice)
+				reinterpret_cast<Job::QueueService*>(ctx->mt.queueservice)->addRef();
 
-			auto& rhs = *(reinterpret_cast<Nany::Context*>(inherit->build.internal));
-			ctx->build.internal = new Nany::Context(*ctx, rhs);
+			ctx->internal = new Nany::Context(*ctx, *inheritInternal);
 		}
 		else
 		{
@@ -81,7 +85,7 @@ extern "C" nybool_t nany_initialize(nycontext_t* ctx, const nycontext_t* inherit
 			ctx->console.flush_stderr = nanysdbx_flush_stderr;
 
 			// build
-			ctx->build.internal = new Nany::Context(*ctx);
+			ctx->internal = new Nany::Context(*ctx);
 			ctx->build.on_err_file_access = nanysdbx_build_on_err_file_access;
 		}
 
@@ -106,17 +110,16 @@ extern "C" void nany_uninitialize(nycontext_t* context)
 
 		try
 		{
-			delete (reinterpret_cast<Nany::Context*>(context->build.internal));
+			delete (reinterpret_cast<Nany::Context*>(context->internal));
 		}
 		catch (...){}
 
-		if (context->queueservice)
-			nany_queueservice_unref(&(context->queueservice));
+		if (context->mt.queueservice)
+			nany_queueservice_unref(&(context->mt.queueservice));
 
-		#ifndef NDEBUG
 		// to avoid bad reuse (see MALLOC_OPTIONS on UNIXs)
-		memset(context, 0xEF, sizeof(nycontext_t));
-		#endif
+		if (debugmode)
+			memset(context, 0xEF, sizeof(nycontext_t));
 	}
 }
 
@@ -135,21 +138,21 @@ extern "C" void nany_dispose(nycontext_t** context)
 extern "C" void nany_lock(const nycontext_t* ctx)
 {
 	assert(ctx != nullptr);
-	(reinterpret_cast<Nany::Context*>(ctx->build.internal))->mutex.lock();
+	(reinterpret_cast<Nany::Context*>(ctx->internal))->mutex.lock();
 }
 
 
 extern "C" void nany_unlock(const nycontext_t* ctx)
 {
 	assert(ctx != nullptr);
-	(reinterpret_cast<Nany::Context*>(ctx->build.internal))->mutex.unlock();
+	(reinterpret_cast<Nany::Context*>(ctx->internal))->mutex.unlock();
 }
 
 
 extern "C" nybool_t nany_trylock(const nycontext_t* ctx)
 {
 	assert(ctx != nullptr);
-	bool success = (reinterpret_cast<Nany::Context*>(ctx->build.internal))->mutex.trylock();
+	bool success = (reinterpret_cast<Nany::Context*>(ctx->internal))->mutex.trylock();
 	return (success) ? nytrue : nyfalse;
 }
 
@@ -163,7 +166,7 @@ extern "C" nybool_t nany_build(nycontext_t* ctx, nyreport_t** report)
 		*report = nany_report_create();
 	nany_report_add_compiler_headerinfo(*report);
 
-	auto& context = *(reinterpret_cast<Nany::Context*>(ctx->build.internal));
+	auto& context = *(reinterpret_cast<Nany::Context*>(ctx->internal));
 	auto* message = reinterpret_cast<Nany::Logs::Message*>(*report);
 	bool  success = context.build(message);
 	return success ? nytrue : nyfalse;
@@ -176,11 +179,11 @@ extern "C" int nany_run_main(nycontext_t* ctx, int argc, const char** argv)
 		return INT_MIN;
 	if (YUNI_UNLIKELY(not (argc > 0) or argv == nullptr))
 		return INT_MIN;
-	if (YUNI_UNLIKELY(!ctx->build.internal))
+	if (YUNI_UNLIKELY(!ctx->internal))
 		return INT_MIN;
 
 	bool success = false;
-	auto& context = *(reinterpret_cast<Nany::Context*>(ctx->build.internal));
+	auto& context = *(reinterpret_cast<Nany::Context*>(ctx->internal));
 
 	int exitstatus = context.run(success);
 	return (success) ? static_cast<int>(exitstatus) : INT_MIN;

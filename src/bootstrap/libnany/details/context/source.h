@@ -57,7 +57,15 @@ namespace Nany
 
 		void clean();
 
+		/*!
+		** \brief Add a task for building this source
+		*/
 		void build(BuildInfoContext&, Yuni::Job::Taskgroup& task, Logs::Report& report);
+
+		/*!
+		** \brief Build this source
+		*/
+		bool build(BuildInfoContext&, Logs::Report& report);
 
 		Source& operator = (const Source&) = delete;
 

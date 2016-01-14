@@ -79,26 +79,28 @@ NY_EXPORT const char* nany_website_url();
 
 
 /*! nybool_t */
-enum nybool_t {nyfalse, nytrue};
-typedef enum nybool_t nybool_t;
+typedef enum nybool_t {nyfalse, nytrue} nybool_t;
 
 
+/*! Task status */
 enum nytask_status_t
 {
+	/*! The task has failed */
 	nys_failed = 0,
+	/*! The task has succeeded */
 	nys_succeeded,
+	/*! The task is still running */
 	nys_running,
+	/*! The task is waiting for being launched */
 	nys_idle,
+	/*! The task has been canceled */
 	nys_canceled,
 };
 typedef enum nytask_status_t  nytask_status_t;
 
 
 /*!
-** \brief Builtin type for intrinsics and for interface of shared libraries
-**
-** \note The bitmask style used is only meant for fast lookup (signed ? unsigned ?
-**   float-point-value ?), not for being used as a areal bitmask
+** \brief Nany builtin types
 */
 typedef enum /* nytype_t */
 {
@@ -159,7 +161,7 @@ typedef enum /* nytarget_type_t */
 /*!
 ** \brief Identifiers' visibility
 **
-** \note All values are ordered
+** \internal All values are strictly ordered
 */
 typedef enum /* nyvisibility_t */
 {
@@ -205,17 +207,33 @@ typedef struct nytask_t nytask_t;
 /*@}*/
 
 
+/*! File handle */
 typedef void* nyfd_t;
+
+/*! File attributes */
+typedef uint32_t nyio_flags_t;
+
+/*! Flags for file attributes */
 enum
 {
+	/*! Read access */
 	nyio_flag_read                  = (1 << 0),
+	/*! Write access */
 	nyio_flag_write                 = (1 << 1),
+	/*! Try to create the file if it does not exist */
 	nyio_flag_create_if_not_exist   = (1 << 4),
+	/*! Append content instead of rewrite */
 	nyio_flag_append                = (1 << 5),
+	/*! Reset the size of the file to 0 */
 	nyio_flag_truncate              = (1 << 6),
 };
 
 
+/*!
+** \brief Error levels
+**
+** \internal All values are strictly ordered
+*/
 typedef enum /* nyerr_level_t */
 {
 	/*! ICE (Internal Compiler Error) */
@@ -243,16 +261,15 @@ typedef enum /* nyerr_level_t */
 
 
 
-/*! Flags for intrinsic callbacks */
-typedef enum
-{
-	nyintr_flag_default          = (1 << 0),
-	/*! The parameters will be used from another thread */
-	nyintr_flag_params_in_thread = (1 << 1),
-	/*! The callback will never return */
-	nyintr_flag_never_return     = (1 << 2),
+/*! Intrnsic attributes */
+typedef uint32_t nybind_flag_t;
 
-} nyintrinsic_flag_t;
+/*! Flags for intrinsic attributes */
+enum
+{
+	/*! Default settings */
+	nybind_default = 0,
+};
 
 
 
@@ -266,13 +283,16 @@ typedef enum
 
 typedef struct nycontext_t nycontext_t;
 
+/*!
+** \brief Nany context
+*/
 typedef struct nycontext_t
 {
 	/* -- runtime hooks -- */
 	/*! User data */
 	void* userdata;
 
-	struct
+	struct nycontext_memory_t
 	{
 		/*! Allocates some memory */
 		void* (*allocate)(nycontext_t*, size_t);
@@ -288,7 +308,7 @@ typedef struct nycontext_t
 	}
 	memory;
 
-	struct
+	struct nycontext_io_t
 	{
 		/*! Open a new handle to a given filename */
 		nyfd_t (*open)(nycontext_t*, const char* filename, size_t length, uint32_t flags);
@@ -305,7 +325,7 @@ typedef struct nycontext_t
 	}
 	io;
 
-	struct
+	struct nycontext_console_t
 	{
 		/*! Write some data to STDOUT */
 		void (*write_stdout)(nycontext_t*, const char* text, size_t length);
@@ -318,40 +338,56 @@ typedef struct nycontext_t
 	}
 	console;
 
-	/*! queueservice */
-	nyqueueservice_t* queueservice;
 
+	struct nycontext_mt_t
+	{
+		/*! queueservice for concurrent jobs */
+		nyqueueservice_t* queueservice;
+	}
+	mt;
 
-	/* -- build hooks -- */
-	struct
+	struct nycontext_build_t
 	{
 		/*! event: a context is about to be created (from another one) */
 		nybool_t (*on_context_create_query)(const nycontext_t* ctxtemplate);
 		/*! event: a context has been created (from another one) */
-		void (*on_context_create)(nycontext_t* ctx, const nycontext_t* ctxtemplate);
+		void (*on_context_create)(nycontext_t*, const nycontext_t* ctxtemplate);
 		/*! event: a context is about to be destroyed */
-		void (*on_context_destroy)(nycontext_t* ctx);
+		void (*on_context_destroy)(nycontext_t*);
 
 		/*! event: a build is about to begin */
-		nybool_t (*on_build_query)(nycontext_t* ctx);
+		nybool_t (*on_build_query)(nycontext_t*);
 		/*! event: a build has begun */
-		void (*on_build_begin)(nycontext_t* ctx);
+		void (*on_build_begin)(nycontext_t*);
 		/*! event: a build has ended (report will be null if empty) */
-		void (*on_build_end)(nycontext_t* ctx, nybool_t success, const nyreport_t* report, int64_t duration_ms);
+		void (*on_build_end)(nycontext_t*, nybool_t success, const nyreport_t* report, int64_t duration_ms);
 
 		/*! event: failed to load source file */
 		void (*on_err_file_access)(nycontext_t*, const char* filename, size_t length);
-
-		/*! queueservice */
-		nyqueueservice_t* queueservice;
-		/*! Opaque internal data */
-		void* internal;
 	}
 	build;
+
+	/*! Opaque internal data */
+	void* internal;
 }
 nycontext_t;
 
 
+
+typedef struct nytctx_t nytctx_t;
+
+/*!
+** \brief Nany Thread Context
+*/
+struct
+{
+	/*! Parent context */
+	nycontext_t* context;
+
+	/*! Opaque internal data */
+	void* internal;
+}
+nytctx_t;
 
 
 
@@ -420,7 +456,7 @@ NY_EXPORT int nany_run_main(nycontext_t* ctx, int argc, const char** argv);
 /*! Lock a valid context */
 NY_EXPORT void nany_lock(const nycontext_t*);
 /*! Unlock a valid context */
-NY_EXPORT void nany_lock(const nycontext_t*);
+NY_EXPORT void nany_unlock(const nycontext_t*);
 /*! Try to lock a valid context */
 NY_EXPORT nybool_t nany_trylock(const nycontext_t*);
 /*@}*/
@@ -474,34 +510,74 @@ NY_EXPORT nybool_t nany_report_add_compiler_headerinfo(nyreport_t* report);
 
 
 
-/*! \name Intrinsics */
+/*! \name Intrinsic bindings */
 /*@{*/
 /*!
-** \briefe Register a new intrinsic function
+** \brief Bind a C function
+**
+** \code
+** static double square(nytctx_t*, uint32_t value)
+** {
+**	return value * value;
+** }
+**
+** int main()
+** {
+**	nycontext_t ctx;
+**	nany_initialize(&ctx);
+**	// ...
+**	nany_bind(&ctx, "square", nybind_default, square, nyt_f64, nyt_u32);
+**	// ...
+**	nany_uninitialize(&ctx);
+**	return 0;
+** }
+** \endcode
+**
+** \note 'extern "C"' is required only for C++ code
 **
 ** \param name Name of the intrinsic (ex: 'myprogram.hello.world')
-** \param flags List of flags (see nyintrinsic_flag_t). nyintr_flag_default or 0 if unsure
+** \param flags List of flags (see nybind_flag_t). nybind_default or 0 if unsure
 ** \param callback C callback at runtime
 ** \param ret The return type
 ** \param ret... List of parameter types, followed by 'nyt_void'
 ** \return nytrue if the operation succeeded
 */
 NY_EXPORT nybool_t
-nany_add_intrinsic(nycontext_t*, const char* name, uint32_t flags, void* callback, nytype_t ret, ...);
+nany_bind(nycontext_t*, const char* name, nybind_flag_t flags, void* callback, nytype_t ret, ...);
 
 /*!
-** \briefe Register a new intrinsic function
+** \brief Bind a C function
+**
+** \code
+** static double square(nytctx_t*, uint32_t value)
+** {
+**	return value * value;
+** }
+**
+** int main()
+** {
+**	nycontext_t ctx;
+**	nany_initialize(&ctx);
+**	// ...
+**	nany_bind(&ctx, "square", nybind_default, square, nyt_f64, nyt_u32);
+**	// ...
+**	nany_uninitialize(&ctx);
+**	return 0;
+** }
+** \endcode
+**
+** \note 'extern "C"' is required only for C++ code
 **
 ** \param name Name of the intrinsic (ex: 'myprogram.hello.world')
 ** \param length Length of the intrinsic name
-** \param flags List of flags (see nyintrinsic_flag_t). nyintr_flag_default or 0 if unsure
+** \param flags List of flags (see nybind_flag_t). nybind_default or 0 if unsure
 ** \param callback C callback at runtime
 ** \param ret The return type
 ** \param ret... List of parameter types, followed by 'nyt_void'
 ** \return nytrue if the operation succeeded
 */
 NY_EXPORT nybool_t
-nany_add_intrinsic_n(nycontext_t*, const char* name, size_t length, uint32_t flags, void* callback, nytype_t ret, ...);
+nany_bind_n(nycontext_t*, const char* name, size_t length, nybind_flag_t flags, void* callback, nytype_t ret, ...);
 /*@}*/
 
 
