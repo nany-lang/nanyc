@@ -18,6 +18,9 @@ if ("${CMAKE_BUILD_TYPE}" STREQUAL "" OR (NOT "${CMAKE_BUILD_TYPE}" STREQUAL "re
 endif()
 nmessage("configuration: ${CMAKE_BUILD_TYPE}")
 
+#set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
+set(CMAKE_DISABLE_SOURCE_CHANGES  ON)
+
 include("cmake/utils.cmake")
 include("cmake/settings.cmake")
 
@@ -25,13 +28,21 @@ include("cmake/settings.cmake")
 
 
 
-include("cmake/cpack.cmake")
+#include("cmake/cpack.cmake")
 
-configure_file("cmake/yuni-profilebuild-template.cmake" "ext/yuni/src/ProfileBuild.cmake")
 
+#
+# -- Facilities for YCM - (vim/YouCompleteMe)
+#
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 set(nany_compilation_database_folder "${CMAKE_CURRENT_BINARY_DIR}")
 configure_file("cmake/you-complete-me.vim.template.cmake" ".ycm_extra_conf.py")
+
+
+#
+# -- Yuni - (aka libyuni)
+#
+configure_file("cmake/yuni-profilebuild-template.cmake" "ext/yuni/src/ProfileBuild.cmake")
 
 if (NOT EXISTS "ext/yuni/src/CMakeLists.txt")
 	nerror("The extenal library 'yuni' is not present (submodule)")
@@ -42,6 +53,22 @@ include_directories("ext/yuni/src")
 
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_CURRENT_BINARY_DIR}")
 
+
+
+
+#
+# -- dyncall - (Generic Dynamic FFI package / http://www.dyncall.org/)
+#
+add_subdirectory("ext/dyncall")
+#include(ExternalProject)
+#externalproject_add(ext_dyncall
+#	SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/ext/dyncall/"
+#	PREFIX "${CMAKE_CURRENT_LIST_DIR}/ext/dyncall"
+#	INSTALL_COMMAND ""
+#	CMAKE_ARGS
+#	"-DCMAKE_BUILD_TYPE=Release")
+#add_library(dyncall UNKNOWN IMPORTED)
+#add_dependencies(dyncall ext_dyncall)
 
 
 
@@ -135,7 +162,7 @@ add_subdirectory("libnany")
 add_executable(nany "nany.cpp")
 target_link_libraries(nany PRIVATE libnany yuni-static-core)
 set_target_properties(nany PROPERTIES
-	VERSION   "${nany_version_major}.${nany_version_minor}.${nany_version_patch}")
+	VERSION "${nany_version_major}.${nany_version_minor}.${nany_version_patch}")
 
 
 add_executable(nyt-print-ast  print-ast.cpp)

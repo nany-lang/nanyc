@@ -7,3 +7,6 @@
 [submodule "src/nsl"]
 	path = src/nsl
 	url = https://github.com/nany-lang/nany-nsl
+[submodule "src/bootstrap/ext/dyncall"]
+	path = src/bootstrap/ext/dyncall
+	url = https://github.com/nany-lang/ext-dyncall

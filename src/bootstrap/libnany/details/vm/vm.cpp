@@ -4,6 +4,7 @@
 #include "stacktrace.h"
 #include "memchecker.h"
 #include <iostream>
+#include "dyncall/dyncall.h"
 
 using namespace Yuni;
 
@@ -85,6 +86,8 @@ namespace VM
 			std::reference_wrapper<const IR::Program> program;
 			//! User context
 			nycontext_t& context;
+
+			DCCallVM* dyncall = nullptr;
 
 			//! Reference to the current iterator
 			const IR::Instruction** cursor = nullptr;
@@ -168,11 +171,15 @@ namespace VM
 			: map(map)
 			, program(std::cref(program))
 			, context(context)
-		{}
+		{
+			dyncall = dcNewCallVM(4096);
+			dcMode(dyncall, DC_CALL_C_DEFAULT);
+		}
 
 
 		inline Engine::~Engine()
 		{
+			dcFree(dyncall);
 			memchecker.printLeaksIfAny(context);
 		}
 

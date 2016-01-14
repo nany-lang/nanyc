@@ -490,7 +490,8 @@ set_target_properties(libnany-grammar PROPERTIES
 	VERSION   "${nany_version_major}.${nany_version_minor}.${nany_version_patch}"
 	SOVERSION "${nany_version_major}")
 
-target_link_libraries(libnany PRIVATE yuni-static-core libnany-grammar)
+target_link_libraries(libnany PRIVATE
+	yuni-static-core libnany-grammar dyncall_s)
 
 set_property(TARGET libnany PROPERTY MACOSX_RPATH true)
 set_property(TARGET libnany PROPERTY LIBRARY_OUTPUT_NAME "nany")
@@ -507,6 +508,7 @@ target_compile_definitions(libnany PRIVATE "LIBNANY_DLL_EXPORT=1")
 
 
 target_include_directories(libnany PRIVATE "${libnany_config_folder}")
+target_include_directories(libnany PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../ext/dyncall/")
 target_include_directories(libnany PUBLIC  "${CMAKE_CURRENT_LIST_DIR}")
 target_include_directories(libnany-grammar PUBLIC "${CMAKE_CURRENT_LIST_DIR}")
 
