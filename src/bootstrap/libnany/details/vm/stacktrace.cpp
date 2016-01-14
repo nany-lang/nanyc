@@ -35,7 +35,7 @@ namespace VM
 			auto& frame = *pointer;
 			out << "  at #" << i << ": ";
 			out << map.fetchProgramCaption(frame.atomidInstance[0], frame.atomidInstance[1]);
-			out << " (";
+			out << " (from '";
 
 			auto* atom = map.findAtom(frame.atomidInstance[0]);
 			if (atom)
@@ -47,7 +47,7 @@ namespace VM
 			else
 				out << "<invalid-atom>";
 
-			out << ")\n";
+			out << "')\n";
 		}
 		return out;
 	}

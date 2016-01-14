@@ -15,8 +15,8 @@ using namespace Yuni;
 
 #define VM_CHECK_POINTER(P,LVID) do { if (YUNI_UNLIKELY(not memchecker.has((P)))) { \
 	/*assert(false and "invalid pointer");*/ \
-	throw (String{"invalid pointer "} << (P) << " not found, opc: " << (Nany::IR::ISA::print(program.get(), operands, &map)) \
-		<< '\n' << stacktrace.dump(map)); \
+	throw (String{"invalid pointer "} << (P) << " not found, opc: " \
+		<< (Nany::IR::ISA::print(program.get(), operands, &map))); \
 	} } while (0)
 
 
