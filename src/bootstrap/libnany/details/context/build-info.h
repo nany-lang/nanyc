@@ -6,6 +6,7 @@
 #include "details/intrinsic/intrinsic-table.h"
 #include "details/ir/program.h"
 #include "isolate.h"
+#include "nany/nany.h"
 
 
 
@@ -15,8 +16,8 @@ namespace Nany
 	class BuildInfoContext final : public Yuni::Policy::ObjectLevelLockable<BuildInfoContext>
 	{
 	public:
-		BuildInfoContext(const IntrinsicTable& intrinsics)
-			: isolate(intrinsics)
+		BuildInfoContext(nycontext_t& context)
+			: isolate(context)
 		{}
 
 	public:

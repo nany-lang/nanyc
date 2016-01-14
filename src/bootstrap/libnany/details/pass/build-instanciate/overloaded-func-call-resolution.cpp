@@ -100,7 +100,7 @@ namespace Nany
 					Logs::Message::Ptr newReport;
 
 					// trying to instanciate the solution
-					Pass::Instanciate::InstanciateData info{newReport, solutions[r].get(), cdeftable, intrinsics, parameters[r]};
+					Pass::Instanciate::InstanciateData info{newReport, solutions[r].get(), cdeftable, context, parameters[r]};
 					info.canGenerateCode = canGenerateCode;
 					info.canGenerateErrors = canGenerateErrors;
 

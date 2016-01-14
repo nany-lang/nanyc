@@ -5,6 +5,7 @@
 #include "details/atom/func-overload-match.h"
 #include "details/reporting/message.h"
 #include "details/utils/origin.h"
+#include "details/context/context.h"
 #include "libnany-traces.h"
 
 using namespace Yuni;
@@ -21,11 +22,23 @@ namespace Pass
 namespace Instanciate
 {
 
+	InstanciateData::InstanciateData(Logs::Message::Ptr& report, Atom& atom, ClassdefTableView& cdeftable,
+		nycontext_t& context, decltype(FuncOverloadMatch::result.params)& params)
+		: report(report)
+		, atom(atom)
+		, cdeftable(cdeftable)
+		, context(context)
+		, params(params)
+	{
+		returnType.mutateToAny();
+	}
 
-	ProgramBuilder::ProgramBuilder(Logs::Report report, ClassdefTableView& cdeftable, const IntrinsicTable& intrinsics,
+
+	ProgramBuilder::ProgramBuilder(Logs::Report report, ClassdefTableView& cdeftable, nycontext_t& context,
 		IR::Program& out, IR::Program& program)
 		: cdeftable(cdeftable)
-		, intrinsics(intrinsics)
+		, context(context)
+		, intrinsics(((Context*) context.internal)->intrinsics)
 		, out(out)
 		, currentProgram(program)
 		, overloadMatch(report, cdeftable)
@@ -258,7 +271,7 @@ namespace Nany
 
 		ClassdefTableView cdeftblView{classdefTable};
 
-		Pass::Instanciate::InstanciateData info{newReport, *entrypointAtom, cdeftblView, intrinsics, params};
+		Pass::Instanciate::InstanciateData info{newReport, *entrypointAtom, cdeftblView, context, params};
 		auto* program = Pass::Instanciate::InstanciateAtom(info);
 		report.appendEntry(newReport);
 		return (nullptr != program);

@@ -6,7 +6,7 @@
 #include "details/atom/atom.h"
 #include "details/atom/signature.h"
 #include "details/atom/classdef-table.h"
-#include "details/intrinsic/intrinsic-table.h"
+#include "nany/nany.h"
 #include <memory>
 #include <vector>
 
@@ -25,11 +25,12 @@ namespace Nany
 
 
 	public:
-		OverloadedFuncCallResolver(Logs::Report report, FuncOverloadMatch& overloadMatch, ClassdefTableView& cdeftable, const IntrinsicTable& intrinsics)
+		OverloadedFuncCallResolver(Logs::Report report, FuncOverloadMatch& overloadMatch, ClassdefTableView& cdeftable,
+			nycontext_t& context)
 			: overloadMatch(overloadMatch)
 			, report(report)
 			, cdeftable(cdeftable)
-			, intrinsics(intrinsics)
+			, context(context)
 		{}
 
 		bool resolve(const std::vector<std::reference_wrapper<Atom>>& solutions);
@@ -65,7 +66,8 @@ namespace Nany
 		std::vector<bool> solutionsThatCanBeInstanciated;
 		//!
 		ClassdefTableView& cdeftable;
-		const IntrinsicTable& intrinsics;
+		//! Parent context
+		nycontext_t& context;
 
 	}; // class OverloadedFuncCallResolver
 

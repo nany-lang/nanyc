@@ -52,7 +52,7 @@ namespace Nany
 	inline std::unique_ptr<BuildInfoContext> Context::doBuildWL(Logs::Report report, int64_t& duration)
 	{
 		pBuildInfo.reset(nullptr); // release some memory
-		auto buildinfoptr = std::make_unique<BuildInfoContext>(intrinsics);
+		auto buildinfoptr = std::make_unique<BuildInfoContext>(usercontext);
 		auto& buildinfo = *(buildinfoptr.get());
 		// the result will succeed by default, and will be reverted to false as soon as an error occurs
 		buildinfo.success = true;

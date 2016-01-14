@@ -362,6 +362,9 @@ typedef struct nycontext_t
 		/*! event: a build has ended (report will be null if empty) */
 		void (*on_build_end)(nycontext_t*, nybool_t success, const nyreport_t* report, int64_t duration_ms);
 
+		/*! event: load-on-demand intrinsic not already bound */
+		nybool_t (*on_intrinsic_discover)(nycontext_t*, const char* name, size_t);
+
 		/*! event: failed to load source file */
 		void (*on_err_file_access)(nycontext_t*, const char* filename, size_t length);
 	}
@@ -379,7 +382,7 @@ typedef struct nytctx_t nytctx_t;
 /*!
 ** \brief Nany Thread Context
 */
-struct
+typedef struct nytctx_t
 {
 	/*! Parent context */
 	nycontext_t* context;

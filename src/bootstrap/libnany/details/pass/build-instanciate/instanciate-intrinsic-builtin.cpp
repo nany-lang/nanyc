@@ -527,18 +527,19 @@ namespace Instanciate
 		{"igte",            { &ProgramBuilder::instanciateIntrinsicIGTE,      2 }},
 	};
 
-	bool ProgramBuilder::instanciateBuiltinIntrinsic(const AnyString& name, uint32_t lvid)
+	bool ProgramBuilder::instanciateBuiltinIntrinsic(const AnyString& name, uint32_t lvid, bool canComplain)
 	{
 		assert(not name.empty());
 
-		bool success = ([&]()
+		bool success = ([&]() -> bool
 		{
+			auto it = builtinDispatch.find(name);
+			if (unlikely(it == builtinDispatch.end()))
+				return (canComplain and complainUnknownIntrinsic(name));
+
 			if (unlikely(not lastPushedNamedParameters.empty()))
 				return complainIntrinsicWithNamedParameters(name);
 
-			auto it = builtinDispatch.find(name);
-			if (unlikely(it == builtinDispatch.end()))
-				return complainUnknownIntrinsic(name);
 
 			// check for parameters
 			{
@@ -560,7 +561,7 @@ namespace Instanciate
 		})();
 
 		// annotate any error
-		if (unlikely(not success))
+		if (unlikely(not success and canComplain))
 			atomStack.back().lvids[lvid].errorReported = true;
 		return success;
 	}

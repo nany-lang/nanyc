@@ -1,8 +1,8 @@
 #pragma once
 #include "context.h"
 #include "details/atom/classdef-table.h"
-#include "details/intrinsic/intrinsic-table.h"
 #include "details/ir/program.h"
+#include "nany/nany.h"
 
 
 
@@ -30,7 +30,7 @@ namespace Nany
 	public:
 		//! \name Constructor
 		//@{
-		Isolate(const IntrinsicTable& intrinsics) : intrinsics(intrinsics) {}
+		Isolate(nycontext_t& ctx) : context(ctx) {}
 		Isolate(const Isolate&) = delete;
 		~Isolate() = default;
 		//@}
@@ -75,8 +75,8 @@ namespace Nany
 	public:
 		//! The datatype matrix (must be protected by self)
 		ClassdefTable classdefTable;
-		//! Intrinsics (must be protected by itself)
-		const IntrinsicTable& intrinsics;
+		//! Context
+		nycontext_t& context;
 
 		Yuni::Mutex mutex;
 

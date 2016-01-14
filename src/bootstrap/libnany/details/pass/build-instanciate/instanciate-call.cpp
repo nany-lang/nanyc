@@ -119,7 +119,7 @@ namespace Instanciate
 				return complainOperand(reinterpret_cast<const IR::Instruction&>(operands), "no solution available");
 
 
-			OverloadedFuncCallResolver resolver{report, overloadMatch, cdeftable, intrinsics};
+			OverloadedFuncCallResolver resolver{report, overloadMatch, cdeftable, context};
 			if (unlikely(not resolver.resolve(solutions)))
 				return complainMultipleOverloads(operands.ptr2func, solutions, resolver);
 
@@ -171,7 +171,7 @@ namespace Instanciate
 
 		// instanciate the called func
 		Logs::Message::Ptr subreport;
-		InstanciateData info{subreport, *atom, cdeftable, intrinsics, params};
+		InstanciateData info{subreport, *atom, cdeftable, context, params};
 		bool instok = doInstanciateAtomFunc(subreport, info, lvid);
 		if (unlikely(not instok))
 			return false;

@@ -1,6 +1,7 @@
 #pragma once
 #include <yuni/yuni.h>
 #include <yuni/string.h>
+#include "nany/nany.h"
 #include "details/reporting/report.h"
 #include "details/atom/signature.h"
 #include "details/atom/classdef-table.h"
@@ -59,7 +60,7 @@ namespace Instanciate
 		//! \name Constructor & Destructor
 		//@{
 		//! Default constructor (importSignature must be called after)
-		ProgramBuilder(Logs::Report report, ClassdefTableView&, const IntrinsicTable& intrinsics,
+		ProgramBuilder(Logs::Report report, ClassdefTableView&, nycontext_t& context,
 			IR::Program& out, IR::Program& program);
 
 		//! Prepare the first local registers according the given signature
@@ -79,7 +80,7 @@ namespace Instanciate
 
 		void instanciateInstrinsicCall();
 		bool instanciateUserDefinedIntrinsic(const IR::ISA::Operand<IR::ISA::Op::intrinsic>& operands);
-		bool instanciateBuiltinIntrinsic(const AnyString& name, uint32_t lvid);
+		bool instanciateBuiltinIntrinsic(const AnyString& name, uint32_t lvid, bool canComplain = true);
 		bool instanciateIntrinsicFieldset(uint32_t lvid);
 		bool instanciateIntrinsicRef(uint32_t lvid);
 		bool instanciateIntrinsicUnref(uint32_t lvid);
@@ -307,6 +308,8 @@ namespace Instanciate
 
 		// Isolate
 		ClassdefTableView cdeftable;
+		//! Context
+		nycontext_t& context;
 		//! intrinsics
 		const IntrinsicTable& intrinsics;
 		// New opcode program
@@ -362,16 +365,8 @@ namespace Instanciate
 
 	struct InstanciateData final
 	{
-		InstanciateData(Logs::Message::Ptr& report, Atom& atom, ClassdefTableView& cdeftable, const IntrinsicTable& intrinsics,
-						decltype(FuncOverloadMatch::result.params)& params)
-			: report(report)
-			  , atom(atom)
-			  , cdeftable(cdeftable)
-			  , intrinsics(intrinsics)
-			  , params(params)
-		{
-			returnType.mutateToAny();
-		}
+		InstanciateData(Logs::Message::Ptr& report, Atom& atom, ClassdefTableView& cdeftable, nycontext_t& context,
+			decltype(FuncOverloadMatch::result.params)& params);
 
 		Logs::Message::Ptr& report;
 		//! The atom to instanciate
@@ -382,8 +377,8 @@ namespace Instanciate
 		uint32_t instanceid = (uint32_t) -1;
 		//! The original view to the classdef table
 		ClassdefTableView& cdeftable;
-		//! Alias to the intrinsic table
-		const IntrinsicTable& intrinsics;
+		//! Context
+		nycontext_t& context;
 
 		//! Parameters used for instanciation
 		decltype(FuncOverloadMatch::result.params)& params;

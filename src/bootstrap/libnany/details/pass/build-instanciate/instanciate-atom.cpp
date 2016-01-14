@@ -174,7 +174,7 @@ namespace Instanciate
 		decltype(FuncOverloadMatch::result.params)  params;
 		Logs::Message::Ptr newReport;
 
-		Pass::Instanciate::InstanciateData info{newReport, atom, cdeftable, intrinsics, params};
+		Pass::Instanciate::InstanciateData info{newReport, atom, cdeftable, context, params};
 		info.parentAtom = &(atomStack.back().atom);
 		info.shouldMergeLayer = true;
 
@@ -243,7 +243,7 @@ namespace Instanciate
 
 		// instanciate the called func
 		Logs::Message::Ptr subreport;
-		InstanciateData info{subreport, funcAtom, cdeftable, intrinsics, params};
+		InstanciateData info{subreport, funcAtom, cdeftable, context, params};
 		bool instok = doInstanciateAtomFunc(subreport, info, retlvid);
 		instanceid = info.instanceid;
 
@@ -388,7 +388,7 @@ namespace Instanciate
 
 			// instanciate the program attached to the atom
 			auto builder =
-				std::make_unique<ProgramBuilder>(report.subgroup(), newView, info.intrinsics, *out, sourceProgram);
+				std::make_unique<ProgramBuilder>(report.subgroup(), newView, info.context, *out, sourceProgram);
 
 			builder->pushParametersFromSignature(info.atom.atomid, signature);
 			if (info.parentAtom)
