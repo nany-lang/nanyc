@@ -37,21 +37,11 @@ namespace Nany
 		//! Get if empty
 		bool empty() const;
 
-
 		/*!
 		** \brief Find an intrinsic by its name
 		*/
 		const Intrinsic* find(const AnyString& name) const;
 
-
-		//! Register defaults
-		void registerStdCore();
-
-
-
-	private:
-		//! Register all intrinsics related to 'bool'
-		void registerBool();
 
 	private:
 		//! All intrinsics
