@@ -33,6 +33,7 @@ namespace Nany
 
 		Intrinsic(const Intrinsic&) = default;
 
+		YString print() const;
 
 	public:
 		//! C-Callback

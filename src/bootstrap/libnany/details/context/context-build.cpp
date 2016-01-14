@@ -80,9 +80,6 @@ namespace Nany
 		Nany::Sema::Metadata::initialize(); // TODO remove those methods
 		Nany::ASTHelper::initialize();
 
-		if (intrinsics.empty())
-			intrinsics.registerStdCore();
-
 		// preparing the queue service if not already present
 		auto* qs = usercontext.mt.queueservice;
 		auto* queueservice = reinterpret_cast<Job::QueueService*>(qs);

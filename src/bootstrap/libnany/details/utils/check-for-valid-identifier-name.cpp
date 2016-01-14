@@ -35,7 +35,7 @@ namespace Nany
 
 	static const std::unordered_set<AnyString> operatorKeywords =
 	{
-		"new", "dispose",
+		"new", "dispose", "clone",
 		"and", "or", "mod", "xor", "not",
 		"+", "-", "*", "/", "^",
 		"<<", ">>", "!=", "==", "<", ">", "<=", ">=",

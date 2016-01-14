@@ -1,12 +1,13 @@
 #pragma once
 #include "intrinsic-table.h"
+#include <yuni/core/static/types.h>
 
 
 
 namespace Nany
 {
 
-	template<class T> struct CTypeToNanyType;
+	template<class T> struct CTypeToNanyType {};
 
 	template<> struct CTypeToNanyType<std::int8_t> final
 	{
@@ -68,11 +69,17 @@ namespace Nany
 		static constexpr nytype_t type = nyt_void;
 	};
 
+	template<> struct CTypeToNanyType<void> final
+	{
+		static constexpr nytype_t type = nyt_void;
+	};
+
 	template<uint N, uint Max, class T> struct IntrinsicPushParameter final
 	{
 		static void push(Intrinsic& intrinsic)
 		{
-			intrinsic.params[N] = CTypeToNanyType<typename T::template Argument<N>::Type>::type;
+			static_assert(N > 0, "the first param is reserved for context");
+			intrinsic.params[N - 1] = CTypeToNanyType<typename T::template Argument<N>::Type>::type;
 			IntrinsicPushParameter<N + 1, Max, T>::push(intrinsic);
 		}
 	};
@@ -86,12 +93,11 @@ namespace Nany
 	template<class T>
 	inline bool IntrinsicTable::add(const AnyString& name, T callback)
 	{
-		if (YUNI_UNLIKELY(name.empty() or (0 == pByNames.count(name))))
+		if (YUNI_UNLIKELY(name.empty() or (0 != pByNames.count(name))))
 			return false;
 
 		typedef Yuni::Bind<T> B;
-		if (YUNI_UNLIKELY(B::argumentCount > Config::maxPushedParameters))
-			return false;
+		static_assert(B::argumentCount < Config::maxPushedParameters, "too many params");
 
 		pIntrinsics.emplace_back(new Intrinsic(name, reinterpret_cast<void*>(callback)));
 		auto& intrinsic = *(pIntrinsics.back());
@@ -101,10 +107,14 @@ namespace Nany
 		if (B::hasReturnValue)
 			intrinsic.rettype = CTypeToNanyType<typename B::ReturnType>::type;
 
-		if (B::argumentCount > 0)
+		// the first argument if the thread context
+		static_assert(Yuni::Static::Type::Equal<
+			typename B::template Argument<0>::Type, nytctx_t*>::Yes, "requires 'nytctx_t*'");
+
+		if (B::argumentCount > 1)
 		{
-			IntrinsicPushParameter<0, B::argumentCount, B>::push(intrinsic);
-			intrinsic.paramcount = static_cast<uint32_t>(B::argumentCount);
+			IntrinsicPushParameter<1, B::argumentCount, B>::push(intrinsic);
+			intrinsic.paramcount = static_cast<uint32_t>(B::argumentCount - 1);
 		}
 		return true;
 	}
@@ -119,12 +129,6 @@ namespace Nany
 	inline bool IntrinsicTable::empty() const
 	{
 		return pIntrinsics.empty();
-	}
-
-
-	inline void IntrinsicTable::registerStdCore()
-	{
-		registerBool();
 	}
 
 

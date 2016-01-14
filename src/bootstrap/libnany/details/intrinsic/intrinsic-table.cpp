@@ -1,4 +1,5 @@
 #include "intrinsic-table.h"
+#include "details/fwd.h"
 
 
 
@@ -29,7 +30,7 @@ namespace Nany
 			if (i == 0)
 				break;
 
-			if (count >= Config::maxPushedParameters or i >= static_cast<int>(nyt_count))
+			if (unlikely(count >= Config::maxPushedParameters or i >= static_cast<int>(nyt_count)))
 			{
 				delete intrinsic;
 				return false;
@@ -38,7 +39,7 @@ namespace Nany
 			intrinsic->params[count] = static_cast<nytype_t>(i);
 			++count;
 		}
-		while(true);
+		while (true);
 
 		intrinsic->paramcount = count;
 
