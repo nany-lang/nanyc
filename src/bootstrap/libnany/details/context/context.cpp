@@ -19,7 +19,7 @@ namespace Nany
 		: usercontext(context)
 	{
 		importNSLCore(*this);
-		importNSLCoreIntrinsics(intrinsics);
+		importNSLCoreString(intrinsics);
 	}
 
 

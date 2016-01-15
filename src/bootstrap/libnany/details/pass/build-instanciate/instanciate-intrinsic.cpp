@@ -79,7 +79,7 @@ namespace Instanciate
 				return false;
 
 			if (canGenerateCode())
-				out.emitIntrinsic(operands.lvid, name);
+				out.emitIntrinsic(operands.lvid, nullptr, intrinsic->id);
 			return true;
 		})();
 

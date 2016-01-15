@@ -22,6 +22,7 @@ namespace Nany
 		auto* intrinsic = new Intrinsic(name, callback);
 		intrinsic->rettype = ret;
 		intrinsic->flags   = flags;
+		intrinsic->id      = (uint32_t) pIntrinsics.size();
 
 		uint32_t count = 0;
 		do
@@ -45,7 +46,7 @@ namespace Nany
 
 
 		pIntrinsics.emplace_back(intrinsic);
-		pByNames.insert(std::make_pair(AnyString{intrinsic->name}, std::ref(*(intrinsic))));
+		pByNames.insert(std::make_pair(AnyString{intrinsic->name}, intrinsic));
 		return true;
 	}
 

@@ -183,7 +183,7 @@ namespace IR
 		//! Emit a call opcode for atom
 		void emitCall(uint32_t lvid, uint32_t atomid, uint32_t instanceid);
 		//! Emit intrinsic call
-		void emitIntrinsic(uint32_t lvid, const AnyString& name);
+		void emitIntrinsic(uint32_t lvid, const AnyString& name, uint32_t id = (uint32_t) -1);
 
 		//! Emit a identify opcode
 		void emitIdentify(uint32_t lvid, const AnyString& name, uint32_t self);

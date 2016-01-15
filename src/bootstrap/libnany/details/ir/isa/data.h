@@ -391,7 +391,9 @@ namespace ISA
 		constexpr static const char* opname() { return "intrinsic"; }
 		uint32_t opcode;
 		uint32_t lvid;
-		//! intrinsic name when compiling, id when running
+		//! Intrinsic ID (only valid at execution)
+		uint32_t iid;
+		// intrinsic name
 		uint32_t intrinsic;
 	};
 

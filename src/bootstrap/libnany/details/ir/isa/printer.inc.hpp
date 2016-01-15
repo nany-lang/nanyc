@@ -309,7 +309,10 @@ namespace // anonymous
 		void print(const Operand<Op::intrinsic>& operands)
 		{
 			out << tabs << '%' << operands.lvid << " = intrinsic ";
-			printString(operands.intrinsic);
+			if (operands.iid != (uint32_t) -1)
+				out << "id:" << operands.iid;
+			else
+				printString(operands.intrinsic);
 		}
 
 		void print(const Operand<Op::comment>& operands)

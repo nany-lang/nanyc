@@ -692,11 +692,12 @@ namespace IR
 	}
 
 
-	inline void Program::emitIntrinsic(uint32_t lvid, const AnyString& name)
+	inline void Program::emitIntrinsic(uint32_t lvid, const AnyString& name, uint32_t id)
 	{
 		auto& operands     = emit<ISA::Op::intrinsic>();
 		operands.lvid      = lvid;
 		operands.intrinsic = stringrefs.ref(name);
+		operands.iid       = id;
 	}
 
 

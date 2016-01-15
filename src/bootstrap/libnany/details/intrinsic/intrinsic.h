@@ -37,7 +37,7 @@ namespace Nany
 
 	public:
 		//! C-Callback
-		const void* callback;
+		void* callback;
 
 		//! name of the intrinsic
 		const Yuni::ShortString64 name;
@@ -51,6 +51,8 @@ namespace Nany
 
 		//! Flags
 		uint32_t flags = (uint32_t) nybind_default;
+		//! Intrinsic ID
+		uint32_t id = (uint32_t) -1;
 
 	}; // class Intrinsic
 

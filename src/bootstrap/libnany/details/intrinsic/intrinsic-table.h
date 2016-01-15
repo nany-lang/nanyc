@@ -37,17 +37,25 @@ namespace Nany
 		//! Get if empty
 		bool empty() const;
 
+		//! The total number of user-defined intrinsics
+		uint32_t size() const;
+
 		/*!
 		** \brief Find an intrinsic by its name
 		*/
 		const Intrinsic* find(const AnyString& name) const;
+
+		/*!
+		** \brief Get the intrinsic for a given intrinsic id
+		*/
+		const Intrinsic& operator [] (uint32_t id) const;
 
 
 	private:
 		//! All intrinsics
 		std::vector<Intrinsic::Ptr> pIntrinsics;
 		//! All intrinsics, ordered by their name
-		std::unordered_map<AnyString, std::reference_wrapper<Intrinsic>> pByNames;
+		std::unordered_map<AnyString, Intrinsic*> pByNames;
 
 	}; // class IntrinsicTable
 

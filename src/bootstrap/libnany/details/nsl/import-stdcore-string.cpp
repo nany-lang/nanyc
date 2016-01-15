@@ -10,10 +10,11 @@ using namespace Yuni;
 
 namespace Nany
 {
-namespace Import
+namespace Builtin
 {
 
-	static String* yn_string_new(nytctx_t* tctx)
+
+	static void* yn_string_new(nytctx_t* tctx)
 	{
 		void* p = tctx->context->memory.allocate(tctx->context, sizeof(String));
 		return new (p) String{};
@@ -36,9 +37,15 @@ namespace Import
 		reinterpret_cast<String*>(string)->assign(other);
 	}
 
+	static void yn_string_clear(nytctx_t*, void* string)
+	{
+		reinterpret_cast<String*>(string)->clear();
+	}
 
 
-} // namespace Import
+
+
+} // namespace Builtin
 } // namespace Nany
 
 
@@ -46,12 +53,13 @@ namespace Import
 namespace Nany
 {
 
-	void importNSLCoreIntrinsics(IntrinsicTable& intrinsics)
+	void importNSLCoreString(IntrinsicTable& intrinsics)
 	{
-		intrinsics.add("yuni.string.new",    Import::yn_string_new);
-		intrinsics.add("yuni.string.delete", Import::yn_string_delete);
-		intrinsics.add("yuni.string.size",   Import::yn_string_size);
-		intrinsics.add("yuni.string.assign", Import::yn_string_assign);
+		intrinsics.add("yuni.string.new",    Builtin::yn_string_new);
+		intrinsics.add("yuni.string.delete", Builtin::yn_string_delete);
+		intrinsics.add("yuni.string.clear",  Builtin::yn_string_clear);
+		intrinsics.add("yuni.string.size",   Builtin::yn_string_size);
+		intrinsics.add("yuni.string.assign", Builtin::yn_string_assign);
 	}
 
 

@@ -472,7 +472,7 @@ add_library(libnany ${mode_libnany}
 
 	# NSL - std.core
 	details/nsl/import-stdcore.h
-	details/nsl/import-stdcore-intrinsics.cpp
+	details/nsl/import-stdcore-string.cpp
 	${nysrc_nsl_stdcore}
 
 	# misc

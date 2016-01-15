@@ -101,7 +101,8 @@ namespace Nany
 
 		pIntrinsics.emplace_back(new Intrinsic(name, reinterpret_cast<void*>(callback)));
 		auto& intrinsic = *(pIntrinsics.back());
-		pByNames.insert(std::make_pair(AnyString{intrinsic.name}, std::ref(intrinsic)));
+		pByNames.insert(std::make_pair(AnyString{intrinsic.name}, &intrinsic));
+		intrinsic.id = ((uint32_t)pIntrinsics.size() - 1);
 
 		// return type / parameters
 		if (B::hasReturnValue)
@@ -132,10 +133,23 @@ namespace Nany
 	}
 
 
+	inline uint32_t IntrinsicTable::size() const
+	{
+		return static_cast<uint32_t>(pIntrinsics.size());
+	}
+
+
 	inline const Intrinsic* IntrinsicTable::find(const AnyString& name) const
 	{
 		auto it = pByNames.find(name);
-		return (it != pByNames.end()) ? &(it->second.get()) : nullptr;
+		return (it != pByNames.end()) ? it->second : nullptr;
+	}
+
+
+	inline const Intrinsic& IntrinsicTable::operator [] (uint32_t id) const
+	{
+		assert(id < pIntrinsics.size());
+		return *(pIntrinsics[id]);
 	}
 
 

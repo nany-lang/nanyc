@@ -14,7 +14,7 @@ namespace Nany
 	*/
 	void importNSLCore(Context&);
 
-	void importNSLCoreIntrinsics(IntrinsicTable&);
+	void importNSLCoreString(IntrinsicTable&);
 
 
 } // namespace Nany

@@ -1,6 +1,8 @@
 #include "vm.h"
 #include "details/ir/isa/data.h"
 #include "details/atom/atom.h"
+#include "details/intrinsic/intrinsic-table.h"
+#include "details/context/context.h"
 #include "stacktrace.h"
 #include "memchecker.h"
 #include <iostream>
@@ -10,7 +12,6 @@ using namespace Yuni;
 
 //! Print opcodes executed by the vm
 #define NANY_VM_PRINT_OPCODES 0
-
 
 
 
@@ -68,7 +69,7 @@ namespace // anonymous
 		//! Number of pushed parameters
 		uint32_t funcparamCount = 0; // parameters are 2-based
 		//! all pushed parameters
-		uint64_t funcparams[Config::maxPushedParameters];
+		DataRegister funcparams[Config::maxPushedParameters];
 
 		//! Stack trace
 		Stacktrace<true> stacktrace;
@@ -89,6 +90,11 @@ namespace // anonymous
 		std::reference_wrapper<const IR::Program> program;
 		//! User context
 		nycontext_t& context;
+		//! Thread context
+		nytctx_t threadcontext;
+
+		//! All user-defined intrinsics
+		const IntrinsicTable& userDefinedIntrinsics;
 
 		DCCallVM* dyncall = nullptr;
 
@@ -101,9 +107,12 @@ namespace // anonymous
 			: map(map)
 			, program(std::cref(program))
 			, context(context)
+			, userDefinedIntrinsics(((Context*)context.internal)->intrinsics)
 		{
 			dyncall = dcNewCallVM(4096);
 			dcMode(dyncall, DC_CALL_C_DEFAULT);
+
+			threadcontext.context = &context;
 		}
 
 		~ThreadContext()
@@ -135,7 +144,7 @@ namespace // anonymous
 			{
 				// reset parameters for func call
 				funcparamCount = 1;
-				funcparams[0] = reinterpret_cast<uint64_t>(object); // self
+				funcparams[0].u64 = reinterpret_cast<uint64_t>(object); // self
 				// func call
 				call(0, dtor->atomid, instanceid);
 			}
@@ -192,10 +201,124 @@ namespace // anonymous
 
 
 		// accept those opcode for debugging purposes
-		void visit(const IR::ISA::Operand<IR::ISA::Op::comment>&) {}
-		void visit(const IR::ISA::Operand<IR::ISA::Op::scope>&) {}
-		void visit(const IR::ISA::Operand<IR::ISA::Op::end>&) {}
-		void visit(const IR::ISA::Operand<IR::ISA::Op::nop>&) {}
+		void visit(const IR::ISA::Operand<IR::ISA::Op::comment>&)
+		{
+		}
+
+		void visit(const IR::ISA::Operand<IR::ISA::Op::scope>&)
+		{
+		}
+
+		void visit(const IR::ISA::Operand<IR::ISA::Op::end>&)
+		{
+		}
+
+		void visit(const IR::ISA::Operand<IR::ISA::Op::nop>&)
+		{
+		}
+
+		inline void visit(const IR::ISA::Operand<IR::ISA::Op::intrinsic>& opr)
+		{
+			VM_PRINT_OPCODE(operands);
+			dcReset(dyncall);
+			dcArgPointer(dyncall, &threadcontext);
+
+			auto& intrinsic = userDefinedIntrinsics[opr.iid];
+			for (uint32_t i = 0; i != funcparamCount; ++i)
+			{
+				auto r = funcparams[i];
+				switch (intrinsic.params[i])
+				{
+					case nyt_u64:
+						dcArgLongLong(dyncall, static_cast<DClonglong>(r.u64));
+						break;
+					case nyt_i64:
+						dcArgLongLong(dyncall, static_cast<DClonglong>(r.i64));
+						break;
+					case nyt_u32:
+						dcArgInt(dyncall, static_cast<DCint>(r.u64));
+						break;
+					case nyt_i32:
+						dcArgInt(dyncall, static_cast<DCint>(r.i64));
+						break;
+					case nyt_pointer:
+						dcArgPointer(dyncall, reinterpret_cast<DCpointer>(r.u64));
+						break;
+					case nyt_u16:
+						dcArgShort(dyncall, static_cast<DCshort>(r.u64));
+						break;
+					case nyt_i16:
+						dcArgShort(dyncall, static_cast<DCshort>(r.i64));
+						break;
+					case nyt_u8:
+						dcArgChar(dyncall, static_cast<DCchar>(r.u64));
+						break;
+					case nyt_i8:
+						dcArgChar(dyncall, static_cast<DCchar>(r.i64));
+						break;
+					case nyt_f32:
+						dcArgFloat(dyncall, static_cast<DCfloat>(r.f64));
+						break;
+					case nyt_f64:
+						dcArgDouble(dyncall, static_cast<DCdouble>(r.f64));
+						break;
+					case nyt_bool:
+						dcArgBool(dyncall, static_cast<DCbool>(r.u64));
+						break;
+					case nyt_void:
+					case nyt_any:
+					case nyt_count:
+						throw String{"intrinsic invalid parameter type"};
+				}
+			}
+			funcparamCount = 0;
+
+			switch (intrinsic.rettype)
+			{
+				case nyt_u64:
+					registers[opr.lvid].u64 = static_cast<uint64_t>(dcCallLongLong(dyncall, intrinsic.callback));
+					break;
+				case nyt_i64:
+					registers[opr.lvid].i64 = static_cast<int64_t>(dcCallLongLong(dyncall, intrinsic.callback));
+					break;
+				case nyt_u32:
+					registers[opr.lvid].u64 = static_cast<uint64_t>(dcCallInt(dyncall, intrinsic.callback));
+					break;
+				case nyt_i32:
+					registers[opr.lvid].i64 = static_cast<int64_t>(dcCallInt(dyncall, intrinsic.callback));
+					break;
+				case nyt_pointer:
+					registers[opr.lvid].u64 = reinterpret_cast<uint64_t>(dcCallPointer(dyncall, intrinsic.callback));
+					break;
+				case nyt_u16:
+					registers[opr.lvid].u64 = static_cast<uint64_t>(dcCallShort(dyncall, intrinsic.callback));
+					break;
+				case nyt_i16:
+					registers[opr.lvid].i64 = static_cast<int64_t>(dcCallShort(dyncall, intrinsic.callback));
+					break;
+				case nyt_u8:
+					registers[opr.lvid].u64 = static_cast<uint64_t>(dcCallChar(dyncall, intrinsic.callback));
+					break;
+				case nyt_i8:
+					registers[opr.lvid].i64 = static_cast<int64_t>(dcCallChar(dyncall, intrinsic.callback));
+					break;
+				case nyt_f32:
+					registers[opr.lvid].f64 = static_cast<float>(dcCallFloat(dyncall, intrinsic.callback));
+					break;
+				case nyt_f64:
+					registers[opr.lvid].f64 = static_cast<double>(dcCallDouble(dyncall, intrinsic.callback));
+					break;
+				case nyt_bool:
+					registers[opr.lvid].u64 = (dcCallBool(dyncall, intrinsic.callback) ? 1 : 0);
+					break;
+				case nyt_void:
+					dcCallVoid(dyncall, intrinsic.callback);
+					break;
+				case nyt_any:
+				case nyt_count:
+					throw String{"intrinsic invalid return type"};
+			}
+		}
 
 
 		inline void visit(const IR::ISA::Operand<IR::ISA::Op::fadd>& opr)
@@ -412,7 +535,7 @@ namespace // anonymous
 		{
 			VM_PRINT_OPCODE(operands);
 			assert(operands.lvid < registerCount);
-			funcparams[funcparamCount++] = registers[operands.lvid].u64;
+			funcparams[funcparamCount++].u64 = registers[operands.lvid].u64;
 		}
 
 
@@ -607,7 +730,7 @@ namespace // anonymous
 		}
 
 
-		template<enum IR::ISA::Op O> void visit(const IR::ISA::Operand<O>& operands)
+		template<IR::ISA::Op O> void visit(const IR::ISA::Operand<O>& operands)
 		{
 			VM_PRINT_OPCODE(operands); // FALLBACK
 			(void) operands; // unused
@@ -637,7 +760,7 @@ namespace // anonymous
 
 				// retrieve parameters for the func
 				for (uint32_t i = 0; i != funcparamCount; ++i)
-					stackvalues[i + 2].u64 = funcparams[i]; // 2-based
+					stackvalues[i + 2].u64 = funcparams[i].u64; // 2-based
 				funcparamCount = 0;
 
 				callee.each(*this, 1); // offset: 1, avoid blueprint pragma
