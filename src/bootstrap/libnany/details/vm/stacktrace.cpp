@@ -25,31 +25,42 @@ namespace VM
 	}
 
 
-	YString Stacktrace<true>::dump(const AtomMap& map) const
+	void Stacktrace<true>::dump(nycontext_t& ctx, const AtomMap& map) const
 	{
-		YString out;
+		// this routine does not allocate memory to handle extreme situations
 
+		ShortString128 tmp;
 		uint32_t i = 0;
+
 		for (auto* pointer = topframe; (pointer > baseframe); --pointer, ++i)
 		{
 			auto& frame = *pointer;
-			out << "  at #" << i << ": ";
-			out << map.fetchProgramCaption(frame.atomidInstance[0], frame.atomidInstance[1]);
-			out << " (from '";
+
+			ctx.console.write_stderr(&ctx, "    at #", 8);
+			tmp.clear();
+			tmp << i << ": ";
+			ctx.console.write_stderr(&ctx, tmp.c_str(), tmp.size());
+			const auto& caption = map.fetchProgramCaption(frame.atomidInstance[0], frame.atomidInstance[1]);
+			ctx.console.write_stderr(&ctx, caption.c_str(), caption.size());
+
+			ctx.console.write_stderr(&ctx, "\n       '", 9);
 
 			auto* atom = map.findAtom(frame.atomidInstance[0]);
 			if (atom)
 			{
-				out << atom->origin.filename;
+				ctx.console.write_stderr(&ctx, atom->origin.filename.c_str(), atom->origin.filename.size());
 				if (atom->origin.line != 0)
-					out << ':' << atom->origin.line;
+				{
+					tmp.clear();
+					tmp << ':' << atom->origin.line;
+					ctx.console.write_stderr(&ctx, tmp.c_str(), tmp.size());
+				}
 			}
 			else
-				out << "<invalid-atom>";
+				ctx.console.write_stderr(&ctx, "<invalid-atom>", 14);
 
-			out << "')\n";
+			ctx.console.write_stderr(&ctx, "'\n", 2);
 		}
-		return out;
 	}
 
 

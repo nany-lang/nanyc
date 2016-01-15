@@ -16,7 +16,7 @@ namespace VM
 	{
 		static void push(uint32_t, uint32_t) {}
 		static void pop() {}
-		static YString dump(const AtomMap&) { return YString{}; }
+		static void dump(nycontext_t&) {}
 	};
 
 
@@ -71,7 +71,7 @@ namespace VM
 
 
 		//! Export the whole stack to a string
-		YString dump(const AtomMap& map) const;
+		void dump(nycontext_t&, const AtomMap&) const;
 
 		//! deleted Operator assignment
 		Stacktrace& operator = (const Stacktrace&) = delete;

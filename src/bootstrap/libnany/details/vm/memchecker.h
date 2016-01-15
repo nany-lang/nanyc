@@ -24,6 +24,8 @@ namespace VM
 		static constexpr void forget(const uint64_t*) {}
 		static constexpr bool checkObjectSize(const uint64_t*, size_t) { return true; }
 		static constexpr bool has(const uint64_t*) { return true; }
+
+		static constexpr void clear() {}
 	};
 
 
@@ -41,6 +43,10 @@ namespace VM
 			return currentAtomid;
 		}
 
+		void clear()
+		{
+			ownedPointers.clear();
+		}
 
 		void hold(const uint64_t* const pointer, size_t size, uint32_t lvid)
 		{
