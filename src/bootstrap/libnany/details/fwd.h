@@ -1,6 +1,9 @@
 #pragma once
 #include <yuni/yuni.h>
 
+#ifdef YUNI_OS_MSVC
+#pragma warning(disable: 4251)
+#endif
 
 
 /*!

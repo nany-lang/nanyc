@@ -1,5 +1,5 @@
 #pragma once
-#include <yuni/yuni.h>
+#include "../fwd.h"
 #include <yuni/core/smartptr/intrusive.h>
 #include <yuni/string.h>
 #include <yuni/job/queue/service.h>

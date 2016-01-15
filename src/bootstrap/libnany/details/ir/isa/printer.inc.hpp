@@ -618,7 +618,7 @@ namespace // anonymous
 
 
 
-		template<enum Op O> inline void visit(const Operand<O>& instr)
+		template<Nany::IR::ISA::Op O> inline void visit(const Operand<O>& instr)
 		{
 			print(instr);
 			printEOL();

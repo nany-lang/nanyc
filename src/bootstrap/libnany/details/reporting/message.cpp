@@ -10,15 +10,6 @@ namespace Nany
 namespace Logs
 {
 
-	#ifndef YUNI_OS_WINDOWS
-	static constexpr bool withUTF8 = true;
-	#else
-	static constexpr bool withUTF8 = false;
-	#endif
-
-
-
-
 	Message& Message::createEntry(Level level)
 	{
 		Message::Ptr entry = new Message(level);
@@ -53,7 +44,11 @@ namespace Logs
 		template<class T>
 		static void printMessage(T& out, const Message& message, uint indent, String& tmp)
 		{
-			static const AnyString sep = (withUTF8) ? " \u205E " : " | ";
+			#ifndef YUNI_OS_WINDOWS
+			static const AnyString sep = " \u205E ";
+			#else
+			static const AnyString sep = " | ";
+			#endif
 
 			Message::ThreadingPolicy::MutexLocker locker{message};
 
@@ -62,19 +57,25 @@ namespace Logs
 				switch (message.level)
 				{
 					case Level::error:
+					{
 						System::Console::SetTextColor(out, System::Console::red);
-						if (withUTF8)
-							out << "      \u2718 " << sep;
-						else
-							out << "       X" << sep;
+						#ifndef YUNI_OS_WINDOWS
+						out << "      \u2718 " << sep;
+						#else
+						out << "       X" << sep;
+						#endif
 						break;
+					}
 					case Level::warning:
+					{
 						System::Console::SetTextColor(out, System::Console::yellow);
-						if (withUTF8)
-							out << "      \u26A0 " << sep;
-						else
-							out << "       !" << sep;
+						#ifndef YUNI_OS_WINDOWS
+						out << "      \u26A0 " << sep;
+						#else
+						out << "       !" << sep;
+						#endif
 						break;
+					}
 					case Level::info:
 					{
 						if (message.section.empty())
@@ -103,12 +104,15 @@ namespace Logs
 					}
 
 					case Level::success:
+					{
 						System::Console::SetTextColor(out, System::Console::green);
-						if (withUTF8)
-							out << "      \u2713 " << sep;
-						else
-							out << "        " << sep;
+						#ifndef YUNI_OS_WINDOWS
+						out << "      \u2713 " << sep;
+						#else
+						out << "        " << sep;
+						#endif
 						break;
+					}
 
 					case Level::trace:
 						System::Console::SetTextColor(out, System::Console::purple);

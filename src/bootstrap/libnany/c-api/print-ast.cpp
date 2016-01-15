@@ -3,14 +3,16 @@
 #include <yuni/core/system/console.h>
 #include "details/grammar/nany.h"
 #include <stdio.h>
-#ifndef YUNI_OS_MSVC
-#include <unistd.h>
-#else
+
+#ifdef YUNI_OS_MSVC
 #include <io.h>
+#define STDOUT_FILENO  1
+#define STDERR_FILENO  2
+#else
+#include <unistd.h>
 #endif
 
 using namespace Yuni;
-
 
 
 
@@ -43,8 +45,13 @@ namespace // anonymous
 		Clob out;
 		Nany::Node::Export(out, *parser.root, hasUnixColors);
 
+		#ifdef YUNI_OS_MSVC
+		int w = _write(fd, out.c_str(), static_cast<unsigned int>(out.size()));
+		return (w == static_cast<int>(out.size()));
+		#else
 		sint64 w = ::write(fd, out.c_str(), out.size());
-		return (w == (sint64) out.size());
+		return (w == static_cast<sint64>(out.size()));
+		#endif
 	}
 
 

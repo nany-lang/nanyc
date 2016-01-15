@@ -18,8 +18,11 @@ namespace Instanciate
 
 	struct ReturnValueMarker
 	{
+		ReturnValueMarker(const CLID& clid, uint32_t line, uint32_t offset)
+			: clid(clid), line(line), offset(offset)
+		{}
 		CLID clid;
-		uint line, offset;
+		uint32_t line, offset;
 	};
 
 

@@ -48,7 +48,7 @@ namespace Instanciate
 					opc.type = static_cast<uint32_t>(cdef.kind);
 			}
 
-			template<enum IR::ISA::Op O> void visit(const IR::ISA::Operand<O>&)
+			template<IR::ISA::Op O> void visit(const IR::ISA::Operand<O>&)
 			{
 				// nothing to do
 			}

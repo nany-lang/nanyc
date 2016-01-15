@@ -4,6 +4,7 @@
 #include <yuni/core/smartptr/intrusive.h>
 #include "nany/nany.h"
 #include "libnany-config.h"
+#include <array>
 
 
 

@@ -170,7 +170,7 @@ namespace Instanciate
 		void visit(const IR::ISA::Operand<IR::ISA::Op::comment>&);
 
 		//! visitor - fallback
-		template<enum IR::ISA::Op O> void visit(const IR::ISA::Operand<O>&);
+		template<IR::ISA::Op O> void visit(const IR::ISA::Operand<O>&);
 		//@}
 
 

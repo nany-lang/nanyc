@@ -44,7 +44,7 @@ namespace IR
 	}
 
 
-	template<enum ISA::Op O> inline ISA::Operand<O>& Program::at(uint32_t offset)
+	template<ISA::Op O> inline ISA::Operand<O>& Program::at(uint32_t offset)
 	{
 		assert(offset < pSize);
 		static_assert(sizeof(Instruction) >= sizeof(ISA::Operand<O>), "pSize mismatch");
@@ -53,7 +53,7 @@ namespace IR
 
 
 
-	template<enum ISA::Op O> inline const ISA::Operand<O>& Program::at(uint32_t offset) const
+	template<ISA::Op O> inline const ISA::Operand<O>& Program::at(uint32_t offset) const
 	{
 		assert(offset < pSize);
 		static_assert(sizeof(Instruction) >= sizeof(ISA::Operand<O>), "pSize mismatch");
@@ -61,7 +61,7 @@ namespace IR
 	}
 
 
-	template<enum ISA::Op O> inline ISA::Operand<O>& Program::emitraw()
+	template<ISA::Op O> inline ISA::Operand<O>& Program::emitraw()
 	{
 		static_assert(sizeof(Instruction) >= sizeof(ISA::Operand<O>), "pSize mismatch");
 		assert(pSize + 1 < pCapacity);
@@ -71,7 +71,7 @@ namespace IR
 	}
 
 
-	template<enum ISA::Op O> inline ISA::Operand<O>& Program::emit()
+	template<ISA::Op O> inline ISA::Operand<O>& Program::emit()
 	{
 		reserve(pSize + 1);
 
@@ -801,7 +801,7 @@ namespace IR
 		return r;
 	}
 
-	template<enum ISA::Op O>
+	template<ISA::Op O>
 	inline uint32_t Program::offsetOf(const ISA::Operand<O>& instr) const
 	{
 		static_assert(sizeof(Instruction) >= sizeof(ISA::Operand<O>), "pSize mismatch");

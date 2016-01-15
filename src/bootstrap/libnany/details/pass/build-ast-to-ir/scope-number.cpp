@@ -134,7 +134,7 @@ namespace Producer
 				{
 					if (not numdef.isUnsigned)
 					{
-						if (numdef.part1 < std::numeric_limits<int64_t>::max())
+						if (numdef.part1 < static_cast<uint64_t>(std::numeric_limits<int64_t>::max()))
 						{
 							int64_t sv = static_cast<int64_t>(numdef.part1);
 							switch (numdef.bits)

@@ -4,14 +4,14 @@
 #ifndef YUNI_OS_MSVC
 #include <unistd.h>
 #endif
+#include <iostream>
+
+#ifdef YUNI_OS_WINDOWS
+#include <io.h>
+#endif
 
 using namespace Yuni;
 
-#ifdef YUNI_OS_MSVC
-#define STDOUT_FILENO  1
-#define STDERR_FILENO  2
-#define STDIN_FILENO  0
-#endif
 
 
 
@@ -35,16 +35,21 @@ static inline int fsync(int fd)
 		switch (err)
 		{
 			case ERROR_ACCESS_DENIED:
+			{
 				// For a read-only handle, fsync should succeed, even though we have
 				// no way to sync the access-time changes
 				return 0;
-
+			}
 				// eg. Trying to fsync a tty.
 			case ERROR_INVALID_HANDLE:
+			{
 				errno = EINVAL;
 				break;
+			}
 			default:
+			{
 				errno = EIO;
+			}
 		}
 		return -1;
 	}
@@ -65,51 +70,43 @@ extern "C" void nanysdbx_not_enough_memory(nycontext_t* ctx)
 extern "C" void nanysdbx_write_stdout(nycontext_t*, const char* text, size_t length)
 {
 	if (YUNI_LIKELY(text != nullptr and length))
-	{
-		auto w = ::write(STDOUT_FILENO, text, length);
-		(void) w;
-	}
+		std::cout.write(text, static_cast<std::streamsize>(length));
 }
 
 
 extern "C" void nanysdbx_write_stderr(nycontext_t*, const char* text, size_t length)
 {
 	if (YUNI_LIKELY(text != nullptr and length))
-	{
-		auto w = ::write(STDERR_FILENO, text, length);
-		(void) w;
-	}
+		std::cerr.write(text, static_cast<std::streamsize>(length));
 }
 
 
 extern "C" void nanysdbx_flush_stdout(nycontext_t*)
 {
+	#ifndef YUNI_OS_WINDOWS
 	::fsync(STDOUT_FILENO);
+	#endif
 }
 
 
 extern "C" void nanysdbx_flush_stderr(nycontext_t*)
 {
+	#ifndef YUNI_OS_WINDOWS
 	::fsync(STDERR_FILENO);
+	#endif
 }
 
 
 extern "C" void* nanysdbx_mem_alloc(nycontext_t*, size_t size)
 {
 	assert(0 != size);
-	void* ptr = ::malloc(size);
-	if (YUNI_UNLIKELY(!ptr))
-		throw std::bad_alloc();
-	return ptr;
+	return ::malloc(size);
 }
 
 
 extern "C" void* nanysdbx_mem_realloc(nycontext_t*, void* ptr, size_t, size_t newsize)
 {
-	void* newptr = ::realloc(ptr, newsize);
-	if (YUNI_UNLIKELY(!newptr))
-		throw std::bad_alloc();
-	return newptr;
+	return ::realloc(ptr, newsize);
 }
 
 

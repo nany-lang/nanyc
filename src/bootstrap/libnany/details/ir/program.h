@@ -1,5 +1,5 @@
 #pragma once
-#include <yuni/yuni.h>
+#include "../fwd.h"
 #include <yuni/core/string.h>
 #include "details/ir/isa/opcodes.h"
 #include "details/ir/isa/pragma.h"
@@ -45,21 +45,21 @@ namespace IR
 		//! \name Opcodes
 		//@{
 		//! Fetch an instruction at a given offset
-		template<enum ISA::Op O> ISA::Operand<O>& at(uint32_t offset);
+		template<ISA::Op O> ISA::Operand<O>& at(uint32_t offset);
 		//! Fetch an instruction at a given offset (const)
-		template<enum ISA::Op O> const ISA::Operand<O>& at(uint32_t offset) const;
+		template<ISA::Op O> const ISA::Operand<O>& at(uint32_t offset) const;
 		//! Fetch an instruction at a given offset
 		const Instruction& at(uint32_t offset) const;
 		//! Fetch an instruction at a given offset
 		Instruction& at(uint32_t offset);
 
 		//! emit a new Instruction
-		template<enum ISA::Op O> ISA::Operand<O>& emit();
+		template<ISA::Op O> ISA::Operand<O>& emit();
 		//! emit a new Instruction (without reserving data if needed)
-		template<enum ISA::Op O> ISA::Operand<O>& emitraw();
+		template<ISA::Op O> ISA::Operand<O>& emitraw();
 
 		//! Get the offset of an instruction within the program
-		template<enum ISA::Op O> uint32_t offsetOf(const ISA::Operand<O>& instr) const;
+		template<ISA::Op O> uint32_t offsetOf(const ISA::Operand<O>& instr) const;
 		//! Get the offset of an instruction within the program
 		uint32_t offsetOf(const Instruction& instr) const;
 

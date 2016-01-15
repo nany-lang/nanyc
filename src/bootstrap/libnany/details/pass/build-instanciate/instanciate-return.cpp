@@ -160,9 +160,8 @@ namespace Instanciate
 
 		// the return valus is accepted
 		frame.returnValues.emplace_back(ReturnValueMarker {
-			.clid   = returnCLIDForReference,
-			.line   = currentLine,
-			.offset = currentOffset
+			returnCLIDForReference,
+			currentLine, currentOffset
 		});
 
 		if (canGenerateCode())

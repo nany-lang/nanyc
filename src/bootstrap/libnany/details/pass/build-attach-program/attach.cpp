@@ -63,7 +63,7 @@ namespace Nany
 			}
 
 
-			template<enum IR::ISA::Op O> void printError(const IR::ISA::Operand<O>& operands, AnyString msg = nullptr)
+			template<IR::ISA::Op O> void printError(const IR::ISA::Operand<O>& operands, AnyString msg = nullptr)
 			{
 				// example: ICE: unknown opcode 'resolveAttribute': from 'ref %4 = resolve %3."()"'
 				auto trace = report.ICE();
@@ -77,7 +77,7 @@ namespace Nany
 			}
 
 
-			template<enum IR::ISA::Op O> bool checkForLVID(const IR::ISA::Operand<O>& operands, LVID lvid)
+			template<IR::ISA::Op O> bool checkForLVID(const IR::ISA::Operand<O>& operands, LVID lvid)
 			{
 				if (unlikely(lvid == 0 or not (lvid < atomStack.back().classdefs.size())))
 				{
@@ -634,7 +634,7 @@ namespace Nany
 			}
 
 
-			template<enum IR::ISA::Op O> void visit(IR::ISA::Operand<O>& operands)
+			template<IR::ISA::Op O> void visit(IR::ISA::Operand<O>& operands)
 			{
 				switch (O)
 				{

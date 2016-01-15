@@ -215,7 +215,7 @@ namespace Instanciate
 
 
 
-	template<enum IR::ISA::Op O>
+	template<IR::ISA::Op O>
 	void ProgramBuilder::visit(const IR::ISA::Operand<O>& operands)
 	{
 		complainOperand(reinterpret_cast<const IR::Instruction&>(operands));
