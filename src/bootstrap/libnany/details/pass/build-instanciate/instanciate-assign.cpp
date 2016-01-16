@@ -29,7 +29,8 @@ namespace Instanciate
 			spare.import(cdefsrc);
 		}
 
-		instanciateAssignment(atomStack.back(), operands.lhs, operands.rhs, operands.disposelhs);
+		bool canDisposeLHS = (operands.disposelhs != 0);
+		instanciateAssignment(atomStack.back(), operands.lhs, operands.rhs, canDisposeLHS);
 	}
 
 
