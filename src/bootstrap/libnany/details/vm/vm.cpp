@@ -7,6 +7,8 @@
 #include "memchecker.h"
 #include <iostream>
 #include "dyncall/dyncall.h"
+#include "types.h"
+#include "stack.h"
 
 using namespace Yuni;
 
@@ -43,21 +45,6 @@ namespace VM
 namespace // anonymous
 {
 
-	union DataRegister
-	{
-		uint64_t u64;
-		int64_t i64;
-		double f64;
-	};
-
-
-	struct CodeException: public std::exception
-	{
-		virtual const char* what() const throw() { return ""; }
-	};
-
-
-
 
 	struct ThreadContext final
 	{
@@ -70,6 +57,8 @@ namespace // anonymous
 		uint32_t funcparamCount = 0; // parameters are 2-based
 		//! all pushed parameters
 		DataRegister funcparams[Config::maxPushedParameters];
+
+		Stack stack;
 
 		//! Stack trace
 		Stacktrace<true> stacktrace;
@@ -150,7 +139,7 @@ namespace // anonymous
 			}
 
 			// sandbox release
-			context.memory.release(&context, object, classsizeof);
+			context.memory.release(&context, object, static_cast<size_t>(classsizeof));
 			memchecker.forget(object);
 		}
 
@@ -691,7 +680,7 @@ namespace // anonymous
 			assert(operands.lvid < registerCount);
 			assert(operands.regsize < registerCount);
 
-			auto size = registers[operands.regsize].u64;
+			size_t size = static_cast<size_t>(registers[operands.regsize].u64);
 			size += sizeof(uint64_t); // reference counter
 
 			uint64_t* pointer = (uint64_t*) context.memory.allocate(&context, size);
@@ -704,7 +693,7 @@ namespace // anonymous
 			pointer[0] = 0; // init ref counter
 			registers[operands.lvid].u64 = reinterpret_cast<uint64_t>(pointer);
 
-			memchecker.hold(pointer, static_cast<size_t>(size), operands.lvid);
+			memchecker.hold(pointer, size, operands.lvid);
 		}
 
 
@@ -716,7 +705,7 @@ namespace // anonymous
 
 			uint64_t* object = reinterpret_cast<uint64_t*>(registers[operands.lvid].u64);
 			VM_CHECK_POINTER(object, operands);
-			uint64 size = registers[operands.regsize].u64;
+			size_t size = static_cast<size_t>(registers[operands.regsize].u64);
 			size += sizeof(uint64_t); // reference counter
 
 			if (YUNI_UNLIKELY(not memchecker.checkObjectSize(object, static_cast<size_t>(size))))
@@ -750,20 +739,17 @@ namespace // anonymous
 				assert(callee.at<IR::ISA::Op::stacksize>(0).opcode == (uint32_t) IR::ISA::Op::stacksize);
 				#endif
 
-				DataRegister stackvalues[framesize];
-				if (debugmode)
-					memset(stackvalues, 0xDE, sizeof(stackvalues));
-
-				stackvalues[0].u64 = 0;
-				registers = stackvalues;
+				registers = stack.push(framesize);
+				registers[0].u64 = 0;
 				program = std::cref(callee);
 
 				// retrieve parameters for the func
 				for (uint32_t i = 0; i != funcparamCount; ++i)
-					stackvalues[i + 2].u64 = funcparams[i].u64; // 2-based
+					registers[i + 2].u64 = funcparams[i].u64; // 2-based
 				funcparamCount = 0;
 
 				callee.each(*this, 1); // offset: 1, avoid blueprint pragma
+				stack.pop(framesize);
 				return retRegister;
 			}
 			catch (const CodeException&)

@@ -250,6 +250,10 @@ addsrc(
 	"details/vm/memchecker.cpp"
 	"details/vm/stacktrace.h"
 	"details/vm/stacktrace.cpp"
+	"details/vm/stack.cpp"
+	"details/vm/stack.h"
+	"details/vm/stack.hxx"
+	"details/vm/types.h"
 	"details/vm/vm.h")
 
 
