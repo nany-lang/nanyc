@@ -58,7 +58,7 @@ namespace Nany
 				}
 				case 0:
 				{
-					report.error() << "failed to find ' class" << name << "'";
+					report.error() << "failed to find builtin 'class " << name << "' from nsl";
 					break;
 				}
 				default:
