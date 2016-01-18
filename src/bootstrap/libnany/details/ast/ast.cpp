@@ -10,7 +10,7 @@ namespace AST
 {
 
 
-	Node* createNodeFunc(const AnyString& name)
+	Node* createNodeFunc(Node*& funcname)
 	{
 		Node* func = new Node{rgFunction};
 		func->children.reserve(4);
@@ -32,16 +32,17 @@ namespace AST
 				Node::Ptr symname = new Node{rgSymbolName};
 				funcKindFunc->children.push_back(symname);
 
-				symname->children.push_back(createNodeIdentifier(name, true));
+				funcname = createNodeIdentifier(nullptr, true);
+				symname->children.push_back(funcname);
 			}
 		}
 		return func;
 	}
 
 
-	Node* createNodeFuncCrefParam(const AnyString& name, const AnyString& paramname)
+	Node* createNodeFuncCrefParam(Node*& funcname, const AnyString& paramname)
 	{
-		auto* func = createNodeFunc(name);
+		auto* func = createNodeFunc(funcname);
 
 		// func-params (+3)
 		// |   func-param (+2)

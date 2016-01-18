@@ -73,6 +73,31 @@ namespace Producer
 				Node::Ptr lvidnode;
 			}
 			literal;
+
+			struct {
+				Node::Ptr createObject;
+				YString text;
+			}
+			string;
+
+			struct {
+				Node::Ptr node;
+				Node* funcname = nullptr;
+				Node* varname = nullptr;
+			}
+			func;
+
+			struct {
+				Node::Ptr node;
+				Node* funcname = nullptr;
+			}
+			operatorDefault;
+
+			struct {
+				Node::Ptr node;
+				Node* funcname;
+			}
+			operatorClone;
 		}
 		reuse;
 

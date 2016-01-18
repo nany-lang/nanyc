@@ -315,27 +315,24 @@ operator-kind: notext // like operator-all, but not hidden
 
 // --- STRINGS ---
 
-char-extended: hidden, notext
+char-extended:
 	[abcdefghijklmnopqrstuvwxyz\\"%$] | (([xuU]) hex+) | integer
 
 string-interpolation: notext
-	tk-string-var-open  expr  tk-string-var-close
+	tk-string-var-open  expr?  tk-string-var-close
 
-single-char: hidden, notext
+char: hidden
+	| [^\\"\n]
 	| ('\\' char-extended)
-	| string-interpolation
-	| [^"\n]
 
 string-literal:
-	single-char*
+	[^\\"\n]+
 
 string: notext
-	tk-double-quote (string-literal tk-double-quote) | error-eol
+	tk-double-quote
+	((string-interpolation | ('\\' char-extended) | string-literal)* tk-double-quote) | error-eol
 
-char:
-	single-char
-
-char-value: hidden notext
+char-value:
 	['] char [']
 
 

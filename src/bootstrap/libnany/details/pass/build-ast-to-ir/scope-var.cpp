@@ -96,10 +96,14 @@ namespace Producer
 		// the first parameter is the result of the default value
 		// the second parameter is the register where the name of member has been stored
 
-		auto funcInitNode = AST::createNodeFunc(funcName);
+		auto& reuse = context.reuse.func;
+
+		if (!reuse.node)
 		{
+			reuse.node = AST::createNodeFunc(reuse.funcname);
+
 			Node::Ptr funcBody = new Node{rgFuncBody};
-			funcInitNode->children.push_back(funcBody);
+			(reuse.node)->children.push_back(funcBody);
 
 			Node::Ptr expr = new Node{rgExpr};
 			funcBody->children.push_back(expr);
@@ -143,12 +147,14 @@ namespace Producer
 				Node::Ptr pexpr = new Node{rgExpr};
 				callparam->children.push_back(pexpr);
 
-				Node::Ptr value  = new Node{rgStringLiteral};
-				pexpr->children.push_back(value);
-				value->text = varname;
+				reuse.varname = new Node{rgStringLiteral};
+				pexpr->children.push_back(reuse.varname);
 			}
 		}
-		return visitASTFunc(*funcInitNode);
+
+		reuse.funcname->text = funcName;
+		reuse.varname->text = varname;
+		return visitASTFunc(*(reuse.node));
 	}
 
 
@@ -177,7 +183,7 @@ namespace Producer
 					varnodeDecl = &child;
 					varname = child.text;
 					setErrorFrom(child);
-					if (unlikely(not checkForValidIdentifierName(pContext.report, child, varname, false)))
+					if (unlikely(not checkForValidIdentifierName(context.report, child, varname, false)))
 						return false;
 					break;
 				}

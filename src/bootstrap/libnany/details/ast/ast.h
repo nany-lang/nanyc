@@ -33,10 +33,10 @@ namespace AST
 	Node* createNodeIdentifier(const AnyString& name, bool withMetadata = false);
 
 	//! Create a new node 'function'
-	Node* createNodeFunc(const AnyString& name);
+	Node* createNodeFunc(Node*& funcname);
 
 	//! Create a new node 'function' with 1 cref param
-	Node* createNodeFuncCrefParam(const AnyString& name, const AnyString& paramname);
+	Node* createNodeFuncCrefParam(Node*& funcname, const AnyString& paramname);
 
 
 

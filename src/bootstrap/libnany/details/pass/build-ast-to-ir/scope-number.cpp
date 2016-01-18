@@ -183,7 +183,7 @@ namespace Producer
 		}
 		else
 		{
-			if (!pContext.reuse.literal.node)
+			if (!context.reuse.literal.node)
 			{
 				// new (+2)
 				//     type-decl
@@ -192,7 +192,7 @@ namespace Producer
 				//         call-parameter
 				//             expr
 				//                 register: <lvid>
-				auto& cache = pContext.reuse.literal;
+				auto& cache = context.reuse.literal;
 				cache.node = new Node{rgNew};
 				Node::Ptr typeDecl = new Node{rgTypeDecl};
 				cache.node->children.push_back(typeDecl);
@@ -209,19 +209,20 @@ namespace Producer
 				expr->children.push_back(cache.lvidnode);
 			}
 
-			pContext.reuse.literal.classname->text = cn;
+			context.reuse.literal.classname->text = cn;
 			ShortString16 lvidstr;
 			lvidstr = hardcodedlvid;
-			pContext.reuse.literal.lvidnode->text = lvidstr;
+			context.reuse.literal.lvidnode->text = lvidstr;
 
 
-			bool success = visitASTExprNew(*(pContext.reuse.literal.node), localvar);
+			bool success = visitASTExprNew(*(context.reuse.literal.node), localvar);
 
-			if (debugmode)
-			{
-				pContext.reuse.literal.classname->text.clear();
-				pContext.reuse.literal.lvidnode->text.clear();
-			}
+			//if (debugmode)
+			//{
+			//	// to not print invalid data in the debugger
+			//	context.reuse.literal.classname->text.clear();
+			//	context.reuse.literal.lvidnode->text.clear();
+			//}
 			return success;
 		}
 	}

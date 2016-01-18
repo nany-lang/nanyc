@@ -14,13 +14,13 @@ namespace Producer
 {
 
 	inline Scope::Scope(Context& context)
-		: pContext(context)
+		: context(context)
 		, broadcastNextVarID(false)
 	{}
 
 
 	inline Scope::Scope(Scope& scope)
-		: pContext(scope.pContext)
+		: context(scope.context)
 		, pNextVarID(scope.pNextVarID)
 		, parentScope(&scope)
 		, kind(scope.kind)
@@ -39,19 +39,19 @@ namespace Producer
 
 	inline Logs::Report& Scope::report()
 	{
-		return pContext.report;
+		return context.report;
 	}
 
 
 	inline Program& Scope::program()
 	{
-		return pContext.program;
+		return context.program;
 	}
 
 
 	inline AnyString Scope::acquireString(const AnyString& string)
 	{
-		return pContext.program.stringrefs.refstr(string);
+		return context.program.stringrefs.refstr(string);
 	}
 
 
@@ -75,13 +75,13 @@ namespace Producer
 
 	inline void Scope::addDebugCurrentPosition(uint line, uint offset)
 	{
-		if (pContext.debuginfo)
+		if (context.debuginfo)
 		{
-			if (not Config::removeRedundantDbgOffset or offset != pContext.pPreviousDbgOffset or line != pContext.pPreviousDbgLine)
+			if (not Config::removeRedundantDbgOffset or offset != context.pPreviousDbgOffset or line != context.pPreviousDbgLine)
 			{
 				program().emitDebugpos(line, offset);
-				pContext.pPreviousDbgOffset = offset;
-				pContext.pPreviousDbgLine = line;
+				context.pPreviousDbgOffset = offset;
+				context.pPreviousDbgLine = line;
 			}
 		}
 	}
@@ -95,7 +95,7 @@ namespace Producer
 
 	inline void Scope::addDebugCurrentFilename()
 	{
-		addDebugCurrentFilename(pContext.dbgSourceFilename);
+		addDebugCurrentFilename(context.dbgSourceFilename);
 	}
 
 
@@ -106,8 +106,8 @@ namespace Producer
 		pNextVarID = localvarStart;
 
 		// force debug info
-		pContext.pPreviousDbgOffset = 0;
-		pContext.pPreviousDbgLine = 0;
+		context.pPreviousDbgOffset = 0;
+		context.pPreviousDbgLine = 0;
 	}
 
 	inline uint32_t Scope::nextvar()
@@ -150,7 +150,7 @@ namespace Producer
 
 	inline bool Scope::hasDebuginfo() const
 	{
-		return pContext.debuginfo;
+		return context.debuginfo;
 	}
 
 
@@ -187,7 +187,7 @@ namespace Producer
 
 	inline void Scope::setErrorFrom(const Node& node) const
 	{
-		setErrorFrom(pContext.report, node);
+		setErrorFrom(context.report, node);
 	}
 
 

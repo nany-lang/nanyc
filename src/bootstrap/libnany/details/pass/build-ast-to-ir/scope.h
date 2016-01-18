@@ -31,7 +31,7 @@ namespace Producer
 		//! \name Constructor & Destructor
 		//@{
 		//! Default constructor from a producer context
-		Scope(Context& context);
+		explicit Scope(Context& context);
 		//! Default constructor from another scope
 		Scope(Scope& scope);
 		//! Destructor
@@ -62,10 +62,11 @@ namespace Producer
 		bool visitASTExprSubDot(Node&, LVID& localvar);
 		bool visitASTExprScope(Node&);
 		bool visitASTExprNumber(Node&, LVID& localvar);
+		bool visitASTExprString(Node&, LVID& localvar);
+		bool visitASTExprStringLiteral(Node&, LVID& localvar);
 		bool visitASTExprNew(const Node&, LVID& localvar);
 		bool visitASTExprTypeDecl(Node&, LVID& localvar);
 		bool visitASTExprTypeof(Node&, LVID& localvar);
-		bool visitASTExprStringLiteral(Node&, LVID& localvar);
 		bool visitASTExprIfStmt(Node&);
 		bool visitASTExprIfExpr(Node&, LVID& localvar);
 		bool visitASTExprWhile(Node&);
@@ -157,14 +158,17 @@ namespace Producer
 		//@}
 
 
+	public:
+		//! Context
+		Context& context;
+
+
 	private:
 		bool generateInitFuncForClassVar(const AnyString& varname, LVID, const Node& varAssign);
 		bool generateTypeofForClassVar(LVID&, const Node& varAssign);
 		template<bool BuiltinT, class DefT> bool generateNumberCode(uint32_t& localvar, const DefT& numdef, const Node&);
 
 	private:
-		//! Context
-		Context& pContext;
 		//! Next local variable
 		LVID pNextVarID = 0u;
 		//! Parent scope (if any)

@@ -19,7 +19,7 @@ namespace Producer
 	{
 		if (not Nany::ASTRuleIsError(node.rule))
 		{
-			auto report = pContext.report.ICE();
+			auto report = context.report.ICE();
 			auto rulename = Nany::ASTRuleToString(node.rule);
 			report << "unexpected node '" << rulename << '\'';
 			if (not location.empty())
@@ -33,7 +33,7 @@ namespace Producer
 
 	Logs::Report Scope::error(const Node& node)
 	{
-		auto err = pContext.report.error();
+		auto err = context.report.error();
 		setErrorFrom(err, node);
 		return err;
 	}
@@ -41,7 +41,7 @@ namespace Producer
 
 	Logs::Report Scope::warning(const Node& node)
 	{
-		auto err = pContext.report.warning();
+		auto err = context.report.warning();
 		setErrorFrom(err, node);
 		return err;
 	}
@@ -49,7 +49,7 @@ namespace Producer
 
 	Logs::Report Scope::ICE(Node& node) const
 	{
-		auto ice = pContext.report.ICE();
+		auto ice = context.report.ICE();
 		setErrorFrom(ice, node);
 		return ice;
 	}
@@ -60,10 +60,10 @@ namespace Producer
 	{
 		if (node.offset > 0)
 		{
-			auto it = pContext.offsetToLine.lower_bound(node.offset);
-			if (it != pContext.offsetToLine.end())
+			auto it = context.offsetToLine.lower_bound(node.offset);
+			if (it != context.offsetToLine.end())
 			{
-				if (it->first == node.offset or (--it != pContext.offsetToLine.end()))
+				if (it->first == node.offset or (--it != context.offsetToLine.end()))
 				{
 					line = it->second;
 					offset = node.offset - it->first;
@@ -85,10 +85,10 @@ namespace Producer
 	{
 		if (likely(node.offset > 0))
 		{
-			auto it = pContext.offsetToLine.lower_bound(node.offset);
-			if (it != pContext.offsetToLine.end())
+			auto it = context.offsetToLine.lower_bound(node.offset);
+			if (it != context.offsetToLine.end())
 			{
-				if (it->first == node.offset or (--it != pContext.offsetToLine.end()))
+				if (it->first == node.offset or (--it != context.offsetToLine.end()))
 					addDebugCurrentPosition(it->second, node.offset - it->first);
 			}
 		}

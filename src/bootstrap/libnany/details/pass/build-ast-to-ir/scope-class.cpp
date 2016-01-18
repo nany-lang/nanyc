@@ -85,14 +85,23 @@ namespace Producer
 			// those functions are currently empty, but may be filled later at instanciation
 			// if the equivalent operator 'new', 'clone' & 'dispose' are not defined
 			// by the user, those functions will be renamed on the fly
-			Node::Ptr defaultNew = AST::createNodeFunc("^default-new");
-			success &= scope.visitASTFunc(*defaultNew);
 
-			Node::Ptr defaultDispose = AST::createNodeFunc("^obj-dispose");
-			success &= scope.visitASTFunc(*defaultDispose);
+			auto& reuse = scope.context.reuse;
 
-			Node::Ptr defaultClone = AST::createNodeFuncCrefParam("^obj-clone", "rhs");
-			success &= scope.visitASTFunc(*defaultClone);
+			if (!reuse.operatorDefault.node)
+				reuse.operatorDefault.node = AST::createNodeFunc(reuse.operatorDefault.funcname);
+
+			if (!reuse.operatorClone.node)
+				reuse.operatorClone.node = AST::createNodeFuncCrefParam(reuse.operatorClone.funcname, "rhs");
+
+			reuse.operatorDefault.funcname->text = "^default-new";
+			success &= scope.visitASTFunc(*reuse.operatorDefault.node);
+
+			reuse.operatorDefault.funcname->text = "^obj-dispose";
+			success &= scope.visitASTFunc(*reuse.operatorDefault.node);
+
+			reuse.operatorClone.funcname->text = "^obj-clone";
+			success &= scope.visitASTFunc(*(reuse.operatorClone.node));
 			return success;
 		}
 

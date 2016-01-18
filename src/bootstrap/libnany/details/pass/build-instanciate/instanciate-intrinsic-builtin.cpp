@@ -21,7 +21,7 @@ namespace Instanciate
 		uint32_t lvidsid = lastPushedIndexedParameters[1].lvid;
 		uint32_t sid = frame.lvids[lvidsid].text_sid;
 		if (unlikely(sid == (uint32_t) -1))
-			return (ICE() << "invalid string-id for field name");
+			return (ICE() << "invalid string-id for field name (got lvid " << lvidsid << ')');
 
 		AnyString varname = out.stringrefs[sid];
 		if (unlikely(varname.empty()))
