@@ -798,44 +798,52 @@ namespace // anonymous
 
 
 
-
-
-int execute(bool& success, nycontext_t& context, const IR::Sequence& sequence, const AtomMap& map)
-{
-	uint64_t returnvalue = 0;
-	success = false;
-
-	try
+	Program::~Program()
 	{
-		ThreadContext thrctx{map, context, sequence};
-		returnvalue = thrctx.invoke(sequence);
-		success = true;
-	}
-	catch (const CodeException&)
-	{
-		// error already handled
-	}
-	catch (const std::bad_alloc&)
-	{
-		context.memory.on_not_enough_memory(&context);
-	}
-	catch (const std::exception& e)
-	{
-		String msg; msg << "error: exception: " << e.what() << '\n';
-		context.console.write_stderr(&context, msg.c_str(), msg.size());
-	}
-	catch (...)
-	{
-		AnyString txt{"error: exception received: aborting\n"};
-		context.console.write_stderr(&context, txt.c_str(), txt.size());
+		if (ownsSequence)
+			delete sequence;
 	}
 
-	// always flush to make sure that the listener will update the output
-	// (mainly when embedded into a C/C++ application)
-	context.console.flush_stderr(&context);
-	context.console.flush_stdout(&context);
-	return static_cast<int>(returnvalue);
-}
+
+	bool Program::execute()
+	{
+		retvalue = 0;
+		bool success = false;
+
+		try
+		{
+			if (YUNI_UNLIKELY(nullptr == sequence))
+				throw String{"invalid sequence object"};
+
+			ThreadContext thrctx{map, context, *sequence};
+			retvalue = thrctx.invoke(*sequence);
+			success = true;
+		}
+		catch (const CodeException&)
+		{
+			// error already handled
+		}
+		catch (const std::bad_alloc&)
+		{
+			context.memory.on_not_enough_memory(&context);
+		}
+		catch (const std::exception& e)
+		{
+			String msg; msg << "error: exception: " << e.what() << '\n';
+			context.console.write_stderr(&context, msg.c_str(), msg.size());
+		}
+		catch (...)
+		{
+			AnyString txt{"error: exception received: aborting\n"};
+			context.console.write_stderr(&context, txt.c_str(), txt.size());
+		}
+
+		// always flush to make sure that the listener will update the output
+		// (mainly when embedded into a C/C++ application)
+		context.console.flush_stderr(&context);
+		context.console.flush_stdout(&context);
+		return success;
+	}
 
 
 

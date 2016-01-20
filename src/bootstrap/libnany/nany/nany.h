@@ -199,6 +199,9 @@ typedef struct nyreport_t  nyreport_t;
 /*! Opaque structure for object */
 typedef struct nyobject_t  nyobject_t;
 
+/*! Nany compiled program */
+typedef struct nyprogram_t nyprogram_t;
+
 
 /*! Opaque structure for queueservice */
 typedef struct nyqueueservice_t nyqueueservice_t;

@@ -90,7 +90,10 @@ namespace Nany
 				return 0;
 			}
 		}
-		return VM::execute(success, ctx, *sequence, classdefTable.atoms);
+
+		VM::Program program{ctx, sequence, classdefTable.atoms};
+		success = program.execute();
+		return static_cast<int>(program.retvalue);
 	}
 
 

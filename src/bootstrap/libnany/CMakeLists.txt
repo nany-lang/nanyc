@@ -254,6 +254,7 @@ addsrc(
 	"details/vm/stack.h"
 	"details/vm/stack.hxx"
 	"details/vm/types.h"
+	"details/vm/vm.hxx"
 	"details/vm/vm.h")
 
 
