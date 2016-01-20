@@ -130,9 +130,9 @@ namespace Producer
 		scope.broadcastNextVarID = false;
 
 		// creating a new blueprint for the function
-		uint32_t bpoffset = program().emitBlueprintClass();
-		uint32_t bpoffsiz = program().emitBlueprintSize();
-		uint32_t bpoffsck = program().emitStackSizeIncrease();
+		uint32_t bpoffset = sequence().emitBlueprintClass();
+		uint32_t bpoffsiz = sequence().emitBlueprintSize();
+		uint32_t bpoffsck = sequence().emitStackSizeIncrease();
 
 		// making sure that debug info are available
 		scope.addDebugCurrentFilename();
@@ -146,8 +146,8 @@ namespace Producer
 			ClassInspector inspector{scope};
 			success = inspector.inspect(node);
 
-			auto& operands = program().at<ISA::Op::pragma>(bpoffset);
-			operands.value.blueprint.name = program().stringrefs.ref(inspector.classname);
+			auto& operands = sequence().at<ISA::Op::pragma>(bpoffset);
+			operands.value.blueprint.name = sequence().stringrefs.ref(inspector.classname);
 			return inspector.body;
 		})();
 
@@ -163,10 +163,10 @@ namespace Producer
 
 
 		// end of the blueprint
-		program().emitEnd();
-		uint32_t blpsize = program().opcodeCount() - bpoffset;
-		program().at<ISA::Op::pragma>(bpoffsiz).value.blueprintsize = blpsize;
-		program().at<ISA::Op::stacksize>(bpoffsck).add = scope.pNextVarID + 1;
+		sequence().emitEnd();
+		uint32_t blpsize = sequence().opcodeCount() - bpoffset;
+		sequence().at<ISA::Op::pragma>(bpoffsiz).value.blueprintsize = blpsize;
+		sequence().at<ISA::Op::stacksize>(bpoffsck).add = scope.pNextVarID + 1;
 		return success;
 	}
 

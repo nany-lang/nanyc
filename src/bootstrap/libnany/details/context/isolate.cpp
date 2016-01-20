@@ -1,5 +1,5 @@
 #include "isolate.h"
-#include "details/ir/program.h"
+#include "details/ir/sequence.h"
 #include "details/reporting/report.h"
 #include "details/atom/classdef-table-view.h"
 #include "details/vm/vm.h"
@@ -12,10 +12,10 @@ using namespace Yuni;
 namespace Nany
 {
 
-	Isolate::AttachedProgramRef::~AttachedProgramRef()
+	Isolate::AttachedSequenceRef::~AttachedSequenceRef()
 	{
 		if (owned)
-			delete program;
+			delete sequence;
 	}
 
 
@@ -25,13 +25,13 @@ namespace Nany
 		out.reserve(1024);
 		uint index = 0;
 
-		for (auto& ref: pAttachedPrograms)
+		for (auto& ref: pAttachedSequences)
 		{
-			if (ref.program != nullptr)
+			if (ref.sequence != nullptr)
 			{
 				auto trace = (report.trace() << "\n");
-				trace.data().prefix << "SOURCE COMPILATION PROGRAM " << index;
-				ref.program->print(trace.data().message);
+				trace.data().prefix << "SOURCE COMPILATION sequence " << index;
+				ref.sequence->print(trace.data().message);
 				trace.data().message.shrink();
 				report.info(); // for beauty
 			}
@@ -46,7 +46,7 @@ namespace Nany
 	{
 		success = false;
 
-		const IR::Program* program;
+		const IR::Sequence* sequence;
 		{
 			// try to find the entrypoint
 			Atom* entrypointAtom = nullptr;
@@ -80,8 +80,8 @@ namespace Nany
 				return 0;
 			}
 
-			program = entrypointAtom->fetchInstance(0);
-			if (unlikely(nullptr == program))
+			sequence = entrypointAtom->fetchInstance(0);
+			if (unlikely(nullptr == sequence))
 			{
 				String msg;
 				msg << "error: failed to instanciate '" << entrypoint << "()': function not found\n";
@@ -90,7 +90,7 @@ namespace Nany
 				return 0;
 			}
 		}
-		return VM::execute(success, ctx, *program, classdefTable.atoms);
+		return VM::execute(success, ctx, *sequence, classdefTable.atoms);
 	}
 
 

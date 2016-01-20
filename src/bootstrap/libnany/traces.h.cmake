@@ -44,10 +44,10 @@ namespace Traces
 	static constexpr bool printClassdefTable = all or false;
 
 	//! Print opcodes generated from AST
-	static constexpr bool printSourceOpcodeProgram = all or false;
+	static constexpr bool printSourceOpcodeSequence = all or false;
 
 	//! Print opcodes after program instanciation
-	static constexpr bool printGeneratedOpcodeProgram = all or false;
+	static constexpr bool printGeneratedOpcodeSequence = all or false;
 
 
 

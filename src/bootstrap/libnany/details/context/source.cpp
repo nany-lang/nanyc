@@ -147,11 +147,11 @@ namespace Nany
 					// uses the normalized AST to generate high-level nany-IR
 					astSuccess &= passTransformASTToIRWL(report);
 
-					// attach the new program to the execution context
+					// attach the new sequence to the execution context
 					if (astSuccess)
 					{
-						auto& program = pBuildInfo->parsing.program;
-						astSuccess &= ctx.isolate.attach(program, report);
+						auto& sequence = pBuildInfo->parsing.sequence;
+						astSuccess &= ctx.isolate.attach(sequence, report);
 					}
 				}
 

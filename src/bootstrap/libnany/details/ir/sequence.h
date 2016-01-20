@@ -29,17 +29,17 @@ namespace IR
 
 
 
-	class Program final
+	class Sequence final
 	{
 	public:
 		//! \name Constructors & Destructor
 		//@{
 		//! Default constructor
-		Program();
+		Sequence();
 		//! Copy constructor
-		Program(const Program&) = delete;
+		Sequence(const Sequence&) = delete;
 		//! Destructor
-		~Program();
+		~Sequence();
 		//@}
 
 		//! \name Opcodes
@@ -58,9 +58,9 @@ namespace IR
 		//! emit a new Instruction (without reserving data if needed)
 		template<ISA::Op O> ISA::Operand<O>& emitraw();
 
-		//! Get the offset of an instruction within the program
+		//! Get the offset of an instruction within the sequence
 		template<ISA::Op O> uint32_t offsetOf(const ISA::Operand<O>& instr) const;
-		//! Get the offset of an instruction within the program
+		//! Get the offset of an instruction within the sequence
 		uint32_t offsetOf(const Instruction& instr) const;
 
 		//! Get the upper limit
@@ -211,22 +211,22 @@ namespace IR
 
 		//! Emit a blueprint class opcode
 		void emitBlueprintClass(const AnyString& name, uint32_t atomid);
-		//! Emit a blueprint class opcode and give the offset of the instruction in the program
+		//! Emit a blueprint class opcode and give the offset of the instruction in the sequence
 		uint32_t emitBlueprintClass();
 		//! Emit a blueprint func opcode
 		void emitBlueprintFunc(const AnyString& name, uint32_t atomid);
-		//! Emit a blueprint func opcode and give the offset of the instruction in the program
+		//! Emit a blueprint func opcode and give the offset of the instruction in the sequence
 		uint32_t emitBlueprintFunc();
-		//! Emit a blueprint size opcode and give the offset of the instruction in the program
+		//! Emit a blueprint size opcode and give the offset of the instruction in the sequence
 		uint32_t emitBlueprintSize();
-		//! Emit a blueprint param opcode and give the offset of the instruction in the program
+		//! Emit a blueprint param opcode and give the offset of the instruction in the sequence
 		uint32_t emitBlueprintParam(LVID, const AnyString&);
-		//! Emit a blueprint param opcode and give the offset of the instruction in the program
+		//! Emit a blueprint param opcode and give the offset of the instruction in the sequence
 		uint32_t emitBlueprintParam(LVID);
 		//! Emit a blueprint vardef opcode
 		void emitBlueprintVardef(LVID, const AnyString&);
 
-		//! Emit a stack size increase opcode and give the offset of the instruction in the program
+		//! Emit a stack size increase opcode and give the offset of the instruction in the sequence
 		uint32_t emitStackSizeIncrease();
 		//! Emit a stack size increase opcode
 		uint32_t emitStackSizeIncrease(uint32_t size);
@@ -281,14 +281,14 @@ namespace IR
 
 		//! \name Memory Management
 		//@{
-		//! Get how many instructions the program has
+		//! Get how many instructions the sequence has
 		uint32_t opcodeCount() const;
-		//! Get the capacity of the program (in instructions)
+		//! Get the capacity of the sequence (in instructions)
 		uint32_t capacity() const;
-		//! Get the amount of memory in bytes used by the program
+		//! Get the amount of memory in bytes used by the sequence
 		size_t sizeInBytes() const;
 
-		//! Clear the program
+		//! Clear the sequence
 		void clear();
 		//! Shrink the memory used by the pBody
 		void shrink();
@@ -299,16 +299,16 @@ namespace IR
 
 		//! \name Atom relationship
 		//@{
-		//! Get if the program is attached to an atom
+		//! Get if the sequence is attached to an atom
 		bool hasAtomParent() const;
 		//@}
 
 
 		//! \name Debug
 		//@{
-		//! Print the program to a string
+		//! Print the sequence to a string
 		void print(Yuni::String& out, const AtomMap* = nullptr) const;
-		//! Print the program to a clob
+		//! Print the sequence to a clob
 		void print(Yuni::Clob& out, const AtomMap* = nullptr) const;
 
 		//! Get the raw pointer of an offset in memory (for "watching" changes from gdb)
@@ -328,16 +328,16 @@ namespace IR
 		void grow(uint32_t newcapa);
 
 	private:
-		//! Size of the program
+		//! Size of the sequence
 		uint32_t pSize = 0;
-		//! Capacity of the program
+		//! Capacity of the sequence
 		uint32_t pCapacity = 0;
-		//! pBody of the program
+		//! pBody of the sequence
 		std::unique_ptr<Instruction, decltype(std::free)*> pBody;
 		//! Attaced Atom, if any
 		Atom* pAtom = nullptr;
 
-	}; // class Program
+	}; // class Sequence
 
 
 
@@ -346,5 +346,5 @@ namespace IR
 } // namespace IR
 } // namespace Nany
 
-#include "program.hxx"
+#include "sequence.hxx"
 #include "scope-locker.h"

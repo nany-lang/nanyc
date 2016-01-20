@@ -411,11 +411,11 @@ nytctx_t;
 */
 NY_EXPORT nycontext_t* nany_create(const nycontext_t* inherit);
 /*!
-** \brief Release a program previously created by nany_create
-** \param program A program (can be null) to release. The pointer will be set to NULL
+** \brief Release a context previously created by nany_create
+** \param ctx A context (can be null) to release. The pointer will be set to NULL
 ** \see nany_create()
 */
-NY_EXPORT void nany_dispose(nycontext_t**);
+NY_EXPORT void nany_dispose(nycontext_t** ctx);
 
 /*!
 ** \brief Initialize a context already allocated

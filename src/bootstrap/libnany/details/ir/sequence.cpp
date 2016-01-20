@@ -1,4 +1,4 @@
-#include "program.h"
+#include "sequence.h"
 #include <cstdlib>
 #include "details/ir/isa/printer.inc.hpp"
 #include "details/atom/atom.h"
@@ -13,29 +13,29 @@ namespace IR
 {
 
 
-	Program::Program()
+	Sequence::Sequence()
 		: pBody(nullptr, std::free)
 	{}
 
-	Program::~Program()
+	Sequence::~Sequence()
 	{}
 
 
-	void Program::clear()
+	void Sequence::clear()
 	{
 		pSize = 0;
 		stringrefs.clear();
 	}
 
 
-	size_t Program::sizeInBytes() const
+	size_t Sequence::sizeInBytes() const
 	{
 		return pCapacity * sizeof(Instruction) + stringrefs.inspectMemoryUsage();
 	}
 
 
 
-	void Program::grow(uint32_t N)
+	void Sequence::grow(uint32_t N)
 	{
 		auto newcapa = pCapacity;
 		do { newcapa += 1000000; } while (newcapa < N);
@@ -50,7 +50,7 @@ namespace IR
 	}
 
 
-	void Program::shrink()
+	void Sequence::shrink()
 	{
 		if (pSize == 0)
 		{
@@ -70,7 +70,7 @@ namespace IR
 
 
 
-	void Program::print(Clob& out, const AtomMap* atommap) const
+	void Sequence::print(Clob& out, const AtomMap* atommap) const
 	{
 		using namespace ISA;
 		out.reserve(out.size() + pSize * 20); // arbitrary
@@ -79,7 +79,7 @@ namespace IR
 		each(printer);
 	}
 
-	void Program::print(YString& out, const AtomMap* atommap) const
+	void Sequence::print(YString& out, const AtomMap* atommap) const
 	{
 		using namespace ISA;
 		out.reserve(out.size() + pSize * 20); // arbitrary
@@ -89,7 +89,7 @@ namespace IR
 	}
 
 
-	void Program::emitDebugfile(const AnyString& filename)
+	void Sequence::emitDebugfile(const AnyString& filename)
 	{
 		auto& operands    = emit<ISA::Op::debugfile>();
 		operands.filename = stringrefs.ref(filename);

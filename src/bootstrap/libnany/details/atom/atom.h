@@ -177,37 +177,37 @@ namespace Nany
 		//! \name Instances
 		//@{
 		/*!
-		** \brief Fetch the program for a given signature (if any) and update the signature
+		** \brief Fetch the sequence for a given signature (if any) and update the signature
 		**
-		** \param[out] Pointer to the program attached to the given signature
+		** \param[out] Pointer to the sequence attached to the given signature
 		** \param[in,out] The signature. If the instance is found, its return type
 		**  will be updated accordingly
 		*/
-		uint32_t findInstance(IR::Program*& program, Signature& signature);
+		uint32_t findInstance(IR::Sequence*& sequence, Signature& signature);
 		//! Find Instance ID
-		uint32_t findInstanceID(const IR::Program&) const;
+		uint32_t findInstanceID(const IR::Sequence&) const;
 
-		//! Get the caption for a program instance
-		AnyString findInstanceCaption(const IR::Program&) const;
+		//! Get the caption for a sequence instance
+		AnyString findInstanceCaption(const IR::Sequence&) const;
 
-		//! Fetch the program according its instance id
-		const IR::Program* fetchInstance(uint32_t instanceid) const;
+		//! Fetch the sequence according its instance id
+		const IR::Sequence* fetchInstance(uint32_t instanceid) const;
 
 		AnyString fetchInstanceCaption(uint32_t instanceid) const;
 
 		/*!
-		** \brief Fetch the program according its instance id
+		** \brief Fetch the sequence according its instance id
 		*/
-		const IR::Program& instance(uint32_t instanceid) const;
+		const IR::Sequence& instance(uint32_t instanceid) const;
 
 		/*!
 		** \brief Keep an instance of the atom for a given signature
 		**
 		** \param signature The signature of the atom (parameters)
-		** \param program The program itself (must not be null)
+		** \param sequence The sequence itself (must not be null)
 		** \param symbolname The complete symbol name (ex: "func A.foo(b: ref __i32): ref __i32")
 		*/
-		uint32_t assignInstance(const Signature& signature, IR::Program* program, const AnyString& symbolname);
+		uint32_t assignInstance(const Signature& signature, IR::Sequence* sequence, const AnyString& symbolname);
 
 		//! Mark as invalid a given signature
 		uint32_t assignInvalidInstance(const Signature& signature);
@@ -231,7 +231,7 @@ namespace Nany
 		//! Print the subtree
 		void print(Logs::Report& report, const ClassdefTableView&) const;
 
-		//! Print all instanciated programs for the atom
+		//! Print all instanciated sequences for the atom
 		void printInstances(Yuni::Clob& out, const AtomMap&) const;
 
 		/*!
@@ -247,7 +247,7 @@ namespace Nany
 
 	private:
 		//! All instances, indexed by their internal id
-		std::vector<std::unique_ptr<IR::Program>> instances;
+		std::vector<std::unique_ptr<IR::Sequence>> instances;
 
 	public:
 		//! Atom unique ID (32-bits only, used for classification)
@@ -346,16 +346,16 @@ namespace Nany
 		//! The maximum number of variables / classdefs registered for the atom
 		uint localVariablesCount = 0u;
 
-		//! The original IR program
+		//! The original IR sequence
 		struct
 		{
-			//! The original IR program
-			IR::Program* program = nullptr;
-			//! Offset to start within this program
+			//! The original IR sequence
+			IR::Sequence* sequence = nullptr;
+			//! Offset to start within this sequence
 			// \warning offset of the operands of the blueprint, not the opcode value
 			uint32_t offset = 0;
 
-			//! Flag to determine whether the program is owned by the atom or not
+			//! Flag to determine whether the sequence is owned by the atom or not
 			bool owned = false;
 		}
 		opcodes;
@@ -394,7 +394,7 @@ namespace Nany
 		//! All children
 		std::multimap<AnyString, Ptr> pChildren;
 		//! All code instances
-		std::unordered_map<Signature, std::pair<uint32_t, IR::Program*>> pInstancesBySign;
+		std::unordered_map<Signature, std::pair<uint32_t, IR::Sequence*>> pInstancesBySign;
 		//! Symbol names for instances in `pInstances`
 		std::vector<Yuni::String> pSymbolInstances;
 

@@ -121,8 +121,8 @@ namespace Producer
 		//@{
 		//! Acquire a string
 		AnyString acquireString(const AnyString& string);
-		//! The attached program
-		Program& program();
+		//! The attached sequence
+		Sequence& sequence();
 
 		//! Get if debuginfo should be used
 		bool hasDebuginfo() const;

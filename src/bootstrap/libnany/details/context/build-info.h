@@ -4,7 +4,7 @@
 #include "details/grammar/nany.h"
 #include "details/ast/tree-index.h"
 #include "details/intrinsic/intrinsic-table.h"
-#include "details/ir/program.h"
+#include "details/ir/sequence.h"
 #include "isolate.h"
 #include "nany/nany.h"
 
@@ -27,7 +27,7 @@ namespace Nany
 		bool success = true;
 		//! timestamp (in ms) of the start of current build
 		yint64 buildtime = 0;
-		//! list of all sources currently built (keep program for each source)
+		//! list of all sources currently built (keep sequence for each source)
 		std::vector<Source::Ptr> sources;
 	};
 
@@ -50,8 +50,8 @@ namespace Nany
 			//! Root node
 			Node::Ptr rootnode;
 
-			//! The original program, generated from the normalized AST
-			IR::Program program;
+			//! The original sequence, generated from the normalized AST
+			IR::Sequence sequence;
 
 			//! Parse / IR result
 			bool success = false;

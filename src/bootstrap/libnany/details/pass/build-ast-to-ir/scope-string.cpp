@@ -20,7 +20,7 @@ namespace Producer
 		// when called, this rule represents an internal cstring
 		// thus, this function is not called by an user-defined string
 		emitDebugpos(node);
-		localvar = program().emitStackallocText(nextvar(), node.text);
+		localvar = sequence().emitStackallocText(nextvar(), node.text);
 		return true;
 	}
 
@@ -55,8 +55,8 @@ namespace Producer
 		if (unlikely(not success))
 			return false;
 
-		// program output
-		auto& out = program();
+		// sequence output
+		auto& out = sequence();
 
 		uint32_t idlvid = out.emitStackalloc(nextvar(), nyt_any);
 		out.emitIdentify(idlvid, "append", localvar);

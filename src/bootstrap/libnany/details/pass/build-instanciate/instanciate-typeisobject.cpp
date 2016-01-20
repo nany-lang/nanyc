@@ -12,7 +12,7 @@ namespace Pass
 namespace Instanciate
 {
 
-	void ProgramBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::typeisobject>& operands)
+	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::typeisobject>& operands)
 	{
 		auto& frame = atomStack.back();
 		auto& cdef = cdeftable.classdef(CLID{frame.atomid, operands.lvid});

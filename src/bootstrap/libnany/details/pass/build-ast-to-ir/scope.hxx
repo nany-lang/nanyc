@@ -43,15 +43,15 @@ namespace Producer
 	}
 
 
-	inline Program& Scope::program()
+	inline Sequence& Scope::sequence()
 	{
-		return context.program;
+		return context.sequence;
 	}
 
 
 	inline AnyString Scope::acquireString(const AnyString& string)
 	{
-		return context.program.stringrefs.refstr(string);
+		return context.sequence.stringrefs.refstr(string);
 	}
 
 
@@ -63,13 +63,13 @@ namespace Producer
 
 	inline void Scope::comment(const AnyString& text)
 	{
-		program().emitComment(text);
+		sequence().emitComment(text);
 	}
 
 
 	inline void Scope::comment()
 	{
-		program().emitComment();
+		sequence().emitComment();
 	}
 
 
@@ -79,7 +79,7 @@ namespace Producer
 		{
 			if (not Config::removeRedundantDbgOffset or offset != context.pPreviousDbgOffset or line != context.pPreviousDbgLine)
 			{
-				program().emitDebugpos(line, offset);
+				sequence().emitDebugpos(line, offset);
 				context.pPreviousDbgOffset = offset;
 				context.pPreviousDbgLine = line;
 			}
@@ -89,7 +89,7 @@ namespace Producer
 
 	inline void Scope::addDebugCurrentFilename(const AnyString& filename)
 	{
-		program().emitDebugfile(filename);
+		sequence().emitDebugfile(filename);
 	}
 
 
@@ -123,28 +123,28 @@ namespace Producer
 	inline LVID Scope::createLocalBuiltinVoid(const Node& node)
 	{
 		emitDebugpos(node);
-		return program().emitStackalloc(nextvar(), nyt_void);
+		return sequence().emitStackalloc(nextvar(), nyt_void);
 	}
 
 
 	inline LVID Scope::createLocalBuiltinAny(const Node& node)
 	{
 		emitDebugpos(node);
-		return program().emitStackalloc(nextvar(), nyt_any);
+		return sequence().emitStackalloc(nextvar(), nyt_any);
 	}
 
 
 	inline LVID Scope::createLocalBuiltinFloat64(const Node& node, nytype_t type, double value)
 	{
 		emitDebugpos(node);
-		return program().emitStackalloc_f64(nextvar(), type, value);
+		return sequence().emitStackalloc_f64(nextvar(), type, value);
 	}
 
 
 	inline LVID Scope::createLocalBuiltinInt64(const Node& node, nytype_t type, yuint64 value)
 	{
 		emitDebugpos(node);
-		return program().emitStackalloc_u64(nextvar(), type, value);
+		return sequence().emitStackalloc_u64(nextvar(), type, value);
 	}
 
 

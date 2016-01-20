@@ -1,5 +1,5 @@
 #include "atom.h"
-#include "details/ir/program.h"
+#include "details/ir/sequence.h"
 #include "details/atom/classdef-table.h"
 #include "details/atom/classdef-table-view.h"
 #include "details/reporting/report.h"
@@ -32,16 +32,16 @@ namespace Nany
 	{
 		assert(instances.size() == pSymbolInstances.size());
 		if (opcodes.owned)
-			delete opcodes.program;
+			delete opcodes.sequence;
 	}
 
 
-	uint32_t Atom::findInstance(IR::Program*& program, Signature& signature)
+	uint32_t Atom::findInstance(IR::Sequence*& sequence, Signature& signature)
 	{
 		auto it = pInstancesBySign.find(signature);
 		if (it != pInstancesBySign.end())
 		{
-			program = it->second.second;
+			sequence = it->second.second;
 
 			auto& storedRetType = it->first.returnType;
 			signature.returnType.import(storedRetType);
@@ -317,13 +317,13 @@ namespace Nany
 	}
 
 
-	uint32_t Atom::assignInstance(const Signature& signature, IR::Program* program, const AnyString& symbolname)
+	uint32_t Atom::assignInstance(const Signature& signature, IR::Sequence* sequence, const AnyString& symbolname)
 	{
-		assert(program != nullptr);
+		assert(sequence != nullptr);
 		uint32_t iid = (uint32_t) instances.size();
-		instances.emplace_back(program);
+		instances.emplace_back(sequence);
 		pSymbolInstances.emplace_back(symbolname);
-		pInstancesBySign.insert(std::make_pair(signature, std::make_pair(iid, program)));
+		pInstancesBySign.insert(std::make_pair(signature, std::make_pair(iid, sequence)));
 		assert(instances.size() == pSymbolInstances.size());
 		return iid;
 	}
@@ -346,22 +346,22 @@ namespace Nany
 	}
 
 
-	uint32_t Atom::findInstanceID(const IR::Program& program) const
+	uint32_t Atom::findInstanceID(const IR::Sequence& sequence) const
 	{
 		for (size_t i = 0; i != instances.size(); ++i)
 		{
-			if (&program == instances[i].get())
+			if (&sequence == instances[i].get())
 				return static_cast<uint32_t>(i);
 		}
 		return (uint32_t) -1;
 	}
 
 
-	AnyString Atom::findInstanceCaption(const IR::Program& program) const
+	AnyString Atom::findInstanceCaption(const IR::Sequence& sequence) const
 	{
 		for (size_t i = 0; i != instances.size(); ++i)
 		{
-			if (&program == instances[i].get())
+			if (&sequence == instances[i].get())
 				return pSymbolInstances[i];
 		}
 		return AnyString{};

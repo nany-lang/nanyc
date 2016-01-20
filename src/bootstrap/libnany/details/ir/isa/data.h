@@ -7,7 +7,7 @@
 
 
 // forward declaration
-namespace Nany { class AtomMap; namespace IR { class Program; struct Instruction; } }
+namespace Nany { class AtomMap; namespace IR { class Sequence; struct Instruction; } }
 
 
 namespace Nany
@@ -642,12 +642,12 @@ namespace ISA
 
 
 
-	Yuni::String print(const Program&, const Nany::IR::Instruction&, const AtomMap* = nullptr);
+	Yuni::String print(const Sequence&, const Nany::IR::Instruction&, const AtomMap* = nullptr);
 
 	template<Nany::IR::ISA::Op O>
-	inline Yuni::String print(const Program& program, const Nany::IR::ISA::Operand<O>& operands, const AtomMap* map = nullptr)
+	inline Yuni::String print(const Sequence& sequence, const Nany::IR::ISA::Operand<O>& operands, const AtomMap* map = nullptr)
 	{
-		return print(program, reinterpret_cast<const Nany::IR::Instruction&>(operands), map);
+		return print(sequence, reinterpret_cast<const Nany::IR::Instruction&>(operands), map);
 	}
 
 

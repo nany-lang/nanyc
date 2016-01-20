@@ -1,6 +1,6 @@
 #pragma once
 #include "opcodes.h"
-#include "../program.h"
+#include "../sequence.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include "details/atom/atom-map.h"
@@ -21,19 +21,19 @@ namespace // anonymous
 		S& out;
 		Yuni::String tabs;
 		Yuni::String tmp;
-		const Program& program;
+		const Sequence& sequence;
 		const Instruction** cursor = nullptr;
 		const Nany::AtomMap* atommap = nullptr;
 
 
-		Printer(S& out, const Program& program) : out(out), program(program) {}
+		Printer(S& out, const Sequence& sequence) : out(out), sequence(sequence) {}
 		void indent()   { tabs.append("    ", 4); }
 		void unindent() { tabs.chop(4); }
 		void printEOL() { out += '\n'; }
 
 		void printString(uint32_t sid)
 		{
-			auto text = program.stringrefs[sid];
+			auto text = sequence.stringrefs[sid];
 			out << '@' << sid << "\"" << text << "\"";
 		}
 
@@ -207,7 +207,7 @@ namespace // anonymous
 			if (atommap and atomid != 0)
 			{
 				out << " // ";
-				auto caption = atommap->fetchProgramCaption(atomid, instanceid);
+				auto caption = atommap->fetchSequenceCaption(atomid, instanceid);
 				if (not caption.empty())
 					out << caption;
 				else
@@ -320,7 +320,7 @@ namespace // anonymous
 			if (operands.text != 0) // not empty
 			{
 				out << tabs << "// ";
-				auto text = program.stringrefs[operands.text];
+				auto text = sequence.stringrefs[operands.text];
 				if (not text.contains('\n'))
 				{
 					printString(operands.text);
@@ -626,7 +626,7 @@ namespace // anonymous
 
 		inline void visit(const IR::Instruction& instruction)
 		{
-			LIBNANY_IR_VISIT_PROGRAM(const IR::ISA::Operand, *this, instruction);
+			LIBNANY_IR_VISIT_SEQUENCE(const IR::ISA::Operand, *this, instruction);
 		}
 	};
 

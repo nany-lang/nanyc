@@ -13,7 +13,7 @@ namespace Instanciate
 {
 
 
-	void ProgramBuilder::tryUnrefObject(uint32_t lvid)
+	void SequenceBuilder::tryUnrefObject(uint32_t lvid)
 	{
 		auto& frame = atomStack.back();
 		if (not frame.verify(lvid))
@@ -43,7 +43,7 @@ namespace Instanciate
 	}
 
 
-	void ProgramBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::ref>& operands)
+	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::ref>& operands)
 	{
 		if (not atomStack.back().verify(operands.lvid))
 			return;

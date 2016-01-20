@@ -15,7 +15,7 @@ namespace Instanciate
 {
 
 
-	inline bool ProgramBuilder::emitFuncCall(const IR::ISA::Operand<IR::ISA::Op::call>& operands)
+	inline bool SequenceBuilder::emitFuncCall(const IR::ISA::Operand<IR::ISA::Op::call>& operands)
 	{
 		// the current frame
 		auto& frame = atomStack.back();
@@ -193,7 +193,7 @@ namespace Instanciate
 	}
 
 
-	bool ProgramBuilder::generateShortCircuitInstrs(uint32_t retlvid)
+	bool SequenceBuilder::generateShortCircuitInstrs(uint32_t retlvid)
 	{
 		assert(canGenerateCode());
 		// insert some code after the computation of the first argument but before
@@ -266,7 +266,7 @@ namespace Instanciate
 	}
 
 
-	void ProgramBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::call>& operands)
+	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::call>& operands)
 	{
 		// after AST transformation, assignments are method calls
 		// ('a = b' have been transformed into 'a.=(b)'). However this is not

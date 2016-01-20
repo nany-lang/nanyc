@@ -72,8 +72,8 @@ namespace Producer
 
 		// create a value even if nothing
 		emitDebugpos(node);
-		localvar = program().emitStackalloc(nextvar(), nyt_any);
-		program().emitIntrinsic(localvar, intrinsicname);
+		localvar = sequence().emitStackalloc(nextvar(), nyt_any);
+		sequence().emitIntrinsic(localvar, intrinsicname);
 		return success;
 	}
 

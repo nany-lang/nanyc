@@ -58,7 +58,7 @@ namespace Instanciate
 			IR::Instruction** cursor = nullptr;
 		};
 
-		static void postProcessStackAlloc(IR::Program& out, ClassdefTableView& table, uint32_t atomid)
+		static void postProcessStackAlloc(IR::Sequence& out, ClassdefTableView& table, uint32_t atomid)
 		{
 			PostProcessStackAllocWalker walker{table, atomid};
 			out.each(walker);
@@ -72,7 +72,7 @@ namespace Instanciate
 
 
 
-	bool ProgramBuilder::instanciateAtomClassClone(Atom& atom, uint32_t lvid, uint32_t rhs)
+	bool SequenceBuilder::instanciateAtomClassClone(Atom& atom, uint32_t lvid, uint32_t rhs)
 	{
 		if (unlikely(atom.hasErrors))
 			return false;
@@ -119,7 +119,7 @@ namespace Instanciate
 	}
 
 
-	bool ProgramBuilder::instanciateAtomClassDestructor(Atom& atom, uint32_t lvid)
+	bool SequenceBuilder::instanciateAtomClassDestructor(Atom& atom, uint32_t lvid)
 	{
 		if (unlikely(atom.hasErrors))
 			return false;
@@ -166,7 +166,7 @@ namespace Instanciate
 	}
 
 
-	bool ProgramBuilder::instanciateAtomClass(Atom& atom)
+	bool SequenceBuilder::instanciateAtomClass(Atom& atom)
 	{
 		atom.classinfo.isInstanciated = true;
 
@@ -178,10 +178,10 @@ namespace Instanciate
 		info.parentAtom = &(atomStack.back().atom);
 		info.shouldMergeLayer = true;
 
-		auto* program = Pass::Instanciate::InstanciateAtom(info);
+		auto* sequence = Pass::Instanciate::InstanciateAtom(info);
 		report.subgroup().appendEntry(newReport);
 
-		if (program != nullptr)
+		if (sequence != nullptr)
 		{
 			// generate default constructor function if none is available
 			if (not atom.hasMember("^new"))
@@ -193,7 +193,7 @@ namespace Instanciate
 	}
 
 
-	bool ProgramBuilder::instanciateAtomFunc(uint32_t& instanceid, Atom& funcAtom, uint32_t retlvid, uint32_t p1, uint32_t p2)
+	bool SequenceBuilder::instanciateAtomFunc(uint32_t& instanceid, Atom& funcAtom, uint32_t retlvid, uint32_t p1, uint32_t p2)
 	{
 		assert(not atomStack.empty());
 		auto& frame = atomStack.back();
@@ -254,15 +254,15 @@ namespace Instanciate
 
 
 
-	bool ProgramBuilder::doInstanciateAtomFunc(Logs::Message::Ptr& subreport, InstanciateData& info, uint32_t retlvid)
+	bool SequenceBuilder::doInstanciateAtomFunc(Logs::Message::Ptr& subreport, InstanciateData& info, uint32_t retlvid)
 	{
 		// even within a typeof, any new instanciation must see their code generated
 		// (and its errors generated)
 		info.canGenerateCode = true; // canGenerateCode();
 
-		auto* program = InstanciateAtom(info);
+		auto* sequence = InstanciateAtom(info);
 		report.appendEntry(subreport);
-		if (unlikely(nullptr == program))
+		if (unlikely(nullptr == sequence))
 		{
 			success = false;
 			return false;
@@ -274,7 +274,7 @@ namespace Instanciate
 			return false;
 		}
 
-		// import the return type of the instanciated program
+		// import the return type of the instanciated sequence
 		auto& spare = cdeftable.substitute(retlvid);
 		spare.kind = info.returnType.kind;
 		spare.atom = info.returnType.atom;
@@ -317,7 +317,7 @@ namespace Instanciate
 	} // anonymous namespace
 
 
-	inline void ProgramBuilder::pushParametersFromSignature(LVID atomid, const Signature& signature)
+	inline void SequenceBuilder::pushParametersFromSignature(LVID atomid, const Signature& signature)
 	{
 		assert(atomid != 0);
 		// magic constant +2
@@ -344,7 +344,7 @@ namespace Instanciate
 	}
 
 
-	IR::Program* InstanciateAtom(InstanciateData& info)
+	IR::Sequence* InstanciateAtom(InstanciateData& info)
 	{
 		// prepare the matching signature
 		Signature signature;
@@ -357,13 +357,13 @@ namespace Instanciate
 
 		// try to pick an existing instanciation
 		{
-			IR::Program* program = nullptr;
-			uint32_t ix = info.atom.findInstance(program, signature);
+			IR::Sequence* sequence = nullptr;
+			uint32_t ix = info.atom.findInstance(sequence, signature);
 			if (ix != static_cast<uint32_t>(-1))
 			{
 				info.returnType.import(signature.returnType);
 				info.instanceid = ix;
-				return program;
+				return sequence;
 			}
 		}
 
@@ -372,23 +372,23 @@ namespace Instanciate
 		info.report = new Logs::Message(Logs::Level::none);
 		Logs::Report report{*info.report};
 
-		if (unlikely(info.atom.opcodes.program == nullptr))
+		if (unlikely(info.atom.opcodes.sequence == nullptr))
 		{
-			report.ICE() << "imvalid null opcode program for atom ";
+			report.ICE() << "imvalid null opcode sequence for atom ";
 			return nullptr;
 		}
 
-		// the new program for the instanciated function
-		auto out = std::make_unique<IR::Program>();
+		// the new sequence for the instanciated function
+		auto out = std::make_unique<IR::Sequence>();
 		{
-			// the original IR program (generated from the AST)
-			auto& sourceProgram = *(info.atom.opcodes.program);
+			// the original IR sequence (generated from the AST)
+			auto& sourceSequence = *(info.atom.opcodes.sequence);
 			// new layer for the cdeftable
 			ClassdefTableView newView{info.cdeftable, info.atom.atomid, signature.parameters.size()};
 
-			// instanciate the program attached to the atom
+			// instanciate the sequence attached to the atom
 			auto builder =
-				std::make_unique<ProgramBuilder>(report.subgroup(), newView, info.context, *out, sourceProgram);
+				std::make_unique<SequenceBuilder>(report.subgroup(), newView, info.context, *out, sourceSequence);
 
 			builder->pushParametersFromSignature(info.atom.atomid, signature);
 			if (info.parentAtom)
@@ -397,7 +397,7 @@ namespace Instanciate
 			// instanciate the atom !
 			bool success = builder->readAndInstanciate(info.atom.opcodes.offset);
 
-			// post-process the output program to update the type of all
+			// post-process the output sequence to update the type of all
 			// stack-allocated variables
 			// (always update, easier for debugging)
 			postProcessStackAlloc(*out, newView, info.atom.atomid);
@@ -410,13 +410,13 @@ namespace Instanciate
 			// Generating the full name of the symbol
 			// (example: "func A.foo(b: ref __i32): ref __i32")
 			String symbolName;
-			if (success or Config::Traces::printGeneratedOpcodeProgram)
+			if (success or Config::Traces::printGeneratedOpcodeSequence)
 			{
 				symbolName << newView.keyword(info.atom) << ' ';
 				info.atom.appendCaption(symbolName, newView);
 			}
 
-			if (Config::Traces::printGeneratedOpcodeProgram)
+			if (Config::Traces::printGeneratedOpcodeSequence)
 			{
 				report.info();
 				auto trace = report.subgroup();

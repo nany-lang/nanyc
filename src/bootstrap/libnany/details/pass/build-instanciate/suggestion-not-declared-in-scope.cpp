@@ -96,7 +96,7 @@ namespace Instanciate
 
 
 
-	bool ProgramBuilder::complainUnknownIdentifier(const Atom* self, const Atom& atom, const AnyString& name)
+	bool SequenceBuilder::complainUnknownIdentifier(const Atom* self, const Atom& atom, const AnyString& name)
 	{
 		assert(not name.empty());
 		if (unlikely(name.empty())) // should never happen

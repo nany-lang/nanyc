@@ -120,7 +120,7 @@ namespace Nany
 		// debug
 		if (Config::Traces::printPreAtomTable or Config::Traces::printClassdefTable)
 			printDebugInfoClassdefAtomTable(report, cdeftable);
-		if (Config::Traces::printSourceOpcodeProgram)
+		if (Config::Traces::printSourceOpcodeSequence)
 			buildinfo.isolate.print(report);
 
 		// instanciate the whole code (if possible)

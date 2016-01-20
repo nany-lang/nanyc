@@ -13,7 +13,7 @@ namespace Instanciate
 {
 
 
-	void ProgramBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::ret>& operands)
+	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::ret>& operands)
 	{
 		// current frame
 		auto& frame = atomStack.back();

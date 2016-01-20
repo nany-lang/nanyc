@@ -13,7 +13,7 @@ namespace Pass
 namespace Instanciate
 {
 
-	bool  ProgramBuilder::instanciateIntrinsicFieldset(uint32_t lvid)
+	bool  SequenceBuilder::instanciateIntrinsicFieldset(uint32_t lvid)
 	{
 		cdeftable.substitute(lvid).mutateToVoid();
 
@@ -79,7 +79,7 @@ namespace Instanciate
 	}
 
 
-	bool  ProgramBuilder::instanciateIntrinsicRef(uint32_t lvid)
+	bool  SequenceBuilder::instanciateIntrinsicRef(uint32_t lvid)
 	{
 		cdeftable.substitute(lvid).mutateToVoid();
 		if (canGenerateCode())
@@ -88,7 +88,7 @@ namespace Instanciate
 	}
 
 
-	bool  ProgramBuilder::instanciateIntrinsicUnref(uint32_t lvid)
+	bool  SequenceBuilder::instanciateIntrinsicUnref(uint32_t lvid)
 	{
 		cdeftable.substitute(lvid).mutateToVoid();
 		if (canGenerateCode())
@@ -97,7 +97,7 @@ namespace Instanciate
 	}
 
 
-	bool  ProgramBuilder::instanciateIntrinsicAddressof(uint32_t lvid)
+	bool  SequenceBuilder::instanciateIntrinsicAddressof(uint32_t lvid)
 	{
 		cdeftable.substitute(lvid).mutateToBuiltin(nyt_u64);
 
@@ -113,7 +113,7 @@ namespace Instanciate
 	}
 
 
-	bool  ProgramBuilder::instanciateIntrinsicSizeof(uint32_t lvid)
+	bool  SequenceBuilder::instanciateIntrinsicSizeof(uint32_t lvid)
 	{
 		cdeftable.substitute(lvid).mutateToBuiltin(nyt_u64);
 
@@ -151,7 +151,7 @@ namespace Instanciate
 	}
 
 
-	bool  ProgramBuilder::instanciateIntrinsicMemalloc(uint32_t lvid)
+	bool  SequenceBuilder::instanciateIntrinsicMemalloc(uint32_t lvid)
 	{
 		cdeftable.substitute(lvid).mutateToBuiltin(nyt_u64);
 
@@ -167,7 +167,7 @@ namespace Instanciate
 	}
 
 
-	bool  ProgramBuilder::instanciateIntrinsicMemFree(uint32_t lvid)
+	bool  SequenceBuilder::instanciateIntrinsicMemFree(uint32_t lvid)
 	{
 		cdeftable.substitute(lvid).mutateToVoid();
 
@@ -190,8 +190,8 @@ namespace Instanciate
 
 
 	template<nytype_t R, bool AcceptBool, bool AcceptInt, bool AcceptFloat,
-		void (IR::Program::* M)(uint32_t, uint32_t, uint32_t)>
-	inline bool ProgramBuilder::instanciateIntrinsicOperator(uint32_t lvid, const char* const name)
+		void (IR::Sequence::* M)(uint32_t, uint32_t, uint32_t)>
+	inline bool SequenceBuilder::instanciateIntrinsicOperator(uint32_t lvid, const char* const name)
 	{
 		assert(lastPushedIndexedParameters.size() == 2);
 		auto& frame = atomStack.back();
@@ -328,150 +328,147 @@ namespace Instanciate
 	}
 
 
-	bool  ProgramBuilder::instanciateIntrinsicAND(uint32_t lvid)
+	bool  SequenceBuilder::instanciateIntrinsicAND(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<nyt_any, 1, 1, 0, &IR::Program::emitAND>(lvid, "and");
+		return instanciateIntrinsicOperator<nyt_any, 1, 1, 0, &IR::Sequence::emitAND>(lvid, "and");
 	}
 
-	bool  ProgramBuilder::instanciateIntrinsicOR(uint32_t lvid)
+	bool  SequenceBuilder::instanciateIntrinsicOR(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<nyt_any, 1, 1, 0, &IR::Program::emitOR>(lvid, "or");
+		return instanciateIntrinsicOperator<nyt_any, 1, 1, 0, &IR::Sequence::emitOR>(lvid, "or");
 	}
 
-	bool  ProgramBuilder::instanciateIntrinsicXOR(uint32_t lvid)
+	bool  SequenceBuilder::instanciateIntrinsicXOR(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<nyt_any, 1, 1, 0, &IR::Program::emitXOR>(lvid, "xor");
+		return instanciateIntrinsicOperator<nyt_any, 1, 1, 0, &IR::Sequence::emitXOR>(lvid, "xor");
 	}
 
-	bool  ProgramBuilder::instanciateIntrinsicMOD(uint32_t lvid)
+	bool  SequenceBuilder::instanciateIntrinsicMOD(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<nyt_any, 1, 1, 0, &IR::Program::emitMOD>(lvid, "mod");
+		return instanciateIntrinsicOperator<nyt_any, 1, 1, 0, &IR::Sequence::emitMOD>(lvid, "mod");
 	}
 
-	bool  ProgramBuilder::instanciateIntrinsicADD(uint32_t lvid)
+	bool  SequenceBuilder::instanciateIntrinsicADD(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<nyt_any, 0, 1, 0, &IR::Program::emitADD>(lvid, "add");
+		return instanciateIntrinsicOperator<nyt_any, 0, 1, 0, &IR::Sequence::emitADD>(lvid, "add");
 	}
 
-	bool  ProgramBuilder::instanciateIntrinsicSUB(uint32_t lvid)
+	bool  SequenceBuilder::instanciateIntrinsicSUB(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<nyt_any, 0, 1, 0, &IR::Program::emitSUB>(lvid, "sub");
+		return instanciateIntrinsicOperator<nyt_any, 0, 1, 0, &IR::Sequence::emitSUB>(lvid, "sub");
 	}
 
-	bool  ProgramBuilder::instanciateIntrinsicDIV(uint32_t lvid)
+	bool  SequenceBuilder::instanciateIntrinsicDIV(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<nyt_any, 0, 1, 0, &IR::Program::emitDIV>(lvid, "div");
+		return instanciateIntrinsicOperator<nyt_any, 0, 1, 0, &IR::Sequence::emitDIV>(lvid, "div");
 	}
 
-	bool  ProgramBuilder::instanciateIntrinsicMUL(uint32_t lvid)
+	bool  SequenceBuilder::instanciateIntrinsicMUL(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<nyt_any, 0, 1, 0, &IR::Program::emitMUL>(lvid, "mul");
+		return instanciateIntrinsicOperator<nyt_any, 0, 1, 0, &IR::Sequence::emitMUL>(lvid, "mul");
 	}
 
-	bool  ProgramBuilder::instanciateIntrinsicIDIV(uint32_t lvid)
+	bool  SequenceBuilder::instanciateIntrinsicIDIV(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<nyt_any, 0, 1, 0, &IR::Program::emitIDIV>(lvid, "idiv");
+		return instanciateIntrinsicOperator<nyt_any, 0, 1, 0, &IR::Sequence::emitIDIV>(lvid, "idiv");
 	}
 
-	bool  ProgramBuilder::instanciateIntrinsicIMUL(uint32_t lvid)
+	bool  SequenceBuilder::instanciateIntrinsicIMUL(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<nyt_any, 0, 1, 0, &IR::Program::emitIMUL>(lvid, "imul");
+		return instanciateIntrinsicOperator<nyt_any, 0, 1, 0, &IR::Sequence::emitIMUL>(lvid, "imul");
 	}
 
-	bool  ProgramBuilder::instanciateIntrinsicFADD(uint32_t lvid)
+	bool  SequenceBuilder::instanciateIntrinsicFADD(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<nyt_any, 0, 0, 1, &IR::Program::emitFADD>(lvid, "fadd");
+		return instanciateIntrinsicOperator<nyt_any, 0, 0, 1, &IR::Sequence::emitFADD>(lvid, "fadd");
 	}
 
-	bool  ProgramBuilder::instanciateIntrinsicFSUB(uint32_t lvid)
+	bool  SequenceBuilder::instanciateIntrinsicFSUB(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<nyt_any, 0, 0, 1, &IR::Program::emitFSUB>(lvid, "fsub");
+		return instanciateIntrinsicOperator<nyt_any, 0, 0, 1, &IR::Sequence::emitFSUB>(lvid, "fsub");
 	}
 
-	bool  ProgramBuilder::instanciateIntrinsicFDIV(uint32_t lvid)
+	bool  SequenceBuilder::instanciateIntrinsicFDIV(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<nyt_any, 0, 0, 1, &IR::Program::emitFDIV>(lvid, "fdiv");
+		return instanciateIntrinsicOperator<nyt_any, 0, 0, 1, &IR::Sequence::emitFDIV>(lvid, "fdiv");
 	}
 
-	bool  ProgramBuilder::instanciateIntrinsicFMUL(uint32_t lvid)
+	bool  SequenceBuilder::instanciateIntrinsicFMUL(uint32_t lvid)
 	{
-		return instanciateIntrinsicOperator<nyt_any, 0, 0, 1, &IR::Program::emitFMUL>(lvid, "fmul");
-	}
-
-
-
-	bool  ProgramBuilder::instanciateIntrinsicEQ(uint32_t lvid)
-	{
-		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Program::emitEQ>(lvid, "eq");
-	}
-
-	bool  ProgramBuilder::instanciateIntrinsicNEQ(uint32_t lvid)
-	{
-		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Program::emitNEQ>(lvid, "neq");
-	}
-
-	bool  ProgramBuilder::instanciateIntrinsicFLT(uint32_t lvid)
-	{
-		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Program::emitFLT>(lvid, "flt");
-	}
-
-	bool  ProgramBuilder::instanciateIntrinsicFLTE(uint32_t lvid)
-	{
-		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Program::emitFLTE>(lvid, "flte");
-	}
-
-	bool  ProgramBuilder::instanciateIntrinsicFGT(uint32_t lvid)
-	{
-		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Program::emitFGT>(lvid, "fgt");
-	}
-
-	bool  ProgramBuilder::instanciateIntrinsicFGTE(uint32_t lvid)
-	{
-		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Program::emitFGTE>(lvid, "fgte");
-	}
-
-	bool  ProgramBuilder::instanciateIntrinsicLT(uint32_t lvid)
-	{
-		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Program::emitLT>(lvid, "lt");
-	}
-
-	bool  ProgramBuilder::instanciateIntrinsicLTE(uint32_t lvid)
-	{
-		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Program::emitLTE>(lvid, "lte");
-	}
-
-	bool  ProgramBuilder::instanciateIntrinsicILT(uint32_t lvid)
-	{
-		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Program::emitILT>(lvid, "ilt");
-	}
-
-	bool  ProgramBuilder::instanciateIntrinsicILTE(uint32_t lvid)
-	{
-		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Program::emitILTE>(lvid, "ilte");
-	}
-
-	bool  ProgramBuilder::instanciateIntrinsicGT(uint32_t lvid)
-	{
-		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Program::emitGT>(lvid, "gt");
-	}
-
-	bool  ProgramBuilder::instanciateIntrinsicGTE(uint32_t lvid)
-	{
-		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Program::emitGTE>(lvid, "gte");
-	}
-
-	bool  ProgramBuilder::instanciateIntrinsicIGT(uint32_t lvid)
-	{
-		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Program::emitIGT>(lvid, "igt");
-	}
-
-	bool  ProgramBuilder::instanciateIntrinsicIGTE(uint32_t lvid)
-	{
-		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Program::emitIGTE>(lvid, "igte");
+		return instanciateIntrinsicOperator<nyt_any, 0, 0, 1, &IR::Sequence::emitFMUL>(lvid, "fmul");
 	}
 
 
 
+	bool  SequenceBuilder::instanciateIntrinsicEQ(uint32_t lvid)
+	{
+		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitEQ>(lvid, "eq");
+	}
+
+	bool  SequenceBuilder::instanciateIntrinsicNEQ(uint32_t lvid)
+	{
+		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitNEQ>(lvid, "neq");
+	}
+
+	bool  SequenceBuilder::instanciateIntrinsicFLT(uint32_t lvid)
+	{
+		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitFLT>(lvid, "flt");
+	}
+
+	bool  SequenceBuilder::instanciateIntrinsicFLTE(uint32_t lvid)
+	{
+		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitFLTE>(lvid, "flte");
+	}
+
+	bool  SequenceBuilder::instanciateIntrinsicFGT(uint32_t lvid)
+	{
+		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitFGT>(lvid, "fgt");
+	}
+
+	bool  SequenceBuilder::instanciateIntrinsicFGTE(uint32_t lvid)
+	{
+		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitFGTE>(lvid, "fgte");
+	}
+
+	bool  SequenceBuilder::instanciateIntrinsicLT(uint32_t lvid)
+	{
+		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitLT>(lvid, "lt");
+	}
+
+	bool  SequenceBuilder::instanciateIntrinsicLTE(uint32_t lvid)
+	{
+		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitLTE>(lvid, "lte");
+	}
+
+	bool  SequenceBuilder::instanciateIntrinsicILT(uint32_t lvid)
+	{
+		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitILT>(lvid, "ilt");
+	}
+
+	bool  SequenceBuilder::instanciateIntrinsicILTE(uint32_t lvid)
+	{
+		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitILTE>(lvid, "ilte");
+	}
+
+	bool  SequenceBuilder::instanciateIntrinsicGT(uint32_t lvid)
+	{
+		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitGT>(lvid, "gt");
+	}
+
+	bool  SequenceBuilder::instanciateIntrinsicGTE(uint32_t lvid)
+	{
+		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitGTE>(lvid, "gte");
+	}
+
+	bool  SequenceBuilder::instanciateIntrinsicIGT(uint32_t lvid)
+	{
+		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitIGT>(lvid, "igt");
+	}
+
+	bool  SequenceBuilder::instanciateIntrinsicIGTE(uint32_t lvid)
+	{
+		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitIGTE>(lvid, "igte");
+	}
 
 
 
@@ -483,51 +480,54 @@ namespace Instanciate
 
 
 
-	typedef bool (ProgramBuilder::* BuiltinIntrinsic)(uint32_t);
+
+
+
+	typedef bool (SequenceBuilder::* BuiltinIntrinsic)(uint32_t);
 
 	static const std::unordered_map<AnyString, std::pair<BuiltinIntrinsic, uint32_t>> builtinDispatch =
 	{
-		{"^fieldset",       { &ProgramBuilder::instanciateIntrinsicFieldset,  2 }},
-		{"addressof",       { &ProgramBuilder::instanciateIntrinsicAddressof, 1 }},
-		{"memory.allocate", { &ProgramBuilder::instanciateIntrinsicMemalloc,  1 }},
-		{"memory.dispose",  { &ProgramBuilder::instanciateIntrinsicMemFree,   2 }},
-		{"ref",             { &ProgramBuilder::instanciateIntrinsicRef,       1 }},
-		{"unref",           { &ProgramBuilder::instanciateIntrinsicUnref,     1 }},
-		{"sizeof",          { &ProgramBuilder::instanciateIntrinsicSizeof,    1 }},
+		{"^fieldset",       { &SequenceBuilder::instanciateIntrinsicFieldset,  2 }},
+		{"addressof",       { &SequenceBuilder::instanciateIntrinsicAddressof, 1 }},
+		{"memory.allocate", { &SequenceBuilder::instanciateIntrinsicMemalloc,  1 }},
+		{"memory.dispose",  { &SequenceBuilder::instanciateIntrinsicMemFree,   2 }},
+		{"ref",             { &SequenceBuilder::instanciateIntrinsicRef,       1 }},
+		{"unref",           { &SequenceBuilder::instanciateIntrinsicUnref,     1 }},
+		{"sizeof",          { &SequenceBuilder::instanciateIntrinsicSizeof,    1 }},
 		//
-		{"and",             { &ProgramBuilder::instanciateIntrinsicAND,       2 }},
-		{"or",              { &ProgramBuilder::instanciateIntrinsicOR,        2 }},
-		{"xor",             { &ProgramBuilder::instanciateIntrinsicXOR,       2 }},
-		{"mod",             { &ProgramBuilder::instanciateIntrinsicMOD,       2 }},
+		{"and",             { &SequenceBuilder::instanciateIntrinsicAND,       2 }},
+		{"or",              { &SequenceBuilder::instanciateIntrinsicOR,        2 }},
+		{"xor",             { &SequenceBuilder::instanciateIntrinsicXOR,       2 }},
+		{"mod",             { &SequenceBuilder::instanciateIntrinsicMOD,       2 }},
 		//
-		{"add",             { &ProgramBuilder::instanciateIntrinsicADD,       2 }},
-		{"sub",             { &ProgramBuilder::instanciateIntrinsicSUB,       2 }},
-		{"div",             { &ProgramBuilder::instanciateIntrinsicDIV,       2 }},
-		{"mul",             { &ProgramBuilder::instanciateIntrinsicMUL,       2 }},
-		{"idiv",            { &ProgramBuilder::instanciateIntrinsicIDIV,      2 }},
-		{"imul",            { &ProgramBuilder::instanciateIntrinsicIMUL,      2 }},
-		{"fadd",            { &ProgramBuilder::instanciateIntrinsicFADD,      2 }},
-		{"fsub",            { &ProgramBuilder::instanciateIntrinsicFSUB,      2 }},
-		{"fdiv",            { &ProgramBuilder::instanciateIntrinsicFDIV,      2 }},
-		{"fmul",            { &ProgramBuilder::instanciateIntrinsicFMUL,      2 }},
+		{"add",             { &SequenceBuilder::instanciateIntrinsicADD,       2 }},
+		{"sub",             { &SequenceBuilder::instanciateIntrinsicSUB,       2 }},
+		{"div",             { &SequenceBuilder::instanciateIntrinsicDIV,       2 }},
+		{"mul",             { &SequenceBuilder::instanciateIntrinsicMUL,       2 }},
+		{"idiv",            { &SequenceBuilder::instanciateIntrinsicIDIV,      2 }},
+		{"imul",            { &SequenceBuilder::instanciateIntrinsicIMUL,      2 }},
+		{"fadd",            { &SequenceBuilder::instanciateIntrinsicFADD,      2 }},
+		{"fsub",            { &SequenceBuilder::instanciateIntrinsicFSUB,      2 }},
+		{"fdiv",            { &SequenceBuilder::instanciateIntrinsicFDIV,      2 }},
+		{"fmul",            { &SequenceBuilder::instanciateIntrinsicFMUL,      2 }},
 		//
-		{"eq",              { &ProgramBuilder::instanciateIntrinsicEQ,        2 }},
-		{"neq",             { &ProgramBuilder::instanciateIntrinsicNEQ,       2 }},
-		{"flt",             { &ProgramBuilder::instanciateIntrinsicFLT,       2 }},
-		{"flte",            { &ProgramBuilder::instanciateIntrinsicFLTE,      2 }},
-		{"fgt",             { &ProgramBuilder::instanciateIntrinsicFGT,       2 }},
-		{"fgte",            { &ProgramBuilder::instanciateIntrinsicFGTE,      2 }},
-		{"lt",              { &ProgramBuilder::instanciateIntrinsicLT,        2 }},
-		{"lte",             { &ProgramBuilder::instanciateIntrinsicLTE,       2 }},
-		{"ilt",             { &ProgramBuilder::instanciateIntrinsicILT,       2 }},
-		{"ilte",            { &ProgramBuilder::instanciateIntrinsicILTE,      2 }},
-		{"gt",              { &ProgramBuilder::instanciateIntrinsicGT,        2 }},
-		{"gte",             { &ProgramBuilder::instanciateIntrinsicGTE,       2 }},
-		{"igt",             { &ProgramBuilder::instanciateIntrinsicIGT,       2 }},
-		{"igte",            { &ProgramBuilder::instanciateIntrinsicIGTE,      2 }},
+		{"eq",              { &SequenceBuilder::instanciateIntrinsicEQ,        2 }},
+		{"neq",             { &SequenceBuilder::instanciateIntrinsicNEQ,       2 }},
+		{"flt",             { &SequenceBuilder::instanciateIntrinsicFLT,       2 }},
+		{"flte",            { &SequenceBuilder::instanciateIntrinsicFLTE,      2 }},
+		{"fgt",             { &SequenceBuilder::instanciateIntrinsicFGT,       2 }},
+		{"fgte",            { &SequenceBuilder::instanciateIntrinsicFGTE,      2 }},
+		{"lt",              { &SequenceBuilder::instanciateIntrinsicLT,        2 }},
+		{"lte",             { &SequenceBuilder::instanciateIntrinsicLTE,       2 }},
+		{"ilt",             { &SequenceBuilder::instanciateIntrinsicILT,       2 }},
+		{"ilte",            { &SequenceBuilder::instanciateIntrinsicILTE,      2 }},
+		{"gt",              { &SequenceBuilder::instanciateIntrinsicGT,        2 }},
+		{"gte",             { &SequenceBuilder::instanciateIntrinsicGTE,       2 }},
+		{"igt",             { &SequenceBuilder::instanciateIntrinsicIGT,       2 }},
+		{"igte",            { &SequenceBuilder::instanciateIntrinsicIGTE,      2 }},
 	};
 
-	bool ProgramBuilder::instanciateBuiltinIntrinsic(const AnyString& name, uint32_t lvid, bool canComplain)
+	bool SequenceBuilder::instanciateBuiltinIntrinsic(const AnyString& name, uint32_t lvid, bool canComplain)
 	{
 		assert(not name.empty());
 

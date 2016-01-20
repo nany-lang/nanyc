@@ -21,7 +21,7 @@ namespace Nany
 		auto& astnodes = buildinfo.parsing.rootnode->children;
 
 		// helper for generating IR code
-		IR::Producer::Context producer{buildinfo.parsing.program, report};
+		IR::Producer::Context producer{buildinfo.parsing.sequence, report};
 		// generate namespace-related opcodes
 		producer.useNamespace(buildinfo.parsing.nmspc.first);
 		producer.dbgSourceFilename = pFilename;

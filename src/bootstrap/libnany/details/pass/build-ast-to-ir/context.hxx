@@ -12,8 +12,8 @@ namespace Producer
 {
 
 
-	inline Context::Context(Program& program, Logs::Report report)
-		: program(program)
+	inline Context::Context(Sequence& sequence, Logs::Report report)
+		: sequence(sequence)
 		, report(report)
 	{}
 

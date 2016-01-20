@@ -55,8 +55,8 @@ namespace Producer
 		}
 
 		IR::Producer::Scope scope{*this};
-		OpcodeCodegenDisabler codegen{program()};
-		program().emitComment("typeof expression");
+		OpcodeCodegenDisabler codegen{sequence()};
+		sequence().emitComment("typeof expression");
 		return scope.visitASTExpr(*expr, localvar);
 	}
 

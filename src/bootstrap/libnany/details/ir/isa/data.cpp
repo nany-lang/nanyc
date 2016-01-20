@@ -1,6 +1,6 @@
 #include "data.h"
 #include "printer.inc.hpp"
-#include "../program.h"
+#include "../sequence.h"
 
 using namespace Yuni;
 
@@ -15,10 +15,10 @@ namespace ISA
 {
 
 
-	String print(const Program& program, const Nany::IR::Instruction& instr, const Nany::AtomMap* atommap)
+	String print(const Sequence& sequence, const Nany::IR::Instruction& instr, const Nany::AtomMap* atommap)
 	{
 		String text;
-		Printer<String> printer{text, program};
+		Printer<String> printer{text, sequence};
 		printer.atommap = atommap;
 		printer.visit(instr);
 		text.trimRight();

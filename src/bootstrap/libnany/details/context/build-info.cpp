@@ -9,7 +9,7 @@ namespace Nany
 	{
 		size_t bytes = sizeof(BuildInfoSource);
 		bytes += parsing.nmspc.first.capacity();
-		bytes += parsing.program.sizeInBytes();
+		bytes += parsing.sequence.sizeInBytes();
 		return bytes;
 	}
 

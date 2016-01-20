@@ -40,7 +40,7 @@ namespace VM
 			tmp.clear();
 			tmp << i << ": ";
 			ctx.console.write_stderr(&ctx, tmp.c_str(), tmp.size());
-			const auto& caption = map.fetchProgramCaption(frame.atomidInstance[0], frame.atomidInstance[1]);
+			const auto& caption = map.fetchSequenceCaption(frame.atomidInstance[0], frame.atomidInstance[1]);
 			ctx.console.write_stderr(&ctx, caption.c_str(), caption.size());
 
 			ctx.console.write_stderr(&ctx, "\n       '", 9);

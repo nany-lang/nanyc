@@ -45,19 +45,19 @@ namespace Nany
 
 
 		/*
-		** \brief Fetch a program
+		** \brief Fetch a sequence
 		*/
-		const IR::Program* fetchProgram(uint32_t atomid, uint32_t instanceid) const;
+		const IR::Sequence* fetchSequence(uint32_t atomid, uint32_t instanceid) const;
 
 		/*
-		** \brief Fetch a program
+		** \brief Fetch a sequence
 		*/
-		const IR::Program& program(uint32_t atomid, uint32_t instanceid) const;
+		const IR::Sequence& sequence(uint32_t atomid, uint32_t instanceid) const;
 
 		/*!
 		** \brief Retrieve the human readable name of an atom
 		*/
-		AnyString fetchProgramCaption(uint32_t atomid, uint32_t instanceid) const;
+		AnyString fetchSequenceCaption(uint32_t atomid, uint32_t instanceid) const;
 
 		//! Retrieve atom {const}
 		const Atom* findAtom(uint32_t atomid) const;

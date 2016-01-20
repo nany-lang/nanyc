@@ -14,11 +14,11 @@ namespace Instanciate
 {
 
 
-	bool ProgramBuilder::instanciateUserDefinedIntrinsic(const IR::ISA::Operand<IR::ISA::Op::intrinsic>& operands)
+	bool SequenceBuilder::instanciateUserDefinedIntrinsic(const IR::ISA::Operand<IR::ISA::Op::intrinsic>& operands)
 	{
 		bool success = ([&]() -> bool
 		{
-			AnyString name = currentProgram.stringrefs[operands.intrinsic];
+			AnyString name = currentSequence.stringrefs[operands.intrinsic];
 			if (unlikely(name.empty()))
 				return (error() << "invalid empty intrinsic name");
 
@@ -89,7 +89,7 @@ namespace Instanciate
 	}
 
 
-	void ProgramBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::intrinsic>& operands)
+	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::intrinsic>& operands)
 	{
 		if (unlikely(not instanciateUserDefinedIntrinsic(operands)))
 		{

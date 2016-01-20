@@ -20,14 +20,14 @@ using namespace Yuni;
 #define VM_CHECK_POINTER(P,LVID) do { if (YUNI_UNLIKELY(not memchecker.has((P)))) { \
 	/*assert(false and "invalid pointer");*/ \
 	throw (String{"invalid pointer "} << (P) << " not found, opc: " \
-		<< (Nany::IR::ISA::print(program.get(), operands, &map))); \
+		<< (Nany::IR::ISA::print(sequence.get(), operands, &map))); \
 	} } while (0)
 
 
 
 #if NANY_VM_PRINT_OPCODES != 0
 #define VM_PRINT_OPCODE(O)  do { std::cout << "== nany:vm ==  " \
-	<< Nany::IR::ISA::print(program.get(), operands, &map) << '\n';} while (0)
+	<< Nany::IR::ISA::print(sequence.get(), operands, &map) << '\n';} while (0)
 #else
 #define VM_PRINT_OPCODE(O)
 #endif
@@ -75,8 +75,8 @@ namespace // anonymous
 		//! Atom collection references
 		const AtomMap& map;
 
-		//! Source program
-		std::reference_wrapper<const IR::Program> program;
+		//! Source sequence
+		std::reference_wrapper<const IR::Sequence> sequence;
 		//! User context
 		nycontext_t& context;
 		//! Thread context
@@ -92,9 +92,9 @@ namespace // anonymous
 
 
 	public:
-		ThreadContext(const AtomMap& map, nycontext_t& context, const IR::Program& program)
+		ThreadContext(const AtomMap& map, nycontext_t& context, const IR::Sequence& sequence)
 			: map(map)
-			, program(std::cref(program))
+			, sequence(std::cref(sequence))
 			, context(context)
 			, userDefinedIntrinsics(((Context*)context.internal)->intrinsics)
 		{
@@ -152,7 +152,7 @@ namespace // anonymous
 			assert(retlvid < registerCount);
 			// save the current stack frame
 			auto* storestackptr = registers;
-			auto storeprogram = program;
+			auto storesequence = sequence;
 			auto* storecursor = cursor;
 			#ifndef NDEBUG
 			auto  storestckfrmsize = registerCount;
@@ -162,12 +162,12 @@ namespace // anonymous
 			stacktrace.push(atomfunc, instanceid);
 
 			// call
-			uint64_t ret = invoke(map.program(atomfunc, instanceid));
+			uint64_t ret = invoke(map.sequence(atomfunc, instanceid));
 
 			// restore the previous stack frame and store the result of the call
 			registers = storestackptr;
 			registers[retlvid].u64 = ret;
-			program = storeprogram;
+			sequence = storesequence;
 				cursor = storecursor;
 			#ifndef NDEBUG
 			registerCount = storestckfrmsize;
@@ -183,9 +183,9 @@ namespace // anonymous
 		inline void gotoLabel(uint32_t label)
 		{
 			if (label > upperLabelID)
-				program.get().jumpToLabelForward(*cursor, label);
+				sequence.get().jumpToLabelForward(*cursor, label);
 			else
-				program.get().jumpToLabelBackward(*cursor, label);
+				sequence.get().jumpToLabelBackward(*cursor, label);
 		}
 
 
@@ -533,7 +533,7 @@ namespace // anonymous
 			VM_PRINT_OPCODE(operands);
 			assert(operands.lvid < registerCount);
 			retRegister = registers[operands.lvid].u64;
-			program.get().invalidateCursor(*cursor);
+			sequence.get().invalidateCursor(*cursor);
 		}
 
 
@@ -551,7 +551,7 @@ namespace // anonymous
 			VM_PRINT_OPCODE(operands);
 			assert(operands.lvid   < registerCount);
 			registers[operands.lvid].u64 =
-				reinterpret_cast<uint64_t>(program.get().stringrefs[operands.text].c_str());
+				reinterpret_cast<uint64_t>(sequence.get().stringrefs[operands.text].c_str());
 		}
 
 
@@ -728,7 +728,7 @@ namespace // anonymous
 		}
 
 
-		uint64_t invoke(const IR::Program& callee)
+		uint64_t invoke(const IR::Sequence& callee)
 		{
 			try
 			{
@@ -741,7 +741,7 @@ namespace // anonymous
 
 				registers = stack.push(framesize);
 				registers[0].u64 = 0;
-				program = std::cref(callee);
+				sequence = std::cref(callee);
 
 				// retrieve parameters for the func
 				for (uint32_t i = 0; i != funcparamCount; ++i)
@@ -800,15 +800,15 @@ namespace // anonymous
 
 
 
-int execute(bool& success, nycontext_t& context, const IR::Program& program, const AtomMap& map)
+int execute(bool& success, nycontext_t& context, const IR::Sequence& sequence, const AtomMap& map)
 {
 	uint64_t returnvalue = 0;
 	success = false;
 
 	try
 	{
-		ThreadContext thrctx{map, context, program};
-		returnvalue = thrctx.invoke(program);
+		ThreadContext thrctx{map, context, sequence};
+		returnvalue = thrctx.invoke(sequence);
 		success = true;
 	}
 	catch (const CodeException&)

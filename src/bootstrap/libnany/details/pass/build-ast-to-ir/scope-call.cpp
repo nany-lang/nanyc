@@ -30,8 +30,8 @@ namespace Producer
 		}
 		pushedIndexedParam[Config::maxPushedParameters];
 
-		// the program
-		auto& out = program();
+		// the sequence
+		auto& out = sequence();
 
 
 		for (auto& childptr: node.children)
@@ -161,7 +161,7 @@ namespace Producer
 
 		emitDebugpos(node);
 
-		auto& out = program();
+		auto& out = sequence();
 		// ask to resolve the call to operator ()
 		auto func = out.emitStackalloc(nextvar(), nyt_any);
 		out.emitIdentify(func, "^()", localvar);

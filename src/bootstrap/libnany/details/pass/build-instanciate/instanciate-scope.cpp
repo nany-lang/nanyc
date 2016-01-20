@@ -13,7 +13,7 @@ namespace Pass
 namespace Instanciate
 {
 
-	void ProgramBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::scope>& /*operands*/)
+	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::scope>& /*operands*/)
 	{
 		if (likely(not atomStack.empty()))
 			++(atomStack.back().scope);
@@ -23,7 +23,7 @@ namespace Instanciate
 	}
 
 
-	void ProgramBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::end>& /*operands*/)
+	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::end>& /*operands*/)
 	{
 		if (likely(not atomStack.empty()))
 		{
@@ -50,13 +50,13 @@ namespace Instanciate
 						out.emitEnd();
 				}
 				else
-					*cursor += currentProgram.opcodeCount(); // end of the code
+					*cursor += currentSequence.opcodeCount(); // end of the code
 			}
 		}
 		else
 		{
 			assert(false and "should not happen");
-			*cursor += currentProgram.opcodeCount();
+			*cursor += currentSequence.opcodeCount();
 		}
 	}
 

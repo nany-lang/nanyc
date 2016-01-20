@@ -13,7 +13,7 @@ namespace Instanciate
 {
 
 
-	void ProgramBuilder::generateMemberVarDefaultDispose()
+	void SequenceBuilder::generateMemberVarDefaultDispose()
 	{
 		assert(canGenerateCode());
 		assert(lastOpcodeStacksizeOffset != (uint32_t) -1);

@@ -2,7 +2,7 @@
 #include <yuni/yuni.h>
 #include <yuni/core/noncopyable.h>
 #include "details/fwd.h"
-#include "details/ir/program.h"
+#include "details/ir/sequence.h"
 #include "details/reporting/report.h"
 #include "details/grammar/nany.h"
 #include <map>
@@ -33,7 +33,7 @@ namespace Producer
 		//! \name Constructor & Destructor
 		//@{
 		//! Default constructor
-		explicit Context(Program& program, Logs::Report);
+		explicit Context(Sequence& sequence, Logs::Report);
 		//@}
 
 
@@ -54,8 +54,8 @@ namespace Producer
 
 
 	public:
-		//! Linked IR program
-		Program& program;
+		//! Linked IR sequence
+		Sequence& sequence;
 		//! Reporting
 		Logs::Report report;
 		//! Has debug info ?

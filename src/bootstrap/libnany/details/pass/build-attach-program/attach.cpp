@@ -33,12 +33,12 @@ namespace Nany
 
 
 
-		class ProgramSynchronizer final
+		class SequenceSynchronizer final
 		{
 		public:
-			ProgramSynchronizer(Logs::Report& report, Isolate& isolate, IR::Program& program)
+			SequenceSynchronizer(Logs::Report& report, Isolate& isolate, IR::Sequence& sequence)
 				: isolate(isolate)
-				, currentProgram(program)
+				, currentSequence(sequence)
 				, report(report)
 			{
 				atomStack.reserve(4); // arbitrary
@@ -70,9 +70,9 @@ namespace Nany
 				if (not msg.empty())
 					trace << msg;
 				else
-					trace << "attach program: unknown opcode: '" << IR::ISA::Operand<O>::opname() << '\'';
+					trace << "attach sequence: unknown opcode: '" << IR::ISA::Operand<O>::opname() << '\'';
 
-				trace << ": from '" << IR::ISA::print(currentProgram, operands) << '\'';
+				trace << ": from '" << IR::ISA::print(currentSequence, operands) << '\'';
 				success = false;
 			}
 
@@ -114,7 +114,7 @@ namespace Nany
 
 					case IR::ISA::Pragma::namespacedef:
 					{
-						AnyString nmname = currentProgram.stringrefs[operands.value.namespacedef];
+						AnyString nmname = currentSequence.stringrefs[operands.value.namespacedef];
 						assert(not atomStack.empty());
 						Atom& parentAtom = atomStack.back().atom;
 
@@ -133,7 +133,7 @@ namespace Nany
 						assert(not atomStack.empty());
 						// registering the blueprint into the outline...
 						Atom& atom = atomStack.back().atom;
-						AnyString varname = currentProgram.stringrefs[operands.value.vardef.name];
+						AnyString varname = currentSequence.stringrefs[operands.value.vardef.name];
 						if (unlikely(varname.empty()))
 							return printError(operands, "invalid func name");
 						if (unlikely(atom.type != Atom::Type::classdef))
@@ -155,7 +155,7 @@ namespace Nany
 						assert(not atomStack.empty());
 						// registering the blueprint into the outline...
 						Atom& atom = atomStack.back().atom;
-						AnyString funcname = currentProgram.stringrefs[operands.value.blueprint.name];
+						AnyString funcname = currentSequence.stringrefs[operands.value.blueprint.name];
 						if (unlikely(funcname.empty()))
 							return printError(operands, "invalid func name");
 
@@ -169,8 +169,8 @@ namespace Nany
 						auto* newFuncAtom = isolate.classdefTable.atoms.createFuncdef(atom, funcname);
 						assert(newFuncAtom != nullptr);
 						newFuncAtom->usedDefined      = true;
-						newFuncAtom->opcodes.program  = &currentProgram;
-						newFuncAtom->opcodes.offset   = currentProgram.offsetOf(operands);
+						newFuncAtom->opcodes.sequence  = &currentSequence;
+						newFuncAtom->opcodes.offset   = currentSequence.offsetOf(operands);
 						// create a pseudo classdef to easily retrieve the real atom from a clid
 						isolate.classdefTable.registerAtom(newFuncAtom);
 
@@ -199,7 +199,7 @@ namespace Nany
 							return;
 
 						CLID clid {frame.atom.atomid, paramLVID};
-						AnyString name = currentProgram.stringrefs[operands.value.param.name];
+						AnyString name = currentSequence.stringrefs[operands.value.param.name];
 						frame.atom.parameters.append(clid, name);
 
 						// keep somewhere that this definition is a variable instance
@@ -221,15 +221,15 @@ namespace Nany
 						lastPushedNamedParameters.clear();
 						lastPushedIndexedParameters.clear();
 
-						AnyString classname = currentProgram.stringrefs[operands.value.blueprint.name];
+						AnyString classname = currentSequence.stringrefs[operands.value.blueprint.name];
 
 						MutexLocker locker{isolate.mutex};
 						// create a new atom in the global type table
 						auto* newClassAtom = isolate.classdefTable.atoms.createClassdef(atom, classname);
 						assert(newClassAtom != nullptr);
 						newClassAtom->usedDefined     = true;
-						newClassAtom->opcodes.program = &currentProgram;
-						newClassAtom->opcodes.offset  = currentProgram.offsetOf(operands);
+						newClassAtom->opcodes.sequence = &currentSequence;
+						newClassAtom->opcodes.offset  = currentSequence.offsetOf(operands);
 						// create a pseudo classdef to easily retrieve the real atom from a clid
 						isolate.classdefTable.registerAtom(newClassAtom);
 						// update atomid
@@ -246,7 +246,7 @@ namespace Nany
 					{
 						assert(not atomStack.empty());
 						Atom& atom = atomStack.back().atom;
-						atom.builtinalias = currentProgram.stringrefs[operands.value.builtinalias.namesid];
+						atom.builtinalias = currentSequence.stringrefs[operands.value.builtinalias.namesid];
 						break;
 					}
 
@@ -402,7 +402,7 @@ namespace Nany
 
 				if (unlikely(operands.text == 0))
 					return printError(operands, "invalid symbol name");
-				AnyString name = currentProgram.stringrefs[operands.text];
+				AnyString name = currentSequence.stringrefs[operands.text];
 
 				lastLVID = operands.lvid;
 				auto& atomFrame = atomStack.back();
@@ -454,7 +454,7 @@ namespace Nany
 
 				if (operands.name != 0) // named parameter
 				{
-					AnyString name = currentProgram.stringrefs[operands.name];
+					AnyString name = currentSequence.stringrefs[operands.name];
 					lastPushedNamedParameters.emplace_back(std::make_pair(name, operands.lvid));
 				}
 				else
@@ -586,7 +586,7 @@ namespace Nany
 
 			void visit(IR::ISA::Operand<IR::ISA::Op::debugfile>& operands)
 			{
-				currentFilename = currentProgram.stringrefs[operands.filename].c_str();
+				currentFilename = currentSequence.stringrefs[operands.filename].c_str();
 				if (needAtomDbgFileReport)
 				{
 					needAtomDbgFileReport = false;
@@ -677,8 +677,8 @@ namespace Nany
 			std::vector<std::pair<AnyString, LVID>> lastPushedNamedParameters;
 			//! exit status
 			bool success = true;
-			//! Current program
-			IR::Program& currentProgram;
+			//! Current sequence
+			IR::Sequence& currentSequence;
 			//! Step
 			Logs::Report report;
 
@@ -690,7 +690,7 @@ namespace Nany
 
 			IR::Instruction** cursor = nullptr;
 
-		}; // class ProgramSynchronizer
+		}; // class SequenceSynchronizer
 
 
 
@@ -702,15 +702,15 @@ namespace Nany
 
 
 
-	bool Isolate::attach(IR::Program& program, Logs::Report& report, bool owned)
+	bool Isolate::attach(IR::Sequence& sequence, Logs::Report& report, bool owned)
 	{
-		// keep the program somewhere
+		// keep the sequence somewhere
 		{
 			MutexLocker locker{mutex};
-			pAttachedPrograms.push_back(AttachedProgramRef{&program, owned});
+			pAttachedSequences.push_back(AttachedSequenceRef{&sequence, owned});
 		}
-		ProgramSynchronizer syncer{report, *this, program};
-		program.each(syncer);
+		SequenceSynchronizer syncer{report, *this, sequence};
+		sequence.each(syncer);
 		return syncer.success;
 	}
 

@@ -21,7 +21,7 @@ namespace Producer
 		{
 			nmspc.words(".", [&](const AnyString& part) -> bool
 			{
-				program.emitNamespace(part);
+				sequence.emitNamespace(part);
 				return true;
 			});
 		}

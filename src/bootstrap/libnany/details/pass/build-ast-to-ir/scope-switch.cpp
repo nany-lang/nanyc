@@ -23,9 +23,9 @@ namespace Producer
 		bool success = true;
 
 		if (debugmode)
-			program().emitComment("switch");
+			sequence().emitComment("switch");
 
-		auto& out = program();
+		auto& out = sequence();
 		OpcodeScopeLocker opscopeSwitch{out};
 
 		// the variable id of the initial condition

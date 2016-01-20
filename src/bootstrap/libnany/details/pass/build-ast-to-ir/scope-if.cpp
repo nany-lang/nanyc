@@ -17,8 +17,8 @@ namespace Producer
 
 	bool Scope::generateIfStmt(Node& expr, Node& thenc, Node* elseptr, uint32_t* customjmpthenOffset)
 	{
-		// output program
-		auto& out = program();
+		// output sequence
+		auto& out = sequence();
 
 		if (debugmode)
 			out.emitComment("*** if-stmt");
@@ -103,8 +103,8 @@ namespace Producer
 
 	bool Scope::generateIfExpr(uint32_t& ifret, Node& expr, Node& thenc, Node& elsec)
 	{
-		// output program
-		auto& out = program();
+		// output sequence
+		auto& out = sequence();
 
 		if (debugmode)
 			out.emitComment("*** if-expr");

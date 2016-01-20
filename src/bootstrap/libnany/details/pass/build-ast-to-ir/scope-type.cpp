@@ -39,7 +39,7 @@ namespace Producer
 		}
 
 		IR::Producer::Scope scope{*this};
-		OpcodeCodegenDisabler codegenDisabler{program()};
+		OpcodeCodegenDisabler codegenDisabler{sequence()};
 		return scope.visitASTExpr(node, localvar);
 	}
 
@@ -103,10 +103,10 @@ namespace Producer
 		if (0 != localvar)
 		{
 			if (localvar == (uint32_t) -1)
-				localvar = program().emitStackalloc(reserveLocalVariable(), nyt_any);
+				localvar = sequence().emitStackalloc(reserveLocalVariable(), nyt_any);
 
-			program().emitQualifierRef(localvar, isRef);
-			program().emitQualifierConst(localvar, isConst);
+			sequence().emitQualifierRef(localvar, isRef);
+			sequence().emitQualifierConst(localvar, isConst);
 		}
 		return success;
 	}

@@ -13,7 +13,7 @@ namespace Instanciate
 {
 
 
-	Logs::Report ProgramBuilder::error() const
+	Logs::Report SequenceBuilder::error() const
 	{
 		success = false;
 		auto err = report.error();
@@ -23,7 +23,7 @@ namespace Instanciate
 		return err;
 	}
 
-	Logs::Report ProgramBuilder::warning() const
+	Logs::Report SequenceBuilder::warning() const
 	{
 		auto wrn = report.warning();
 		wrn.message.origins.location.filename   = currentFilename;
@@ -33,7 +33,7 @@ namespace Instanciate
 	}
 
 
-	Logs::Report ProgramBuilder::ICE() const
+	Logs::Report SequenceBuilder::ICE() const
 	{
 		success = false;
 		auto ice = report.ICE();
@@ -48,7 +48,7 @@ namespace Instanciate
 	}
 
 
-	YString ProgramBuilder::ICE(const Classdef& cdef, const AnyString& msg) const
+	YString SequenceBuilder::ICE(const Classdef& cdef, const AnyString& msg) const
 	{
 		success = false;
 		auto ice = (ICE() << msg << ": " << cdef.clid << ' ');
@@ -57,7 +57,7 @@ namespace Instanciate
 	}
 
 
-	bool ProgramBuilder::complainRedeclared(const AnyString& name, uint32_t previousDeclaration)
+	bool SequenceBuilder::complainRedeclared(const AnyString& name, uint32_t previousDeclaration)
 	{
 		success = false;
 		auto& frame = atomStack.back();
@@ -74,7 +74,7 @@ namespace Instanciate
 	}
 
 
-	bool ProgramBuilder::complainMultipleOverloads(LVID lvid, const std::vector<std::reference_wrapper<Atom>>& solutions
+	bool SequenceBuilder::complainMultipleOverloads(LVID lvid, const std::vector<std::reference_wrapper<Atom>>& solutions
 	   , const OverloadedFuncCallResolver& resolver)
 	{
 		assert(solutions.size() == resolver.suitable.size());
@@ -162,7 +162,7 @@ namespace Instanciate
 	}
 
 
-	bool ProgramBuilder::complainMultipleDefinitions(const Atom& atom, const AnyString& funcOrOpName)
+	bool SequenceBuilder::complainMultipleDefinitions(const Atom& atom, const AnyString& funcOrOpName)
 	{
 		auto err = (error() << atom.keyword() << ' ');
 		atom.printFullname(err.data().message, false);
@@ -171,28 +171,28 @@ namespace Instanciate
 	}
 
 
-	bool ProgramBuilder::complainBuiltinIntrinsicDoesNotAccept(const AnyString& name, const AnyString& what)
+	bool SequenceBuilder::complainBuiltinIntrinsicDoesNotAccept(const AnyString& name, const AnyString& what)
 	{
 		error() << "builtin intrinsic '" << name << "' does not accept " << what;
 		return false;
 	}
 
 
-	bool ProgramBuilder::complainUnknownIntrinsic(const AnyString& name)
+	bool SequenceBuilder::complainUnknownIntrinsic(const AnyString& name)
 	{
 		error() << "unknown intrinsic '" << name << '\'';
 		return false;
 	}
 
 
-	bool ProgramBuilder::complainIntrinsicWithNamedParameters(const AnyString& name)
+	bool SequenceBuilder::complainIntrinsicWithNamedParameters(const AnyString& name)
 	{
 		error() << "intrinsic '" << name << "': named parameters are not accepted";
 		return false;
 	}
 
 
-	bool ProgramBuilder::checkForIntrinsicParamCount(const AnyString& name, uint32_t count)
+	bool SequenceBuilder::checkForIntrinsicParamCount(const AnyString& name, uint32_t count)
 	{
 		if (unlikely(lastPushedIndexedParameters.size() > count))
 		{
@@ -213,7 +213,7 @@ namespace Instanciate
 	}
 
 
-	bool ProgramBuilder::complainIntrinsicParameter(const AnyString& name, uint32_t pindex, const Classdef& got,
+	bool SequenceBuilder::complainIntrinsicParameter(const AnyString& name, uint32_t pindex, const Classdef& got,
 		const AnyString& expected)
 	{
 		success = false;
@@ -234,7 +234,7 @@ namespace Instanciate
 	}
 
 
-	bool ProgramBuilder::complainOperand(const IR::Instruction& operands, AnyString msg)
+	bool SequenceBuilder::complainOperand(const IR::Instruction& operands, AnyString msg)
 	{
 		success = false;
 		auto message = ICE();
@@ -244,14 +244,14 @@ namespace Instanciate
 		else
 			message << "unexpected opcode";
 
-		message << ": '" << IR::ISA::print(currentProgram, operands) << '\'';
+		message << ": '" << IR::ISA::print(currentSequence, operands) << '\'';
 		// stop reading the opcodes
-		currentProgram.invalidateCursor(*cursor);
+		currentSequence.invalidateCursor(*cursor);
 		return false;
 	}
 
 
-	void ProgramBuilder::complainUnusedVariable(const AtomStackFrame& frame, uint32_t lvid) const
+	void SequenceBuilder::complainUnusedVariable(const AtomStackFrame& frame, uint32_t lvid) const
 	{
 		auto& lvidinfo = frame.lvids[lvid];
 		auto err = warning();
@@ -264,7 +264,7 @@ namespace Instanciate
 	}
 
 
-	bool ProgramBuilder::complainInvalidMemberRequestNonClass(const AnyString& name, nytype_t kind) const
+	bool SequenceBuilder::complainInvalidMemberRequestNonClass(const AnyString& name, nytype_t kind) const
 	{
 		assert(not name.empty());
 		success = false;
@@ -278,14 +278,14 @@ namespace Instanciate
 	}
 
 
-	bool ProgramBuilder::complainUnknownBuiltinType(const AnyString& name) const
+	bool SequenceBuilder::complainUnknownBuiltinType(const AnyString& name) const
 	{
 		error() << "unknown builtin type '" << name << '\'';
 		return false;
 	}
 
 
-	bool ProgramBuilder::complainInvalidSelfRefForVariableAssignment(uint32_t lvid) const
+	bool SequenceBuilder::complainInvalidSelfRefForVariableAssignment(uint32_t lvid) const
 	{
 		assert(not atomStack.empty());
 		auto& frame = atomStack.back();
@@ -296,7 +296,7 @@ namespace Instanciate
 	}
 
 
-	bool ProgramBuilder::complainMissingOperator(Atom& atom, const AnyString& name) const
+	bool SequenceBuilder::complainMissingOperator(Atom& atom, const AnyString& name) const
 	{
 		auto ice = (ICE() << "missing operator '" << name << "' for '");
 		ice << atom.keyword() << ' ';
@@ -306,7 +306,7 @@ namespace Instanciate
 	}
 
 
-	bool ProgramBuilder::complainInvalidType(const Classdef& from, const Classdef& to)
+	bool SequenceBuilder::complainInvalidType(const Classdef& from, const Classdef& to)
 	{
 		auto err = (error() << "cannot convert '");
 		from.print(err.data().message, cdeftable, false);

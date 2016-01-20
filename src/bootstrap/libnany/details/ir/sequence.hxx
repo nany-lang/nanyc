@@ -1,7 +1,8 @@
-#include "program.h"
+#pragma once
+#include "sequence.h"
 
-#define NANY_PRINT_PROGRAM_OPCODES 0
-#if NANY_PRINT_PROGRAM_OPCODES != 0
+#define NANY_PRINT_sequence_OPCODES 0
+#if NANY_PRINT_sequence_OPCODES != 0
 #include <iostream>
 #endif
 
@@ -13,38 +14,38 @@ namespace IR
 {
 
 
-	inline void Program::reserve(uint32_t N)
+	inline void Sequence::reserve(uint32_t N)
 	{
 		if (pCapacity < N)
 			grow(N);
 	}
 
-	inline uint32_t Program::opcodeCount() const
+	inline uint32_t Sequence::opcodeCount() const
 	{
 		return pSize;
 	}
 
-	inline uint32_t Program::capacity() const
+	inline uint32_t Sequence::capacity() const
 	{
 		return pCapacity;
 	}
 
 
-	inline const Instruction& Program::at(uint32_t offset) const
+	inline const Instruction& Sequence::at(uint32_t offset) const
 	{
 		assert(offset < pSize);
 		return pBody.get()[offset];
 	}
 
 
-	inline Instruction& Program::at(uint32_t offset)
+	inline Instruction& Sequence::at(uint32_t offset)
 	{
 		assert(offset < pSize);
 		return pBody.get()[offset];
 	}
 
 
-	template<ISA::Op O> inline ISA::Operand<O>& Program::at(uint32_t offset)
+	template<ISA::Op O> inline ISA::Operand<O>& Sequence::at(uint32_t offset)
 	{
 		assert(offset < pSize);
 		static_assert(sizeof(Instruction) >= sizeof(ISA::Operand<O>), "pSize mismatch");
@@ -53,7 +54,7 @@ namespace IR
 
 
 
-	template<ISA::Op O> inline const ISA::Operand<O>& Program::at(uint32_t offset) const
+	template<ISA::Op O> inline const ISA::Operand<O>& Sequence::at(uint32_t offset) const
 	{
 		assert(offset < pSize);
 		static_assert(sizeof(Instruction) >= sizeof(ISA::Operand<O>), "pSize mismatch");
@@ -61,7 +62,7 @@ namespace IR
 	}
 
 
-	template<ISA::Op O> inline ISA::Operand<O>& Program::emitraw()
+	template<ISA::Op O> inline ISA::Operand<O>& Sequence::emitraw()
 	{
 		static_assert(sizeof(Instruction) >= sizeof(ISA::Operand<O>), "pSize mismatch");
 		assert(pSize + 1 < pCapacity);
@@ -71,7 +72,7 @@ namespace IR
 	}
 
 
-	template<ISA::Op O> inline ISA::Operand<O>& Program::emit()
+	template<ISA::Op O> inline ISA::Operand<O>& Sequence::emit()
 	{
 		reserve(pSize + 1);
 
@@ -83,19 +84,19 @@ namespace IR
 	}
 
 
-	inline void Program::emitNop()
+	inline void Sequence::emitNop()
 	{
 		emit<ISA::Op::nop>();
 	}
 
 
-	inline void Program::emitRef(uint32_t lvid)
+	inline void Sequence::emitRef(uint32_t lvid)
 	{
 		emit<ISA::Op::ref>().lvid = lvid;
 	}
 
 
-	inline uint32_t Program::emitAllocate(uint32_t lvid, uint32_t atomid)
+	inline uint32_t Sequence::emitAllocate(uint32_t lvid, uint32_t atomid)
 	{
 		auto& operands = emit<ISA::Op::allocate>();
 		operands.lvid = lvid;
@@ -104,7 +105,7 @@ namespace IR
 	}
 
 
-	inline void Program::emitUnref(uint32_t lvid, uint32_t atomid, uint32_t instanceid)
+	inline void Sequence::emitUnref(uint32_t lvid, uint32_t atomid, uint32_t instanceid)
 	{
 		auto& operands      = emit<ISA::Op::unref>();
 		operands.lvid       = lvid;
@@ -113,7 +114,7 @@ namespace IR
 	}
 
 
-	inline void Program::emitFADD(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	inline void Sequence::emitFADD(uint32_t lvid, uint32_t lhs, uint32_t rhs)
 	{
 		auto& operands = emit<ISA::Op::fadd>();
 		operands.lvid  = lvid;
@@ -121,7 +122,7 @@ namespace IR
 		operands.rhs   = rhs;
 	}
 
-	inline void Program::emitFSUB(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	inline void Sequence::emitFSUB(uint32_t lvid, uint32_t lhs, uint32_t rhs)
 	{
 		auto& operands = emit<ISA::Op::fsub>();
 		operands.lvid  = lvid;
@@ -129,7 +130,7 @@ namespace IR
 		operands.rhs   = rhs;
 	}
 
-	inline void Program::emitFDIV(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	inline void Sequence::emitFDIV(uint32_t lvid, uint32_t lhs, uint32_t rhs)
 	{
 		auto& operands = emit<ISA::Op::fdiv>();
 		operands.lvid  = lvid;
@@ -137,7 +138,7 @@ namespace IR
 		operands.rhs   = rhs;
 	}
 
-	inline void Program::emitFMUL(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	inline void Sequence::emitFMUL(uint32_t lvid, uint32_t lhs, uint32_t rhs)
 	{
 		auto& operands = emit<ISA::Op::fmul>();
 		operands.lvid  = lvid;
@@ -145,7 +146,7 @@ namespace IR
 		operands.rhs   = rhs;
 	}
 
-	inline void Program::emitADD(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	inline void Sequence::emitADD(uint32_t lvid, uint32_t lhs, uint32_t rhs)
 	{
 		auto& operands = emit<ISA::Op::add>();
 		operands.lvid  = lvid;
@@ -153,7 +154,7 @@ namespace IR
 		operands.rhs   = rhs;
 	}
 
-	inline void Program::emitSUB(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	inline void Sequence::emitSUB(uint32_t lvid, uint32_t lhs, uint32_t rhs)
 	{
 		auto& operands = emit<ISA::Op::sub>();
 		operands.lvid  = lvid;
@@ -161,7 +162,7 @@ namespace IR
 		operands.rhs   = rhs;
 	}
 
-	inline void Program::emitDIV(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	inline void Sequence::emitDIV(uint32_t lvid, uint32_t lhs, uint32_t rhs)
 	{
 		auto& operands = emit<ISA::Op::div>();
 		operands.lvid  = lvid;
@@ -169,7 +170,7 @@ namespace IR
 		operands.rhs   = rhs;
 	}
 
-	inline void Program::emitMUL(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	inline void Sequence::emitMUL(uint32_t lvid, uint32_t lhs, uint32_t rhs)
 	{
 		auto& operands = emit<ISA::Op::mul>();
 		operands.lvid  = lvid;
@@ -177,7 +178,7 @@ namespace IR
 		operands.rhs   = rhs;
 	}
 
-	inline void Program::emitIMUL(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	inline void Sequence::emitIMUL(uint32_t lvid, uint32_t lhs, uint32_t rhs)
 	{
 		auto& operands = emit<ISA::Op::imul>();
 		operands.lvid  = lvid;
@@ -185,7 +186,7 @@ namespace IR
 		operands.rhs   = rhs;
 	}
 
-	inline void Program::emitIDIV(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	inline void Sequence::emitIDIV(uint32_t lvid, uint32_t lhs, uint32_t rhs)
 	{
 		auto& operands = emit<ISA::Op::idiv>();
 		operands.lvid  = lvid;
@@ -194,7 +195,7 @@ namespace IR
 	}
 
 
-	inline void Program::emitEQ(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	inline void Sequence::emitEQ(uint32_t lvid, uint32_t lhs, uint32_t rhs)
 	{
 		auto& operands = emit<ISA::Op::eq>();
 		operands.lvid  = lvid;
@@ -202,7 +203,7 @@ namespace IR
 		operands.rhs   = rhs;
 	}
 
-	inline void Program::emitNEQ(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	inline void Sequence::emitNEQ(uint32_t lvid, uint32_t lhs, uint32_t rhs)
 	{
 		auto& operands = emit<ISA::Op::neq>();
 		operands.lvid  = lvid;
@@ -211,7 +212,7 @@ namespace IR
 	}
 
 
-	inline void Program::emitFLT(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	inline void Sequence::emitFLT(uint32_t lvid, uint32_t lhs, uint32_t rhs)
 	{
 		auto& operands = emit<ISA::Op::flt>();
 		operands.lvid  = lvid;
@@ -219,7 +220,7 @@ namespace IR
 		operands.rhs   = rhs;
 	}
 
-	inline void Program::emitFLTE(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	inline void Sequence::emitFLTE(uint32_t lvid, uint32_t lhs, uint32_t rhs)
 	{
 		auto& operands = emit<ISA::Op::flte>();
 		operands.lvid  = lvid;
@@ -227,7 +228,7 @@ namespace IR
 		operands.rhs   = rhs;
 	}
 
-	inline void Program::emitFGT(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	inline void Sequence::emitFGT(uint32_t lvid, uint32_t lhs, uint32_t rhs)
 	{
 		auto& operands = emit<ISA::Op::fgt>();
 		operands.lvid  = lvid;
@@ -235,7 +236,7 @@ namespace IR
 		operands.rhs   = rhs;
 	}
 
-	inline void Program::emitFGTE(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	inline void Sequence::emitFGTE(uint32_t lvid, uint32_t lhs, uint32_t rhs)
 	{
 		auto& operands = emit<ISA::Op::fgte>();
 		operands.lvid  = lvid;
@@ -244,7 +245,7 @@ namespace IR
 	}
 
 
-	inline void Program::emitLT(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	inline void Sequence::emitLT(uint32_t lvid, uint32_t lhs, uint32_t rhs)
 	{
 		auto& operands = emit<ISA::Op::lt>();
 		operands.lvid  = lvid;
@@ -252,7 +253,7 @@ namespace IR
 		operands.rhs   = rhs;
 	}
 
-	inline void Program::emitLTE(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	inline void Sequence::emitLTE(uint32_t lvid, uint32_t lhs, uint32_t rhs)
 	{
 		auto& operands = emit<ISA::Op::lte>();
 		operands.lvid  = lvid;
@@ -260,7 +261,7 @@ namespace IR
 		operands.rhs   = rhs;
 	}
 
-	inline void Program::emitILT(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	inline void Sequence::emitILT(uint32_t lvid, uint32_t lhs, uint32_t rhs)
 	{
 		auto& operands = emit<ISA::Op::ilt>();
 		operands.lvid  = lvid;
@@ -268,7 +269,7 @@ namespace IR
 		operands.rhs   = rhs;
 	}
 
-	inline void Program::emitILTE(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	inline void Sequence::emitILTE(uint32_t lvid, uint32_t lhs, uint32_t rhs)
 	{
 		auto& operands = emit<ISA::Op::ilte>();
 		operands.lvid  = lvid;
@@ -276,7 +277,7 @@ namespace IR
 		operands.rhs   = rhs;
 	}
 
-	inline void Program::emitGT(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	inline void Sequence::emitGT(uint32_t lvid, uint32_t lhs, uint32_t rhs)
 	{
 		auto& operands = emit<ISA::Op::gt>();
 		operands.lvid  = lvid;
@@ -284,7 +285,7 @@ namespace IR
 		operands.rhs   = rhs;
 	}
 
-	inline void Program::emitGTE(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	inline void Sequence::emitGTE(uint32_t lvid, uint32_t lhs, uint32_t rhs)
 	{
 		auto& operands = emit<ISA::Op::gte>();
 		operands.lvid  = lvid;
@@ -292,7 +293,7 @@ namespace IR
 		operands.rhs   = rhs;
 	}
 
-	inline void Program::emitIGT(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	inline void Sequence::emitIGT(uint32_t lvid, uint32_t lhs, uint32_t rhs)
 	{
 		auto& operands = emit<ISA::Op::igt>();
 		operands.lvid  = lvid;
@@ -300,7 +301,7 @@ namespace IR
 		operands.rhs   = rhs;
 	}
 
-	inline void Program::emitIGTE(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	inline void Sequence::emitIGTE(uint32_t lvid, uint32_t lhs, uint32_t rhs)
 	{
 		auto& operands = emit<ISA::Op::igte>();
 		operands.lvid  = lvid;
@@ -309,7 +310,7 @@ namespace IR
 	}
 
 
-	inline void Program::emitAND(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	inline void Sequence::emitAND(uint32_t lvid, uint32_t lhs, uint32_t rhs)
 	{
 		auto& operands = emit<ISA::Op::opand>();
 		operands.lvid  = lvid;
@@ -317,7 +318,7 @@ namespace IR
 		operands.rhs   = rhs;
 	}
 
-	inline void Program::emitOR(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	inline void Sequence::emitOR(uint32_t lvid, uint32_t lhs, uint32_t rhs)
 	{
 		auto& operands = emit<ISA::Op::opor>();
 		operands.lvid  = lvid;
@@ -325,7 +326,7 @@ namespace IR
 		operands.rhs   = rhs;
 	}
 
-	inline void Program::emitXOR(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	inline void Sequence::emitXOR(uint32_t lvid, uint32_t lhs, uint32_t rhs)
 	{
 		auto& operands = emit<ISA::Op::opxor>();
 		operands.lvid  = lvid;
@@ -333,7 +334,7 @@ namespace IR
 		operands.rhs   = rhs;
 	}
 
-	inline void Program::emitMOD(uint32_t lvid, uint32_t lhs, uint32_t rhs)
+	inline void Sequence::emitMOD(uint32_t lvid, uint32_t lhs, uint32_t rhs)
 	{
 		auto& operands = emit<ISA::Op::opmod>();
 		operands.lvid  = lvid;
@@ -342,13 +343,13 @@ namespace IR
 	}
 
 
-	inline void Program::emitTypeIsObject(uint32_t lvid)
+	inline void Sequence::emitTypeIsObject(uint32_t lvid)
 	{
 		emit<ISA::Op::typeisobject>().lvid = lvid;
 	}
 
 
-	inline void Program::emitInheritQualifiers(uint32_t lhs, uint32_t rhs)
+	inline void Sequence::emitInheritQualifiers(uint32_t lhs, uint32_t rhs)
 	{
 		auto& operands   = emit<ISA::Op::inherit>();
 		operands.inherit = 2;
@@ -357,14 +358,14 @@ namespace IR
 	}
 
 
-	inline void Program::emitPragmaSuggest(bool onoff)
+	inline void Sequence::emitPragmaSuggest(bool onoff)
 	{
 		auto& opc = emit<ISA::Op::pragma>();
 		opc.pragma = static_cast<uint32_t>(IR::ISA::Pragma::suggest);
 		opc.value.suggest = static_cast<uint32_t>(onoff);
 	}
 
-	inline void Program::emitPragmaBuiltinAlias(const AnyString& name)
+	inline void Sequence::emitPragmaBuiltinAlias(const AnyString& name)
 	{
 		auto& opc = emit<ISA::Op::pragma>();
 		opc.pragma = static_cast<uint32_t>(IR::ISA::Pragma::builtinalias);
@@ -372,14 +373,14 @@ namespace IR
 	}
 
 
-	inline void Program::emitPragmaShortcircuit(bool evalvalue)
+	inline void Sequence::emitPragmaShortcircuit(bool evalvalue)
 	{
 		auto& opc = emit<ISA::Op::pragma>();
 		opc.pragma = static_cast<uint32_t>(IR::ISA::Pragma::shortcircuit);
 		opc.value.shortcircuit = static_cast<uint32_t>(evalvalue);
 	}
 
-	inline void Program::emitPragmaShortcircuitMetadata(uint32_t label)
+	inline void Sequence::emitPragmaShortcircuitMetadata(uint32_t label)
 	{
 		auto& opc = emit<ISA::Op::pragma>();
 		opc.pragma = static_cast<uint32_t>(IR::ISA::Pragma::shortcircuitOpNopOffset);
@@ -387,33 +388,33 @@ namespace IR
 	}
 
 
-	inline void Program::emitLabel(uint32_t labelid)
+	inline void Sequence::emitLabel(uint32_t labelid)
 	{
 		emit<IR::ISA::Op::label>().label = labelid;
 	}
 
 
-	inline void Program::emitPragmaFuncBody()
+	inline void Sequence::emitPragmaFuncBody()
 	{
 		emit<ISA::Op::pragma>().pragma = static_cast<uint32_t>(IR::ISA::Pragma::bodystart);
 	}
 
 
-	inline void Program::emitPragmaAllowCodeGeneration(bool enabled)
+	inline void Sequence::emitPragmaAllowCodeGeneration(bool enabled)
 	{
 		auto& operands = emit<ISA::Op::pragma>();
 		operands.pragma = (uint32_t) ISA::Pragma::codegen;
 		operands.value.codegen = static_cast<uint32_t>(enabled);
 	}
 
-	inline void Program::emitVisibility(nyvisibility_t visibility)
+	inline void Sequence::emitVisibility(nyvisibility_t visibility)
 	{
 		auto& operands = emit<ISA::Op::pragma>();
 		operands.pragma = (uint32_t) ISA::Pragma::visibility;
 		operands.value.visibility = static_cast<uint32_t>(visibility);
 	}
 
-	inline uint32_t Program::emitStackSizeIncrease(uint32_t size)
+	inline uint32_t Sequence::emitStackSizeIncrease(uint32_t size)
 	{
 		uint32_t offset = pSize;
 		emit<ISA::Op::stacksize>().add = size;
@@ -421,12 +422,12 @@ namespace IR
 	}
 
 
-	inline uint32_t Program::emitStackSizeIncrease()
+	inline uint32_t Sequence::emitStackSizeIncrease()
 	{
 		return emitStackSizeIncrease(0);
 	}
 
-	inline uint32_t Program::emitBlueprintSize()
+	inline uint32_t Sequence::emitBlueprintSize()
 	{
 		uint32_t offset = pSize;
 		auto& operands = emit<ISA::Op::pragma>();
@@ -436,7 +437,7 @@ namespace IR
 	}
 
 
-	inline void Program::emitBlueprintClass(const AnyString& name, uint32_t atomid)
+	inline void Sequence::emitBlueprintClass(const AnyString& name, uint32_t atomid)
 	{
 		auto& operands = emit<ISA::Op::pragma>();
 		operands.pragma = (uint32_t) ISA::Pragma::blueprintclassdef;
@@ -444,7 +445,7 @@ namespace IR
 		operands.value.blueprint.atomid = atomid;
 	}
 
-	inline uint32_t Program::emitBlueprintClass()
+	inline uint32_t Sequence::emitBlueprintClass()
 	{
 		uint32_t offset = pSize;
 		auto& operands = emit<ISA::Op::pragma>();
@@ -454,7 +455,7 @@ namespace IR
 		return offset;
 	}
 
-	inline void Program::emitBlueprintFunc(const AnyString& name, uint32_t atomid)
+	inline void Sequence::emitBlueprintFunc(const AnyString& name, uint32_t atomid)
 	{
 		auto& operands = emit<ISA::Op::pragma>();
 		operands.pragma = (uint32_t) ISA::Pragma::blueprintfuncdef;
@@ -462,7 +463,7 @@ namespace IR
 		operands.value.blueprint.atomid = atomid;
 	}
 
-	inline uint32_t Program::emitBlueprintFunc()
+	inline uint32_t Sequence::emitBlueprintFunc()
 	{
 		uint32_t offset = pSize;
 		auto& operands = emit<ISA::Op::pragma>();
@@ -472,7 +473,7 @@ namespace IR
 		return offset;
 	}
 
-	inline uint32_t Program::emitBlueprintParam(LVID lvid, const AnyString& name)
+	inline uint32_t Sequence::emitBlueprintParam(LVID lvid, const AnyString& name)
 	{
 		uint32_t offset = pSize;
 		auto& operands = emit<ISA::Op::pragma>();
@@ -482,7 +483,7 @@ namespace IR
 		return offset;
 	}
 
-	inline uint32_t Program::emitBlueprintParam(LVID lvid)
+	inline uint32_t Sequence::emitBlueprintParam(LVID lvid)
 	{
 		uint32_t offset = pSize;
 		auto& operands = emit<ISA::Op::pragma>();
@@ -493,7 +494,7 @@ namespace IR
 	}
 
 
-	inline void Program::emitBlueprintVardef(LVID lvid, const AnyString& name)
+	inline void Sequence::emitBlueprintVardef(LVID lvid, const AnyString& name)
 	{
 		auto& operands = emit<ISA::Op::pragma>();
 		operands.pragma = (uint32_t) ISA::Pragma::blueprintvar;
@@ -502,14 +503,14 @@ namespace IR
 	}
 
 
-	inline void Program::emitStore_u64(uint32_t lvid, uint64_t value)
+	inline void Sequence::emitStore_u64(uint32_t lvid, uint64_t value)
 	{
 		auto& operands = emit<ISA::Op::storeConstant>();
 		operands.lvid  = lvid;
 		operands.value.u64 = value;
 	}
 
-	inline void Program::emitStore_f64(uint32_t lvid, double value)
+	inline void Sequence::emitStore_f64(uint32_t lvid, double value)
 	{
 		auto& operands = emit<ISA::Op::storeConstant>();
 		operands.lvid  = lvid;
@@ -517,7 +518,7 @@ namespace IR
 	}
 
 
-	inline uint32_t Program::emitStoreText(uint32_t lvid, const AnyString& text)
+	inline uint32_t Sequence::emitStoreText(uint32_t lvid, const AnyString& text)
 	{
 		auto& operands = emit<ISA::Op::storeText>();
 		operands.lvid = lvid;
@@ -526,7 +527,7 @@ namespace IR
 	}
 
 
-	inline uint32_t Program::emitStackalloc(uint32_t lvid, nytype_t type)
+	inline uint32_t Sequence::emitStackalloc(uint32_t lvid, nytype_t type)
 	{
 		auto& operands = emit<ISA::Op::stackalloc>();
 		operands.lvid   = lvid;
@@ -536,14 +537,14 @@ namespace IR
 	}
 
 
-	inline uint32_t Program::emitStackalloc_u64(uint32_t lvid, nytype_t type, uint64_t value)
+	inline uint32_t Sequence::emitStackalloc_u64(uint32_t lvid, nytype_t type, uint64_t value)
 	{
 		emitStackalloc(lvid, type);
 		emitStore_u64(lvid, value);
 		return lvid;
 	}
 
-	inline uint32_t Program::emitStackalloc_f64(uint32_t lvid, nytype_t type, double value)
+	inline uint32_t Sequence::emitStackalloc_f64(uint32_t lvid, nytype_t type, double value)
 	{
 		emitStackalloc(lvid, type);
 		emitStore_f64(lvid, value);
@@ -551,14 +552,14 @@ namespace IR
 	}
 
 
-	inline uint32_t Program::emitStackallocText(uint32_t lvid, const AnyString& text)
+	inline uint32_t Sequence::emitStackallocText(uint32_t lvid, const AnyString& text)
 	{
 		emitStackalloc(lvid, nyt_pointer);
 		emitStoreText(lvid, text);
 		return lvid;
 	}
 
-	inline void Program::emitStore(uint32_t lvid, uint32_t source)
+	inline void Sequence::emitStore(uint32_t lvid, uint32_t source)
 	{
 		auto& operands  = emit<ISA::Op::store>();
 		operands.lvid   = lvid;
@@ -566,7 +567,7 @@ namespace IR
 	}
 
 
-	inline void Program::emitNamespace(const AnyString& name)
+	inline void Sequence::emitNamespace(const AnyString& name)
 	{
 		auto& operands = emit<ISA::Op::pragma>();
 		operands.pragma = (uint32_t) ISA::Pragma::namespacedef;
@@ -574,7 +575,7 @@ namespace IR
 	}
 
 
-	inline void Program::emitDebugpos(uint32_t line, uint32_t offset)
+	inline void Sequence::emitDebugpos(uint32_t line, uint32_t offset)
 	{
 		auto& operands  = emit<ISA::Op::debugpos>();
 		operands.line   = line;
@@ -582,7 +583,7 @@ namespace IR
 	}
 
 
-	inline void Program::emitPush(uint32_t lvid)
+	inline void Sequence::emitPush(uint32_t lvid)
 	{
 		auto& operands = emit<ISA::Op::push>();
 		operands.lvid  = lvid;
@@ -590,7 +591,7 @@ namespace IR
 	}
 
 
-	inline uint32_t Program::emitMemalloc(uint32_t lvid, uint32_t regsize)
+	inline uint32_t Sequence::emitMemalloc(uint32_t lvid, uint32_t regsize)
 	{
 		auto& operands   = emit<ISA::Op::memalloc>();
 		operands.lvid    = lvid;
@@ -598,7 +599,7 @@ namespace IR
 		return lvid;
 	}
 
-	inline void Program::emitMemFree(uint32_t lvid, uint32_t regsize)
+	inline void Sequence::emitMemFree(uint32_t lvid, uint32_t regsize)
 	{
 		auto& operands   = emit<ISA::Op::memfree>();
 		operands.lvid    = lvid;
@@ -606,7 +607,7 @@ namespace IR
 	}
 
 
-	inline void Program::emitSizeof(uint32_t lvid, uint32_t type)
+	inline void Sequence::emitSizeof(uint32_t lvid, uint32_t type)
 	{
 		auto& operands = emit<ISA::Op::classdefsizeof>();
 		operands.lvid  = lvid;
@@ -614,7 +615,7 @@ namespace IR
 	}
 
 
-	inline void Program::emitNameAlias(uint32_t lvid, const AnyString& name)
+	inline void Sequence::emitNameAlias(uint32_t lvid, const AnyString& name)
 	{
 		auto& operands = emit<ISA::Op::namealias>();
 		operands.lvid  = lvid;
@@ -622,32 +623,32 @@ namespace IR
 	}
 
 
-	inline void Program::emitReturn(uint32_t lvid)
+	inline void Sequence::emitReturn(uint32_t lvid)
 	{
 		emit<ISA::Op::ret>().lvid = lvid;
 	}
 
 
-	inline void Program::emitComment(const AnyString& text)
+	inline void Sequence::emitComment(const AnyString& text)
 	{
 		emit<ISA::Op::comment>().text = stringrefs.ref(text);
 	}
 
 
-	inline void Program::emitComment()
+	inline void Sequence::emitComment()
 	{
 		emit<ISA::Op::comment>().text = 0;
 	}
 
 
 
-	inline void Program::emitSelf(uint32_t self)
+	inline void Sequence::emitSelf(uint32_t self)
 	{
 		emit<ISA::Op::self>().self = self;
 	}
 
 
-	inline void Program::emitAssign(uint32_t lhs, uint32_t rhs, bool canDisposeLHS)
+	inline void Sequence::emitAssign(uint32_t lhs, uint32_t rhs, bool canDisposeLHS)
 	{
 		auto& operands = emit<ISA::Op::assign>();
 		operands.lhs = lhs;
@@ -656,7 +657,7 @@ namespace IR
 	}
 
 
-	inline void Program::emitIdentify(uint32_t lvid, const AnyString& name, uint32_t self)
+	inline void Sequence::emitIdentify(uint32_t lvid, const AnyString& name, uint32_t self)
 	{
 		auto& operands = emit<ISA::Op::identify>();
 		operands.lvid  = lvid;
@@ -665,7 +666,7 @@ namespace IR
 	}
 
 
-	inline void Program::emitPush(uint32_t lvid, const AnyString& name)
+	inline void Sequence::emitPush(uint32_t lvid, const AnyString& name)
 	{
 		assert(not name.empty());
 		auto& operands = emit<ISA::Op::push>();
@@ -674,7 +675,7 @@ namespace IR
 	}
 
 
-	inline void Program::emitCall(uint32_t lvid, uint32_t ptr2func)
+	inline void Sequence::emitCall(uint32_t lvid, uint32_t ptr2func)
 	{
 		auto& operands = emit<ISA::Op::call>();
 		operands.lvid  = lvid;
@@ -682,7 +683,7 @@ namespace IR
 		operands.instanceid = (uint32_t) -1;
 	}
 
-	inline void Program::emitCall(uint32_t lvid, uint32_t atomid, uint32_t instanceid)
+	inline void Sequence::emitCall(uint32_t lvid, uint32_t atomid, uint32_t instanceid)
 	{
 		assert(instanceid != (uint32_t) -1);
 		auto& operands = emit<ISA::Op::call>();
@@ -692,7 +693,7 @@ namespace IR
 	}
 
 
-	inline void Program::emitIntrinsic(uint32_t lvid, const AnyString& name, uint32_t id)
+	inline void Sequence::emitIntrinsic(uint32_t lvid, const AnyString& name, uint32_t id)
 	{
 		auto& operands     = emit<ISA::Op::intrinsic>();
 		operands.lvid      = lvid;
@@ -701,7 +702,7 @@ namespace IR
 	}
 
 
-	inline void Program::emitFieldget(uint32_t lvid, uint32_t self, uint32_t fieldindex)
+	inline void Sequence::emitFieldget(uint32_t lvid, uint32_t self, uint32_t fieldindex)
 	{
 		assert(lvid != 0 and self != 0);
 		auto& operands = emit<ISA::Op::fieldget>();
@@ -711,7 +712,7 @@ namespace IR
 	}
 
 
-	inline void Program::emitFieldset(uint32_t lvid, uint32_t self, uint32_t varid)
+	inline void Sequence::emitFieldset(uint32_t lvid, uint32_t self, uint32_t varid)
 	{
 		assert(lvid != 0 and self != 0);
 		auto& operands = emit<ISA::Op::fieldset>();
@@ -721,24 +722,24 @@ namespace IR
 	}
 
 
-	inline void Program::emitScope()
+	inline void Sequence::emitScope()
 	{
 		emit<ISA::Op::scope>();
 	}
 
 
-	inline void Program::emitEnd()
+	inline void Sequence::emitEnd()
 	{
 		emit<ISA::Op::end>();
 	}
 
 
-	inline void Program::emitJmp(uint32_t label)
+	inline void Sequence::emitJmp(uint32_t label)
 	{
 		emit<ISA::Op::jmp>().label = label;
 	}
 
-	inline void Program::emitJz(uint32_t lvid, uint32_t result, uint32_t label)
+	inline void Sequence::emitJz(uint32_t lvid, uint32_t result, uint32_t label)
 	{
 		auto& opc  = emit<ISA::Op::jz>();
 		opc.lvid   = lvid;
@@ -746,7 +747,7 @@ namespace IR
 		opc.label  = label;
 	}
 
-	inline void Program::emitJnz(uint32_t lvid, uint32_t result, uint32_t label)
+	inline void Sequence::emitJnz(uint32_t lvid, uint32_t result, uint32_t label)
 	{
 		auto& opc  = emit<ISA::Op::jnz>();
 		opc.lvid   = lvid;
@@ -755,7 +756,7 @@ namespace IR
 	}
 
 
-	inline void Program::emitQualifierRef(uint32_t lvid, bool flag)
+	inline void Sequence::emitQualifierRef(uint32_t lvid, bool flag)
 	{
 		auto& operands = emit<ISA::Op::qualifiers>();
 		operands.lvid  = lvid;
@@ -764,7 +765,7 @@ namespace IR
 	}
 
 
-	inline void Program::emitQualifierConst(uint32_t lvid, bool flag)
+	inline void Sequence::emitQualifierConst(uint32_t lvid, bool flag)
 	{
 		auto& operands = emit<ISA::Op::qualifiers>();
 		operands.lvid  = lvid;
@@ -774,19 +775,19 @@ namespace IR
 
 
 
-	inline const void* Program::pointer(uint32_t offset) const
+	inline const void* Sequence::pointer(uint32_t offset) const
 	{
 		return reinterpret_cast<const void*>(pBody.get() + offset);
 	}
 
 
-	inline Yuni::String Program::gdbMemoryWatch(uint32_t offset) const
+	inline Yuni::String Sequence::gdbMemoryWatch(uint32_t offset) const
 	{
 		return YString{} << "awatch (char[" << sizeof(Instruction) << "]) *" << pointer(offset);
 	}
 
 
-	inline uint32_t Program::offsetOf(const Instruction& instr) const
+	inline uint32_t Sequence::offsetOf(const Instruction& instr) const
 	{
 		assert(pSize > 0 and pCapacity > 0);
 		assert(&instr >= pBody.get());
@@ -802,31 +803,31 @@ namespace IR
 	}
 
 	template<ISA::Op O>
-	inline uint32_t Program::offsetOf(const ISA::Operand<O>& instr) const
+	inline uint32_t Sequence::offsetOf(const ISA::Operand<O>& instr) const
 	{
 		static_assert(sizeof(Instruction) >= sizeof(ISA::Operand<O>), "pSize mismatch");
 		return offsetOf(reinterpret_cast<const Instruction&>(instr));
 	}
 
 
-	inline bool Program::hasAtomParent() const
+	inline bool Sequence::hasAtomParent() const
 	{
 		return (nullptr != pAtom);
 	}
 
 
-	inline void Program::invalidateCursor(const Instruction*& cursor) const
+	inline void Sequence::invalidateCursor(const Instruction*& cursor) const
 	{
 		cursor = pBody.get() + pSize;
 	}
 
-	inline void Program::invalidateCursor(Instruction*& cursor) const
+	inline void Sequence::invalidateCursor(Instruction*& cursor) const
 	{
 		cursor = pBody.get() + pSize;
 	}
 
 
-	inline void Program::jumpToLabelForward(const Instruction*& cursor, uint32_t label) const
+	inline void Sequence::jumpToLabelForward(const Instruction*& cursor, uint32_t label) const
 	{
 		auto* end = pBody.get() + pSize;
 		while (++cursor < end)
@@ -842,7 +843,7 @@ namespace IR
 	}
 
 
-	inline void Program::jumpToLabelBackward(const Instruction*& cursor, uint32_t label) const
+	inline void Sequence::jumpToLabelBackward(const Instruction*& cursor, uint32_t label) const
 	{
 		auto* base = pBody.get();
 		while (cursor-- > base)
@@ -859,7 +860,7 @@ namespace IR
 	}
 
 
-	template<class T> inline void Program::each(T& visitor, uint32_t offset)
+	template<class T> inline void Sequence::each(T& visitor, uint32_t offset)
 	{
 		if (likely(offset < pSize))
 		{
@@ -868,17 +869,17 @@ namespace IR
 			visitor.cursor = &it;
 			for ( ; it < end; ++it)
 			{
-				#if NANY_PRINT_PROGRAM_OPCODES != 0
+				#if NANY_PRINT_sequence_OPCODES != 0
 				std::cout << "== opcode == at " << (it - pBody.get()) << "|" << (void*) it << " :: "
 					<< it->opcodes[0] << ": " << IR::ISA::print(*this, *it) << '\n';
 				#endif
-				LIBNANY_IR_VISIT_PROGRAM(IR::ISA::Operand, visitor, *it);
+				LIBNANY_IR_VISIT_SEQUENCE(IR::ISA::Operand, visitor, *it);
 			}
 		}
 	}
 
 
-	template<class T> inline void Program::each(T& visitor, uint32_t offset) const
+	template<class T> inline void Sequence::each(T& visitor, uint32_t offset) const
 	{
 		if (likely(offset < pSize))
 		{
@@ -887,11 +888,11 @@ namespace IR
 			visitor.cursor = &it;
 			for ( ; it < end; ++it)
 			{
-				#if NANY_PRINT_PROGRAM_OPCODES != 0
+				#if NANY_PRINT_sequence_OPCODES != 0
 				std::cout << "== opcode == at " << (it - pBody.get()) << "|" << (void*) it << " :: "
 					<< it->opcodes[0] << ": " << IR::ISA::print(*this, *it) << '\n';
 				#endif
-				LIBNANY_IR_VISIT_PROGRAM(const IR::ISA::Operand, visitor, *it);
+				LIBNANY_IR_VISIT_SEQUENCE(const IR::ISA::Operand, visitor, *it);
 			}
 		}
 	}

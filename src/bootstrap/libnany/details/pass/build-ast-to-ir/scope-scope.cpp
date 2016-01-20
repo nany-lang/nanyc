@@ -29,7 +29,7 @@ namespace Producer
 			return false;
 		}
 
-		IR::OpcodeScopeLocker opscope{program()};
+		IR::OpcodeScopeLocker opscope{sequence()};
 		IR::Producer::Scope scope{*this};
 
 		bool success = true;

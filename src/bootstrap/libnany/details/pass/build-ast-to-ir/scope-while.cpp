@@ -27,7 +27,7 @@ namespace Producer
 			return false;
 		}
 
-		auto& out = program();
+		auto& out = sequence();
 		bool success = true;
 
 		if (debugmode)
@@ -94,7 +94,7 @@ namespace Producer
 			return false;
 		}
 
-		auto& out = program();
+		auto& out = sequence();
 		bool success = true;
 
 		if (debugmode)

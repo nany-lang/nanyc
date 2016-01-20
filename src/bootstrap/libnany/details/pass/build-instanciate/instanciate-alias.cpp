@@ -13,7 +13,7 @@ namespace Instanciate
 {
 
 
-	void ProgramBuilder::declareNamedVariable(const AnyString& name, LVID lvid, bool autoreleased)
+	void SequenceBuilder::declareNamedVariable(const AnyString& name, LVID lvid, bool autoreleased)
 	{
 		auto& frame = atomStack.back();
 
@@ -42,7 +42,7 @@ namespace Instanciate
 	}
 
 
-	// inline void ProgramBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::namealias>& operands)
+	// inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::namealias>& operands)
 	// see .h
 
 

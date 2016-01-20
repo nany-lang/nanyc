@@ -249,7 +249,7 @@ namespace Producer
 			return false;
 		}
 
-		auto& out = program();
+		auto& out = sequence();
 
 		if (not isProperty)
 		{

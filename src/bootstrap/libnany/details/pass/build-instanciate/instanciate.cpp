@@ -34,13 +34,13 @@ namespace Instanciate
 	}
 
 
-	ProgramBuilder::ProgramBuilder(Logs::Report report, ClassdefTableView& cdeftable, nycontext_t& context,
-		IR::Program& out, IR::Program& program)
+	SequenceBuilder::SequenceBuilder(Logs::Report report, ClassdefTableView& cdeftable, nycontext_t& context,
+		IR::Sequence& out, IR::Sequence& sequence)
 		: cdeftable(cdeftable)
 		, context(context)
 		, intrinsics(((Context*) context.internal)->intrinsics)
 		, out(out)
-		, currentProgram(program)
+		, currentSequence(sequence)
 		, overloadMatch(report, cdeftable)
 		, report(report)
 	{
@@ -52,14 +52,14 @@ namespace Instanciate
 	}
 
 
-	ProgramBuilder::~ProgramBuilder()
+	SequenceBuilder::~SequenceBuilder()
 	{
 		if (Config::Traces::printClassdefTable)
 			printClassdefTable();
 	}
 
 
-	void ProgramBuilder::printClassdefTable()
+	void SequenceBuilder::printClassdefTable()
 	{
 		while (not atomStack.empty())
 		{
@@ -69,7 +69,7 @@ namespace Instanciate
 	}
 
 
-	void ProgramBuilder::releaseScopedVariables(int scope, bool forget)
+	void SequenceBuilder::releaseScopedVariables(int scope, bool forget)
 	{
 		if (unlikely(atomStack.empty()))
 			return;
@@ -126,7 +126,7 @@ namespace Instanciate
 	}
 
 
-	uint32_t ProgramBuilder::createLocalVariables(uint32_t count)
+	uint32_t SequenceBuilder::createLocalVariables(uint32_t count)
 	{
 		assert(lastOpcodeStacksizeOffset != (uint32_t) -1);
 		assert(not atomStack.empty());
@@ -175,7 +175,7 @@ namespace Instanciate
 	}
 
 
-	void ProgramBuilder::printClassdefTable(Logs::Report trace, const AtomStackFrame& frame) const
+	void SequenceBuilder::printClassdefTable(Logs::Report trace, const AtomStackFrame& frame) const
 	{
 		auto entry = trace.trace();
 
@@ -208,9 +208,9 @@ namespace Instanciate
 
 
 
-	bool ProgramBuilder::readAndInstanciate(uint32_t offset)
+	bool SequenceBuilder::readAndInstanciate(uint32_t offset)
 	{
-		currentProgram.each(*this, offset);
+		currentSequence.each(*this, offset);
 		return success;
 	}
 
@@ -272,9 +272,9 @@ namespace Nany
 		ClassdefTableView cdeftblView{classdefTable};
 
 		Pass::Instanciate::InstanciateData info{newReport, *entrypointAtom, cdeftblView, context, params};
-		auto* program = Pass::Instanciate::InstanciateAtom(info);
+		auto* sequence = Pass::Instanciate::InstanciateAtom(info);
 		report.appendEntry(newReport);
-		return (nullptr != program);
+		return (nullptr != sequence);
 	}
 
 

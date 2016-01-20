@@ -27,7 +27,7 @@ namespace Nany
 	}
 
 
-	const IR::Program* AtomMap::fetchProgram(uint32_t atomid, uint32_t instanceid) const
+	const IR::Sequence* AtomMap::fetchSequence(uint32_t atomid, uint32_t instanceid) const
 	{
 		if (atomid < pByIndex.size())
 			return pByIndex[atomid]->fetchInstance(instanceid);
@@ -35,7 +35,7 @@ namespace Nany
 	}
 
 
-	AnyString AtomMap::fetchProgramCaption(uint32_t atomid, uint32_t instanceid) const
+	AnyString AtomMap::fetchSequenceCaption(uint32_t atomid, uint32_t instanceid) const
 	{
 		if (atomid < pByIndex.size())
 			return pByIndex[atomid]->fetchInstanceCaption(instanceid);

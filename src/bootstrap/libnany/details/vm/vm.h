@@ -1,5 +1,5 @@
 #pragma once
-#include "details/ir/program.h"
+#include "details/ir/sequence.h"
 #include "nany/nany.h"
 #include "details/atom/atom-map.h"
 #include "details/context/context.h"
@@ -14,9 +14,9 @@ namespace VM
 
 
 	/*!
-	** \brief Execute a program within its sandbox
+	** \brief Execute a sequence within its sandbox
 	*/
-	int execute(bool& success, nycontext_t&, const IR::Program& program, const AtomMap&);
+	int execute(bool& success, nycontext_t&, const IR::Sequence& sequence, const AtomMap&);
 
 
 

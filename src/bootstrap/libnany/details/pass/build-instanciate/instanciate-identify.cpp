@@ -31,10 +31,10 @@ namespace Instanciate
 
 
 
-	inline bool ProgramBuilder::identify(const IR::ISA::Operand<IR::ISA::Op::identify>& operands)
+	inline bool SequenceBuilder::identify(const IR::ISA::Operand<IR::ISA::Op::identify>& operands)
 	{
 		auto& frame = atomStack.back();
-		AnyString name = currentProgram.stringrefs[operands.text];
+		AnyString name = currentSequence.stringrefs[operands.text];
 
 		// keeping traces of the code logic
 		frame.lvids[operands.lvid].resolvedName = name;
@@ -353,7 +353,7 @@ namespace Instanciate
 
 
 
-	void ProgramBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::identify>& operands)
+	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::identify>& operands)
 	{
 		assert(not atomStack.empty());
 

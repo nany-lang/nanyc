@@ -12,7 +12,7 @@ namespace Pass
 namespace Instanciate
 {
 
-	void ProgramBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::stacksize>& operands)
+	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::stacksize>& operands)
 	{
 		if (atomStack.empty())
 			return;

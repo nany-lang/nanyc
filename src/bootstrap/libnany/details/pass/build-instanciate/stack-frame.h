@@ -57,7 +57,7 @@ namespace Instanciate
 
 			//! The scope depth when the variable has been declared
 			int scope = -1;
-			//! declaration offset (stackalloc) in the out program
+			//! declaration offset (stackalloc) in the out sequence
 			uint32_t offsetDeclOut = (uint32_t) -1;
 
 			struct {

@@ -103,7 +103,7 @@ namespace Producer
 					}
 
 					// set the visibility
-					scope.program().emitVisibility(visibility);
+					scope.sequence().emitVisibility(visibility);
 				}
 				else
 				{
@@ -234,7 +234,7 @@ namespace Producer
 
 						if (not lvidIsAny(paramtype) and paramtype != 0)
 						{
-							auto& operands    = scope.program().emit<ISA::Op::follow>();
+							auto& operands    = scope.sequence().emit<ISA::Op::follow>();
 							operands.follower = lvid;
 							operands.lvid     = paramtype;
 							operands.symlink  = 1;
@@ -271,11 +271,11 @@ namespace Producer
 			}
 
 			// update the parameter name within the IR code (whatever previous result)
-			auto sid = scope.program().stringrefs.ref(paramname);
+			auto sid = scope.sequence().stringrefs.ref(paramname);
 
 			// update the parameter opcode
 			{
-				auto& opparam = scope.program().at<ISA::Op::pragma>(paramoffset);
+				auto& opparam = scope.sequence().at<ISA::Op::pragma>(paramoffset);
 				opparam.value.param.name = sid;
 				if (autoMemberAssignment)
 					opparam.pragma = static_cast<uint32_t>(ISA::Pragma::blueprintparamself);
@@ -284,9 +284,9 @@ namespace Producer
 			// the qualifiers may have been set by the type definition
 			// thus they must be overriden and not always reset
 			if (ref)
-				scope.program().emitQualifierRef(lvid, true);
+				scope.sequence().emitQualifierRef(lvid, true);
 			if (constant)
-				scope.program().emitQualifierConst(lvid, true);
+				scope.sequence().emitQualifierConst(lvid, true);
 			return success;
 		}
 
@@ -325,7 +325,7 @@ namespace Producer
 			// creating all blueprint parameters first to have their 'lvid' predictible
 			// as a consequence, classdef for parameters start from 2 (0: null, 1: return type)
 			// and variables for parameters start from 1
-			auto& out = scope.program();
+			auto& out = scope.sequence();
 
 			// dealing first with the implicit parameter 'self'
 			if (pWithinClass)
@@ -400,7 +400,7 @@ namespace Producer
 			{
 				if (rettype != 0)
 				{
-					auto& operands    = scope.program().emit<ISA::Op::follow>();
+					auto& operands    = scope.sequence().emit<ISA::Op::follow>();
 					operands.follower = 1; // params are 2-based (1 is the return type)
 					operands.lvid     = rettype;
 					operands.symlink  = 1;
@@ -415,7 +415,7 @@ namespace Producer
 		bool FuncInspector::inspectAttributes(Node& node)
 		{
 			assert(node.rule == rgAttributes);
-			auto& out = scope.program();
+			auto& out = scope.sequence();
 
 			for (auto& childptr: node.children)
 			{
@@ -548,9 +548,9 @@ namespace Producer
 		scope.broadcastNextVarID = false;
 
 		// creating a new blueprint for the function
-		uint32_t bpoffset = program().emitBlueprintFunc();
-		uint32_t bpoffsiz = program().emitBlueprintSize();
-		uint32_t bpoffsck = program().emitStackSizeIncrease();
+		uint32_t bpoffset = sequence().emitBlueprintFunc();
+		uint32_t bpoffsiz = sequence().emitBlueprintSize();
+		uint32_t bpoffsck = sequence().emitStackSizeIncrease();
 
 		// making sure that debug info are available
 		scope.addDebugCurrentFilename();
@@ -568,13 +568,13 @@ namespace Producer
 
 			isOperator = (inspector.funcname.first() == '^');
 			// update the func name
-			auto sid = program().stringrefs.ref(inspector.funcname);
-			program().at<ISA::Op::pragma>(bpoffset).value.blueprint.name = sid;
+			auto sid = sequence().stringrefs.ref(inspector.funcname);
+			sequence().at<ISA::Op::pragma>(bpoffset).value.blueprint.name = sid;
 			return inspector.body;
 		})();
 
 		// body start (for auto generation)
-		program().emitPragmaFuncBody();
+		sequence().emitPragmaFuncBody();
 
 		if (likely(body != nullptr))
 		{
@@ -587,10 +587,10 @@ namespace Producer
 		}
 
 		// end of the blueprint
-		program().emitEnd();
-		uint32_t blpsize = program().opcodeCount() - bpoffset;
-		program().at<ISA::Op::pragma>(bpoffsiz).value.blueprintsize = blpsize;
-		program().at<ISA::Op::stacksize>(bpoffsck).add = scope.pNextVarID + 1;
+		sequence().emitEnd();
+		uint32_t blpsize = sequence().opcodeCount() - bpoffset;
+		sequence().at<ISA::Op::pragma>(bpoffsiz).value.blueprintsize = blpsize;
+		sequence().at<ISA::Op::stacksize>(bpoffsck).add = scope.pNextVarID + 1;
 		return success;
 	}
 

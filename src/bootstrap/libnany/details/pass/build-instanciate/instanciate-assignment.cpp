@@ -27,7 +27,7 @@ namespace Instanciate
 
 
 
-	bool ProgramBuilder::instanciateAssignment(AtomStackFrame& frame, LVID lhs, LVID rhs, bool canDisposeLHS,
+	bool SequenceBuilder::instanciateAssignment(AtomStackFrame& frame, LVID lhs, LVID rhs, bool canDisposeLHS,
 		bool checktype, bool forceDeepcopy)
 	{
 		// lhs and rhs can not be null, but they can be identical, to force a clone
@@ -231,7 +231,7 @@ namespace Instanciate
 
 
 
-	bool ProgramBuilder::instanciateAssignment(const IR::ISA::Operand<IR::ISA::Op::call>& operands)
+	bool SequenceBuilder::instanciateAssignment(const IR::ISA::Operand<IR::ISA::Op::call>& operands)
 	{
 		if (unlikely(lastPushedIndexedParameters.size() != 1))
 		{

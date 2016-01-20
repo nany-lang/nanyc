@@ -49,7 +49,7 @@ namespace Producer
 			}
 			case rgExprGroup:
 			{
-				IR::OpcodeScopeLocker opscope{program()};
+				IR::OpcodeScopeLocker opscope{sequence()};
 				LVID localvar;
 				return visitASTExpr(node, localvar, /*allowScope:*/true);
 			}

@@ -21,7 +21,7 @@ namespace Producer
 
 		bool success = true;
 		bool hasReturnValue = false;
-		auto& out = program();
+		auto& out = sequence();
 
 		for (auto& childptr: node.children)
 		{
@@ -38,9 +38,9 @@ namespace Producer
 					// generate error on the begining of the expr and not the return itself
 					emitDebugpos(child);
 
-					uint32_t copy = program().emitStackalloc(nextvar(), nyt_any);
+					uint32_t copy = sequence().emitStackalloc(nextvar(), nyt_any);
 					{
-						auto& operands    = program().emit<ISA::Op::follow>();
+						auto& operands    = sequence().emit<ISA::Op::follow>();
 						operands.follower = copy;
 						operands.lvid     = 1; // return type
 						operands.symlink  = 0; // true

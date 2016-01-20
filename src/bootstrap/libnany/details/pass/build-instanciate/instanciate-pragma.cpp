@@ -13,7 +13,7 @@ namespace Instanciate
 {
 
 
-	inline void ProgramBuilder::adjustSettingsNewFuncdefOperator(const AnyString& name)
+	inline void SequenceBuilder::adjustSettingsNewFuncdefOperator(const AnyString& name)
 	{
 		assert(name.size() >= 2);
 		switch (name[1])
@@ -56,7 +56,7 @@ namespace Instanciate
 	}
 
 
-	bool ProgramBuilder::pragmaBlueprint(const IR::ISA::Operand<IR::ISA::Op::pragma>& operands)
+	bool SequenceBuilder::pragmaBlueprint(const IR::ISA::Operand<IR::ISA::Op::pragma>& operands)
 	{
 		// reset
 		lastPushedNamedParameters.clear();
@@ -70,7 +70,7 @@ namespace Instanciate
 		--layerDepthLimit;
 
 		uint32_t atomid = operands.value.blueprint.atomid;
-		AnyString atomname = currentProgram.stringrefs[operands.value.blueprint.name];
+		AnyString atomname = currentSequence.stringrefs[operands.value.blueprint.name];
 
 		if (not atomStack.empty() and canGenerateCode())
 		{
@@ -88,7 +88,7 @@ namespace Instanciate
 		}
 
 		atomStack.emplace_back(*atom);
-		atomStack.back().blueprintOpcodeOffset = currentProgram.offsetOf(**cursor);
+		atomStack.back().blueprintOpcodeOffset = currentSequence.offsetOf(**cursor);
 
 		if ((IR::ISA::Pragma) operands.pragma == IR::ISA::Pragma::blueprintfuncdef)
 		{
@@ -104,7 +104,7 @@ namespace Instanciate
 	}
 
 
-	void ProgramBuilder::pragmaBodyStart()
+	void SequenceBuilder::pragmaBodyStart()
 	{
 		assert(not atomStack.empty());
 
@@ -162,7 +162,7 @@ namespace Instanciate
 	}
 
 
-	void ProgramBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::pragma>& operands)
+	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::pragma>& operands)
 	{
 		if (unlikely(not (operands.pragma < static_cast<uint32_t>(IR::ISA::Pragma::max))))
 			return (void)(ICE() << "invalid pragma");
@@ -189,7 +189,7 @@ namespace Instanciate
 				uint32_t sid  = operands.value.param.name;
 				uint32_t lvid = operands.value.param.lvid;
 				cdeftable.substitute(lvid).qualifiers.ref = false;
-				declareNamedVariable(currentProgram.stringrefs[sid], lvid, false);
+				declareNamedVariable(currentSequence.stringrefs[sid], lvid, false);
 				break;
 			}
 
@@ -211,7 +211,7 @@ namespace Instanciate
 
 				uint32_t sid  = operands.value.param.name;
 				uint32_t lvid = operands.value.param.lvid;
-				AnyString varname = currentProgram.stringrefs[sid];
+				AnyString varname = currentSequence.stringrefs[sid];
 				(*frame.selfParameters)[varname].first = lvid;
 				break;
 			}
@@ -237,7 +237,7 @@ namespace Instanciate
 				if (frame.atom.isClass())
 				{
 					uint32_t sid  = operands.value.vardef.name;
-					const AnyString& varname = currentProgram.stringrefs[sid];
+					const AnyString& varname = currentSequence.stringrefs[sid];
 
 					Atom* atom = nullptr;
 					if (1 != frame.atom.findVarAtom(atom, varname))
@@ -268,7 +268,7 @@ namespace Instanciate
 
 					// goto the end of the blueprint
 					// -2: the final 'end' opcode must be interpreted
-					*cursor = &currentProgram.at(startOffset + count - 1 - 1);
+					*cursor = &currentSequence.at(startOffset + count - 1 - 1);
 				}
 				break;
 			}

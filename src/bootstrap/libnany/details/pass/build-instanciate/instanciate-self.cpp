@@ -13,7 +13,7 @@ namespace Instanciate
 {
 
 
-	void ProgramBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::self>& operands)
+	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::self>& operands)
 	{
 		// we can have at least 2 patterns:
 		//

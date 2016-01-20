@@ -44,7 +44,7 @@ namespace ISA //!< Instruction Set Architecture
 
 		//! shortcircuit attribute
 		shortcircuit,
-		//! shortcircuit program offset of 'nop' instructions
+		//! shortcircuit sequence offset of 'nop' instructions
 		shortcircuitOpNopOffset,
 		//! Builtin alias
 		builtinalias,

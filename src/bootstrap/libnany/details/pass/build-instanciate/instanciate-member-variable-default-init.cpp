@@ -13,7 +13,7 @@ namespace Instanciate
 {
 
 
-	void ProgramBuilder::generateMemberVarDefaultInitialization()
+	void SequenceBuilder::generateMemberVarDefaultInitialization()
 	{
 		assert(not atomStack.empty());
 		assert(canGenerateCode());

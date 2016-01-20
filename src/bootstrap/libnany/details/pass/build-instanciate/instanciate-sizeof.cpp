@@ -13,7 +13,7 @@ namespace Instanciate
 {
 
 
-	void ProgramBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::classdefsizeof>& operands)
+	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::classdefsizeof>& operands)
 	{
 		if (canGenerateCode())
 		{

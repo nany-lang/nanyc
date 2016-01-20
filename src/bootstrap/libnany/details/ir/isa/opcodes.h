@@ -153,7 +153,7 @@ namespace ISA //!< Instruction Set Architecture
 		debugpos,
 		//! named alias
 		namealias,
-		//! Comment within the program
+		//! Comment within the sequence
 		comment,
 		//! begining of a new scope
 		scope,
@@ -180,7 +180,7 @@ namespace ISA //!< Instruction Set Architecture
 		}
 
 
-	#define LIBNANY_IR_VISIT_PROGRAM(PREFIX,VISITOR, IT) \
+	#define LIBNANY_IR_VISIT_SEQUENCE(PREFIX,VISITOR, IT) \
 	do \
 	{ \
 		uint32_t opc = (IT).opcodes[0]; \

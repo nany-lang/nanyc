@@ -1,5 +1,5 @@
 #pragma once
-#include "program.h"
+#include "sequence.h"
 
 
 
@@ -10,41 +10,41 @@ namespace IR
 
 	struct OpcodeScopeLocker final
 	{
-		OpcodeScopeLocker(Program& program)
-			: program(program)
+		OpcodeScopeLocker(Sequence& sequence)
+			: sequence(sequence)
 		{
-			program.emitScope();
+			sequence.emitScope();
 		}
 
 		~OpcodeScopeLocker()
 		{
-			program.emitEnd();
+			sequence.emitEnd();
 		}
 
 		OpcodeScopeLocker(const OpcodeScopeLocker&) = delete;
 		OpcodeScopeLocker(OpcodeScopeLocker&&) = default;
 
-		Program& program;
+		Sequence& sequence;
 	};
 
 
 	struct OpcodeCodegenDisabler final
 	{
-		OpcodeCodegenDisabler(Program& program)
-			: program(program)
+		OpcodeCodegenDisabler(Sequence& sequence)
+			: sequence(sequence)
 		{
-			program.emitPragmaAllowCodeGeneration(false);
+			sequence.emitPragmaAllowCodeGeneration(false);
 		}
 
 		~OpcodeCodegenDisabler()
 		{
-			program.emitPragmaAllowCodeGeneration(true);
+			sequence.emitPragmaAllowCodeGeneration(true);
 		}
 
 		OpcodeCodegenDisabler(const OpcodeCodegenDisabler&) = delete;
 		OpcodeCodegenDisabler(OpcodeCodegenDisabler&&) = default;
 
-		Program& program;
+		Sequence& sequence;
 	};
 
 

@@ -19,8 +19,8 @@ namespace Producer
 	{
 		// value fetching
 		emitDebugpos(node);
-		uint32_t rid = program().emitStackalloc(nextvar(), nyt_any);
-		program().emitIdentify(rid, node.text, localvar);
+		uint32_t rid = sequence().emitStackalloc(nextvar(), nyt_any);
+		sequence().emitIdentify(rid, node.text, localvar);
 		localvar = rid;
 
 		return visitASTExprContinuation(node, localvar);

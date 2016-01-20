@@ -1,7 +1,7 @@
 #pragma once
 #include "context.h"
 #include "details/atom/classdef-table.h"
-#include "details/ir/program.h"
+#include "details/ir/sequence.h"
 #include "nany/nany.h"
 
 
@@ -14,15 +14,15 @@ namespace Nany
 	class Isolate final
 	{
 	public:
-		struct AttachedProgramRef final
+		struct AttachedSequenceRef final
 		{
-			AttachedProgramRef(IR::Program* program, bool owned)
-				: program(program), owned(owned) {}
-			AttachedProgramRef(AttachedProgramRef&&) = default;
-			AttachedProgramRef(const AttachedProgramRef&) = delete;
-			~AttachedProgramRef();
+			AttachedSequenceRef(IR::Sequence* sequence, bool owned)
+				: sequence(sequence), owned(owned) {}
+			AttachedSequenceRef(AttachedSequenceRef&&) = default;
+			AttachedSequenceRef(const AttachedSequenceRef&) = delete;
+			~AttachedSequenceRef();
 
-			IR::Program* program = nullptr;
+			IR::Sequence* sequence = nullptr;
 			bool owned = false;
 		};
 
@@ -36,10 +36,10 @@ namespace Nany
 		//@}
 
 
-		//! \name Program
+		//! \name Sequence
 		//@{
-		//! Attach an IR program
-		bool attach(IR::Program& program, Logs::Report& report, bool owned = false);
+		//! Attach an IR sequence
+		bool attach(IR::Sequence& sequence, Logs::Report& report, bool owned = false);
 		//@}
 
 		//! \name Compilation
@@ -84,7 +84,7 @@ namespace Nany
 		void doPrintInstanciatedCodeForAtomWL(Logs::Report& report, Yuni::Clob& out, YString& tmp, const Atom& atom) const;
 
 	private:
-		std::vector<AttachedProgramRef> pAttachedPrograms;
+		std::vector<AttachedSequenceRef> pAttachedSequences;
 
 	}; // class Isolate
 

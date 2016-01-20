@@ -9,7 +9,7 @@
 #include "details/atom/atom.h"
 #include "details/atom/func-overload-match.h"
 #include "details/intrinsic/intrinsic-table.h"
-#include "details/ir/program.h"
+#include "details/ir/sequence.h"
 #include "overloaded-func-call-resolution.h"
 #include "stack-frame.h"
 #include <vector>
@@ -54,20 +54,20 @@ namespace Instanciate
 
 
 
-	class ProgramBuilder final
+	class SequenceBuilder final
 	{
 	public:
 		//! \name Constructor & Destructor
 		//@{
 		//! Default constructor (importSignature must be called after)
-		ProgramBuilder(Logs::Report report, ClassdefTableView&, nycontext_t& context,
-			IR::Program& out, IR::Program& program);
+		SequenceBuilder(Logs::Report report, ClassdefTableView&, nycontext_t& context,
+			IR::Sequence& out, IR::Sequence& sequence);
 
 		//! Prepare the first local registers according the given signature
 		void pushParametersFromSignature(LVID atomid, const Signature&);
 
 		//! Destructor
-		~ProgramBuilder();
+		~SequenceBuilder();
 		//@}
 
 
@@ -90,7 +90,7 @@ namespace Instanciate
 		bool instanciateIntrinsicMemFree(uint32_t lvid);
 
 		template<nytype_t R, bool AcceptBool, bool AcceptInt, bool AcceptFloat,
-			void (IR::Program::* M)(uint32_t, uint32_t, uint32_t)>
+			void (IR::Sequence::* M)(uint32_t, uint32_t, uint32_t)>
 		bool instanciateIntrinsicOperator(uint32_t lvid, const char* const name);
 
 		bool instanciateIntrinsicAND(uint32_t);
@@ -312,10 +312,10 @@ namespace Instanciate
 		nycontext_t& context;
 		//! intrinsics
 		const IntrinsicTable& intrinsics;
-		// New opcode program
-		IR::Program& out;
-		// Current program
-		IR::Program& currentProgram;
+		// New opcode sequence
+		IR::Sequence& out;
+		// Current sequence
+		IR::Sequence& currentSequence;
 
 		//! Flag to prevent code generation when != 0 (used for typeof for example)
 		uint32_t codeGenerationLock = 0;
@@ -356,9 +356,9 @@ namespace Instanciate
 			bool compareTo = false;
 		} shortcircuit;
 
-		friend class Nany::IR::Program;
+		friend class Nany::IR::Sequence;
 
-	}; // class ProgramBuilder
+	}; // class SequenceBuilder
 
 
 
@@ -394,7 +394,7 @@ namespace Instanciate
 		bool shouldMergeLayer = false;
 	};
 
-	IR::Program* InstanciateAtom(InstanciateData& info);
+	IR::Sequence* InstanciateAtom(InstanciateData& info);
 
 
 

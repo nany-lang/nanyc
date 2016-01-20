@@ -2,7 +2,7 @@
 #include <yuni/yuni.h>
 #include "details/reporting/report.h"
 #include "details/atom/func-overload-match.h"
-#include "details/ir/program.h"
+#include "details/ir/sequence.h"
 #include "details/atom/atom.h"
 #include "details/atom/signature.h"
 #include "details/atom/classdef-table.h"

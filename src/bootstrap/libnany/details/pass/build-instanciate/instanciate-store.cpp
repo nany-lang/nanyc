@@ -12,14 +12,14 @@ namespace Pass
 namespace Instanciate
 {
 
-	void ProgramBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::storeConstant>& operands)
+	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::storeConstant>& operands)
 	{
 		assert(not atomStack.empty());
 		out.emitStore_u64(operands.lvid, operands.value.u64);
 	}
 
 
-	void ProgramBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::store>& operands)
+	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::store>& operands)
 	{
 		assert(not atomStack.empty());
 		auto& frame = atomStack.back();
@@ -39,9 +39,9 @@ namespace Instanciate
 	}
 
 
-	void ProgramBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::storeText>& operands)
+	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::storeText>& operands)
 	{
-		uint32_t sid = out.emitStoreText(operands.lvid, currentProgram.stringrefs[operands.text]);
+		uint32_t sid = out.emitStoreText(operands.lvid, currentSequence.stringrefs[operands.text]);
 		auto& frame = atomStack.back();
 		frame.lvids[operands.lvid].text_sid = sid;
 	}
