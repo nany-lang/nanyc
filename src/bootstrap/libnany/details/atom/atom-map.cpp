@@ -47,26 +47,35 @@ namespace Nany
 	{
 		static inline bool findCoreObject(Atom::Ptr& out, nytype_t kind, const AnyString& name, Logs::Report& report, Atom& root)
 		{
-			Atom* atom;
-			switch (root.findClassAtom(atom, name))
+			if (Config::importNSL)
 			{
-				case 1:
+				Atom* atom;
+				switch (root.findClassAtom(atom, name))
 				{
-					out = atom;
-					atom->builtinMapping = kind;
-					return true;
+					case 1:
+					{
+						out = atom;
+						atom->builtinMapping = kind;
+						return true;
+					}
+					case 0:
+					{
+						report.error() << "failed to find builtin 'class " << name << "' from nsl";
+						break;
+					}
+					default:
+					{
+						report.error() << "multiple definition for 'class" << name << "'";
+					}
 				}
-				case 0:
-				{
-					report.error() << "failed to find builtin 'class " << name << "' from nsl";
-					break;
-				}
-				default:
-				{
-					report.error() << "multiple definition for 'class" << name << "'";
-				}
+				return false;
 			}
-			return false;
+			else
+			{
+				out = Atom::createDummy();
+				out->builtinMapping = nyt_void;
+				return true;
+			}
 		}
 
 	} // anonymous namespace
@@ -75,6 +84,7 @@ namespace Nany
 	bool AtomMap::fetchAndIndexCoreObjects(Logs::Report& report)
 	{
 		bool success = true;
+
 		if (core.object[nyt_bool] == nullptr)
 		{
 			success &= findCoreObject(core.object[nyt_bool], nyt_bool, "bool", report, root);

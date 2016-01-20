@@ -18,8 +18,11 @@ namespace Nany
 	Context::Context(nycontext_t& context)
 		: usercontext(context)
 	{
-		importNSLCore(*this);
-		importNSLCoreString(intrinsics);
+		if (Config::importNSL)
+		{
+			importNSLCore(*this);
+			importNSLCoreString(intrinsics);
+		}
 	}
 
 

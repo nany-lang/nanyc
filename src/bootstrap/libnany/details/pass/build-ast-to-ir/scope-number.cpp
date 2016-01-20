@@ -2,6 +2,7 @@
 #include "details/grammar/nany.h"
 #include "details/ast/ast.h"
 #include <limits>
+#include "libnany-config.h"
 
 using namespace Yuni;
 
@@ -238,7 +239,8 @@ namespace Producer
 		// Number definition
 		NumberDef numdef;
 		// is a builtin ? (__i32, __f64...)
-		bool builtin = false;
+		// (always generate builtin types when not importing the NSL)
+		bool builtin = (not Config::importNSL);
 
 		emitDebugpos(node);
 

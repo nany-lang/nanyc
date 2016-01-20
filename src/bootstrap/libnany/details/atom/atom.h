@@ -52,6 +52,9 @@ namespace Nany
 			vardef,
 		};
 
+		//! Create a dummy atom
+		static Atom* createDummy();
+
 
 	public:
 		//! Public destructor

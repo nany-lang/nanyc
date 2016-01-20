@@ -33,6 +33,10 @@ namespace Config
 	static constexpr bool removeRedundantDbgOffset = true;
 
 
+	//! Import the NSL
+	static constexpr bool importNSL = true;
+
+
 
 } // namespace Config
 } // namespace Nany

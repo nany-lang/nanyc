@@ -36,6 +36,7 @@ namespace Nany
 	}
 
 
+
 	inline const IR::Sequence& AtomMap::sequence(uint32_t atomid, uint32_t instanceid) const
 	{
 		assert(atomid < pByIndex.size());
