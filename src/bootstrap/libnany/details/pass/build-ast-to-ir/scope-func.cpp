@@ -316,7 +316,7 @@ namespace Producer
 			if (unlikely(paramCount > Config::maxFuncDeclParameterCount - 1)) // too many parameters ?
 			{
 				assert(node != nullptr);
-				scope.error(*node) << "too many parameters. Got " << paramCount << ", expected: "
+				scope.error(*node) << "hard limit: too many parameters. Got " << paramCount << ", expected: "
 					<< (Config::maxFuncDeclParameterCount - 1);
 				success = false;
 				paramCount = Config::maxFuncDeclParameterCount - 1;
