@@ -319,7 +319,7 @@ char-extended:
 	[abcdefghijklmnopqrstuvwxyz\\"%$] | (([xuU]) hex+) | integer
 
 string-interpolation: notext
-	tk-string-var-open  expr?  tk-string-var-close
+	tk-string-var-open wp (expr wp)?  tk-string-var-close
 
 char: hidden
 	| [^\\"\n]
