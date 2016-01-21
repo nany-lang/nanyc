@@ -194,9 +194,9 @@ namespace Nany
 			//
 			ast.nodeRulePromote(node, rgExprSubDot);
 			ast.nodeRulePromote(operatorNode, rgIdentifier);
-			// to deal with grammar's potential glitches when eating tokens
-			// (it would considerably slow down the parsing to improve it)
-			operatorNode.text.trimRight();
+
+			// normalizing the operator
+			operatorNode.text = normalizeOperatorName(operatorNode.text);
 
 			auto& call = *ast.nodeAppend(operatorNode, rgCall);
 			auto& expr = *ast.nodeAppend(call, {rgCallParameter, rgExpr});

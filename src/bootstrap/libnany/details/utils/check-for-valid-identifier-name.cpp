@@ -82,6 +82,9 @@ namespace Nany
 
 		assert(not name.empty());
 
+		if (name == '=')
+			return AnyString{"=", 1}; // iso, not an overloaded operator
+
 		// TODO normalize operator name: find a mecanism to not rely on a map
 		auto tit = opnormalize.find(name);
 		if (YUNI_LIKELY(tit != opnormalize.end()))
