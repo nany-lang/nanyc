@@ -86,7 +86,7 @@ namespace Nany
 		intrinsics.add("yuni.string.delete",         Builtin::yn_string_delete);
 		intrinsics.add("yuni.string.clear",          Builtin::yn_string_clear);
 		intrinsics.add("yuni.string.size",           Builtin::yn_string_size);
-		intrinsics.add("yuni.string.append",         Builtin::yn_string_append_str);
+		intrinsics.add("yuni.string.append.string",  Builtin::yn_string_append_str);
 		intrinsics.add("yuni.string.append.cstring", Builtin::yn_string_append_cstring);
 
 		intrinsics.add("yuni.string.append.u8",   Builtin::yn_string_append<uint8_t>);
