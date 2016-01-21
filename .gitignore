@@ -1,5 +1,7 @@
 # hidden / vim files
 .*
+!.gitignore
+!.gitattributes
 # Ninja files
 *.ninja
 # Visual Studio
