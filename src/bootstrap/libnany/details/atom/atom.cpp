@@ -126,6 +126,8 @@ namespace Nany
 				if (name.startsWith("^default-var-%")) // keep it simple
 					break;
 
+				if (name[0] == '^')
+					out << ' ';
 				out << '(';
 				bool first = true;
 
