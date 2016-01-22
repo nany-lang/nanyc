@@ -8,6 +8,8 @@
 Debug
 Release
 
+cachegrind.out.*
+callgrind.out.*
 a.out
 
 # CMake stuff
