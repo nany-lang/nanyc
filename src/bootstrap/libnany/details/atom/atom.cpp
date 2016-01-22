@@ -74,16 +74,13 @@ namespace Nany
 	}
 
 
-	void Atom::printFullname(Yuni::String& out, bool clearBefore) const
+	void Atom::retrieveFullname(Yuni::String& out) const
 	{
-		if (clearBefore)
-			out.clear();
-
 		if (parent)
 		{
 			if (parent->parent)
 			{
-				parent->printFullname(out, false);
+				parent->retrieveFullname(out);
 				out += '.';
 			}
 
@@ -114,10 +111,18 @@ namespace Nany
 	}
 
 
+	YString Atom::fullname() const
+	{
+		YString out;
+		retrieveFullname(out);
+		return out;
+	}
+
+
 	template<class T>
 	void Atom::doAppendCaption(YString& out, const T* table) const
 	{
-		printFullname(out, false);
+		retrieveFullname(out);
 
 		switch (type)
 		{
@@ -196,15 +201,25 @@ namespace Nany
 	}
 
 
-	void Atom::appendCaption(YString& out) const
-	{
-		doAppendCaption<ClassdefTableView>(out, nullptr);
-	}
-
-	void Atom::appendCaption(YString& out, const ClassdefTableView& table) const
+	void Atom::retrieveCaption(YString& out, const ClassdefTableView& table) const
 	{
 		doAppendCaption(out, &table);
 	}
+
+	YString Atom::caption(const ClassdefTableView& view) const
+	{
+		String out;
+		retrieveCaption(out, view);
+		return out;
+	}
+
+	YString Atom::caption() const
+	{
+		String out;
+		doAppendCaption<ClassdefTableView>(out, nullptr);
+		return out;
+	}
+
 
 
 
@@ -217,7 +232,7 @@ namespace Nany
 		if (parent != nullptr)
 		{
 			entry.message.prefix << table.keyword(*this) << ' ';
-			appendCaption(entry.data().message, table);
+			retrieveCaption(entry.data().message, table);
 			entry << " [id:" << atomid;
 			if (isMemberVariable())
 				entry << ", field: " << varinfo.effectiveFieldIndex;

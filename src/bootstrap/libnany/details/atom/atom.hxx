@@ -207,14 +207,6 @@ namespace Nany
 	}
 
 
-	inline YString Atom::printFullname() const
-	{
-		YString out;
-		printFullname(out);
-		return out;
-	}
-
-
 	inline uint32_t Atom::size() const
 	{
 		return (uint32_t) pChildren.size();

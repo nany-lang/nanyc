@@ -16,7 +16,7 @@ namespace Nany
 		for (auto& atom: pOverloads)
 		{
 			out << "        overload ";
-			atom.get().appendCaption(out, table);
+			atom.get().retrieveCaption(out, table);
 			out << '\n';
 		}
 	}

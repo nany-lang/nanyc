@@ -219,17 +219,21 @@ namespace Nany
 
 		//! \name Info / Debugging
 		//@{
-		//! Get the full name of the atom
-		void printFullname(YString& out, bool clearBefore = true) const;
-		//! Get the full name of the atom
-		YString printFullname() const;
+		//! Get the full name of the atom (without any parameters)
+		YString fullname() const;
+		//! Append the full name of the atom (without any parameters)
+		void retrieveFullname(YString& out) const;
 
-		//! Print the full name of the atom along with its parameters
-		void appendCaption(YString& out) const;
-		//! Print the full name of the atom along with its parameters
-		void appendCaption(YString& out, const ClassdefTableView& table) const;
-		//! Print the full name of the atom along with its parameters
-		void appendCaption(YString& out, const ClassdefTable& table) const;
+
+		//! Get the full name of the atom along with its parameters
+		// \internal mainly used for convenience and debugging purposes
+		YString caption() const;
+		//! Get the full name of the atom along with its parameter
+		// \internal mainly used for convenience and debugging purposes
+		YString caption(const ClassdefTableView&) const;
+		//! Append the full name of the atom along with its parameters
+		void retrieveCaption(YString& out, const ClassdefTableView& table) const;
+
 
 		//! Print the subtree
 		void print(Logs::Report& report, const ClassdefTableView&) const;

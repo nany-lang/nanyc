@@ -228,7 +228,7 @@ namespace Instanciate
 		{
 			// fail - try again to produce error message, hint, and any suggestion
 			auto err = (error() << "cannot call '" << funcAtom.keyword() << ' ');
-			funcAtom.printFullname(err.data().message, false);
+			funcAtom.retrieveFullname(err.data().message);
 			err << '\'';
 			overloadMatch.canGenerateReport = true;
 			overloadMatch.report = std::ref(err);
@@ -413,7 +413,7 @@ namespace Instanciate
 			if (success or Config::Traces::printGeneratedOpcodeSequence)
 			{
 				symbolName << newView.keyword(info.atom) << ' ';
-				info.atom.appendCaption(symbolName, newView);
+				info.atom.retrieveCaption(symbolName, newView);
 			}
 
 			if (Config::Traces::printGeneratedOpcodeSequence)
@@ -451,7 +451,7 @@ namespace Instanciate
 						else
 						{
 							report.ICE() << "invalid atom pointer in func return type for '"
-								<< info.atom.printFullname() << '\'';
+								<< info.atom.fullname() << '\'';
 							success = false;
 						}
 					}

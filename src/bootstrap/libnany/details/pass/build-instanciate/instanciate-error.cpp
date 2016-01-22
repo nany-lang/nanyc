@@ -64,7 +64,7 @@ namespace Instanciate
 		auto err = (error() << "redeclaration of '" << name << '\'');
 		err << " in '";
 		err << cdeftable.keyword(frame.atom) << ' ';
-		frame.atom.appendCaption(err.data().message, cdeftable);
+		frame.atom.retrieveCaption(err.data().message, cdeftable);
 		err << '\'';
 
 		auto suggest = (err.hint() << "previous declaration of '" << name << '\'');
@@ -126,7 +126,7 @@ namespace Instanciate
 
 					hint << '\'';
 					hint << cdeftable.keyword(atom) << ' ';
-					atom.appendCaption(hint.text(), cdeftable);
+					atom.retrieveCaption(hint.text(), cdeftable);
 					hint << "' is a suitable candidate";
 
 					hint.appendEntry(resolver.subreports[i]); // subreport can be null
@@ -151,7 +151,7 @@ namespace Instanciate
 
 					hint << '\'';
 					hint << cdeftable.keyword(atom) << ' ';
-					atom.appendCaption(hint.text(), cdeftable);
+					atom.retrieveCaption(hint.text(), cdeftable);
 					hint << '\'';
 
 					hint.appendEntry(resolver.subreports[i]); // subreport can be null
@@ -165,7 +165,7 @@ namespace Instanciate
 	bool SequenceBuilder::complainMultipleDefinitions(const Atom& atom, const AnyString& funcOrOpName)
 	{
 		auto err = (error() << atom.keyword() << ' ');
-		atom.printFullname(err.data().message, false);
+		atom.retrieveFullname(err.data().message);
 		err << ": multiple definition for " << funcOrOpName;
 		return false;
 	}
@@ -259,7 +259,7 @@ namespace Instanciate
 		lvidinfo.fillLogEntryWithLocation(err);
 		err << "unused variable '" << lvidinfo.userDefinedName << "' in '";
 		err << cdeftable.keyword(frame.atom) << ' ';
-		frame.atom.appendCaption(err.data().message, cdeftable);
+		frame.atom.retrieveCaption(err.data().message, cdeftable);
 		err << '\'';
 	}
 
@@ -300,7 +300,7 @@ namespace Instanciate
 	{
 		auto ice = (ICE() << "missing operator '" << name << "' for '");
 		ice << atom.keyword() << ' ';
-		atom.printFullname(ice.data().message, false);
+		atom.retrieveFullname(ice.data().message);
 		ice << '\'';
 		return false;
 	}

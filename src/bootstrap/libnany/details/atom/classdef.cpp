@@ -54,7 +54,7 @@ namespace Nany
 		{
 			if (kind == nyt_pointer)
 				out << "ptr -> ";
-			selfAtom->appendCaption(out, table);
+			selfAtom->retrieveCaption(out, table);
 		}
 		else
 			out << nany_type_to_cstring(kind);

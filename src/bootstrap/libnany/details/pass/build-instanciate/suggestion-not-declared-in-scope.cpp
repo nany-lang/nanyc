@@ -114,7 +114,7 @@ namespace Instanciate
 			{
 				err << "'operator " << rname << "' is not declared in '";
 				err << cdeftable.keyword(*self) << ' ';
-				self->appendCaption(err.data().message, cdeftable);
+				self->retrieveCaption(err.data().message, cdeftable);
 				err << '\'';
 			}
 			else
@@ -126,7 +126,7 @@ namespace Instanciate
 			{
 				err << '\'' << name << "' is not declared in '";
 				err << cdeftable.keyword(*self) << ' ';
-				self->appendCaption(err.data().message, cdeftable);
+				self->retrieveCaption(err.data().message, cdeftable);
 				err << '\'';
 			}
 			else
@@ -159,7 +159,7 @@ namespace Instanciate
 				{
 					suggest << ": ";
 					suggest << cdeftable.keyword(*varAtom) << ' ';
-					varAtom->appendCaption(suggest.data().message, cdeftable);
+					varAtom->retrieveCaption(suggest.data().message, cdeftable);
 				}
 
 				suggest.origins().location.pos.line   = crlcvr.file.line;
@@ -211,7 +211,7 @@ namespace Instanciate
 					if (candidate.canBeSuggestedInErrReporting)
 					{
 						auto suggest = (err.suggest() << '\'' << cdeftable.keyword(candidate) << ' ');
-						candidate.appendCaption(suggest.data().message, cdeftable);
+						candidate.retrieveCaption(suggest.data().message, cdeftable);
 						suggest << '\'';
 
 						suggest.origins().location.pos.line   = candidate.origin.line;

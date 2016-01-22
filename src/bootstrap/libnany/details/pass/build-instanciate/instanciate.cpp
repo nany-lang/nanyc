@@ -180,7 +180,7 @@ namespace Instanciate
 		auto entry = trace.trace();
 
 		entry.message.prefix << cdeftable.keyword(frame.atom) << ' ';
-		frame.atom.appendCaption(entry.message.prefix, cdeftable);
+		frame.atom.retrieveCaption(entry.message.prefix, cdeftable);
 		entry << " - type matrix, after instanciation - atom " << frame.atom.atomid;
 
 		for (uint i = 0; i != frame.localVariablesCount(); ++i)

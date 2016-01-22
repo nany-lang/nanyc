@@ -269,7 +269,7 @@ namespace Instanciate
 					auto& cdefvar = cdeftable.classdef(atom.returnType.clid);
 					auto* atomvar = cdeftable.findClassdefAtom(cdefvar);
 					if (unlikely(not (atomvar or cdefvar.isBuiltin())))
-						return (ICE() << "invalid variable member type for " << atom.printFullname());
+						return (ICE() << "invalid variable member type for " << atom.fullname());
 
 					auto& spare = cdeftable.substitute(operands.lvid);
 					spare.import(cdefvar);

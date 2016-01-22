@@ -41,7 +41,6 @@ namespace Nany
 
 		overloadMatch.canGenerateReport = false;
 
-
 		// trying to find all suitable solutions
 		for (uint32_t r = 0; r != solutionCount; ++r)
 		{

@@ -84,7 +84,7 @@ namespace Instanciate
 				{
 					auto ice = (ICE() << "invalid atom from " << cdef.clid);
 					ice << " for disposing member variable '";
-					subatom.printFullname(ice.data().message, false);
+					subatom.retrieveFullname(ice.data().message);
 					ice << "'";
 					continue;
 				}
