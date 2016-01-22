@@ -27,6 +27,17 @@
 # define LIBNANY_DLL_EXPORT
 #endif
 
+
+#if defined(__clang__) || defined(__GNUC__)
+# define LIBNANY_ATTR_ALLOCSIZE(A)    __attribute__((alloc_size(A)))
+# define LIBNANY_ATTR_ALLOCSIZE2(A,B) __attribute__((alloc_size(A, B)))
+#else
+# define LIBNANY_ATTR_ALLOCSIZE(A)
+# define LIBNANY_ATTR_ALLOCSIZE2(A, B)
+#endif
+
+
+
 /*!
 ** \macro NY_EXPORT
 ** \brief Export / import a libnany symbol (function)
@@ -736,8 +747,8 @@ NY_EXPORT size_t nanysdbx_io_read(nycontext_t*, nyfd_t fd, uint8_t* buffer, size
 NY_EXPORT size_t nanysdbx_io_write(nycontext_t*, nyfd_t fd, uint8_t* buffer, size_t size);
 
 NY_EXPORT void  nanysdbx_not_enough_memory(nycontext_t*);
-NY_EXPORT void* nanysdbx_mem_alloc(nycontext_t*, size_t size);
-NY_EXPORT void* nanysdbx_mem_realloc(nycontext_t*, void* ptr, size_t, size_t newsize);
+NY_EXPORT void* nanysdbx_mem_alloc(nycontext_t*, size_t size) LIBNANY_ATTR_ALLOCSIZE(2);
+NY_EXPORT void* nanysdbx_mem_realloc(nycontext_t*, void* ptr, size_t, size_t newsize) LIBNANY_ATTR_ALLOCSIZE2(3,4);
 NY_EXPORT void nanysdbx_mem_free(nycontext_t*, void* ptr, size_t);
 
 NY_EXPORT void nanysdbx_build_on_err_file_access(nycontext_t*, const char* filename, size_t length);
