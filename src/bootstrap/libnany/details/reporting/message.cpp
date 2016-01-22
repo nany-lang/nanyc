@@ -59,7 +59,11 @@ namespace Logs
 					case Level::error:
 					{
 						System::Console::SetTextColor(out, System::Console::red);
+						#ifndef YUNI_OS_WINDOWS
+						out << "   error \u220E ";
+						#else
 						out << "   error > ";
+						#endif
 						break;
 					}
 					case Level::warning:

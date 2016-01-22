@@ -111,8 +111,7 @@ namespace Nany
 				if (pFilename.first() != '{')
 				{
 					#ifndef YUNI_OS_WINDOWS
-					//AnyString arrow{"\u21E2 "};
-					AnyString arrow{"→ "};
+					AnyString arrow{"\u2192 "};
 					#else
 					constexpr const char* arrow = nullptr;
 					#endif
