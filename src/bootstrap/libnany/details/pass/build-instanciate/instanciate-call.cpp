@@ -69,15 +69,17 @@ namespace Instanciate
 		}
 		else
 		{
-			// no referer (a.foo, a would be the referer), but we may have 'self' as implici paramete)
-			if (frame.atom.isFunction() and frame.atom.isClassMember())
+			// implicit parameter 'self' ?
+			// no referer ('a.foo', 'a' would be the referer), but we may have 'self' as implici parameter
+			if (frame.atom.isClassMember())
 			{
 				Atom* callParent = atom;
 				if (nullptr == callParent)
 				{
+					// the solutions should all have the same parent
 					auto& solutions = frame.resolvePerCLID[cdefFuncToCall.clid];
 					if (not solutions.empty())
-						callParent = &(solutions[0].get());
+						callParent = solutions[0].get().parent;
 				}
 				else
 					callParent = atom->parent;
