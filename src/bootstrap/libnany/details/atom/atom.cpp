@@ -150,18 +150,18 @@ namespace Nany
 					{
 						if (table) // and table->hasClassdef(vardef.clid))
 						{
-							out << ": ";
-							table->classdef(vardef.clid).print(out, *table, false);
+							auto& retcdef = table->classdef(vardef.clid);
+							if (not retcdef.isVoid())
+							{
+								out << ": ";
+								retcdef.print(out, *table, false);
+							}
 						}
-						else
-							out << ": void";
 					}
 					else
 					{
 						if (not vardef.clid.isVoid())
 							out << ": any";
-						else
-							out << ": void";
 					}
 				}
 				out << ')';
@@ -170,19 +170,21 @@ namespace Nany
 				{
 					if (not returnType.clid.isVoid() and table->hasClassdef(returnType.clid))
 					{
-						out.write(": ", 2);
-						table->classdef(returnType.clid).print(out, *table, false);
+						auto& retcdef = table->classdef(returnType.clid);
+						if (not retcdef.isVoid())
+						{
+							out.write(": ", 2);
+							retcdef.print(out, *table, false);
+						}
 						break;
 					}
 				}
 				else
 				{
-					out << ((returnType.clid.isVoid()) ? ": void" : ": ref");
+					if (not returnType.clid.isVoid())
+						out << ": ref";
 					break;
 				}
-
-				// no return type
-				out.write(": void", 6);
 				break;
 			}
 
