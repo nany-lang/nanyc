@@ -183,9 +183,15 @@ namespace Nany
 			{
 				if (nullptr == result.params[i].cdef or result.params[i].cdef->clid.isVoid()) // undefined - TODO: default values
 				{
-					// std::cout << "the parameter " << i << " is missing - default value not implemented\n";
 					if (canGenerateReport)
-						report.get().hint() << "the parameter " << i << " is missing";
+					{
+						auto ix = i;
+						if (not atom.isClassMember())
+							++ix;
+						auto hint = (report.get().hint());
+						hint << atom.caption(table) << ": no value provided for the parameter '";
+						hint << atom.parameters.name((uint32_t) i) << '\'';
+					}
 					return TypeCheck::Match::none;
 				}
 			}

@@ -33,6 +33,9 @@ namespace Nany
 		parameters.clear();
 		parameters.resize(solutionCount);
 
+		if (unlikely(solutionCount == 0))
+			return false;
+
 		// the last perfect match found
 		Atom* perfectMatch = nullptr;
 		ParameterTypesRequested* perfectMatchParams = nullptr;
@@ -78,8 +81,20 @@ namespace Nany
 			}
 		}
 
-		if (0 == suitableCount) // sorry. nothing.
+		if (unlikely(0 == suitableCount)) // sorry. nothing.
+		{
+			// hum nothing has been, let's do another loop for generating a report
+			if (false)
+			{
+				overloadMatch.canGenerateReport = true;
+				auto err = (report.error() << "cannot call ");
+				overloadMatch.report = std::ref(err);
+
+				for (uint32_t r = 0; r != solutionCount; ++r)
+					overloadMatch.validate(solutions[r].get());
+			}
 			return false;
+		}
 
 		if (suitableCount > 1)
 		{

@@ -157,7 +157,7 @@ namespace Nany
 		if (unlikely(not buildinfo.success))
 		{
 			report.info(); // empty line for beauty (some other errors are already displayed)
-			report.error() << "build failed. some error occured (" << duration << "ms)";
+			report.error() << "build failed (" << duration << "ms)";
 			return nullptr;
 		}
 
