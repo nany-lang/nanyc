@@ -80,14 +80,12 @@ namespace Nany
 		auto& paramdef = table.classdef(atom.parameters.vardef(index).clid);
 
 		resultinfo.strategy = TypeCheck::isSimilarTo(table, nullptr, cdef, paramdef, pAllowImplicit);
-		if (resultinfo.strategy == TypeCheck::Match::none and canGenerateReport)
+		if (canGenerateReport and resultinfo.strategy == TypeCheck::Match::none)
 		{
 			report.get().trace() << "failed to push value " << cdef.clid << " to parameter "
 				<< (CLID{atom.atomid,0})
 				<< " '" << atom.name << "' index " << index;
 
-			String atomName;
-			atom.appendCaption(atomName, table);
 			auto err = report.get().hint();
 			switch (index)
 			{

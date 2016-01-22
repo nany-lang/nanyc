@@ -108,6 +108,7 @@ namespace Nany
 				auto report = reporttarget.subgroup();
 
 				// reporting
+				if (pFilename.first() != '{')
 				{
 					#ifndef YUNI_OS_WINDOWS
 					//AnyString arrow{"\u21E2 "};
@@ -116,7 +117,7 @@ namespace Nany
 					constexpr const char* arrow = nullptr;
 					#endif
 
-					auto entry = (report.info() << "compile " << pFilename);
+					auto entry = (report.info() << "building " << pFilename);
 					entry.message.prefix = arrow;
 				}
 

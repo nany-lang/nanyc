@@ -15,56 +15,67 @@ namespace Nany
 		//
 		// DEFINITION: perfect match:
 		//   a perfect match is a prototype that strictly satisfies the input parameter types
-		//   (aka the appropriate type has been given, not "any" nor something that looks like)
+		//   (aka the appropriate type has been given, not "any" nor something that "looks like" the same)
 
 		// invalidating the result
 		atom = nullptr;
 		params = nullptr;
+		// alias
+		uint32_t solutionCount = static_cast<uint32_t>(solutions.size());
 
 		// all really suitable solutions (type match)
 		suitable.clear();
-		suitable.resize(solutions.size(), false);
+		suitable.resize(solutionCount, false);
 		// sub-reports for error generation
 		subreports.clear();
-		subreports.resize(solutions.size());
+		subreports.resize(solutionCount);
 		// parameter instanciation per solution
 		parameters.clear();
-		parameters.resize(solutions.size());
+		parameters.resize(solutionCount);
 
 		// the last perfect match found
 		Atom* perfectMatch = nullptr;
 		ParameterTypesRequested* perfectMatchParams = nullptr;
 		// flag for determine whether a perfect match has really been found (and not invalidated a posteriori)
-		uint perfectMatchCount = 0;
+		uint32_t perfectMatchCount = 0;
 
 		overloadMatch.canGenerateReport = false;
 
+
 		// trying to find all suitable solutions
-		for (uint32_t r = 0; r != (uint32_t) solutions.size(); ++r)
+		for (uint32_t r = 0; r != solutionCount; ++r)
 		{
 			Atom& atomsol = solutions[r].get();
 
-			// checking for each parameter
 			auto match = overloadMatch.validate(atomsol);
-			if (match == TypeCheck::Match::none) // hum no. sorry.
-				continue;
-
-			// ok, the solution is "suitable"
-			++suitableCount;
-			suitable[r] = true;
-			atom = &atomsol;
-			// keeping the new parameters
-			// for using this solution, implicit object creation may be required
-			parameters[r].swap(overloadMatch.result.params);
-			params = &(parameters[r]);
-
-			// Found a perfect match ! Keeping traces of it to reuse it later if it is _the_ solution
-			// (and if unique)
-			if (match == TypeCheck::Match::strictEqual)
+			switch (match)
 			{
-				perfectMatch = atom;
-				perfectMatchParams = params;
-				++perfectMatchCount;
+				case TypeCheck::Match::none:
+				{
+					break;
+				}
+				case TypeCheck::Match::equal:
+				case TypeCheck::Match::strictEqual:
+				{
+					// ok, the solution is "suitable"
+					++suitableCount;
+					suitable[r] = true;
+					atom = &atomsol;
+					// keeping the new parameters
+					// for using this solution, implicit object creation may be required
+					parameters[r].swap(overloadMatch.result.params);
+					params = &(parameters[r]);
+
+					// Found a perfect match ! Keeping traces of it to reuse it later if it is _the_ solution
+					// (and if unique)
+					if (match == TypeCheck::Match::strictEqual)
+					{
+						perfectMatch = atom;
+						perfectMatchParams = params;
+						++perfectMatchCount;
+					}
+					break;
+				}
 			}
 		}
 
@@ -75,7 +86,7 @@ namespace Nany
 		{
 			if (1 == perfectMatchCount)
 			{
-				// several solutions might be possible, but a single perfect match has been found
+				// several solutions might be possible, but a perfect match has been found
 				atom = perfectMatch; // this is _the_ solution !
 				params = perfectMatchParams;
 				suitableCount = 1;
@@ -91,16 +102,17 @@ namespace Nany
 				solutionsThatCanBeInstanciated.clear();
 				solutionsThatCanBeInstanciated.resize(suitable.size(), false);
 
-				for (uint r = 0; r != (uint) suitable.size(); ++r)
+				for (uint32_t r = 0; r != (uint32_t) suitable.size(); ++r)
 				{
 					if (not suitable[r])
 						continue;
 
 					// reporting for the instanciation (may or may not be created by `instanciateAtom`)
 					Logs::Message::Ptr newReport;
+					auto& solutionAtom = solutions[r].get();
 
 					// trying to instanciate the solution
-					Pass::Instanciate::InstanciateData info{newReport, solutions[r].get(), cdeftable, context, parameters[r]};
+					Pass::Instanciate::InstanciateData info{newReport, solutionAtom, cdeftable, context, parameters[r]};
 					info.canGenerateCode = canGenerateCode;
 					info.canGenerateErrors = canGenerateErrors;
 
@@ -118,7 +130,7 @@ namespace Nany
 					}
 					else
 					{
-						// keeping the error report, for reporting it to the user
+						// keeping the error report for the user
 						subreports[r].swap(newReport);
 					}
 				}

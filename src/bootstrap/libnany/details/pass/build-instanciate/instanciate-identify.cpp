@@ -159,16 +159,13 @@ namespace Instanciate
 							out.emitStore_u64(operands.lvid, 1);
 							return true;
 						}
-						else
-						{
-							nytype_t type = nany_cstring_to_type_n(name.c_str(), (uint)name.size());
-							if (unlikely(type == nyt_void))
-								return complainUnknownBuiltinType(name);
 
-							cdeftable.substitute(operands.lvid).mutateToBuiltin(type);
-							return true;
-						}
-						return false;
+						nytype_t type = nany_cstring_to_type_n(name.c_str(), name.size());
+						if (unlikely(type == nyt_void))
+							return complainUnknownBuiltinType(name);
+
+						cdeftable.substitute(operands.lvid).mutateToBuiltin(type);
+						return true;
 					}
 					break;
 				}

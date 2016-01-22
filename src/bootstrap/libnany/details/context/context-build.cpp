@@ -56,10 +56,6 @@ namespace Nany
 		auto& buildinfo = *(buildinfoptr.get());
 		// the result will succeed by default, and will be reverted to false as soon as an error occurs
 		buildinfo.success = true;
-		// start time
-
-		// build
-		report.info("preparing sources").data().section = "build";
 
 		// ask to the default target to provide its list of sources
 		if (!(!pDefaultTarget))
@@ -125,7 +121,6 @@ namespace Nany
 
 		// instanciate the whole code (if possible)
 		report.info(); // empty line for beauty
-		report.info("compiling assemblies");
 
 		//if (not buildinfo.success)
 		//	report.warning() << "build failed";

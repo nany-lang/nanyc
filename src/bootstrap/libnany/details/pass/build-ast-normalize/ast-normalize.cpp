@@ -209,7 +209,7 @@ namespace Nany
 		void ASTReplicator::normalizeExprTransformOperatorsToFuncCall(Nany::Node& node)
 		{
 			// go for children, the container may change between each iteration
-			for (uint i = 0; i < (uint) node.children.size(); )
+			for (uint32_t i = 0; i < static_cast<uint32_t>(node.children.size()); )
 			{
 				Nany::Node& child = *(node.children[i]);
 
@@ -277,7 +277,7 @@ namespace Nany
 			{
 				// re-ordering nodes for operators +, *, == ...
 				// this step is mandatory to have understanding AST
-				for (uint i = 0; i < (uint) node.children.size(); ++i)
+				for (uint32_t i = 0; i < static_cast<uint32_t>(node.children.size()); ++i)
 				{
 					switch (node.children[i]->rule)
 					{
@@ -328,7 +328,7 @@ namespace Nany
 
 
 				// go for children, the container may change between each iteration
-				for (uint i = 0; i < (uint) node.children.size(); ++i)
+				for (uint32_t i = 0; i < static_cast<uint32_t>(node.children.size()); ++i)
 				{
 					Nany::Node& child = *(node.children[i]);
 
@@ -346,7 +346,7 @@ namespace Nany
 						//    - call
 						//       - expr-sub-dot
 						//          - identifier
-						if (i + 1 < (uint) node.children.size()) // another node after the current one ?
+						if (i + 1 < static_cast<uint32_t>(node.children.size())) // another node after the current one ?
 						{
 							auto& nextChild = *(node.children[i + 1]);
 							auto nrule = nextChild.rule;
@@ -457,13 +457,20 @@ namespace Nany
 
 				case rgIdentifier:
 				{
-					if ((parent.rule == rgExpr or parent.rule == rgExprValue))
+					switch (parent.rule)
 					{
-						if (node.text == "true" or node.text == "false")
+						case rgExprValue:
+						case rgExpr:
 						{
-							appendNewBoolNode(parent, (node.text[0] == 't'));
-							return true;
+							if (node.text == "true" or node.text == "false")
+							{
+								appendNewBoolNode(parent, (node.text[0] == 't'));
+								return true;
+							}
+							break;
 						}
+						default:
+							break;
 					}
 					break;
 				}
@@ -534,11 +541,11 @@ namespace Nany
 					//
 					// The AST will be normalized to avoid so many differences and a return type node
 					// will be added if none has been given and if a 'return-inline' node is present.
-					if (not (parent.findFirst(rgFuncReturnType) < (uint) parent.children.size()))
+					if (not (parent.findFirst(rgFuncReturnType) < (uint32_t) parent.children.size()))
 					{
 						// the parent does not declare any return type.
 						// do the body has a 'return-inline' node ?
-						if (node.findFirst(rgReturnInline) < (uint) node.children.size())
+						if (node.findFirst(rgReturnInline) < (uint32_t) node.children.size())
 						{
 							// all conditions are met. No type is present but should be
 							auto returnType = ast.nodeAppend(parent, {rgFuncReturnType, rgType, rgTypeDecl, rgIdentifier});

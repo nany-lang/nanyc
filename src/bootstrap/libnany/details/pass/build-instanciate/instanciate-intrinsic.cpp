@@ -1,5 +1,4 @@
 #include "instanciate.h"
-#include <iostream>
 
 using namespace Yuni;
 
@@ -54,7 +53,6 @@ namespace Instanciate
 			auto& frame = atomStack.back();
 			bool hasErrors = false;
 
-			std::cout << intrinsic->print() << std::endl;
 			// reset the returned type
 			cdeftable.substitute(operands.lvid).kind = intrinsic->rettype;
 

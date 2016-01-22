@@ -107,30 +107,30 @@ namespace Instanciate
 
 		auto err = error();
 
-		if (resolver.suitableCount != 0)
+		if (resolver.suitableCount > 0)
 		{
 			// generating the error
 			err << "ambiguous call to overloaded function '" << varname << '(';
 			overloadMatch.printInputParameters(err.data().message);
 			err << ")'";
 
-			for (uint i = 0; i != (uint) solutions.size(); ++i)
+			for (size_t i = 0; i != solutions.size(); ++i)
 			{
-				if (not resolver.suitable[i])
-					continue;
+				if (resolver.suitable[i])
+				{
+					auto& atom = solutions[i].get();
+					auto hint = err.hint();
+					hint.message.origins.location.filename   = atom.origin.filename;
+					hint.message.origins.location.pos.line   = atom.origin.line;
+					hint.message.origins.location.pos.offset = atom.origin.offset;
 
-				auto& atom = solutions[i].get();
-				auto hint = err.hint();
-				hint.message.origins.location.filename   = atom.origin.filename;
-				hint.message.origins.location.pos.line   = atom.origin.line;
-				hint.message.origins.location.pos.offset = atom.origin.offset;
+					hint << '\'';
+					hint << cdeftable.keyword(atom) << ' ';
+					atom.appendCaption(hint.text(), cdeftable);
+					hint << "' is a suitable candidate";
 
-				hint << '\'';
-				hint << cdeftable.keyword(atom) << ' ';
-				atom.appendCaption(hint.text(), cdeftable);
-				hint << "' is a suitable candidate";
-
-				hint.appendEntry(resolver.subreports[i]); // subreport can be null
+					hint.appendEntry(resolver.subreports[i]); // subreport can be null
+				}
 			}
 		}
 		else
@@ -139,7 +139,7 @@ namespace Instanciate
 			overloadMatch.printInputParameters(err.data().message);
 			err << ")'";
 
-			for (uint i = 0; i != solutions.size(); ++i)
+			for (size_t i = 0; i != solutions.size(); ++i)
 			{
 				auto& atom = solutions[i].get();
 				if (atom.canBeSuggestedInErrReporting)

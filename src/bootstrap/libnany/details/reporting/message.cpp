@@ -12,7 +12,7 @@ namespace Logs
 
 	Message& Message::createEntry(Level level)
 	{
-		Message::Ptr entry = new Message(level);
+		Message* entry = new Message{level};
 
 		ThreadingPolicy::MutexLocker locker{*this};
 		entry->origins = origins;
@@ -42,12 +42,12 @@ namespace Logs
 	{
 
 		template<class T>
-		static void printMessage(T& out, const Message& message, uint indent, String& tmp)
+		static void printMessage(T& out, const Message& message, uint32_t indent, String& tmp)
 		{
 			#ifndef YUNI_OS_WINDOWS
 			static const AnyString sep = " \u205E ";
 			#else
-			static const AnyString sep = " | ";
+			static const AnyString sep = " : ";
 			#endif
 
 			Message::ThreadingPolicy::MutexLocker locker{message};
@@ -59,21 +59,13 @@ namespace Logs
 					case Level::error:
 					{
 						System::Console::SetTextColor(out, System::Console::red);
-						#ifndef YUNI_OS_WINDOWS
-						out << "      \u2718 " << sep;
-						#else
-						out << "       X" << sep;
-						#endif
+						out << "   error > ";
 						break;
 					}
 					case Level::warning:
 					{
 						System::Console::SetTextColor(out, System::Console::yellow);
-						#ifndef YUNI_OS_WINDOWS
-						out << "      \u26A0 " << sep;
-						#else
-						out << "       !" << sep;
-						#endif
+						out << " warning > ";
 						break;
 					}
 					case Level::info:
@@ -135,7 +127,7 @@ namespace Logs
 						break;
 				}
 
-				for (uint i = indent; i--; )
+				for (uint32_t i = indent; i--; )
 					out.write("    ", 4);
 
 				if (not message.prefix.empty())
@@ -149,7 +141,7 @@ namespace Logs
 					System::Console::SetTextColor(out, System::Console::lightblue);
 					out << "suggest: ";
 				}
-				if (message.level == Level::hint)
+				else if (message.level == Level::hint)
 				{
 					System::Console::SetTextColor(out, System::Console::lightblue);
 					out << "hint: ";
