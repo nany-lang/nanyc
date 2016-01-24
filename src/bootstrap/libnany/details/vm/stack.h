@@ -17,12 +17,19 @@ namespace VM
 		Stack();
 		~Stack();
 
+		/*!
+		** \brief Push a new frame and allocates registers
+		*/
 		DataRegister* push(uint32_t count);
 
+		/*!
+		** \brief Remove the last frame
+		*/
 		void pop(uint32_t count);
 
-		void expandChunk();
 
+	private:
+		void expandChunk();
 
 	private:
 		struct Chunk
