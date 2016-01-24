@@ -18,7 +18,7 @@ namespace VM
 	};
 
 
-	struct CodeException: public std::exception
+	struct CodeAbort: public std::exception
 	{
 		virtual const char* what() const throw() { return ""; }
 	};

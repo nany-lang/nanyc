@@ -19,7 +19,7 @@ namespace VM
 		/*!
 		** \brief Create a brand new program
 		*/
-		Program(nycontext_t&, const IR::Sequence*, const AtomMap&);
+		Program(nycontext_t&, const AtomMap&);
 
 		/*!
 		** \brief Create a program from another program
@@ -29,14 +29,10 @@ namespace VM
 		*/
 		explicit Program(Program& inherit);
 
-		//! Destructor
-		~Program();
-
-
 		/*!
 		** \brief Execute the main entry point
 		*/
-		bool execute();
+		bool execute(uint32_t atomid, uint32_t instanceid);
 
 
 	public:
@@ -44,8 +40,6 @@ namespace VM
 
 		//! User context
 		nycontext_t& context;
-		//! Byte code
-		const IR::Sequence* sequence;
 		//! Atom Map
 		const AtomMap& map;
 

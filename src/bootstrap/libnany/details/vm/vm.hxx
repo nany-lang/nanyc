@@ -8,16 +8,14 @@ namespace Nany
 namespace VM
 {
 
-	inline Program::Program(nycontext_t& context, const IR::Sequence* sequence, const AtomMap& map)
+	inline Program::Program(nycontext_t& context, const AtomMap& map)
 		: context(context)
-		, sequence(sequence)
 		, map(map)
 	{}
 
 
 	inline Program::Program(Program& inherit)
 		: context(inherit.context)
-		, sequence(inherit.sequence)
 		, map(inherit.map)
 	{}
 

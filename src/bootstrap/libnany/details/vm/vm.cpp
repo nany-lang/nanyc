@@ -19,8 +19,8 @@ using namespace Yuni;
 
 #define VM_CHECK_POINTER(P,LVID) do { if (YUNI_UNLIKELY(not memchecker.has((P)))) { \
 	/*assert(false and "invalid pointer");*/ \
-	throw (String{"invalid pointer "} << (P) << " not found, opc: " \
-		<< (Nany::IR::ISA::print(sequence.get(), operands, &map))); \
+	throw (String{"invalid pointer "} << (P) << " not found, opcode:\"" \
+		<< (Nany::IR::ISA::print(sequence.get(), operands, &map) << '"')); \
 	} } while (0)
 
 
@@ -752,9 +752,10 @@ namespace // anonymous
 				stack.pop(framesize);
 				return retRegister;
 			}
-			catch (const CodeException&)
+			catch (const CodeAbort&)
 			{
-				throw; // propagate error
+				// re-throw and does nothing (the error has already been handled)
+				throw;
 			}
 			catch (const std::bad_alloc&)
 			{
@@ -763,26 +764,26 @@ namespace // anonymous
 			catch (const std::exception& e)
 			{
 				String msg;
-				msg << "\n\nerror: exception piko: " << e.what() << '\n';
+				msg << "\n\nexception: " << e.what() << '\n';
 				context.console.write_stderr(&context, msg.c_str(), msg.size());
 			}
 			catch (const String& incoming)
 			{
 				String msg;
-				msg << "\n\nerror: exception: " << incoming << '\n';
+				msg << "\n\nexception: " << incoming << '\n';
 				context.console.write_stderr(&context, msg.c_str(), msg.size());
 			}
 			catch (...)
 			{
-				AnyString msg{"\n\nerror: exception: unexpected error\n"};
+				AnyString msg{"\n\nexception: unexpected error\n"};
 				context.console.write_stderr(&context, msg.c_str(), msg.size());
 			}
 
 			stacktrace.dump(context, map);
 
-			// invalid data related to allocated pointers
+			// invalid data related to allocated pointers to avoid invalid err messages
 			memchecker.clear();
-			throw CodeException{};
+			throw CodeAbort{}; // re-throw
 			return (uint64_t) -1;
 		}
 
@@ -798,28 +799,22 @@ namespace // anonymous
 
 
 
-	Program::~Program()
-	{
-		if (ownsSequence)
-			delete sequence;
-	}
 
-
-	bool Program::execute()
+	bool Program::execute(uint32_t atomid, uint32_t instanceid)
 	{
 		retvalue = 0;
 		bool success = false;
 
 		try
 		{
-			if (YUNI_UNLIKELY(nullptr == sequence))
-				throw String{"invalid sequence object"};
+			auto& sequence = map.sequence(atomid, instanceid);
 
-			ThreadContext thrctx{map, context, *sequence};
-			retvalue = thrctx.invoke(*sequence);
+			ThreadContext thrctx{map, context, sequence};
+			thrctx.stacktrace.push(atomid, instanceid);
+			retvalue = thrctx.invoke(sequence);
 			success = true;
 		}
-		catch (const CodeException&)
+		catch (const CodeAbort&)
 		{
 			// error already handled
 		}

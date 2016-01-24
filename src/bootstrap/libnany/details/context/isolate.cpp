@@ -45,8 +45,8 @@ namespace Nany
 	int Isolate::run(bool& success, nycontext_t& ctx, const AnyString& entrypoint)
 	{
 		success = false;
+		uint32_t atomid = (uint32_t) -1;
 
-		const IR::Sequence* sequence;
 		{
 			// try to find the entrypoint
 			Atom* entrypointAtom = nullptr;
@@ -80,7 +80,8 @@ namespace Nany
 				return 0;
 			}
 
-			sequence = entrypointAtom->fetchInstance(0);
+			atomid = entrypointAtom->atomid;
+			auto* sequence = entrypointAtom->fetchInstance(0);
 			if (unlikely(nullptr == sequence))
 			{
 				String msg;
@@ -91,8 +92,8 @@ namespace Nany
 			}
 		}
 
-		VM::Program program{ctx, sequence, classdefTable.atoms};
-		success = program.execute();
+		VM::Program program{ctx, classdefTable.atoms};
+		success = program.execute(atomid, 0);
 		return static_cast<int>(program.retvalue);
 	}
 
