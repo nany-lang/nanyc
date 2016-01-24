@@ -56,7 +56,7 @@ namespace VM
 		//! Register a new stack frame
 		void push(uint32_t atomid, uint32_t instanceid)
 		{
-			if (YUNI_UNLIKELY(!(++topframe < upperLimit)))
+			if (YUNI_UNLIKELY(not (++topframe < upperLimit)))
 				grow();
 			*topframe = Frame{{atomid, instanceid}};
 		}

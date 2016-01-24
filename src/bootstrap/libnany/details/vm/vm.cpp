@@ -154,6 +154,7 @@ namespace // anonymous
 			auto* storestackptr = registers;
 			auto storesequence = sequence;
 			auto* storecursor = cursor;
+			auto labelid = upperLabelID;
 			#ifndef NDEBUG
 			auto  storestckfrmsize = registerCount;
 			#endif
@@ -165,10 +166,11 @@ namespace // anonymous
 			uint64_t ret = invoke(map.sequence(atomfunc, instanceid));
 
 			// restore the previous stack frame and store the result of the call
+			upperLabelID = labelid;
 			registers = storestackptr;
 			registers[retlvid].u64 = ret;
 			sequence = storesequence;
-				cursor = storecursor;
+			cursor = storecursor;
 			#ifndef NDEBUG
 			registerCount = storestckfrmsize;
 			#endif
@@ -742,6 +744,9 @@ namespace // anonymous
 				registers = stack.push(framesize);
 				registers[0].u64 = 0;
 				sequence = std::cref(callee);
+				if (debugmode)
+					retRegister = (uint64_t) -1;
+				upperLabelID = 0;
 
 				// retrieve parameters for the func
 				for (uint32_t i = 0; i != funcparamCount; ++i)

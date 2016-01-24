@@ -840,6 +840,7 @@ namespace IR
 			}
 		}
 		// not found - the cursor is alreayd invalidated
+		throw (YString{"forward label "} << label << " not found");
 	}
 
 
@@ -857,6 +858,7 @@ namespace IR
 		}
 		// not found - invalidate
 		invalidateCursor(cursor);
+		throw (YString{"backward label "} << label << " not found");
 	}
 
 
