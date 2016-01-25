@@ -10,7 +10,9 @@ namespace Nany
 	inline Atom* AtomMap::createNamespace(Atom& root, const AnyString& name)
 	{
 		assert(not name.empty());
-		return createNewAtom(Atom::Type::namespacedef, root, name);
+		Atom* nmspc = root.findNamespaceAtom(name);
+		return (nmspc != nullptr)
+			? nmspc : createNewAtom(Atom::Type::namespacedef, root, name);
 	}
 
 	inline Atom* AtomMap::createFuncdef(Atom& root, const AnyString& name)

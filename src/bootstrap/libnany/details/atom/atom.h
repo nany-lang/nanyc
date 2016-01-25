@@ -151,6 +151,7 @@ namespace Nany
 		uint32_t findClassAtom(Atom*& out, const AnyString& name);
 		uint32_t findFuncAtom(Atom*& out, const AnyString& name);
 		uint32_t findVarAtom(Atom*& out, const AnyString& name);
+		Atom* findNamespaceAtom(const AnyString& name);
 
 		const Atom* findChildByMemberFieldID(uint32_t field) const;
 

@@ -517,6 +517,24 @@ namespace Nany
 	}
 
 
+	Atom* Atom::findNamespaceAtom(const AnyString& name)
+	{
+		// first, try to find the dtor function
+		Atom* atomA = nullptr;
+
+		eachChild([&](Atom& child) -> bool
+		{
+			if (child.isNamespace() and child.name == name)
+			{
+				atomA = &child;
+				return false;
+			}
+			return true;
+		});
+		return atomA;
+	}
+
+
 	void Atom::renameChild(const AnyString& from, const AnyString& to)
 	{
 		Ptr child;
