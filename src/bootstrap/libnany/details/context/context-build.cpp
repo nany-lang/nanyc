@@ -21,7 +21,7 @@ namespace Nany
 	namespace // anonymous
 	{
 
-		static inline void printDebugInfoClassdefAtomTable(Logs::Report& report, ClassdefTable& table)
+		static void printDebugInfoClassdefAtomTable(Logs::Report& report, ClassdefTable& table)
 		{
 			report.info(); // for beauty
 			report.info();
@@ -44,6 +44,15 @@ namespace Nany
 		}
 
 
+		static void printAtomTable(Logs::Report& report, ClassdefTable& table)
+		{
+			auto trace = report.trace();
+			trace.message.prefix = "ATOMS";
+			table.atoms.root.print(report, ClassdefTableView{table});
+			report.info(); // for beauty
+			report.info(); // for beauty
+		}
+
 	} // anonymous namespace
 
 
@@ -51,6 +60,9 @@ namespace Nany
 
 	inline std::unique_ptr<BuildInfoContext> Context::doBuildWL(Logs::Report report, int64_t& duration)
 	{
+		//
+		// -- initialization & source fetching
+		//
 		pBuildInfo.reset(nullptr); // release some memory
 		auto buildinfoptr = std::make_unique<BuildInfoContext>(usercontext);
 		auto& buildinfo = *(buildinfoptr.get());
@@ -71,16 +83,19 @@ namespace Nany
 			return nullptr;
 		}
 
-
 		// initialization of some global data
 		Nany::Sema::Metadata::initialize(); // TODO remove those methods
 		Nany::ASTHelper::initialize();
 
-		// preparing the queue service if not already present
+
+		//
+		// -- preparing the queue service for multitasking (if available)
+		//
 		auto* qs = usercontext.mt.queueservice;
+		bool isMultithreaded = (qs != nullptr);
 		auto* queueservice = reinterpret_cast<Job::QueueService*>(qs);
 		bool qsWasStarted = false;
-		if (queueservice)
+		if (isMultithreaded)
 		{
 			queueservice->addRef();
 			qsWasStarted = queueservice->started();
@@ -89,13 +104,16 @@ namespace Nany
 		}
 
 
-		// run all tasks
-		if (qs)
+		//
+		// -- parse and extract information for all input source files
+		// -- transform input source files into AST
+		// -- transform AST into IR (opcodes for both typing and )
+		//
+		if (isMultithreaded)
 		{
-			Job::Taskgroup task{*queueservice, false};
+			Job::Taskgroup task{*queueservice, false}; // prepare all tasks
 			for (auto& ptr: buildinfo.sources)
 				ptr->build(buildinfo, task, report);
-
 
 			buildinfo.buildtime = DateTime::NowMilliSeconds();
 
@@ -106,7 +124,6 @@ namespace Nany
 		else
 		{
 			buildinfo.buildtime = DateTime::NowMilliSeconds();
-
 			for (auto& ptr: buildinfo.sources)
 				ptr->build(buildinfo, report);
 		}
@@ -125,111 +142,132 @@ namespace Nany
 		//if (not buildinfo.success)
 		//	report.warning() << "build failed";
 
+
+		//
+		// -- intermediate name lookup
+		//
+		// TODO remove this method
 		// report.info() << "intermediate name resolution";
 		bool successNameLookup = cdeftable.performNameLookup();
 		if (unlikely(not successNameLookup and buildinfo.success))
 			report.warning() << "name lookup failed";
 
+
+		//
+		// -- Core Objects (bool, u32, u64, f32, ...)
+		//
 		buildinfo.success &= successNameLookup
-			and cdeftable.atoms.fetchAndIndexCoreObjects(report)
+			and cdeftable.atoms.fetchAndIndexCoreObjects(report);
+
+		//
+		// -- instanciate code from 'main' entry point
+		// -- take the input IR, instanciate all functions and classes
+		// -- perform complete type checking
+		// -- generate opcodes for execution
+		//
+		buildinfo.success = buildinfo.success
 			and buildinfo.isolate.instanciate(report, "main");
 
+
+		// chrono stop
 		yint64 endTime = DateTime::NowMilliSeconds();
 		duration = endTime - buildinfo.buildtime;
 
+		// debug info
 		if (Config::Traces::printAtomTable)
-		{
-			auto trace = report.trace();
-			trace.message.prefix = "ATOMS";
-			cdeftable.atoms.root.print(report, ClassdefTableView{cdeftable});
-			report.info(); // for beauty
-			report.info(); // for beauty
-		}
+			printAtomTable(report, cdeftable);
 
-		if (qs)
+
+		//
+		// -- stopping the queueservice (if any)
+		//
+		if (isMultithreaded)
 		{
-			if (not qsWasStarted) // stop the queueservice if it was not already started
+			// stop the queueservice only if not started at the beginning
+			if (not qsWasStarted)
 				queueservice->stop();
 			nany_queueservice_unref(&qs);
 		}
 
 
+		// status report
 		if (unlikely(not buildinfo.success))
 		{
 			report.info(); // empty line for beauty (some other errors are already displayed)
 			report.error() << "build failed (" << duration << "ms)";
 			return nullptr;
 		}
-
+		// SUCCESS !
 		report.success() << "build succeeded (" << duration << "ms)";
 		return buildinfoptr;
 	}
 
 
 
-	bool Context::build(Logs::Message* message)
+	bool Context::build(Logs::Message& message)
 	{
-		assert(message != nullptr);
+		if (unlikely(pTargets.empty() and !pDefaultTarget)) // nothing to build ?
+			return false;
 
 		// build report
-		Nany::Logs::Report report{*message};
+		Nany::Logs::Report report{message};
 
-		bool success = false;
 		try
 		{
+			//
+			// -- pre user event, which may cancel the build
+			//
 			if (usercontext.build.on_build_query)
 			{
 				if (not usercontext.build.on_build_query(&usercontext))
 					return false;
 			}
-
-			if (unlikely(pTargets.empty() and !pDefaultTarget)) // nothing to build ?
-				return false;
-
+			// build accepted !
 			if (usercontext.build.on_build_begin)
 				usercontext.build.on_build_begin(&usercontext);
 
-			// build
+			//
+			// -- build everything
+			//
 			int64_t duration = 0;
 			std::unique_ptr<BuildInfoContext> buildinfo = doBuildWL(report, duration);
-			success = (buildinfo.get() != nullptr);
+			bool success = (buildinfo.get() != nullptr);
 
+			//
+			// -- post user event
+			//
 			if (usercontext.build.on_build_end)
 			{
-				auto* creport = reinterpret_cast<const nyreport_t*>(message);
+				auto* creport = reinterpret_cast<const nyreport_t*>(&message);
 				nybool_t endSuccess = nytrue;
 				usercontext.build.on_build_end(&usercontext, endSuccess, creport, duration);
 				success &= (endSuccess == nytrue);
 			}
 
 			std::swap(buildinfo, pBuildInfo);
+			return success;
 		}
 		catch (const std::bad_alloc&)
 		{
 			report.error() << "not enough memory";
-			success = false;
 		}
 		catch (const String& msg)
 		{
 			report.ICE() << "unexpected error: " << msg;
-			success = false;
 		}
 		catch (const char* msg)
 		{
 			report.ICE() << "unexpected error: " << msg;
-			success = false;
 		}
 		catch (const std::exception& ex)
 		{
 			report.ICE() << "unexpected error: " << ex.what();
-			success = false;
 		}
 		catch (...)
 		{
 			report.error() << "unexpected error";
-			success = false;
 		}
-		return success;
+		return false;
 	}
 
 

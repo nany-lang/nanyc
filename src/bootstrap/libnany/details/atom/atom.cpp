@@ -431,19 +431,16 @@ namespace Nany
 
 		eachChild([&](Atom& child) -> bool
 		{
-			if (child.isClass())
+			if (child.isClass() and child.name == name)
 			{
-				if (child.name == name)
+				if (likely(atomA == nullptr))
 				{
-					if (likely(atomA == nullptr))
-					{
-						atomA = &child;
-					}
-					else
-					{
-						count = 2;
-						return false;
-					}
+					atomA = &child;
+				}
+				else
+				{
+					count = 2;
+					return false;
 				}
 			}
 			return true;
@@ -466,19 +463,16 @@ namespace Nany
 
 		eachChild([&](Atom& child) -> bool
 		{
-			if (child.isFunction())
+			if (child.isFunction() and child.name == name)
 			{
-				if (child.name == name)
+				if (likely(atomA == nullptr))
 				{
-					if (likely(atomA == nullptr))
-					{
-						atomA = &child;
-					}
-					else
-					{
-						count = 2;
-						return false;
-					}
+					atomA = &child;
+				}
+				else
+				{
+					count = 2;
+					return false;
 				}
 			}
 			return true;
@@ -500,19 +494,16 @@ namespace Nany
 
 		eachChild([&](Atom& child) -> bool
 		{
-			if (child.isMemberVariable())
+			if (child.isMemberVariable() and child.name == name)
 			{
-				if (child.name == name)
+				if (likely(atomA == nullptr))
 				{
-					if (likely(atomA == nullptr))
-					{
-						atomA = &child;
-					}
-					else
-					{
-						count = 2;
-						return false;
-					}
+					atomA = &child;
+				}
+				else
+				{
+					count = 2;
+					return false;
 				}
 			}
 			return true;

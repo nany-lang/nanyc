@@ -38,7 +38,7 @@ namespace Nany
 
 		//! \name Build
 		//@{
-		bool build(Logs::Message* message);
+		bool build(Logs::Message& message);
 		//@}
 
 

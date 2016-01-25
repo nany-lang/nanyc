@@ -168,7 +168,7 @@ extern "C" nybool_t nany_build(nycontext_t* ctx, nyreport_t** report)
 
 	auto& context = *(reinterpret_cast<Nany::Context*>(ctx->internal));
 	auto* message = reinterpret_cast<Nany::Logs::Message*>(*report);
-	bool  success = context.build(message);
+	bool  success = context.build(*message);
 	return success ? nytrue : nyfalse;
 }
 
