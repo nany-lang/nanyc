@@ -469,7 +469,7 @@ type-decl: notext
 	// without continuation
 	//| if
 	//| switch
-	//| class
+	| class
 	// continuation
 	| type-decl-can-continue 
 	// expr-value
