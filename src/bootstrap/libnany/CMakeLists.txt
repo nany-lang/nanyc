@@ -204,6 +204,8 @@ addsrc(
 	NAME  nysrc_details_pass_build_attach
 	GROUP "details/pass/build-attach"
 	FILES
+	"details/pass/build-attach-program/mapping.cpp"
+	"details/pass/build-attach-program/mapping.h"
 	"details/pass/build-attach-program/attach.cpp")
 
 
