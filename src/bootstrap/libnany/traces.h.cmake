@@ -20,6 +20,9 @@ namespace Traces
 	//! Enable all traces (very verbose)
 	static constexpr bool all = false;
 
+	static constexpr bool recommended = all or false;
+
+
 
 
 	//! Print all AST
@@ -35,19 +38,19 @@ namespace Traces
 
 
 	//! Print ATOM table
-	static constexpr bool printAtomTable = all or false;
+	static constexpr bool printAtomTable = all or recommended or false;
 
 	//! Print ATOM table
 	static constexpr bool printPreAtomTable = all or false;
 
 	//! Print classdef table
-	static constexpr bool printClassdefTable = all or false;
+	static constexpr bool printClassdefTable = all or recommended or false;
 
 	//! Print opcodes generated from AST
-	static constexpr bool printSourceOpcodeSequence = all or false;
+	static constexpr bool printSourceOpcodeSequence = all or recommended or false;
 
 	//! Print opcodes after program instanciation
-	static constexpr bool printGeneratedOpcodeSequence = all or false;
+	static constexpr bool printGeneratedOpcodeSequence = all or recommended or false;
 
 
 
