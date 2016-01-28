@@ -41,8 +41,10 @@ namespace Producer
 				// anonymous / inline class definitnio
 				if (identifier.rule == rgClass)
 				{
-					localvar = 2;
-					return visitASTClass(identifier, &localvar);
+					error(identifier) << "anonymous classes are not supported yet";
+					return false;
+					//localvar = 2;
+					//return visitASTClass(identifier, &localvar);
 				}
 			}
 		}
