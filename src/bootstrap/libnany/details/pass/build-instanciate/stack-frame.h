@@ -26,80 +26,81 @@ namespace Instanciate
 	};
 
 
-	//! A single element within the stack for analysing opcodes
-	class AtomStackFrame final
+	struct LVIDInfo final
 	{
-	public:
-		struct LVIDInfo final
-		{
-			//! List of referer
-			uint32_t referer = 0;
-			//! List of all fully-defined variables
-			bool errorReported = false;
-			//! LVID marked as any
-			bool markedAsAny = false;
-			//! LVID marked as dynamic
-			bool isConstexpr = false;
-			//! LVID marked as assignment '=' (for name/call resolution)
-			bool isAssignment = false;
-			//! flag to remember if the variable has been used
-			bool hasBeenUsed = false;
-			//! unref at the end of the scope
-			bool autorelease = false;
+		//! List of referer
+		uint32_t referer = 0;
+		//! List of all fully-defined variables
+		bool errorReported = false;
+		//! LVID marked as any
+		bool markedAsAny = false;
+		//! LVID marked as dynamic
+		bool isConstexpr = false;
+		//! LVID marked as assignment '=' (for name/call resolution)
+		bool isAssignment = false;
+		//! flag to remember if the variable has been used
+		bool hasBeenUsed = false;
+		//! unref at the end of the scope
+		bool autorelease = false;
 
-			//! lvid alias
-			uint32_t alias = 0;
+		//! The scope depth when the variable has been declared
+		int scope = -1; // -1: no scope, : 0 first scope
+		//! declaration offset (stackalloc) in the out sequence
+		uint32_t offsetDeclOut = (uint32_t) -1;
+		//! lvid alias
+		uint32_t alias = 0;
+		//! Any associated text
+		uint32_t text_sid = (uint32_t) -1;
 
-			//! Resolve name
-			AnyString resolvedName;
-			//! User-defined name for the local variable
-			AnyString userDefinedName;
+		struct {
+			//! Does the value come from a memory allocation ?
+			bool memalloc = false;
+			//! Does the value come from a func call ?
+			bool returnedValue = false;
 
-			//! The scope depth when the variable has been declared
-			int scope = -1;
-			//! declaration offset (stackalloc) in the out sequence
-			uint32_t offsetDeclOut = (uint32_t) -1;
-
+			//! Does the value come from a variable member ? (atomid != 0)
 			struct {
-				//! Does the value come from a memory allocation ?
-				bool memalloc = false;
-				//! Does the value come from a func call ?
-				bool returnedValue = false;
-
-				//! Does the value come from a variable member ? (atomid != 0)
-				struct {
-					uint32_t self = 0u; // lvid
-					uint32_t atomid = 0u;
-					uint32_t field = 0u;
-				}
-				varMember;
+				uint32_t self = 0u; // lvid
+				uint32_t atomid = 0u;
+				uint32_t field = 0u;
 			}
-			origin;
+			varMember;
+		}
+		origin;
 
-			//! File origin
-			struct {
-				const char* url = nullptr;
-				//! Line in the associated file
-				uint32_t line = 1;
-				//! Offset in the associated file
-				uint32_t offset = 1;
-			}
-			file;
+		//! File origin
+		struct {
+			const char* url = nullptr;
+			//! Line in the associated file
+			uint32_t line = 1u;
+			//! Offset in the associated file
+			uint32_t offset = 1u;
+		}
+		file;
 
-			//! warnings (valid only if userDefinedName is valid)
-			struct {
-				//! Warn if unused
-				bool unused = true;
-			}
-			warning;
+		//! warnings (valid only if userDefinedName is valid)
+		struct {
+			//! Warn if unused
+			bool unused = true;
+		}
+		warning;
 
-			//! Any associated text
-			uint32_t text_sid = (uint32_t) -1;
+		//! Resolve name
+		AnyString resolvedName;
+		//! User-defined name for the local variable
+		AnyString userDefinedName;
 
-			void fillLogEntryWithLocation(Logs::Report& entry) const;
-		};
 
 	public:
+		void fillLogEntryWithLocation(Logs::Report& entry) const;
+
+	}; // class LVIDInfo
+
+
+
+	//! A single element within the stack for analysing opcodes
+	struct AtomStackFrame final
+	{
 		explicit AtomStackFrame(Atom& atom);
 
 		uint32_t localVariablesCount() const;

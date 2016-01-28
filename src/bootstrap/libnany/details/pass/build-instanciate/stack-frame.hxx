@@ -13,7 +13,7 @@ namespace Instanciate
 {
 
 
-	inline void AtomStackFrame::LVIDInfo::fillLogEntryWithLocation(Logs::Report& entry) const
+	inline void LVIDInfo::fillLogEntryWithLocation(Logs::Report& entry) const
 	{
 		auto& origins = entry.origins();
 		origins.location.pos.line   = file.line;
@@ -38,12 +38,13 @@ namespace Instanciate
 
 	inline uint32_t AtomStackFrame::findLocalVariable(const AnyString& name) const
 	{
-		for (uint i = (uint) lvids.size(); i--; )
+		uint32_t count = static_cast<uint32_t>(lvids.size());
+		for (uint32_t i = count; i--; )
 		{
 			if (lvids[i].userDefinedName == name)
 				return i;
 		}
-		return 0;
+		return 0u;
 	}
 
 
@@ -57,8 +58,6 @@ namespace Instanciate
 
 	inline bool AtomStackFrame::verify(uint32_t lvid) const
 	{
-		if (not (lvid != 0 and lvid < lvids.size()))
-			throw "piko";
 		assert(lvid != 0 and lvid < lvids.size());
 		return likely(not lvids[lvid].errorReported);
 	}
