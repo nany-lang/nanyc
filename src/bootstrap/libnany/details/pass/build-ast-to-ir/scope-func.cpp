@@ -507,6 +507,9 @@ namespace Producer
 				}
 			}
 
+			if (funcname.empty())
+				funcname = "<anonymous>";
+
 			// the variable representing the return type (only a very simple definition)
 			if (nodeReturnType)
 				scope.createLocalBuiltinAny(node); // pre-create the return type

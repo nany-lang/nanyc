@@ -53,7 +53,8 @@ namespace Producer
 
 		inline ClassInspector::ClassInspector(Scope& scope)
 			: scope(scope)
-		{}
+		{
+		}
 
 
 		inline bool ClassInspector::inspectClassname(Node& node)
@@ -80,6 +81,9 @@ namespace Producer
 						success &= scope.ICEUnexpectedNode(child, "[class]");
 				}
 			}
+
+			if (classname.empty())
+				classname = "<anonymous>";
 
 			// default implemented functions
 			// those functions are currently empty, but may be filled later at instanciation
@@ -117,7 +121,7 @@ namespace Producer
 
 
 
-	bool Scope::visitASTClass(Node& node)
+	bool Scope::visitASTClass(Node& node, LVID* localvar)
 	{
 		assert(node.rule == rgClass);
 		assert(not node.children.empty());
@@ -129,10 +133,12 @@ namespace Producer
 		scope.kind = Scope::Kind::kclass;
 		scope.broadcastNextVarID = false;
 
+		auto& out = sequence();
+
 		// creating a new blueprint for the function
-		uint32_t bpoffset = sequence().emitBlueprintClass();
-		uint32_t bpoffsiz = sequence().emitBlueprintSize();
-		uint32_t bpoffsck = sequence().emitStackSizeIncrease();
+		uint32_t bpoffset = out.emitBlueprintClass();
+		uint32_t bpoffsiz = out.emitBlueprintSize();
+		uint32_t bpoffsck = out.emitStackSizeIncrease();
 
 		// making sure that debug info are available
 		scope.addDebugCurrentFilename();
@@ -146,8 +152,8 @@ namespace Producer
 			ClassInspector inspector{scope};
 			success = inspector.inspect(node);
 
-			auto& operands = sequence().at<ISA::Op::pragma>(bpoffset);
-			operands.value.blueprint.name = sequence().stringrefs.ref(inspector.classname);
+			auto& operands = out.at<ISA::Op::pragma>(bpoffset);
+			operands.value.blueprint.name = out.stringrefs.ref(inspector.classname);
 			return inspector.body;
 		})();
 
@@ -163,10 +169,10 @@ namespace Producer
 
 
 		// end of the blueprint
-		sequence().emitEnd();
-		uint32_t blpsize = sequence().opcodeCount() - bpoffset;
-		sequence().at<ISA::Op::pragma>(bpoffsiz).value.blueprintsize = blpsize;
-		sequence().at<ISA::Op::stacksize>(bpoffsck).add = scope.pNextVarID + 1;
+		out.emitEnd();
+		uint32_t blpsize = out.opcodeCount() - bpoffset;
+		out.at<ISA::Op::pragma>(bpoffsiz).value.blueprintsize = blpsize;
+		out.at<ISA::Op::stacksize>(bpoffsck).add = scope.pNextVarID + 1;
 		return success;
 	}
 

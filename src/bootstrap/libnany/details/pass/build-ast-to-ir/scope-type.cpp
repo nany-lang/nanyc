@@ -36,6 +36,15 @@ namespace Producer
 					return true;
 				}
 			}
+			else
+			{
+				// anonymous / inline class definitnio
+				if (identifier.rule == rgClass)
+				{
+					localvar = 2;
+					return visitASTClass(identifier, &localvar);
+				}
+			}
 		}
 
 		IR::Producer::Scope scope{*this};
@@ -88,6 +97,11 @@ namespace Producer
 								success = ICEUnexpectedNode(child, "[ir/type-qualifier]");
 						}
 					}
+					break;
+				}
+
+				case rgClass:
+				{
 					break;
 				}
 

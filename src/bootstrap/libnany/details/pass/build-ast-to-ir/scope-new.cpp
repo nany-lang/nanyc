@@ -38,8 +38,8 @@ namespace Producer
 				{
 					if (unlikely(rettype != 0))
 						return ICEUnexpectedNode(child, "[ir/new/several calls]");
-					success &= visitASTExprTypeDecl(child, rettype);
 
+					success &= visitASTExprTypeDecl(child, rettype);
 					if (success)
 					{
 						if (unlikely(lvidIsAny(rettype)))

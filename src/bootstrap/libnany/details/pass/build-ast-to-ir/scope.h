@@ -46,7 +46,7 @@ namespace Producer
 
 		bool visitASTStmt(Node&);
 		bool visitASTFunc(Node&);
-		bool visitASTClass(Node&);
+		bool visitASTClass(Node&, LVID* localvar = nullptr);
 		bool visitASTType(Node&, LVID& localvar);
 
 		bool visitASTVar(Node&);
