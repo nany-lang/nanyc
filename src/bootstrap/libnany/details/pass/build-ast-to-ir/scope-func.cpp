@@ -257,6 +257,13 @@ namespace Producer
 						break;
 					}
 
+					case rgFuncParamVariadic:
+					{
+						scope.error(child) << "variadic parameters not implemented";
+						success = false;
+						break;
+					}
+
 					default:
 						success = scope.ICEUnexpectedNode(child, "[param]");
 				}

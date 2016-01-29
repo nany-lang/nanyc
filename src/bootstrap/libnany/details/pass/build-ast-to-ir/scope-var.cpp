@@ -232,6 +232,12 @@ namespace Producer
 					break;
 				}
 
+				case rgFuncParamVariadic:
+				{
+					error(child) << "variadic parameter not allowed in variable definition";
+					return false;
+				}
+
 				default:
 					return ICEUnexpectedNode(child, "[var]");
 			}
