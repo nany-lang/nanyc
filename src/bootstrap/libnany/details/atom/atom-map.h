@@ -43,6 +43,11 @@ namespace Nany
 		*/
 		Atom* createVardef(Atom& root, const AnyString& name);
 
+		/*!
+		** \brief Create a new atom related to a type alias
+		*/
+		Atom* createTypealias(Atom& root, const AnyString& name);
+
 
 		/*
 		** \brief Fetch a sequence

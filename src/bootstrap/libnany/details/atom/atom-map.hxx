@@ -27,6 +27,13 @@ namespace Nany
 		return createNewAtom(Atom::Type::classdef, root, name);
 	}
 
+	inline Atom* AtomMap::createTypealias(Atom& root, const AnyString& name)
+	{
+		assert(not name.empty());
+		return createNewAtom(Atom::Type::typealias, root, name);
+	}
+
+
 	inline Atom* AtomMap::createVardef(Atom& root, const AnyString& name)
 	{
 		assert(not name.empty());

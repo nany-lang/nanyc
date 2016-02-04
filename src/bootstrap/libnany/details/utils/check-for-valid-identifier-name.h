@@ -11,7 +11,8 @@ namespace Nany
 	/*!
 	** \brief Determine if an identifier is acceptable
 	*/
-	bool checkForValidIdentifierName(Logs::Report& report, const Nany::Node& node, const AnyString& name, bool isOperator);
+	bool checkForValidIdentifierName(Logs::Report& report, const Nany::Node& node,
+		const AnyString& name, bool isOperator = false);
 
 
 	/*!

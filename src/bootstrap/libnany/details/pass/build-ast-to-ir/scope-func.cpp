@@ -282,10 +282,10 @@ namespace Producer
 
 			// update the parameter opcode
 			{
-				auto& opparam = scope.sequence().at<ISA::Op::pragma>(paramoffset);
-				opparam.value.param.name = sid;
+				auto& opparam = scope.sequence().at<ISA::Op::blueprint>(paramoffset);
+				opparam.name  = sid;
 				if (autoMemberAssignment)
-					opparam.pragma = static_cast<uint32_t>(ISA::Pragma::blueprintparamself);
+					opparam.kind = (uint32_t) IR::ISA::Blueprint::paramself;
 			}
 
 			// the qualifiers may have been set by the type definition
@@ -579,7 +579,7 @@ namespace Producer
 			isOperator = (inspector.funcname.first() == '^');
 			// update the func name
 			auto sid = sequence().stringrefs.ref(inspector.funcname);
-			sequence().at<ISA::Op::pragma>(bpoffset).value.blueprint.name = sid;
+			sequence().at<ISA::Op::blueprint>(bpoffset).name = sid;
 			return inspector.body;
 		})();
 

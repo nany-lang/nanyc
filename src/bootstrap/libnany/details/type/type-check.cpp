@@ -88,6 +88,12 @@ namespace TypeCheck
 					assert(false and "comparing two namespaces ?"); // Uh ?
 					return Match::none;
 				}
+
+				case Atom::Type::typealias:
+				{
+					assert(false and "type comparison - with typedef - implementation missing");
+					return Match::none;
+				}
 			}
 
 			assert(false and "some value not handled here...");

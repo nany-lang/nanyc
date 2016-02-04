@@ -367,7 +367,7 @@ namespace Producer
 		else
 		{
 			// the declaration is a property
-			ICE(*varnodeDecl) << "properties not implemented";
+			error(*varnodeDecl) << "properties not implemented";
 			return false;
 		}
 

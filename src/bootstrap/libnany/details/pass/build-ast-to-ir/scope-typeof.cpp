@@ -1,6 +1,5 @@
 #include <yuni/yuni.h>
 #include "details/pass/build-ast-to-ir/scope.h"
-#include "details/utils/check-for-valid-identifier-name.h"
 #include "libnany-config.h"
 
 using namespace Yuni;
@@ -48,11 +47,8 @@ namespace Producer
 			}
 		}
 
-		if (nullptr == expr)
-		{
-			error(node) << "invalid typeof expression";
-			return false;
-		}
+		if (unlikely(nullptr == expr))
+			return (ICE(node) << "invalid typeof expression");
 
 		IR::Producer::Scope scope{*this};
 		OpcodeCodegenDisabler codegen{sequence()};

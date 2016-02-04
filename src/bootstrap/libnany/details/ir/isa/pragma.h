@@ -21,19 +21,6 @@ namespace ISA //!< Instruction Set Architecture
 
 		// --- pragma for compilation only
 
-		//! Namespace definition (one part of it)
-		namespacedef,
-
-		//! Function definition
-		blueprintfuncdef,
-		//! Variable member definition
-		blueprintvar,
-		//! Class definition
-		blueprintclassdef,
-		//! Parameter definition (for a function or a class)
-		blueprintparam,
-		//! Parameter definition, with auto assignment
-		blueprintparamself,
 		//! Size of the blueprint, in opcodes
 		blueprintsize,
 
@@ -56,6 +43,28 @@ namespace ISA //!< Instruction Set Architecture
 		max,
 	};
 
+
+	/*!
+	** \internal the total number of items must currently be < 2^4 (see data struct)
+	** \see struct Operand<ISA::Op::blueprint>
+	*/
+	enum class Blueprint
+	{
+		//! Function definition
+		funcdef,
+		//! Variable member definition
+		vardef,
+		//! Class definition
+		classdef,
+		//! Typedef
+		typealias,
+		//! Parameter definition (for a function or a class)
+		param,
+		//! Parameter definition, with auto assignment
+		paramself,
+		//! Namespace definition (one part of it)
+		namespacedef
+	};
 
 
 

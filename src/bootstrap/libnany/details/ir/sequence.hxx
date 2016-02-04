@@ -437,69 +437,86 @@ namespace IR
 	}
 
 
+	inline void Sequence::emitBlueprintTypealias(const AnyString& name, uint32_t lvid)
+	{
+		auto& operands  = emit<ISA::Op::blueprint>();
+		operands.kind   = (uint32_t) IR::ISA::Blueprint::typealias;
+		operands.name   = stringrefs.ref(name);
+		operands.atomid = static_cast<uint32_t>(-1);
+		operands.setLVID(lvid);
+	}
+
+
 	inline void Sequence::emitBlueprintClass(const AnyString& name, uint32_t atomid)
 	{
-		auto& operands = emit<ISA::Op::pragma>();
-		operands.pragma = (uint32_t) ISA::Pragma::blueprintclassdef;
-		operands.value.blueprint.name   = stringrefs.ref(name);
-		operands.value.blueprint.atomid = atomid;
+		auto& operands  = emit<ISA::Op::blueprint>();
+		operands.kind   = (uint32_t) IR::ISA::Blueprint::classdef;
+		operands.name   = stringrefs.ref(name);
+		operands.atomid = atomid;
+		operands.lvid   = 0u;
 	}
 
 	inline uint32_t Sequence::emitBlueprintClass()
 	{
 		uint32_t offset = pSize;
-		auto& operands = emit<ISA::Op::pragma>();
-		operands.pragma = (uint32_t) ISA::Pragma::blueprintclassdef;
-		operands.value.blueprint.name   = 0;;
-		operands.value.blueprint.atomid = (uint32_t) -1;
+		auto& operands  = emit<ISA::Op::blueprint>();
+		operands.kind   = (uint32_t) IR::ISA::Blueprint::classdef;
+		operands.name   = 0u;
+		operands.atomid = static_cast<uint32_t>(-1);
+		operands.lvid   = 0u;
 		return offset;
 	}
 
 	inline void Sequence::emitBlueprintFunc(const AnyString& name, uint32_t atomid)
 	{
-		auto& operands = emit<ISA::Op::pragma>();
-		operands.pragma = (uint32_t) ISA::Pragma::blueprintfuncdef;
-		operands.value.blueprint.name   = stringrefs.ref(name);
-		operands.value.blueprint.atomid = atomid;
+		auto& operands  = emit<ISA::Op::blueprint>();
+		operands.kind   = (uint32_t) IR::ISA::Blueprint::funcdef;
+		operands.name   = stringrefs.ref(name);
+		operands.atomid = atomid;
+		operands.lvid   = 0u;
 	}
 
 	inline uint32_t Sequence::emitBlueprintFunc()
 	{
 		uint32_t offset = pSize;
-		auto& operands = emit<ISA::Op::pragma>();
-		operands.pragma = (uint32_t) ISA::Pragma::blueprintfuncdef;
-		operands.value.blueprint.name   = 0;
-		operands.value.blueprint.atomid = (uint32_t) -1;
+		auto& operands  = emit<ISA::Op::blueprint>();
+		operands.kind   = (uint32_t) IR::ISA::Blueprint::funcdef;
+		operands.name   = 0u;
+		operands.atomid = static_cast<uint32_t>(-1);
+		operands.lvid   = 0u;
 		return offset;
 	}
 
 	inline uint32_t Sequence::emitBlueprintParam(LVID lvid, const AnyString& name)
 	{
 		uint32_t offset = pSize;
-		auto& operands = emit<ISA::Op::pragma>();
-		operands.pragma = (uint32_t) ISA::Pragma::blueprintparam;
-		operands.value.param.name = stringrefs.ref(name);
-		operands.value.param.lvid = lvid;
+		auto& operands  = emit<ISA::Op::blueprint>();
+		operands.kind   = (uint32_t) IR::ISA::Blueprint::param;
+		operands.name   = stringrefs.ref(name);
+		operands.atomid = static_cast<uint32_t>(-1);
+		operands.setLVID(lvid);
 		return offset;
 	}
 
 	inline uint32_t Sequence::emitBlueprintParam(LVID lvid)
 	{
 		uint32_t offset = pSize;
-		auto& operands = emit<ISA::Op::pragma>();
-		operands.pragma = (uint32_t) ISA::Pragma::blueprintparam;
-		operands.value.param.name = 0;
-		operands.value.param.lvid = lvid;
+		auto& operands  = emit<ISA::Op::blueprint>();
+		operands.kind   = (uint32_t) IR::ISA::Blueprint::param;
+		operands.name   = 0;
+		operands.atomid = static_cast<uint32_t>(-1);
+		operands.setLVID(lvid);
 		return offset;
 	}
 
 
 	inline void Sequence::emitBlueprintVardef(LVID lvid, const AnyString& name)
 	{
-		auto& operands = emit<ISA::Op::pragma>();
-		operands.pragma = (uint32_t) ISA::Pragma::blueprintvar;
-		operands.value.vardef.name = stringrefs.ref(name);
-		operands.value.vardef.lvid = lvid;
+		auto& operands  = emit<ISA::Op::blueprint>();
+		operands.kind   = (uint32_t) IR::ISA::Blueprint::vardef;
+		operands.name   = stringrefs.ref(name);
+		operands.atomid = static_cast<uint32_t>(-1);
+		operands.setLVID(lvid);
 	}
 
 
@@ -569,9 +586,11 @@ namespace IR
 
 	inline void Sequence::emitNamespace(const AnyString& name)
 	{
-		auto& operands = emit<ISA::Op::pragma>();
-		operands.pragma = (uint32_t) ISA::Pragma::namespacedef;
-		operands.value.namespacedef = stringrefs.ref(name);
+		auto& operands  = emit<ISA::Op::blueprint>();
+		operands.kind   = (uint32_t) IR::ISA::Blueprint::namespacedef;
+		operands.name   = stringrefs.ref(name);
+		operands.atomid = static_cast<uint32_t>(-1);
+		operands.lvid   = 0u;
 	}
 
 

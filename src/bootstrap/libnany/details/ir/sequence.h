@@ -213,6 +213,9 @@ namespace IR
 		void emitBlueprintClass(const AnyString& name, uint32_t atomid);
 		//! Emit a blueprint class opcode and give the offset of the instruction in the sequence
 		uint32_t emitBlueprintClass();
+		//! Emit a blueprint typealias opcode
+		void emitBlueprintTypealias(const AnyString& name, uint32_t lvid);
+
 		//! Emit a blueprint func opcode
 		void emitBlueprintFunc(const AnyString& name, uint32_t atomid);
 		//! Emit a blueprint func opcode and give the offset of the instruction in the sequence

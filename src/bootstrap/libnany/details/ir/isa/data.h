@@ -526,19 +526,39 @@ namespace ISA
 		{
 			uint32_t codegen;
 			uint32_t error;
-			uint32_t namespacedef;
 			uint32_t visibility;
 			uint32_t blueprintsize;
 			uint32_t shortcircuit;
 			uint32_t suggest;
 			struct { uint32_t namesid; } builtinalias;
 			struct { uint32_t label; } shortcircuitMetadata;
-			struct { uint32_t name; uint32_t atomid; } blueprint;
-			struct { uint32_t name; uint32_t lvid;   } param;
-			struct { uint32_t name; uint32_t lvid;   } vardef;
 		}
 		value;
 	};
+
+
+	template<> struct Operand<Nany::IR::ISA::Op::blueprint> final
+	{
+		constexpr static const char* opname() { return "blueprint"; }
+
+		uint32_t opcode;
+		//! Kind of blueprint (classdef, vardef, funcdef...)
+		//! \see enum IR::ISA::Blueprint
+		uint32_t kind:4;
+		//! Attached lvid (if any)
+		uint32_t lvid:28; // should be big enough even for large func
+		//! Blueprint name
+		uint32_t name;
+		//! Attached atomid (if any)
+		uint32_t atomid;
+
+		void setLVID(uint32_t newlvid) // only to avoid warning
+		{
+			union {uint32_t i; uint32_t lvid:28; } converter {newlvid};
+			lvid = converter.lvid;
+		}
+	};
+
 
 
 	template<> struct Operand<Nany::IR::ISA::Op::self> final

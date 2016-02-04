@@ -152,8 +152,8 @@ namespace Producer
 			ClassInspector inspector{scope};
 			success = inspector.inspect(node);
 
-			auto& operands = out.at<ISA::Op::pragma>(bpoffset);
-			operands.value.blueprint.name = out.stringrefs.ref(inspector.classname);
+			auto& operands = out.at<ISA::Op::blueprint>(bpoffset);
+			operands.name = out.stringrefs.ref(inspector.classname);
 			return inspector.body;
 		})();
 

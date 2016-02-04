@@ -30,6 +30,48 @@ namespace Instanciate
 
 
 
+	Atom& SequenceBuilder::resolveTypeAlias(Atom& original, bool& success)
+	{
+		assert(original.isTypeAlias());
+
+		// trying a direct resolution
+		auto& hopCdef = cdeftable.classdef(original.returnType.clid);
+		auto* alias = cdeftable.findClassdefAtom(hopCdef);
+		if (alias)
+		{
+			std::unordered_set<uint32_t> encountered; // to avoid circular references
+			do
+			{
+				if ((alias->parent == original.parent) and alias->atomid > original.atomid)
+				{
+					// same parent but declared after (the atomid is likely to be greater
+					// than the first one since registered after)
+					complainTypedefDeclaredAfter(original, *alias);
+					break;
+				}
+
+				if (not alias->isTypeAlias())
+					return *alias;
+
+				// checking for circular aliases
+				if (not encountered.insert(alias->atomid).second)
+				{
+					// circular reference
+					complainTypealiasCircularRef(original, *alias);
+					break;
+				}
+
+				auto& cdef = cdeftable.classdef(alias->returnType.clid);
+				alias = cdeftable.findClassdefAtom(cdef);
+			}
+			while (alias != nullptr);
+		}
+
+		complainTypedefUnresolved(original);
+		success = false;
+		return original;
+	}
+
 
 	inline bool SequenceBuilder::identify(const IR::ISA::Operand<IR::ISA::Op::identify>& operands)
 	{
@@ -76,12 +118,15 @@ namespace Instanciate
 
 		// checking if the lvid does not map to a parameter, which  must
 		// have already be resolved when instanciating the function
-		assert(cdef.clid.lvid() >= 2 + frame.atom.parameters.size());
-		if (unlikely(cdef.clid.lvid() < 2 + frame.atom.parameters.size()))
+		if (frame.atom.isFunction())
 		{
-			String errmsg;
-			errmsg << CLID{frame.atomid, operands.lvid} << ": should be alreayd resolved";
-			return complainOperand(reinterpret_cast<const IR::Instruction&>(operands), errmsg);
+			assert(cdef.clid.lvid() >= 2 + frame.atom.parameters.size());
+			if (unlikely(cdef.clid.lvid() < 2 + frame.atom.parameters.size()))
+			{
+				String errmsg;
+				errmsg << CLID{frame.atomid, operands.lvid} << ": should be alreayd resolved";
+				return complainOperand(reinterpret_cast<const IR::Instruction&>(operands), errmsg);
+			}
 		}
 
 		// list of all possible atoms when resolving 'name'
@@ -254,8 +299,13 @@ namespace Instanciate
 		{
 			case 1: // unique match count
 			{
-				auto& atom = multipleResults[0].get();
-				if (unlikely(atom.hasErrors))
+				auto& resultAtom = multipleResults[0].get();
+				bool aliasSuccess = true;
+				auto& atom = (not resultAtom.isTypeAlias())
+					? resultAtom
+					: resolveTypeAlias(resultAtom, aliasSuccess);
+
+				if (unlikely(not aliasSuccess or atom.hasErrors))
 					return false;
 
 				// if the resolution is simple (aka only one solution), it is possible that the

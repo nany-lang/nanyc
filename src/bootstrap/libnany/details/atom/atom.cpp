@@ -196,6 +196,7 @@ namespace Nany
 			case Type::classdef:
 			case Type::namespacedef:
 			case Type::vardef:
+			case Type::typealias:
 				break;
 		}
 	}
@@ -418,6 +419,7 @@ namespace Nany
 			case Type::classdef:     return "class";
 			case Type::namespacedef: return "namespace";
 			case Type::vardef:       return "var";
+			case Type::typealias:    return "typedef";
 		}
 		return "auto";
 	}

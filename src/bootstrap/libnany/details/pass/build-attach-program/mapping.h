@@ -72,6 +72,7 @@ namespace Mapping
 
 	public:
 		void visit(IR::ISA::Operand<IR::ISA::Op::pragma>&);
+		void visit(IR::ISA::Operand<IR::ISA::Op::blueprint>&);
 		void visit(IR::ISA::Operand<IR::ISA::Op::stacksize>&);
 		void visit(IR::ISA::Operand<IR::ISA::Op::scope>&);
 		void visit(IR::ISA::Operand<IR::ISA::Op::end>&);

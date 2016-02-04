@@ -131,6 +131,7 @@ namespace ISA //!< Instruction Set Architecture
 		//! label
 		label,
 
+
 		// --- opcodes for compilation only
 
 		//! fetch a variable or a function
@@ -141,6 +142,8 @@ namespace ISA //!< Instruction Set Architecture
 		self,
 		//! follow
 		follow,
+		//! Blueprint
+		blueprint,
 		//! sizeof
 		classdefsizeof,
 		//! field read
@@ -244,6 +247,7 @@ namespace ISA //!< Instruction Set Architecture
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::label) \
 				\
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::follow) \
+				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::blueprint) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::classdefsizeof) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::fieldget) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::fieldset) \

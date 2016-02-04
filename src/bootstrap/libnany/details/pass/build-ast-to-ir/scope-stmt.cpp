@@ -60,6 +60,7 @@ namespace Producer
 			case rgVar:     return visitASTVar(node);
 			case rgReturn:  return visitASTExprReturn(node);
 			case rgClass:   return visitASTClass(node);
+			case rgTypedef: return visitASTTypedef(node);
 
 			case rgClassVisibility: /*currently ignored */ return true;
 

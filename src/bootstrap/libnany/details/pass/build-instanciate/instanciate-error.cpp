@@ -317,6 +317,42 @@ namespace Instanciate
 	}
 
 
+	void SequenceBuilder::complainTypealiasCircularRef(const Atom& original, const Atom& responsible)
+	{
+		auto err = (error() << "cannot resolve type alias '");
+		original.retrieveCaption(err.data().message, cdeftable);
+		err << "': circular dependcy";
+
+		if (responsible.atomid != original.atomid)
+		{
+			auto hint = (err.hint() << "when trying to resolve '");
+			responsible.retrieveCaption(err.data().message, cdeftable);
+			hint << '\'';
+		}
+	}
+
+
+	void SequenceBuilder::complainTypedefDeclaredAfter(const Atom& original, const Atom& responsible)
+	{
+		auto err = error() << "cannot resolve type alias '";
+		original.retrieveCaption(err.data().message, cdeftable);
+		err << "': type alias '";
+		responsible.retrieveCaption(err.data().message, cdeftable);
+		err << "' not resolved yet";
+
+		auto hint = (err.hint() << "when trying to resolve '");
+		responsible.retrieveCaption(err.data().message, cdeftable);
+		hint << '\'';
+	}
+
+
+	void SequenceBuilder::complainTypedefUnresolved(const Atom& original)
+	{
+		auto err = error() << "cannot resolve type alias '";
+		original.retrieveCaption(err.data().message, cdeftable);
+		err << "'";
+	}
+
 
 
 

@@ -28,6 +28,11 @@ namespace Nany
 		return type == Type::classdef;
 	}
 
+	inline bool Atom::isTypeAlias() const
+	{
+		return type == Type::typealias;
+	}
+
 	inline bool Atom::isFunction() const
 	{
 		return type == Type::funcdef;

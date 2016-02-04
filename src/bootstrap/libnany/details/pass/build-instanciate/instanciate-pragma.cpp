@@ -13,97 +13,6 @@ namespace Instanciate
 {
 
 
-	inline void SequenceBuilder::adjustSettingsNewFuncdefOperator(const AnyString& name)
-	{
-		assert(name.size() >= 2);
-		switch (name[1])
-		{
-			case 'd':
-			{
-				if (name == "^default-new")
-				{
-					generateClassVarsAutoInit = true; // same as '^new'
-					break;
-				}
-				break;
-			}
-
-			case 'n':
-			{
-				if (name == "^new")
-				{
-					generateClassVarsAutoInit = true; // same as '^default-new'
-					break;
-				}
-				break;
-			}
-
-			case 'o':
-			{
-				if (name == "^obj-dispose")
-				{
-					generateClassVarsAutoRelease = true;
-					break;
-				}
-				if (name == "^obj-clone")
-				{
-					generateClassVarsAutoClone = true;
-					break;
-				}
-				break;
-			}
-		}
-	}
-
-
-	bool SequenceBuilder::pragmaBlueprint(const IR::ISA::Operand<IR::ISA::Op::pragma>& operands)
-	{
-		// reset
-		lastPushedNamedParameters.clear();
-		lastPushedIndexedParameters.clear();
-
-		generateClassVarsAutoInit = false;
-		generateClassVarsAutoRelease = false;
-		lastOpcodeStacksizeOffset = (uint32_t) -1;
-
-		assert(layerDepthLimit > 0);
-		--layerDepthLimit;
-
-		uint32_t atomid = operands.value.blueprint.atomid;
-		AnyString atomname = currentSequence.stringrefs[operands.value.blueprint.name];
-
-		if (not atomStack.empty() and canGenerateCode())
-		{
-			if ((IR::ISA::Pragma) operands.pragma == IR::ISA::Pragma::blueprintfuncdef)
-				out.emitBlueprintFunc(atomname, atomid);
-			else
-				out.emitBlueprintClass(atomname, atomid);
-		}
-
-		auto* atom = cdeftable.atoms().findAtom(atomid);
-		if (unlikely(nullptr == atom))
-		{
-			complainOperand(reinterpret_cast<const IR::Instruction&>(operands), "invalid atom");
-			return false;
-		}
-
-		atomStack.emplace_back(*atom);
-		atomStack.back().blueprintOpcodeOffset = currentSequence.offsetOf(**cursor);
-
-		if ((IR::ISA::Pragma) operands.pragma == IR::ISA::Pragma::blueprintfuncdef)
-		{
-			if (atomname[0] == '^') // operator !
-			{
-				// some special actions must be triggered according the operator name
-				adjustSettingsNewFuncdefOperator(atomname);
-			}
-		}
-
-		assert(not atomStack.empty() and "invalid atom stack");
-		return true;
-	}
-
-
 	void SequenceBuilder::pragmaBodyStart()
 	{
 		assert(not atomStack.empty());
@@ -182,71 +91,9 @@ namespace Instanciate
 				break;
 			}
 
-			case IR::ISA::Pragma::blueprintparam:
-			{
-				// -- function parameter
-				assert(not atomStack.empty() and "invalid atom stack");
-				uint32_t sid  = operands.value.param.name;
-				uint32_t lvid = operands.value.param.lvid;
-				cdeftable.substitute(lvid).qualifiers.ref = false;
-				declareNamedVariable(currentSequence.stringrefs[sid], lvid, false);
-				break;
-			}
-
-			case IR::ISA::Pragma::blueprintparamself:
-			{
-				// -- function parameter
-				// -- with automatic variable assignment for operator new
-				// example: operator new (self varname) {}
-				assert(not atomStack.empty() and "invalid atom stack");
-				auto& frame = atomStack.back();
-				if (unlikely(not frame.atom.isClassMember()))
-				{
-					error() << "automatic variable assignment is only allowed in class operator 'new'";
-					break;
-				}
-
-				if (!frame.selfParameters.get())
-					frame.selfParameters = std::make_unique<decltype(frame.selfParameters)::element_type>();
-
-				uint32_t sid  = operands.value.param.name;
-				uint32_t lvid = operands.value.param.lvid;
-				AnyString varname = currentSequence.stringrefs[sid];
-				(*frame.selfParameters)[varname].first = lvid;
-				break;
-			}
-
-			case IR::ISA::Pragma::blueprintfuncdef:
-			case IR::ISA::Pragma::blueprintclassdef:
-			{
-				pragmaBlueprint(operands);
-				break;
-			}
-
 			case IR::ISA::Pragma::bodystart:
 			{
 				pragmaBodyStart();
-				break;
-			}
-
-			case IR::ISA::Pragma::blueprintvar:
-			{
-				// update the type of the variable member
-				assert(not atomStack.empty());
-				auto& frame = atomStack.back();
-				if (frame.atom.isClass())
-				{
-					uint32_t sid  = operands.value.vardef.name;
-					const AnyString& varname = currentSequence.stringrefs[sid];
-
-					Atom* atom = nullptr;
-					if (1 != frame.atom.findVarAtom(atom, varname))
-					{
-						ICE() << "unknown variable member '" << varname << "'";
-						return;
-					}
-					atom->returnType.clid.reclass(frame.atomid, operands.value.vardef.lvid);
-				}
 				break;
 			}
 
@@ -288,7 +135,6 @@ namespace Instanciate
 			case IR::ISA::Pragma::suggest:
 			case IR::ISA::Pragma::builtinalias:
 			case IR::ISA::Pragma::shortcircuit:
-			case IR::ISA::Pragma::namespacedef:
 			case IR::ISA::Pragma::unknown:
 			case IR::ISA::Pragma::max:
 				break;

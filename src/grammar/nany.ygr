@@ -672,7 +672,7 @@ var-assign: notext
 	operator-kind wp (expr | error-semicolon)
 
 var-property: notext
-	tk-arrow wp object
+	tk-arrow wp (object | expr)
 
 var-decl: hidden
 	identifier func-param-variadic?

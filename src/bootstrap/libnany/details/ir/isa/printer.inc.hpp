@@ -491,6 +491,90 @@ namespace // anonymous
 		}
 
 
+		void print(const Operand<Op::blueprint>& operands)
+		{
+			auto kind = static_cast<IR::ISA::Blueprint>(operands.kind);
+			switch (kind)
+			{
+				case ISA::Blueprint::funcdef:
+				{
+					printEOL();
+
+					out << tabs << "func id:";
+					uint32_t  atomid = operands.atomid;
+					if (atomid != (uint32_t) -1)
+						out << atomid;
+					else
+						out << "<unspecified>";
+
+					out << ' ';
+					printString(operands.name);
+					printEOL();
+					out << tabs << '{';
+					indent();
+					break;
+				}
+				case ISA::Blueprint::param:
+				{
+					out << tabs << "param ";
+					printString(operands.name);
+					out << ": %" << static_cast<uint32_t>(operands.lvid);
+					break;
+				}
+				case ISA::Blueprint::paramself:
+				{
+					out << tabs << "self param ";
+					printString(operands.name);
+					out << ", %" << (uint32_t) operands.lvid;
+					break;
+				}
+				case ISA::Blueprint::classdef:
+				{
+					printEOL();
+					out << tabs << "class ";
+					printString(operands.name);
+					printEOL();
+					out << tabs << '{';
+					indent();
+					printEOL();
+
+					// ID
+					uint32_t  atomid = operands.atomid;
+					out << tabs << "// atomid: ";
+					if (atomid != (uint32_t) -1)
+						out << atomid;
+					else
+						out << "<unspecified>";
+					break;
+				}
+				case ISA::Blueprint::vardef:
+				{
+					out << tabs << "var ";
+					printString(operands.name);
+					out << ": %" << (uint32_t) operands.lvid;
+					break;
+				}
+				case ISA::Blueprint::typealias:
+				{
+					out << tabs << "typealias ";
+					printString(operands.name);
+					out << ": %" << (uint32_t) operands.lvid;
+					if (operands.atomid != (uint32_t) -1)
+						out << ", atom: " << operands.atomid;
+					break;
+				}
+				case ISA::Blueprint::namespacedef:
+				{
+					out << tabs << "namespace ";
+					printString(operands.name);
+					break;
+				}
+
+				default:
+					break;
+			}
+		}
+
 		void print(const Operand<Op::pragma>& operands)
 		{
 			if (operands.pragma < static_cast<uint32_t>(Pragma::max))
@@ -500,72 +584,6 @@ namespace // anonymous
 					case Pragma::codegen:
 					{
 						out << tabs << "pragma codegen " << ((operands.value.codegen != 0) ? "enable" : "disable");
-						break;
-					}
-					case Pragma::namespacedef:
-					{
-						out << tabs << "namespace ";
-						printString(operands.value.namespacedef);
-						break;
-					}
-					case Pragma::blueprintclassdef:
-					{
-						printEOL();
-						out << tabs << "class ";
-						printString(operands.value.blueprint.name);
-						printEOL();
-						out << tabs << '{';
-						indent();
-						printEOL();
-
-						// ID
-						uint32_t  atomid = operands.value.blueprint.atomid;
-						out << tabs << "// atomid: ";
-						if (atomid != (uint32_t) -1)
-							out << atomid;
-						else
-							out << "<unspecified>";
-						break;
-					}
-					case Pragma::blueprintfuncdef:
-					{
-						printEOL();
-
-						out << tabs << "func id:";
-						uint32_t  atomid = operands.value.blueprint.atomid;
-						if (atomid != (uint32_t) -1)
-							out << atomid;
-						else
-							out << "<unspecified>";
-
-						out << ' ';
-						printString(operands.value.blueprint.name);
-						printEOL();
-						out << tabs << '{';
-						indent();
-						break;
-					}
-
-					case Pragma::blueprintparamself:
-					{
-						out << tabs << "self param ";
-						printString(operands.value.param.name);
-						out << ", %" << operands.value.param.lvid;
-						break;
-					}
-
-					case Pragma::blueprintparam:
-					{
-						out << tabs << "param ";
-						printString(operands.value.param.name);
-						out << ": %" << operands.value.param.lvid;
-						break;
-					}
-					case Pragma::blueprintvar:
-					{
-						out << tabs << "var ";
-						printString(operands.value.vardef.name);
-						out << ": %" << operands.value.vardef.lvid;
 						break;
 					}
 					case Pragma::blueprintsize:
@@ -586,7 +604,6 @@ namespace // anonymous
 						out << tabs << "pragma body start";
 						break;
 					}
-
 					case Pragma::shortcircuit:
 					{
 						out << tabs << "pragma shortcircuit ";
@@ -601,7 +618,6 @@ namespace // anonymous
 						out << (1 + operands.value.shortcircuitMetadata.label);
 						break;
 					}
-
 					case Pragma::builtinalias:
 					{
 						out << tabs << "pragma builtinalias ";

@@ -149,6 +149,7 @@ namespace Instanciate
 		void visit(const IR::ISA::Operand<IR::ISA::Op::debugfile>&);
 		void visit(const IR::ISA::Operand<IR::ISA::Op::debugpos>&);
 		void visit(const IR::ISA::Operand<IR::ISA::Op::pragma>&);
+		void visit(const IR::ISA::Operand<IR::ISA::Op::blueprint>&);
 		void visit(const IR::ISA::Operand<IR::ISA::Op::stacksize>&);
 		void visit(const IR::ISA::Operand<IR::ISA::Op::namealias>&);
 		void visit(const IR::ISA::Operand<IR::ISA::Op::storeConstant>&);
@@ -176,6 +177,8 @@ namespace Instanciate
 
 		//! perform type resolution and fetch data (local variable, func...)
 		bool identify(const IR::ISA::Operand<IR::ISA::Op::identify>& operands);
+
+		Atom& resolveTypeAlias(Atom& atom, bool& success);
 
 		bool pragmaBlueprint(const IR::ISA::Operand<IR::ISA::Op::pragma>& operands);
 		void pragmaBodyStart();
@@ -274,6 +277,10 @@ namespace Instanciate
 
 		bool complainIntrinsicParameter(const AnyString& name, uint32_t pindex, const Classdef& got,
 			const AnyString& expected = "");
+
+		void complainTypealiasCircularRef(const Atom& original, const Atom& responsible);
+		void complainTypedefDeclaredAfter(const Atom& original, const Atom& responsible);
+		void complainTypedefUnresolved(const Atom& original);
 
 		/*!
 		**
