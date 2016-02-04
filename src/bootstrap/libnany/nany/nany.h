@@ -297,6 +297,26 @@ enum
 
 typedef struct nycontext_t nycontext_t;
 
+typedef struct nytctx_t nytctx_t;
+
+/*!
+** \brief Nany Thread Context
+*/
+typedef struct nytctx_t
+{
+	/*! Parent context */
+	nycontext_t* context;
+
+	/*! event: a new thread is destroyed */
+	void (*on_thread_destroy)(nytctx_t*);
+
+	/*! Opaque internal data */
+	void* internal;
+}
+nytctx_t;
+
+
+
 /*!
 ** \brief Nany context
 */
@@ -314,8 +334,9 @@ typedef struct nycontext_t
 		void* (*reallocate)(nycontext_t*, void* ptr, size_t oldsize, size_t newsize);
 		/*! free */
 		void (*release)(nycontext_t*, void* ptr, size_t);
-		/*! Memory limit in bytes, meaningful only if used by the implementation */
-		size_t limits_mem_size;
+		/*! Memory limit in bytes (0 means unlimited) */
+		/* (meaningful only if used by the implementation) */
+		size_t limit_mem_size;
 
 		/*! event: not enough memory */
 		void (*on_not_enough_memory)(nycontext_t*);
@@ -357,8 +378,40 @@ typedef struct nycontext_t
 	{
 		/*! queueservice for concurrent jobs */
 		nyqueueservice_t* queueservice;
+
+		/*! Maximum number of threads (0 means 'disabled') */
+		uint32_t limit_thread_count;
+		/*! Maximum number of tasks (0 means 'disabled') */
+		uint32_t limit_task_count;
+
+		/*! event: a new thread is about to be created */
+		nybool_t (*on_task_create_query)(nycontext_t*, nytask_t* parent);
+		/*! event: a new thread is created */
+		void (*on_task_create)(nycontext_t*, nytask_t*, nytask_t* parent);
+		/*! event: a new thread is destroyed */
+		void (*on_task_destroy)(nycontext_t*, nytask_t*);
+
+		/*! event: a new thread is about to be created */
+		nybool_t (*on_thread_create_query)(nycontext_t*, nytctx_t* parent);
+		/*! event: a new thread is created */
+		void (*on_thread_create)(nytctx_t* thread, nytctx_t* parent);
+		/*! event: a new thread is destroyed */
+		void (*on_thread_destroy)(nytctx_t*);
 	}
 	mt;
+
+
+	struct nycontext_program_t
+	{
+		/*! event: the program has started */
+		nybool_t (*on_start)(nycontext_t*, int argc, const char** argv);
+		/*! event: the program has stopped */
+		int (*on_stop)(nycontext_t*, int exitcode);
+		/*! event: the program has encountered a runtime error */
+		int (*on_failed)(nycontext_t*, int exitcode);
+	}
+	program;
+
 
 	struct nycontext_build_t
 	{
@@ -386,25 +439,17 @@ typedef struct nycontext_t
 
 	/*! Opaque internal data */
 	void* internal;
+
+	/*! Special values that may not be used directly but are here for performance reasons */
+	struct nycontext_reserved_t {
+		size_t mem0;
+	}
+	reserved;
 }
 nycontext_t;
 
 
 
-typedef struct nytctx_t nytctx_t;
-
-/*!
-** \brief Nany Thread Context
-*/
-typedef struct nytctx_t
-{
-	/*! Parent context */
-	nycontext_t* context;
-
-	/*! Opaque internal data */
-	void* internal;
-}
-nytctx_t;
 
 
 

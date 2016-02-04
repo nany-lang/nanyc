@@ -97,22 +97,59 @@ extern "C" void nanysdbx_flush_stderr(nycontext_t*)
 }
 
 
-extern "C" void* nanysdbx_mem_alloc(nycontext_t*, size_t size)
+extern "C" void* nanysdbx_mem_alloc(nycontext_t* ctx, size_t size)
 {
 	assert(0 != size);
-	return ::malloc(size);
+	if (YUNI_LIKELY((ctx->reserved.mem0 += size) < ctx->memory.limit_mem_size))
+	{
+		void* p = ::malloc(size);
+		if (YUNI_LIKELY(p))
+			return p;
+	}
+
+	ctx->reserved.mem0 -= size;
+	if (ctx->memory.on_not_enough_memory)
+		ctx->memory.on_not_enough_memory(ctx);
+	return nullptr;
 }
 
 
-extern "C" void* nanysdbx_mem_realloc(nycontext_t*, void* ptr, size_t, size_t newsize)
+extern "C" void* nanysdbx_mem_realloc(nycontext_t* ctx, void* ptr, size_t oldsize, size_t newsize)
 {
-	return ::realloc(ptr, newsize);
+	if (newsize > oldsize)
+	{
+		if (YUNI_LIKELY((ctx->reserved.mem0 += newsize - oldsize) < ctx->memory.limit_mem_size))
+		{
+			void* p = ::realloc(ptr, newsize);
+			if (YUNI_LIKELY(p))
+				return p;
+
+			ctx->reserved.mem0 -= newsize - oldsize;
+		}
+	}
+	else
+	{
+		void* p = ::realloc(ptr, newsize);
+		if (YUNI_LIKELY(p))
+		{
+			ctx->reserved.mem0 -= oldsize - newsize;
+			return p;
+		}
+	}
+
+	if (ctx->memory.on_not_enough_memory)
+		ctx->memory.on_not_enough_memory(ctx);
+	return nullptr;
 }
 
 
-extern "C" void nanysdbx_mem_free(nycontext_t*, void* ptr, size_t)
+extern "C" void nanysdbx_mem_free(nycontext_t* ctx, void* ptr, size_t size)
 {
-	free(ptr);
+	if (ptr)
+	{
+		free(ptr);
+		ctx->reserved.mem0 -= size;
+	}
 }
 
 

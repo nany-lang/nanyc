@@ -82,9 +82,10 @@ namespace Nany
 	int Context::run(bool& success)
 	{
 		success = false;
+		int exitcode = 66;
 		if (!!pBuildInfo)
-			return pBuildInfo->isolate.run(success, usercontext, "main");
-		return 0;
+			exitcode = pBuildInfo->isolate.run(success, usercontext, "main");
+		return exitcode;
 	}
 
 

@@ -101,6 +101,8 @@ namespace // anonymous
 			dyncall = dcNewCallVM(4096);
 			dcMode(dyncall, DC_CALL_C_DEFAULT);
 
+			memset(&threadcontext, 0x0, sizeof(threadcontext));
+			threadcontext.internal = this;
 			threadcontext.context = &context;
 		}
 
@@ -109,6 +111,16 @@ namespace // anonymous
 			if (dyncall)
 				dcFree(dyncall);
 			memchecker.printLeaksIfAny(context);
+		}
+
+
+		inline void triggerEventsDestroy()
+		{
+			if (threadcontext.on_thread_destroy)
+				threadcontext.on_thread_destroy(&threadcontext);
+
+			if (context.mt.on_thread_destroy)
+				context.mt.on_thread_destroy(&threadcontext);
 		}
 
 
@@ -812,9 +824,17 @@ namespace // anonymous
 
 		try
 		{
-			auto& sequence = map.sequence(atomid, instanceid);
+			if (context.program.on_start)
+			{
+				const char* argv[] = { "script.ny" };
+				auto query = context.program.on_start(&context, 1, argv);
+				if (unlikely(nyfalse == query))
+					throw CodeAbort();
+			}
 
+			auto& sequence = map.sequence(atomid, instanceid);
 			ThreadContext thrctx{map, context, sequence};
+
 			thrctx.stacktrace.push(atomid, instanceid);
 			retvalue = thrctx.invoke(sequence);
 			success = true;
@@ -836,6 +856,18 @@ namespace // anonymous
 		{
 			AnyString txt{"error: exception received: aborting\n"};
 			context.console.write_stderr(&context, txt.c_str(), txt.size());
+		}
+
+
+		if (success)
+		{
+			if (context.program.on_stop)
+				context.program.on_stop(&context, 0);
+		}
+		else
+		{
+			if (context.program.on_failed)
+				context.program.on_failed(&context, 0);
 		}
 
 		// always flush to make sure that the listener will update the output

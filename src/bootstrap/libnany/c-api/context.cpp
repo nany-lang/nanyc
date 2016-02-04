@@ -6,6 +6,29 @@
 using namespace Yuni;
 
 
+namespace Nany
+{
+namespace Defaults
+{
+
+	// arbitrary to prevent unwanted misuse in embedded mode
+
+	//! Maximum allocated memory (in bytes)
+	constexpr size_t limit_mem_size = 16 * 1024*1024u;
+
+	//! Maximum number of threads
+	constexpr uint32_t limit_thread_count = 0u; // disabled
+	//! Maximum number of tasks
+	constexpr uint32_t limit_task_count = 1000u;
+
+
+
+} // namespace Defaults
+} // namespace Nany
+
+
+
+
 
 
 extern "C" nycontext_t* nany_create(const nycontext_t* inherit)
@@ -65,30 +88,36 @@ extern "C" nybool_t nany_initialize(nycontext_t* ctx, const nycontext_t* inherit
 		else
 		{
 			memset(ctx, 0x0, sizeof(nycontext_t));
-			// default implementation
+
+			// memory
 			ctx->memory.allocate   = nanysdbx_mem_alloc;
 			ctx->memory.reallocate = nanysdbx_mem_realloc;
 			ctx->memory.release    = nanysdbx_mem_free;
-			ctx->memory.limits_mem_size = 0;
+			ctx->memory.limit_mem_size = Nany::Defaults::limit_mem_size;
 			ctx->memory.on_not_enough_memory = nanysdbx_not_enough_memory;
 
+			// I/O
 			ctx->io.chroot_path = nullptr;
-			ctx->io.chroot_path_size = 0;
+			ctx->io.chroot_path_size = 0u;
 			ctx->io.open  = nanysdbx_io_open;
 			ctx->io.close = nanysdbx_io_close;
 			ctx->io.read  = nanysdbx_io_read;
 			ctx->io.write = nanysdbx_io_write;
 
+			// console output
 			ctx->console.write_stdout = nanysdbx_write_stdout;
 			ctx->console.write_stderr = nanysdbx_write_stderr;
 			ctx->console.flush_stdout = nanysdbx_flush_stdout;
 			ctx->console.flush_stderr = nanysdbx_flush_stderr;
 
+			// Multithreading
+			ctx->mt.limit_thread_count = Nany::Defaults::limit_thread_count;
+			ctx->mt.limit_task_count   = Nany::Defaults::limit_task_count;
+
 			// build
 			ctx->internal = new Nany::Context(*ctx);
 			ctx->build.on_err_file_access = nanysdbx_build_on_err_file_access;
 		}
-
 
 		if (ctx->build.on_context_create)
 			ctx->build.on_context_create(ctx, inherit);
