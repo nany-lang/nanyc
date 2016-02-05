@@ -9,6 +9,7 @@ CPackConfig.cmake
 /*.rpm
 /*.gz
 /*.tgz
+/cmake-build-settings.txt
 
 # yuni related stuff
 /ext/yuni/src/ProfileBuild.cmake

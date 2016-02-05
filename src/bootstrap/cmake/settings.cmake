@@ -55,14 +55,24 @@ endif()
 
 
 
-set(nany_version_string "${nany_version_major}.${nany_version_minor}.${nany_version_patch}")
+set(nany_version "${nany_version_major}.${nany_version_minor}.${nany_version_patch}" CACHE STRING "" FORCE)
+set(nany_version_string "${nany_version}")
 if (NOT "${nany_version_prerelease}" STREQUAL "")
-	set(nany_version_string "${nany_version_string}-${nany_version_prerelease}")
+	set(nany_version_string "${nany_version_string}-${nany_version_prerelease}" CACHE STRING "" FORCE)
 endif()
 if (NOT "${nany_version_metadata}" STREQUAL "")
-	set(nany_version_string "${nany_version_string}+${nany_version_metadata}")
+	set(nany_version_string "${nany_version_string}+${nany_version_metadata}" CACHE STRING "" FORCE)
 endif()
 
 nmessage("") # for beauty (and to find it easily)
 nmessage("version: ${nany_version_string}")
+
+
+file(WRITE "${CMAKE_CURRENT_LIST_DIR}/../cmake-build-settings.txt"
+"// override from cmake
+version: ${nany_version}
+version_string: ${nany_version_string}
+version_metadata: ${nany_version_metadata}
+")
+
 

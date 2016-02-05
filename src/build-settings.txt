@@ -11,3 +11,6 @@ version_metadata:
 // Web site
 website_url: http://nany.io
 contact: contact@nany.io
+
+// License
+license: Mozilla Public License, version 2.0
