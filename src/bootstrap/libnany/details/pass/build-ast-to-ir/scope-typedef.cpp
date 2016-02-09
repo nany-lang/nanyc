@@ -29,7 +29,7 @@ namespace Producer
 				case rgIdentifier:
 				{
 					typedefname = child.text;
-					bool ok = checkForValidIdentifierName(report(), child, typedefname);
+					bool ok = checkForValidIdentifierName(report(), child, typedefname, false, true);
 					if (unlikely(not ok))
 						return false;
 					break;

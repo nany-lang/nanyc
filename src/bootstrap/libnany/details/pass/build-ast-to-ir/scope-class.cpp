@@ -60,7 +60,8 @@ namespace Producer
 		inline bool ClassInspector::inspectClassname(Node& node)
 		{
 			classname = scope.getSymbolNameFromASTNode(node);
-			return not classname.empty();
+			return not classname.empty()
+				and checkForValidIdentifierName(scope.report(), node, classname, false, true);
 		}
 
 

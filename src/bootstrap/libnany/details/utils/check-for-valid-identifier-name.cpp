@@ -95,7 +95,8 @@ namespace Nany
 	}
 
 
-	bool checkForValidIdentifierName(Logs::Report& report, const Nany::Node& node, const AnyString& name, bool isOperator)
+	bool checkForValidIdentifierName(Logs::Report& report, const Nany::Node& node, const AnyString& name,
+		bool isOperator, bool isType)
 	{
 		// do never accept empty names
 		if (unlikely(name.empty()))
@@ -126,18 +127,21 @@ namespace Nany
 				{
 					if (not i->isAscii())
 					{
-						auto wrn = report.warning() << "invalid identifier name: the name contains non-ascii characters";
-						wrn.message.origins.location.pos.offsetEnd = wrn.message.origins.location.pos.offset + name.size();
+						auto wrn = report.warning()
+							<< "invalid identifier name: the name contains non-ascii characters";
+						auto& location = wrn.message.origins.location;
+						location.pos.offsetEnd = location.pos.offset + name.size();
 						break;
 					}
 				}
 			}
 
 			// checking if the id name is not from one of reserved keywords
-			if (unlikely(reservedKeywords.count(name) != 0))
+			if (unlikely(not isType and reservedKeywords.count(name) != 0))
 			{
 				auto err = report.error() << "'" << name << "' is a reserved keyword";
-				err.message.origins.location.pos.offsetEnd = err.message.origins.location.pos.offset + name.size();
+				auto& location = err.message.origins.location;
+				location.pos.offsetEnd = location.pos.offset + name.size();
 				return false;
 			}
 		}
@@ -146,8 +150,10 @@ namespace Nany
 			// checking if the operator name is one from the list
 			if (unlikely(operatorKeywords.count(name) == 0)) // not found
 			{
-				auto err = report.error() << "invalid identifier name: '" << name << "' is not a valid operator";
-				err.message.origins.location.pos.offsetEnd = err.message.origins.location.pos.offset + name.size();
+				auto err = (report.error()
+					<< "invalid identifier name: '" << name << "' is not a valid operator");
+				auto& location = err.message.origins.location;
+				location.pos.offsetEnd = location.pos.offset + name.size();
 				return false;
 			}
 		}
@@ -156,7 +162,8 @@ namespace Nany
 		if (unlikely(name.size() > 127u))
 		{
 			auto err = report.error() << "identifier name too long";
-			err.message.origins.location.pos.offsetEnd = err.message.origins.location.pos.offset + name.size();
+			auto& location = err.message.origins.location;
+			location.pos.offsetEnd = location.pos.offset + name.size();
 			return false;
 		}
 		return true;
