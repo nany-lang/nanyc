@@ -52,7 +52,6 @@ namespace Producer
 		//@}
 
 
-
 	public:
 		//! Linked IR sequence
 		Sequence& sequence;

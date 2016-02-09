@@ -35,18 +35,23 @@ namespace Mapping
 	}
 
 
-	template<IR::ISA::Op O>
-	void SequenceMapping::printError(const IR::ISA::Operand<O>& operands, AnyString msg)
+	void SequenceMapping::printError(const IR::Instruction& operands, AnyString msg)
 	{
 		// example: ICE: unknown opcode 'resolveAttribute': from 'ref %4 = resolve %3."()"'
 		auto trace = report.ICE();
 		if (not msg.empty())
-			trace << msg;
+			trace << msg << ':';
 		else
-			trace << "attach sequence: unknown opcode: '" << IR::ISA::Operand<O>::opname() << '\'';
+			trace << "invalid opcode ";
 
-		trace << ": from '" << IR::ISA::print(currentSequence, operands) << '\'';
+		trace << " '" << IR::ISA::print(currentSequence, operands) << '\'';
 		success = false;
+	}
+
+	template<IR::ISA::Op O>
+	inline void SequenceMapping::printError(const IR::ISA::Operand<O>& operands, AnyString msg)
+	{
+		printError(reinterpret_cast<const IR::Instruction&>(operands), msg);
 	}
 
 
@@ -355,7 +360,12 @@ namespace Mapping
 
 	inline void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::stacksize>& operands)
 	{
+		if (unlikely(atomStack.empty()))
+			return printError(operands, "invalid parent atom");
+
 		Atom& parentAtom = atomStack.back().atom;
+		if (unlikely(parentAtom.atomid == 0))
+			return printError(operands, "invalid parent atom id");
 
 		// creating all related classdefs
 		// (take max with 1 to prevent against invalid opcode)
@@ -634,17 +644,21 @@ namespace Mapping
 			case 1: // ref
 			{
 				MutexLocker locker{isolate.mutex};
+				if (debugmode and not isolate.classdefTable.hasClassdef(clid))
+					return printError(operands, "invalid clid");
 				isolate.classdefTable.classdef(clid).qualifiers.ref = onoff;
 				break;
 			}
 			case 2: // const
 			{
 				MutexLocker locker{isolate.mutex};
+				if (debugmode and not isolate.classdefTable.hasClassdef(clid))
+					return printError(operands, "invalid clid");
 				isolate.classdefTable.classdef(clid).qualifiers.constant = onoff;
 				break;
 			}
 			default:
-			printError(operands, "invalid qualifier value");
+				printError(operands, "invalid qualifier value");
 		}
 	}
 

@@ -92,6 +92,7 @@ namespace Mapping
 
 	private:
 		template<IR::ISA::Op O> void printError(const IR::ISA::Operand<O>& operands, AnyString msg = nullptr);
+		void printError(const IR::Instruction& operands, AnyString msg = nullptr);
 		template<IR::ISA::Op O> bool checkForLVID(const IR::ISA::Operand<O>& operands, LVID lvid);
 		void attachFuncCall(const IR::ISA::Operand<IR::ISA::Op::call>&);
 		Logs::Report error();

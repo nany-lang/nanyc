@@ -35,9 +35,12 @@ namespace Nany
 		{
 			IR::Producer::Scope scope{producer};
 			scope.addDebugCurrentFilename();
+			uint32_t bpoffsck = scope.sequence().emitStackSizeIncrease();
 
 			for (auto& element: astnodes)
 				success &= scope.visitAST(*element);
+
+			scope.sequence().at<IR::ISA::Op::stacksize>(bpoffsck).add = scope.nextvar();
 		}
 
 		// do not keep back information

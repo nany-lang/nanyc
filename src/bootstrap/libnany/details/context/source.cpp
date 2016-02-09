@@ -196,7 +196,6 @@ namespace Nany
 		async(task, [&,self](Job::IJob&) -> bool
 		{
 			bool success = self->build(ctx, reporttarget);
-
 			// release the internal refcount but not delete ourselves
 			self->release();
 
