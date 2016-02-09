@@ -218,7 +218,7 @@ namespace Instanciate
 	template<IR::ISA::Op O>
 	void SequenceBuilder::visit(const IR::ISA::Operand<O>& operands)
 	{
-		complainOperand(reinterpret_cast<const IR::Instruction&>(operands));
+		complainOperand(IR::Instruction::fromOpcode(operands));
 	}
 
 

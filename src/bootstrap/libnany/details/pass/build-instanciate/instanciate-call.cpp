@@ -118,7 +118,7 @@ namespace Instanciate
 			// (from previous call to opcode 'resolve')
 			auto& solutions = frame.resolvePerCLID[cdefFuncToCall.clid];
 			if (unlikely(solutions.empty()))
-				return complainOperand(reinterpret_cast<const IR::Instruction&>(operands), "no solution available");
+				return complainOperand(IR::Instruction::fromOpcode(operands), "no solution available");
 
 
 			OverloadedFuncCallResolver resolver{report, overloadMatch, cdeftable, context};
@@ -136,7 +136,7 @@ namespace Instanciate
 
 			// no overload, the func to call is known
 			if (unlikely(not atom->isFunction()))
-				return complainOperand(reinterpret_cast<const IR::Instruction&>(operands), "a functor is required for func call");
+				return complainOperand(IR::Instruction::fromOpcode(operands), "a functor is required for func call");
 
 			// any error can be directly reported (since no overload is present)
 			overloadMatch.canGenerateReport = false;

@@ -837,7 +837,7 @@ namespace IR
 	inline uint32_t Sequence::offsetOf(const ISA::Operand<O>& instr) const
 	{
 		static_assert(sizeof(Instruction) >= sizeof(ISA::Operand<O>), "pSize mismatch");
-		return offsetOf(reinterpret_cast<const Instruction&>(instr));
+		return offsetOf(IR::Instruction::fromOpcode(instr));
 	}
 
 
@@ -865,7 +865,7 @@ namespace IR
 		{
 			if (cursor->opcodes[0] == static_cast<uint32_t>(IR::ISA::Op::label))
 			{
-				auto& operands = reinterpret_cast<const IR::ISA::Operand<IR::ISA::Op::label>&>(*cursor);
+				auto& operands = (*cursor).to<IR::ISA::Op::label>();
 				if (operands.label == label)
 					return;
 			}
@@ -882,7 +882,7 @@ namespace IR
 		{
 			if (cursor->opcodes[0] == static_cast<uint32_t>(IR::ISA::Op::label))
 			{
-				auto& operands = reinterpret_cast<const IR::ISA::Operand<IR::ISA::Op::label>&>(*cursor);
+				auto& operands = (*cursor).to<IR::ISA::Op::label>();
 				if (operands.label == label)
 					return;
 			}

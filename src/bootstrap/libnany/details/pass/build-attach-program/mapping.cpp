@@ -51,7 +51,7 @@ namespace Mapping
 	template<IR::ISA::Op O>
 	inline void SequenceMapping::printError(const IR::ISA::Operand<O>& operands, AnyString msg)
 	{
-		printError(reinterpret_cast<const IR::Instruction&>(operands), msg);
+		printError(IR::Instruction::fromOpcode(operands), msg);
 	}
 
 

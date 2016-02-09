@@ -89,7 +89,7 @@ namespace Instanciate
 				auto* atom = cdeftable.atoms().findAtom(atomid);
 				if (unlikely(nullptr == atom))
 				{
-					complainOperand(reinterpret_cast<const IR::Instruction&>(operands), "invalid atom");
+					complainOperand(IR::Instruction::fromOpcode(operands), "invalid atom");
 					break;
 				}
 
@@ -179,7 +179,7 @@ namespace Instanciate
 				auto* atom = cdeftable.atoms().findAtom(atomid);
 				if (unlikely(nullptr == atom))
 				{
-					complainOperand(reinterpret_cast<const IR::Instruction&>(operands), "invalid unit atom");
+					complainOperand(IR::Instruction::fromOpcode(operands), "invalid unit atom");
 					break;
 				}
 

@@ -4,6 +4,7 @@
 #include "details/ir/isa/opcodes.h"
 #include "details/ir/isa/pragma.h"
 #include "details/ir/isa/data.h"
+#include "details/ir/instruction.h"
 #include "details/utils/stringrefs.h"
 #include "details/utils/clid.h"
 #include <memory>
@@ -21,12 +22,6 @@ namespace IR
 {
 
 	struct OpcodeScopeLocker;
-
-	struct Instruction final
-	{
-		uint32_t opcodes[4];
-	};
-
 
 
 	class Sequence final

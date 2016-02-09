@@ -125,7 +125,7 @@ namespace Instanciate
 			{
 				String errmsg;
 				errmsg << CLID{frame.atomid, operands.lvid} << ": should be alreayd resolved";
-				return complainOperand(reinterpret_cast<const IR::Instruction&>(operands), errmsg);
+				return complainOperand(IR::Instruction::fromOpcode(operands), errmsg);
 			}
 		}
 
