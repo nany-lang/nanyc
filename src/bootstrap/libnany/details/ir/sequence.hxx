@@ -447,6 +447,18 @@ namespace IR
 	}
 
 
+	inline uint32_t Sequence::emitBlueprintUnit()
+	{
+		uint32_t offset = pSize;
+		auto& operands  = emit<ISA::Op::blueprint>();
+		operands.kind   = (uint32_t) IR::ISA::Blueprint::unit;
+		operands.name   = 0u;
+		operands.atomid = static_cast<uint32_t>(-1);
+		operands.lvid   = 0u;
+		return offset;
+	}
+
+
 	inline void Sequence::emitBlueprintClass(const AnyString& name, uint32_t atomid)
 	{
 		auto& operands  = emit<ISA::Op::blueprint>();

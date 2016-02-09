@@ -48,6 +48,11 @@ namespace Nany
 		*/
 		Atom* createTypealias(Atom& root, const AnyString& name);
 
+		/*!
+		** \brief Create a new atom related to an unit (source file)
+		*/
+		Atom* createUnit(Atom& root, const AnyString& name);
+
 
 		/*
 		** \brief Fetch a sequence

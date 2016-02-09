@@ -41,7 +41,9 @@ namespace ISA //!< Instruction Set Architecture
 
 		//! The maximum number of elements, for integrity check
 		max,
-	};
+
+	}; // enum Pragma
+
 
 
 	/*!
@@ -63,8 +65,11 @@ namespace ISA //!< Instruction Set Architecture
 		//! Parameter definition, with auto assignment
 		paramself,
 		//! Namespace definition (one part of it)
-		namespacedef
-	};
+		namespacedef,
+		//! Unit (source file)
+		unit,
+
+	}; // enum Blueprint
 
 
 

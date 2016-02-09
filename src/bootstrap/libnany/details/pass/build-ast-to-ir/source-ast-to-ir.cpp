@@ -35,11 +35,17 @@ namespace Nany
 		{
 			IR::Producer::Scope scope{producer};
 			scope.addDebugCurrentFilename();
-			uint32_t bpoffsck = scope.sequence().emitStackSizeIncrease();
+			auto& out = scope.sequence();
+			uint32_t bpoffset = out.emitBlueprintUnit();
+			uint32_t bpoffsiz = out.emitBlueprintSize();
+			uint32_t bpoffsck = out.emitStackSizeIncrease();
 
 			for (auto& element: astnodes)
 				success &= scope.visitAST(*element);
 
+			out.emitEnd();
+			uint32_t blpsize = out.opcodeCount() - bpoffset;
+			out.at<IR::ISA::Op::pragma>(bpoffsiz).value.blueprintsize = blpsize;
 			scope.sequence().at<IR::ISA::Op::stacksize>(bpoffsck).add = scope.nextvar();
 		}
 

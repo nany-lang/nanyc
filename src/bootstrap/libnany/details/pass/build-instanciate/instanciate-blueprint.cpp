@@ -166,6 +166,28 @@ namespace Instanciate
 				break;
 			}
 
+			case IR::ISA::Blueprint::unit:
+			{
+				// reset
+				lastPushedNamedParameters.clear();
+				lastPushedIndexedParameters.clear();
+
+				generateClassVarsAutoInit = false;
+				generateClassVarsAutoRelease = false;
+
+				uint32_t atomid = operands.atomid;
+				auto* atom = cdeftable.atoms().findAtom(atomid);
+				if (unlikely(nullptr == atom))
+				{
+					complainOperand(reinterpret_cast<const IR::Instruction&>(operands), "invalid unit atom");
+					break;
+				}
+
+				atomStack.emplace_back(*atom);
+				atomStack.back().blueprintOpcodeOffset = currentSequence.offsetOf(**cursor);
+				break;
+			}
+
 			case IR::ISA::Blueprint::namespacedef:
 				break;
 		}

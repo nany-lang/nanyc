@@ -82,21 +82,19 @@ namespace TypeCheck
 					return found ? Match::equal : Match::none;
 				}
 
-				case Atom::Type::namespacedef:
-				case Atom::Type::vardef:
-				{
-					assert(false and "comparing two namespaces ?"); // Uh ?
-					return Match::none;
-				}
-
 				case Atom::Type::typealias:
 				{
 					assert(false and "type comparison - with typedef - implementation missing");
-					return Match::none;
+					break;
+				}
+				case Atom::Type::namespacedef:
+				case Atom::Type::vardef:
+				case Atom::Type::unit:
+				{
+					assert(false and "invalid type comparison");
+					break;
 				}
 			}
-
-			assert(false and "some value not handled here...");
 			return Match::none;
 		}
 

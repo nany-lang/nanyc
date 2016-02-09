@@ -28,7 +28,13 @@ namespace Mapping
 		uint parameterIndex = 0;
 		//! Convenient classdefs alias
 		std::vector<CLID> classdefs;
-	};
+
+		Atom& currentAtomNotUnit()
+		{
+			return (not atom.isUnit()) ? atom : (*(atom.parent));
+		}
+
+	}; // class AtomStackFrame
 
 
 

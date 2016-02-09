@@ -52,6 +52,8 @@ namespace Nany
 			vardef,
 			//! Typedef
 			typealias,
+			//! Unit (source file)
+			unit,
 		};
 
 		//! Create a dummy atom
@@ -83,6 +85,8 @@ namespace Nany
 		bool isMemberVarDefaultInit() const;
 		//! Is a type alias
 		bool isTypeAlias() const;
+		//! Get if the atom is an unit
+		bool isUnit() const;
 
 		//! Get if the atom is publicly accessible
 		bool isPublicOrPublished() const;

@@ -33,6 +33,12 @@ namespace Nany
 		return createNewAtom(Atom::Type::typealias, root, name);
 	}
 
+	inline Atom* AtomMap::createUnit(Atom& root, const AnyString& name)
+	{
+		return createNewAtom(Atom::Type::unit, root, name);
+	}
+
+
 
 	inline Atom* AtomMap::createVardef(Atom& root, const AnyString& name)
 	{

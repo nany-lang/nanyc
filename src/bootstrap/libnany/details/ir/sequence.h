@@ -209,6 +209,9 @@ namespace IR
 		//! Emit opcode for adding/removing const qualifier
 		void emitQualifierConst(uint32_t lvid, bool flag);
 
+		//! Emit a blueprint unit opcode and give the offset of the instruction in the sequence
+		uint32_t emitBlueprintUnit();
+
 		//! Emit a blueprint class opcode
 		void emitBlueprintClass(const AnyString& name, uint32_t atomid);
 		//! Emit a blueprint class opcode and give the offset of the instruction in the sequence

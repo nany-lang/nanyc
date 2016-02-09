@@ -28,6 +28,11 @@ namespace Nany
 		return type == Type::classdef;
 	}
 
+	inline bool Atom::isUnit() const
+	{
+		return type == Type::unit;
+	}
+
 	inline bool Atom::isTypeAlias() const
 	{
 		return type == Type::typealias;

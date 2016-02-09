@@ -62,7 +62,7 @@ namespace Mapping
 		{
 			if (unlikely(lvid == 0 or not (lvid < atomStack.back().classdefs.size())))
 			{
-				printError(operands, String{"invalid lvid %"} << lvid << " (upper bound: %"
+				printError(operands, String{"mapping: invalid lvid %"} << lvid << " (upper bound: %"
 					<< atomStack.back().classdefs.size() << ')');
 				return false;
 			}
@@ -134,7 +134,7 @@ namespace Mapping
 			{
 				assert(not atomStack.empty());
 				// registering the blueprint into the outline...
-				Atom& atom = atomStack.back().atom;
+				Atom& atom = atomStack.back().currentAtomNotUnit();
 				AnyString varname = currentSequence.stringrefs[operands.name];
 				if (unlikely(varname.empty()))
 					return printError(operands, "invalid func name");
@@ -157,6 +157,8 @@ namespace Mapping
 			{
 				assert(not atomStack.empty());
 				auto& frame = atomStack.back();
+				assert(frame.atom.isFunction());
+
 				// calculating the lvid for the current parameter
 				// (+1 since %1 is the return value/type)
 				uint paramLVID = (++frame.parameterIndex) + 1;
@@ -180,7 +182,7 @@ namespace Mapping
 			{
 				assert(not atomStack.empty());
 				// registering the blueprint into the outline...
-				Atom& atom = atomStack.back().atom;
+				Atom& atom = atomStack.back().currentAtomNotUnit();
 				AnyString funcname = currentSequence.stringrefs[operands.name];
 				if (unlikely(funcname.empty()))
 					return printError(operands, "invalid func name");
@@ -216,7 +218,7 @@ namespace Mapping
 			{
 				// registering the blueprint into the outline...
 				assert(not atomStack.empty());
-				Atom& atom = atomStack.back().atom;
+				Atom& atom = atomStack.back().currentAtomNotUnit();
 
 				// reset last lvid and parameters
 				lastLVID = 0;
@@ -250,7 +252,7 @@ namespace Mapping
 			case IR::ISA::Blueprint::typealias:
 			{
 				assert(not atomStack.empty());
-				Atom& atom = atomStack.back().atom;
+				Atom& atom = atomStack.back().currentAtomNotUnit();
 
 				AnyString classname = currentSequence.stringrefs[operands.name];
 				Atom* newAliasAtom;
@@ -268,7 +270,7 @@ namespace Mapping
 				{
 					default:
 					{
-						CLID clid{atom.atomid, operands.lvid};
+						CLID clid{atomStack.back().atom.atomid, operands.lvid};
 						newAliasAtom->returnType.clid = clid;
 						break;
 					}
@@ -293,7 +295,7 @@ namespace Mapping
 			{
 				AnyString nmname = currentSequence.stringrefs[operands.name];
 				assert(not atomStack.empty());
-				Atom& parentAtom = atomStack.back().atom;
+				Atom& parentAtom = atomStack.back().currentAtomNotUnit();
 
 				MutexLocker locker{isolate.mutex};
 				Atom* newRoot = isolate.classdefTable.atoms.createNamespace(parentAtom, nmname);
@@ -301,6 +303,29 @@ namespace Mapping
 				newRoot->usedDefined = true;
 				// create a pseudo classdef to easily retrieve the real atom from a clid
 				isolate.classdefTable.registerAtom(newRoot);
+				atomStack.push_back(AtomStackFrame{*newRoot});
+				break;
+			}
+
+			case IR::ISA::Blueprint::unit:
+			{
+				assert(not atomStack.empty());
+				Atom& parentAtom = atomStack.back().currentAtomNotUnit();
+
+				Atom* newRoot;
+				{
+					MutexLocker locker{isolate.mutex};
+					newRoot = isolate.classdefTable.atoms.createUnit(parentAtom, currentFilename);
+					assert(newRoot != nullptr);
+					newRoot->usedDefined = true;
+					// create a pseudo classdef to easily retrieve the real atom from a clid
+					isolate.classdefTable.registerAtom(newRoot);
+				}
+
+				// update atomid
+				operands.atomid = newRoot->atomid;
+				assert(newRoot->atomid != 0);
+
 				atomStack.push_back(AtomStackFrame{*newRoot});
 				break;
 			}
@@ -365,7 +390,7 @@ namespace Mapping
 
 		Atom& parentAtom = atomStack.back().atom;
 		if (unlikely(parentAtom.atomid == 0))
-			return printError(operands, "invalid parent atom id");
+			return printError(operands, "mapping: invalid parent atom id");
 
 		// creating all related classdefs
 		// (take max with 1 to prevent against invalid opcode)
