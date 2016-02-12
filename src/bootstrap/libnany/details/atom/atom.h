@@ -358,6 +358,8 @@ namespace Nany
 		}
 		parameters;
 
+		//! Template parameters
+		std::unique_ptr<Parameters> tmplparams;
 
 		//! The maximum number of variables / classdefs registered for the atom
 		uint localVariablesCount = 0u;

@@ -154,6 +154,7 @@ namespace Mapping
 
 			case IR::ISA::Blueprint::param:
 			case IR::ISA::Blueprint::paramself:
+			case IR::ISA::Blueprint::tmplparam:
 			{
 				assert(not atomStack.empty());
 				auto& frame = atomStack.back();
@@ -166,14 +167,23 @@ namespace Mapping
 				if (unlikely(not checkForLVID(operands, paramLVID)))
 					return;
 
+				bool isTemplate = (kind == IR::ISA::Blueprint::tmplparam);
+
+				if (isTemplate and !frame.atom.tmplparams)
+					frame.atom.tmplparams = std::make_unique<Atom::Parameters>();
+
 				CLID clid {frame.atom.atomid, paramLVID};
 				AnyString name = currentSequence.stringrefs[operands.name];
-				frame.atom.parameters.append(clid, name);
+
+				auto& parameters = (not isTemplate)
+					? frame.atom.parameters
+					: *(frame.atom.tmplparams.get());
+				parameters.append(clid, name);
 
 				// keep somewhere that this definition is a variable instance
 				MutexLocker locker{isolate.mutex};
 				auto& cdef = isolate.classdefTable.classdef(clid);
-				cdef.instance = true;
+				cdef.instance = not isTemplate;
 				cdef.qualifiers.ref = false; // should not be 'ref' by default, contrary to all other classdefs
 				break;
 			}

@@ -112,7 +112,19 @@ namespace Instanciate
 			{
 				uint32_t sid  = operands.name;
 				uint32_t lvid = operands.lvid;
-				cdeftable.substitute(lvid).qualifiers.ref = false;
+				auto& cdef = cdeftable.substitute(lvid);
+				cdef.qualifiers.ref = false;
+				cdef.instance = true;
+				declareNamedVariable(currentSequence.stringrefs[sid], lvid, false);
+				break;
+			}
+			case IR::ISA::Blueprint::tmplparam: // -- template parameter
+			{
+				uint32_t sid  = operands.name;
+				uint32_t lvid = operands.lvid;
+				auto& cdef = cdeftable.substitute(lvid);
+				cdef.qualifiers.ref = false;
+				cdef.instance = false;
 				declareNamedVariable(currentSequence.stringrefs[sid], lvid, false);
 				break;
 			}

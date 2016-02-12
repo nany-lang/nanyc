@@ -224,6 +224,11 @@ namespace IR
 		uint32_t emitBlueprintParam(LVID, const AnyString&);
 		//! Emit a blueprint param opcode and give the offset of the instruction in the sequence
 		uint32_t emitBlueprintParam(LVID);
+		//! Emit a blueprint template param opcode and give the offset of the instruction in the sequence
+		uint32_t emitBlueprintTmplParam(LVID, const AnyString&);
+		//! Emit a blueprint template param opcode and give the offset of the instruction in the sequence
+		uint32_t emitBlueprintTmplParam(LVID);
+
 		//! Emit a blueprint vardef opcode
 		void emitBlueprintVardef(LVID, const AnyString&);
 

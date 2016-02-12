@@ -499,6 +499,30 @@ namespace IR
 		return offset;
 	}
 
+
+	inline uint32_t Sequence::emitBlueprintTmplParam(LVID lvid, const AnyString& name)
+	{
+		uint32_t offset = pSize;
+		auto& operands  = emit<ISA::Op::blueprint>();
+		operands.kind   = (uint32_t) IR::ISA::Blueprint::tmplparam;
+		operands.name   = stringrefs.ref(name);
+		operands.atomid = static_cast<uint32_t>(-1);
+		operands.setLVID(lvid);
+		return offset;
+	}
+
+	inline uint32_t Sequence::emitBlueprintTmplParam(LVID lvid)
+	{
+		uint32_t offset = pSize;
+		auto& operands  = emit<ISA::Op::blueprint>();
+		operands.kind   = (uint32_t) IR::ISA::Blueprint::tmplparam;
+		operands.name   = 0;
+		operands.atomid = static_cast<uint32_t>(-1);
+		operands.setLVID(lvid);
+		return offset;
+	}
+
+
 	inline uint32_t Sequence::emitBlueprintParam(LVID lvid, const AnyString& name)
 	{
 		uint32_t offset = pSize;

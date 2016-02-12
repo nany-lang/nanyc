@@ -60,8 +60,10 @@ namespace ISA //!< Instruction Set Architecture
 		classdef,
 		//! Typedef
 		typealias,
-		//! Parameter definition (for a function or a class)
+		//! Parameter definition (for a function)
 		param,
+		//! Template parameter
+		tmplparam,
 		//! Parameter definition, with auto assignment
 		paramself,
 		//! Namespace definition (one part of it)
