@@ -169,15 +169,11 @@ namespace Mapping
 
 				bool isTemplate = (kind == IR::ISA::Blueprint::tmplparam);
 
-				if (isTemplate and !frame.atom.tmplparams)
-					frame.atom.tmplparams = std::make_unique<Atom::Parameters>();
-
 				CLID clid {frame.atom.atomid, paramLVID};
 				AnyString name = currentSequence.stringrefs[operands.name];
 
 				auto& parameters = (not isTemplate)
-					? frame.atom.parameters
-					: *(frame.atom.tmplparams.get());
+					? frame.atom.parameters : frame.atom.tmplparams;
 				parameters.append(clid, name);
 
 				// keep somewhere that this definition is a variable instance

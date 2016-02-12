@@ -27,10 +27,11 @@ namespace TypeCheck
 			{
 				case Atom::Type::funcdef:
 				{
-					if (atom.parameters.size() != to.parameters.size())
+					uint32_t apsize = atom.parameters.size();
+					if (apsize != to.parameters.size())
 						return Match::none;
 
-					for (uint32_t p = 0; p != atom.parameters.size(); ++p)
+					for (uint32_t p = 0; p != apsize; ++p)
 					{
 						auto& atomParam = atom.parameters[p];
 						auto& toParam   = to.parameters[p];

@@ -135,25 +135,42 @@ namespace Nany
 	}
 
 
-	inline uint Atom::Parameters::size() const
+	template<class T>
+	inline void Atom::Parameters::each(const T& callback) const
 	{
-		return pCount;
+		if (!!pData)
+		{
+			uint32_t count = pData->count;
+			auto& params = pData->params;
+			for (uint32_t i = 0; i != count; ++i)
+			{
+				auto& pair = params[i];
+				callback(i, pair.first, pair.second);
+			}
+		}
 	}
 
+	inline uint Atom::Parameters::size() const
+	{
+		return (!!pData) ? pData.get()->count : 0;
+	}
 
 	inline bool Atom::Parameters::empty() const
 	{
-		return pCount == 0;
+		return !pData;
 	}
-
 
 	inline bool Atom::Parameters::append(const CLID& clid, const AnyString& name)
 	{
-		if (pCount < Config::maxPushedParameters)
+		if (!pData)
+			pData = std::make_unique<Data>();
+		auto& internal = *pData.get();
+
+		if (likely(internal.count < Config::maxPushedParameters))
 		{
-			pParams[pCount].first  = name;
-			pParams[pCount].second.clid = clid;
-			++pCount;
+			internal.params[internal.count].first  = name;
+			internal.params[internal.count].second.clid = clid;
+			++internal.count;
 			return true;
 		}
 		return false;
@@ -162,10 +179,15 @@ namespace Nany
 
 	inline yuint32 Atom::Parameters::findByName(const AnyString& name, yuint32 offset) const
 	{
-		for (uint i = offset; i < pCount; ++i)
+		if (!!pData)
 		{
-			if (name == pParams[i].first)
-				return i;
+			auto& internal = *pData.get();
+			uint32_t count = internal.count;
+			for (uint32_t i = offset; i < count; ++i)
+			{
+				if (name == internal.params[i].first)
+					return i;
+			}
 		}
 		return static_cast<yuint32>(-1);
 	}
@@ -173,21 +195,21 @@ namespace Nany
 
 	inline const AnyString& Atom::Parameters::name(uint index) const
 	{
-		assert(index < pCount);
-		return pParams[index].first;
+		assert(!!pData and index < pData->count);
+		return pData->params[index].first;
 	}
 
 	inline const Vardef& Atom::Parameters::vardef(uint index) const
 	{
-		assert(index < pCount);
-		return pParams[index].second;
+		assert(!!pData and index < pData->count);
+		return pData->params[index].second;
 	}
 
 
 	inline const std::pair<AnyString, Vardef>& Atom::Parameters::operator [] (uint index) const
 	{
-		assert(index < pCount);
-		return pParams[index];
+		assert(!!pData and index < pData->count);
+		return pData->params[index];
 	}
 
 

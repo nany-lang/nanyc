@@ -131,18 +131,16 @@ namespace Nany
 				if (name.startsWith("^default-var-%")) // keep it simple
 					break;
 
-				if (name[0] == '^')
+				if (name.first() == '^')
 					out << ' ';
 				out << '(';
 				bool first = true;
 
-				for (uint i = 0; i != parameters.size(); ++i)
+				parameters.each([&](uint32_t i, const AnyString& paramname, const Vardef& vardef)
 				{
-					AnyString paramname = parameters.name(i);
-
 					// avoid the first virtual parameter
 					if (i == 0 and paramname == "self")
-						continue;
+						return;
 
 					if (not first)
 						out << ", ";
@@ -150,7 +148,6 @@ namespace Nany
 
 					out << paramname;
 
-					const Vardef& vardef = parameters.vardef(i);
 					if (table)
 					{
 						if (table) // and table->hasClassdef(vardef.clid))
@@ -168,7 +165,7 @@ namespace Nany
 						if (not vardef.clid.isVoid())
 							out << ": any";
 					}
-				}
+				});
 				out << ')';
 
 				if (table)

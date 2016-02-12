@@ -80,7 +80,7 @@ namespace Nany
 		auto& paramdef = table.classdef(atom.parameters.vardef(index).clid);
 
 		resultinfo.strategy = TypeCheck::isSimilarTo(table, nullptr, cdef, paramdef, pAllowImplicit);
-		if (canGenerateReport and resultinfo.strategy == TypeCheck::Match::none)
+		if (unlikely(canGenerateReport) and resultinfo.strategy == TypeCheck::Match::none)
 		{
 			report.get().trace() << "failed to push value " << cdef.clid << " to parameter "
 				<< (CLID{atom.atomid,0})
@@ -121,7 +121,7 @@ namespace Nany
 		// trivial check, too many parameters for this overload
 		if (atom.parameters.size() < (uint32_t) input.indexedParams.size())
 		{
-			if (canGenerateReport)
+			if (unlikely(canGenerateReport))
 			{
 				// do not take into consideration the 'self' parameter for error reporting
 				uint selfidx = (atom.isClassMember() and atom.isFunction());
@@ -142,7 +142,7 @@ namespace Nany
 			result.params.resize(atom.parameters.size());
 
 			// trying to resolve indexed parameters (if they match)
-			for (uint i = 0; i != (uint) input.indexedParams.size(); ++i)
+			for (uint32_t i = 0; i != (uint32_t) input.indexedParams.size(); ++i)
 			{
 				switch (pushParameter(atom, i, input.indexedParams[i]))
 				{
@@ -155,16 +155,16 @@ namespace Nany
 			// try to resolve named-parameters
 			if (not input.namedParams.empty())
 			{
-				yuint32 offset = (yuint32) input.indexedParams.size();
+				uint32_t offset = (uint32_t) input.indexedParams.size();
 				for (auto& pair: input.namedParams)
 				{
-					yuint32 index = atom.parameters.findByName(pair.first, offset);
+					uint32_t index = atom.parameters.findByName(pair.first, offset);
 					// the named parameter is not present after indexed parameters
-					if (not (index < atom.parameters.size()))
+					if (index == static_cast<uint32_t>(-1))
 					{
 						//report.trace() << "named parameter '" << pair.first
 						//	<< "' not found after started from index " << offset << " in " << (CLID{atom.atomid,0});
-						if (canGenerateReport)
+						if (unlikely(canGenerateReport))
 							report.get().hint() << "named parameter '" << pair.first << "' not found after indexed parameters";
 						return TypeCheck::Match::none;
 					}
@@ -183,7 +183,7 @@ namespace Nany
 			{
 				if (nullptr == result.params[i].cdef or result.params[i].cdef->clid.isVoid()) // undefined - TODO: default values
 				{
-					if (canGenerateReport)
+					if (unlikely(canGenerateReport))
 					{
 						auto ix = i;
 						if (not atom.isClassMember())
@@ -214,7 +214,7 @@ namespace Nany
 					auto& atomRettype = table.classdef(atom.returnType.clid);
 					if (TypeCheck::Match::none == TypeCheck::isSimilarTo(table, nullptr, wantedRettype, atomRettype, pAllowImplicit))
 					{
-						if (canGenerateReport)
+						if (unlikely(canGenerateReport))
 						{
 							auto err = report.get().hint() << "returned type does not match, got '";
 							atomRettype.print(err.message.message, table, false);
@@ -235,7 +235,7 @@ namespace Nany
 					auto& atomRettype = table.classdef(atom.returnType.clid);
 					if (unlikely(not atomRettype.isVoid()))
 					{
-						if (canGenerateReport)
+						if (unlikely(canGenerateReport))
 						{
 							auto err = report.get().hint() << "returned type does not match, got '";
 							atomRettype.print(err.message.message, table, false);

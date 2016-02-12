@@ -17,22 +17,24 @@ namespace Instanciate
 	{
 		assert(not atomStack.empty());
 
-		// cloning function parameters
+		//
+		// cloning all function parameters (only non-ref parameters)
+		//
 		auto& frame = atomStack.back();
-		assert(frame.atom.isFunction());
 		if (frame.atom.isFunction())
 		{
 			uint32_t count = frame.atom.parameters.size();
-			for (uint32_t i = 0; i != count; ++i)
+			frame.atom.parameters.each([&](uint32_t i, const AnyString&, const Vardef& vardef)
 			{
-				auto& cdef = cdeftable.classdef(frame.atom.parameters.vardef(i).clid);
-				if (not cdef.qualifiers.ref)
+				if (not cdeftable.classdef(vardef.clid).qualifiers.ref)
 				{
-					// a register has been reserved for cloning parameters
-					uint32_t lvid = i + 1 + 1; // 1 based, 1: return type
+					// a register has already been reserved for cloning parameters
+					uint32_t lvid  = i + 1 + 1; // 1 based, 1: return type
 					uint32_t clone = 2 + count + i;
 
-					out.emitComment(String{} << "\n -----   ---- deep copy param " << i);
+					if (debugmode)
+						out.emitComment(String{} << "\n ----- ---- deep copy parameter " << i);
+
 					instanciateAssignment(frame, clone, lvid, false, false, true);
 
 					if (canBeAcquired(lvid))
@@ -40,28 +42,40 @@ namespace Instanciate
 						frame.lvids[lvid].autorelease = true;
 						frame.lvids[clone].autorelease = false;
 					}
-
 					// register swap
 					out.emitStore(lvid, clone);
 
-					out.emitComment("--\n");
+					if (debugmode)
+						out.emitComment("--\n");
 				}
-			}
+			});
 		}
 
 		// generating some code on the fly
+
+		//
+		// variables initialization (ctor)
+		//
 		if (generateClassVarsAutoInit)
 		{
 			generateClassVarsAutoInit = false;
 			if (canGenerateCode())
 				generateMemberVarDefaultInitialization();
 		}
+
+		//
+		// variables destruction (dtor)
+		//
 		if (generateClassVarsAutoRelease)
 		{
 			generateClassVarsAutoRelease = false;
 			if (canGenerateCode())
 				generateMemberVarDefaultDispose();
 		}
+
+		//
+		// variables cloning (copy ctor)
+		//
 		if (generateClassVarsAutoClone)
 		{
 			generateClassVarsAutoClone = false;

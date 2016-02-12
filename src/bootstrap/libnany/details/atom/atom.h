@@ -56,6 +56,42 @@ namespace Nany
 			unit,
 		};
 
+		struct Parameters final
+		{
+			//! Get the total number of parameters
+			uint size() const;
+			//! Get if empty
+			bool empty() const;
+			//! Add a new parameter
+			bool append(const CLID&, const AnyString& name);
+			//! Try to find a parameter index from its name
+			yuint32 findByName(const AnyString& name, yuint32 offset = 0) const;
+
+			const std::pair<AnyString, Vardef>& operator [] (uint index) const;
+
+			//! Parameter name
+			const AnyString& name(uint index) const;
+			//! Var def
+			const Vardef& vardef(uint index) const;
+
+			//! Iterate through all parameters
+			// \param callbakc void()(uint32_t index, const AnyString& name, const Vardef& vardef)
+			template<class T> void each(const T& callback) const;
+
+			//! Shortcircuit value (if applicable)
+			// \TODO ishortcircuitvalue: this property is only used twice...
+			bool shortcircuitValue = false;
+
+		private:
+			struct Data final {
+				yuint32 count = 0u;
+				std::pair<AnyString, Vardef> params[Config::maxFuncDeclParameterCount];
+			};
+			std::unique_ptr<Data> pData;
+		};
+
+
+	public:
 		//! Create a dummy atom
 		static Atom* createDummy();
 
@@ -274,9 +310,9 @@ namespace Nany
 		{
 			//! Field index within the class (before optimization)
 			// \note This value is used internally for mapping
-			uint32_t fieldindex = 0;
+			uint16_t fieldindex = 0;
 			//! Effective field index for runtime
-			uint32_t effectiveFieldIndex = 0;
+			uint16_t effectiveFieldIndex = 0;
 		}
 		varinfo;
 
@@ -287,7 +323,7 @@ namespace Nany
 			//! Flag to determine whether the class has already been instanciated or not
 			bool isInstanciated = false;
 			//! Next field index for new variable members
-			uint32_t nextFieldIndex = 0;
+			uint16_t nextFieldIndex = 0;
 
 			//! Direct access to the destructor (used for reduce compilation time)
 			struct {
@@ -330,36 +366,10 @@ namespace Nany
 		//! The return type
 		Vardef returnType;
 
-		struct Parameters final
-		{
-			//! Get the total number of parameters
-			uint size() const;
-			//! Get if empty
-			bool empty() const;
-			//! Add a new parameter
-			bool append(const CLID&, const AnyString& name);
-			//! Try to find a parameter index from its name
-			yuint32 findByName(const AnyString& name, yuint32 offset = 0) const;
-
-			const std::pair<AnyString, Vardef>& operator [] (uint index) const;
-
-			//! Parameter name
-			const AnyString& name(uint index) const;
-			//! Var def
-			const Vardef& vardef(uint index) const;
-
-			//! Shortcircuit value (if applicable)
-			// \TODO ishortcircuitvalue: this property is only used twice...
-			bool shortcircuitValue = false;
-
-		private:
-			yuint32 pCount = 0u;
-			std::pair<AnyString, Vardef> pParams[Config::maxFuncDeclParameterCount];
-		}
-		parameters;
-
+		//! Parameters (for functions)
+		Parameters parameters;
 		//! Template parameters
-		std::unique_ptr<Parameters> tmplparams;
+		Parameters tmplparams;
 
 		//! The maximum number of variables / classdefs registered for the atom
 		uint localVariablesCount = 0u;
@@ -387,14 +397,14 @@ namespace Nany
 		//! A different scope for name resolution, if not null
 		Atom* scopeForNameResolution = nullptr;
 
-		//! True if the atom has been defined by the user
-		bool usedDefined = false;
-
 		//! Name of the current atom
 		AnyString name;
 
 		//! Flag to suppress spurious error messages and code generation
 		bool hasErrors = false;
+
+		//! True if the atom has been defined by the user
+		bool usedDefined = false;
 
 		//! Can be used for error reporting
 		bool canBeSuggestedInErrReporting = true;
