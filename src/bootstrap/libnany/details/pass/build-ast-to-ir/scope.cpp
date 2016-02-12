@@ -15,7 +15,7 @@ namespace Producer
 {
 
 
-	bool Scope::ICEUnexpectedNode(Node& node, const AnyString& location) const
+	bool Scope::ICEUnexpectedNode(const Node& node, const AnyString& location) const
 	{
 		if (not Nany::ASTRuleIsError(node.rule))
 		{
@@ -47,7 +47,7 @@ namespace Producer
 	}
 
 
-	Logs::Report Scope::ICE(Node& node) const
+	Logs::Report Scope::ICE(const Node& node) const
 	{
 		auto ice = context.report.ICE();
 		setErrorFrom(ice, node);
@@ -95,7 +95,7 @@ namespace Producer
 	}
 
 
-	AnyString Scope::getSymbolNameFromASTNode(Node& node)
+	AnyString Scope::getSymbolNameFromASTNode(const Node& node)
 	{
 		assert(node.rule == rgSymbolName);
 		assert(node.children.size() == 1);

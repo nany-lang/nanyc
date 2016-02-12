@@ -44,35 +44,35 @@ namespace Producer
 		//! Visit an unknown node
 		bool visitAST(Node&);
 
-		bool visitASTStmt(Node&);
-		bool visitASTFunc(Node&);
-		bool visitASTClass(Node&, LVID* localvar = nullptr);
-		bool visitASTType(Node&, LVID& localvar);
-		bool visitASTTypedef(Node&);
+		bool visitASTStmt(const Node&);
+		bool visitASTFunc(const Node&);
+		bool visitASTClass(const Node&, LVID* localvar = nullptr);
+		bool visitASTType(const Node&, LVID& localvar);
+		bool visitASTTypedef(const Node&);
 
-		bool visitASTVar(Node&);
-		bool visitASTVarValueInitialization(LVID&, Node&, const Node&, const AnyString&);
+		bool visitASTVar(const Node&);
+		bool visitASTVarValueInitialization(LVID&, const Node&, const Node&, const AnyString&);
 
-		bool visitASTExpr(Node&, LVID& localvar, bool allowScope = false);
-		bool visitASTExprIntrinsic(Node&, LVID& localvar);
-		bool visitASTExprReturn(Node&);
-		bool visitASTExprContinuation(Node&, LVID& localvar, bool allowScope = false);
-		bool visitASTExprIdentifier(Node&, LVID& localvar);
+		bool visitASTExpr(const Node&, LVID& localvar, bool allowScope = false);
+		bool visitASTExprIntrinsic(const Node&, LVID& localvar);
+		bool visitASTExprReturn(const Node&);
+		bool visitASTExprContinuation(const Node&, LVID& localvar, bool allowScope = false);
+		bool visitASTExprIdentifier(const Node&, LVID& localvar);
 		bool visitASTExprCall(const Node*, LVID& localvar, const Node* parent = nullptr); // func call
 		bool visitASTExprCallParameters(const Node&, uint32_t shortcircuitlabel = 0); // parameters of a func call
-		bool visitASTExprSubDot(Node&, LVID& localvar);
-		bool visitASTExprScope(Node&);
-		bool visitASTExprNumber(Node&, LVID& localvar);
-		bool visitASTExprString(Node&, LVID& localvar);
-		bool visitASTExprStringLiteral(Node&, LVID& localvar);
+		bool visitASTExprSubDot(const Node&, LVID& localvar);
+		bool visitASTExprScope(const Node&);
+		bool visitASTExprNumber(const Node&, LVID& localvar);
+		bool visitASTExprString(const Node&, LVID& localvar);
+		bool visitASTExprStringLiteral(const Node&, LVID& localvar);
 		bool visitASTExprNew(const Node&, LVID& localvar);
-		bool visitASTExprTypeDecl(Node&, LVID& localvar);
-		bool visitASTExprTypeof(Node&, LVID& localvar);
-		bool visitASTExprIfStmt(Node&);
-		bool visitASTExprIfExpr(Node&, LVID& localvar);
-		bool visitASTExprWhile(Node&);
-		bool visitASTExprDoWhile(Node&);
-		bool visitASTExprSwitch(Node&);
+		bool visitASTExprTypeDecl(const Node&, LVID& localvar);
+		bool visitASTExprTypeof(const Node&, LVID& localvar);
+		bool visitASTExprIfStmt(const Node&);
+		bool visitASTExprIfExpr(const Node&, LVID& localvar);
+		bool visitASTExprWhile(const Node&);
+		bool visitASTExprDoWhile(const Node&);
+		bool visitASTExprSwitch(const Node&);
 		//@}
 
 
@@ -114,8 +114,8 @@ namespace Producer
 		void addDebugCurrentPosition(uint line, uint offset);
 		void fetchLineAndOffsetFromNode(const Node& node, yuint32& line, yuint32& offset) const;
 
-		bool generateIfStmt(Node& expr, Node& thenc, Node* elsec = nullptr, uint32_t* customjmpthenOffset = nullptr);
-		bool generateIfExpr(uint32_t& ifret, Node& expr, Node& thenc, Node& elsec);
+		bool generateIfStmt(const Node& expr, const Node& thenc, const Node* elsec = nullptr, uint32_t* customjmpthenOffset = nullptr);
+		bool generateIfExpr(uint32_t& ifret, const Node& expr, const Node& thenc, const Node& elsec);
 
 
 		//! \name Utilities
@@ -129,7 +129,7 @@ namespace Producer
 		bool hasDebuginfo() const;
 
 		//! Get the name from a 'symbol-name' node (empty if error)
-		AnyString getSymbolNameFromASTNode(Node& node);
+		AnyString getSymbolNameFromASTNode(const Node& node);
 		//@}
 
 
@@ -139,10 +139,10 @@ namespace Producer
 		Logs::Report& report();
 		//! Generate an error "ICE: unexecpected node..."
 		// \return Always false
-		bool ICEUnexpectedNode(Node& node, const AnyString& location) const;
+		bool ICEUnexpectedNode(const Node& node, const AnyString& location) const;
 		//! Generate an error "ICE: <msg>"
 		// \return Always false
-		Logs::Report ICE(Node& node) const;
+		Logs::Report ICE(const Node& node) const;
 
 		Logs::Report error(const Node& node);
 		Logs::Report warning(const Node& node);

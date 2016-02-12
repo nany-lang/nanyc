@@ -231,7 +231,7 @@ namespace Producer
 
 
 
-	bool Scope::visitASTExprNumber(Node& node, yuint32& localvar)
+	bool Scope::visitASTExprNumber(const Node& node, yuint32& localvar)
 	{
 		assert(node.rule == rgNumber);
 		assert(not node.children.empty());

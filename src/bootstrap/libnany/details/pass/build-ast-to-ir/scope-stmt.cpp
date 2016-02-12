@@ -14,7 +14,7 @@ namespace Producer
 {
 
 
-	bool Scope::visitASTStmt(Node& orignode)
+	bool Scope::visitASTStmt(const Node& orignode)
 	{
 		auto& node = (orignode.rule == rgExpr
 			and orignode.children.size() == 1 and orignode.children[0]->rule == rgExprValue)

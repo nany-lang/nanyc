@@ -33,14 +33,14 @@ namespace Producer
 			//! Default
 			FuncInspector(Scope& scope);
 
-			bool inspect(Node& node);
+			bool inspect(const Node& node);
 
 
 		public:
 			//! Parent scope
 			Scope& scope;
 			//! Func body
-			Node* body = nullptr;
+			const Node* body = nullptr;
 
 			//! name of the function
 			FuncnameType funcname;
@@ -50,12 +50,12 @@ namespace Producer
 
 
 		private:
-			bool inspectVisibility(Node&);
-			bool inspectKind(Node&);
-			bool inspectParameters(Node*);
-			bool inspectReturnType(Node&);
-			bool inspectSingleParameter(uint pindex, Node&, uint32_t paramoffset);
-			bool inspectAttributes(Node&);
+			bool inspectVisibility(const Node&);
+			bool inspectKind(const Node&);
+			bool inspectParameters(const Node*);
+			bool inspectReturnType(const Node&);
+			bool inspectSingleParameter(uint pindex, const Node&, uint32_t paramoffset);
+			bool inspectAttributes(const Node&);
 
 		private:
 			bool pWithinClass = false;
@@ -74,7 +74,7 @@ namespace Producer
 		{}
 
 
-		inline bool FuncInspector::inspectVisibility(Node& node)
+		inline bool FuncInspector::inspectVisibility(const Node& node)
 		{
 			bool success = true;
 
@@ -115,7 +115,7 @@ namespace Producer
 		}
 
 
-		inline bool FuncInspector::inspectKind(Node& node)
+		inline bool FuncInspector::inspectKind(const Node& node)
 		{
 			if (unlikely(node.children.size() != 1))
 				return scope.ICEUnexpectedNode(node, "[funckind/child]");
@@ -165,7 +165,7 @@ namespace Producer
 		}
 
 
-		inline bool FuncInspector::inspectSingleParameter(uint pindex, Node& node, uint32_t paramoffset)
+		inline bool FuncInspector::inspectSingleParameter(uint pindex, const Node& node, uint32_t paramoffset)
 		{
 			assert(node.rule == rgFuncParam and "invalid func param node");
 
@@ -296,7 +296,7 @@ namespace Producer
 		}
 
 
-		bool FuncInspector::inspectParameters(Node* node)
+		bool FuncInspector::inspectParameters(const Node* node)
 		{
 			// total number of parameters
 			uint32_t paramCount;
@@ -380,7 +380,7 @@ namespace Producer
 		}
 
 
-		inline bool FuncInspector::inspectReturnType(Node& node)
+		inline bool FuncInspector::inspectReturnType(const Node& node)
 		{
 			assert(node.rule == rgFuncReturnType and "invalid return type node");
 			if (debugmode)
@@ -420,7 +420,7 @@ namespace Producer
 		}
 
 
-		bool FuncInspector::inspectAttributes(Node& node)
+		bool FuncInspector::inspectAttributes(const Node& node)
 		{
 			assert(node.rule == rgAttributes);
 			auto& out = scope.sequence();
@@ -490,14 +490,14 @@ namespace Producer
 
 
 
-		inline bool FuncInspector::inspect(Node& node)
+		inline bool FuncInspector::inspect(const Node& node)
 		{
 			// exit status
 			bool success = true;
 			// the node related to parameters
-			Node* nodeParams = nullptr;
+			const Node* nodeParams = nullptr;
 			// the node related to the return type
-			Node* nodeReturnType = nullptr;
+			const Node* nodeReturnType = nullptr;
 
 			for (auto& childptr: node.children)
 			{
@@ -546,7 +546,7 @@ namespace Producer
 
 
 
-	bool Scope::visitASTFunc(Node& node)
+	bool Scope::visitASTFunc(const Node& node)
 	{
 		assert(node.rule == rgFunction);
 		assert(not node.children.empty());
@@ -572,7 +572,7 @@ namespace Producer
 		bool isOperator = false;
 
 		// evaluate the whole function, and grab the node body for continuing evaluation
-		Node* body = ([&]() -> Node*
+		auto* body = ([&]() -> const Node*
 		{
 			FuncInspector inspector{scope};
 			success = inspector.inspect(node);
@@ -601,7 +601,7 @@ namespace Producer
 		sequence().emitEnd();
 		uint32_t blpsize = sequence().opcodeCount() - bpoffset;
 		sequence().at<ISA::Op::pragma>(bpoffsiz).value.blueprintsize = blpsize;
-		sequence().at<ISA::Op::stacksize>(bpoffsck).add = scope.pNextVarID + 1;
+		sequence().at<ISA::Op::stacksize>(bpoffsck).add = scope.pNextVarID + 1u;
 		return success;
 	}
 

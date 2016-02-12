@@ -15,7 +15,7 @@ namespace Producer
 {
 
 
-	bool Scope::visitASTExprWhile(Node& node)
+	bool Scope::visitASTExprWhile(const Node& node)
 	{
 		assert(node.rule == rgWhile);
 		assert(not node.children.empty());
@@ -82,7 +82,7 @@ namespace Producer
 	}
 
 
-	bool Scope::visitASTExprDoWhile(Node& node)
+	bool Scope::visitASTExprDoWhile(const Node& node)
 	{
 		assert(node.rule == rgDoWhile);
 		assert(not node.children.empty());

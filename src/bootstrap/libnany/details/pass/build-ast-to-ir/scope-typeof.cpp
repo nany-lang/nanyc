@@ -14,7 +14,8 @@ namespace IR
 namespace Producer
 {
 
-	bool Scope::visitASTExprTypeof(Node& node, LVID& localvar)
+
+	bool Scope::visitASTExprTypeof(const Node& node, LVID& localvar)
 	{
 		assert(node.rule == rgTypeof);
 
@@ -25,26 +26,21 @@ namespace Producer
 		for (auto& childptr: node.children)
 		{
 			auto& child = *childptr;
-			switch (child.rule)
+			if (child.rule == rgCall)
 			{
-				case rgCall:
+				if (child.children.size() != 1)
 				{
-					if (child.children.size() != 1)
-					{
-						error(child) << "invalid number of parameters for typeof-expression";
-						return false;
-					}
-					auto& parameter = *(child.children[0]);
-					if (parameter.rule != rgCallParameter or parameter.children.size() != 1)
-						return ICEUnexpectedNode(parameter, "ir/typeof/param");
-
-					expr = Node::Ptr::WeakPointer(parameter.children[0]);
-					break;
+					error(child) << "invalid number of parameters for typeof-expression";
+					return false;
 				}
+				auto& parameter = *(child.children[0]);
+				if (parameter.rule != rgCallParameter or parameter.children.size() != 1)
+					return ICEUnexpectedNode(parameter, "ir/typeof/param");
 
-				default:
-					return ICEUnexpectedNode(child, "[ir/typeof]");
+				expr = Node::Ptr::WeakPointer(parameter.children[0]);
 			}
+			else
+				return ICEUnexpectedNode(child, "[ir/typeof]");
 		}
 
 		if (unlikely(nullptr == expr))

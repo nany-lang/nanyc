@@ -28,21 +28,21 @@ namespace Producer
 		public:
 			ClassInspector(Scope& scope);
 
-			bool inspect(Node& node);
+			bool inspect(const Node& node);
 
 
 		public:
 			//! Parent scope
 			Scope& scope;
 			//! Class body
-			Node* body = nullptr;
+			const Node* body = nullptr;
 
 			//! name of the class (if any)
 			ClassnameType classname;
 
 
 		private:
-			bool inspectClassname(Node&);
+			bool inspectClassname(const Node&);
 			void createDefaultOperators();
 
 		}; // class ClassInspector
@@ -57,7 +57,7 @@ namespace Producer
 		}
 
 
-		inline bool ClassInspector::inspectClassname(Node& node)
+		inline bool ClassInspector::inspectClassname(const Node& node)
 		{
 			classname = scope.getSymbolNameFromASTNode(node);
 			return not classname.empty()
@@ -65,7 +65,7 @@ namespace Producer
 		}
 
 
-		inline bool ClassInspector::inspect(Node& node)
+		inline bool ClassInspector::inspect(const Node& node)
 		{
 			// exit status
 			bool success = true;
@@ -122,7 +122,7 @@ namespace Producer
 
 
 
-	bool Scope::visitASTClass(Node& node, LVID* /*localvar*/)
+	bool Scope::visitASTClass(const Node& node, LVID* /*localvar*/)
 	{
 		assert(node.rule == rgClass);
 		assert(not node.children.empty());
@@ -148,7 +148,7 @@ namespace Producer
 		bool success = true;
 
 		// evaluate the whole function, and grab the node body for continuing evaluation
-		Node* body = ([&]() -> Node*
+		auto* body = ([&]() -> const Node*
 		{
 			ClassInspector inspector{scope};
 			success = inspector.inspect(node);
@@ -173,7 +173,7 @@ namespace Producer
 		out.emitEnd();
 		uint32_t blpsize = out.opcodeCount() - bpoffset;
 		out.at<ISA::Op::pragma>(bpoffsiz).value.blueprintsize = blpsize;
-		out.at<ISA::Op::stacksize>(bpoffsck).add = scope.pNextVarID + 1;
+		out.at<ISA::Op::stacksize>(bpoffsck).add = scope.pNextVarID + 1u;
 		return success;
 	}
 

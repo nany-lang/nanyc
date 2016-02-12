@@ -20,7 +20,7 @@ namespace Producer
 
 
 	inline bool
-	Scope::visitASTVarValueInitialization(LVID& localvar, Node& varAssign, const Node& varnodeDecl, const AnyString& varname)
+	Scope::visitASTVarValueInitialization(LVID& localvar, const Node& varAssign, const Node& varnodeDecl, const AnyString& varname)
 	{
 		for (auto& assignptr: varAssign.children)
 		{
@@ -159,7 +159,7 @@ namespace Producer
 
 
 
-	bool Scope::visitASTVar(Node& node)
+	bool Scope::visitASTVar(const Node& node)
 	{
 		assert(node.rule == rgVar);
 		assert(not node.children.empty());

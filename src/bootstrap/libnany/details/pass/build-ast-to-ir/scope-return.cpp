@@ -14,7 +14,7 @@ namespace Producer
 {
 
 
-	bool Scope::visitASTExprReturn(Node& node)
+	bool Scope::visitASTExprReturn(const Node& node)
 	{
 		assert(node.rule == rgReturn);
 		// assert(not node.children.empty()); -- a return may be empty

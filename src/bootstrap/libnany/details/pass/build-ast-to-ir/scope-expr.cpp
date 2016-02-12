@@ -15,7 +15,7 @@ namespace IR
 namespace Producer
 {
 
-	inline bool Scope::visitASTExprIdentifier(Node& node, LVID& localvar)
+	inline bool Scope::visitASTExprIdentifier(const Node& node, LVID& localvar)
 	{
 		// value fetching
 		emitDebugpos(node);
@@ -27,13 +27,13 @@ namespace Producer
 	}
 
 
-	inline bool Scope::visitASTExprSubDot(Node& node, LVID& localvar)
+	inline bool Scope::visitASTExprSubDot(const Node& node, LVID& localvar)
 	{
 		return visitASTExprContinuation(node, localvar);
 	}
 
 
-	bool Scope::visitASTExprContinuation(Node& node, LVID& localvar, bool allowScope)
+	bool Scope::visitASTExprContinuation(const Node& node, LVID& localvar, bool allowScope)
 	{
 		bool success = true;
 		for (auto& childptr: node.children)
@@ -77,7 +77,7 @@ namespace Producer
 	}
 
 
-	bool Scope::visitASTExpr(Node& orignode, LVID& localvar, bool allowScope)
+	bool Scope::visitASTExpr(const Node& orignode, LVID& localvar, bool allowScope)
 	{
 		assert(not orignode.children.empty());
 

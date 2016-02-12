@@ -15,11 +15,11 @@ namespace IR
 namespace Producer
 {
 
-	bool Scope::visitASTTypedef(Node& node)
+	bool Scope::visitASTTypedef(const Node& node)
 	{
 		assert(node.rule == rgTypedef);
 		AnyString typedefname;
-		Node* typeexpr = nullptr;
+		const Node* typeexpr = nullptr;
 
 		for (auto& childptr: node.children)
 		{

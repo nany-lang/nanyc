@@ -17,7 +17,7 @@ namespace Producer
 {
 
 
-	bool Scope::visitASTExprSwitch(Node& node)
+	bool Scope::visitASTExprSwitch(const Node& node)
 	{
 		assert(node.rule == rgSwitch);
 		bool success = true;

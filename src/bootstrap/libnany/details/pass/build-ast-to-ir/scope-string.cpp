@@ -15,7 +15,7 @@ namespace IR
 namespace Producer
 {
 
-	bool Scope::visitASTExprStringLiteral(Node& node, LVID& localvar)
+	bool Scope::visitASTExprStringLiteral(const Node& node, LVID& localvar)
 	{
 		// when called, this rule represents an internal cstring
 		// thus, this function is not called by an user-defined string
@@ -25,7 +25,7 @@ namespace Producer
 	}
 
 
-	bool Scope::visitASTExprString(Node& node, yuint32& localvar)
+	bool Scope::visitASTExprString(const Node& node, yuint32& localvar)
 	{
 		assert(node.rule == rgString);
 

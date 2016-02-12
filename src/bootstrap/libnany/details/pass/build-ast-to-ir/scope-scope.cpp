@@ -14,7 +14,7 @@ namespace Producer
 {
 
 
-	bool Scope::visitASTExprScope(Node& node)
+	bool Scope::visitASTExprScope(const Node& node)
 	{
 		if (unlikely(kind != Kind::kfunc))
 		{

@@ -14,7 +14,7 @@ namespace IR
 namespace Producer
 {
 
-	bool Scope::visitASTExprTypeDecl(Node& node, LVID& localvar)
+	bool Scope::visitASTExprTypeDecl(const Node& node, LVID& localvar)
 	{
 		assert(node.rule == rgTypeDecl);
 		localvar = 0;
@@ -56,7 +56,7 @@ namespace Producer
 
 
 
-	bool Scope::visitASTType(Node& node, LVID& localvar)
+	bool Scope::visitASTType(const Node& node, LVID& localvar)
 	{
 		assert(node.rule == rgType);
 		assert(not node.children.empty());
