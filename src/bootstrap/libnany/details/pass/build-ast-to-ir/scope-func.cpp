@@ -47,8 +47,6 @@ namespace Producer
 			//! Flag to remember if the function is the new operator
 			// (for 'self' parameters for example)
 			bool isNewOperator = false;
-			// number of parameters of the function
-			uint paramCount = 0;
 
 
 		private:
@@ -300,21 +298,24 @@ namespace Producer
 
 		bool FuncInspector::inspectParameters(Node* node)
 		{
+			// total number of parameters
+			uint32_t paramCount;
+
 			if (node != nullptr)
 			{
 				assert(node->rule == rgFuncParams and "invalid func params node");
 				// determining the total number of parameters for the function
 				// if within a class, a implicit parameter 'self' will be added to each function
-				paramCount = (uint) node->children.size();
+				paramCount = static_cast<uint32_t>(node->children.size());
 			}
 			else
-				paramCount = 0;
+				paramCount = 0u;
 
 			if (pWithinClass)
 				++paramCount; // self
 
 			// no parameter (not even 'self'), nothing to do here !
-			if (paramCount == 0)
+			if (paramCount == 0u)
 				return true;
 
 
@@ -323,8 +324,8 @@ namespace Producer
 			if (unlikely(paramCount > Config::maxFuncDeclParameterCount - 1)) // too many parameters ?
 			{
 				assert(node != nullptr);
-				scope.error(*node) << "hard limit: too many parameters. Got " << paramCount << ", expected: "
-					<< (Config::maxFuncDeclParameterCount - 1);
+				scope.error(*node) << "hard limit: too many parameters. Got "
+					<< paramCount << ", expected: " << (Config::maxFuncDeclParameterCount - 1);
 				success = false;
 				paramCount = Config::maxFuncDeclParameterCount - 1;
 			}
@@ -343,35 +344,35 @@ namespace Producer
 			}
 
 			// iterating through all other user-defined parameters
-			uint offset = (pWithinClass) ? 1 : 0;
-			if (paramCount - offset > 0)
+			uint32_t offset = (pWithinClass) ? 1u : 0u;
+			if (paramCount - offset > 0U)
 			{
 				// already checked before
 				assert(paramCount - offset < Config::maxPushedParameters);
 
 				// adding all parameters first
 				uint32_t paramOffsets[Config::maxPushedParameters];
-				for (uint i = offset; i < paramCount; ++i) // reserving lvid for each parameter
+				for (uint32_t i = offset; i < paramCount; ++i) // reserving lvid for each parameter
 				{
 					auto opaddr = out.emitBlueprintParam(scope.nextvar(), nullptr);
 					paramOffsets[i - offset] = opaddr;
 				}
 
 				// reserve registers as many as parameters for cloning parameters
-				for (uint32_t i = 0; i != paramCount; ++i)
+				for (uint32_t i = 0u; i != paramCount; ++i)
 					out.emitStore(scope.nextvar(), nyt_any);
 
 				// inspecting each parameter
 				out.emitComment("parameters definition");
 
 				assert(node != nullptr and "should not be here if there is no real parameter");
-				for (uint i = offset; i < paramCount; ++i)
+				for (uint32_t i = offset; i < paramCount; ++i)
 					success &= inspectSingleParameter(i, *(node->children[i - offset]), paramOffsets[i - offset]);
 			}
 			else
 			{
 				// produce reserved registers for consistency, even if not used
-				for (uint32_t i = 0; i != paramCount; ++i)
+				for (uint32_t i = 0u; i != paramCount; ++i)
 					out.emitStore(scope.nextvar(), nyt_any);
 			}
 
