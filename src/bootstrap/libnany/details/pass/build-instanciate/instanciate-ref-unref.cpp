@@ -23,18 +23,17 @@ namespace Instanciate
 		if (not canBeAcquired(cdef)) // do nothing if builtin
 			return;
 
-
 		auto* atom = cdeftable.findClassdefAtom(cdef);
 		if (unlikely(nullptr == atom))
 		{
 			ICE() << "invalid atom for 'unref' opcode";
-			return;
+			return frame.invalidate(lvid);
 		}
 
 		if (0 == atom->classinfo.dtor.atomid)
 		{
 			if (unlikely(not instanciateAtomClassDestructor(*atom, lvid)))
-				return;
+				return frame.invalidate(lvid);
 			assert(atom->classinfo.dtor.atomid != 0);
 		}
 
