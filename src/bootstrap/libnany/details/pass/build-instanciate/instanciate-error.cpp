@@ -254,13 +254,16 @@ namespace Instanciate
 	void SequenceBuilder::complainUnusedVariable(const AtomStackFrame& frame, uint32_t lvid) const
 	{
 		auto& lvidinfo = frame.lvids[lvid];
-		auto err = warning();
+		if (not lvidinfo.errorReported)
+		{
+			auto err = warning();
 
-		lvidinfo.fillLogEntryWithLocation(err);
-		err << "unused variable '" << lvidinfo.userDefinedName << "' in '";
-		err << cdeftable.keyword(frame.atom) << ' ';
-		frame.atom.retrieveCaption(err.data().message, cdeftable);
-		err << '\'';
+			lvidinfo.fillLogEntryWithLocation(err);
+			err << "unused variable '" << lvidinfo.userDefinedName << "' in '";
+			err << cdeftable.keyword(frame.atom) << ' ';
+			frame.atom.retrieveCaption(err.data().message, cdeftable);
+			err << '\'';
+		}
 	}
 
 
