@@ -65,9 +65,7 @@ namespace Instanciate
 			case IR::ISA::Blueprint::classdef:
 			{
 				// reset
-				lastPushedNamedParameters.clear();
-				lastPushedIndexedParameters.clear();
-
+				pushedparams.clear();
 				generateClassVarsAutoInit = false;
 				generateClassVarsAutoRelease = false;
 				lastOpcodeStacksizeOffset = (uint32_t) -1;
@@ -170,20 +168,20 @@ namespace Instanciate
 						atom->returnType.clid.reclass(frame.atomid, operands.lvid);
 					}
 				}
+				pushedparams.clear();
 				break;
 			}
 
 			case IR::ISA::Blueprint::typealias:
 			{
+				pushedparams.clear();
 				break;
 			}
 
 			case IR::ISA::Blueprint::unit:
 			{
 				// reset
-				lastPushedNamedParameters.clear();
-				lastPushedIndexedParameters.clear();
-
+				pushedparams.clear();
 				generateClassVarsAutoInit = false;
 				generateClassVarsAutoRelease = false;
 

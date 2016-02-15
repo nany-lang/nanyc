@@ -377,6 +377,14 @@ namespace ISA
 		uint32_t name; // if named parameter
 	};
 
+	template<> struct Operand<Nany::IR::ISA::Op::tpush> final
+	{
+		constexpr static const char* opname() { return "tpush"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		uint32_t name; // if named parameter
+	};
+
 	template<> struct Operand<Nany::IR::ISA::Op::call> final
 	{
 		constexpr static const char* opname() { return "call"; }

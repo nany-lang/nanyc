@@ -229,6 +229,7 @@ addsrc(
 	"details/pass/build-instanciate/instanciate-stacksize.cpp"
 	"details/pass/build-instanciate/instanciate-alias.cpp"
 	"details/pass/build-instanciate/instanciate-store.cpp"
+	"details/pass/build-instanciate/instanciate-push.cpp"
 	"details/pass/build-instanciate/instanciate-builtin.cpp"
 	"details/pass/build-instanciate/instanciate-call.cpp"
 	"details/pass/build-instanciate/instanciate-sizeof.cpp"

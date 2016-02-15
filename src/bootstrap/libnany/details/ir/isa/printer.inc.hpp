@@ -291,6 +291,21 @@ namespace // anonymous
 			out << operands.lvid;
 		}
 
+		void print(const Operand<Op::tpush>& operands)
+		{
+			if (operands.name == 0)
+			{
+				out << tabs << "tpush %";
+			}
+			else
+			{
+				out << tabs << "tpush ";
+				printString(operands.name);
+				out << " %";
+			}
+			out << operands.lvid;
+		}
+
 		void print(const Operand<Op::call>& operands)
 		{
 			out << tabs << '%' << operands.lvid << " = call ";

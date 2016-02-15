@@ -31,7 +31,6 @@ namespace Instanciate
 		IndexedParameter(LVID lvid, uint line, uint offset)
 			: lvid(lvid), line(line), offset(offset)
 		{}
-
 		uint32_t lvid;
 		uint32_t line;
 		uint32_t offset;
@@ -42,7 +41,6 @@ namespace Instanciate
 		NamedParameter(const AnyString& name, LVID lvid, uint line, uint offset)
 			: name(name), lvid(lvid), line(line), offset(offset)
 		{}
-
 		AnyString name;
 		uint32_t lvid;
 		uint32_t line;
@@ -143,6 +141,7 @@ namespace Instanciate
 		void visit(const IR::ISA::Operand<IR::ISA::Op::stackalloc>&);
 		void visit(const IR::ISA::Operand<IR::ISA::Op::allocate>&);
 		void visit(const IR::ISA::Operand<IR::ISA::Op::push>&);
+		void visit(const IR::ISA::Operand<IR::ISA::Op::tpush>&);
 		void visit(const IR::ISA::Operand<IR::ISA::Op::classdefsizeof>&);
 		void visit(const IR::ISA::Operand<IR::ISA::Op::follow>&);
 		void visit(const IR::ISA::Operand<IR::ISA::Op::identify>&);
@@ -265,15 +264,16 @@ namespace Instanciate
 		*/
 		bool complainUnknownIntrinsic(const AnyString& name);
 
-		/*!
-		** \brief Restriction on builtin intrinsics
-		*/
+		//! Restriction on builtin intrinsics
 		bool complainBuiltinIntrinsicDoesNotAccept(const AnyString& name, const AnyString& what);
 
-		/*!
-		** \brief Complain about named parameters used with an intrinsic
-		*/
+		//! Complain about named parameters used with an intrinsic
 		bool complainIntrinsicWithNamedParameters(const AnyString& name);
+
+		//! Complain about generic type parameters used with an intrinsic
+		bool complainIntrinsicWithGenTypeParameters(const AnyString& name);
+
+		bool complainIntrinsicParameterCount(const AnyString& name, uint32_t count);
 
 		bool complainIntrinsicParameter(const AnyString& name, uint32_t pindex, const Classdef& got,
 			const AnyString& expected = "");
@@ -329,10 +329,23 @@ namespace Instanciate
 		//! Flag to prevent error generation when != 0
 		uint32_t errorGenerationLock = 0;
 
-		// Last pushed indexed parameters
-		std::vector<IndexedParameter> lastPushedIndexedParameters;
-		// Last pushed named parameters
-		std::vector<NamedParameter> lastPushedNamedParameters;
+		//! All pushed parameters
+		struct PushedParameters final
+		{
+			struct Catalog final
+			{
+				std::vector<IndexedParameter> indexed;
+				std::vector<NamedParameter> named;
+			};
+
+			//! All pushed parameters for func call
+			Catalog func;
+			//! All pushed parameters for generic type parameters
+			Catalog gentypes;
+
+			void clear();
+		}
+		pushedparams;
 
 		// Helper for resolving func overloads (reused by each opcode 'call')
 		FuncOverloadMatch overloadMatch;

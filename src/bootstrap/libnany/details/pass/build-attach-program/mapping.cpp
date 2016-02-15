@@ -567,6 +567,12 @@ namespace Mapping
 	}
 
 
+	inline void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::tpush>& operands)
+	{
+		if (unlikely(not checkForLVID(operands, operands.lvid)))
+			return;
+	}
+
 	inline void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::push>& operands)
 	{
 		if (unlikely(not checkForLVID(operands, operands.lvid)))

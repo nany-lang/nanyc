@@ -187,29 +187,31 @@ namespace Instanciate
 
 	bool SequenceBuilder::complainIntrinsicWithNamedParameters(const AnyString& name)
 	{
-		error() << "intrinsic '" << name << "': named parameters are not accepted";
+		error() << "intrinsic '" << name << "': named parameters are not allowed";
 		return false;
 	}
 
 
-	bool SequenceBuilder::checkForIntrinsicParamCount(const AnyString& name, uint32_t count)
+	bool SequenceBuilder::complainIntrinsicWithGenTypeParameters(const AnyString& name)
 	{
-		if (unlikely(lastPushedIndexedParameters.size() > count))
-		{
-			error() << "intrinsic '" << name << "': too many parameters (got "
-				<< lastPushedIndexedParameters.size()
-				<< " instead of " << count << ')';
-			return false;
-		}
+		error() << "intrinsic '" << name << "': generic type parameters are not allowed";
+		return false;
+	}
 
-		if (unlikely(lastPushedIndexedParameters.size() < count))
-		{
-			error() << "intrinsic '" << name << "': not enough parameters (got "
-				<< lastPushedIndexedParameters.size()
-				<< " instead of " << count << ')';
-			return false;
-		}
-		return true;
+
+	bool SequenceBuilder::complainIntrinsicParameterCount(const AnyString& name, uint32_t count)
+	{
+		uint32_t c = static_cast<uint32_t>(pushedparams.func.indexed.size());
+		assert(c != count);
+
+		auto err = (error() << "intrinsic '" << name << "': ");
+		if (unlikely(c > count))
+			err << "too many parameters";
+		else
+			err << "not enough parameters";
+
+		err << " (got " << c << " instead of " << count << ')';
+		return false;
 	}
 
 
@@ -217,7 +219,7 @@ namespace Instanciate
 		const AnyString& expected)
 	{
 		success = false;
-		auto& element = lastPushedIndexedParameters[pindex];
+		auto& element = pushedparams.func.indexed[pindex];
 
 		auto err = (error() << "intrinsic '" << name << "': invalid type for parameter " << (1 + pindex) << ", got '");
 		got.print(err, cdeftable);

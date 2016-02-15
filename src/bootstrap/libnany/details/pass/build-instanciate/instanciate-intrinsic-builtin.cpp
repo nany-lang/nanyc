@@ -18,7 +18,7 @@ namespace Instanciate
 		cdeftable.substitute(lvid).mutateToVoid();
 
 		auto& frame = atomStack.back();
-		uint32_t lvidsid = lastPushedIndexedParameters[1].lvid;
+		uint32_t lvidsid = pushedparams.func.indexed[1].lvid;
 		uint32_t sid = frame.lvids[lvidsid].text_sid;
 		if (unlikely(sid == (uint32_t) -1))
 			return (ICE() << "invalid string-id for field name (got lvid " << lvidsid << ')');
@@ -41,7 +41,7 @@ namespace Instanciate
 		if (unlikely(!varatom))
 			return (ICE() << "invalid variable member atom for __nanyc_fieldset");
 
-		uint32_t objlvid = lastPushedIndexedParameters[0].lvid;
+		uint32_t objlvid = pushedparams.func.indexed[0].lvid;
 		auto& cdefvar = cdeftable.classdefFollowClassMember(varatom->returnType.clid);
 		auto& cdef    = cdeftable.classdef(CLID{frame.atomid, objlvid});
 
@@ -83,7 +83,7 @@ namespace Instanciate
 	{
 		cdeftable.substitute(lvid).mutateToVoid();
 		if (canGenerateCode())
-			tryToAcquireObject(lastPushedIndexedParameters[0].lvid);
+			tryToAcquireObject(pushedparams.func.indexed[0].lvid);
 		return true;
 	}
 
@@ -92,7 +92,7 @@ namespace Instanciate
 	{
 		cdeftable.substitute(lvid).mutateToVoid();
 		if (canGenerateCode())
-			tryUnrefObject(lastPushedIndexedParameters[0].lvid);
+			tryUnrefObject(pushedparams.func.indexed[0].lvid);
 		return true;
 	}
 
@@ -103,7 +103,7 @@ namespace Instanciate
 
 		if (canGenerateCode())
 		{
-			uint32_t objlvid = lastPushedIndexedParameters[0].lvid;
+			uint32_t objlvid = pushedparams.func.indexed[0].lvid;
 			if (canBeAcquired(objlvid))
 				out.emitStore(lvid, objlvid);
 			else
@@ -117,7 +117,7 @@ namespace Instanciate
 	{
 		cdeftable.substitute(lvid).mutateToBuiltin(nyt_u64);
 
-		uint32_t objlvid = lastPushedIndexedParameters[0].lvid;
+		uint32_t objlvid = pushedparams.func.indexed[0].lvid;
 		auto& frame = atomStack.back();
 		auto& cdef = cdeftable.classdefFollowClassMember(CLID{frame.atomid, objlvid});
 
@@ -132,7 +132,7 @@ namespace Instanciate
 
 		if (canGenerateCode())
 		{
-			uint32_t objlvid = lastPushedIndexedParameters[0].lvid;
+			uint32_t objlvid = pushedparams.func.indexed[0].lvid;
 			auto& frame = atomStack.back();
 			auto& cdef = cdeftable.classdefFollowClassMember(CLID{frame.atomid, objlvid});
 
@@ -155,7 +155,7 @@ namespace Instanciate
 	{
 		cdeftable.substitute(lvid).mutateToBuiltin(nyt_u64);
 
-		uint32_t objlvid = lastPushedIndexedParameters[0].lvid;
+		uint32_t objlvid = pushedparams.func.indexed[0].lvid;
 		auto& frame = atomStack.back();
 		auto& cdef = cdeftable.classdefFollowClassMember(CLID{frame.atomid, objlvid});
 		if (not cdef.isBuiltingUnsigned())
@@ -173,12 +173,12 @@ namespace Instanciate
 
 		auto& frame = atomStack.back();
 
-		uint32_t objlvid = lastPushedIndexedParameters[0].lvid;
+		uint32_t objlvid = pushedparams.func.indexed[0].lvid;
 		auto& cdef = cdeftable.classdefFollowClassMember(CLID{frame.atomid, objlvid});
 		if (cdef.kind != nyt_u64)
 			return complainIntrinsicParameter("memory.dispose", 0, cdef, "'__u64'");
 
-		uint32_t size = lastPushedIndexedParameters[1].lvid;
+		uint32_t size = pushedparams.func.indexed[1].lvid;
 		auto& cdefsize = cdeftable.classdefFollowClassMember(CLID{frame.atomid, size});
 		if (unlikely(not cdefsize.isBuiltingUnsigned()))
 			return complainIntrinsicParameter("memory.dispose", 1, cdef, "'__u64'");
@@ -193,9 +193,9 @@ namespace Instanciate
 		void (IR::Sequence::* M)(uint32_t, uint32_t, uint32_t)>
 	inline bool SequenceBuilder::instanciateIntrinsicOperator(uint32_t lvid, const char* const name)
 	{
-		assert(lastPushedIndexedParameters.size() == 2);
+		assert(pushedparams.func.indexed.size() == 2);
 		auto& frame = atomStack.back();
-		uint32_t lhs  = lastPushedIndexedParameters[0].lvid;
+		uint32_t lhs  = pushedparams.func.indexed[0].lvid;
 		auto& cdeflhs   = cdeftable.classdefFollowClassMember(CLID{frame.atomid, lhs});
 
 		Atom* atomBuiltinCast = nullptr;
@@ -214,7 +214,7 @@ namespace Instanciate
 			}
 		}
 
-		uint32_t rhs  = lastPushedIndexedParameters[1].lvid;
+		uint32_t rhs  = pushedparams.func.indexed[1].lvid;
 		auto& cdefrhs = cdeftable.classdefFollowClassMember(CLID{frame.atomid, rhs});
 		nytype_t builtinrhs = cdefrhs.kind;
 
@@ -531,32 +531,34 @@ namespace Instanciate
 	{
 		assert(not name.empty());
 
+		// named parameters are not accepted
+		if (unlikely(not pushedparams.func.named.empty()))
+			return complainIntrinsicWithNamedParameters(name);
+
+		// generic type parameters are not accepted
+		if (unlikely(not pushedparams.gentypes.indexed.empty() or pushedparams.gentypes.named.empty()))
+			return complainIntrinsicWithNamedParameters(name);
+
 		bool success = ([&]() -> bool
 		{
 			auto it = builtinDispatch.find(name);
 			if (unlikely(it == builtinDispatch.end()))
 				return (canComplain and complainUnknownIntrinsic(name));
 
-			if (unlikely(not lastPushedNamedParameters.empty()))
-				return complainIntrinsicWithNamedParameters(name);
+			// checking for parameters
+			auto& frame = atomStack.back();
+			uint32_t count = it->second.second;
+			if (unlikely(not checkForIntrinsicParamCount(name, count)))
+				return false;
 
-
-			// check for parameters
+			// checking if one parameter was already flag as 'error'
+			for (uint32_t i = 0u; i != count; ++i)
 			{
-				auto& frame = atomStack.back();
-				uint32_t count = it->second.second;
-				if (unlikely(not checkForIntrinsicParamCount(name, count)))
+				if (unlikely(not frame.verify(pushedparams.func.indexed[i].lvid)))
 					return false;
-
-				// checking if one parameter was already flag as 'error'
-				for (uint32_t i = 0u; i != count; ++i)
-				{
-					if (unlikely(not frame.verify(lastPushedIndexedParameters[i].lvid)))
-						return false;
-				}
 			}
 
-			// specific code for the intrinsic
+			// invoke specific implementation for the intrinsic
 			return (this->*(it->second.first))(lvid);
 		})();
 

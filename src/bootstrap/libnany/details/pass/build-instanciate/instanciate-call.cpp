@@ -94,14 +94,14 @@ namespace Instanciate
 
 
 		// parameters
-		for (auto indxparm: lastPushedIndexedParameters)
+		for (auto indxparm: pushedparams.func.indexed)
 		{
 			if (not frame.verify(indxparm.lvid))
 				return false;
 			overloadMatch.input.indexedParams.emplace_back(CLID{atomid, indxparm.lvid});
 		}
 		// named parameters
-		for (auto nmparm: lastPushedNamedParameters)
+		for (auto nmparm: pushedparams.func.named)
 		{
 			if (not frame.verify(nmparm.lvid))
 				return false;
@@ -159,13 +159,13 @@ namespace Instanciate
 
 		if (not atom->builtinalias.empty())
 		{
-			if (unlikely(lastPushedIndexedParameters.size() != params.size()))
+			if (unlikely(pushedparams.func.indexed.size() != params.size()))
 				return (error() << "builtin alias not allowed for methods");
 			// update each lvid, since they may have been changed (via implicit ctors)
 			for (uint32_t i = 0; i != params.size(); ++i)
 			{
-				assert(lastPushedIndexedParameters[i].lvid == params[i].clid.lvid());
-				lastPushedIndexedParameters[i].lvid = params[i].clid.lvid();
+				assert(pushedparams.func.indexed[i].lvid == params[i].clid.lvid());
+				pushedparams.func.indexed[i].lvid = params[i].clid.lvid();
 			}
 			shortcircuit.compareTo = atom->parameters.shortcircuitValue;
 			return instanciateBuiltinIntrinsic(atom->builtinalias, lvid);
@@ -218,7 +218,7 @@ namespace Instanciate
 		assert(out.at(offset).opcodes[0] == static_cast<uint32_t>(IR::ISA::Op::stackalloc));
 
 		// lvid of the first parameter
-		uint32_t lvidvalue = lastPushedIndexedParameters[0].lvid;
+		uint32_t lvidvalue = pushedparams.func.indexed[0].lvid;
 		auto& cdef = cdeftable.classdef(CLID{frame.atomid, lvidvalue});
 		if (cdef.kind != nyt_bool)
 		{
@@ -294,8 +294,7 @@ namespace Instanciate
 		}
 
 		// always remove pushed parameters, whatever the result
-		lastPushedNamedParameters.clear();
-		lastPushedIndexedParameters.clear();
+		pushedparams.clear();
 	}
 
 

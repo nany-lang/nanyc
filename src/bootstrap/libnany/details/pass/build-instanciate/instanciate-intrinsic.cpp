@@ -21,10 +21,6 @@ namespace Instanciate
 			if (unlikely(name.empty()))
 				return (error() << "invalid empty intrinsic name");
 
-			if (unlikely(not lastPushedNamedParameters.empty()))
-				return complainIntrinsicWithNamedParameters(name);
-
-
 			// trying user-defined intrinsic
 			auto* intrinsic = intrinsics.find(name);
 
@@ -45,20 +41,27 @@ namespace Instanciate
 					return complainUnknownIntrinsic(name);
 			}
 
+			// named parameters are not accepted
+			if (unlikely(not pushedparams.func.named.empty()))
+				return complainIntrinsicWithNamedParameters(name);
+
+			// generic type parameters are not accepted
+			if (unlikely(not pushedparams.gentypes.indexed.empty() or pushedparams.gentypes.named.empty()))
+				return complainIntrinsicWithNamedParameters(name);
 
 			if (unlikely(not checkForIntrinsicParamCount(name, intrinsic->paramcount)))
 				return false;
 
-			uint count = static_cast<uint>(lastPushedIndexedParameters.size());
+			uint32_t count = static_cast<uint32_t>(pushedparams.func.indexed.size());
 			auto& frame = atomStack.back();
 			bool hasErrors = false;
 
 			// reset the returned type
 			cdeftable.substitute(operands.lvid).kind = intrinsic->rettype;
 
-			for (uint i = 0; i != count; ++i)
+			for (uint32_t i = 0; i != count; ++i)
 			{
-				auto& element = lastPushedIndexedParameters[i];
+				auto& element = pushedparams.func.indexed[i];
 				if (not frame.verify(element.lvid)) // silently ignore error
 					return false;
 
@@ -96,8 +99,7 @@ namespace Instanciate
 		}
 
 		// always remove pushed parameters, whatever the result
-		lastPushedNamedParameters.clear();
-		lastPushedIndexedParameters.clear();
+		pushedparams.clear();
 	}
 
 

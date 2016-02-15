@@ -123,8 +123,14 @@ namespace Producer
 		if (not visitASTType(*type, localvar))
 			return false;
 
-		error(*type) << "generic type parameters not fully implemented yet";
-		return false;
+		if (unlikely(localvar == (uint32_t) -1))
+			return (error(*type) << "'any' is not accepted as parameter");
+
+		if (name.empty())
+			sequence().emitTPush(localvar);
+		else
+			sequence().emitTPush(localvar, name);
+		return true;
 	}
 
 

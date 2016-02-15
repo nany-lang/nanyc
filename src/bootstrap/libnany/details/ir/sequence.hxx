@@ -638,14 +638,6 @@ namespace IR
 	}
 
 
-	inline void Sequence::emitPush(uint32_t lvid)
-	{
-		auto& operands = emit<ISA::Op::push>();
-		operands.lvid  = lvid;
-		operands.name  = 0;
-	}
-
-
 	inline uint32_t Sequence::emitMemalloc(uint32_t lvid, uint32_t regsize)
 	{
 		auto& operands   = emit<ISA::Op::memalloc>();
@@ -721,6 +713,14 @@ namespace IR
 	}
 
 
+	inline void Sequence::emitPush(uint32_t lvid)
+	{
+		auto& operands = emit<ISA::Op::push>();
+		operands.lvid  = lvid;
+		operands.name  = 0;
+	}
+
+
 	inline void Sequence::emitPush(uint32_t lvid, const AnyString& name)
 	{
 		assert(not name.empty());
@@ -729,6 +729,22 @@ namespace IR
 		operands.name  = stringrefs.ref(name);
 	}
 
+
+	inline void Sequence::emitTPush(uint32_t lvid)
+	{
+		auto& operands = emit<ISA::Op::tpush>();
+		operands.lvid  = lvid;
+		operands.name  = 0;
+	}
+
+
+	inline void Sequence::emitTPush(uint32_t lvid, const AnyString& name)
+	{
+		assert(not name.empty());
+		auto& operands = emit<ISA::Op::tpush>();
+		operands.lvid  = lvid;
+		operands.name  = stringrefs.ref(name);
+	}
 
 	inline void Sequence::emitCall(uint32_t lvid, uint32_t ptr2func)
 	{

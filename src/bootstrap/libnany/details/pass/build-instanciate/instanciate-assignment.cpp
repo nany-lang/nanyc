@@ -21,11 +21,6 @@ namespace Instanciate
 	};
 
 
-	namespace // anonymous
-	{
-	} // anonymous namespace
-
-
 
 	bool SequenceBuilder::instanciateAssignment(AtomStackFrame& frame, LVID lhs, LVID rhs, bool canDisposeLHS,
 		bool checktype, bool forceDeepcopy)
@@ -233,16 +228,14 @@ namespace Instanciate
 
 	bool SequenceBuilder::instanciateAssignment(const IR::ISA::Operand<IR::ISA::Op::call>& operands)
 	{
-		if (unlikely(lastPushedIndexedParameters.size() != 1))
-		{
-			ICE() << "assignment: invalid number of pushed parameters";
-			return false;
-		}
-		if (unlikely(not lastPushedNamedParameters.empty()))
-		{
-			ICE() << "assignment: named parameters are not accepted";
-			return false;
-		}
+		if (unlikely(pushedparams.func.indexed.size() != 1))
+			return (ICE() << "assignment: invalid number of pushed parameters");
+
+		if (unlikely(not pushedparams.func.named.empty()))
+			return (ICE() << "assignment: named parameters are not accepted");
+
+		if (unlikely(not pushedparams.gentypes.indexed.empty() or not pushedparams.gentypes.named.empty()))
+			return (ICE() << "assignment: invalid template parameters");
 
 		// the current frame
 		auto& frame = atomStack.back();
@@ -264,8 +257,8 @@ namespace Instanciate
 		}
 
 		// -- RHS
-		LVID rhs = lastPushedIndexedParameters[0].lvid;
-		lastPushedIndexedParameters.clear();
+		LVID rhs = pushedparams.func.indexed[0].lvid;
+		pushedparams.func.indexed.clear();
 
 		return instanciateAssignment(frame, lhs, rhs);
 	}

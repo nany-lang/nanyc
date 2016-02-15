@@ -140,6 +140,8 @@ namespace ISA //!< Instruction Set Architecture
 		assign,
 		//! declare a register as 'self'
 		self,
+		//! push a generic type parameter
+		tpush,
 		//! follow
 		follow,
 		//! Blueprint
@@ -246,6 +248,7 @@ namespace ISA //!< Instruction Set Architecture
 				\
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::label) \
 				\
+				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::tpush) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::follow) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::blueprint) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::classdefsizeof) \

@@ -10,6 +10,15 @@ namespace Pass
 namespace Instanciate
 {
 
+	inline void SequenceBuilder::PushedParameters::clear()
+	{
+		func.indexed.clear();
+		func.named.clear();
+		gentypes.indexed.clear();
+		gentypes.named.clear();
+	}
+
+
 	inline bool SequenceBuilder::canBeAcquired(const Classdef& cdef) const
 	{
 		bool success = not cdef.isBuiltinOrVoid();
@@ -52,8 +61,10 @@ namespace Instanciate
 
 	inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::namealias>& operands)
 	{
-		declareNamedVariable(currentSequence.stringrefs[operands.name], operands.lvid);
+		const auto& name = currentSequence.stringrefs[operands.name];
+		declareNamedVariable(name, operands.lvid);
 	}
+
 
 	inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::debugfile>& operands)
 	{
@@ -68,20 +79,6 @@ namespace Instanciate
 	}
 
 
-	inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::push>& operands)
-	{
-		if (operands.name != 0) // named parameter
-		{
-			AnyString name = currentSequence.stringrefs[operands.name];
-			lastPushedNamedParameters.emplace_back(name, operands.lvid, currentLine, currentOffset);
-		}
-		else
-		{
-			lastPushedIndexedParameters.emplace_back(operands.lvid, currentLine, currentOffset);
-		}
-	}
-
-
 	inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::follow>& operands)
 	{
 		if (not operands.symlink)
@@ -93,6 +90,14 @@ namespace Instanciate
 			spare.import(cdef);
 			spare.instance = true;
 		}
+	}
+
+
+	inline bool SequenceBuilder::checkForIntrinsicParamCount(const AnyString& name, uint32_t count)
+	{
+		return (pushedparams.func.indexed.size() == count)
+			? true
+			: complainIntrinsicParameterCount(name, count);
 	}
 
 

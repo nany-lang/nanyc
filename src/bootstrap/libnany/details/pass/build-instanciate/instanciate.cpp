@@ -44,11 +44,14 @@ namespace Instanciate
 		, overloadMatch(report, cdeftable)
 		, report(report)
 	{
-		// reduce memory allocations
+		// reduce memory (re)allocations
 		atomStack.reserve(4); // arbitrary
-		lastPushedNamedParameters.reserve(32); // arbitrary
-		lastPushedIndexedParameters.reserve(32);
 		multipleResults.reserve(8); // arbitrary value
+
+		pushedparams.func.indexed.reserve(16);
+		pushedparams.func.named.reserve(16);
+		pushedparams.gentypes.indexed.reserve(8);
+		pushedparams.gentypes.named.reserve(8);
 	}
 
 
