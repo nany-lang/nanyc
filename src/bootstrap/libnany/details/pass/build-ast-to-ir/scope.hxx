@@ -198,6 +198,12 @@ namespace Producer
 	}
 
 
+	inline bool Scope::visitASTExprSubDot(const Node& node, LVID& localvar)
+	{
+		return visitASTExprContinuation(node, localvar);
+	}
+
+
 
 
 } // namespace Producer

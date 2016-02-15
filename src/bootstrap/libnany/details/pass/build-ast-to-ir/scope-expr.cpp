@@ -27,12 +27,6 @@ namespace Producer
 	}
 
 
-	inline bool Scope::visitASTExprSubDot(const Node& node, LVID& localvar)
-	{
-		return visitASTExprContinuation(node, localvar);
-	}
-
-
 	bool Scope::visitASTExprContinuation(const Node& node, LVID& localvar, bool allowScope)
 	{
 		bool success = true;
