@@ -521,6 +521,13 @@ namespace // anonymous
 					out << ": %" << static_cast<uint32_t>(operands.lvid);
 					break;
 				}
+				case ISA::Blueprint::gentypeparam:
+				{
+					out << tabs << "generic param <:";
+					printString(operands.name);
+					out << ":> : %" << static_cast<uint32_t>(operands.lvid);
+					break;
+				}
 				case ISA::Blueprint::paramself:
 				{
 					out << tabs << "self param ";
@@ -570,8 +577,15 @@ namespace // anonymous
 					break;
 				}
 
-				default:
+				case ISA::Blueprint::unit:
+				{
+					out << tabs << "unit ";
+					printString(operands.name);
+					printEOL();
+					out << tabs << '{';
+					indent();
 					break;
+				}
 			}
 		}
 
@@ -583,7 +597,8 @@ namespace // anonymous
 				{
 					case Pragma::codegen:
 					{
-						out << tabs << "pragma codegen " << ((operands.value.codegen != 0) ? "enable" : "disable");
+						out << tabs << "pragma codegen ";
+						out << ((operands.value.codegen != 0) ? "enable" : "disable");
 						break;
 					}
 					case Pragma::blueprintsize:
@@ -624,8 +639,16 @@ namespace // anonymous
 						printString(operands.value.builtinalias.namesid);
 						break;
 					}
-
-					default: out << tabs << "<unknown pragma>";
+					case Pragma::suggest:
+					{
+						out << tabs << "pragma suggest ";
+						out << (operands.value.suggest != 0 ? "true" : "false");
+						break;
+					}
+					case Pragma::unknown:
+					case Pragma::max:
+						out << tabs << "<invalid pragma identifier>";
+						break;
 				}
 			}
 			else

@@ -63,7 +63,7 @@ namespace ISA //!< Instruction Set Architecture
 		//! Parameter definition (for a function)
 		param,
 		//! Template parameter
-		tmplparam,
+		gentypeparam,
 		//! Parameter definition, with auto assignment
 		paramself,
 		//! Namespace definition (one part of it)

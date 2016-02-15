@@ -118,7 +118,7 @@ namespace Instanciate
 				declareNamedVariable(currentSequence.stringrefs[sid], lvid, false);
 				break;
 			}
-			case IR::ISA::Blueprint::tmplparam: // -- template parameter
+			case IR::ISA::Blueprint::gentypeparam: // -- template parameter
 			{
 				uint32_t sid  = operands.name;
 				uint32_t lvid = operands.lvid;

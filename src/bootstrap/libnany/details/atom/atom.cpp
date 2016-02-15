@@ -133,39 +133,78 @@ namespace Nany
 
 				if (name.first() == '^')
 					out << ' ';
-				out << '(';
+
 				bool first = true;
 
-				parameters.each([&](uint32_t i, const AnyString& paramname, const Vardef& vardef)
+				if (not tmplparams.empty())
 				{
-					// avoid the first virtual parameter
-					if (i == 0 and paramname == "self")
-						return;
+					out << "<:";
 
-					if (not first)
-						out << ", ";
-					first = false;
-
-					out << paramname;
-
-					if (table)
+					tmplparams.each([&](uint32_t, const AnyString& paramname, const Vardef& vardef)
 					{
-						if (table) // and table->hasClassdef(vardef.clid))
+						if (not first)
+							out << ", ";
+						first = false;
+						out << paramname;
+
+						if (table)
 						{
-							auto& retcdef = table->classdef(vardef.clid);
-							if (not retcdef.isVoid())
+							if (table) // and table->hasClassdef(vardef.clid))
 							{
-								out << ": ";
-								retcdef.print(out, *table, false);
+								auto& retcdef = table->classdef(vardef.clid);
+								if (not retcdef.isVoid())
+								{
+									out << ": ";
+									retcdef.print(out, *table, false);
+								}
 							}
 						}
-					}
-					else
+						else
+						{
+							if (not vardef.clid.isVoid())
+								out << ": any";
+						}
+					});
+
+					out << ":>";
+				}
+
+				out << '(';
+
+				if (not parameters.empty())
+				{
+					first = true;
+
+					parameters.each([&](uint32_t i, const AnyString& paramname, const Vardef& vardef)
 					{
-						if (not vardef.clid.isVoid())
-							out << ": any";
-					}
-				});
+						// avoid the first virtual parameter
+						if (i == 0 and paramname == "self")
+							return;
+
+						if (not first)
+							out << ", ";
+						first = false;
+						out << paramname;
+
+						if (table)
+						{
+							if (table) // and table->hasClassdef(vardef.clid))
+							{
+								auto& retcdef = table->classdef(vardef.clid);
+								if (not retcdef.isVoid())
+								{
+									out << ": ";
+									retcdef.print(out, *table, false);
+								}
+							}
+						}
+						else
+						{
+							if (not vardef.clid.isVoid())
+								out << ": any";
+						}
+					});
+				}
 				out << ')';
 
 				if (table)

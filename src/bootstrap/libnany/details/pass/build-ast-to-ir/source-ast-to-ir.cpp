@@ -36,7 +36,7 @@ namespace Nany
 			IR::Producer::Scope scope{producer};
 			scope.addDebugCurrentFilename();
 			auto& out = scope.sequence();
-			uint32_t bpoffset = out.emitBlueprintUnit();
+			uint32_t bpoffset = out.emitBlueprintUnit(pFilename);
 			uint32_t bpoffsiz = out.emitBlueprintSize();
 			uint32_t bpoffsck = out.emitStackSizeIncrease();
 

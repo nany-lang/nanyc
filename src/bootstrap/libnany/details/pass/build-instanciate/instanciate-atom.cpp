@@ -74,6 +74,7 @@ namespace Instanciate
 
 	bool SequenceBuilder::instanciateAtomClassClone(Atom& atom, uint32_t lvid, uint32_t rhs)
 	{
+		assert(atom.isClass());
 		if (unlikely(atom.hasErrors))
 			return false;
 
@@ -121,7 +122,13 @@ namespace Instanciate
 
 	bool SequenceBuilder::instanciateAtomClassDestructor(Atom& atom, uint32_t lvid)
 	{
-		if (unlikely(atom.hasErrors))
+		// if the IR code produced when transforming the AST is invalid,
+		// a common scenario is that the code tries to destroy something (via unref)
+		// which is not be a real class
+		if (unlikely(not atom.isClass()))
+			return (ICE() << "trying to call the destructor of a non-class atom");
+
+		if (unlikely(atom.hasErrors)) // error already reported
 			return false;
 
 		// first, try to find the user-defined dtor function (if any)
@@ -139,7 +146,6 @@ namespace Instanciate
 			}
 			default: return complainMultipleDefinitions(atom, "operator 'dispose'");
 		}
-
 
 		Atom* dtor = nullptr;
 		switch (atom.findFuncAtom(dtor, "^obj-dispose"))
@@ -168,6 +174,7 @@ namespace Instanciate
 
 	bool SequenceBuilder::instanciateAtomClass(Atom& atom)
 	{
+		assert(atom.isClass());
 		atom.classinfo.isInstanciated = true;
 
 		// parameters for the signature
@@ -195,6 +202,7 @@ namespace Instanciate
 
 	bool SequenceBuilder::instanciateAtomFunc(uint32_t& instanceid, Atom& funcAtom, uint32_t retlvid, uint32_t p1, uint32_t p2)
 	{
+		assert(funcAtom.isFunction());
 		assert(not atomStack.empty());
 		auto& frame = atomStack.back();
 		auto& frameAtom = frame.atom;

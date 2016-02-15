@@ -447,12 +447,12 @@ namespace IR
 	}
 
 
-	inline uint32_t Sequence::emitBlueprintUnit()
+	inline uint32_t Sequence::emitBlueprintUnit(const AnyString& filename)
 	{
 		uint32_t offset = pSize;
 		auto& operands  = emit<ISA::Op::blueprint>();
 		operands.kind   = (uint32_t) IR::ISA::Blueprint::unit;
-		operands.name   = 0u;
+		operands.name   = stringrefs.ref(filename);
 		operands.atomid = static_cast<uint32_t>(-1);
 		operands.lvid   = 0u;
 		return offset;
@@ -500,22 +500,22 @@ namespace IR
 	}
 
 
-	inline uint32_t Sequence::emitBlueprintTmplParam(LVID lvid, const AnyString& name)
+	inline uint32_t Sequence::emitBlueprintGenericTypeParam(LVID lvid, const AnyString& name)
 	{
 		uint32_t offset = pSize;
 		auto& operands  = emit<ISA::Op::blueprint>();
-		operands.kind   = (uint32_t) IR::ISA::Blueprint::tmplparam;
+		operands.kind   = (uint32_t) IR::ISA::Blueprint::gentypeparam;
 		operands.name   = stringrefs.ref(name);
 		operands.atomid = static_cast<uint32_t>(-1);
 		operands.setLVID(lvid);
 		return offset;
 	}
 
-	inline uint32_t Sequence::emitBlueprintTmplParam(LVID lvid)
+	inline uint32_t Sequence::emitBlueprintGenericTypeParam(LVID lvid)
 	{
 		uint32_t offset = pSize;
 		auto& operands  = emit<ISA::Op::blueprint>();
-		operands.kind   = (uint32_t) IR::ISA::Blueprint::tmplparam;
+		operands.kind   = (uint32_t) IR::ISA::Blueprint::gentypeparam;
 		operands.name   = 0;
 		operands.atomid = static_cast<uint32_t>(-1);
 		operands.setLVID(lvid);

@@ -418,10 +418,10 @@ namespace: notext important
 // --- TEMPLATES ---
 
 call-template-parameter: notext
-	expr
+	type
 
 call-template-named-parameter: notext
-	identifier wp tk-colon wp   (expr wp) | error-parenthese-or-bracket
+	identifier wp tk-colon wp   (type wp) | error-parenthese-or-bracket
 
 call-template-parameters: notext
 	call-template-named-parameter | call-template-parameter

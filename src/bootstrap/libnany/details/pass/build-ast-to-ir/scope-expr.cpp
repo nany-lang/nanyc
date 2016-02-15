@@ -64,11 +64,16 @@ namespace Producer
 				case rgIf:         success &= visitASTExprIfExpr(child, localvar); break;
 				case rgWhile:      success &= visitASTExprWhile(child); break;
 
+				case rgExprTemplate: success &= visitASTExprTemplate(child, localvar); break;
+
 				// special for internal AST manipulation
 				case rgRegister:   localvar = child.text.to<uint32_t>(); break;
 
 				// scope may appear in expr (when expr are actually statements)
-				case rgScope:  if (allowScope) { success &= visitASTExprScope(child); break; }; // if not > unexpected
+				case rgScope:  if (allowScope) {
+					success &= visitASTExprScope(child);
+					break;
+				} // fallthru ok - if not then unexpected
 				default:
 					success = ICEUnexpectedNode(child, "[ir/expr/continuation]");
 			}

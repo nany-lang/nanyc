@@ -51,7 +51,7 @@ namespace Mapping
 	template<IR::ISA::Op O>
 	inline void SequenceMapping::printError(const IR::ISA::Operand<O>& operands, AnyString msg)
 	{
-		printError(IR::Instruction::fromOpcode(operands), msg);
+			printError(IR::Instruction::fromOpcode(operands), msg);
 	}
 
 
@@ -154,7 +154,7 @@ namespace Mapping
 
 			case IR::ISA::Blueprint::param:
 			case IR::ISA::Blueprint::paramself:
-			case IR::ISA::Blueprint::tmplparam:
+			case IR::ISA::Blueprint::gentypeparam:
 			{
 				assert(not atomStack.empty());
 				auto& frame = atomStack.back();
@@ -167,7 +167,7 @@ namespace Mapping
 				if (unlikely(not checkForLVID(operands, paramLVID)))
 					return;
 
-				bool isTemplate = (kind == IR::ISA::Blueprint::tmplparam);
+				bool isTemplate = (kind == IR::ISA::Blueprint::gentypeparam);
 
 				CLID clid {frame.atom.atomid, paramLVID};
 				AnyString name = currentSequence.stringrefs[operands.name];

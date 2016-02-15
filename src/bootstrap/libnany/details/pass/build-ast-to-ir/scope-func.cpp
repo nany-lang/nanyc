@@ -1,6 +1,5 @@
 #include <yuni/yuni.h>
 #include <yuni/core/noncopyable.h>
-#include <yuni/core/tribool.h>
 #include "details/pass/build-ast-to-ir/scope.h"
 #include "details/utils/check-for-valid-identifier-name.h"
 #include "details/grammar/nany.h"
@@ -52,13 +51,15 @@ namespace Producer
 		private:
 			bool inspectVisibility(const Node&);
 			bool inspectKind(const Node&);
-			bool inspectParameters(const Node*);
+			bool inspectParameters(const Node*, const Node*);
 			bool inspectReturnType(const Node&);
 			bool inspectSingleParameter(uint pindex, const Node&, uint32_t paramoffset);
 			bool inspectAttributes(const Node&);
 
 		private:
-			bool pWithinClass = false;
+			//! Flag to determine whether the 'self' parameter is implicit
+			// (simply dictated if within a class)
+			bool hasImplicitSelf = false;
 
 		}; // class FuncInspector
 
@@ -70,7 +71,7 @@ namespace Producer
 
 		inline FuncInspector::FuncInspector(Scope& scope)
 			: scope(scope)
-			, pWithinClass(scope.isWithinClass())
+			, hasImplicitSelf(scope.isWithinClass())
 		{}
 
 
@@ -296,7 +297,7 @@ namespace Producer
 		}
 
 
-		bool FuncInspector::inspectParameters(const Node* node)
+		bool FuncInspector::inspectParameters(const Node* node, const Node* nodeTypeParams)
 		{
 			// total number of parameters
 			uint32_t paramCount;
@@ -311,12 +312,17 @@ namespace Producer
 			else
 				paramCount = 0u;
 
-			if (pWithinClass)
-				++paramCount; // self
+			if (hasImplicitSelf) // implicit 'self' parameter
+				++paramCount;
 
 			// no parameter (not even 'self'), nothing to do here !
 			if (paramCount == 0u)
+			{
+				// no parameters, but maybe some generic type parameters
+				if (nodeTypeParams)
+					return scope.visitASTDeclGenericTypeParameters(*nodeTypeParams);
 				return true;
+			}
 
 
 			bool success = true;
@@ -335,8 +341,9 @@ namespace Producer
 			// and variables for parameters start from 1
 			auto& out = scope.sequence();
 
+
 			// dealing first with the implicit parameter 'self'
-			if (pWithinClass)
+			if (hasImplicitSelf)
 			{
 				uint32_t selfid = scope.nextvar();
 				out.emitBlueprintParam(selfid, "self");
@@ -344,38 +351,38 @@ namespace Producer
 			}
 
 			// iterating through all other user-defined parameters
-			uint32_t offset = (pWithinClass) ? 1u : 0u;
+			uint32_t offset = (hasImplicitSelf) ? 1u : 0u;
 			if (paramCount - offset > 0U)
 			{
 				// already checked before
 				assert(paramCount - offset < Config::maxPushedParameters);
 
-				// adding all parameters first
+				// declare all parameters first
 				uint32_t paramOffsets[Config::maxPushedParameters];
 				for (uint32_t i = offset; i < paramCount; ++i) // reserving lvid for each parameter
 				{
-					auto opaddr = out.emitBlueprintParam(scope.nextvar(), nullptr);
+					uint32_t opaddr = out.emitBlueprintParam(scope.nextvar(), nullptr);
 					paramOffsets[i - offset] = opaddr;
 				}
 
-				// reserve registers as many as parameters for cloning parameters
+				// reserve registers (as many as parameters) for cloning parameters
 				for (uint32_t i = 0u; i != paramCount; ++i)
-					out.emitStore(scope.nextvar(), nyt_any);
+					out.emitStackalloc(scope.nextvar(), nyt_any);
+
+				// Generating IR for template parameters before the IR code for parameters
+				// (especially for being able to use these types)
+				if (nodeTypeParams)
+					success &= scope.visitASTDeclGenericTypeParameters(*nodeTypeParams);
 
 				// inspecting each parameter
-				out.emitComment("parameters definition");
+				if (debugmode)
+					out.emitComment("function parameters");
 
+				// Generate IR (typing and default value) for each parameter
 				assert(node != nullptr and "should not be here if there is no real parameter");
 				for (uint32_t i = offset; i < paramCount; ++i)
 					success &= inspectSingleParameter(i, *(node->children[i - offset]), paramOffsets[i - offset]);
 			}
-			else
-			{
-				// produce reserved registers for consistency, even if not used
-				for (uint32_t i = 0u; i != paramCount; ++i)
-					out.emitStore(scope.nextvar(), nyt_any);
-			}
-
 			return success;
 		}
 
@@ -496,6 +503,8 @@ namespace Producer
 			bool success = true;
 			// the node related to parameters
 			const Node* nodeParams = nullptr;
+			// the node related to template parameters
+			const Node* nodeGenTParams = nullptr;
 			// the node related to the return type
 			const Node* nodeReturnType = nullptr;
 
@@ -510,6 +519,7 @@ namespace Producer
 					case rgFuncReturnType: { nodeReturnType = &child; break; }
 					case rgFuncBody:       { body = &child; break; }
 					case rgAttributes:     { success = inspectAttributes(child); break; }
+					case rgClassTemplateParams: { nodeGenTParams = &child; break; }
 					default:
 						success &= scope.ICEUnexpectedNode(child, "[func]");
 				}
@@ -518,14 +528,23 @@ namespace Producer
 			if (funcname.empty())
 				funcname = "<anonymous>";
 
-			// the variable representing the return type (only a very simple definition)
+			// the code currently has some prerequisites:
+			// lvid %0: <invalid value>
+			// lvid %1: the return type
+			// lvid %2..N: the N parameters (if any)
+			// lvid %2+N+1 .. %2+N+1+N: a reserved local variables for copying parameters
+			//    (if required)
+			// ...: generic type parameters if any
+			// ...: definition of each parameters (and maybe variable cloning)
+
+			// %1: the variable representing the return type (only a very simple definition)
 			if (nodeReturnType)
 				scope.createLocalBuiltinAny(node); // pre-create the return type
 			else
 				scope.createLocalBuiltinVoid(node);
 
 			// ...then the parameters
-			success &= inspectParameters(nodeParams);
+			success &= inspectParameters(nodeParams, nodeGenTParams);
 
 			// generate opcodes for return type verification (after parameters)
 			if (nodeReturnType)

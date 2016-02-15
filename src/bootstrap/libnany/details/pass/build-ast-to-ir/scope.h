@@ -73,6 +73,11 @@ namespace Producer
 		bool visitASTExprWhile(const Node&);
 		bool visitASTExprDoWhile(const Node&);
 		bool visitASTExprSwitch(const Node&);
+
+		bool visitASTExprTemplate(const Node&, LVID& localvar);
+		bool visitASTExprTemplateParameter(const Node& node);
+		bool visitASTDeclGenericTypeParameters(const Node&);
+		bool visitASTDeclSingleGenericTypeParameter(const Node&);
 		//@}
 
 

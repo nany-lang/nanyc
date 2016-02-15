@@ -17,14 +17,15 @@ namespace Instanciate
 	{
 		assert(not atomStack.empty());
 
-		//
-		// cloning all function parameters (only non-ref parameters)
-		//
 		auto& frame = atomStack.back();
-		if (frame.atom.isFunction())
+		auto& atom = frame.atom;
+		if (atom.isFunction())
 		{
-			uint32_t count = frame.atom.parameters.size();
-			frame.atom.parameters.each([&](uint32_t i, const AnyString&, const Vardef& vardef)
+			//
+			// cloning all function parameters (only non-ref parameters)
+			//
+			uint32_t count = atom.parameters.size();
+			atom.parameters.each([&](uint32_t i, const AnyString&, const Vardef& vardef)
 			{
 				if (not cdeftable.classdef(vardef.clid).qualifiers.ref)
 				{
@@ -32,7 +33,7 @@ namespace Instanciate
 					uint32_t lvid  = i + 1 + 1; // 1 based, 1: return type
 					uint32_t clone = 2 + count + i;
 
-					if (debugmode)
+					if (debugmode and canGenerateCode())
 						out.emitComment(String{} << "\n ----- ---- deep copy parameter " << i);
 
 					instanciateAssignment(frame, clone, lvid, false, false, true);
@@ -42,45 +43,40 @@ namespace Instanciate
 						frame.lvids[lvid].autorelease = true;
 						frame.lvids[clone].autorelease = false;
 					}
-					// register swap
-					out.emitStore(lvid, clone);
 
-					if (debugmode)
-						out.emitComment("--\n");
+					if (canGenerateCode())
+					{
+						out.emitStore(lvid, clone); // register swap
+						if (debugmode)
+							out.emitComment("--\n");
+					}
 				}
 			});
-		}
 
-		// generating some code on the fly
+			// generating some code on the fly
+			if (atom.isOperator() and canGenerateCode())
+			{
+				// variables initialization (for a ctor)
+				if (generateClassVarsAutoInit)
+				{
+					generateClassVarsAutoInit = false;
+					generateMemberVarDefaultInitialization();
+				}
 
-		//
-		// variables initialization (ctor)
-		//
-		if (generateClassVarsAutoInit)
-		{
-			generateClassVarsAutoInit = false;
-			if (canGenerateCode())
-				generateMemberVarDefaultInitialization();
-		}
+				// variables destruction (for dtor)
+				if (generateClassVarsAutoRelease)
+				{
+					generateClassVarsAutoRelease = false;
+					generateMemberVarDefaultDispose();
+				}
 
-		//
-		// variables destruction (dtor)
-		//
-		if (generateClassVarsAutoRelease)
-		{
-			generateClassVarsAutoRelease = false;
-			if (canGenerateCode())
-				generateMemberVarDefaultDispose();
-		}
-
-		//
-		// variables cloning (copy ctor)
-		//
-		if (generateClassVarsAutoClone)
-		{
-			generateClassVarsAutoClone = false;
-			if (canGenerateCode())
-				generateMemberVarDefaultClone();
+				// variables cloning (copy a ctor)
+				if (generateClassVarsAutoClone)
+				{
+					generateClassVarsAutoClone = false;
+					generateMemberVarDefaultClone();
+				}
+			}
 		}
 	}
 

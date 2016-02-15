@@ -200,6 +200,7 @@ addsrc(
 	"details/pass/build-ast-to-ir/scope-number.cpp"
 	"details/pass/build-ast-to-ir/scope-string.cpp"
 	"details/pass/build-ast-to-ir/scope-intrinsic.cpp"
+	"details/pass/build-ast-to-ir/scope-generic-type-parameters.cpp"
 	"details/pass/build-ast-to-ir/source-ast-to-ir.cpp")
 
 

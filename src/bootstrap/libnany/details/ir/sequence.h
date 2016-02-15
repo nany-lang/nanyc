@@ -205,7 +205,7 @@ namespace IR
 		void emitQualifierConst(uint32_t lvid, bool flag);
 
 		//! Emit a blueprint unit opcode and give the offset of the instruction in the sequence
-		uint32_t emitBlueprintUnit();
+		uint32_t emitBlueprintUnit(const AnyString& filename);
 
 		//! Emit a blueprint class opcode
 		void emitBlueprintClass(const AnyString& name, uint32_t atomid);
@@ -225,9 +225,9 @@ namespace IR
 		//! Emit a blueprint param opcode and give the offset of the instruction in the sequence
 		uint32_t emitBlueprintParam(LVID);
 		//! Emit a blueprint template param opcode and give the offset of the instruction in the sequence
-		uint32_t emitBlueprintTmplParam(LVID, const AnyString&);
+		uint32_t emitBlueprintGenericTypeParam(LVID, const AnyString&);
 		//! Emit a blueprint template param opcode and give the offset of the instruction in the sequence
-		uint32_t emitBlueprintTmplParam(LVID);
+		uint32_t emitBlueprintGenericTypeParam(LVID);
 
 		//! Emit a blueprint vardef opcode
 		void emitBlueprintVardef(LVID, const AnyString&);
