@@ -87,9 +87,10 @@ namespace Nany
 
 	void CTarget::notifyNotEnoughMemory() const
 	{
+		// TODO to be removed
 		ThreadingPolicy::MutexLocker locker{*this};
 		if (pContext)
-			pContext->usercontext.memory.on_not_enough_memory(&(pContext->usercontext));
+			pContext->usercontext.memory.on_not_enough_memory(&(pContext->usercontext), nyfalse);
 	}
 
 

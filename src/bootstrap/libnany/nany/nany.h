@@ -330,7 +330,7 @@ typedef struct nycontext_memory_t
 	size_t limit_mem_size;
 
 	/*! event: not enough memory */
-	void (*on_not_enough_memory)(nycontext_t*);
+	void (*on_not_enough_memory)(nycontext_t*, nybool_t limit_reached);
 }
 nycontext_memory_t;
 
@@ -800,7 +800,7 @@ NY_EXPORT void nanysdbx_io_close(nycontext_t*, nyfd_t fd);
 NY_EXPORT size_t nanysdbx_io_read(nycontext_t*, nyfd_t fd, uint8_t* buffer, size_t size);
 NY_EXPORT size_t nanysdbx_io_write(nycontext_t*, nyfd_t fd, uint8_t* buffer, size_t size);
 
-NY_EXPORT void  nanysdbx_not_enough_memory(nycontext_t*);
+NY_EXPORT void  nanysdbx_not_enough_memory(nycontext_t*, nybool_t);
 NY_EXPORT void* nanysdbx_mem_alloc(nycontext_t*, size_t size) LIBNANY_ATTR_ALLOCSIZE(2);
 NY_EXPORT void* nanysdbx_mem_realloc(nycontext_t*, void* ptr, size_t, size_t newsize) LIBNANY_ATTR_ALLOCSIZE2(3,4);
 NY_EXPORT void nanysdbx_mem_free(nycontext_t*, void* ptr, size_t);

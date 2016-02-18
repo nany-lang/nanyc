@@ -58,11 +58,16 @@ static inline int fsync(int fd)
 #endif
 
 
-extern "C" void nanysdbx_not_enough_memory(nycontext_t* ctx)
+extern "C" void nanysdbx_not_enough_memory(nycontext_t* ctx, nybool_t limit_reached)
 {
-	constexpr const char* const msg = "error: not enough memory\n";
-	auto len = strlen(msg);
-	ctx->console.write_stderr(ctx, msg, len);
+	ShortString128 msg;
+	msg = "error: not enough memory";
+	if (limit_reached == nytrue)
+		msg << ", sandbox limit reached (" << ctx->memory.limit_mem_size << " bytes)\n";
+	else
+		msg << " from the system\n";
+
+	ctx->console.write_stderr(ctx, msg.c_str(), msg.sizeInBytes());
 	ctx->console.flush_stderr(ctx);
 }
 
@@ -105,11 +110,17 @@ extern "C" void* nanysdbx_mem_alloc(nycontext_t* ctx, size_t size)
 		void* p = ::malloc(size);
 		if (YUNI_LIKELY(p))
 			return p;
-	}
 
-	ctx->reserved.mem0 -= size;
-	if (ctx->memory.on_not_enough_memory)
-		ctx->memory.on_not_enough_memory(ctx);
+		ctx->reserved.mem0 -= size;
+		if (ctx->memory.on_not_enough_memory)
+			ctx->memory.on_not_enough_memory(ctx, nyfalse);
+	}
+	else
+	{
+		ctx->reserved.mem0 -= size;
+		if (ctx->memory.on_not_enough_memory)
+			ctx->memory.on_not_enough_memory(ctx, nytrue);
+	}
 	return nullptr;
 }
 
@@ -126,6 +137,12 @@ extern "C" void* nanysdbx_mem_realloc(nycontext_t* ctx, void* ptr, size_t oldsiz
 
 			ctx->reserved.mem0 -= newsize - oldsize;
 		}
+		else
+		{
+			if (ctx->memory.on_not_enough_memory)
+				ctx->memory.on_not_enough_memory(ctx, nytrue);
+			return nullptr;
+		}
 	}
 	else
 	{
@@ -138,7 +155,7 @@ extern "C" void* nanysdbx_mem_realloc(nycontext_t* ctx, void* ptr, size_t oldsiz
 	}
 
 	if (ctx->memory.on_not_enough_memory)
-		ctx->memory.on_not_enough_memory(ctx);
+		ctx->memory.on_not_enough_memory(ctx, nyfalse);
 	return nullptr;
 }
 

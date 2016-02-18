@@ -93,7 +93,8 @@ namespace // anonymous
 
 	public:
 		ThreadContext(const AtomMap& map, nycontext_t& context, const IR::Sequence& sequence)
-			: map(map)
+			: stack(context)
+			, map(map)
 			, sequence(std::cref(sequence))
 			, context(context)
 			, userDefinedIntrinsics(((Context*)context.internal)->intrinsics)
@@ -776,7 +777,7 @@ namespace // anonymous
 			}
 			catch (const std::bad_alloc&)
 			{
-				context.memory.on_not_enough_memory(&context);
+				// already reported by the custom memory allocator
 			}
 			catch (const std::exception& e)
 			{
@@ -845,7 +846,7 @@ namespace // anonymous
 		}
 		catch (const std::bad_alloc&)
 		{
-			context.memory.on_not_enough_memory(&context);
+			// already reported by the custom memory allocator
 		}
 		catch (const std::exception& e)
 		{
