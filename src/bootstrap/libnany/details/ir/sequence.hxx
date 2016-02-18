@@ -13,6 +13,11 @@ namespace Nany
 namespace IR
 {
 
+	inline Sequence::~Sequence()
+	{
+		std::free(pBody);
+	}
+
 
 	inline void Sequence::reserve(uint32_t N)
 	{
@@ -34,14 +39,14 @@ namespace IR
 	inline const Instruction& Sequence::at(uint32_t offset) const
 	{
 		assert(offset < pSize);
-		return pBody.get()[offset];
+		return pBody[offset];
 	}
 
 
 	inline Instruction& Sequence::at(uint32_t offset)
 	{
 		assert(offset < pSize);
-		return pBody.get()[offset];
+		return pBody[offset];
 	}
 
 
@@ -49,7 +54,7 @@ namespace IR
 	{
 		assert(offset < pSize);
 		static_assert(sizeof(Instruction) >= sizeof(ISA::Operand<O>), "pSize mismatch");
-		return reinterpret_cast<ISA::Operand<O>&>(pBody.get()[offset]);
+		return reinterpret_cast<ISA::Operand<O>&>(pBody[offset]);
 	}
 
 
@@ -58,7 +63,7 @@ namespace IR
 	{
 		assert(offset < pSize);
 		static_assert(sizeof(Instruction) >= sizeof(ISA::Operand<O>), "pSize mismatch");
-		return reinterpret_cast<ISA::Operand<O>&>(pBody.get()[offset]);
+		return reinterpret_cast<ISA::Operand<O>&>(pBody[offset]);
 	}
 
 
@@ -74,7 +79,8 @@ namespace IR
 
 	template<ISA::Op O> inline ISA::Operand<O>& Sequence::emit()
 	{
-		reserve(pSize + 1);
+		if (unlikely(pCapacity < pSize + 1))
+			grow(pSize + 1);
 
 		static_assert(sizeof(Instruction) >= sizeof(ISA::Operand<O>), "pSize mismatch");
 		assert(pSize + 1 < pCapacity);
@@ -845,12 +851,17 @@ namespace IR
 	}
 
 
+	inline void Sequence::emitDebugfile(const AnyString& filename)
+	{
+		auto& operands    = emit<ISA::Op::debugfile>();
+		operands.filename = stringrefs.ref(filename);
+	}
+
 
 	inline const void* Sequence::pointer(uint32_t offset) const
 	{
-		return reinterpret_cast<const void*>(pBody.get() + offset);
+		return reinterpret_cast<const void*>(pBody + offset);
 	}
-
 
 	inline Yuni::String Sequence::gdbMemoryWatch(uint32_t offset) const
 	{
@@ -861,10 +872,10 @@ namespace IR
 	inline uint32_t Sequence::offsetOf(const Instruction& instr) const
 	{
 		assert(pSize > 0 and pCapacity > 0);
-		assert(&instr >= pBody.get());
-		assert(&instr <  pBody.get() + pSize);
+		assert(&instr >= pBody);
+		assert(&instr <  pBody + pSize);
 
-		auto start = reinterpret_cast<std::uintptr_t>(pBody.get());
+		auto start = reinterpret_cast<std::uintptr_t>(pBody);
 		auto end   = reinterpret_cast<std::uintptr_t>(&instr);
 		assert((end - start) / sizeof(Instruction) < 512 * 1024 * 1024); // arbitrary
 
@@ -889,18 +900,18 @@ namespace IR
 
 	inline void Sequence::invalidateCursor(const Instruction*& cursor) const
 	{
-		cursor = pBody.get() + pSize;
+		cursor = pBody + pSize;
 	}
 
 	inline void Sequence::invalidateCursor(Instruction*& cursor) const
 	{
-		cursor = pBody.get() + pSize;
+		cursor = pBody + pSize;
 	}
 
 
 	inline void Sequence::jumpToLabelForward(const Instruction*& cursor, uint32_t label) const
 	{
-		auto* end = pBody.get() + pSize;
+		const auto* const end = pBody + pSize;
 		while (++cursor < end)
 		{
 			if (cursor->opcodes[0] == static_cast<uint32_t>(IR::ISA::Op::label))
@@ -917,7 +928,7 @@ namespace IR
 
 	inline void Sequence::jumpToLabelBackward(const Instruction*& cursor, uint32_t label) const
 	{
-		auto* base = pBody.get();
+		const auto* const base = pBody;
 		while (cursor-- > base)
 		{
 			if (cursor->opcodes[0] == static_cast<uint32_t>(IR::ISA::Op::label))
@@ -937,13 +948,13 @@ namespace IR
 	{
 		if (likely(offset < pSize))
 		{
-			auto* it = pBody.get() + offset;
-			auto* end = pBody.get() + pSize;
+			auto* it = pBody + offset;
+			const auto* const end = pBody + pSize;
 			visitor.cursor = &it;
 			for ( ; it < end; ++it)
 			{
 				#if NANY_PRINT_sequence_OPCODES != 0
-				std::cout << "== opcode == at " << (it - pBody.get()) << "|" << (void*) it << " :: "
+				std::cout << "== opcode == at " << (it - pBody) << "|" << (void*) it << " :: "
 					<< it->opcodes[0] << ": " << IR::ISA::print(*this, *it) << '\n';
 				#endif
 				LIBNANY_IR_VISIT_SEQUENCE(IR::ISA::Operand, visitor, *it);
@@ -956,21 +967,19 @@ namespace IR
 	{
 		if (likely(offset < pSize))
 		{
-			const auto* it = pBody.get() + offset;
-			const auto* end = pBody.get() + pSize;
+			const auto* it = pBody + offset;
+			const auto* const end = pBody + pSize;
 			visitor.cursor = &it;
 			for ( ; it < end; ++it)
 			{
 				#if NANY_PRINT_sequence_OPCODES != 0
-				std::cout << "== opcode == at " << (it - pBody.get()) << "|" << (void*) it << " :: "
+				std::cout << "== opcode == at " << (it - pBody) << "|" << (void*) it << " :: "
 					<< it->opcodes[0] << ": " << IR::ISA::print(*this, *it) << '\n';
 				#endif
 				LIBNANY_IR_VISIT_SEQUENCE(const IR::ISA::Operand, visitor, *it);
 			}
 		}
 	}
-
-
 
 
 

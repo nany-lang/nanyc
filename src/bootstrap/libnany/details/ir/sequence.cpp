@@ -13,14 +13,6 @@ namespace IR
 {
 
 
-	Sequence::Sequence()
-		: pBody(nullptr, std::free)
-	{}
-
-	Sequence::~Sequence()
-	{}
-
-
 	void Sequence::clear()
 	{
 		pSize = 0;
@@ -34,18 +26,14 @@ namespace IR
 	}
 
 
-
 	void Sequence::grow(uint32_t N)
 	{
 		auto newcapa = pCapacity;
 		do { newcapa += 1000000; } while (newcapa < N);
 		pCapacity = newcapa;
 
-		Instruction* instrs = pBody.release();
-		instrs = (Instruction*)::std::realloc(instrs, sizeof(Instruction) * newcapa);
-		if (nullptr != instrs)
-			pBody.reset(instrs);
-		else
+		pBody = (Instruction*)::std::realloc(pBody, sizeof(Instruction) * newcapa);
+		if (unlikely(nullptr == pBody))
 			throw std::bad_alloc();
 	}
 
@@ -55,19 +43,16 @@ namespace IR
 		if (pSize == 0)
 		{
 			pCapacity = 0;
-			pBody.reset(nullptr);
+			std::free(pBody);
+			pBody = nullptr;
 		}
 		else
 		{
-			Instruction* instrs = pBody.release();
-			instrs = (Instruction*) std::realloc(instrs, sizeof(Instruction) * pSize);
-			if (nullptr != instrs)
-				pBody.reset(instrs);
-			else
+			pBody = (Instruction*) std::realloc(pBody, sizeof(Instruction) * pSize);
+			if (unlikely(nullptr == pBody))
 				throw std::bad_alloc();
 		}
 	}
-
 
 
 	void Sequence::print(Clob& out, const AtomMap* atommap) const
@@ -86,13 +71,6 @@ namespace IR
 		Printer<String> printer{out, *this};
 		printer.atommap = atommap;
 		each(printer);
-	}
-
-
-	void Sequence::emitDebugfile(const AnyString& filename)
-	{
-		auto& operands    = emit<ISA::Op::debugfile>();
-		operands.filename = stringrefs.ref(filename);
 	}
 
 

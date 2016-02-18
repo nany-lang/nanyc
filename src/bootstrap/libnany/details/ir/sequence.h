@@ -30,7 +30,7 @@ namespace IR
 		//! \name Constructors & Destructor
 		//@{
 		//! Default constructor
-		Sequence();
+		Sequence() = default;
 		//! Copy constructor
 		Sequence(const Sequence&) = delete;
 		//! Destructor
@@ -328,6 +328,7 @@ namespace IR
 		Yuni::String gdbMemoryWatch(uint32_t offset) const;
 		//@}
 
+
 	public:
 		//! All strings
 		StringRefs stringrefs;
@@ -339,11 +340,11 @@ namespace IR
 
 	private:
 		//! Size of the sequence
-		uint32_t pSize = 0;
+		uint32_t pSize = 0u;
 		//! Capacity of the sequence
-		uint32_t pCapacity = 0;
+		uint32_t pCapacity = 0u;
 		//! pBody of the sequence
-		std::unique_ptr<Instruction, decltype(std::free)*> pBody;
+		Instruction* pBody = nullptr;
 		//! Attaced Atom, if any
 		Atom* pAtom = nullptr;
 
