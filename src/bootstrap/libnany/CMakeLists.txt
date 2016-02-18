@@ -277,6 +277,7 @@ addsrc(
 	"details/utils/stringrefs.h"
 	"details/utils/stringrefs.hxx"
 	"details/utils/stringrefs.cpp"
+	"details/utils/memory-allocator.h"
 	"details/utils/check-for-valid-identifier-name.cpp"
 	"details/utils/check-for-valid-identifier-name.h"
 	"details/utils/clid.h"
