@@ -36,8 +36,8 @@ namespace Nany
 
 		Allocator(const Allocator&) noexcept = default;
 
-		static pointer address(reference x) const noexcept { return &x; }
-		static const_pointer address(const_reference x) const noexcept { return &x; }
+		static pointer address(reference x) noexcept { return &x; }
+		static const_pointer address(const_reference x) noexcept { return &x; }
 
 		pointer allocate(size_type n, const_pointer /*hint*/ = nullptr)
 		{
@@ -52,13 +52,13 @@ namespace Nany
 			context.memory.release(&context, p, n * sizeof(T));
 		}
 
-		size_type max_size() const noexcept
+		static size_type max_size() noexcept
 		{
 			return std::template numeric_limits<size_type>::max();
 		}
 
 		template<class U, class... Args>
-		void construct(U* p, Args&&... args);
+		void construct(U* p, Args&&... args)
 		{
 			::new((void*) p) U(std::forward<Args>(args)...);
 		}

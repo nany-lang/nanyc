@@ -40,7 +40,6 @@ namespace Nany
 	class Intrinsic;
 
 
-
 } // namespace Nany
 
 

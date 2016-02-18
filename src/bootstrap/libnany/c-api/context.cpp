@@ -2,6 +2,7 @@
 #include "nany/nany.h"
 #include "details/context/context.h"
 #include <limits.h>
+#include "details/utils/memory-allocator.h"
 
 using namespace Yuni;
 
@@ -87,7 +88,9 @@ nany_initialize(nycontext_t* ctx, const nycontext_t* inherit, const nycontext_me
 			if (ctx->mt.queueservice)
 				reinterpret_cast<Job::QueueService*>(ctx->mt.queueservice)->addRef();
 
-			ctx->internal = new Nany::Context(*ctx, *inheritInternal);
+			Nany::Allocator<Nany::Context> alloc{*ctx};
+			ctx->internal = alloc.allocate(1);
+			alloc.construct(reinterpret_cast<Nany::Context*>(ctx->internal), *ctx, *inheritInternal);
 		}
 		else
 		{
@@ -124,8 +127,11 @@ nany_initialize(nycontext_t* ctx, const nycontext_t* inherit, const nycontext_me
 			ctx->mt.limit_task_count   = Nany::Defaults::limit_task_count;
 
 			// build
-			ctx->internal = new Nany::Context(*ctx);
 			ctx->build.on_err_file_access = nanysdbx_build_on_err_file_access;
+
+			Nany::Allocator<Nany::Context> alloc{*ctx};
+			ctx->internal = alloc.allocate(1);
+			alloc.construct(reinterpret_cast<Nany::Context*>(ctx->internal), *ctx);
 		}
 
 		if (ctx->build.on_context_create)
@@ -148,7 +154,12 @@ extern "C" void nany_uninitialize(nycontext_t* context)
 
 		try
 		{
-			delete (reinterpret_cast<Nany::Context*>(context->internal));
+			if (auto* p = reinterpret_cast<Nany::Context*>(context->internal))
+			{
+				Nany::Allocator<Nany::Context> alloc{*context};
+				alloc.destroy(p);
+				alloc.deallocate(p, 1);
+			}
 		}
 		catch (...){}
 
