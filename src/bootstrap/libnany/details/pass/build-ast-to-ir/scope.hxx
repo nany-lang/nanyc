@@ -75,14 +75,12 @@ namespace Producer
 
 	inline void Scope::addDebugCurrentPosition(uint line, uint offset)
 	{
-		if (context.debuginfo)
+		if (context.debuginfo and (not Config::removeRedundantDbgOffset
+			or offset != context.pPreviousDbgOffset or line != context.pPreviousDbgLine))
 		{
-			if (not Config::removeRedundantDbgOffset or offset != context.pPreviousDbgOffset or line != context.pPreviousDbgLine)
-			{
-				sequence().emitDebugpos(line, offset);
-				context.pPreviousDbgOffset = offset;
-				context.pPreviousDbgLine = line;
-			}
+			sequence().emitDebugpos(line, offset);
+			context.pPreviousDbgOffset = offset;
+			context.pPreviousDbgLine = line;
 		}
 	}
 

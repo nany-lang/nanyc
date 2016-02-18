@@ -18,6 +18,7 @@
 
 
 
+struct nytcontext_t;
 
 
 

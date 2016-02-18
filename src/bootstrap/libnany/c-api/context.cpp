@@ -31,7 +31,8 @@ namespace Defaults
 
 
 
-extern "C" nycontext_t* nany_create(const nycontext_t* inherit)
+extern "C" nycontext_t*
+nany_create(const nycontext_t* inherit, const nycontext_memory_t* allocator)
 {
 	if (inherit and inherit->build.on_context_create_query)
 	{
@@ -42,7 +43,7 @@ extern "C" nycontext_t* nany_create(const nycontext_t* inherit)
 	nycontext_t* ctx = (nycontext_t*) malloc(sizeof(nycontext_t));
 	if (YUNI_LIKELY(ctx))
 	{
-		nybool_t success = nany_initialize(ctx, inherit);
+		nybool_t success = nany_initialize(ctx, inherit, allocator);
 		if (YUNI_UNLIKELY(success == nyfalse))
 		{
 			memset(ctx, 0x0, sizeof(nycontext_t));
@@ -54,7 +55,8 @@ extern "C" nycontext_t* nany_create(const nycontext_t* inherit)
 }
 
 
-extern "C" nybool_t nany_initialize(nycontext_t* ctx, const nycontext_t* inherit)
+extern "C" nybool_t
+nany_initialize(nycontext_t* ctx, const nycontext_t* inherit, const nycontext_memory_t* allocator)
 {
 	if (YUNI_UNLIKELY(!ctx))
 		return nyfalse;
@@ -66,13 +68,15 @@ extern "C" nybool_t nany_initialize(nycontext_t* ctx, const nycontext_t* inherit
 			if (YUNI_UNLIKELY(!inheritInternal))
 				return nyfalse;
 
-			memcpy(ctx, inherit, sizeof(nycontext_t));
+			::memcpy(ctx, inherit, sizeof(nycontext_t));
+			if (allocator)
+				ctx->memory = *allocator;
 
 			if (ctx->io.chroot_path_size != 0)
 			{
 				size_t len = ctx->io.chroot_path_size;
 				char* cstr = (char*) malloc(sizeof(char) * len + 1);
-				memcpy(cstr, ctx->io.chroot_path, sizeof(char) * len);
+				::memcpy(cstr, ctx->io.chroot_path, sizeof(char) * len);
 				cstr[len] = '\0';
 				ctx->io.chroot_path = cstr;
 			}
@@ -90,11 +94,16 @@ extern "C" nybool_t nany_initialize(nycontext_t* ctx, const nycontext_t* inherit
 			memset(ctx, 0x0, sizeof(nycontext_t));
 
 			// memory
-			ctx->memory.allocate   = nanysdbx_mem_alloc;
-			ctx->memory.reallocate = nanysdbx_mem_realloc;
-			ctx->memory.release    = nanysdbx_mem_free;
-			ctx->memory.limit_mem_size = Nany::Defaults::limit_mem_size;
-			ctx->memory.on_not_enough_memory = nanysdbx_not_enough_memory;
+			if (nullptr == allocator)
+			{
+				ctx->memory.allocate   = nanysdbx_mem_alloc;
+				ctx->memory.reallocate = nanysdbx_mem_realloc;
+				ctx->memory.release    = nanysdbx_mem_free;
+				ctx->memory.limit_mem_size = Nany::Defaults::limit_mem_size;
+				ctx->memory.on_not_enough_memory = nanysdbx_not_enough_memory;
+			}
+			else
+				ctx->memory = *allocator;
 
 			// I/O
 			ctx->io.chroot_path = nullptr;

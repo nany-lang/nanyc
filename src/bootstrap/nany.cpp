@@ -72,7 +72,7 @@ static inline int execute(int argc, char** argv, const Options& options)
 
 	// nany context
 	nycontext_t ctx;
-	nany_initialize(&ctx, nullptr);
+	nany_initialize(&ctx, nullptr, nullptr);
 
 	// for concurrent build
 	if (options.jobs > 1)

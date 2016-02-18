@@ -317,6 +317,25 @@ nytctx_t;
 
 
 
+typedef struct nycontext_memory_t
+{
+	/*! Allocates some memory */
+	void* (*allocate)(nycontext_t*, size_t);
+	/*! Re-allocate */
+	void* (*reallocate)(nycontext_t*, void* ptr, size_t oldsize, size_t newsize);
+	/*! free */
+	void (*release)(nycontext_t*, void* ptr, size_t);
+
+	/*! Memory usage limit (in bytes) */
+	size_t limit_mem_size;
+
+	/*! event: not enough memory */
+	void (*on_not_enough_memory)(nycontext_t*);
+}
+nycontext_memory_t;
+
+
+
 /*!
 ** \brief Nany context
 */
@@ -326,24 +345,10 @@ typedef struct nycontext_t
 	/*! User data */
 	void* userdata;
 
-	struct nycontext_memory_t
-	{
-		/*! Allocates some memory */
-		void* (*allocate)(nycontext_t*, size_t);
-		/*! Re-allocate */
-		void* (*reallocate)(nycontext_t*, void* ptr, size_t oldsize, size_t newsize);
-		/*! free */
-		void (*release)(nycontext_t*, void* ptr, size_t);
-		/*! Memory limit in bytes (0 means unlimited) */
-		/* (meaningful only if used by the implementation) */
-		size_t limit_mem_size;
+	/*! Memory management */
+	nycontext_memory_t  memory;
 
-		/*! event: not enough memory */
-		void (*on_not_enough_memory)(nycontext_t*);
-	}
-	memory;
-
-	struct nycontext_io_t
+	struct io_t
 	{
 		/*! Open a new handle to a given filename */
 		nyfd_t (*open)(nycontext_t*, const char* filename, size_t length, uint32_t flags);
@@ -360,7 +365,7 @@ typedef struct nycontext_t
 	}
 	io;
 
-	struct nycontext_console_t
+	struct console_t
 	{
 		/*! Write some data to STDOUT */
 		void (*write_stdout)(nycontext_t*, const char* text, size_t length);
@@ -374,7 +379,7 @@ typedef struct nycontext_t
 	console;
 
 
-	struct nycontext_mt_t
+	struct mt_t
 	{
 		/*! queueservice for concurrent jobs */
 		nyqueueservice_t* queueservice;
@@ -401,7 +406,7 @@ typedef struct nycontext_t
 	mt;
 
 
-	struct nycontext_program_t
+	struct program_t
 	{
 		/*! event: the program has started */
 		nybool_t (*on_start)(nycontext_t*, int argc, const char** argv);
@@ -413,7 +418,7 @@ typedef struct nycontext_t
 	program;
 
 
-	struct nycontext_build_t
+	struct build_t
 	{
 		/*! event: a context is about to be created (from another one) */
 		nybool_t (*on_context_create_query)(const nycontext_t* ctxtemplate);
@@ -466,9 +471,11 @@ nycontext_t;
 ** \brief Create and initialize a new context
 **
 ** \param inherit A context to inherit from (can be NULL)
+** \param allocator Custom allocator functions (can be NULL)
 ** \see nany_dispose()
 */
-NY_EXPORT nycontext_t* nany_create(const nycontext_t* inherit);
+NY_EXPORT nycontext_t*
+nany_create(const nycontext_t* inherit, const nycontext_memory_t* allocator);
 /*!
 ** \brief Release a context previously created by nany_create
 ** \param ctx A context (can be null) to release. The pointer will be set to NULL
@@ -481,12 +488,14 @@ NY_EXPORT void nany_dispose(nycontext_t** ctx);
 **
 ** This method can be used with the context is allocated on the stack
 ** \param inherit A context to inherit from (can be NULL)
+** \param allocator Custom allocator functions (can be NULL)
 **
 ** \note All internal resources are not created immediatly (since it may
 ** require more time or more memory for nothing)
 ** \note The event on_context_create_query will not be triggered
 */
-NY_EXPORT nybool_t nany_initialize(nycontext_t*, const nycontext_t* inherit);
+NY_EXPORT nybool_t
+nany_initialize(nycontext_t*, const nycontext_t* inherit, const nycontext_memory_t* allocator);
 /*!
 ** \brief Uninitialize a context (without freeing the memory)
 **
