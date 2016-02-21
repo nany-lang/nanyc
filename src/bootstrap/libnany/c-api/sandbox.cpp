@@ -58,20 +58,6 @@ static inline int fsync(int fd)
 #endif
 
 
-extern "C" void nanysdbx_not_enough_memory(nycontext_t* ctx, nybool_t limit_reached)
-{
-	ShortString128 msg;
-	msg = "error: not enough memory";
-	if (limit_reached == nytrue)
-		msg << ", sandbox limit reached (" << ctx->memory.limit_mem_size << " bytes)\n";
-	else
-		msg << " from the system\n";
-
-	ctx->console.write_stderr(ctx, msg.c_str(), msg.sizeInBytes());
-	ctx->console.flush_stderr(ctx);
-}
-
-
 extern "C" void nanysdbx_write_stdout(nycontext_t*, const char* text, size_t length)
 {
 	if (YUNI_LIKELY(text != nullptr and length))
@@ -99,74 +85,6 @@ extern "C" void nanysdbx_flush_stderr(nycontext_t*)
 	#ifndef YUNI_OS_WINDOWS
 	::fsync(STDERR_FILENO);
 	#endif
-}
-
-
-extern "C" void* nanysdbx_mem_alloc(nycontext_t* ctx, size_t size)
-{
-	assert(0 != size);
-	if (YUNI_LIKELY((ctx->reserved.mem0 += size) < ctx->memory.limit_mem_size))
-	{
-		void* p = ::malloc(size);
-		if (YUNI_LIKELY(p))
-			return p;
-
-		ctx->reserved.mem0 -= size;
-		if (ctx->memory.on_not_enough_memory)
-			ctx->memory.on_not_enough_memory(ctx, nyfalse);
-	}
-	else
-	{
-		ctx->reserved.mem0 -= size;
-		if (ctx->memory.on_not_enough_memory)
-			ctx->memory.on_not_enough_memory(ctx, nytrue);
-	}
-	return nullptr;
-}
-
-
-extern "C" void* nanysdbx_mem_realloc(nycontext_t* ctx, void* ptr, size_t oldsize, size_t newsize)
-{
-	if (newsize > oldsize)
-	{
-		if (YUNI_LIKELY((ctx->reserved.mem0 += newsize - oldsize) < ctx->memory.limit_mem_size))
-		{
-			void* p = ::realloc(ptr, newsize);
-			if (YUNI_LIKELY(p))
-				return p;
-
-			ctx->reserved.mem0 -= newsize - oldsize;
-		}
-		else
-		{
-			if (ctx->memory.on_not_enough_memory)
-				ctx->memory.on_not_enough_memory(ctx, nytrue);
-			return nullptr;
-		}
-	}
-	else
-	{
-		void* p = ::realloc(ptr, newsize);
-		if (YUNI_LIKELY(p))
-		{
-			ctx->reserved.mem0 -= oldsize - newsize;
-			return p;
-		}
-	}
-
-	if (ctx->memory.on_not_enough_memory)
-		ctx->memory.on_not_enough_memory(ctx, nyfalse);
-	return nullptr;
-}
-
-
-extern "C" void nanysdbx_mem_free(nycontext_t* ctx, void* ptr, size_t size)
-{
-	if (ptr)
-	{
-		free(ptr);
-		ctx->reserved.mem0 -= size;
-	}
 }
 
 

@@ -430,6 +430,7 @@ addsrc(
 	"c-api/print-ast.cpp"
 	"c-api/queueservice.cpp"
 	"c-api/report.cpp"
+	"c-api/memory.cpp"
 	"c-api/sandbox.cpp"
 	"c-api/bind.cpp"
 	"c-api/source.cpp"

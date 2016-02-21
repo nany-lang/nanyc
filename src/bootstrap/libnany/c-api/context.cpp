@@ -98,13 +98,7 @@ nany_initialize(nycontext_t* ctx, const nycontext_t* inherit, const nycontext_me
 
 			// memory
 			if (nullptr == allocator)
-			{
-				ctx->memory.allocate   = nanysdbx_mem_alloc;
-				ctx->memory.reallocate = nanysdbx_mem_realloc;
-				ctx->memory.release    = nanysdbx_mem_free;
-				ctx->memory.limit_mem_size = Nany::Defaults::limit_mem_size;
-				ctx->memory.on_not_enough_memory = nanysdbx_not_enough_memory;
-			}
+				nany_memalloc_init_default(&ctx->memory);
 			else
 				ctx->memory = *allocator;
 

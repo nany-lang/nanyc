@@ -1,4 +1,4 @@
-/*
+ /*
 ** Nany - https://nany.io
 ** This Source Code Form is subject to the terms of the Mozilla Public
 ** License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -447,7 +447,7 @@ typedef struct nycontext_t
 
 	/*! Special values that may not be used directly but are here for performance reasons */
 	struct nycontext_reserved_t {
-		size_t mem0;
+		volatile size_t mem0;
 	}
 	reserved;
 }
@@ -503,6 +503,22 @@ nany_initialize(nycontext_t*, const nycontext_t* inherit, const nycontext_memory
 ** \param inherit A context to inherit from (can be NULL)
 */
 NY_EXPORT void nany_uninitialize(nycontext_t*);
+
+
+
+
+/*!
+** \nbrief Set to the default C memory allocator
+*/
+NY_EXPORT void nany_memalloc_init_default(nycontext_memory_t*);
+
+/*!
+** \nbrief Set to the default C memory allocator with
+*/
+NY_EXPORT void nany_mem_alloc_init_with_limit(nycontext_memory_t*, size_t limit);
+
+
+
 
 
 
@@ -801,9 +817,6 @@ NY_EXPORT size_t nanysdbx_io_read(nycontext_t*, nyfd_t fd, uint8_t* buffer, size
 NY_EXPORT size_t nanysdbx_io_write(nycontext_t*, nyfd_t fd, uint8_t* buffer, size_t size);
 
 NY_EXPORT void  nanysdbx_not_enough_memory(nycontext_t*, nybool_t);
-NY_EXPORT void* nanysdbx_mem_alloc(nycontext_t*, size_t size) LIBNANY_ATTR_ALLOCSIZE(2);
-NY_EXPORT void* nanysdbx_mem_realloc(nycontext_t*, void* ptr, size_t, size_t newsize) LIBNANY_ATTR_ALLOCSIZE2(3,4);
-NY_EXPORT void nanysdbx_mem_free(nycontext_t*, void* ptr, size_t);
 
 NY_EXPORT void nanysdbx_build_on_err_file_access(nycontext_t*, const char* filename, size_t length);
 /*@}*/
