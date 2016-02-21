@@ -218,10 +218,10 @@ namespace Instanciate
 		overloadMatch.clear(); // reset
 		if (p1 != 0) // first parameter
 		{
-			overloadMatch.input.indexedParams.emplace_back(frameAtom.atomid, p1);
+			overloadMatch.input.params.indexed.emplace_back(frameAtom.atomid, p1);
 
 			if (p2 != 0) // second parameter
-				overloadMatch.input.indexedParams.emplace_back(frameAtom.atomid, p2);
+				overloadMatch.input.params.indexed.emplace_back(frameAtom.atomid, p2);
 		}
 
 		if (retlvid != 0) // return value

@@ -9,8 +9,8 @@ namespace Nany
 
 	inline bool FuncOverloadMatch::hasAtLeastOneParameter(Atom& atom) const
 	{
-		return not atom.parameters.empty() or not input.indexedParams.empty()
-			or not input.namedParams.empty();
+		return not atom.parameters.empty() or not input.params.indexed.empty()
+			or not input.params.named.empty();
 	}
 
 

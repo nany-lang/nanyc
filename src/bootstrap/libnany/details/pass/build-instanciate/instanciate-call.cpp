@@ -65,7 +65,7 @@ namespace Instanciate
 			auto& cdefReferer = cdeftable.classdef(CLID{atomid, referer});
 			const Atom* selfAtom = cdeftable.findClassdefAtom(cdefReferer);
 			if (selfAtom and selfAtom->type != Atom::Type::namespacedef)
-				overloadMatch.input.indexedParams.emplace_back(CLID{atomid, referer});
+				overloadMatch.input.params.indexed.emplace_back(CLID{atomid, referer});
 		}
 		else
 		{
@@ -73,13 +73,13 @@ namespace Instanciate
 			// no referer ('a.foo', 'a' would be the referer), but we may have 'self' as implici parameter
 			if (frame.atom.isClassMember())
 			{
-				Atom* callParent = atom;
-				if (nullptr == callParent)
+				Atom* callParent;
+				if (nullptr == atom)
 				{
 					// the solutions should all have the same parent
 					auto& solutions = frame.resolvePerCLID[cdefFuncToCall.clid];
-					if (not solutions.empty())
-						callParent = solutions[0].get().parent;
+					callParent = (not solutions.empty())
+						? solutions[0].get().parent : nullptr;
 				}
 				else
 					callParent = atom->parent;
@@ -87,7 +87,7 @@ namespace Instanciate
 				if (callParent and callParent == frame.atom.parent) // method from the same class
 				{
 					// 0: invalid, 1: return type, 2: first parameter
-					overloadMatch.input.indexedParams.emplace_back(CLID{frame.atomid, 2});
+					overloadMatch.input.params.indexed.emplace_back(CLID{frame.atomid, 2});
 				}
 			}
 		}
@@ -98,14 +98,14 @@ namespace Instanciate
 		{
 			if (not frame.verify(indxparm.lvid))
 				return false;
-			overloadMatch.input.indexedParams.emplace_back(CLID{atomid, indxparm.lvid});
+			overloadMatch.input.params.indexed.emplace_back(CLID{atomid, indxparm.lvid});
 		}
 		// named parameters
 		for (auto nmparm: pushedparams.func.named)
 		{
 			if (not frame.verify(nmparm.lvid))
 				return false;
-			overloadMatch.input.namedParams.emplace_back(std::make_pair(nmparm.name, CLID{atomid, nmparm.lvid}));
+			overloadMatch.input.params.named.emplace_back(std::make_pair(nmparm.name, CLID{atomid, nmparm.lvid}));
 		}
 
 

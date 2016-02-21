@@ -51,10 +51,12 @@ namespace Nany
 		{
 			//! The return type
 			std::vector<CLID> rettype;
-			//! Indexed parameters
-			std::vector<CLID> indexedParams;
-			//! name parameters
-			std::vector<std::pair<AnyString, CLID>> namedParams;
+
+			struct {
+				std::vector<CLID> indexed;
+				std::vector<std::pair<AnyString, CLID>> named;
+			}
+			params;
 		}
 		input;
 

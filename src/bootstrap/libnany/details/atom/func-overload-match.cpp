@@ -19,8 +19,8 @@ namespace Nany
 		, table(table)
 	{
 		input.rettype.reserve(1); // currently, only 1 return value is allowed
-		input.indexedParams.reserve(Config::maxPushedParameters);
-		input.namedParams.reserve(Config::maxPushedParameters);
+		input.params.indexed.reserve(Config::maxPushedParameters);
+		input.params.named.reserve(Config::maxPushedParameters);
 		result.params.reserve(Config::maxPushedParameters);
 	}
 
@@ -28,8 +28,8 @@ namespace Nany
 	void FuncOverloadMatch::clear()
 	{
 		input.rettype.clear();
-		input.indexedParams.clear();
-		input.namedParams.clear();
+		input.params.indexed.clear();
+		input.params.named.clear();
 
 		result.params.clear();
 		result.funcToCall = nullptr;
@@ -38,26 +38,26 @@ namespace Nany
 
 	void FuncOverloadMatch::printInputParameters(String& out) const
 	{
-		if (not input.indexedParams.empty())
+		if (not input.params.indexed.empty())
 		{
-			table.classdef(input.indexedParams.front()).print(out, table, false);
+			table.classdef(input.params.indexed.front()).print(out, table, false);
 
-			for (auto it = input.indexedParams.begin() + 1; it != input.indexedParams.end(); ++it)
+			for (auto it = input.params.indexed.begin() + 1; it != input.params.indexed.end(); ++it)
 			{
 				out.write(", ", 2);
 				table.classdef(*it).print(out, table, false);
 			}
 		}
 
-		if (not input.namedParams.empty())
+		if (not input.params.named.empty())
 		{
-			if (not input.indexedParams.empty())
+			if (not input.params.indexed.empty())
 				out.write(", ", 2);
 
-			(out << input.namedParams.front().first).write(": ", 2);
-			table.classdef(input.namedParams.front().second).print(out, table, false);
+			(out << input.params.named.front().first).write(": ", 2);
+			table.classdef(input.params.named.front().second).print(out, table, false);
 
-			for (auto it = input.namedParams.begin() + 1; it != input.namedParams.end(); ++it)
+			for (auto it = input.params.named.begin() + 1; it != input.params.named.end(); ++it)
 			{
 				out.write(", ", 2);
 				(out << it->first).write(": ", 2);
@@ -115,17 +115,18 @@ namespace Nany
 		result.params.clear();
 		result.funcToCall = &atom;
 
-		if (not atom.isFunction())
+		if (unlikely(not atom.isFunction()))
 			return TypeCheck::Match::none;
 
 		// trivial check, too many parameters for this overload
-		if (atom.parameters.size() < (uint32_t) input.indexedParams.size())
+		if (atom.parameters.size() < (uint32_t) input.params.indexed.size())
 		{
 			if (unlikely(canGenerateReport))
 			{
 				// do not take into consideration the 'self' parameter for error reporting
-				uint selfidx = (atom.isClassMember() and atom.isFunction());
-				report.get().hint() << "too many parameters. Got " << (input.indexedParams.size() - selfidx)
+				uint32_t selfidx = static_cast<uint32_t>(atom.isClassMember() and atom.isFunction());
+				report.get().hint() << "too many parameters. Got "
+					<< (input.params.indexed.size() - selfidx)
 					<< ", expected: " << (atom.parameters.size() - selfidx);
 			}
 			return TypeCheck::Match::none;
@@ -134,7 +135,7 @@ namespace Nany
 		pAllowImplicit = allowImplicit;
 		bool perfectMatch /*= false*/;
 
-		// checking input parameters
+		// checking input.params
 		// determine whether there is at least one parameter, in the atom or pushed
 		if (hasAtLeastOneParameter(atom))
 		{
@@ -142,9 +143,9 @@ namespace Nany
 			result.params.resize(atom.parameters.size());
 
 			// trying to resolve indexed parameters (if they match)
-			for (uint32_t i = 0; i != (uint32_t) input.indexedParams.size(); ++i)
+			for (uint32_t i = 0; i != (uint32_t) input.params.indexed.size(); ++i)
 			{
-				switch (pushParameter(atom, i, input.indexedParams[i]))
+				switch (pushParameter(atom, i, input.params.indexed[i]))
 				{
 					case TypeCheck::Match::equal:       perfectMatch = false; break;
 					case TypeCheck::Match::strictEqual: break;
@@ -153,10 +154,10 @@ namespace Nany
 			}
 
 			// try to resolve named-parameters
-			if (not input.namedParams.empty())
+			if (not input.params.named.empty())
 			{
-				uint32_t offset = (uint32_t) input.indexedParams.size();
-				for (auto& pair: input.namedParams)
+				uint32_t offset = (uint32_t) input.params.indexed.size();
+				for (auto& pair: input.params.named)
 				{
 					uint32_t index = atom.parameters.findByName(pair.first, offset);
 					// the named parameter is not present after indexed parameters
@@ -179,7 +180,7 @@ namespace Nany
 			}
 
 			// check for missing default values
-			for (size_t i = input.indexedParams.size(); i < result.params.size(); ++i)
+			for (size_t i = input.params.indexed.size(); i < result.params.size(); ++i)
 			{
 				if (nullptr == result.params[i].cdef or result.params[i].cdef->clid.isVoid()) // undefined - TODO: default values
 				{
