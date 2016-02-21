@@ -1,6 +1,7 @@
 #include <yuni/yuni.h>
 #include <yuni/string.h>
 #include <yuni/core/system/main.h>
+#include <yuni/core/system/environment.h>
 #include <yuni/io/file.h>
 #include <nany/nany.h>
 #include <memory>
@@ -20,6 +21,8 @@ struct Options
 	bool verbose = false;
 	//! Maximum number of jobs
 	uint32_t jobs = 1;
+	//! Memory limit (zero means unlimited)
+	size_t memoryLimit = 0;
 };
 
 
@@ -63,6 +66,31 @@ static int unknownOption(const AnyString& name)
 }
 
 
+static inline void initializeContext(nycontext_t& ctx, const Options& options)
+{
+	size_t memoryLimit = options.memoryLimit;
+	if (memoryLimit == 0)
+		memoryLimit = static_cast<size_t>(System::Environment::ReadAsUInt64("NANY_MEMORY_LIMIT", 0));
+
+	if (memoryLimit == 0)
+	{
+		// internal: using nullptr should be slighty faster than
+		// using 'nany_memalloc_init_default' + custom memalloc as parameter
+		nany_initialize(&ctx, nullptr, nullptr);
+	}
+	else
+	{
+		nycontext_memory_t memalloc;
+		nany_mem_alloc_init_with_limit(&memalloc, memoryLimit);
+		nany_initialize(&ctx, nullptr, &memalloc);
+	}
+
+	// for concurrent build, create a queue service if more than
+	// one concurrent job is allowed
+	if (options.jobs > 1)
+		ctx.mt.queueservice = nany_queueservice_create();
+}
+
 
 static inline int execute(int argc, char** argv, const Options& options)
 {
@@ -72,14 +100,10 @@ static inline int execute(int argc, char** argv, const Options& options)
 
 	// nany context
 	nycontext_t ctx;
-	nany_initialize(&ctx, nullptr, nullptr);
+	initializeContext(ctx, options);
 
-	// for concurrent build
-	if (options.jobs > 1)
-		ctx.mt.queueservice = nany_queueservice_create();
-
+	// sources
 	nany_source_add_from_file_n(&ctx, scriptfile.c_str(), scriptfile.size());
-
 
 	// building
 	bool buildstatus;
@@ -130,7 +154,6 @@ static inline int execute(int argc, char** argv, const Options& options)
 
 
 
-
 YUNI_MAIN_CONSOLE(argc, argv)
 {
 	argv0 = argv[0];
@@ -139,7 +162,6 @@ YUNI_MAIN_CONSOLE(argc, argv)
 		std::cerr << argv0 << ": no input script file\n";
 		return EXIT_FAILURE;
 	}
-
 
 	try
 	{
