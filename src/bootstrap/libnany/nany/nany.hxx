@@ -36,14 +36,14 @@ inline size_t nany_type_sizeof(nytype_t type)
 }
 
 
-inline void nany_source_add_from_file(nycontext_t* ctx, const char* const filename)
+inline nybool_t nany_source_add_from_file(nycontext_t* ctx, const char* const filename)
 {
 	size_t length = (filename ? strlen(filename) : 0u);
 	return nany_source_add_from_file_n(ctx, filename, length);
 }
 
 
-inline void nany_source_add(nycontext_t* ctx, const char* const text)
+inline nybool_t nany_source_add(nycontext_t* ctx, const char* const text)
 {
 	size_t length = (text ? strlen(text) : 0u);
 	return nany_source_add_n(ctx, text, length);

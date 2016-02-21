@@ -66,7 +66,7 @@ static int unknownOption(const AnyString& name)
 }
 
 
-static inline void initializeContext(nycontext_t& ctx, const Options& options)
+static inline bool initializeContext(nycontext_t& ctx, const Options& options)
 {
 	size_t memoryLimit = options.memoryLimit;
 	if (memoryLimit == 0)
@@ -76,37 +76,45 @@ static inline void initializeContext(nycontext_t& ctx, const Options& options)
 	{
 		// internal: using nullptr should be slighty faster than
 		// using 'nany_memalloc_init_default' + custom memalloc as parameter
-		nany_initialize(&ctx, nullptr, nullptr);
+		if (nyfalse == nany_initialize(&ctx, nullptr, nullptr))
+			return false;
 	}
 	else
 	{
 		nycontext_memory_t memalloc;
 		nany_mem_alloc_init_with_limit(&memalloc, memoryLimit);
-		nany_initialize(&ctx, nullptr, &memalloc);
+		if (nyfalse == nany_initialize(&ctx, nullptr, &memalloc))
+			return false;
 	}
 
 	// for concurrent build, create a queue service if more than
 	// one concurrent job is allowed
 	if (options.jobs > 1)
 		ctx.mt.queueservice = nany_queueservice_create();
+	return true;
 }
 
 
 static inline int execute(int argc, char** argv, const Options& options)
 {
 	assert(argc >= 1);
-	String scriptfile;
-	IO::Canonicalize(scriptfile, argv[0]);
+	int exitstatus = 66;
 
 	// nany context
 	nycontext_t ctx;
-	initializeContext(ctx, options);
+	bool init = initializeContext(ctx, options);
+	if (YUNI_UNLIKELY(not init))
+		return exitstatus;
 
 	// sources
-	nany_source_add_from_file_n(&ctx, scriptfile.c_str(), scriptfile.size());
+	String scriptfile;
+	IO::Canonicalize(scriptfile, argv[0]);
+	auto r = nany_source_add_from_file_n(&ctx, scriptfile.c_str(), scriptfile.size());
+	init = (r == nytrue);
 
 	// building
 	bool buildstatus;
+	if (init)
 	{
 		nyreport_t* report = nullptr;
 		buildstatus = (nany_build(&ctx, &report) == nytrue);
@@ -118,10 +126,10 @@ static inline int execute(int argc, char** argv, const Options& options)
 
 		nany_report_unref(&report);
 	}
-
+	else
+		buildstatus = false;
 
 	// executing the program
-	int exitstatus = 66;
 	if (buildstatus)
 	{
 		if (argc == 1)

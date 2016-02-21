@@ -553,14 +553,14 @@ NY_EXPORT nybool_t nany_trylock(const nycontext_t*);
 /*! \name Sources */
 /*@{*/
 /*! Add a source file */
-inline void nany_source_add_from_file(nycontext_t*, const char* const filename);
+inline nybool_t nany_source_add_from_file(nycontext_t*, const char* const filename);
 /*! Add a source file */
-NY_EXPORT void nany_source_add_from_file_n(nycontext_t*, const char* const filename, size_t len);
+NY_EXPORT nybool_t nany_source_add_from_file_n(nycontext_t*, const char* const filename, size_t len);
 
 /*! Add a source */
-inline void nany_source_add(nycontext_t*, const char* const text);
+inline nybool_t nany_source_add(nycontext_t*, const char* const text);
 /*! Add a source */
-NY_EXPORT void nany_source_add_n(nycontext_t*, const char* const text, size_t len);
+NY_EXPORT nybool_t nany_source_add_n(nycontext_t*, const char* const text, size_t len);
 /*@}*/
 
 
