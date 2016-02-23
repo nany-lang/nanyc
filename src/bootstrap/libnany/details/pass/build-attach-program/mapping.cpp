@@ -708,6 +708,7 @@ namespace Mapping
 			// all following opcodes can be safely ignored
 			case IR::ISA::Op::allocate:
 			case IR::ISA::Op::comment:
+			case IR::ISA::Op::ensureresolved:
 			case IR::ISA::Op::classdefsizeof:
 			case IR::ISA::Op::namealias:
 			case IR::ISA::Op::store:

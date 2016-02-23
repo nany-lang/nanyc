@@ -719,6 +719,13 @@ namespace IR
 	}
 
 
+	inline void Sequence::emitEnsureTypeResolved(uint32_t lvid)
+	{
+		auto& operands = emit<ISA::Op::ensureresolved>();
+		operands.lvid  = lvid;
+	}
+
+
 	inline void Sequence::emitPush(uint32_t lvid)
 	{
 		auto& operands = emit<ISA::Op::push>();

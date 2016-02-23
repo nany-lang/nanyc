@@ -389,6 +389,11 @@ namespace // anonymous
 			printString(operands.text);
 		}
 
+		void print(const Operand<Op::ensureresolved>& operands)
+		{
+			out << tabs << "ensure resolved %" << operands.lvid;
+		}
+
 
 		void print(const Operand<Op::label>& operands)
 		{

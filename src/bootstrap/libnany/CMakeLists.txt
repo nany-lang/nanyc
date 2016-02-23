@@ -224,6 +224,7 @@ addsrc(
 	"details/pass/build-instanciate/stack-frame.h"
 	"details/pass/build-instanciate/stack-frame.hxx"
 	"details/pass/build-instanciate/instanciate-identify.cpp"
+	"details/pass/build-instanciate/instanciate-ensure-resolved.cpp"
 	"details/pass/build-instanciate/instanciate-self.cpp"
 	"details/pass/build-instanciate/instanciate-allocate.cpp"
 	"details/pass/build-instanciate/instanciate-stacksize.cpp"

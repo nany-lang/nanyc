@@ -74,6 +74,35 @@ namespace Instanciate
 	}
 
 
+	bool SequenceBuilder::complainMultipleOverloads(LVID lvid)
+	{
+		assert(not atomStack.empty());
+
+		auto& frame = atomStack.back();
+		auto err = (error() << "ambigous call");
+		if (not frame.lvids[lvid].resolvedName.empty())
+			err << " to '" << frame.lvids[lvid].resolvedName << "'";
+
+		CLID clid{frame.atomid, lvid};
+
+		auto& solutions = frame.resolvePerCLID[clid];
+		for (size_t i = 0; i != solutions.size(); ++i)
+		{
+			auto& atom = solutions[i].get();
+			auto hint = err.hint();
+			hint.message.origins.location.filename   = atom.origin.filename;
+			hint.message.origins.location.pos.line   = atom.origin.line;
+			hint.message.origins.location.pos.offset = atom.origin.offset;
+
+			hint << '\'';
+			hint << cdeftable.keyword(atom) << ' ';
+			atom.retrieveCaption(hint.text(), cdeftable);
+			hint << "' is a suitable candidate";
+		}
+		return false;
+	}
+
+
 	bool SequenceBuilder::complainMultipleOverloads(LVID lvid, const std::vector<std::reference_wrapper<Atom>>& solutions
 	   , const OverloadedFuncCallResolver& resolver)
 	{

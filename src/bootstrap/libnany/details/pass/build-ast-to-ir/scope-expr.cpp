@@ -94,8 +94,12 @@ namespace Producer
 		// always creating a new scope for a expr
 		IR::Producer::Scope scope{*this};
 		scope.emitDebugpos(node);
-		return scope.visitASTExprContinuation(node, localvar, allowScope);
+		bool r = scope.visitASTExprContinuation(node, localvar, allowScope);
+		if (r and localvar != 0 and localvar != (uint32_t) -1)
+			scope.sequence().emitEnsureTypeResolved(localvar);
+		return r;
 	}
+
 
 
 

@@ -145,6 +145,7 @@ namespace Instanciate
 		void visit(const IR::ISA::Operand<IR::ISA::Op::classdefsizeof>&);
 		void visit(const IR::ISA::Operand<IR::ISA::Op::follow>&);
 		void visit(const IR::ISA::Operand<IR::ISA::Op::identify>&);
+		void visit(const IR::ISA::Operand<IR::ISA::Op::ensureresolved>&);
 		void visit(const IR::ISA::Operand<IR::ISA::Op::debugfile>&);
 		void visit(const IR::ISA::Operand<IR::ISA::Op::debugpos>&);
 		void visit(const IR::ISA::Operand<IR::ISA::Op::pragma>&);
@@ -255,6 +256,8 @@ namespace Instanciate
 
 		bool complainMultipleOverloads(LVID lvid, const std::vector<std::reference_wrapper<Atom>>& solutions,
 			const OverloadedFuncCallResolver& resolver);
+
+		bool complainMultipleOverloads(LVID lvid);
 
 		bool complainRedeclared(const AnyString& name, uint32_t previousDeclaration);
 

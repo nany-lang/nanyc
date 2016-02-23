@@ -586,6 +586,13 @@ namespace ISA
 		uint32_t text;
 	};
 
+	template<> struct Operand<Nany::IR::ISA::Op::ensureresolved> final
+	{
+		constexpr static const char* opname() { return "ensureresolved"; }
+		uint32_t opcode;
+		uint32_t lvid;
+	};
+
 	template<> struct Operand<Nany::IR::ISA::Op::assign> final
 	{
 		constexpr static const char* opname() { return "assign"; }

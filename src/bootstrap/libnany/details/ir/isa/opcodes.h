@@ -134,8 +134,11 @@ namespace ISA //!< Instruction Set Architecture
 
 		// --- opcodes for compilation only
 
-		//! fetch a variable or a function
+		//! try to identity an identifier (partially or completely from its referer)
 		identify,
+		//! try to identify completely the type of sub expression
+		// (if not already done by 'identity')
+		ensureresolved,
 		//! assign a variable to another
 		assign,
 		//! declare a register as 'self'
@@ -255,6 +258,7 @@ namespace ISA //!< Instruction Set Architecture
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::fieldget) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::fieldset) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::identify) \
+				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::ensureresolved) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::assign) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::self) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::comment) \

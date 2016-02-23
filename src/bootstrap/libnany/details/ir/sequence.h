@@ -186,6 +186,8 @@ namespace IR
 
 		//! Emit a identify opcode
 		void emitIdentify(uint32_t lvid, const AnyString& name, uint32_t self);
+		//! Emit a identify opcode
+		void emitEnsureTypeResolved(uint32_t lvid);
 		//! Emit a self opcode
 		void emitSelf(uint32_t self);
 
