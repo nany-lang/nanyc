@@ -251,7 +251,7 @@ namespace // anonymous
 		{
 			out << tabs << '%' << operands.lvid << " = constant ";
 			out << (void*) operands.value.u64;
-			out << " (u64: " << operands.value.u64 << ", f64: " << operands.value.f64 << ')';
+			out << " (.u64: " << operands.value.u64 << ", .f64: " << operands.value.f64 << ')';
 		}
 
 		void print(const Operand<Op::storeText>& operands)
