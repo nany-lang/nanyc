@@ -216,7 +216,14 @@ namespace Instanciate
 
 	bool SequenceBuilder::complainIntrinsicWithNamedParameters(const AnyString& name)
 	{
-		error() << "intrinsic '" << name << "': named parameters are not allowed";
+		assert(not pushedparams.func.named.empty() and "Uh ?");
+		auto err = (error());
+		err << "piko: intrinsic '" << name << "': named parameters are not allowed";
+		if (debugmode)
+		{
+			for (auto nmparm: pushedparams.func.named)
+				err.hint() << "parameter name '" << nmparm.name << '\'';
+		}
 		return false;
 	}
 

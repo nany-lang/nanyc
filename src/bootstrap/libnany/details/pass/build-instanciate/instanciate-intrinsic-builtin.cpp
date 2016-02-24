@@ -536,8 +536,8 @@ namespace Instanciate
 			return complainIntrinsicWithNamedParameters(name);
 
 		// generic type parameters are not accepted
-		if (unlikely(not pushedparams.gentypes.indexed.empty() or pushedparams.gentypes.named.empty()))
-			return complainIntrinsicWithNamedParameters(name);
+		if (unlikely(not pushedparams.gentypes.indexed.empty() or not pushedparams.gentypes.named.empty()))
+			return complainIntrinsicWithGenTypeParameters(name);
 
 		bool success = ([&]() -> bool
 		{
