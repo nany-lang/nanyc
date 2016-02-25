@@ -76,7 +76,7 @@ namespace Instanciate
 				uint32_t atomid = operands.atomid;
 				AnyString atomname = currentSequence.stringrefs[operands.name];
 
-				if (not atomStack.empty() and canGenerateCode())
+				if (frame != nullptr and canGenerateCode())
 				{
 					if (kind == IR::ISA::Blueprint::funcdef)
 						out.emitBlueprintFunc(atomname, atomid);
@@ -91,8 +91,9 @@ namespace Instanciate
 					break;
 				}
 
-				atomStack.emplace_back(*atom);
-				atomStack.back().blueprintOpcodeOffset = currentSequence.offsetOf(**cursor);
+				// create new frame
+				pushNewFrame(*atom);
+				frame->blueprintOpcodeOffset = currentSequence.offsetOf(**cursor);
 
 				if (kind == IR::ISA::Blueprint::funcdef)
 				{
@@ -102,7 +103,6 @@ namespace Instanciate
 						adjustSettingsNewFuncdefOperator(atomname);
 					}
 				}
-				assert(not atomStack.empty() and "invalid atom stack");
 				break;
 			}
 
@@ -130,42 +130,40 @@ namespace Instanciate
 			{
 				// -- with automatic variable assignment for operator new
 				// example: operator new (self varname) {}
-				assert(not atomStack.empty());
-				auto& frame = atomStack.back();
-				if (unlikely(not frame.atom.isClassMember()))
+				assert(frame != nullptr);
+				if (unlikely(not frame->atom.isClassMember()))
 				{
 					error() << "automatic variable assignment is only allowed in class operator 'new'";
 					break;
 				}
 
-				if (!frame.selfParameters.get())
-					frame.selfParameters = std::make_unique<decltype(frame.selfParameters)::element_type>();
+				if (!frame->selfParameters.get())
+					frame->selfParameters = std::make_unique<decltype(frame->selfParameters)::element_type>();
 
 				uint32_t sid  = operands.name;
 				uint32_t lvid = operands.lvid;
 				AnyString varname = currentSequence.stringrefs[sid];
-				(*frame.selfParameters)[varname].first = lvid;
+				(*frame->selfParameters)[varname].first = lvid;
 				break;
 			}
 
 			case IR::ISA::Blueprint::vardef:
 			{
 				// update the type of the variable member
-				if (not atomStack.empty())
+				if (frame != nullptr)
 				{
-					auto& frame = atomStack.back();
-					if (frame.atom.isClass())
+					if (frame->atom.isClass())
 					{
 						uint32_t sid  = operands.name;
 						const AnyString& varname = currentSequence.stringrefs[sid];
 
 						Atom* atom = nullptr;
-						if (1 != frame.atom.findVarAtom(atom, varname))
+						if (1 != frame->atom.findVarAtom(atom, varname))
 						{
 							ICE() << "unknown variable member '" << varname << "'";
 							break;
 						}
-						atom->returnType.clid.reclass(frame.atomid, operands.lvid);
+						atom->returnType.clid.reclass(frame->atomid, operands.lvid);
 					}
 				}
 				pushedparams.clear();
@@ -193,8 +191,8 @@ namespace Instanciate
 					break;
 				}
 
-				atomStack.emplace_back(*atom);
-				atomStack.back().blueprintOpcodeOffset = currentSequence.offsetOf(**cursor);
+				pushNewFrame(*atom);
+				frame->blueprintOpcodeOffset = currentSequence.offsetOf(**cursor);
 				break;
 			}
 

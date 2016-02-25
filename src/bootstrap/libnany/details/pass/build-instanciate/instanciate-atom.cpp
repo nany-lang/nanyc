@@ -182,7 +182,7 @@ namespace Instanciate
 		Logs::Message::Ptr newReport;
 
 		Pass::Instanciate::InstanciateData info{newReport, atom, cdeftable, context, params};
-		info.parentAtom = &(atomStack.back().atom);
+		info.parentAtom = &(frame->atom);
 		info.shouldMergeLayer = true;
 
 		auto* sequence = Pass::Instanciate::InstanciateAtom(info);
@@ -203,15 +203,14 @@ namespace Instanciate
 	bool SequenceBuilder::instanciateAtomFunc(uint32_t& instanceid, Atom& funcAtom, uint32_t retlvid, uint32_t p1, uint32_t p2)
 	{
 		assert(funcAtom.isFunction());
-		assert(not atomStack.empty());
-		auto& frame = atomStack.back();
-		auto& frameAtom = frame.atom;
+		assert(frame != nullptr);
+		auto& frameAtom = frame->atom;
 
 
-		if (unlikely((p1 != 0 and not frame.verify(p1)) or (p2 != 0 and not frame.verify(p2))))
+		if (unlikely((p1 != 0 and not frame->verify(p1)) or (p2 != 0 and not frame->verify(p2))))
 		{
 			if (retlvid != 0)
-				frame.invalidate(retlvid);
+				frame->invalidate(retlvid);
 			return false;
 		}
 
@@ -242,7 +241,7 @@ namespace Instanciate
 			overloadMatch.report = std::ref(err);
 			overloadMatch.validate(funcAtom);
 			if (retlvid != 0)
-				frame.invalidate(retlvid);
+				frame->invalidate(retlvid);
 			return false;
 		}
 
@@ -256,7 +255,7 @@ namespace Instanciate
 		instanceid = info.instanceid;
 
 		if (unlikely(not instok and retlvid != 0))
-			frame.invalidate(retlvid);
+			frame->invalidate(retlvid);
 		return instok;
 	}
 

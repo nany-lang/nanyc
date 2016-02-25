@@ -16,8 +16,7 @@ namespace Instanciate
 	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::ret>& operands)
 	{
 		// current frame
-		auto& frame = atomStack.back();
-		if (unlikely(frame.atom.type != Atom::Type::funcdef)) // just in case
+		if (unlikely(frame->atom.type != Atom::Type::funcdef)) // just in case
 			return (void)(error() << "return values are only accepted in functions");
 
 		// note: the 'return' opcode accepts null value in lvid input (as 'return void')
@@ -25,18 +24,18 @@ namespace Instanciate
 
 		if (hasReturnValue)
 		{
-			if (not frame.verify(operands.lvid))
+			if (not frame->verify(operands.lvid))
 				return;
-			if (unlikely(frame.lvids[operands.lvid].markedAsAny))
+			if (unlikely(frame->lvids[operands.lvid].markedAsAny))
 				return (void)(error() << "return: can not perform member lookup on 'any'");
-			if (unlikely(frame.lvids[operands.lvid].synthetic))
+			if (unlikely(frame->lvids[operands.lvid].synthetic))
 				return (void)(error() << "cannot return a synthetic object");
 		}
 
 		// the clid to remember for the return value
 		CLID returnCLIDForReference;
 		// clid from the prototype of the func
-		auto& expectedReturnClid = frame.atom.returnType.clid;
+		auto& expectedReturnClid = frame->atom.returnType.clid;
 		// even with a return value, it can be void
 		bool isVoid = (not hasReturnValue);
 		// strategy for the returned value
@@ -51,11 +50,11 @@ namespace Instanciate
 					return (void)(error() << "return-statement with no value");
 
 				// classdef of the returned expression
-				auto& cdef = cdeftable.classdefFollowClassMember(CLID{frame.atomid, operands.lvid});
+				auto& cdef = cdeftable.classdefFollowClassMember(CLID{frame->atomid, operands.lvid});
 				if (unlikely(cdef.isAny() and nullptr == cdeftable.findClassdefAtom(cdef)))
 				{
 					ICE() << "invalid 'any' type in return-statement (from "
-						<< CLID{frame.atomid, operands.lvid} << ')';
+						<< CLID{frame->atomid, operands.lvid} << ')';
 					return;
 				}
 
@@ -92,9 +91,9 @@ namespace Instanciate
 
 				// the return expr matches the return type requested by the source code
 				// if this type is any, checking for previous return types
-				if (expectedCdef.isAny() and not frame.returnValues.empty())
+				if (expectedCdef.isAny() and not frame->returnValues.empty())
 				{
-					auto& marker = frame.returnValues.front();
+					auto& marker = frame->returnValues.front();
 					auto& cdefPreviousReturn = cdeftable.classdef(marker.clid);
 					auto similarity = TypeCheck::isSimilarTo(cdeftable, nullptr, cdef, cdefPreviousReturn);
 					switch (similarity)
@@ -138,7 +137,7 @@ namespace Instanciate
 		// the func is returning 'void'
 		if (isVoid and hasReturnValue)
 		{
-			auto& cdef = cdeftable.classdef(CLID{frame.atomid, operands.lvid});
+			auto& cdef = cdeftable.classdef(CLID{frame->atomid, operands.lvid});
 			if (unlikely(not cdef.isVoid()))
 				return (void)(error() << "return-statement with a value, in function returning 'void'");
 		}
@@ -161,7 +160,7 @@ namespace Instanciate
 
 
 		// the return valus is accepted
-		frame.returnValues.emplace_back(ReturnValueMarker {
+		frame->returnValues.emplace_back(ReturnValueMarker {
 			returnCLIDForReference,
 			currentLine, currentOffset
 		});

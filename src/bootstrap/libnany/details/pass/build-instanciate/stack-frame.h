@@ -139,6 +139,9 @@ namespace Instanciate
 		std::unique_ptr<std::unordered_map<AnyString, std::pair<LVID, bool>>> selfParameters;
 
 		uint32_t blueprintOpcodeOffset = (uint32_t) -1;
+
+		//! Linked list frames
+		AtomStackFrame* previous = nullptr;
 	};
 
 

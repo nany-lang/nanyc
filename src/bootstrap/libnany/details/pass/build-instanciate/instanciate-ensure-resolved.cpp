@@ -15,16 +15,15 @@ namespace Instanciate
 
 	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::ensureresolved>& operands)
 	{
-		assert(not atomStack.empty());
-		auto& frame = atomStack.back();
-		if (not frame.verify(operands.lvid))
+		assert(frame != nullptr);
+		if (not frame->verify(operands.lvid))
 			return;
 
-		CLID clid{frame.atomid, operands.lvid};
-		if (unlikely(not frame.resolvePerCLID[clid].empty()))
+		CLID clid{frame->atomid, operands.lvid};
+		if (unlikely(not frame->resolvePerCLID[clid].empty()))
 		{
 			complainMultipleOverloads(operands.lvid);
-			return frame.invalidate(operands.lvid);
+			return frame->invalidate(operands.lvid);
 		}
 
 		auto& cdef = cdeftable.classdef(clid);
@@ -35,7 +34,7 @@ namespace Instanciate
 		if (unlikely(atom == nullptr))
 		{
 			ICE() << "invalid 'any' type for " << clid;
-			return frame.invalidate(operands.lvid);
+			return frame->invalidate(operands.lvid);
 		}
 
 		switch (atom->type)
@@ -48,7 +47,7 @@ namespace Instanciate
 			case Atom::Type::funcdef:
 			{
 				error() << "pointer-to-function are not implemented yet";
-				return frame.invalidate(operands.lvid);
+				return frame->invalidate(operands.lvid);
 				break;
 			}
 			default:

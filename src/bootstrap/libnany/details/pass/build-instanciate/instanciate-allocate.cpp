@@ -14,19 +14,18 @@ namespace Instanciate
 
 	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::allocate>& operands)
 	{
-		auto& frame = atomStack.back();
-		if (not frame.verify(operands.atomid))
+		if (not frame->verify(operands.atomid))
 			return;
 
 		// find the type of the object to allocate
-		auto& cdef = cdeftable.classdef(CLID{frame.atomid, operands.atomid});
+		auto& cdef = cdeftable.classdef(CLID{frame->atomid, operands.atomid});
 		Atom* atom = (not cdef.isBuiltinOrVoid()) ? cdeftable.findClassdefAtom(cdef) : nullptr;
 		if (unlikely(atom == nullptr))
 		{
 			auto err = (error() << "cannot instanciate object of type '");
 			cdef.print(err.data().message, cdeftable, false);
 			err << "'";
-			frame.invalidate(operands.lvid);
+			frame->invalidate(operands.lvid);
 			return;
 		}
 
@@ -39,9 +38,9 @@ namespace Instanciate
 
 		// remember that the value stored into the register comes from a memory allocation
 		// (can be used to avoid spurious object copies for example)
-		frame.lvids[operands.lvid].origin.memalloc = true;
+		frame->lvids[operands.lvid].origin.memalloc = true;
 		// not a synthetic object
-		frame.lvids[operands.lvid].synthetic = false;
+		frame->lvids[operands.lvid].synthetic = false;
 
 		if (canGenerateCode())
 		{

@@ -15,12 +15,13 @@ namespace Instanciate
 
 	void SequenceBuilder::generateMemberVarDefaultDispose()
 	{
+		assert(frame != nullptr);
 		assert(canGenerateCode());
 		assert(lastOpcodeStacksizeOffset != (uint32_t) -1);
 
 		// special location: in a constructor - initializing all variables with their def value
 		// note: do not keep a reference on 'out.at...', since the internal buffer might be reized
-		auto& parentAtom = *(atomStack.back().atom.parent);
+		auto& parentAtom = *(frame->atom.parent);
 
 
 		std::vector<std::reference_wrapper<Atom>> atomvars;
@@ -54,8 +55,6 @@ namespace Instanciate
 			++lvid;
 		}
 
-		auto& frame = atomStack.back();
-
 		// ... then release all variables !
 		for (auto& subatomref: atomvars)
 		{
@@ -74,7 +73,7 @@ namespace Instanciate
 				// read the pointer
 				out.emitFieldget(reglvid, /*self*/ 2, subatom.varinfo.effectiveFieldIndex);
 
-				auto& origin  = frame.lvids[reglvid].origin.varMember;
+				auto& origin  = frame->lvids[reglvid].origin.varMember;
 				origin.self   = 2;
 				origin.atomid = subatom.atomid;
 				origin.field  = subatom.varinfo.effectiveFieldIndex;

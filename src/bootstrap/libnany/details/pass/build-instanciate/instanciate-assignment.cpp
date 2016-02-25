@@ -234,6 +234,8 @@ namespace Instanciate
 
 	bool SequenceBuilder::instanciateAssignment(const IR::ISA::Operand<IR::ISA::Op::call>& operands)
 	{
+		assert(frame != nullptr);
+
 		if (unlikely(pushedparams.func.indexed.size() != 1))
 			return (ICE() << "assignment: invalid number of pushed parameters");
 
@@ -243,21 +245,18 @@ namespace Instanciate
 		if (unlikely(not pushedparams.gentypes.indexed.empty() or not pushedparams.gentypes.named.empty()))
 			return (ICE() << "assignment: invalid template parameters");
 
-		// the current frame
-		auto& frame = atomStack.back();
-
 		// -- LHS
 		// note: double indirection, since assignment is like method call
 		//  %y = %x."="
 		//  %z = resolve %y."^()"
-		assert(operands.ptr2func < frame.lvids.size());
-		LVID lhs = frame.lvids[operands.ptr2func].referer;
+		assert(operands.ptr2func < frame->lvids.size());
+		LVID lhs = frame->lvids[operands.ptr2func].referer;
 		if (likely(0 != lhs))
 		{
-			assert(lhs < frame.lvids.size());
-			lhs  = frame.lvids[lhs].referer;
+			assert(lhs < frame->lvids.size());
+			lhs  = frame->lvids[lhs].referer;
 
-			uint32_t alias = frame.lvids[lhs].alias;
+			uint32_t alias = frame->lvids[lhs].alias;
 			if (alias != 0)
 				lhs = alias;
 		}
@@ -266,7 +265,7 @@ namespace Instanciate
 		LVID rhs = pushedparams.func.indexed[0].lvid;
 		pushedparams.func.indexed.clear();
 
-		return instanciateAssignment(frame, lhs, rhs);
+		return instanciateAssignment(*frame, lhs, rhs);
 	}
 
 

@@ -75,18 +75,17 @@ namespace Instanciate
 
 	inline bool SequenceBuilder::identify(const IR::ISA::Operand<IR::ISA::Op::identify>& operands)
 	{
-		auto& frame = atomStack.back();
 		AnyString name = currentSequence.stringrefs[operands.text];
 
 		// keeping traces of the code logic
-		frame.lvids[operands.lvid].resolvedName = name;
-		frame.lvids[operands.lvid].referer = operands.self;
+		frame->lvids[operands.lvid].resolvedName = name;
+		frame->lvids[operands.lvid].referer = operands.self;
 
 
 		if (name == '=') // it is an assignment, not a real method call
 		{
 			// remember this special case
-			frame.lvids[operands.lvid].isAssignment = true;
+			frame->lvids[operands.lvid].isAssignment = true;
 			// for consistency checks, after transformations on the AST, '=' should be a method call
 			// we should have something like: 'foo.=(rhs)'
 			if (unlikely(0 == operands.self))
@@ -96,10 +95,10 @@ namespace Instanciate
 
 		if (operands.self != 0)
 		{
-			if (not frame.verify(operands.self))
+			if (not frame->verify(operands.self))
 				return false;
 
-			if (frame.lvids[operands.self].isAssignment)
+			if (frame->lvids[operands.self].isAssignment)
 			{
 				// since self was marked as an 'assignment', we're trying to resolve here '^()'
 				if (unlikely(name != "^()"))
@@ -109,22 +108,22 @@ namespace Instanciate
 				}
 
 				// remember this special case
-				frame.lvids[operands.lvid].isAssignment = true;
+				frame->lvids[operands.lvid].isAssignment = true;
 				return true;
 			}
 		}
 
-		auto& cdef = cdeftable.classdef(CLID{frame.atomid, operands.lvid});
+		auto& cdef = cdeftable.classdef(CLID{frame->atomid, operands.lvid});
 
 		// checking if the lvid does not map to a parameter, which  must
 		// have already be resolved when instanciating the function
-		if (frame.atom.isFunction())
+		if (frame->atom.isFunction())
 		{
-			assert(cdef.clid.lvid() >= 2 + frame.atom.parameters.size());
-			if (unlikely(cdef.clid.lvid() < 2 + frame.atom.parameters.size()))
+			assert(cdef.clid.lvid() >= 2 + frame->atom.parameters.size());
+			if (unlikely(cdef.clid.lvid() < 2 + frame->atom.parameters.size()))
 			{
 				String errmsg;
-				errmsg << CLID{frame.atomid, operands.lvid} << ": should be alreayd resolved";
+				errmsg << CLID{frame->atomid, operands.lvid} << ": should be alreayd resolved";
 				return complainOperand(IR::Instruction::fromOpcode(operands), errmsg);
 			}
 		}
@@ -148,8 +147,8 @@ namespace Instanciate
 					if (name == "any") // any - nothing to resolve
 					{
 						multipleResults.clear();
-						frame.lvids[operands.lvid].markedAsAny = true;
-						frame.resolvePerCLID[cdef.clid].clear();
+						frame->lvids[operands.lvid].markedAsAny = true;
+						frame->resolvePerCLID[cdef.clid].clear();
 						cdeftable.substitute(operands.lvid).mutateToAny();
 						return true;
 					}
@@ -160,7 +159,7 @@ namespace Instanciate
 					if (name == "null")
 					{
 						multipleResults.clear();
-						frame.resolvePerCLID[cdef.clid].clear(); // just in case
+						frame->resolvePerCLID[cdef.clid].clear(); // just in case
 
 						auto& opc = cdeftable.substitute(operands.lvid);
 						opc.mutateToBuiltin(nyt_pointer);
@@ -175,7 +174,7 @@ namespace Instanciate
 					if (name == "void")
 					{
 						multipleResults.clear();
-						frame.resolvePerCLID[cdef.clid].clear();
+						frame->resolvePerCLID[cdef.clid].clear();
 						cdeftable.substitute(operands.lvid).mutateToVoid();
 						return true;
 					}
@@ -186,7 +185,7 @@ namespace Instanciate
 					if (name[1] == '_')
 					{
 						multipleResults.clear();
-						frame.resolvePerCLID[cdef.clid].clear(); // just in case
+						frame->resolvePerCLID[cdef.clid].clear(); // just in case
 
 						if (name == "__false")
 						{
@@ -194,7 +193,7 @@ namespace Instanciate
 							opc.mutateToBuiltin(nyt_bool);
 							opc.qualifiers.ref = false;
 							out.emitStore_u64(operands.lvid, 0);
-							frame.lvids[operands.lvid].synthetic = false;
+							frame->lvids[operands.lvid].synthetic = false;
 							return true;
 						}
 						if (name == "__true")
@@ -203,7 +202,7 @@ namespace Instanciate
 							opc.mutateToBuiltin(nyt_bool);
 							opc.qualifiers.ref = false;
 							out.emitStore_u64(operands.lvid, 1);
-							frame.lvids[operands.lvid].synthetic = false;
+							frame->lvids[operands.lvid].synthetic = false;
 							return true;
 						}
 
@@ -219,28 +218,28 @@ namespace Instanciate
 			}
 
 			// trying for local variables first
-			LVID lvidVar = frame.findLocalVariable(name);
+			LVID lvidVar = frame->findLocalVariable(name);
 			if (lvidVar != 0)
 			{
 				// the variable is used, whatever it is (error or not)
-				frame.lvids[lvidVar].hasBeenUsed = true;
-				frame.lvids[operands.lvid].alias = lvidVar;
-				frame.lvids[operands.lvid].synthetic = false;
+				frame->lvids[lvidVar].hasBeenUsed = true;
+				frame->lvids[operands.lvid].alias = lvidVar;
+				frame->lvids[operands.lvid].synthetic = false;
 
-				if (not frame.verify(lvidVar)) // suppress spurious errors from previous ones
+				if (not frame->verify(lvidVar)) // suppress spurious errors from previous ones
 					return false;
 
 				// acquire the variable
 				if (canGenerateCode())
 					out.emitStore(operands.lvid, lvidVar);
 
-				auto& varcdef = cdeftable.classdef(CLID{frame.atomid, lvidVar});
+				auto& varcdef = cdeftable.classdef(CLID{frame->atomid, lvidVar});
 				if (not varcdef.isBuiltin())
 				{
 					auto* varAtom = cdeftable.findClassdefAtom(varcdef);
 					if (unlikely(varAtom == nullptr))
 					{
-						ICE() << "invalid atom for local scope variable. clid: " << CLID{frame.atomid, lvidVar}
+						ICE() << "invalid atom for local scope variable. clid: " << CLID{frame->atomid, lvidVar}
 							<< ", " << (uint32_t) varcdef.kind;
 						return false;
 					}
@@ -258,23 +257,23 @@ namespace Instanciate
 			}
 			else
 			{
-				if (not frame.atom.performNameLookupOnChildren(multipleResults, name))
+				if (not frame->atom.performNameLookupOnChildren(multipleResults, name))
 				{
-					if (frame.atom.parent)
-						frame.atom.parent->performNameLookupFromParent(multipleResults, name);
+					if (frame->atom.parent)
+						frame->atom.parent->performNameLookupFromParent(multipleResults, name);
 				}
 			}
 		}
 		else
 		{
 			// self.<something to identify>
-			if (unlikely(frame.lvids[operands.lvid].markedAsAny))
+			if (unlikely(frame->lvids[operands.lvid].markedAsAny))
 			{
 				ICE() << "can not perform member lookup on 'any'";
 				return false;
 			}
 
-			auto& self = cdeftable.classdef(CLID{frame.atomid, operands.self});
+			auto& self = cdeftable.classdef(CLID{frame->atomid, operands.self});
 			if (unlikely(self.isBuiltinOrVoid()))
 				return complainInvalidMemberRequestNonClass(name, self.kind);
 
@@ -284,13 +283,13 @@ namespace Instanciate
 			{
 				// since the parent has been fully resolved, no multiple
 				// solution should be available
-				assert(frame.resolvePerCLID[self.clid].empty());
+				assert(frame->resolvePerCLID[self.clid].empty());
 
 				selfAtom->performNameLookupOnChildren(multipleResults, name);
 			}
 			else
 			{
-				auto& selfSolutions = frame.resolvePerCLID[self.clid];
+				auto& selfSolutions = frame->resolvePerCLID[self.clid];
 				multipleResults.reserve(selfSolutions.size());
 				for (auto& atomElement: selfSolutions)
 					atomElement.get().performNameLookupOnChildren(multipleResults, name);
@@ -333,12 +332,12 @@ namespace Instanciate
 					if (self == 0) // implicit 'self'
 					{
 						// retrieving the local self
-						if (unlikely(not frame.atom.isClassMember()))
+						if (unlikely(not frame->atom.isClassMember()))
 							return (ICE() << "invalid 'self' object");
 						self = 2; // 1: return type, 2: self parameter
 					}
 
-					auto& origin  = frame.lvids[operands.lvid].origin.varMember;
+					auto& origin  = frame->lvids[operands.lvid].origin.varMember;
 					assert(self != 0);
 					assert(atom.atomid != 0);
 					origin.self   = self;
@@ -362,7 +361,7 @@ namespace Instanciate
 					if (isLocalVariable)
 					{
 						// disable optimisation to avoid unwanted behavior
-						auto& origin = frame.lvids[operands.lvid].origin;
+						auto& origin = frame->lvids[operands.lvid].origin;
 						origin.memalloc = false;
 						origin.returnedValue = false;
 
@@ -389,13 +388,13 @@ namespace Instanciate
 				// multiple solutions are possible (probably for a func call)
 				// keeping the solutions for later resolution by the real func call
 				// (with parameters to find the most appropriate one)
-				frame.resolvePerCLID[cdef.clid].swap(multipleResults);
+				frame->resolvePerCLID[cdef.clid].swap(multipleResults);
 				return true;
 			}
 
 			case 0: // no identifier found from 'atom map'
 			{
-				return complainUnknownIdentifier(selfAtom, frame.atom, name);
+				return complainUnknownIdentifier(selfAtom, frame->atom, name);
 			}
 		}
 		return false;
@@ -405,11 +404,11 @@ namespace Instanciate
 
 	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::identify>& operands)
 	{
-		assert(not atomStack.empty());
+		assert(frame != nullptr);
 
 		bool ok = identify(operands);
 		if (unlikely(not ok))
-			atomStack.back().invalidate(operands.lvid);
+			frame->invalidate(operands.lvid);
 	}
 
 

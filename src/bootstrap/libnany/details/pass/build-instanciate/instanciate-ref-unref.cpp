@@ -15,15 +15,14 @@ namespace Instanciate
 
 	void SequenceBuilder::tryUnrefObject(uint32_t lvid)
 	{
-		auto& frame = atomStack.back();
-		if (not frame.verify(lvid))
+		if (not frame->verify(lvid))
 			return;
 
-		auto& cdef  = cdeftable.classdefFollowClassMember(CLID{frame.atomid, lvid});
+		auto& cdef  = cdeftable.classdefFollowClassMember(CLID{frame->atomid, lvid});
 		if (not canBeAcquired(cdef)) // do nothing if builtin
 			return;
 
-		if (unlikely(frame.lvids[lvid].synthetic))
+		if (unlikely(frame->lvids[lvid].synthetic))
 		{
 			error() << "cannot unref a synthetic object";
 			return;
@@ -33,13 +32,13 @@ namespace Instanciate
 		if (unlikely(nullptr == atom))
 		{
 			ICE() << "invalid atom for 'unref' opcode";
-			return frame.invalidate(lvid);
+			return frame->invalidate(lvid);
 		}
 
 		if (0 == atom->classinfo.dtor.atomid)
 		{
 			if (unlikely(not instanciateAtomClassDestructor(*atom, lvid)))
-				return frame.invalidate(lvid);
+				return frame->invalidate(lvid);
 			assert(atom->classinfo.dtor.atomid != 0);
 		}
 
@@ -50,11 +49,10 @@ namespace Instanciate
 
 	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::ref>& operands)
 	{
-		auto& frame = atomStack.back();
-		if (not frame.verify(operands.lvid))
+		if (not frame->verify(operands.lvid))
 			return;
 
-		if (unlikely(frame.lvids[operands.lvid].synthetic))
+		if (unlikely(frame->lvids[operands.lvid].synthetic))
 		{
 			error() << "cannot acquire a synthetic object";
 			return;

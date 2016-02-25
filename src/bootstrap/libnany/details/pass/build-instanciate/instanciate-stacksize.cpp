@@ -14,15 +14,14 @@ namespace Instanciate
 
 	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::stacksize>& operands)
 	{
-		if (atomStack.empty())
-			return;
+		if (frame)
+		{
+			if (cdeftable.substituteAtomID() == frame->atomid)
+				frame->resizeRegisterCount(operands.add, cdeftable);
 
-		auto& frame = atomStack.back();
-		if (cdeftable.substituteAtomID() == frame.atomid)
-			frame.resizeRegisterCount(operands.add, cdeftable);
-
-		if (canGenerateCode())
-			lastOpcodeStacksizeOffset = out.emitStackSizeIncrease(operands.add);
+			if (canGenerateCode())
+				lastOpcodeStacksizeOffset = out.emitStackSizeIncrease(operands.add);
+		}
 	}
 
 

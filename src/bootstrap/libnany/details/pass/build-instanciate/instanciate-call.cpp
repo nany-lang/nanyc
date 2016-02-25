@@ -17,22 +17,20 @@ namespace Instanciate
 
 	inline bool SequenceBuilder::emitFuncCall(const IR::ISA::Operand<IR::ISA::Op::call>& operands)
 	{
-		// the current frame
-		auto& frame = atomStack.back();
 		// alias (to make it local)
 		uint32_t lvid = operands.lvid;
 
-		if (not frame.verify(operands.ptr2func) or not frame.verify(lvid))
+		if (not frame->verify(operands.ptr2func) or not frame->verify(lvid))
 			return false;
 
 		// assignment should be handled somewhere else
-		assert(not frame.lvids[operands.ptr2func].isAssignment);
+		assert(not frame->lvids[operands.ptr2func].isAssignment);
 
-		if (unlikely(frame.lvids[operands.ptr2func].markedAsAny))
+		if (unlikely(frame->lvids[operands.ptr2func].markedAsAny))
 			return error() << "can not perform member lookup on 'any'";
 
 		// alias to the current atomid
-		auto atomid = frame.atomid;
+		auto atomid = frame->atomid;
 		// classdef of the function to call
 		auto& cdefFuncToCall = cdeftable.classdef(CLID{atomid, operands.ptr2func});
 		// any atom already attached ?
@@ -42,7 +40,7 @@ namespace Instanciate
 		decltype(FuncOverloadMatch::result.params) params;
 
 		// whatever the result of this func, 'lvid' is a returned value
-		frame.lvids[lvid].origin.returnedValue = true;
+		frame->lvids[lvid].origin.returnedValue = true;
 
 		// preparing the overload matcher
 		overloadMatch.clear();
@@ -50,14 +48,14 @@ namespace Instanciate
 
 
 		// inserting the 'self' variable if a referer exists
-		LVID referer = frame.lvids[operands.ptr2func].referer;
+		LVID referer = frame->lvids[operands.ptr2func].referer;
 		if (referer != 0)
 		{
 			// double indirection - TODO find a beter way
 			//  %y = %x."foo"
 			//  %z = resolve %y."^()" - due to intermediate representation of func call
-			assert(referer < frame.lvids.size());
-			referer = frame.lvids[referer].referer;
+			assert(referer < frame->lvids.size());
+			referer = frame->lvids[referer].referer;
 		}
 
 		if (referer != 0)
@@ -71,23 +69,23 @@ namespace Instanciate
 		{
 			// implicit parameter 'self' ?
 			// no referer ('a.foo', 'a' would be the referer), but we may have 'self' as implici parameter
-			if (frame.atom.isClassMember())
+			if (frame->atom.isClassMember())
 			{
 				Atom* callParent;
 				if (nullptr == atom)
 				{
 					// the solutions should all have the same parent
-					auto& solutions = frame.resolvePerCLID[cdefFuncToCall.clid];
+					auto& solutions = frame->resolvePerCLID[cdefFuncToCall.clid];
 					callParent = (not solutions.empty())
 						? solutions[0].get().parent : nullptr;
 				}
 				else
 					callParent = atom->parent;
 
-				if (callParent and callParent == frame.atom.parent) // method from the same class
+				if (callParent and callParent == frame->atom.parent) // method from the same class
 				{
 					// 0: invalid, 1: return type, 2: first parameter
-					overloadMatch.input.params.indexed.emplace_back(CLID{frame.atomid, 2});
+					overloadMatch.input.params.indexed.emplace_back(CLID{frame->atomid, 2});
 				}
 			}
 		}
@@ -96,14 +94,14 @@ namespace Instanciate
 		// parameters
 		for (auto indxparm: pushedparams.func.indexed)
 		{
-			if (not frame.verify(indxparm.lvid))
+			if (not frame->verify(indxparm.lvid))
 				return false;
 			overloadMatch.input.params.indexed.emplace_back(CLID{atomid, indxparm.lvid});
 		}
 		// named parameters
 		for (auto nmparm: pushedparams.func.named)
 		{
-			if (not frame.verify(nmparm.lvid))
+			if (not frame->verify(nmparm.lvid))
 				return false;
 			overloadMatch.input.params.named.emplace_back(std::make_pair(nmparm.name, CLID{atomid, nmparm.lvid}));
 		}
@@ -116,7 +114,7 @@ namespace Instanciate
 
 			// retrieving the list of all available solutions
 			// (from previous call to opcode 'resolve')
-			auto& solutions = frame.resolvePerCLID[cdefFuncToCall.clid];
+			auto& solutions = frame->resolvePerCLID[cdefFuncToCall.clid];
 			if (unlikely(solutions.empty()))
 				return complainOperand(IR::Instruction::fromOpcode(operands), "no solution available");
 
@@ -132,7 +130,7 @@ namespace Instanciate
 		}
 		else
 		{
-			assert(frame.resolvePerCLID[cdefFuncToCall.clid].empty());
+			assert(frame->resolvePerCLID[cdefFuncToCall.clid].empty());
 
 			// no overload, the func to call is known
 			if (unlikely(not atom->isFunction()))
@@ -189,7 +187,7 @@ namespace Instanciate
 			// the function is responsible for acquiring the returned object
 			// however we must release it
 			if (canBeAcquired(lvid))
-				frame.lvids[lvid].autorelease = true;
+				frame->lvids[lvid].autorelease = true;
 		}
 		return true;
 	}
@@ -207,10 +205,9 @@ namespace Instanciate
 		uint32_t label = shortcircuit.label;
 		uint32_t lvid  = label + 1;
 
-		auto& frame = atomStack.back();
-		if (not frame.verify(lvid))
+		if (not frame->verify(lvid))
 			return false;
-		uint32_t offset = frame.lvids[lvid].offsetDeclOut;
+		uint32_t offset = frame->lvids[lvid].offsetDeclOut;
 		if (unlikely(not (offset > 0 and offset < out.opcodeCount())))
 			return (ICE() << "invalid opcode offset for generating shortcircuit");
 
@@ -219,7 +216,7 @@ namespace Instanciate
 
 		// lvid of the first parameter
 		uint32_t lvidvalue = pushedparams.func.indexed[0].lvid;
-		auto& cdef = cdeftable.classdef(CLID{frame.atomid, lvidvalue});
+		auto& cdef = cdeftable.classdef(CLID{frame->atomid, lvidvalue});
 		if (cdef.kind != nyt_bool)
 		{
 			auto* atom = cdeftable.findClassdefAtom(cdef);
@@ -273,12 +270,11 @@ namespace Instanciate
 		// after AST transformation, assignments are method calls
 		// ('a = b' have been transformed into 'a.=(b)'). However this is not
 		// a real func call and it is intercepted to be handled differently
-		auto& frame = atomStack.back();
 
 		// the result is not a synthetic object
-		frame.lvids[operands.lvid].synthetic = false;
+		frame->lvids[operands.lvid].synthetic = false;
 
-		bool checkpoint = ((not frame.lvids[operands.ptr2func].isAssignment)
+		bool checkpoint = ((not frame->lvids[operands.ptr2func].isAssignment)
 			? emitFuncCall(operands)
 			: instanciateAssignment(operands));
 
@@ -291,7 +287,7 @@ namespace Instanciate
 		if (unlikely(not checkpoint))
 		{
 			success = false;
-			frame.invalidate(operands.lvid);
+			frame->invalidate(operands.lvid);
 			// invalidate metadata from shortcircuit, just in case something bad
 			// happened before reaching the code responsible for minimal evaluation
 			shortcircuit.label = 0;

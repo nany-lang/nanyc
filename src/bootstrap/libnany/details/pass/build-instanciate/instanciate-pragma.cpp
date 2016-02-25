@@ -15,10 +15,8 @@ namespace Instanciate
 
 	void SequenceBuilder::pragmaBodyStart()
 	{
-		assert(not atomStack.empty());
-
-		auto& frame = atomStack.back();
-		auto& atom = frame.atom;
+		assert(frame != nullptr);
+		auto& atom = frame->atom;
 		if (atom.isFunction())
 		{
 			//
@@ -29,7 +27,7 @@ namespace Instanciate
 			{
 				// lvid for the given parameter
 				uint32_t lvid  = i + 1 + 1; // 1 based, 1: return type
-				frame.lvids[lvid].synthetic = false;
+				frame->lvids[lvid].synthetic = false;
 
 				if (not cdeftable.classdef(vardef.clid).qualifiers.ref)
 				{
@@ -40,16 +38,16 @@ namespace Instanciate
 						out.emitComment(String{} << "\n ----- ---- deep copy parameter " << i);
 
 					// the new value is not synthetic
-					frame.lvids[clone].synthetic = false;
+					frame->lvids[clone].synthetic = false;
 
-					bool r = instanciateAssignment(frame, clone, lvid, false, false, true);
+					bool r = instanciateAssignment(*frame, clone, lvid, false, false, true);
 					if (unlikely(not r))
-						frame.invalidate(clone);
+						frame->invalidate(clone);
 
 					if (canBeAcquired(lvid))
 					{
-						frame.lvids[lvid].autorelease = true;
-						frame.lvids[clone].autorelease = false;
+						frame->lvids[lvid].autorelease = true;
+						frame->lvids[clone].autorelease = false;
 					}
 
 					if (canGenerateCode())
@@ -117,12 +115,12 @@ namespace Instanciate
 
 			case IR::ISA::Pragma::blueprintsize:
 			{
-				assert(not atomStack.empty() and "invalid atom stack");
 				if (0 == layerDepthLimit)
 				{
 					// ignore the current blueprint
 					//*cursor += operands.value.blueprintsize;
-					auto startOffset = atomStack.back().blueprintOpcodeOffset;
+					assert(frame != nullptr);
+					auto startOffset = frame->blueprintOpcodeOffset;
 					auto count = operands.value.blueprintsize;
 
 					if (unlikely(count < 3))
@@ -140,7 +138,7 @@ namespace Instanciate
 
 			case IR::ISA::Pragma::visibility:
 			{
-				assert(not atomStack.empty() and "invalid atom stack");
+				assert(frame != nullptr);
 				break;
 			}
 

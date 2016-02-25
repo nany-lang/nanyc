@@ -60,15 +60,14 @@ namespace Instanciate
 	bool SequenceBuilder::complainRedeclared(const AnyString& name, uint32_t previousDeclaration)
 	{
 		success = false;
-		auto& frame = atomStack.back();
 		auto err = (error() << "redeclaration of '" << name << '\'');
 		err << " in '";
-		err << cdeftable.keyword(frame.atom) << ' ';
-		frame.atom.retrieveCaption(err.data().message, cdeftable);
+		err << cdeftable.keyword(frame->atom) << ' ';
+		frame->atom.retrieveCaption(err.data().message, cdeftable);
 		err << '\'';
 
 		auto suggest = (err.hint() << "previous declaration of '" << name << '\'');
-		auto& lr = frame.lvids[previousDeclaration];
+		auto& lr = frame->lvids[previousDeclaration];
 		lr.fillLogEntryWithLocation(suggest);
 		return false;
 	}
@@ -76,16 +75,14 @@ namespace Instanciate
 
 	bool SequenceBuilder::complainMultipleOverloads(LVID lvid)
 	{
-		assert(not atomStack.empty());
-
-		auto& frame = atomStack.back();
+		assert(frame != nullptr);
 		auto err = (error() << "ambigous call");
-		if (not frame.lvids[lvid].resolvedName.empty())
-			err << " to '" << frame.lvids[lvid].resolvedName << "'";
+		if (not frame->lvids[lvid].resolvedName.empty())
+			err << " to '" << frame->lvids[lvid].resolvedName << "'";
 
-		CLID clid{frame.atomid, lvid};
+		CLID clid{frame->atomid, lvid};
 
-		auto& solutions = frame.resolvePerCLID[clid];
+		auto& solutions = frame->resolvePerCLID[clid];
 		for (size_t i = 0; i != solutions.size(); ++i)
 		{
 			auto& atom = solutions[i].get();
@@ -110,13 +107,11 @@ namespace Instanciate
 
 		success = false;
 
-		// the current frame
-		auto& frame = atomStack.back();
 		// variable name
 		String varname;
-		for (auto l = frame.lvids[lvid].referer; l != 0; l = frame.lvids[l].referer)
+		for (auto l = frame->lvids[lvid].referer; l != 0; l = frame->lvids[l].referer)
 		{
-			auto& part = frame.lvids[l].resolvedName;
+			auto& part = frame->lvids[l].resolvedName;
 			if (part.empty())
 				continue;
 
@@ -328,9 +323,8 @@ namespace Instanciate
 
 	bool SequenceBuilder::complainInvalidSelfRefForVariableAssignment(uint32_t lvid) const
 	{
-		assert(not atomStack.empty());
-		auto& frame = atomStack.back();
-		auto& cdef = cdeftable.classdef(CLID{frame.atomid, lvid});
+		assert(frame != nullptr);
+		auto& cdef = cdeftable.classdef(CLID{frame->atomid, lvid});
 		auto ice = (ICE() << "invalid 'self' reference for variable assignment (self.= <expr>) ");
 		cdef.print(ice.data().message, cdeftable, false);
 		return false;

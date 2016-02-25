@@ -19,7 +19,7 @@ namespace Instanciate
 		//
 		//  * the most frequent, called from a method contained within a class
 		//  * from the class itself, most likely a variable
-		Atom* parent = &atomStack.back().atom;
+		Atom* parent = &(frame->atom);
 		do
 		{
 			if (parent->isClass())

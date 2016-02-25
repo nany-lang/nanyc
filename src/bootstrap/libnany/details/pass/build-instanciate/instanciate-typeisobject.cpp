@@ -14,8 +14,8 @@ namespace Instanciate
 
 	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::typeisobject>& operands)
 	{
-		auto& frame = atomStack.back();
-		auto& cdef = cdeftable.classdef(CLID{frame.atomid, operands.lvid});
+		assert(frame != nullptr);
+		auto& cdef = cdeftable.classdef(CLID{frame->atomid, operands.lvid});
 		if (likely(not cdef.isBuiltinOrVoid()))
 		{
 			auto* atom = cdeftable.findClassdefAtom(cdef);
@@ -26,7 +26,7 @@ namespace Instanciate
 		auto e = (error() << "invalid type: got '");
 		cdef.print(e.data().message, cdeftable, false);
 		e << "', expected class";
-		frame.invalidate(operands.lvid);
+		frame->invalidate(operands.lvid);
 	}
 
 

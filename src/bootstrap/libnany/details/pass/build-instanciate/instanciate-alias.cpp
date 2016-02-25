@@ -15,23 +15,21 @@ namespace Instanciate
 
 	void SequenceBuilder::declareNamedVariable(const AnyString& name, LVID lvid, bool autoreleased)
 	{
-		auto& frame = atomStack.back();
-
-		auto& lr    = frame.lvids[lvid];
-		LVID found  = frame.findLocalVariable(name);
+		auto& lr    = frame->lvids[lvid];
+		LVID found  = frame->findLocalVariable(name);
 
 		if (likely(0 == found))
 		{
-			lr.scope           = frame.scope;
+			lr.scope           = frame->scope;
 			lr.userDefinedName = name;
 			lr.file.line       = currentLine;
 			lr.file.offset     = currentOffset;
 			lr.file.url        = currentFilename;
 			lr.hasBeenUsed     = false;
-			lr.scope           = frame.scope;
+			lr.scope           = frame->scope;
 
-			CLID clid{frame.atomid, lvid};
-			autoreleased   &= frame.verify(lvid); // suppress spurious errors from previous ones
+			CLID clid{frame->atomid, lvid};
+			autoreleased   &= frame->verify(lvid); // suppress spurious errors from previous ones
 			lr.autorelease  = autoreleased and canBeAcquired(cdeftable.classdef(clid));
 		}
 		else

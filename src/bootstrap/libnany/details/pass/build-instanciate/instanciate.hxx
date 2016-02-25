@@ -10,6 +10,15 @@ namespace Pass
 namespace Instanciate
 {
 
+	inline void SequenceBuilder::pushNewFrame(Atom& atom)
+	{
+		auto* newframe = (AtomStackFrame*) context.memory.allocate(&context, sizeof(AtomStackFrame));
+		new (newframe) AtomStackFrame(atom);
+		newframe->previous = frame;
+		frame = newframe;
+	}
+
+
 	inline void SequenceBuilder::PushedParameters::clear()
 	{
 		func.indexed.clear();
@@ -40,9 +49,9 @@ namespace Instanciate
 
 	inline bool SequenceBuilder::canBeAcquired(LVID lvid) const
 	{
-		assert(not atomStack.empty());
-		assert(lvid < atomStack.back().lvids.size());
-		return canBeAcquired(CLID{atomStack.back().atomid, lvid});
+		assert(frame != nullptr);
+		assert(lvid < frame->lvids.size());
+		return canBeAcquired(CLID{frame->atomid, lvid});
 	}
 
 
@@ -83,9 +92,7 @@ namespace Instanciate
 	{
 		if (not operands.symlink)
 		{
-			auto& frame = atomStack.back();
-			auto& cdef  = cdeftable.classdef(CLID{frame.atomid, operands.lvid});
-
+			auto& cdef  = cdeftable.classdef(CLID{frame->atomid, operands.lvid});
 			auto& spare = cdeftable.substitute(operands.follower);
 			spare.import(cdef);
 			spare.instance = true;
@@ -103,8 +110,8 @@ namespace Instanciate
 
 	inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::inherit>& operands)
 	{
-		auto& frame = atomStack.back();
-		if (not frame.verify(operands.lhs))
+		assert(frame != nullptr);
+		if (not frame->verify(operands.lhs))
 			return;
 
 		switch (operands.inherit)
@@ -112,7 +119,7 @@ namespace Instanciate
 			case 2: // qualifiers
 			{
 				auto& spare = cdeftable.substitute(operands.lhs);
-				spare.qualifiers = cdeftable.classdef(CLID{frame.atomid, operands.rhs}).qualifiers;
+				spare.qualifiers = cdeftable.classdef(CLID{frame->atomid, operands.rhs}).qualifiers;
 				break;
 			}
 			default:
@@ -131,9 +138,8 @@ namespace Instanciate
 		out.emitRef(lvid);
 
 		// force unref
-		auto& frame = atomStack.back();
-		assert(lvid < frame.lvids.size());
-		frame.lvids[lvid].autorelease = true;
+		assert(lvid < frame->lvids.size());
+		frame->lvids[lvid].autorelease = true;
 	}
 
 
@@ -173,7 +179,6 @@ namespace Instanciate
 
 	inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::qualifiers>& operands)
 	{
-		assert(not atomStack.empty());
 		bool  onoff = (operands.flag != 0);
 		auto& spare = cdeftable.substitute(operands.lvid);
 

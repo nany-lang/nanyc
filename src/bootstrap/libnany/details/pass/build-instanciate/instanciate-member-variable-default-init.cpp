@@ -15,13 +15,13 @@ namespace Instanciate
 
 	void SequenceBuilder::generateMemberVarDefaultInitialization()
 	{
-		assert(not atomStack.empty());
+		assert(frame != nullptr);
 		assert(canGenerateCode());
 		assert(lastOpcodeStacksizeOffset != (uint32_t) -1);
 
 		// special location: in a constructor - initializing all variables with their def value
 		// note: do not keep a reference on 'out.at...', since the internal buffer might be reized
-		auto& funcAtom = atomStack.back().atom;
+		auto& funcAtom = frame->atom;
 		if (unlikely(funcAtom.parent == nullptr))
 			return (void)(ICE() << "invalid parent atom for variable initialization in ctor");
 
@@ -52,8 +52,7 @@ namespace Instanciate
 		// In both cases, the default value (thus the func for initializing the var)
 		// must be valid (thus instanciated for being checked)
 
-		auto& frame = atomStack.back();
-		if (frame.selfParameters.get() == nullptr)
+		if (frame->selfParameters.get() == nullptr)
 		{
 			for (auto& subatomref: atomvars)
 			{
@@ -74,7 +73,7 @@ namespace Instanciate
 		}
 		else
 		{
-			auto& selfParameters = *(frame.selfParameters.get());
+			auto& selfParameters = *(frame->selfParameters.get());
 			auto noSelfParam = selfParameters.end();
 
 			for (auto& subatomref: atomvars)
@@ -109,11 +108,11 @@ namespace Instanciate
 						uint32_t paramlvid = selfIT->second.first;
 
 						// set the type of 'lvid' to allow assignment
-						auto& cdef  = cdeftable.classdef(CLID{frame.atomid, paramlvid});
+						auto& cdef  = cdeftable.classdef(CLID{frame->atomid, paramlvid});
 						auto& spare = cdeftable.substitute(lvid);
 						spare.import(cdef);
 
-						instanciateAssignment(frame, lvid, paramlvid, false);
+						instanciateAssignment(*frame, lvid, paramlvid, false);
 
 						// retrieving real atom from name to get the field index
 						const Atom* varatom = nullptr;
@@ -144,7 +143,7 @@ namespace Instanciate
 			}
 
 			// release memory
-			frame.selfParameters.reset();
+			frame->selfParameters.reset();
 		}
 	}
 

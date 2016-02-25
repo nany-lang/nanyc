@@ -53,8 +53,7 @@ namespace Instanciate
 				return false;
 
 			uint32_t count = static_cast<uint32_t>(pushedparams.func.indexed.size());
-			auto& frame = atomStack.back();
-			frame.lvids[operands.lvid].synthetic = false;
+			frame->lvids[operands.lvid].synthetic = false;
 			bool hasErrors = false;
 
 			// reset the returned type
@@ -63,10 +62,10 @@ namespace Instanciate
 			for (uint32_t i = 0; i != count; ++i)
 			{
 				auto& element = pushedparams.func.indexed[i];
-				if (not frame.verify(element.lvid)) // silently ignore error
+				if (not frame->verify(element.lvid)) // silently ignore error
 					return false;
 
-				auto& cdef = cdeftable.classdefFollowClassMember(CLID{frame.atomid, element.lvid});
+				auto& cdef = cdeftable.classdefFollowClassMember(CLID{frame->atomid, element.lvid});
 				if (unlikely(not cdef.isBuiltin()))
 				{
 					hasErrors = true;
@@ -86,16 +85,17 @@ namespace Instanciate
 		})();
 
 		if (not success)
-			atomStack.back().lvids[operands.lvid].errorReported = true;
+			frame->lvids[operands.lvid].errorReported = true;
 		return success;
 	}
 
 
 	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::intrinsic>& operands)
 	{
+		assert(frame != nullptr);
 		if (unlikely(not instanciateUserDefinedIntrinsic(operands)))
 		{
-			atomStack.back().invalidate(operands.lvid);
+			frame->invalidate(operands.lvid);
 			success = false;
 		}
 

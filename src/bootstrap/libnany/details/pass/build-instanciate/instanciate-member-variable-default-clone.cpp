@@ -15,19 +15,18 @@ namespace Instanciate
 
 	void SequenceBuilder::generateMemberVarDefaultClone()
 	{
+		assert(frame != nullptr);
 		assert(canGenerateCode());
 		assert(lastOpcodeStacksizeOffset != (uint32_t) -1);
-		assert(not atomStack.empty());
 
 		// special location: in a constructor - initializing all variables with their def value
 		// note: do not keep a reference on 'out.at...', since the internal buffer might be reized
-		auto& frame = atomStack.back();
-		auto& parentAtom = *(frame.atom.parent);
+		auto& parentAtom = *(frame->atom.parent);
 
 		// do not warn about rhs (unused). The parameter is used, but not via its name
 		// reminder: 1-based, 1: returntype, 2: self, 3: first parameter
-		assert(3 < frame.lvids.size());
-		frame.lvids[3].warning.unused = false;
+		assert(3 < frame->lvids.size());
+		frame->lvids[3].warning.unused = false;
 
 
 		std::vector<std::reference_wrapper<Atom>> atomvars;
@@ -66,7 +65,7 @@ namespace Instanciate
 				uint32_t lhsptr = lvid++;
 				out.emitFieldget(rhsptr, /*rhs*/ 3, subatom.varinfo.effectiveFieldIndex);
 
-				auto& origin  = frame.lvids[rhsptr].origin.varMember;
+				auto& origin  = frame->lvids[rhsptr].origin.varMember;
 				origin.self   = 2;
 				origin.atomid = subatom.atomid;
 				origin.field  = subatom.varinfo.effectiveFieldIndex;
@@ -79,7 +78,7 @@ namespace Instanciate
 				cdefrhs.import(cdef);
 				cdefrhs.qualifiers = cdef.qualifiers;
 
-				instanciateAssignment(frame, lhsptr, rhsptr, false);
+				instanciateAssignment(*frame, lhsptr, rhsptr, false);
 				out.emitFieldset(lhsptr, /*self*/ 2, subatom.varinfo.effectiveFieldIndex);
 			}
 			else

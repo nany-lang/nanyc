@@ -17,11 +17,10 @@ namespace Instanciate
 	{
 		if (canGenerateCode())
 		{
-			auto& frame = atomStack.back();
-			if (not frame.verify(operands.type))
-				return frame.invalidate(operands.lvid);
+			if (not frame->verify(operands.type))
+				return frame->invalidate(operands.lvid);
 
-			auto& cdef = cdeftable.classdefFollowClassMember(CLID{frame.atomid, operands.type});
+			auto& cdef = cdeftable.classdefFollowClassMember(CLID{frame->atomid, operands.type});
 			if (not cdef.isBuiltinOrVoid())
 			{
 				auto* atom = cdeftable.findClassdefAtom(cdef);

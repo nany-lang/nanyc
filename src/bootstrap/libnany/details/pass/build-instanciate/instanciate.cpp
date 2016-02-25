@@ -45,7 +45,6 @@ namespace Instanciate
 		, report(report)
 	{
 		// reduce memory (re)allocations
-		atomStack.reserve(4); // arbitrary
 		multipleResults.reserve(8); // arbitrary value
 
 		pushedparams.func.indexed.reserve(16);
@@ -59,36 +58,40 @@ namespace Instanciate
 	{
 		if (Config::Traces::printClassdefTable)
 			printClassdefTable();
+
+		auto* frm = frame;
+		while (frm)
+		{
+			auto* previous = frm->previous;
+			frm->~AtomStackFrame();
+			context.memory.release(&context, frm, sizeof(AtomStackFrame));
+			frm = previous;
+		}
 	}
 
 
 	void SequenceBuilder::printClassdefTable()
 	{
-		while (not atomStack.empty())
-		{
-			printClassdefTable(report.subgroup(), atomStack.back());
-			atomStack.pop_back();
-		}
+		for (auto* f = frame; f != nullptr; f = f->previous)
+			printClassdefTable(report.subgroup(), *f);
 	}
 
 
 	void SequenceBuilder::releaseScopedVariables(int scope, bool forget)
 	{
-		if (unlikely(atomStack.empty()))
+		if (unlikely(!frame))
 			return;
 		if (not forget and (not canGenerateCode()))
 			return;
 
-		auto& frame = atomStack.back();
-
 		// unref in the reverse order
-		auto i = static_cast<uint32_t>(frame.lvids.size());
+		auto i = static_cast<uint32_t>(frame->lvids.size());
 
 		if (canGenerateCode())
 		{
 			while (i-- != 0)
 			{
-				auto& clcvr = frame.lvids[i];
+				auto& clcvr = frame->lvids[i];
 				if (not (clcvr.scope >= scope))
 					continue;
 
@@ -105,7 +108,7 @@ namespace Instanciate
 					if (not clcvr.userDefinedName.empty() and clcvr.warning.unused)
 					{
 						if (unlikely(not clcvr.hasBeenUsed) and (clcvr.userDefinedName != "self"))
-							complainUnusedVariable(frame, i);
+							complainUnusedVariable(*frame, i);
 					}
 
 					clcvr.userDefinedName.clear();
@@ -118,7 +121,7 @@ namespace Instanciate
 			assert(forget == true);
 			while (i-- != 0) // just invalidate everything
 			{
-				auto& clcvr = frame.lvids[i];
+				auto& clcvr = frame->lvids[i];
 				if (clcvr.scope >= scope)
 				{
 					clcvr.userDefinedName.clear();
@@ -132,38 +135,38 @@ namespace Instanciate
 	uint32_t SequenceBuilder::createLocalVariables(uint32_t count)
 	{
 		assert(lastOpcodeStacksizeOffset != (uint32_t) -1);
-		assert(not atomStack.empty());
+		assert(frame != nullptr);
 		assert(count > 0);
 
 		auto& operands = out.at<IR::ISA::Op::stacksize>(lastOpcodeStacksizeOffset);
 		uint32_t startOffset = operands.add;
-		auto& frame = atomStack.back();
+		int scope = frame->scope;
 
 		if (count == 1)
 		{
-			frame.resizeRegisterCount((++operands.add), cdeftable);
+			frame->resizeRegisterCount((++operands.add), cdeftable);
 
 			if (canGenerateCode())
 			{
-				auto& lvidinfo = frame.lvids[startOffset];
-				lvidinfo.scope = frame.scope;
+				auto& lvidinfo = frame->lvids[startOffset];
+				lvidinfo.scope = scope;
 				lvidinfo.offsetDeclOut = out.opcodeCount();
 				out.emitStackalloc(startOffset, nyt_any);
 			}
 			else
-				frame.lvids[startOffset].scope = frame.scope;
+				frame->lvids[startOffset].scope = scope;
 		}
 		else
 		{
 			operands.add += count;
-			frame.resizeRegisterCount(operands.add, cdeftable);
+			frame->resizeRegisterCount(operands.add, cdeftable);
 
 			if (canGenerateCode())
 			{
 				for (uint32_t i = 0; i != count; ++i)
 				{
-					auto& lvidinfo = frame.lvids[startOffset + i];
-					lvidinfo.scope = frame.scope;
+					auto& lvidinfo = frame->lvids[startOffset + i];
+					lvidinfo.scope = scope;
 					lvidinfo.offsetDeclOut = out.opcodeCount();
 					out.emitStackalloc(startOffset + i, nyt_any);
 				}
@@ -171,7 +174,7 @@ namespace Instanciate
 			else
 			{
 				for (uint32_t i = 0; i != count; ++i)
-					frame.lvids[startOffset + i].scope = frame.scope;
+					frame->lvids[startOffset + i].scope = scope;
 			}
 		}
 		return startOffset;

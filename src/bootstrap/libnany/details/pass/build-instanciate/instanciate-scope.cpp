@@ -15,8 +15,8 @@ namespace Instanciate
 
 	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::scope>& /*operands*/)
 	{
-		if (likely(not atomStack.empty()))
-			++(atomStack.back().scope);
+		if (frame != nullptr)
+			++(frame->scope);
 
 		if (canGenerateCode())
 			out.emitScope();
@@ -25,26 +25,30 @@ namespace Instanciate
 
 	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::end>& /*operands*/)
 	{
-		if (likely(not atomStack.empty()))
+		if (frame != nullptr)
 		{
-			auto& frame = atomStack.back();
-			releaseScopedVariables(frame.scope, /*forget*/ true);
+			releaseScopedVariables(frame->scope, /*forget*/ true);
 
 			// the scope might be zero if the opcode 'end' comes from a class or a func
-			if (frame.scope > 0)
+			if (frame->scope > 0)
 			{
 				if (canGenerateCode())
 					out.emitEnd();
-				--frame.scope;
+				--frame->scope;
 			}
 			else
 			{
-				if (atomStack.size() > 1)
+				if (frame->previous != nullptr)
 				{
 					if (Config::Traces::printClassdefTable)
-						printClassdefTable(report.subgroup(), atomStack.back());
+						printClassdefTable(report.subgroup(), *frame);
 
-					atomStack.pop_back(); // remove a part of the stack
+					// destroy the frame
+					auto* previous = frame->previous;
+					frame->~AtomStackFrame();
+					context.memory.release(&context, frame, sizeof(AtomStackFrame));
+					frame = previous;
+
 					++layerDepthLimit;
 					if (canGenerateCode())
 						out.emitEnd();

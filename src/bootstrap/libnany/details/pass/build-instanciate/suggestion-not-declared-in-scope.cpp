@@ -138,13 +138,12 @@ namespace Instanciate
 		if (self == nullptr and not unknownIsOperator)
 		{
 			uint note;
-			auto& frame = atomStack.back();
 
 			// reverse order, to get the nearest first
-			uint i = (uint) frame.lvids.size();
+			uint i = (uint) frame->lvids.size();
 			while (i-- > 0)
 			{
-				auto& crlcvr = frame.lvids[i];
+				auto& crlcvr = frame->lvids[i];
 
 				// only take non-empty names and avoid the hidden parameter 'self'
 				if (crlcvr.userDefinedName.empty() or crlcvr.userDefinedName == "self")
@@ -154,7 +153,7 @@ namespace Instanciate
 					continue;
 
 				auto suggest = (err.suggest() << "var " << crlcvr.userDefinedName);
-				auto* varAtom = cdeftable.findClassdefAtom(cdeftable.classdef(CLID{frame.atomid, i}));
+				auto* varAtom = cdeftable.findClassdefAtom(cdeftable.classdef(CLID{frame->atomid, i}));
 				if (varAtom)
 				{
 					suggest << ": ";

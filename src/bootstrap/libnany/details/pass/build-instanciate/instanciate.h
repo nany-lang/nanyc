@@ -121,15 +121,6 @@ namespace Instanciate
 		bool instanciateIntrinsicIGTE(uint32_t);
 
 
-	public:
-		// exit status
-		mutable bool success = true;
-		//! cursor
-		IR::Instruction** cursor = nullptr;
-		//! Flag to determine weather sub atoms can be instanciated in the same time
-		uint32_t layerDepthLimit = (uint32_t) -1;
-
-
 	private:
 		//! \name Visitors for all supported opcodes
 		//@{
@@ -311,10 +302,11 @@ namespace Instanciate
 
 	private:
 		bool doInstanciateAtomFunc(Logs::Message::Ptr& subreport, InstanciateData& info, uint32_t retlvid);
+		void pushNewFrame(Atom& atom);
 
 	private:
-		// Blueprint root element
-		std::vector<AtomStackFrame> atomStack;
+		// Current stack frame (current func / class...)
+		AtomStackFrame* frame = nullptr;
 
 		// Isolate
 		ClassdefTableView cdeftable;
@@ -379,7 +371,15 @@ namespace Instanciate
 			bool compareTo = false;
 		} shortcircuit;
 
+		// exit status
+		mutable bool success = true;
 		friend class Nany::IR::Sequence;
+
+	public:
+		//! Flag to determine weather sub atoms can be instanciated in the same time
+		uint32_t layerDepthLimit = (uint32_t) -1;
+		//! cursor
+		IR::Instruction** cursor = nullptr;
 
 	}; // class SequenceBuilder
 

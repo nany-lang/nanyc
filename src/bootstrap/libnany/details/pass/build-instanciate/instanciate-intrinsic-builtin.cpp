@@ -13,13 +13,12 @@ namespace Pass
 namespace Instanciate
 {
 
-	bool  SequenceBuilder::instanciateIntrinsicFieldset(uint32_t lvid)
+	bool SequenceBuilder::instanciateIntrinsicFieldset(uint32_t lvid)
 	{
 		cdeftable.substitute(lvid).mutateToVoid();
 
-		auto& frame = atomStack.back();
 		uint32_t lvidsid = pushedparams.func.indexed[1].lvid;
-		uint32_t sid = frame.lvids[lvidsid].text_sid;
+		uint32_t sid = frame->lvids[lvidsid].text_sid;
 		if (unlikely(sid == (uint32_t) -1))
 			return (ICE() << "invalid string-id for field name (got lvid " << lvidsid << ')');
 
@@ -27,7 +26,7 @@ namespace Instanciate
 		if (unlikely(varname.empty()))
 			return (ICE() << "invalid empty field name");
 
-		Atom* parent = frame.atom.isClass() ? &frame.atom : frame.atom.parent;
+		Atom* parent = frame->atom.isClass() ? &frame->atom : frame->atom.parent;
 		if (unlikely(!parent))
 			return (ICE() << "invalid parent atom for __nanyc_fieldset");
 
@@ -43,7 +42,7 @@ namespace Instanciate
 
 		uint32_t objlvid = pushedparams.func.indexed[0].lvid;
 		auto& cdefvar = cdeftable.classdefFollowClassMember(varatom->returnType.clid);
-		auto& cdef    = cdeftable.classdef(CLID{frame.atomid, objlvid});
+		auto& cdef    = cdeftable.classdef(CLID{frame->atomid, objlvid});
 
 		// flag for implicitly converting objects (bool, i32...) into builtin (__bool, __i32...)
 		bool implicitBuiltin = cdefvar.isBuiltin() and (not cdef.isBuiltinOrVoid());
@@ -79,7 +78,7 @@ namespace Instanciate
 	}
 
 
-	bool  SequenceBuilder::instanciateIntrinsicRef(uint32_t lvid)
+	bool SequenceBuilder::instanciateIntrinsicRef(uint32_t lvid)
 	{
 		cdeftable.substitute(lvid).mutateToVoid();
 		if (canGenerateCode())
@@ -88,7 +87,7 @@ namespace Instanciate
 	}
 
 
-	bool  SequenceBuilder::instanciateIntrinsicUnref(uint32_t lvid)
+	bool SequenceBuilder::instanciateIntrinsicUnref(uint32_t lvid)
 	{
 		cdeftable.substitute(lvid).mutateToVoid();
 		if (canGenerateCode())
@@ -97,7 +96,7 @@ namespace Instanciate
 	}
 
 
-	bool  SequenceBuilder::instanciateIntrinsicAddressof(uint32_t lvid)
+	bool SequenceBuilder::instanciateIntrinsicAddressof(uint32_t lvid)
 	{
 		cdeftable.substitute(lvid).mutateToBuiltin(nyt_u64);
 
@@ -113,13 +112,12 @@ namespace Instanciate
 	}
 
 
-	bool  SequenceBuilder::instanciateIntrinsicSizeof(uint32_t lvid)
+	bool SequenceBuilder::instanciateIntrinsicSizeof(uint32_t lvid)
 	{
 		cdeftable.substitute(lvid).mutateToBuiltin(nyt_u64);
 
 		uint32_t objlvid = pushedparams.func.indexed[0].lvid;
-		auto& frame = atomStack.back();
-		auto& cdef = cdeftable.classdefFollowClassMember(CLID{frame.atomid, objlvid});
+		auto& cdef = cdeftable.classdefFollowClassMember(CLID{frame->atomid, objlvid});
 
 		bool isBuiltinOrVoid = cdef.isBuiltinOrVoid();
 		Atom* atom = nullptr;
@@ -133,8 +131,7 @@ namespace Instanciate
 		if (canGenerateCode())
 		{
 			uint32_t objlvid = pushedparams.func.indexed[0].lvid;
-			auto& frame = atomStack.back();
-			auto& cdef = cdeftable.classdefFollowClassMember(CLID{frame.atomid, objlvid});
+			auto& cdef = cdeftable.classdefFollowClassMember(CLID{frame->atomid, objlvid});
 
 			if (not isBuiltinOrVoid)
 			{
@@ -151,13 +148,12 @@ namespace Instanciate
 	}
 
 
-	bool  SequenceBuilder::instanciateIntrinsicMemalloc(uint32_t lvid)
+	bool SequenceBuilder::instanciateIntrinsicMemalloc(uint32_t lvid)
 	{
 		cdeftable.substitute(lvid).mutateToBuiltin(nyt_u64);
 
 		uint32_t objlvid = pushedparams.func.indexed[0].lvid;
-		auto& frame = atomStack.back();
-		auto& cdef = cdeftable.classdefFollowClassMember(CLID{frame.atomid, objlvid});
+		auto& cdef = cdeftable.classdefFollowClassMember(CLID{frame->atomid, objlvid});
 		if (not cdef.isBuiltingUnsigned())
 			return complainIntrinsicParameter("memory.allocate", 0, cdef, "'__u64'");
 
@@ -167,19 +163,17 @@ namespace Instanciate
 	}
 
 
-	bool  SequenceBuilder::instanciateIntrinsicMemFree(uint32_t lvid)
+	bool SequenceBuilder::instanciateIntrinsicMemFree(uint32_t lvid)
 	{
 		cdeftable.substitute(lvid).mutateToVoid();
 
-		auto& frame = atomStack.back();
-
 		uint32_t objlvid = pushedparams.func.indexed[0].lvid;
-		auto& cdef = cdeftable.classdefFollowClassMember(CLID{frame.atomid, objlvid});
+		auto& cdef = cdeftable.classdefFollowClassMember(CLID{frame->atomid, objlvid});
 		if (cdef.kind != nyt_u64)
 			return complainIntrinsicParameter("memory.dispose", 0, cdef, "'__u64'");
 
 		uint32_t size = pushedparams.func.indexed[1].lvid;
-		auto& cdefsize = cdeftable.classdefFollowClassMember(CLID{frame.atomid, size});
+		auto& cdefsize = cdeftable.classdefFollowClassMember(CLID{frame->atomid, size});
 		if (unlikely(not cdefsize.isBuiltingUnsigned()))
 			return complainIntrinsicParameter("memory.dispose", 1, cdef, "'__u64'");
 
@@ -194,9 +188,8 @@ namespace Instanciate
 	inline bool SequenceBuilder::instanciateIntrinsicOperator(uint32_t lvid, const char* const name)
 	{
 		assert(pushedparams.func.indexed.size() == 2);
-		auto& frame = atomStack.back();
 		uint32_t lhs  = pushedparams.func.indexed[0].lvid;
-		auto& cdeflhs   = cdeftable.classdefFollowClassMember(CLID{frame.atomid, lhs});
+		auto& cdeflhs   = cdeftable.classdefFollowClassMember(CLID{frame->atomid, lhs});
 
 		Atom* atomBuiltinCast = nullptr;
 
@@ -215,7 +208,7 @@ namespace Instanciate
 		}
 
 		uint32_t rhs  = pushedparams.func.indexed[1].lvid;
-		auto& cdefrhs = cdeftable.classdefFollowClassMember(CLID{frame.atomid, rhs});
+		auto& cdefrhs = cdeftable.classdefFollowClassMember(CLID{frame->atomid, rhs});
 		nytype_t builtinrhs = cdefrhs.kind;
 
 		if (builtinrhs == nyt_any)
@@ -312,7 +305,7 @@ namespace Instanciate
 				// ALLOC: memory allocation of the new temporary object
 				out.emitMemalloc(lvid, sizeoflvid);
 				out.emitRef(lvid);
-				atomStack.back().lvids[lvid].autorelease = true;
+				frame->lvids[lvid].autorelease = true;
 				// reset the internal value of the object
 				out.emitFieldset(opresult, /*self*/lvid, 0); // builtin
 			}
@@ -328,144 +321,144 @@ namespace Instanciate
 	}
 
 
-	bool  SequenceBuilder::instanciateIntrinsicAND(uint32_t lvid)
+	bool SequenceBuilder::instanciateIntrinsicAND(uint32_t lvid)
 	{
 		return instanciateIntrinsicOperator<nyt_any, 1, 1, 0, &IR::Sequence::emitAND>(lvid, "and");
 	}
 
-	bool  SequenceBuilder::instanciateIntrinsicOR(uint32_t lvid)
+	bool SequenceBuilder::instanciateIntrinsicOR(uint32_t lvid)
 	{
 		return instanciateIntrinsicOperator<nyt_any, 1, 1, 0, &IR::Sequence::emitOR>(lvid, "or");
 	}
 
-	bool  SequenceBuilder::instanciateIntrinsicXOR(uint32_t lvid)
+	bool SequenceBuilder::instanciateIntrinsicXOR(uint32_t lvid)
 	{
 		return instanciateIntrinsicOperator<nyt_any, 1, 1, 0, &IR::Sequence::emitXOR>(lvid, "xor");
 	}
 
-	bool  SequenceBuilder::instanciateIntrinsicMOD(uint32_t lvid)
+	bool SequenceBuilder::instanciateIntrinsicMOD(uint32_t lvid)
 	{
 		return instanciateIntrinsicOperator<nyt_any, 1, 1, 0, &IR::Sequence::emitMOD>(lvid, "mod");
 	}
 
-	bool  SequenceBuilder::instanciateIntrinsicADD(uint32_t lvid)
+	bool SequenceBuilder::instanciateIntrinsicADD(uint32_t lvid)
 	{
 		return instanciateIntrinsicOperator<nyt_any, 0, 1, 0, &IR::Sequence::emitADD>(lvid, "add");
 	}
 
-	bool  SequenceBuilder::instanciateIntrinsicSUB(uint32_t lvid)
+	bool SequenceBuilder::instanciateIntrinsicSUB(uint32_t lvid)
 	{
 		return instanciateIntrinsicOperator<nyt_any, 0, 1, 0, &IR::Sequence::emitSUB>(lvid, "sub");
 	}
 
-	bool  SequenceBuilder::instanciateIntrinsicDIV(uint32_t lvid)
+	bool SequenceBuilder::instanciateIntrinsicDIV(uint32_t lvid)
 	{
 		return instanciateIntrinsicOperator<nyt_any, 0, 1, 0, &IR::Sequence::emitDIV>(lvid, "div");
 	}
 
-	bool  SequenceBuilder::instanciateIntrinsicMUL(uint32_t lvid)
+	bool SequenceBuilder::instanciateIntrinsicMUL(uint32_t lvid)
 	{
 		return instanciateIntrinsicOperator<nyt_any, 0, 1, 0, &IR::Sequence::emitMUL>(lvid, "mul");
 	}
 
-	bool  SequenceBuilder::instanciateIntrinsicIDIV(uint32_t lvid)
+	bool SequenceBuilder::instanciateIntrinsicIDIV(uint32_t lvid)
 	{
 		return instanciateIntrinsicOperator<nyt_any, 0, 1, 0, &IR::Sequence::emitIDIV>(lvid, "idiv");
 	}
 
-	bool  SequenceBuilder::instanciateIntrinsicIMUL(uint32_t lvid)
+	bool SequenceBuilder::instanciateIntrinsicIMUL(uint32_t lvid)
 	{
 		return instanciateIntrinsicOperator<nyt_any, 0, 1, 0, &IR::Sequence::emitIMUL>(lvid, "imul");
 	}
 
-	bool  SequenceBuilder::instanciateIntrinsicFADD(uint32_t lvid)
+	bool SequenceBuilder::instanciateIntrinsicFADD(uint32_t lvid)
 	{
 		return instanciateIntrinsicOperator<nyt_any, 0, 0, 1, &IR::Sequence::emitFADD>(lvid, "fadd");
 	}
 
-	bool  SequenceBuilder::instanciateIntrinsicFSUB(uint32_t lvid)
+	bool SequenceBuilder::instanciateIntrinsicFSUB(uint32_t lvid)
 	{
 		return instanciateIntrinsicOperator<nyt_any, 0, 0, 1, &IR::Sequence::emitFSUB>(lvid, "fsub");
 	}
 
-	bool  SequenceBuilder::instanciateIntrinsicFDIV(uint32_t lvid)
+	bool SequenceBuilder::instanciateIntrinsicFDIV(uint32_t lvid)
 	{
 		return instanciateIntrinsicOperator<nyt_any, 0, 0, 1, &IR::Sequence::emitFDIV>(lvid, "fdiv");
 	}
 
-	bool  SequenceBuilder::instanciateIntrinsicFMUL(uint32_t lvid)
+	bool SequenceBuilder::instanciateIntrinsicFMUL(uint32_t lvid)
 	{
 		return instanciateIntrinsicOperator<nyt_any, 0, 0, 1, &IR::Sequence::emitFMUL>(lvid, "fmul");
 	}
 
 
 
-	bool  SequenceBuilder::instanciateIntrinsicEQ(uint32_t lvid)
+	bool SequenceBuilder::instanciateIntrinsicEQ(uint32_t lvid)
 	{
 		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitEQ>(lvid, "eq");
 	}
 
-	bool  SequenceBuilder::instanciateIntrinsicNEQ(uint32_t lvid)
+	bool SequenceBuilder::instanciateIntrinsicNEQ(uint32_t lvid)
 	{
 		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitNEQ>(lvid, "neq");
 	}
 
-	bool  SequenceBuilder::instanciateIntrinsicFLT(uint32_t lvid)
+	bool SequenceBuilder::instanciateIntrinsicFLT(uint32_t lvid)
 	{
 		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitFLT>(lvid, "flt");
 	}
 
-	bool  SequenceBuilder::instanciateIntrinsicFLTE(uint32_t lvid)
+	bool SequenceBuilder::instanciateIntrinsicFLTE(uint32_t lvid)
 	{
 		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitFLTE>(lvid, "flte");
 	}
 
-	bool  SequenceBuilder::instanciateIntrinsicFGT(uint32_t lvid)
+	bool SequenceBuilder::instanciateIntrinsicFGT(uint32_t lvid)
 	{
 		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitFGT>(lvid, "fgt");
 	}
 
-	bool  SequenceBuilder::instanciateIntrinsicFGTE(uint32_t lvid)
+	bool SequenceBuilder::instanciateIntrinsicFGTE(uint32_t lvid)
 	{
 		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitFGTE>(lvid, "fgte");
 	}
 
-	bool  SequenceBuilder::instanciateIntrinsicLT(uint32_t lvid)
+	bool SequenceBuilder::instanciateIntrinsicLT(uint32_t lvid)
 	{
 		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitLT>(lvid, "lt");
 	}
 
-	bool  SequenceBuilder::instanciateIntrinsicLTE(uint32_t lvid)
+	bool SequenceBuilder::instanciateIntrinsicLTE(uint32_t lvid)
 	{
 		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitLTE>(lvid, "lte");
 	}
 
-	bool  SequenceBuilder::instanciateIntrinsicILT(uint32_t lvid)
+	bool SequenceBuilder::instanciateIntrinsicILT(uint32_t lvid)
 	{
 		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitILT>(lvid, "ilt");
 	}
 
-	bool  SequenceBuilder::instanciateIntrinsicILTE(uint32_t lvid)
+	bool SequenceBuilder::instanciateIntrinsicILTE(uint32_t lvid)
 	{
 		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitILTE>(lvid, "ilte");
 	}
 
-	bool  SequenceBuilder::instanciateIntrinsicGT(uint32_t lvid)
+	bool SequenceBuilder::instanciateIntrinsicGT(uint32_t lvid)
 	{
 		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitGT>(lvid, "gt");
 	}
 
-	bool  SequenceBuilder::instanciateIntrinsicGTE(uint32_t lvid)
+	bool SequenceBuilder::instanciateIntrinsicGTE(uint32_t lvid)
 	{
 		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitGTE>(lvid, "gte");
 	}
 
-	bool  SequenceBuilder::instanciateIntrinsicIGT(uint32_t lvid)
+	bool SequenceBuilder::instanciateIntrinsicIGT(uint32_t lvid)
 	{
 		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitIGT>(lvid, "igt");
 	}
 
-	bool  SequenceBuilder::instanciateIntrinsicIGTE(uint32_t lvid)
+	bool SequenceBuilder::instanciateIntrinsicIGTE(uint32_t lvid)
 	{
 		return instanciateIntrinsicOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitIGTE>(lvid, "igte");
 	}
@@ -546,7 +539,6 @@ namespace Instanciate
 				return (canComplain and complainUnknownIntrinsic(name));
 
 			// checking for parameters
-			auto& frame = atomStack.back();
 			uint32_t count = it->second.second;
 			if (unlikely(not checkForIntrinsicParamCount(name, count)))
 				return false;
@@ -554,7 +546,7 @@ namespace Instanciate
 			// checking if one parameter was already flag as 'error'
 			for (uint32_t i = 0u; i != count; ++i)
 			{
-				if (unlikely(not frame.verify(pushedparams.func.indexed[i].lvid)))
+				if (unlikely(not frame->verify(pushedparams.func.indexed[i].lvid)))
 					return false;
 			}
 
@@ -562,12 +554,11 @@ namespace Instanciate
 			return (this->*(it->second.first))(lvid);
 		})();
 
-		auto& frame = atomStack.back();
-		frame.lvids[lvid].synthetic = false;
+		frame->lvids[lvid].synthetic = false;
 
 		// annotate any error
 		if (unlikely(not success and canComplain))
-			frame.lvids[lvid].errorReported = true;
+			frame->lvids[lvid].errorReported = true;
 		return success;
 	}
 
