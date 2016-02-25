@@ -30,6 +30,12 @@ namespace Instanciate
 		if (unlikely(lhs == 0 or rhs == 0 or lhs == rhs))
 			return (ICE() << "invalid lvid for variable assignment");
 
+		if (checktype and unlikely(frame.lvids[lhs].synthetic))
+			return (error() << "synthetic objects are immutable");
+
+		if (checktype and unlikely(frame.lvids[rhs].synthetic))
+			return (error() << "can not assign synthetic objects");
+
 		// current atom id
 		auto atomid   = frame.atomid;
 		// LHS cdef

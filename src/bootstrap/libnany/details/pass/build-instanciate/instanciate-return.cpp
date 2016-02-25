@@ -29,6 +29,8 @@ namespace Instanciate
 				return;
 			if (unlikely(frame.lvids[operands.lvid].markedAsAny))
 				return (void)(error() << "return: can not perform member lookup on 'any'");
+			if (unlikely(frame.lvids[operands.lvid].synthetic))
+				return (void)(error() << "cannot return a synthetic object");
 		}
 
 		// the clid to remember for the return value

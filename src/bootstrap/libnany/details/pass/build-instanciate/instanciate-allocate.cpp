@@ -26,9 +26,9 @@ namespace Instanciate
 			auto err = (error() << "cannot instanciate object of type '");
 			cdef.print(err.data().message, cdeftable, false);
 			err << "'";
+			frame.invalidate(operands.lvid);
 			return;
 		}
-
 
 		// propagate the object type
 		{
@@ -40,7 +40,8 @@ namespace Instanciate
 		// remember that the value stored into the register comes from a memory allocation
 		// (can be used to avoid spurious object copies for example)
 		frame.lvids[operands.lvid].origin.memalloc = true;
-
+		// not a synthetic object
+		frame.lvids[operands.lvid].synthetic = false;
 
 		if (canGenerateCode())
 		{

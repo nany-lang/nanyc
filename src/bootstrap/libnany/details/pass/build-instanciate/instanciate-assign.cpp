@@ -17,6 +17,8 @@ namespace Instanciate
 	{
 		auto& frame = atomStack.back();
 
+		frame.lvids[operands.lhs].synthetic = false;
+
 		if (not frame.verify(operands.rhs))
 			return frame.invalidate(operands.lhs);
 
@@ -30,7 +32,9 @@ namespace Instanciate
 		}
 
 		bool canDisposeLHS = (operands.disposelhs != 0);
-		instanciateAssignment(atomStack.back(), operands.lhs, operands.rhs, canDisposeLHS);
+		bool r = instanciateAssignment(atomStack.back(), operands.lhs, operands.rhs, canDisposeLHS);
+		if (unlikely(not r))
+			frame.invalidate(operands.lhs);
 	}
 
 

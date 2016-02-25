@@ -18,6 +18,9 @@ namespace Instanciate
 		if (not frame.verify(operands.lvid))
 			return;
 
+		auto& lvidinfo = frame.lvids[operands.lvid];
+		lvidinfo.scope = frame.scope;
+
 		nytype_t type = (nytype_t) operands.type;
 		if (type != nyt_any)
 		{
@@ -28,14 +31,14 @@ namespace Instanciate
 				// type propagation
 				auto& spare = cdeftable.substitute(operands.lvid);
 				if (type != nyt_void)
+				{
+					lvidinfo.synthetic = false;
 					spare.mutateToBuiltin(type);
+				}
 				else
 					spare.mutateToVoid();
 			}
 		}
-
-		auto& lvidinfo = frame.lvids[operands.lvid];
-		lvidinfo.scope = frame.scope;
 
 		// copy only variable instances
 		if (canGenerateCode())

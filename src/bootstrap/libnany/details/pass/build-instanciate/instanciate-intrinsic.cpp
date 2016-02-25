@@ -54,6 +54,7 @@ namespace Instanciate
 
 			uint32_t count = static_cast<uint32_t>(pushedparams.func.indexed.size());
 			auto& frame = atomStack.back();
+			frame.lvids[operands.lvid].synthetic = false;
 			bool hasErrors = false;
 
 			// reset the returned type

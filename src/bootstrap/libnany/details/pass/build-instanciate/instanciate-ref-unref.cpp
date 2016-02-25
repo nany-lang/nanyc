@@ -23,6 +23,12 @@ namespace Instanciate
 		if (not canBeAcquired(cdef)) // do nothing if builtin
 			return;
 
+		if (unlikely(frame.lvids[lvid].synthetic))
+		{
+			error() << "cannot unref a synthetic object";
+			return;
+		}
+
 		auto* atom = cdeftable.findClassdefAtom(cdef);
 		if (unlikely(nullptr == atom))
 		{
@@ -44,8 +50,15 @@ namespace Instanciate
 
 	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::ref>& operands)
 	{
-		if (not atomStack.back().verify(operands.lvid))
+		auto& frame = atomStack.back();
+		if (not frame.verify(operands.lvid))
 			return;
+
+		if (unlikely(frame.lvids[operands.lvid].synthetic))
+		{
+			error() << "cannot acquire a synthetic object";
+			return;
+		}
 
 		if (canGenerateCode())
 		{

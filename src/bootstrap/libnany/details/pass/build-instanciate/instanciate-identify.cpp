@@ -194,6 +194,7 @@ namespace Instanciate
 							opc.mutateToBuiltin(nyt_bool);
 							opc.qualifiers.ref = false;
 							out.emitStore_u64(operands.lvid, 0);
+							frame.lvids[operands.lvid].synthetic = false;
 							return true;
 						}
 						if (name == "__true")
@@ -202,6 +203,7 @@ namespace Instanciate
 							opc.mutateToBuiltin(nyt_bool);
 							opc.qualifiers.ref = false;
 							out.emitStore_u64(operands.lvid, 1);
+							frame.lvids[operands.lvid].synthetic = false;
 							return true;
 						}
 
@@ -223,6 +225,7 @@ namespace Instanciate
 				// the variable is used, whatever it is (error or not)
 				frame.lvids[lvidVar].hasBeenUsed = true;
 				frame.lvids[operands.lvid].alias = lvidVar;
+				frame.lvids[operands.lvid].synthetic = false;
 
 				if (not frame.verify(lvidVar)) // suppress spurious errors from previous ones
 					return false;

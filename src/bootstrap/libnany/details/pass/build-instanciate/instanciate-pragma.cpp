@@ -27,16 +27,24 @@ namespace Instanciate
 			uint32_t count = atom.parameters.size();
 			atom.parameters.each([&](uint32_t i, const AnyString&, const Vardef& vardef)
 			{
+				// lvid for the given parameter
+				uint32_t lvid  = i + 1 + 1; // 1 based, 1: return type
+				frame.lvids[lvid].synthetic = false;
+
 				if (not cdeftable.classdef(vardef.clid).qualifiers.ref)
 				{
 					// a register has already been reserved for cloning parameters
-					uint32_t lvid  = i + 1 + 1; // 1 based, 1: return type
 					uint32_t clone = 2 + count + i;
 
 					if (debugmode and canGenerateCode())
 						out.emitComment(String{} << "\n ----- ---- deep copy parameter " << i);
 
-					instanciateAssignment(frame, clone, lvid, false, false, true);
+					// the new value is not synthetic
+					frame.lvids[clone].synthetic = false;
+
+					bool r = instanciateAssignment(frame, clone, lvid, false, false, true);
+					if (unlikely(not r))
+						frame.invalidate(clone);
 
 					if (canBeAcquired(lvid))
 					{

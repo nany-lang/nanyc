@@ -42,10 +42,12 @@ namespace Instanciate
 		bool hasBeenUsed = false;
 		//! unref at the end of the scope
 		bool autorelease = false;
+		//! Flag for synthetic values (type, func...) contrary to real user variables
+		bool synthetic = true;
 
 		//! The scope depth when the variable has been declared
 		int scope = -1; // -1: no scope, : 0 first scope
-		//! declaration offset (stackalloc) in the out sequence
+		//! declaration offset (stackalloc) in the out IR sequence
 		uint32_t offsetDeclOut = (uint32_t) -1;
 		//! lvid alias
 		uint32_t alias = 0;
@@ -60,9 +62,9 @@ namespace Instanciate
 
 			//! Does the value come from a variable member ? (atomid != 0)
 			struct {
-				uint32_t self = 0u; // lvid
+				uint32_t self   = 0u; // lvid
 				uint32_t atomid = 0u;
-				uint32_t field = 0u;
+				uint32_t field  = 0u;
 			}
 			varMember;
 		}
@@ -85,7 +87,7 @@ namespace Instanciate
 		}
 		warning;
 
-		//! Resolve name
+		//! Resolved name (if any)
 		AnyString resolvedName;
 		//! User-defined name for the local variable
 		AnyString userDefinedName;

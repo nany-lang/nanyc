@@ -15,6 +15,7 @@ namespace Instanciate
 	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::storeConstant>& operands)
 	{
 		assert(not atomStack.empty());
+		atomStack.back().lvids[operands.lvid].synthetic = false;
 		out.emitStore_u64(operands.lvid, operands.value.u64);
 	}
 
@@ -23,6 +24,8 @@ namespace Instanciate
 	{
 		assert(not atomStack.empty());
 		auto& frame = atomStack.back();
+
+		frame.lvids[operands.lvid].synthetic = false;
 
 		if (not frame.verify(operands.source))
 			return frame.invalidate(operands.lvid);
@@ -43,6 +46,7 @@ namespace Instanciate
 	{
 		uint32_t sid = out.emitStoreText(operands.lvid, currentSequence.stringrefs[operands.text]);
 		auto& frame = atomStack.back();
+		frame.lvids[operands.lvid].synthetic = false;
 		frame.lvids[operands.lvid].text_sid = sid;
 	}
 

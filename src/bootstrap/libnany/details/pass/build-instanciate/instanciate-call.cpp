@@ -274,6 +274,10 @@ namespace Instanciate
 		// ('a = b' have been transformed into 'a.=(b)'). However this is not
 		// a real func call and it is intercepted to be handled differently
 		auto& frame = atomStack.back();
+
+		// the result is not a synthetic object
+		frame.lvids[operands.lvid].synthetic = false;
+
 		bool checkpoint = ((not frame.lvids[operands.ptr2func].isAssignment)
 			? emitFuncCall(operands)
 			: instanciateAssignment(operands));

@@ -562,9 +562,12 @@ namespace Instanciate
 			return (this->*(it->second.first))(lvid);
 		})();
 
+		auto& frame = atomStack.back();
+		frame.lvids[lvid].synthetic = false;
+
 		// annotate any error
 		if (unlikely(not success and canComplain))
-			atomStack.back().lvids[lvid].errorReported = true;
+			frame.lvids[lvid].errorReported = true;
 		return success;
 	}
 
