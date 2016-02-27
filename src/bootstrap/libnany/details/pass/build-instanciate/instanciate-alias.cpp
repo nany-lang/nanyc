@@ -15,27 +15,31 @@ namespace Instanciate
 
 	void SequenceBuilder::declareNamedVariable(const AnyString& name, LVID lvid, bool autoreleased)
 	{
-		auto& lr    = frame->lvids[lvid];
-		LVID found  = frame->findLocalVariable(name);
+		assert(frame != nullptr);
+		auto& lr = frame->lvids[lvid];
+		lr.file.line   = currentLine;
+		lr.file.offset = currentOffset;
+		lr.file.url    = currentFilename;
 
-		if (likely(0 == found))
+		LVID previousDecl = frame->findLocalVariable(name);
+		if (likely(0 == previousDecl)) // not found
 		{
 			lr.scope           = frame->scope;
 			lr.userDefinedName = name;
-			lr.file.line       = currentLine;
-			lr.file.offset     = currentOffset;
-			lr.file.url        = currentFilename;
 			lr.hasBeenUsed     = false;
-			lr.scope           = frame->scope;
 
-			CLID clid{frame->atomid, lvid};
-			autoreleased   &= frame->verify(lvid); // suppress spurious errors from previous ones
-			lr.autorelease  = autoreleased and canBeAcquired(cdeftable.classdef(clid));
+			lr.autorelease = autoreleased
+				// If an error has already been reported on this lvid, we
+				// should not try to release this variable later, since it can
+				// be anything and probably something that can not be released
+				and frame->verify(lvid)
+				// and of course if the data can be acquired
+				and canBeAcquired(cdeftable.classdef(CLID{frame->atomid, lvid}));
 		}
 		else
 		{
 			lr.errorReported = true;
-			complainRedeclared(name, found);
+			complainRedeclared(name, previousDecl);
 		}
 	}
 
