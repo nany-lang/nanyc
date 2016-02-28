@@ -1,19 +1,21 @@
 #pragma once
 #include <yuni/yuni.h>
-#include <yuni/string.h>
-#include "nany/nany.h"
-#include "details/reporting/report.h"
-#include "details/atom/signature.h"
-#include "details/atom/classdef-table.h"
+#include <yuni/core/string/string.h>
 #include "details/atom/classdef-table-view.h"
-#include "details/atom/atom.h"
+#include "details/ir/isa/opcodes.h"
+#include "details/ir/isa/data.h"
 #include "details/atom/func-overload-match.h"
-#include "details/intrinsic/intrinsic-table.h"
 #include "details/ir/sequence.h"
-#include "overloaded-func-call-resolution.h"
 #include "stack-frame.h"
 #include <vector>
 
+
+
+namespace Nany
+{
+	class IntrinsicTable;
+	class OverloadedFuncCallResolver;
+}
 
 
 namespace Nany
@@ -382,42 +384,6 @@ namespace Instanciate
 		IR::Instruction** cursor = nullptr;
 
 	}; // class SequenceBuilder
-
-
-
-
-	struct InstanciateData final
-	{
-		InstanciateData(Logs::Message::Ptr& report, Atom& atom, ClassdefTableView& cdeftable, nycontext_t& context,
-			decltype(FuncOverloadMatch::result.params)& params);
-
-		Logs::Message::Ptr& report;
-		//! The atom to instanciate
-		Atom& atom;
-		//! The parent atom, if any
-		Atom* parentAtom = nullptr;
-		//! Instance
-		uint32_t instanceid = (uint32_t) -1;
-		//! The original view to the classdef table
-		ClassdefTableView& cdeftable;
-		//! Context
-		nycontext_t& context;
-
-		//! Parameters used for instanciation
-		decltype(FuncOverloadMatch::result.params)& params;
-		//!
-		Classdef returnType;
-
-		//! Flag to determine whether the code can be generated or not
-		bool canGenerateCode = true;
-		//! Flag to determine whether the code generate errors or not
-		bool canGenerateErrors = true;
-
-		//! Make the layer persistent
-		bool shouldMergeLayer = false;
-	};
-
-	IR::Sequence* InstanciateAtom(InstanciateData& info);
 
 
 

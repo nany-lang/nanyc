@@ -1,6 +1,6 @@
 #include "instanciate.h"
-#include "details/atom/classdef.h"
-#include "details/atom/atom.h"
+#include "instanciate-atom.h"
+#include "overloaded-func-call-resolution.h"
 
 using namespace Yuni;
 

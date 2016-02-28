@@ -6,6 +6,7 @@
 #include "details/reporting/message.h"
 #include "details/utils/origin.h"
 #include "libnany-traces.h"
+#include "instanciate-atom.h"
 
 using namespace Yuni;
 
@@ -66,7 +67,6 @@ namespace Instanciate
 
 
 	} // anonymous namespace
-
 
 
 
@@ -190,7 +190,8 @@ namespace Instanciate
 
 		if (sequence != nullptr)
 		{
-			// generate default constructor function if none is available
+			// the user may already have provided one or more constructors
+			// but if not the case, a default implementatio will be used instead
 			if (not atom.hasMember("^new"))
 				atom.renameChild("^default-new", "^new");
 			return true;
@@ -205,7 +206,6 @@ namespace Instanciate
 		assert(funcAtom.isFunction());
 		assert(frame != nullptr);
 		auto& frameAtom = frame->atom;
-
 
 		if (unlikely((p1 != 0 and not frame->verify(p1)) or (p2 != 0 and not frame->verify(p2))))
 		{
@@ -260,7 +260,6 @@ namespace Instanciate
 	}
 
 
-
 	bool SequenceBuilder::doInstanciateAtomFunc(Logs::Message::Ptr& subreport, InstanciateData& info, uint32_t retlvid)
 	{
 		// even within a typeof, any new instanciation must see their code generated
@@ -270,10 +269,7 @@ namespace Instanciate
 		auto* sequence = InstanciateAtom(info);
 		report.appendEntry(subreport);
 		if (unlikely(nullptr == sequence))
-		{
-			success = false;
-			return false;
-		}
+			return (success = false);
 
 		if (unlikely(info.instanceid == static_cast<uint32_t>(-1)))
 		{
@@ -283,8 +279,8 @@ namespace Instanciate
 
 		// import the return type of the instanciated sequence
 		auto& spare = cdeftable.substitute(retlvid);
-		spare.kind = info.returnType.kind;
-		spare.atom = info.returnType.atom;
+		spare.kind  = info.returnType.kind;
+		spare.atom  = info.returnType.atom;
 		if (not info.returnType.isVoid())
 		{
 			spare.instance = true; // force some values just in case
@@ -296,32 +292,6 @@ namespace Instanciate
 		}
 		return true;
 	}
-
-
-
-	namespace // anonymous
-	{
-
-		static inline bool PrepareSignatureFromResult(ClassdefTableView& cdeftable, Signature& signature,
-			const std::vector<FuncOverloadMatch::ParamCall>& params)
-		{
-			uint32_t count = (uint32_t) params.size();
-			signature.parameters.resize(count);
-
-			for (uint32_t i = 0; i != count; ++i)
-			{
-				assert(params[i].cdef != nullptr);
-				auto& cdef = *(params[i].cdef);
-				auto& param = signature.parameters[i];
-
-				param.atom = const_cast<Atom*>(cdeftable.findClassdefAtom(cdef));
-				param.kind = cdef.kind;
-				param.qualifiers = cdef.qualifiers;
-			}
-			return true;
-		}
-
-	} // anonymous namespace
 
 
 	inline void SequenceBuilder::pushParametersFromSignature(LVID atomid, const Signature& signature)
@@ -351,16 +321,58 @@ namespace Instanciate
 	}
 
 
+
+	namespace // anonymous
+	{
+		template<class R>
+		static inline void printGeneratedIRSequence(R& report, const String& symbolName,
+			const IR::Sequence& out, const ClassdefTableView& newView)
+		{
+			report.info();
+			auto trace = report.subgroup();
+			auto entry = trace.trace();
+			entry.message.prefix << symbolName;
+
+			Clob text;
+			out.print(text, &newView.atoms());
+			text.replace("\n", "\n    ");
+			text.trimRight();
+			trace.trace() << "{\n    " << text << "\n}";
+			trace.info(); // for beauty
+			trace.info(); // for beauty
+			trace.info(); // for beauty
+		}
+
+
+		static inline void prepareSignature(Signature& signature, InstanciateData& info)
+		{
+			uint32_t count = (uint32_t) info.params.size();
+			if (count > 0)
+			{
+				signature.parameters.resize(count);
+
+				for (uint32_t i = 0; i != count; ++i)
+				{
+					assert(info.params[i].cdef != nullptr);
+					auto& cdef  = *(info.params[i].cdef);
+					auto& param = signature.parameters[i];
+
+					param.atom = const_cast<Atom*>(info.cdeftable.findClassdefAtom(cdef));
+					param.kind = cdef.kind;
+					param.qualifiers = cdef.qualifiers;
+				}
+			}
+		}
+
+	} // anonymous namespace
+
+
 	IR::Sequence* InstanciateAtom(InstanciateData& info)
 	{
 		// prepare the matching signature
 		Signature signature;
-		if (not info.params.empty())
-		{
-			if (unlikely(not PrepareSignatureFromResult(info.cdeftable, signature, info.params)))
-				return nullptr;
-			assert(info.params.size() == signature.parameters.size());
-		}
+		prepareSignature(signature, info);
+		assert(info.params.size() == signature.parameters.size());
 
 		// try to pick an existing instanciation
 		{
@@ -406,7 +418,7 @@ namespace Instanciate
 
 			// post-process the output sequence to update the type of all
 			// stack-allocated variables
-			// (always update, easier for debugging)
+			// (always update even if sometimes not necessary, easier for debugging)
 			postProcessStackAlloc(*out, newView, info.atom.atomid);
 
 			// keep the types deduced
@@ -422,23 +434,8 @@ namespace Instanciate
 				symbolName << newView.keyword(info.atom) << ' ';
 				info.atom.retrieveCaption(symbolName, newView);
 			}
-
 			if (Config::Traces::printGeneratedOpcodeSequence)
-			{
-				report.info();
-				auto trace = report.subgroup();
-				auto entry = trace.trace();
-				entry.message.prefix << symbolName;
-
-				Clob text;
-				out.get()->print(text, &newView.atoms());
-				text.replace("\n", "\n    ");
-				text.trimRight();
-				trace.trace() << "{\n    " << text << "\n}";
-				trace.info(); // for beauty
-				trace.info(); // for beauty
-				trace.info(); // for beauty
-			}
+				printGeneratedIRSequence(report, symbolName, *out.get(), newView);
 
 			// retrieving the return type
 			if (success)

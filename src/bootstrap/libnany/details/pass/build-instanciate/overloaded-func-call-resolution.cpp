@@ -1,5 +1,6 @@
 #include "overloaded-func-call-resolution.h"
 #include "instanciate.h"
+#include "instanciate-atom.h"
 #include "libnany-config.h"
 
 

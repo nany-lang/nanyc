@@ -219,6 +219,7 @@ addsrc(
 	FILES
 	"details/pass/build-instanciate/instanciate.cpp"
 	"details/pass/build-instanciate/instanciate-atom.cpp"
+	"details/pass/build-instanciate/instanciate-atom.h"
 	"details/pass/build-instanciate/instanciate.h"
 	"details/pass/build-instanciate/instanciate.hxx"
 	"details/pass/build-instanciate/stack-frame.h"

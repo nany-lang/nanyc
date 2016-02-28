@@ -543,9 +543,9 @@ namespace // anonymous
 				}
 				case ISA::Blueprint::gentypeparam:
 				{
-					out << tabs << "generic param <:";
+					out << tabs << "type param ";
 					printString(operands.name);
-					out << ":> : %" << static_cast<uint32_t>(operands.lvid);
+					out << ": %" << static_cast<uint32_t>(operands.lvid);
 					break;
 				}
 				case ISA::Blueprint::paramself:

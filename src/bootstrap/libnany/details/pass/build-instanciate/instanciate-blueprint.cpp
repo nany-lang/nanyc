@@ -107,25 +107,22 @@ namespace Instanciate
 			}
 
 			case IR::ISA::Blueprint::param: // -- function parameter
+			case IR::ISA::Blueprint::gentypeparam:
 			{
-				uint32_t sid  = operands.name;
+				assert(frame != nullptr);
 				uint32_t lvid = operands.lvid;
 				auto& cdef = cdeftable.substitute(lvid);
 				cdef.qualifiers.ref = false;
-				cdef.instance = true;
-				declareNamedVariable(currentSequence.stringrefs[sid], lvid, false);
+				bool isvar = (kind == IR::ISA::Blueprint::param);
+				cdef.instance = isvar;
+				frame->lvids[lvid].synthetic = (not isvar);
+				// param name
+				const auto& name = currentSequence.stringrefs[operands.name];
+				// declare the new name as locally accessible
+				declareNamedVariable(name, lvid, false);
 				break;
 			}
-			case IR::ISA::Blueprint::gentypeparam: // -- template parameter
-			{
-				uint32_t sid  = operands.name;
-				uint32_t lvid = operands.lvid;
-				auto& cdef = cdeftable.substitute(lvid);
-				cdef.qualifiers.ref = false;
-				cdef.instance = false;
-				declareNamedVariable(currentSequence.stringrefs[sid], lvid, false);
-				break;
-			}
+
 			case IR::ISA::Blueprint::paramself: // -- function parameter
 			{
 				// -- with automatic variable assignment for operator new

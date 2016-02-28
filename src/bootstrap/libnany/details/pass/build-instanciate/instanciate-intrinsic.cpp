@@ -1,4 +1,5 @@
 #include "instanciate.h"
+#include "details/intrinsic/intrinsic-table.h"
 
 using namespace Yuni;
 

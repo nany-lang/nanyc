@@ -7,6 +7,7 @@
 #include "details/utils/origin.h"
 #include "details/context/context.h"
 #include "libnany-traces.h"
+#include "instanciate-atom.h"
 
 using namespace Yuni;
 
@@ -21,17 +22,6 @@ namespace Pass
 {
 namespace Instanciate
 {
-
-	InstanciateData::InstanciateData(Logs::Message::Ptr& report, Atom& atom, ClassdefTableView& cdeftable,
-		nycontext_t& context, decltype(FuncOverloadMatch::result.params)& params)
-		: report(report)
-		, atom(atom)
-		, cdeftable(cdeftable)
-		, context(context)
-		, params(params)
-	{
-		returnType.mutateToAny();
-	}
 
 
 	SequenceBuilder::SequenceBuilder(Logs::Report report, ClassdefTableView& cdeftable, nycontext_t& context,
@@ -212,6 +202,135 @@ namespace Instanciate
 		}
 	}
 
+
+
+	inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::inherit>& operands)
+	{
+		assert(frame != nullptr);
+		if (not frame->verify(operands.lhs))
+			return;
+
+		switch (operands.inherit)
+		{
+			case 2: // qualifiers
+			{
+				auto& spare = cdeftable.substitute(operands.lhs);
+				spare.qualifiers = cdeftable.classdef(CLID{frame->atomid, operands.rhs}).qualifiers;
+				break;
+			}
+			default:
+			{
+				ICE() << "invalid inherit value " << operands.inherit;
+			}
+		}
+	}
+
+
+	inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::namealias>& operands)
+	{
+		const auto& name = currentSequence.stringrefs[operands.name];
+		declareNamedVariable(name, operands.lvid);
+	}
+
+
+	inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::debugfile>& operands)
+	{
+		currentFilename = currentSequence.stringrefs[operands.filename].c_str();
+	}
+
+
+	inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::debugpos>& operands)
+	{
+		currentLine   = operands.line;
+		currentOffset = operands.offset;
+	}
+
+
+	inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::follow>& operands)
+	{
+		if (not operands.symlink)
+		{
+			auto& cdef  = cdeftable.classdef(CLID{frame->atomid, operands.lvid});
+			auto& spare = cdeftable.substitute(operands.follower);
+			spare.import(cdef);
+			spare.instance = true;
+		}
+	}
+
+
+	inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::unref>& operands)
+	{
+		tryUnrefObject(operands.lvid);
+	}
+
+
+	inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::nop>&)
+	{
+		// duplicate nop as well since they can be used to insert code
+		// (for shortcircuit for example)
+		out.emitNop();
+	}
+
+
+	inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::label>& operands)
+	{
+		out.emitLabel(operands.label);
+	}
+
+
+	inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::qualifiers>& operands)
+	{
+		bool  onoff = (operands.flag != 0);
+		auto& spare = cdeftable.substitute(operands.lvid);
+
+		switch (operands.qualifier)
+		{
+			case 1: // ref
+			{
+				spare.qualifiers.ref = onoff;
+				break;
+			}
+			case 2: // const
+			{
+				spare.qualifiers.constant = onoff;
+				break;
+			}
+			default:
+				ICE() << "unknown qualifier constant " << operands.qualifier;
+		}
+	}
+
+
+	inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::jmp>& opc)
+	{
+		out.emit<IR::ISA::Op::jmp>() = opc;
+	}
+
+	inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::jz>& opc)
+	{
+		out.emit<IR::ISA::Op::jz>() = opc;
+	}
+
+	inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::jnz>& opc)
+	{
+		out.emit<IR::ISA::Op::jnz>() = opc;
+	}
+
+	inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::comment>& opc)
+	{
+		// keep the comments in debug
+		if (Yuni::debugmode)
+			out.emitComment(currentSequence.stringrefs[opc.text]);
+	}
+
+
+
+
+	template<IR::ISA::Op O>
+	void SequenceBuilder::visit(const IR::ISA::Operand<O>& operands)
+	{
+		complainOperand(IR::Instruction::fromOpcode(operands));
+	}
 
 
 	bool SequenceBuilder::readAndInstanciate(uint32_t offset)
