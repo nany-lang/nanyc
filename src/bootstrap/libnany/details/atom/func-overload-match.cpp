@@ -4,6 +4,7 @@
 #include "details/atom/classdef-table-view.h"
 #include "details/reporting/report.h"
 #include "libnany-config.h"
+#include <iostream>
 
 using namespace Yuni;
 
@@ -30,8 +31,11 @@ namespace Nany
 		input.rettype.clear();
 		input.params.indexed.clear();
 		input.params.named.clear();
+		input.tmplparams.indexed.clear();
+		input.tmplparams.named.clear();
 
 		result.params.clear();
+		result.tmplparams.clear();
 		result.funcToCall = nullptr;
 	}
 
@@ -67,22 +71,29 @@ namespace Nany
 	}
 
 
+	template<bool isTmpl>
 	inline TypeCheck::Match
 	FuncOverloadMatch::pushParameter(Atom& atom, yuint32 index, const CLID& clid)
 	{
+		if (isTmpl)
+		std::cout << " :: pushing parameter " << index << std::endl;
 		// force reset
 		auto& cdef = table.classdef(clid);
-		auto& resultinfo = result.params[index];
+		auto& resultinfo = (not isTmpl) ? result.params[index] : result.tmplparams[index];
 		resultinfo.clid = clid;
 		resultinfo.cdef = &cdef;
 
 		// type checking
-		auto& paramdef = table.classdef(atom.parameters.vardef(index).clid);
+		auto& paramdef = (not isTmpl)
+			? table.classdef(atom.parameters.vardef(index).clid)
+			: table.classdef(atom.tmplparams.vardef(index).clid);
 
 		resultinfo.strategy = TypeCheck::isSimilarTo(table, nullptr, cdef, paramdef, pAllowImplicit);
 		if (unlikely(canGenerateReport) and resultinfo.strategy == TypeCheck::Match::none)
 		{
-			report.get().trace() << "failed to push value " << cdef.clid << " to parameter "
+			report.get().trace() << "failed to push"
+				<< (isTmpl ? " generic value " : " value ")
+				<< cdef.clid << " to parameter "
 				<< (CLID{atom.atomid,0})
 				<< " '" << atom.name << "' index " << index;
 
@@ -94,6 +105,8 @@ namespace Nany
 				case 2: err << "3rd"; break;
 				default: err << (index + 1) << "th";
 			}
+			if (isTmpl)
+				err << " generic";
 			err << " parameter, got '";
 			cdef.print(err.message.message, table, false);
 			if (debugmode)
@@ -113,6 +126,7 @@ namespace Nany
 	{
 		// some reset
 		result.params.clear();
+		result.tmplparams.clear();
 		result.funcToCall = &atom;
 
 		if (unlikely(not atom.isFunction()))
@@ -131,6 +145,17 @@ namespace Nany
 			}
 			return TypeCheck::Match::none;
 		}
+		// trivial check, too many template parameters for this overload
+		if (atom.tmplparams.size() < (uint32_t) input.tmplparams.indexed.size())
+		{
+			if (unlikely(canGenerateReport))
+			{
+				report.get().hint() << "too many generic type parameters. Got "
+					<< input.tmplparams.indexed.size()
+					<< ", expected: " << atom.tmplparams.size();
+			}
+			return TypeCheck::Match::none;
+		}
 
 		pAllowImplicit = allowImplicit;
 		bool perfectMatch /*= false*/;
@@ -141,11 +166,23 @@ namespace Nany
 		{
 			perfectMatch = true;
 			result.params.resize(atom.parameters.size());
+			result.tmplparams.resize(atom.tmplparams.size());
+
+			// trying to resolve indexed template parameters
+			for (uint32_t i = 0; i != (uint32_t) input.tmplparams.indexed.size(); ++i)
+			{
+				switch (pushParameter<true>(atom, i, input.tmplparams.indexed[i]))
+				{
+					case TypeCheck::Match::equal:       perfectMatch = false; break;
+					case TypeCheck::Match::strictEqual: break;
+					case TypeCheck::Match::none:        return TypeCheck::Match::none;
+				}
+			}
 
 			// trying to resolve indexed parameters (if they match)
 			for (uint32_t i = 0; i != (uint32_t) input.params.indexed.size(); ++i)
 			{
-				switch (pushParameter(atom, i, input.params.indexed[i]))
+				switch (pushParameter<false>(atom, i, input.params.indexed[i]))
 				{
 					case TypeCheck::Match::equal:       perfectMatch = false; break;
 					case TypeCheck::Match::strictEqual: break;
@@ -170,12 +207,38 @@ namespace Nany
 						return TypeCheck::Match::none;
 					}
 
-					switch (pushParameter(atom, index, pair.second))
+					switch (pushParameter<false>(atom, index, pair.second))
 					{
 						case TypeCheck::Match::equal:       perfectMatch = false; break;
 						case TypeCheck::Match::strictEqual: break;
 						case TypeCheck::Match::none:        return TypeCheck::Match::none;
 					}
+				}
+			}
+
+			if (not input.tmplparams.named.empty())
+			{
+				if (unlikely(canGenerateReport))
+					report.get().error() << "named generic type parameters not implemented yet";
+				return TypeCheck::Match::none;
+			}
+
+			// check for missing default values for generic types
+			for (size_t i = input.tmplparams.indexed.size(); i < result.tmplparams.size(); ++i)
+			{
+				if (nullptr == result.tmplparams[i].cdef or result.tmplparams[i].cdef->clid.isVoid()) // undefined - TODO: default values
+				{
+					if (unlikely(canGenerateReport))
+					{
+						auto ix = i;
+						if (not atom.isClassMember())
+							++ix;
+						auto hint = (report.get().hint());
+						hint << atom.caption(table) << ": no type provided for the ";
+						hint << "generic type parameter '";
+						hint << atom.tmplparams.name((uint32_t) i) << '\'';
+					}
+					return TypeCheck::Match::none;
 				}
 			}
 

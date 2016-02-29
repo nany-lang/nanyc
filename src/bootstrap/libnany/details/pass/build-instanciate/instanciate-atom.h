@@ -15,12 +15,14 @@ namespace Instanciate
 	struct InstanciateData final
 	{
 		InstanciateData(Logs::Message::Ptr& report, Atom& atom, ClassdefTableView& cdeftable, nycontext_t& context,
-			decltype(FuncOverloadMatch::result.params)& params)
+			decltype(FuncOverloadMatch::result.params)& params,
+			decltype(FuncOverloadMatch::result.params)& tmplparams)
 			: report(report)
 			, atom(atom)
 			, cdeftable(cdeftable)
 			, context(context)
 			, params(params)
+			, tmplparams(tmplparams)
 		{
 			returnType.mutateToAny();
 		}
@@ -39,6 +41,8 @@ namespace Instanciate
 
 		//! Parameters used for instanciation
 		decltype(FuncOverloadMatch::result.params)& params;
+		//! Template parameters
+		decltype(FuncOverloadMatch::result.params)& tmplparams;
 		//!
 		Classdef returnType;
 

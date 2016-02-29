@@ -38,6 +38,8 @@ namespace Instanciate
 
 		// all pushed parameters
 		decltype(FuncOverloadMatch::result.params) params;
+		// all pushed template parameters
+		decltype(FuncOverloadMatch::result.params) tmplparams;
 
 		// whatever the result of this func, 'lvid' is a returned value
 		frame->lvids[lvid].origin.returnedValue = true;
@@ -106,6 +108,21 @@ namespace Instanciate
 			overloadMatch.input.params.named.emplace_back(std::make_pair(nmparm.name, CLID{atomid, nmparm.lvid}));
 		}
 
+		// template parameters
+		for (auto indxparm: pushedparams.gentypes.indexed)
+		{
+			if (not frame->verify(indxparm.lvid))
+				return false;
+			overloadMatch.input.tmplparams.indexed.emplace_back(CLID{atomid, indxparm.lvid});
+		}
+		// named template parameters
+		for (auto nmparm: pushedparams.gentypes.named)
+		{
+			if (not frame->verify(nmparm.lvid))
+				return false;
+			overloadMatch.input.tmplparams.named.emplace_back(std::make_pair(nmparm.name, CLID{atomid, nmparm.lvid}));
+		}
+
 
 		if (nullptr == atom)
 		{
@@ -125,8 +142,10 @@ namespace Instanciate
 
 			assert(resolver.atom != nullptr and "atom not properly initialized");
 			assert(resolver.params != nullptr);
+			assert(resolver.tmplparams != nullptr);
 			atom = resolver.atom;
 			params.swap(*(resolver.params));
+			tmplparams.swap(*(resolver.tmplparams));
 		}
 		else
 		{
@@ -153,10 +172,13 @@ namespace Instanciate
 
 			// get new parameters
 			params.swap(overloadMatch.result.params);
+			tmplparams.swap(overloadMatch.result.tmplparams);
 		}
 
 		if (not atom->builtinalias.empty())
 		{
+			if (unlikely(not tmplparams.empty()))
+				return (ICE() << "invalid template parameters for builtinalias");
 			if (unlikely(pushedparams.func.indexed.size() != params.size()))
 				return (error() << "builtin alias not allowed for methods");
 			// update each lvid, since they may have been changed (via implicit ctors)
@@ -171,7 +193,7 @@ namespace Instanciate
 
 		// instanciate the called func
 		Logs::Message::Ptr subreport;
-		InstanciateData info{subreport, *atom, cdeftable, context, params};
+		InstanciateData info{subreport, *atom, cdeftable, context, params, tmplparams};
 		bool instok = doInstanciateAtomFunc(subreport, info, lvid);
 		if (unlikely(not instok))
 			return false;

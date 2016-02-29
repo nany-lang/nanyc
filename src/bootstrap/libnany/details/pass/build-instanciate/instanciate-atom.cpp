@@ -130,9 +130,10 @@ namespace Instanciate
 
 		// parameters for the signature
 		decltype(FuncOverloadMatch::result.params)  params;
+		decltype(FuncOverloadMatch::result.params)  tmplparams;
 		Logs::Message::Ptr newReport;
 
-		Pass::Instanciate::InstanciateData info{newReport, atom, cdeftable, context, params};
+		Pass::Instanciate::InstanciateData info{newReport, atom, cdeftable, context, params, tmplparams};
 		info.parentAtom = &(frame->atom);
 		info.shouldMergeLayer = true;
 
@@ -197,11 +198,13 @@ namespace Instanciate
 		}
 
 		decltype(FuncOverloadMatch::result.params) params;
+		decltype(FuncOverloadMatch::result.params) tmplparams;
 		params.swap(overloadMatch.result.params);
+		tmplparams.swap(overloadMatch.result.tmplparams);
 
 		// instanciate the called func
 		Logs::Message::Ptr subreport;
-		InstanciateData info{subreport, funcAtom, cdeftable, context, params};
+		InstanciateData info{subreport, funcAtom, cdeftable, context, params, tmplparams};
 		bool instok = doInstanciateAtomFunc(subreport, info, retlvid);
 		instanceid = info.instanceid;
 
@@ -252,7 +255,7 @@ namespace Instanciate
 		//  * +1: all clid are 1-based (0 is reserved for the atom itself, not for an internal var)
 		//  * +1: the CLID{X, 1} is reserved for the return type
 
-		// unused pseudo register
+		// unused pseudo/invalid register
 		CLID clid{atomid, 0};
 		cdeftable.addSubstitute(nyt_void, nullptr, Qualifiers()); // unused, 1-based
 
@@ -263,10 +266,26 @@ namespace Instanciate
 		Atom* atom = likely(not rettype.isBuiltinOrVoid()) ? cdeftable.findRawClassdefAtom(rettype) : nullptr;
 		cdeftable.addSubstitute(rettype.kind, atom, rettype.qualifiers);
 
+		// adding parameters
 		uint32_t count = signature.parameters.size();
 		for (uint32_t i = 0; i != count; ++i)
 		{
 			auto& param = signature.parameters[i];
+			cdeftable.addSubstitute(param.kind, param.atom, param.qualifiers);
+		}
+		// adding reserved variables for cloning parameters
+		for (uint32_t i = 0; i != count; ++i)
+		{
+			auto& param = signature.parameters[i];
+			cdeftable.addSubstitute(param.kind, param.atom, param.qualifiers);
+		}
+
+		// template parameters
+		count = signature.tmplparams.size();
+		for (uint32_t i = 0; i != count; ++i)
+		{
+			auto& param = signature.tmplparams[i];
+			warning() << " new tmpl param !";
 			cdeftable.addSubstitute(param.kind, param.atom, param.qualifiers);
 		}
 	}
@@ -339,8 +358,8 @@ namespace Instanciate
 
 		static inline void prepareSignature(Signature& signature, InstanciateData& info)
 		{
-			uint32_t count = (uint32_t) info.params.size();
-			if (count > 0)
+			uint32_t count = static_cast<uint32_t>(info.params.size());
+			if (count != 0)
 			{
 				signature.parameters.resize(count);
 
@@ -349,6 +368,23 @@ namespace Instanciate
 					assert(info.params[i].cdef != nullptr);
 					auto& cdef  = *(info.params[i].cdef);
 					auto& param = signature.parameters[i];
+
+					param.atom = const_cast<Atom*>(info.cdeftable.findClassdefAtom(cdef));
+					param.kind = cdef.kind;
+					param.qualifiers = cdef.qualifiers;
+				}
+			}
+
+			count = static_cast<uint32_t>(info.tmplparams.size());
+			if (count != 0)
+			{
+				signature.tmplparams.resize(count);
+
+				for (uint32_t i = 0; i != count; ++i)
+				{
+					assert(info.tmplparams[i].cdef != nullptr);
+					auto& cdef  = *(info.tmplparams[i].cdef);
+					auto& param = signature.tmplparams[i];
 
 					param.atom = const_cast<Atom*>(info.cdeftable.findClassdefAtom(cdef));
 					param.kind = cdef.kind;

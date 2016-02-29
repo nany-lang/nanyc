@@ -33,6 +33,10 @@ namespace Producer
 		// the sequence
 		auto& out = sequence();
 
+		// keep the pushed template parameters
+		decltype(context.reuse.lastPushedTmplParams) lastPushedTmplParams;
+		lastPushedTmplParams.swap(context.reuse.lastPushedTmplParams);
+
 
 		for (auto& childptr: node.children)
 		{
@@ -140,6 +144,9 @@ namespace Producer
 
 		if (0 != shortcircuitlabel)
 			out.emitPragmaShortcircuitMetadata(shortcircuitlabel);
+
+		// push all template parameters
+		context.emitTmplParameters(lastPushedTmplParams);
 
 		// push all parameters, indexed and named
 		for (uint i = 0; i != paramCount; ++i)

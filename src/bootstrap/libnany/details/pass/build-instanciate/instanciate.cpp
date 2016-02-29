@@ -392,11 +392,12 @@ namespace Nany
 
 		// parameters for the signature
 		decltype(FuncOverloadMatch::result.params)  params;
+		decltype(FuncOverloadMatch::result.params)  tmplparams;
 		Logs::Message::Ptr newReport;
 
 		ClassdefTableView cdeftblView{classdefTable};
 
-		Pass::Instanciate::InstanciateData info{newReport, *entrypointAtom, cdeftblView, context, params};
+		Pass::Instanciate::InstanciateData info{newReport, *entrypointAtom, cdeftblView, context, params, tmplparams};
 		auto* sequence = Pass::Instanciate::InstanciateAtom(info);
 		report.appendEntry(newReport);
 		return (nullptr != sequence);

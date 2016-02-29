@@ -22,6 +22,7 @@ namespace Nany
 	{
 	public:
 		typedef decltype(FuncOverloadMatch::result.params)  ParameterTypesRequested;
+		typedef std::pair<ParameterTypesRequested, ParameterTypesRequested> ParameterTypesRequestedPair;
 
 
 	public:
@@ -39,8 +40,10 @@ namespace Nany
 	public:
 		//! The result of the func call resolution (if any)
 		Atom* atom = nullptr;
-		//! Types requeted per parameter (to keep traces of implicit object creations)
+		//! Types requested per parameter (to keep traces of implicit object creations)
 		ParameterTypesRequested* params = nullptr;
+		//! Types requested for template parameters
+		ParameterTypesRequested* tmplparams = nullptr;
 
 		bool canGenerateCode = true;
 		bool canGenerateErrors = true;
@@ -61,7 +64,7 @@ namespace Nany
 		//! Reporting
 		Logs::Report report;
 		//! Parameters per solution
-		std::vector<ParameterTypesRequested> parameters;
+		std::vector<ParameterTypesRequestedPair> parameters;
 		//! Solutions that can really be instanciated
 		std::vector<bool> solutionsThatCanBeInstanciated;
 		//!

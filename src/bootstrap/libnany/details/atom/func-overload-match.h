@@ -57,6 +57,12 @@ namespace Nany
 				std::vector<std::pair<AnyString, CLID>> named;
 			}
 			params;
+
+			struct {
+				std::vector<CLID> indexed;
+				std::vector<std::pair<AnyString, CLID>> named;
+			}
+			tmplparams;
 		}
 		input;
 
@@ -66,6 +72,8 @@ namespace Nany
 			Atom* funcToCall = nullptr;
 			//! All params
 			std::vector<ParamCall> params;
+			//! All template parameters
+			std::vector<ParamCall> tmplparams;
 		}
 		result;
 
@@ -77,6 +85,7 @@ namespace Nany
 
 	private:
 		inline bool hasAtLeastOneParameter(Atom& atom) const;
+		template<bool IsTmpl>
 		inline TypeCheck::Match pushParameter(Atom& atom, yuint32 index, const CLID& clid);
 
 	private:

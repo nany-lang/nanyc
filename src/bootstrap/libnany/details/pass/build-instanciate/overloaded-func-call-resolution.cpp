@@ -66,8 +66,10 @@ namespace Nany
 					atom = &atomsol;
 					// keeping the new parameters
 					// for using this solution, implicit object creation may be required
-					parameters[r].swap(overloadMatch.result.params);
-					params = &(parameters[r]);
+					parameters[r].first.swap(overloadMatch.result.params);
+					parameters[r].second.swap(overloadMatch.result.tmplparams);
+					params     = &(parameters[r].first);
+					tmplparams = &(parameters[r].second);
 
 					// Found a perfect match ! Keeping traces of it to reuse it later if it is _the_ solution
 					// (and if unique)
@@ -127,7 +129,10 @@ namespace Nany
 					auto& solutionAtom = solutions[r].get();
 
 					// trying to instanciate the solution
-					Pass::Instanciate::InstanciateData info{newReport, solutionAtom, cdeftable, context, parameters[r]};
+					Pass::Instanciate::InstanciateData info{
+						newReport, solutionAtom, cdeftable, context,
+						parameters[r].first, parameters[r].second
+					};
 					info.canGenerateCode = canGenerateCode;
 					info.canGenerateErrors = canGenerateErrors;
 
@@ -136,7 +141,8 @@ namespace Nany
 						// nice, it works ! Keeping it (as the last good solution)
 						++instanceSuccessCount;
 						atom = &(solutions[r].get());
-						params = &(parameters[r]);
+						params = &(parameters[r].first);
+						tmplparams = &(parameters[r].second);
 						solutionsThatCanBeInstanciated[r] = true;
 
 						// keep the report if not empty
