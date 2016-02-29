@@ -65,11 +65,6 @@ namespace CString
 namespace Nany
 {
 
-	bool Signature::operator == (const Signature& rhs) const
-	{
-		return (parameters == rhs.parameters and tmplparams == rhs.tmplparams);
-	}
-
 
 	void Signature::Parameters::resize(uint count)
 	{
@@ -106,21 +101,28 @@ namespace Nany
 		assert(static_cast<size_t>(Config::maxPushedParameters) > tmplparams.size());
 
 		parameters.hash(seed);
-		tmplparams.hash(seed);
+		if (not tmplparams.empty())
+		{
+			// adding an arbitrary value, to avoid collision some other functios
+			// with the same set of parameter types
+			Yuni::HashCombine(seed, static_cast<uint8_t>(1));
+
+			tmplparams.hash(seed);
+		}
 		return seed;
 	}
 
 
 	bool Signature::Parameters::operator == (const Signature::Parameters& rhs) const
 	{
-		if (pParamtypes.size() != rhs.pParamtypes.size()) // obviously not equal
-			return false;
-
 		uint32_t count = (uint32_t) pParamtypes.size();
-		for (uint32_t i = 0; i != count; ++i)
+		if (count == (uint32_t) rhs.pParamtypes.size())
 		{
-			if (pParamtypes[i] != rhs.pParamtypes[i])
-				return false;
+			for (uint32_t i = 0; i != count; ++i)
+			{
+				if (pParamtypes[i] != rhs.pParamtypes[i])
+					return false;
+			}
 		}
 		return true;
 	}

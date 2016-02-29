@@ -251,6 +251,23 @@ namespace Nany
 	}
 
 
+	inline uint32_t Atom::findInstance(IR::Sequence*& sequence, Signature& signature)
+	{
+		auto it = pInstancesBySign.find(signature);
+		if (it != pInstancesBySign.end())
+		{
+			sequence = it->second.second;
+
+			auto& storedRetType = it->first.returnType;
+			signature.returnType.import(storedRetType);
+			signature.returnType.qualifiers = storedRetType.qualifiers;
+			return it->second.first;
+		}
+		return (uint32_t) -1;
+	}
+
+
+
 
 
 } // namespace Nany

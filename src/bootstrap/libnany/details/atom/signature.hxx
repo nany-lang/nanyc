@@ -50,6 +50,11 @@ namespace Nany
 	}
 
 
+	inline bool Signature::operator == (const Signature& rhs) const
+	{
+		return (parameters == rhs.parameters and tmplparams == rhs.tmplparams);
+	}
+
 
 
 } // namespace Nany

@@ -22,55 +22,6 @@ namespace Pass
 namespace Instanciate
 {
 
-	namespace // anonymous
-	{
-
-		struct PostProcessStackAllocWalker final
-		{
-			PostProcessStackAllocWalker(ClassdefTableView& table, uint32_t atomid)
-				: table(table)
-				, atomid(atomid)
-			{}
-
-			void visit(IR::ISA::Operand<IR::ISA::Op::stackalloc>& opc)
-			{
-				auto& cdef = table.classdef(CLID{atomid, opc.lvid});
-				if (not cdef.isBuiltinOrVoid())
-				{
-					auto* atom = table.findClassdefAtom(cdef);
-					if (atom != nullptr)
-					{
-						assert(opc.atomid == 0 or opc.atomid == (uint32_t) -1 or opc.atomid == atom->atomid);
-						opc.type = static_cast<uint32_t>(nyt_pointer);
-						opc.atomid = atom->atomid;
-					}
-				}
-				else
-					opc.type = static_cast<uint32_t>(cdef.kind);
-			}
-
-			template<IR::ISA::Op O> void visit(const IR::ISA::Operand<O>&)
-			{
-				// nothing to do
-			}
-
-			ClassdefTableView& table;
-			uint32_t atomid;
-			IR::Instruction** cursor = nullptr;
-		};
-
-		static void postProcessStackAlloc(IR::Sequence& out, ClassdefTableView& table, uint32_t atomid)
-		{
-			PostProcessStackAllocWalker walker{table, atomid};
-			out.each(walker);
-		}
-
-
-	} // anonymous namespace
-
-
-
-
 
 	bool SequenceBuilder::instanciateAtomClassClone(Atom& atom, uint32_t lvid, uint32_t rhs)
 	{
@@ -324,6 +275,48 @@ namespace Instanciate
 
 	namespace // anonymous
 	{
+
+		struct PostProcessStackAllocWalker final
+		{
+			PostProcessStackAllocWalker(ClassdefTableView& table, uint32_t atomid)
+				: table(table)
+				, atomid(atomid)
+			{}
+
+			void visit(IR::ISA::Operand<IR::ISA::Op::stackalloc>& opc)
+			{
+				auto& cdef = table.classdef(CLID{atomid, opc.lvid});
+				if (not cdef.isBuiltinOrVoid())
+				{
+					auto* atom = table.findClassdefAtom(cdef);
+					if (atom != nullptr)
+					{
+						assert(opc.atomid == 0 or opc.atomid == (uint32_t) -1 or opc.atomid == atom->atomid);
+						opc.type = static_cast<uint32_t>(nyt_pointer);
+						opc.atomid = atom->atomid;
+					}
+				}
+				else
+					opc.type = static_cast<uint32_t>(cdef.kind);
+			}
+
+			template<IR::ISA::Op O> void visit(const IR::ISA::Operand<O>&)
+			{
+				// nothing to do
+			}
+
+			ClassdefTableView& table;
+			uint32_t atomid;
+			IR::Instruction** cursor = nullptr;
+		};
+
+		static void reinitStackAllocTypes(IR::Sequence& out, ClassdefTableView& table, uint32_t atomid)
+		{
+			PostProcessStackAllocWalker walker{table, atomid};
+			out.each(walker);
+		}
+
+
 		template<class R>
 		static inline void printGeneratedIRSequence(R& report, const String& symbolName,
 			const IR::Sequence& out, const ClassdefTableView& newView)
@@ -364,7 +357,124 @@ namespace Instanciate
 			}
 		}
 
+
+		static IR::Sequence* performAtomInstanciation(InstanciateData& info, Signature& signature)
+		{
+			// No IR sequence attached for the given signature,
+			// let's instanciate the function or the class !
+
+			// reporting for the current instanciation
+			info.report = new Logs::Message(Logs::Level::none); // TODO remove alloc for reporting
+			Logs::Report report{*info.report};
+
+			if (unlikely(info.atom.opcodes.sequence == nullptr))
+			{
+				report.ICE() << "imvalid null opcode sequence for atom ";
+				return nullptr;
+			}
+
+			// the new IR sequence for the instanciated function
+			auto outIR = std::make_unique<IR::Sequence>();
+			// the original IR sequence generated from the AST
+			auto& inputIR = *(info.atom.opcodes.sequence);
+
+			// new layer for the cdeftable
+			ClassdefTableView newView{info.cdeftable, info.atom.atomid, signature.parameters.size()};
+
+			// instanciate the sequence attached to the atom
+			auto builder = std::make_unique<SequenceBuilder>
+				(report.subgroup(), newView, info.context, *outIR, inputIR);
+
+			builder->pushParametersFromSignature(info.atom.atomid, signature);
+			if (info.parentAtom)
+				builder->layerDepthLimit = 2; // allow the first one
+
+			// Read the input IR sequence, resolve all types, and generate
+			// a new IR sequence ready for execution ! (with or without optimization passes)
+			// (everything happens here)
+			bool success = builder->readAndInstanciate(info.atom.opcodes.offset);
+
+
+			// post-processing regarding 'stackalloc' opcodes
+			// those opcodes may not have the good declared type (most likely
+			// something like 'any')
+			// (always update even if sometimes not necessary, easier for debugging)
+			reinitStackAllocTypes(*outIR, newView, info.atom.atomid);
+
+			// keep all deduced types
+			if (likely(success) and info.shouldMergeLayer)
+				newView.mergeSubstitutes();
+
+			// Generating the full human readable name of the symbol with the
+			// apropriate types & qualifiers for all parameters
+			// (example: "func A.foo(b: cref __i32): ref __i32")
+			String symbolName;
+			if (success or Config::Traces::printGeneratedOpcodeSequence)
+			{
+				symbolName << newView.keyword(info.atom) << ' '; // ex: func
+				info.atom.retrieveCaption(symbolName, newView);  // ex: A.foo(...)...
+			}
+			if (Config::Traces::printGeneratedOpcodeSequence)
+				printGeneratedIRSequence(report, symbolName, *outIR.get(), newView);
+
+			if (success)
+			{
+				if (info.atom.isFunction())
+				{
+					// if the IR code belongs to a function, get the return type
+					// and put it into the signature (for later reuse) and into
+					// the 'info' structure for immediate use
+					auto& cdefReturn = newView.classdef(CLID{info.atom.atomid, 1});
+					if (not cdefReturn.isBuiltinOrVoid())
+					{
+						auto* atom = newView.findClassdefAtom(cdefReturn);
+						if (atom)
+						{
+							signature.returnType.mutateToAtom(atom);
+							info.returnType.mutateToAtom(atom);
+						}
+						else
+						{
+							report.ICE() << "invalid atom pointer in func return type for '"
+								<< symbolName << '\'';
+							success = false;
+						}
+					}
+					else
+					{
+						signature.returnType.kind = cdefReturn.kind;
+						info.returnType.kind = cdefReturn.kind;
+					}
+				}
+				else
+				{
+					// not a function, so no return value (unlikely to be used anyway)
+					signature.returnType.mutateToVoid();
+					info.returnType.mutateToVoid();
+				}
+
+				if (likely(success))
+				{
+					info.instanceid = info.atom.assignInstance(signature, outIR.get(), symbolName);
+					return outIR.release();
+				}
+			}
+
+			// failed to instanciate the input IR sequence. This can be expected, if trying
+			// to not instanciate the appropriate function (if several overloads are present
+			// for example). Anyway, remember that this signature is a 'no-go'.
+			info.instanceid = info.atom.assignInvalidInstance(signature);
+
+			// put some comments in the IR for debugging purposes
+			if (debugmode)
+				outIR->emitComment("<error while compiling>");
+			return nullptr;
+		}
+
+
 	} // anonymous namespace
+
+
 
 
 	IR::Sequence* InstanciateAtom(InstanciateData& info)
@@ -387,102 +497,7 @@ namespace Instanciate
 		}
 
 		// instanciate the function
-
-		info.report = new Logs::Message(Logs::Level::none);
-		Logs::Report report{*info.report};
-
-		if (unlikely(info.atom.opcodes.sequence == nullptr))
-		{
-			report.ICE() << "imvalid null opcode sequence for atom ";
-			return nullptr;
-		}
-
-		// the new sequence for the instanciated function
-		auto out = std::make_unique<IR::Sequence>();
-		{
-			// the original IR sequence (generated from the AST)
-			auto& sourceSequence = *(info.atom.opcodes.sequence);
-			// new layer for the cdeftable
-			ClassdefTableView newView{info.cdeftable, info.atom.atomid, signature.parameters.size()};
-
-			// instanciate the sequence attached to the atom
-			auto builder =
-				std::make_unique<SequenceBuilder>(report.subgroup(), newView, info.context, *out, sourceSequence);
-
-			builder->pushParametersFromSignature(info.atom.atomid, signature);
-			if (info.parentAtom)
-				builder->layerDepthLimit = 2; // allow the first one
-
-			// instanciate the atom !
-			bool success = builder->readAndInstanciate(info.atom.opcodes.offset);
-
-			// post-process the output sequence to update the type of all
-			// stack-allocated variables
-			// (always update even if sometimes not necessary, easier for debugging)
-			postProcessStackAlloc(*out, newView, info.atom.atomid);
-
-			// keep the types deduced
-			if (likely(success) and info.shouldMergeLayer)
-				newView.mergeSubstitutes();
-
-
-			// Generating the full name of the symbol
-			// (example: "func A.foo(b: ref __i32): ref __i32")
-			String symbolName;
-			if (success or Config::Traces::printGeneratedOpcodeSequence)
-			{
-				symbolName << newView.keyword(info.atom) << ' ';
-				info.atom.retrieveCaption(symbolName, newView);
-			}
-			if (Config::Traces::printGeneratedOpcodeSequence)
-				printGeneratedIRSequence(report, symbolName, *out.get(), newView);
-
-			// retrieving the return type
-			if (success)
-			{
-				if (info.atom.isFunction())
-				{
-					auto& cdefReturn = newView.classdef(CLID{info.atom.atomid, 1});
-
-					if (not cdefReturn.isBuiltinOrVoid())
-					{
-						auto* atom = newView.findClassdefAtom(cdefReturn);
-						if (atom)
-						{
-							signature.returnType.mutateToAtom(atom);
-							info.returnType.mutateToAtom(atom);
-						}
-						else
-						{
-							report.ICE() << "invalid atom pointer in func return type for '"
-								<< info.atom.fullname() << '\'';
-							success = false;
-						}
-					}
-					else
-					{
-						signature.returnType.kind = cdefReturn.kind;
-						info.returnType.kind = cdefReturn.kind;
-					}
-				}
-				else
-				{
-					signature.returnType.mutateToVoid();
-					info.returnType.mutateToVoid();
-				}
-
-				if (likely(success))
-				{
-					info.instanceid = info.atom.assignInstance(signature, out.get(), symbolName);
-					return out.release();
-				}
-			}
-		}
-
-		if (debugmode)
-			out->emitComment("error while compiling");
-		info.instanceid = info.atom.assignInvalidInstance(signature);
-		return nullptr;
+		return performAtomInstanciation(info, signature);
 	}
 
 
