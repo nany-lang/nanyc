@@ -285,7 +285,6 @@ namespace Instanciate
 		for (uint32_t i = 0; i != count; ++i)
 		{
 			auto& param = signature.tmplparams[i];
-			warning() << " new tmpl param !";
 			cdeftable.addSubstitute(param.kind, param.atom, param.qualifiers);
 		}
 	}
