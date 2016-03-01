@@ -376,8 +376,7 @@ addsrc(
 	"details/atom/signature.cpp"
 	"details/atom/signature.hxx"
 	"details/atom/func-overload-match.cpp"
-	"details/atom/func-overload-match.h"
-	"details/atom/func-overload-match.hxx")
+	"details/atom/func-overload-match.h")
 
 
 addsrc(

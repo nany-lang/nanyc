@@ -84,7 +84,6 @@ namespace Nany
 
 
 	private:
-		inline bool hasAtLeastOneParameter(Atom& atom) const;
 		template<bool IsTmpl>
 		inline TypeCheck::Match pushParameter(Atom& atom, yuint32 index, const CLID& clid);
 
@@ -99,5 +98,3 @@ namespace Nany
 
 
 } // namespace Nany
-
-#include "func-overload-match.hxx"

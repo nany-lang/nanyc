@@ -4,7 +4,6 @@
 #include "details/atom/classdef-table-view.h"
 #include "details/reporting/report.h"
 #include "libnany-config.h"
-#include <iostream>
 
 using namespace Yuni;
 
@@ -75,8 +74,6 @@ namespace Nany
 	inline TypeCheck::Match
 	FuncOverloadMatch::pushParameter(Atom& atom, yuint32 index, const CLID& clid)
 	{
-		if (isTmpl)
-		std::cout << " :: pushing parameter " << index << std::endl;
 		// force reset
 		auto& cdef = table.classdef(clid);
 		auto& resultinfo = (not isTmpl) ? result.params[index] : result.tmplparams[index];
@@ -161,8 +158,6 @@ namespace Nany
 		bool perfectMatch /*= false*/;
 
 		// checking input.params
-		// determine whether there is at least one parameter, in the atom or pushed
-		if (hasAtLeastOneParameter(atom))
 		{
 			perfectMatch = true;
 			result.params.resize(atom.parameters.size());
@@ -259,11 +254,6 @@ namespace Nany
 					return TypeCheck::Match::none;
 				}
 			}
-		}
-		else
-		{
-			// do not allow perfect matching without parameters
-			perfectMatch = false;
 		}
 
 		// checking return type
