@@ -209,9 +209,8 @@ namespace Instanciate
 					auto& candidate = candidateptr.get();
 					if (candidate.canBeSuggestedInErrReporting)
 					{
-						auto suggest = (err.suggest() << '\'' << cdeftable.keyword(candidate) << ' ');
+						auto suggest = (err.suggest() << cdeftable.keyword(candidate) << ' ');
 						candidate.retrieveCaption(suggest.data().message, cdeftable);
-						suggest << '\'';
 
 						suggest.origins().location.pos.line   = candidate.origin.line;
 						suggest.origins().location.pos.offset = candidate.origin.offset;
