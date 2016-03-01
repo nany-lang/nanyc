@@ -135,16 +135,15 @@ namespace Instanciate
 		if (count == 1)
 		{
 			frame->resizeRegisterCount((++operands.add), cdeftable);
+			auto& lvidinfo = frame->lvids[startOffset];
+			lvidinfo.scope = scope;
+			lvidinfo.synthetic = false;
 
 			if (canGenerateCode())
 			{
-				auto& lvidinfo = frame->lvids[startOffset];
-				lvidinfo.scope = scope;
 				lvidinfo.offsetDeclOut = out.opcodeCount();
 				out.emitStackalloc(startOffset, nyt_any);
 			}
-			else
-				frame->lvids[startOffset].scope = scope;
 		}
 		else
 		{
@@ -157,6 +156,7 @@ namespace Instanciate
 				{
 					auto& lvidinfo = frame->lvids[startOffset + i];
 					lvidinfo.scope = scope;
+					lvidinfo.synthetic = false;
 					lvidinfo.offsetDeclOut = out.opcodeCount();
 					out.emitStackalloc(startOffset + i, nyt_any);
 				}
@@ -164,7 +164,11 @@ namespace Instanciate
 			else
 			{
 				for (uint32_t i = 0; i != count; ++i)
-					frame->lvids[startOffset + i].scope = scope;
+				{
+					auto& lvidinfo = frame->lvids[startOffset + i];
+					lvidinfo.scope = scope;
+					lvidinfo.synthetic = false;
+				}
 			}
 		}
 		return startOffset;

@@ -337,7 +337,10 @@ namespace Instanciate
 						self = 2; // 1: return type, 2: self parameter
 					}
 
-					auto& origin  = frame->lvids[operands.lvid].origin.varMember;
+					auto& lvidinfo = frame->lvids[operands.lvid];
+					lvidinfo.synthetic = false;
+
+					auto& origin  = lvidinfo.origin.varMember;
 					assert(self != 0);
 					assert(atom.atomid != 0);
 					origin.self   = self;
@@ -361,9 +364,10 @@ namespace Instanciate
 					if (isLocalVariable)
 					{
 						// disable optimisation to avoid unwanted behavior
-						auto& origin = frame->lvids[operands.lvid].origin;
-						origin.memalloc = false;
-						origin.returnedValue = false;
+						auto& lvidinfo = frame->lvids[operands.lvid];
+						lvidinfo.synthetic = false;
+						lvidinfo.origin.memalloc = false;
+						lvidinfo.origin.returnedValue = false;
 
 						if (canGenerateCode())
 							acquireObject(operands.lvid);

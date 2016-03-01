@@ -550,9 +550,9 @@ namespace // anonymous
 				}
 				case ISA::Blueprint::paramself:
 				{
-					out << tabs << "self param ";
+					out << tabs << "param ";
 					printString(operands.name);
-					out << ", %" << (uint32_t) operands.lvid;
+					out << ", %" << (uint32_t) operands.lvid << " [self assign]";
 					break;
 				}
 				case ISA::Blueprint::classdef:
