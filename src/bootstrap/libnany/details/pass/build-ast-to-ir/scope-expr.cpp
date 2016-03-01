@@ -58,7 +58,8 @@ namespace Producer
 				case rgIf:         success &= visitASTExprIfExpr(child, localvar); break;
 				case rgWhile:      success &= visitASTExprWhile(child); break;
 
-				case rgExprTemplate: success &= visitASTExprTemplate(child, localvar); break;
+				case rgExprTemplate:
+				case rgExprTypeTemplate: success &= visitASTExprTemplate(child, localvar); break;
 
 				// special for internal AST manipulation
 				case rgRegister:   localvar = child.text.to<uint32_t>(); break;

@@ -134,7 +134,7 @@ namespace Producer
 
 	bool Scope::visitASTExprTemplate(const Node& node, LVID& localvar)
 	{
-		assert(node.rule == rgExprTemplate);
+		assert(node.rule == rgExprTemplate or node.rule == rgExprTypeTemplate);
 
 		for (auto& childptr: node.children)
 		{

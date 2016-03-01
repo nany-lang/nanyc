@@ -158,7 +158,6 @@ namespace Mapping
 			{
 				assert(not atomStack.empty());
 				auto& frame = atomStack.back();
-				assert(frame.atom.isFunction());
 
 				// calculating the lvid for the current parameter
 				// (+1 since %1 is the return value/type)
@@ -168,6 +167,8 @@ namespace Mapping
 					return;
 
 				bool isTemplate = (kind == IR::ISA::Blueprint::gentypeparam);
+				if (unlikely(not isTemplate and not frame.atom.isFunction()))
+					return printError(operands, "parameter for non-function");
 
 				CLID clid {frame.atom.atomid, paramLVID};
 				AnyString name = currentSequence.stringrefs[operands.name];

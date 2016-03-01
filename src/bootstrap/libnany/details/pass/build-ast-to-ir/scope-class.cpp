@@ -75,9 +75,25 @@ namespace Producer
 				auto& child = *childptr;
 				switch (child.rule)
 				{
-					case rgSymbolName:  { success &= inspectClassname(child); break; }
-					case rgClassBody:   { body = &child; break; }
-					case rgVisibility:  { /*currently ignore */ break; }
+					case rgSymbolName:
+					{
+						success &= inspectClassname(child);
+						break;
+					}
+					case rgClassBody:
+					{
+						body = &child;
+						break;
+					}
+					case rgVisibility:
+					{
+						/*currently ignore */ break;
+					}
+					case rgClassTemplateParams:
+					{
+						success &= scope.visitASTDeclGenericTypeParameters(child);
+						break;
+					}
 					default:
 						success &= scope.ICEUnexpectedNode(child, "[class]");
 				}
