@@ -22,8 +22,8 @@ namespace Producer
 	inline Scope::Scope(Scope& scope)
 		: context(scope.context)
 		, pNextVarID(scope.pNextVarID)
-		, parentScope(&scope)
 		, kind(scope.kind)
+		, parentScope(&scope)
 	{}
 
 
@@ -201,6 +201,24 @@ namespace Producer
 		sequence().emitEnsureTypeResolved(localvar);
 		return visitASTExprContinuation(node, localvar);
 	}
+
+
+	inline void Scope::emitTmplParametersIfAny()
+	{
+		if (not lastPushedTmplParams.empty())
+		{
+			auto& outIR = sequence();
+			for (auto& pair: lastPushedTmplParams)
+			{
+				if (pair.second.empty())
+					outIR.emitTPush(pair.first);
+				else
+					outIR.emitTPush(pair.first, pair.second);
+			}
+			lastPushedTmplParams.clear();
+		}
+	}
+
 
 
 

@@ -49,8 +49,6 @@ namespace Producer
 		** \brief Generate a mapping between input offsets and line numbers
 		*/
 		void generateLineIndexes(const AnyString& content);
-
-		void emitTmplParameters(const std::vector<std::pair<uint32_t, AnyString>>&);
 		//@}
 
 
@@ -99,9 +97,6 @@ namespace Producer
 				Node* funcname;
 			}
 			operatorClone;
-
-			//! For template parameters
-			std::vector<std::pair<uint32_t, AnyString>> lastPushedTmplParams;
 		}
 		reuse;
 

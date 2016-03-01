@@ -18,18 +18,6 @@ namespace Producer
 	{}
 
 
-	inline void Context::emitTmplParameters(const std::vector<std::pair<uint32_t, AnyString>>& list)
-	{
-		for (auto& pair: list)
-		{
-			if (pair.second.empty())
-				sequence.emitTPush(pair.first);
-			else
-				sequence.emitTPush(pair.first, pair.second);
-		}
-	}
-
-
 
 
 

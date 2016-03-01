@@ -126,7 +126,7 @@ namespace Producer
 		if (unlikely(localvar == (uint32_t) -1))
 			return (error(*type) << "'any' is not accepted as parameter");
 
-		context.reuse.lastPushedTmplParams.emplace_back(localvar, name);
+		lastPushedTmplParams.emplace_back(localvar, name);
 		return true;
 	}
 
@@ -143,8 +143,8 @@ namespace Producer
 			{
 				case rgCallTemplateParameters:
 				{
-					context.reuse.lastPushedTmplParams.clear();
-					context.reuse.lastPushedTmplParams.reserve(child.children.size());
+					lastPushedTmplParams.clear();
+					lastPushedTmplParams.reserve(child.children.size());
 
 					bool success = true;
 					for (auto& ptr: child.children)

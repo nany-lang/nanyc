@@ -97,11 +97,7 @@ namespace Producer
 		bool r = scope.visitASTExprContinuation(node, localvar, allowScope);
 		if (r and localvar != 0 and localvar != (uint32_t) -1)
 		{
-			if (unlikely(not context.reuse.lastPushedTmplParams.empty()))
-			{
-				context.emitTmplParameters(context.reuse.lastPushedTmplParams);
-				context.reuse.lastPushedTmplParams.clear();
-			}
+			scope.emitTmplParametersIfAny();
 			scope.sequence().emitEnsureTypeResolved(localvar);
 		}
 		return r;

@@ -173,14 +173,19 @@ namespace Producer
 		bool generateInitFuncForClassVar(const AnyString& varname, LVID, const Node& varAssign);
 		bool generateTypeofForClassVar(LVID&, const Node& varAssign);
 		template<bool BuiltinT, class DefT> bool generateNumberCode(uint32_t& localvar, const DefT& numdef, const Node&);
+		void emitTmplParametersIfAny();
 
 	private:
 		//! Next local variable
 		LVID pNextVarID = 0u;
-		//! Parent scope (if any)
-		Scope* parentScope = nullptr;
 		//! Kind
 		Kind kind = Kind::undefined;
+
+		//! Parent scope (if any)
+		Scope* parentScope = nullptr;
+		//! For template parameters
+		std::vector<std::pair<uint32_t, AnyString>> lastPushedTmplParams;
+
 		//! BroadcastNextVarID
 		bool broadcastNextVarID = true;
 		//! Nakama
