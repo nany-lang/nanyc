@@ -77,11 +77,13 @@ namespace Instanciate
 	bool SequenceBuilder::complainMultipleOverloads(LVID lvid)
 	{
 		assert(frame != nullptr);
-		auto err = (error() << "ambigous call");
+		auto err = (error() << "ambigous resolution");
 		if (not frame->lvids[lvid].resolvedName.empty())
-			err << " to '" << frame->lvids[lvid].resolvedName << "'";
+			err << " for '" << frame->lvids[lvid].resolvedName << "'";
 
 		CLID clid{frame->atomid, lvid};
+		if (debugmode)
+			err << ' ' << clid;
 
 		auto& solutions = frame->resolvePerCLID[clid];
 		for (size_t i = 0; i != solutions.size(); ++i)

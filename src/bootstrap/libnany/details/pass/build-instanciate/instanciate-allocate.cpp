@@ -15,7 +15,7 @@ namespace Instanciate
 	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::allocate>& operands)
 	{
 		if (not frame->verify(operands.atomid))
-			return;
+			return frame->invalidate(operands.lvid);
 
 		// find the type of the object to allocate
 		auto& cdef = cdeftable.classdef(CLID{frame->atomid, operands.atomid});

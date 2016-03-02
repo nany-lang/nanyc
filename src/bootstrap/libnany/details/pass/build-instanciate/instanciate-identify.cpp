@@ -13,23 +13,6 @@ namespace Instanciate
 {
 
 
-	namespace // anonymous
-	{
-
-		static inline bool debugResolveListOnlyContainsFunc(const std::vector<std::reference_wrapper<Atom>>& list)
-		{
-			for (auto& atom: list)
-			{
-				if (not atom.get().isFunction())
-					return true;
-			}
-			return false;
-		}
-
-	} // anonymous namespace
-
-
-
 	Atom& SequenceBuilder::resolveTypeAlias(Atom& original, bool& success)
 	{
 		assert(original.isTypeAlias());
@@ -266,6 +249,7 @@ namespace Instanciate
 		}
 		else
 		{
+			assert(frame->verify(operands.self));
 			// self.<something to identify>
 			if (unlikely(frame->lvids[operands.lvid].markedAsAny))
 			{
@@ -382,13 +366,6 @@ namespace Instanciate
 
 			default: // multiple solutions
 			{
-				// checking integrity (debug only) - verifying that all results are functions
-				if (debugmode)
-				{
-					if (unlikely(debugResolveListOnlyContainsFunc(multipleResults)))
-						return complainOperand((const IR::Instruction&) operands, "resolve-list contains something else than functions");
-				}
-
 				// multiple solutions are possible (probably for a func call)
 				// keeping the solutions for later resolution by the real func call
 				// (with parameters to find the most appropriate one)
@@ -398,6 +375,8 @@ namespace Instanciate
 
 			case 0: // no identifier found from 'atom map'
 			{
+				if (debugmode)
+					error() << "failed identify %" << operands.self << ".%" << operands.lvid;
 				return complainUnknownIdentifier(selfAtom, frame->atom, name);
 			}
 		}

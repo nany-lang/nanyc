@@ -198,6 +198,9 @@ namespace Instanciate
 
 				if (frame.lvids[i].isConstexpr)
 					entry << " (constexpr)";
+
+				if (frame.lvids[i].errorReported)
+					entry << " [ERROR]";
 			}
 			else
 			{
