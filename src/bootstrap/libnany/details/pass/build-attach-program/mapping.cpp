@@ -18,9 +18,15 @@ namespace Mapping
 		, report(report)
 	{
 		// reduce memory allocations
-		atomStack.reserve(4); // arbitrary
 		lastPushedNamedParameters.reserve(8); // arbitrary
 		lastPushedIndexedParameters.reserve(8);
+	}
+
+
+	inline void SequenceMapping::pushNewFrame(Atom& atom)
+	{
+		std::unique_ptr<AtomStackFrame> next{atomStack.release()};
+		atomStack = std::make_unique<AtomStackFrame>(atom, next);
 	}
 
 
@@ -51,7 +57,7 @@ namespace Mapping
 	template<IR::ISA::Op O>
 	inline void SequenceMapping::printError(const IR::ISA::Operand<O>& operands, AnyString msg)
 	{
-			printError(IR::Instruction::fromOpcode(operands), msg);
+		printError(IR::Instruction::fromOpcode(operands), msg);
 	}
 
 
@@ -60,10 +66,10 @@ namespace Mapping
 	{
 		if (debugmode)
 		{
-			if (unlikely(lvid == 0 or not (lvid < atomStack.back().classdefs.size())))
+			if (unlikely(lvid == 0 or not (lvid < atomStack->classdefs.size())))
 			{
 				printError(operands, String{"mapping: invalid lvid %"} << lvid << " (upper bound: %"
-					<< atomStack.back().classdefs.size() << ')');
+					<< atomStack->classdefs.size() << ')');
 				return false;
 			}
 		}
@@ -79,21 +85,23 @@ namespace Mapping
 	}
 
 
-	inline void SequenceMapping::attachFuncCall(const IR::ISA::Operand<IR::ISA::Op::call>& operands)
+	void SequenceMapping::attachFuncCall(const IR::ISA::Operand<IR::ISA::Op::call>& operands)
 	{
 		if (unlikely(not checkForLVID(operands, operands.ptr2func)))
 			return;
 		if (unlikely(not checkForLVID(operands, operands.lvid)))
 			return;
 
-		auto& stackframe = atomStack.back();
-		auto atomid      = stackframe.atom.atomid;
+		auto& stackframe     = *atomStack;
+		auto atomid          = stackframe.atom.atomid;
 		auto& clidFuncToCall = stackframe.classdefs[operands.ptr2func];
 		auto& clidRetValue   = stackframe.classdefs[operands.lvid];
 
 
 		// update all underlying types
 		{
+			CLID clid{atomid, 0};
+
 			MutexLocker locker{isolate.mutex};
 
 			resetClassdefOriginFromCurrentPosition(isolate.classdefTable.classdef(clidRetValue));
@@ -101,7 +109,6 @@ namespace Mapping
 			auto& funcdef = isolate.classdefTable.addClassdefInterfaceSelf(clidFuncToCall);
 			funcdef.resetReturnType(clidRetValue);
 			funcdef.clid = clidFuncToCall;
-			CLID clid{atomid, 0};
 
 			for (uint i = 0; i != lastPushedIndexedParameters.size(); ++i)
 			{
@@ -127,14 +134,16 @@ namespace Mapping
 
 	inline void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
 	{
+		if (unlikely(nullptr == atomStack))
+			return printError(operands, "invalid stack for blueprint");
+
 		auto kind = static_cast<IR::ISA::Blueprint>(operands.kind);
 		switch (kind)
 		{
 			case IR::ISA::Blueprint::vardef:
 			{
-				assert(not atomStack.empty());
 				// registering the blueprint into the outline...
-				Atom& atom = atomStack.back().currentAtomNotUnit();
+				Atom& atom = atomStack->currentAtomNotUnit();
 				AnyString varname = currentSequence.stringrefs[operands.name];
 				if (unlikely(varname.empty()))
 					return printError(operands, "invalid func name");
@@ -156,8 +165,7 @@ namespace Mapping
 			case IR::ISA::Blueprint::paramself:
 			case IR::ISA::Blueprint::gentypeparam:
 			{
-				assert(not atomStack.empty());
-				auto& frame = atomStack.back();
+				auto& frame = *atomStack;
 
 				// calculating the lvid for the current parameter
 				// (+1 since %1 is the return value/type)
@@ -187,9 +195,8 @@ namespace Mapping
 
 			case IR::ISA::Blueprint::funcdef:
 			{
-				assert(not atomStack.empty());
 				// registering the blueprint into the outline...
-				Atom& atom = atomStack.back().currentAtomNotUnit();
+				Atom& atom = atomStack->currentAtomNotUnit();
 				AnyString funcname = currentSequence.stringrefs[operands.name];
 				if (unlikely(funcname.empty()))
 					return printError(operands, "invalid func name");
@@ -217,15 +224,14 @@ namespace Mapping
 				// requires additional information
 				needAtomDbgFileReport = true;
 				needAtomDbgOffsetReport = true;
-				atomStack.push_back(AtomStackFrame{*newFuncAtom});
+				pushNewFrame(*newFuncAtom);
 				break;
 			}
 
 			case IR::ISA::Blueprint::classdef:
 			{
 				// registering the blueprint into the outline...
-				assert(not atomStack.empty());
-				Atom& atom = atomStack.back().currentAtomNotUnit();
+				Atom& atom = atomStack->currentAtomNotUnit();
 
 				// reset last lvid and parameters
 				lastLVID = 0;
@@ -252,14 +258,13 @@ namespace Mapping
 				// requires additional information
 				needAtomDbgFileReport = true;
 				needAtomDbgOffsetReport = true;
-				atomStack.push_back(AtomStackFrame{*newClassAtom});
+				pushNewFrame(*newClassAtom);
 				break;
 			}
 
 			case IR::ISA::Blueprint::typealias:
 			{
-				assert(not atomStack.empty());
-				Atom& atom = atomStack.back().currentAtomNotUnit();
+				Atom& atom = atomStack->currentAtomNotUnit();
 
 				AnyString classname = currentSequence.stringrefs[operands.name];
 				Atom* newAliasAtom;
@@ -277,7 +282,7 @@ namespace Mapping
 				{
 					default:
 					{
-						CLID clid{atomStack.back().atom.atomid, operands.lvid};
+						CLID clid{atomStack->atom.atomid, operands.lvid};
 						newAliasAtom->returnType.clid = clid;
 						break;
 					}
@@ -301,8 +306,7 @@ namespace Mapping
 			case IR::ISA::Blueprint::namespacedef:
 			{
 				AnyString nmname = currentSequence.stringrefs[operands.name];
-				assert(not atomStack.empty());
-				Atom& parentAtom = atomStack.back().currentAtomNotUnit();
+				Atom& parentAtom = atomStack->currentAtomNotUnit();
 
 				MutexLocker locker{isolate.mutex};
 				Atom* newRoot = isolate.classdefTable.atoms.createNamespace(parentAtom, nmname);
@@ -310,15 +314,13 @@ namespace Mapping
 				newRoot->usedDefined = true;
 				// create a pseudo classdef to easily retrieve the real atom from a clid
 				isolate.classdefTable.registerAtom(newRoot);
-				atomStack.push_back(AtomStackFrame{*newRoot});
+				pushNewFrame(*newRoot);
 				break;
 			}
 
 			case IR::ISA::Blueprint::unit:
 			{
-				assert(not atomStack.empty());
-				Atom& parentAtom = atomStack.back().currentAtomNotUnit();
-
+				Atom& parentAtom = atomStack->currentAtomNotUnit();
 				Atom* newRoot;
 				{
 					MutexLocker locker{isolate.mutex};
@@ -328,12 +330,10 @@ namespace Mapping
 					// create a pseudo classdef to easily retrieve the real atom from a clid
 					isolate.classdefTable.registerAtom(newRoot);
 				}
-
 				// update atomid
 				operands.atomid = newRoot->atomid;
 				assert(newRoot->atomid != 0);
-
-				atomStack.push_back(AtomStackFrame{*newRoot});
+				pushNewFrame(*newRoot);
 				break;
 			}
 		}
@@ -342,9 +342,8 @@ namespace Mapping
 
 	inline void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::pragma>& operands)
 	{
-		assert(not atomStack.empty());
-		if (atomStack.empty())
-			return printError(operands, "invalid stack for blueprint param");
+		if (unlikely(nullptr == atomStack))
+			return printError(operands, "invalid stack for blueprint pragma");
 
 		if (unlikely(not (operands.pragma < static_cast<uint32_t>(IR::ISA::Pragma::max))))
 			return printError(operands, "invalid pragma");
@@ -358,22 +357,21 @@ namespace Mapping
 
 			case IR::ISA::Pragma::builtinalias:
 			{
-				assert(not atomStack.empty());
-				Atom& atom = atomStack.back().atom;
+				Atom& atom = atomStack->atom;
 				atom.builtinalias = currentSequence.stringrefs[operands.value.builtinalias.namesid];
 				break;
 			}
 
 			case IR::ISA::Pragma::shortcircuit:
 			{
-				assert(not atomStack.empty());
-				atomStack.back().atom.parameters.shortcircuitValue = (0 != operands.value.shortcircuit);
+				bool onoff = (0 != operands.value.shortcircuit);
+				atomStack->atom.parameters.shortcircuitValue = onoff;
 				break;
 			}
 			case IR::ISA::Pragma::suggest:
 			{
-				assert(not atomStack.empty());
-				atomStack.back().atom.canBeSuggestedInErrReporting = (0 != operands.value.suggest);
+				bool onoff = (0 != operands.value.suggest);
+				atomStack->atom.canBeSuggestedInErrReporting = onoff;
 				break;
 			}
 
@@ -392,10 +390,10 @@ namespace Mapping
 
 	inline void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::stacksize>& operands)
 	{
-		if (unlikely(atomStack.empty()))
+		if (unlikely(nullptr == atomStack))
 			return printError(operands, "invalid parent atom");
 
-		Atom& parentAtom = atomStack.back().atom;
+		Atom& parentAtom = atomStack->atom;
 		if (unlikely(parentAtom.atomid == 0))
 			return printError(operands, "mapping: invalid parent atom id");
 
@@ -405,7 +403,7 @@ namespace Mapping
 
 		MutexLocker locker{isolate.mutex};
 		parentAtom.localVariablesCount = localvarCount;
-		isolate.classdefTable.bulkCreate(atomStack.back().classdefs, parentAtom.atomid, localvarCount);
+		isolate.classdefTable.bulkCreate(atomStack->classdefs, parentAtom.atomid, localvarCount);
 
 		if (parentAtom.type == Atom::Type::funcdef)
 		{
@@ -420,14 +418,12 @@ namespace Mapping
 	}
 
 
-	inline void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::scope>&)
+	inline void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::scope>& operands)
 	{
-		if (unlikely(not (atomStack.size() > 0)))
-			throw (String{} << currentFilename << ':' << currentLine << ": invalid stack");
+		if (unlikely(nullptr == atomStack))
+			return printError(operands, "invalid stack");
 
-		if (not atomStack.empty())
-			++(atomStack.back().scope);
-
+		++(atomStack->scope);
 		lastLVID = 0;
 	}
 
@@ -435,15 +431,11 @@ namespace Mapping
 	inline void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::end>&)
 	{
 		// reset the last lvid
-		lastLVID = 0;
-		// pop the stack
+		lastLVID = 0u;
 
-		if (unlikely(not (atomStack.size() > 1)))
-			throw (String{} << currentFilename << ':' << currentLine << ": invalid stack");
-
-		if (likely(not atomStack.empty()))
+		if (likely(atomStack))
 		{
-			auto& scope = atomStack.back().scope;
+			auto& scope = atomStack->scope;
 			// the scope might be zero if the opcode 'end' comes from a class or a func
 			if (scope > 0)
 			{
@@ -451,11 +443,18 @@ namespace Mapping
 			}
 			else
 			{
-				// remove a part of the stack
-				atomStack.pop_back();
-				if (not evaluateWholeSequence and atomStack.size() == 1)
+				// pop the stack frame
+				std::unique_ptr<AtomStackFrame> next{atomStack->next.release()};
+				atomStack.swap(next);
+
+				if (!atomStack or (not evaluateWholeSequence and !atomStack->next))
 					currentSequence.invalidateCursor(*cursor);
 			}
+		}
+		else
+		{
+			assert(false and "invalid stack");
+			currentSequence.invalidateCursor(*cursor);
 		}
 	}
 
@@ -465,7 +464,7 @@ namespace Mapping
 		if (unlikely(not checkForLVID(operands, operands.lvid)))
 			return;
 		lastLVID = operands.lvid;
-		auto clid = atomStack.back().classdefs[operands.lvid];
+		auto clid = atomStack->classdefs[operands.lvid];
 
 		MutexLocker locker{isolate.mutex};
 		auto& cdef = isolate.classdefTable.classdef(clid);
@@ -473,11 +472,11 @@ namespace Mapping
 		switch ((nytype_t) operands.type)
 		{
 			default:
-				{
-					cdef.mutateToBuiltin((nytype_t) operands.type);
-					cdef.instance = true; // keep somewhere that this definition is a variable instance
-					break;
-				}
+			{
+				cdef.mutateToBuiltin((nytype_t) operands.type);
+				cdef.instance = true; // keep somewhere that this definition is a variable instance
+				break;
+			}
 			case nyt_void: cdef.mutateToVoid(); break;
 			case nyt_any:  cdef.mutateToAny(); break;
 		}
@@ -488,20 +487,21 @@ namespace Mapping
 	{
 		if (unlikely(not checkForLVID(operands, operands.self)))
 			return;
-		if (unlikely(atomStack.empty()))
+		if (unlikely(nullptr == atomStack))
 			return printError(operands, "invalid atom stack for 'resolveAsSelf'");
 
 		// we can have at least 2 patterns:
 		//
 		//  * the most frequent, called from a method contained within a class
 		//  * from the class itself, most likely a variable
-		for (auto rit = atomStack.rbegin(); rit != atomStack.rend(); ++rit)
+
+		// clid of the target variable
+		CLID clid {atomStack->atom.atomid, operands.self};
+
+		for (auto* rit = atomStack.get(); rit; rit = rit->next.get())
 		{
 			if (rit->atom.isClass())
 			{
-				// clid of the target variable
-				CLID clid {atomStack.back().atom.atomid, operands.self};
-
 				MutexLocker locker{isolate.mutex};
 				auto& cdef = isolate.classdefTable.classdef(clid);
 				resetClassdefOriginFromCurrentPosition(cdef);
@@ -526,7 +526,7 @@ namespace Mapping
 		AnyString name = currentSequence.stringrefs[operands.text];
 
 		lastLVID = operands.lvid;
-		auto& atomFrame = atomStack.back();
+		auto& atomFrame = *atomStack;
 		auto& localClassdefs = atomFrame.classdefs;
 
 		assert(operands.lvid < localClassdefs.size());
@@ -610,9 +610,8 @@ namespace Mapping
 			if (unlikely(not checkForLVID(operands, operands.lvid)))
 				return;
 
-			auto& stackframe = atomStack.back();
-			auto& classdefRetValue = stackframe.classdefs[1]; // 1 is the return value
-			auto& classdef = stackframe.classdefs[operands.lvid];
+			auto& classdefRetValue = atomStack->classdefs[1]; // 1 is the return value
+			auto& classdef = atomStack->classdefs[operands.lvid];
 
 			MutexLocker locker{isolate.mutex};
 			auto& followup = isolate.classdefTable.classdef(classdefRetValue).followup;
@@ -628,9 +627,8 @@ namespace Mapping
 		if (unlikely(not checkForLVID(operands, operands.follower)))
 			return;
 
-		auto& stackframe = atomStack.back();
-		auto& clidFollower = stackframe.classdefs[operands.follower];
-		auto& clid = stackframe.classdefs[operands.lvid];
+		auto& clidFollower = atomStack->classdefs[operands.follower];
+		auto& clid = atomStack->classdefs[operands.lvid];
 
 		MutexLocker locker{isolate.mutex};
 		if (operands.symlink)
@@ -653,7 +651,7 @@ namespace Mapping
 		if (needAtomDbgFileReport)
 		{
 			needAtomDbgFileReport = false;
-			atomStack.back().atom.origin.filename = currentFilename;
+			atomStack->atom.origin.filename = currentFilename;
 		}
 	}
 
@@ -665,16 +663,15 @@ namespace Mapping
 		if (unlikely(needAtomDbgOffsetReport))
 		{
 			needAtomDbgOffsetReport = false;
-			atomStack.back().atom.origin.line = currentLine;
-			atomStack.back().atom.origin.offset = currentOffset;
+			atomStack->atom.origin.line = currentLine;
+			atomStack->atom.origin.offset = currentOffset;
 		}
 	}
 
 
 	inline void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::qualifiers>& operands)
 	{
-		auto& frame = atomStack.back();
-		CLID clid {frame.atom.atomid, operands.lvid};
+		CLID clid {atomStack->atom.atomid, operands.lvid};
 		bool onoff = (operands.flag != 0);
 
 		switch (operands.qualifier)
@@ -738,19 +735,23 @@ namespace Mapping
 
 	bool SequenceMapping::map(Atom& root, uint32_t offset)
 	{
-		// few reset
-		atomStack.clear();
-		atomStack.emplace_back(root);
-		lastLVID = 0;
+		// some reset if reused
+		assert(not atomStack);
+		pushNewFrame(root);
+
+		lastLVID = 0u;
 		lastPushedNamedParameters.clear();
 		lastPushedIndexedParameters.clear();
 
 		currentFilename = nullptr;
-		currentOffset = 0;
-		currentLine = 0;
+		currentOffset = 0u;
+		currentLine = 0u;
 		success = true;
 
+		// -- walk through all opcodes
 		currentSequence.each(*this, offset);
+
+		atomStack.reset(nullptr); // cleanup after use
 		return success;
 	}
 
