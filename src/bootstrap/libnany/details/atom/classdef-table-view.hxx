@@ -127,6 +127,12 @@ namespace Nany
 	}
 
 
+	inline ClassdefTable& ClassdefTableView::originalTable()
+	{
+		return table;
+	}
+
+
 	inline const ClassdefTable& ClassdefTableView::originalTable() const
 	{
 		return table;

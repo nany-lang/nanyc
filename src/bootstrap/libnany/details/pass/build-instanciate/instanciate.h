@@ -170,13 +170,14 @@ namespace Instanciate
 
 		//! perform type resolution and fetch data (local variable, func...)
 		bool identify(const IR::ISA::Operand<IR::ISA::Op::identify>& operands);
+		bool ensureResolve(const IR::ISA::Operand<IR::ISA::Op::ensureresolved>& operands);
 
 		Atom& resolveTypeAlias(Atom& atom, bool& success);
 
 		bool pragmaBlueprint(const IR::ISA::Operand<IR::ISA::Op::pragma>& operands);
 		void pragmaBodyStart();
 
-		bool instanciateAtomClass(Atom& atom);
+		Atom* instanciateAtomClass(Atom& atom);
 		bool instanciateAtomClassDestructor(Atom& atom, uint32_t self);
 		bool instanciateAtomClassClone(Atom& atom, uint32_t self, uint32_t rhs);
 

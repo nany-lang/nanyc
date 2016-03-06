@@ -1,4 +1,5 @@
 #include "mapping.h"
+#include <iostream>
 
 using namespace Yuni;
 
@@ -12,8 +13,9 @@ namespace Mapping
 {
 
 
-	SequenceMapping::SequenceMapping(Logs::Report& report, Isolate& isolate, IR::Sequence& sequence)
-		: isolate(isolate)
+	SequenceMapping::SequenceMapping(ClassdefTable& cdeftable, Mutex& mutex, Logs::Report& report, IR::Sequence& sequence)
+		: cdeftable(cdeftable)
+		, mutex(mutex)
 		, currentSequence(sequence)
 		, report(report)
 	{
@@ -102,11 +104,11 @@ namespace Mapping
 		{
 			CLID clid{atomid, 0};
 
-			MutexLocker locker{isolate.mutex};
+			MutexLocker locker{mutex};
 
-			resetClassdefOriginFromCurrentPosition(isolate.classdefTable.classdef(clidRetValue));
+			resetClassdefOriginFromCurrentPosition(cdeftable.classdef(clidRetValue));
 
-			auto& funcdef = isolate.classdefTable.addClassdefInterfaceSelf(clidFuncToCall);
+			auto& funcdef = cdeftable.addClassdefInterfaceSelf(clidFuncToCall);
 			funcdef.resetReturnType(clidRetValue);
 			funcdef.clid = clidFuncToCall;
 
@@ -116,7 +118,7 @@ namespace Mapping
 				clid.reclass(lvid);
 				funcdef.appendParameter(clid);
 
-				auto& followup = isolate.classdefTable.classdef(clid).followup;
+				auto& followup = cdeftable.classdef(clid).followup;
 				followup.pushedIndexedParams.push_back(std::make_pair(clidFuncToCall, i));
 			}
 
@@ -125,7 +127,7 @@ namespace Mapping
 				clid.reclass(pair.second);
 				funcdef.appendParameter(pair.first, clid);
 
-				auto& followup = isolate.classdefTable.classdef(clid).followup;
+				auto& followup = cdeftable.classdef(clid).followup;
 				followup.pushedNamedParams.push_back(std::make_pair(clidFuncToCall, pair.first));
 			}
 		}
@@ -150,14 +152,16 @@ namespace Mapping
 				if (unlikely(atom.type != Atom::Type::classdef))
 					return printError(operands, "vardef: invalid parent atom");
 
-				MutexLocker locker{isolate.mutex};
+				MutexLocker locker{mutex};
 				// create a new atom in the global type table
-				auto* newVarAtom = isolate.classdefTable.atoms.createVardef(atom, varname);
+				auto* newVarAtom = cdeftable.atoms.createVardef(atom, varname);
 				assert(newVarAtom != nullptr);
 				newVarAtom->usedDefined = true;
 
-				isolate.classdefTable.registerAtom(newVarAtom);
+				cdeftable.registerAtom(newVarAtom);
 				newVarAtom->returnType.clid.reclass(atom.atomid, operands.lvid);
+				if (!firstAtomCreated)
+					firstAtomCreated = newVarAtom;
 				break;
 			}
 
@@ -186,8 +190,8 @@ namespace Mapping
 				parameters.append(clid, name);
 
 				// keep somewhere that this definition is a variable instance
-				MutexLocker locker{isolate.mutex};
-				auto& cdef = isolate.classdefTable.classdef(clid);
+				MutexLocker locker{mutex};
+				auto& cdef = cdeftable.classdef(clid);
 				cdef.instance = not isTemplate;
 				cdef.qualifiers.ref = false; // should not be 'ref' by default, contrary to all other classdefs
 				break;
@@ -206,15 +210,15 @@ namespace Mapping
 				lastPushedNamedParameters.clear();
 				lastPushedIndexedParameters.clear();
 
-				MutexLocker locker{isolate.mutex};
+				MutexLocker locker{mutex};
 				// create a new atom in the global type table
-				auto* newFuncAtom = isolate.classdefTable.atoms.createFuncdef(atom, funcname);
+				auto* newFuncAtom = cdeftable.atoms.createFuncdef(atom, funcname);
 				assert(newFuncAtom != nullptr);
 				newFuncAtom->usedDefined      = true;
 				newFuncAtom->opcodes.sequence  = &currentSequence;
 				newFuncAtom->opcodes.offset   = currentSequence.offsetOf(operands);
 				// create a pseudo classdef to easily retrieve the real atom from a clid
-				isolate.classdefTable.registerAtom(newFuncAtom);
+				cdeftable.registerAtom(newFuncAtom);
 
 				operands.atomid = newFuncAtom->atomid;
 
@@ -225,6 +229,9 @@ namespace Mapping
 				needAtomDbgFileReport = true;
 				needAtomDbgOffsetReport = true;
 				pushNewFrame(*newFuncAtom);
+
+				if (!firstAtomCreated)
+					firstAtomCreated = newFuncAtom;
 				break;
 			}
 
@@ -242,11 +249,20 @@ namespace Mapping
 
 				Atom* newClassAtom;
 				{
-					MutexLocker locker{isolate.mutex};
+					MutexLocker locker{mutex};
 					// create a new atom in the global type table
-					newClassAtom = isolate.classdefTable.atoms.createClassdef(atom, classname);
+					if (prefixNameForFirstAtomCreated.empty())
+					{
+						newClassAtom = cdeftable.atoms.createClassdef(atom, classname);
+					}
+					else
+					{
+						String tmpname{prefixNameForFirstAtomCreated};
+						prefixNameForFirstAtomCreated.clear();
+						newClassAtom = cdeftable.atoms.createClassdef(atom, tmpname << classname);
+					}
 					// create a pseudo classdef to easily retrieve the real atom from a clid
-					isolate.classdefTable.registerAtom(newClassAtom);
+					cdeftable.registerAtom(newClassAtom);
 				}
 
 				newClassAtom->usedDefined     = true;
@@ -259,6 +275,9 @@ namespace Mapping
 				needAtomDbgFileReport = true;
 				needAtomDbgOffsetReport = true;
 				pushNewFrame(*newClassAtom);
+
+				if (!firstAtomCreated)
+					firstAtomCreated = newClassAtom;
 				break;
 			}
 
@@ -269,9 +288,9 @@ namespace Mapping
 				AnyString classname = currentSequence.stringrefs[operands.name];
 				Atom* newAliasAtom;
 				{
-					MutexLocker locker{isolate.mutex};
-					newAliasAtom = isolate.classdefTable.atoms.createTypealias(atom, classname);
-					isolate.classdefTable.registerAtom(newAliasAtom);
+					MutexLocker locker{mutex};
+					newAliasAtom = cdeftable.atoms.createTypealias(atom, classname);
+					cdeftable.registerAtom(newAliasAtom);
 				}
 
 				newAliasAtom->usedDefined     = true;
@@ -300,6 +319,9 @@ namespace Mapping
 
 				lastPushedNamedParameters.clear();
 				lastPushedIndexedParameters.clear();
+
+				if (!firstAtomCreated)
+					firstAtomCreated = newAliasAtom;
 				break;
 			}
 
@@ -308,12 +330,12 @@ namespace Mapping
 				AnyString nmname = currentSequence.stringrefs[operands.name];
 				Atom& parentAtom = atomStack->currentAtomNotUnit();
 
-				MutexLocker locker{isolate.mutex};
-				Atom* newRoot = isolate.classdefTable.atoms.createNamespace(parentAtom, nmname);
+				MutexLocker locker{mutex};
+				Atom* newRoot = cdeftable.atoms.createNamespace(parentAtom, nmname);
 				assert(newRoot != nullptr);
 				newRoot->usedDefined = true;
 				// create a pseudo classdef to easily retrieve the real atom from a clid
-				isolate.classdefTable.registerAtom(newRoot);
+				cdeftable.registerAtom(newRoot);
 				pushNewFrame(*newRoot);
 				break;
 			}
@@ -323,12 +345,12 @@ namespace Mapping
 				Atom& parentAtom = atomStack->currentAtomNotUnit();
 				Atom* newRoot;
 				{
-					MutexLocker locker{isolate.mutex};
-					newRoot = isolate.classdefTable.atoms.createUnit(parentAtom, currentFilename);
+					MutexLocker locker{mutex};
+					newRoot = cdeftable.atoms.createUnit(parentAtom, currentFilename);
 					assert(newRoot != nullptr);
 					newRoot->usedDefined = true;
 					// create a pseudo classdef to easily retrieve the real atom from a clid
-					isolate.classdefTable.registerAtom(newRoot);
+					cdeftable.registerAtom(newRoot);
 				}
 				// update atomid
 				operands.atomid = newRoot->atomid;
@@ -401,9 +423,9 @@ namespace Mapping
 		// (take max with 1 to prevent against invalid opcode)
 		uint localvarCount = operands.add;
 
-		MutexLocker locker{isolate.mutex};
+		MutexLocker locker{mutex};
 		parentAtom.localVariablesCount = localvarCount;
-		isolate.classdefTable.bulkCreate(atomStack->classdefs, parentAtom.atomid, localvarCount);
+		cdeftable.bulkCreate(atomStack->classdefs, parentAtom.atomid, localvarCount);
 
 		if (parentAtom.type == Atom::Type::funcdef)
 		{
@@ -413,7 +435,7 @@ namespace Mapping
 				return printError(operands, "invalid local variable count for a func blueprint");
 
 			// like parameters, the return type should not 'ref' by default
-			isolate.classdefTable.classdef(CLID{parentAtom.atomid, 1}).qualifiers.ref = false;
+			cdeftable.classdef(CLID{parentAtom.atomid, 1}).qualifiers.ref = false;
 		}
 	}
 
@@ -466,8 +488,8 @@ namespace Mapping
 		lastLVID = operands.lvid;
 		auto clid = atomStack->classdefs[operands.lvid];
 
-		MutexLocker locker{isolate.mutex};
-		auto& cdef = isolate.classdefTable.classdef(clid);
+		MutexLocker locker{mutex};
+		auto& cdef = cdeftable.classdef(clid);
 		resetClassdefOriginFromCurrentPosition(cdef);
 		switch ((nytype_t) operands.type)
 		{
@@ -502,8 +524,8 @@ namespace Mapping
 		{
 			if (rit->atom.isClass())
 			{
-				MutexLocker locker{isolate.mutex};
-				auto& cdef = isolate.classdefTable.classdef(clid);
+				MutexLocker locker{mutex};
+				auto& cdef = cdeftable.classdef(clid);
 				resetClassdefOriginFromCurrentPosition(cdef);
 				cdef.mutateToAtom(&(rit->atom));
 				cdef.qualifiers.ref = true;
@@ -539,11 +561,11 @@ namespace Mapping
 			// in this pass, we will only resolve local variables (and parameters)
 			// all function calls must be resolved later
 
-			MutexLocker locker{isolate.mutex};
+			MutexLocker locker{mutex};
 			// will see later - currently unknown
 			// classdef.mutateToAny();
-			isolate.classdefTable.addClassdefInterfaceSelf(clid, name);
-			resetClassdefOriginFromCurrentPosition(isolate.classdefTable.classdef(clid));
+			cdeftable.addClassdefInterfaceSelf(clid, name);
+			resetClassdefOriginFromCurrentPosition(cdeftable.classdef(clid));
 		}
 		else
 		{
@@ -558,10 +580,10 @@ namespace Mapping
 			assert(operands.self < localClassdefs.size());
 			auto& selfClassdef = localClassdefs[operands.self];
 
-			MutexLocker locker{isolate.mutex};
-			auto& funcdef = isolate.classdefTable.addClassdefInterface(selfClassdef, name);
+			MutexLocker locker{mutex};
+			auto& funcdef = cdeftable.addClassdefInterface(selfClassdef, name);
 			funcdef.clid  = clid;
-			auto& cdef = isolate.classdefTable.classdef(clid);
+			auto& cdef = cdeftable.classdef(clid);
 			cdef.parentclid = selfClassdef;
 			resetClassdefOriginFromCurrentPosition(cdef);
 		}
@@ -613,8 +635,8 @@ namespace Mapping
 			auto& classdefRetValue = atomStack->classdefs[1]; // 1 is the return value
 			auto& classdef = atomStack->classdefs[operands.lvid];
 
-			MutexLocker locker{isolate.mutex};
-			auto& followup = isolate.classdefTable.classdef(classdefRetValue).followup;
+			MutexLocker locker{mutex};
+			auto& followup = cdeftable.classdef(classdefRetValue).followup;
 			followup.extends.push_back(classdef);
 		}
 	}
@@ -630,11 +652,11 @@ namespace Mapping
 		auto& clidFollower = atomStack->classdefs[operands.follower];
 		auto& clid = atomStack->classdefs[operands.lvid];
 
-		MutexLocker locker{isolate.mutex};
+		MutexLocker locker{mutex};
 		if (operands.symlink)
-			isolate.classdefTable.makeHardlink(clid, clidFollower);
+			cdeftable.makeHardlink(clid, clidFollower);
 		else
-			isolate.classdefTable.classdef(clidFollower).followup.extends.push_back(clid);
+			cdeftable.classdef(clidFollower).followup.extends.push_back(clid);
 	}
 
 
@@ -678,18 +700,18 @@ namespace Mapping
 		{
 			case 1: // ref
 			{
-				MutexLocker locker{isolate.mutex};
-				if (debugmode and not isolate.classdefTable.hasClassdef(clid))
+				MutexLocker locker{mutex};
+				if (debugmode and not cdeftable.hasClassdef(clid))
 					return printError(operands, "invalid clid");
-				isolate.classdefTable.classdef(clid).qualifiers.ref = onoff;
+				cdeftable.classdef(clid).qualifiers.ref = onoff;
 				break;
 			}
 			case 2: // const
 			{
-				MutexLocker locker{isolate.mutex};
-				if (debugmode and not isolate.classdefTable.hasClassdef(clid))
+				MutexLocker locker{mutex};
+				if (debugmode and not cdeftable.hasClassdef(clid))
 					return printError(operands, "invalid clid");
-				isolate.classdefTable.classdef(clid).qualifiers.constant = onoff;
+				cdeftable.classdef(clid).qualifiers.constant = onoff;
 				break;
 			}
 			default:
@@ -733,11 +755,11 @@ namespace Mapping
 	}
 
 
-	bool SequenceMapping::map(Atom& root, uint32_t offset)
+	bool SequenceMapping::map(Atom& parentAtom, uint32_t offset)
 	{
 		// some reset if reused
 		assert(not atomStack);
-		pushNewFrame(root);
+		pushNewFrame(parentAtom);
 
 		lastLVID = 0u;
 		lastPushedNamedParameters.clear();

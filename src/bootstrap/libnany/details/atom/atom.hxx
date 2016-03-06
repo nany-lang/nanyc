@@ -78,6 +78,12 @@ namespace Nany
 	}
 
 
+	inline bool Atom::hasGenericParameters() const
+	{
+		return not tmplparams.empty();
+	}
+
+
 	template<class C>
 	inline void Atom::eachChild(const C& callback)
 	{
@@ -132,6 +138,13 @@ namespace Nany
 			if (not callback(*(it->second)))
 				return;
 		}
+	}
+
+
+	inline void Atom::Parameters::swap(Parameters& rhs)
+	{
+		std::swap(pData, rhs.pData);
+		std::swap(shortcircuitValue, rhs.shortcircuitValue);
 	}
 
 
@@ -251,17 +264,19 @@ namespace Nany
 	}
 
 
-	inline uint32_t Atom::findInstance(IR::Sequence*& sequence, Signature& signature)
+	inline uint32_t Atom::findInstance(IR::Sequence*& sequence, Atom*& remapAtom, Signature& signature)
 	{
 		auto it = pInstancesBySign.find(signature);
 		if (it != pInstancesBySign.end())
 		{
-			sequence = it->second.second;
+			auto& metadata = it->second;
+			sequence  = metadata.sequence;
+			remapAtom = metadata.remapAtom;
 
 			auto& storedRetType = it->first.returnType;
 			signature.returnType.import(storedRetType);
 			signature.returnType.qualifiers = storedRetType.qualifiers;
-			return it->second.first;
+			return metadata.instanceid;
 		}
 		return (uint32_t) -1;
 	}

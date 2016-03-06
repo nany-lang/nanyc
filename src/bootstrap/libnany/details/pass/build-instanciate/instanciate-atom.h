@@ -1,6 +1,8 @@
 #pragma once
 #include <yuni/yuni.h>
 #include "details/reporting/report.h"
+#include "details/atom/atom.h"
+#include "details/atom/func-overload-match.h"
 
 
 
@@ -29,7 +31,7 @@ namespace Instanciate
 
 		Logs::Message::Ptr& report;
 		//! The atom to instanciate
-		Atom& atom;
+		std::reference_wrapper<Atom> atom;
 		//! The parent atom, if any
 		Atom* parentAtom = nullptr;
 		//! Instance

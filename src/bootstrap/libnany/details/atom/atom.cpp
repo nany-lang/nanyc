@@ -68,28 +68,53 @@ namespace Nany
 				out += '.';
 			}
 
-			if (name.first() != '^')
+			switch (type)
 			{
-				out += name;
-			}
-			else
-			{
-				if (name.startsWith("^default-var-%"))
+				case Type::funcdef:
 				{
-					AnyString sub{name.c_str() + 14, name.size() - 14};
-					auto ix = sub.find('-');
-
-					if (ix < sub.size())
+					if (name.first() != '^')
 					{
-						++ix;
-						AnyString varname{sub.c_str() + ix, sub.size() - ix};
-						out << varname;
+						out += name;
 					}
 					else
-						out << "<invalid-field>";
+					{
+						if (name.startsWith("^default-var-%"))
+						{
+							AnyString sub{name.c_str() + 14, name.size() - 14};
+							auto ix = sub.find('-');
+
+							if (ix < sub.size())
+							{
+								++ix;
+								AnyString varname{sub.c_str() + ix, sub.size() - ix};
+								out << varname;
+							}
+							else
+								out << "<invalid-field>";
+						}
+						else
+							out.append(name.c_str() + 1, name.size() - 1);
+					}
+					break;
 				}
-				else
-					out.append(name.c_str() + 1, name.size() - 1);
+
+				case Type::classdef:
+				{
+					if (name.first() != '^')
+						out += name;
+					else
+						out.append(name.c_str() + 1, name.size() - 1);
+					break;
+				}
+
+				case Type::namespacedef:
+				case Type::typealias:
+				case Type::vardef:
+				case Type::unit:
+				{
+					out += name;
+					break;
+				}
 			}
 		}
 	}
@@ -116,53 +141,24 @@ namespace Nany
 					break;
 
 				if (name.first() == '^')
-					out << ' ';
+					out << ' '; // for beauty
 
-				bool first = true;
-
-				if (not tmplparams.empty())
+				// break fallthru
+			}
+			case Type::classdef:
+			case Type::typealias:
+			{
+				auto paramprinter = [&](auto& list, bool avoidSelf, AnyString sepBefore, AnyString sepAfter)
 				{
-					out << "<:";
+					if (list.empty())
+						return;
 
-					tmplparams.each([&](uint32_t, const AnyString& paramname, const Vardef& vardef)
-					{
-						if (not first)
-							out << ", ";
-						first = false;
-						out << paramname;
-
-						if (table)
-						{
-							if (table) // and table->hasClassdef(vardef.clid))
-							{
-								auto& retcdef = table->classdef(vardef.clid);
-								if (not retcdef.isVoid())
-								{
-									out << ": ";
-									retcdef.print(out, *table, false);
-								}
-							}
-						}
-						else
-						{
-							if (not vardef.clid.isVoid())
-								out << ": any";
-						}
-					});
-
-					out << ":>";
-				}
-
-				out << '(';
-
-				if (not parameters.empty())
-				{
-					first = true;
-
-					parameters.each([&](uint32_t i, const AnyString& paramname, const Vardef& vardef)
+					bool first = true;
+					out << sepBefore;
+					list.each([&](uint32_t i, const AnyString& paramname, const Vardef& vardef)
 					{
 						// avoid the first virtual parameter
-						if (i == 0 and paramname == "self")
+						if (avoidSelf and i == 0 and paramname == "self")
 							return;
 
 						if (not first)
@@ -188,8 +184,12 @@ namespace Nany
 								out << ": any";
 						}
 					});
-				}
-				out << ')';
+					out << sepAfter;
+				};
+
+				paramprinter(tmplparams, false, "<:", ":>");
+				// paramprinter(tmplparamsForPrinting, false, "<:", ":>");
+				paramprinter(parameters, true, "(", ")");
 
 				if (table)
 				{
@@ -213,10 +213,8 @@ namespace Nany
 				break;
 			}
 
-			case Type::classdef:
 			case Type::namespacedef:
 			case Type::vardef:
-			case Type::typealias:
 			case Type::unit:
 				break;
 		}
@@ -353,18 +351,24 @@ namespace Nany
 
 	uint32_t Atom::assignInvalidInstance(const Signature& signature)
 	{
-		pInstancesBySign.insert(std::make_pair(signature, std::make_pair((uint32_t) -1, nullptr)));
+		pInstancesBySign.insert(std::make_pair(signature, SignatureMetadata{}));
 		return (uint32_t) -1;
 	}
 
 
-	uint32_t Atom::assignInstance(const Signature& signature, IR::Sequence* sequence, const AnyString& symbolname)
+	uint32_t Atom::assignInstance(const Signature& signature, IR::Sequence* sequence, const AnyString& symbolname, Atom* remapAtom)
 	{
 		assert(sequence != nullptr);
 		uint32_t iid = (uint32_t) instances.size();
 		instances.emplace_back(sequence);
 		pSymbolInstances.emplace_back(symbolname);
-		pInstancesBySign.insert(std::make_pair(signature, std::make_pair(iid, sequence)));
+
+		SignatureMetadata metadata;
+		metadata.instanceid = iid;
+		metadata.sequence   = sequence;
+		metadata.remapAtom  = remapAtom;
+
+		pInstancesBySign.insert(std::make_pair(signature, metadata));
 		assert(instances.size() == pSymbolInstances.size());
 		return iid;
 	}

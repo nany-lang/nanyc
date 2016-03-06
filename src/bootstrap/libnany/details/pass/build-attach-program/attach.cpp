@@ -23,7 +23,7 @@ namespace Nany
 			pAttachedSequences.push_back(AttachedSequenceRef{&sequence, owned});
 		}
 
-		Pass::Mapping::SequenceMapping mapper{report, *this, sequence};
+		Pass::Mapping::SequenceMapping mapper{classdefTable, mutex, report, sequence};
 		return mapper.map(classdefTable.atoms.root);
 	}
 

@@ -1,5 +1,6 @@
 #pragma once
 #include "../../fwd.h"
+#include <yuni/thread/mutex.h>
 #include <vector>
 #include <utility>
 #include "details/atom/atom.h"
@@ -46,14 +47,17 @@ namespace Mapping
 	class SequenceMapping final
 	{
 	public:
-		SequenceMapping(Logs::Report& report, Isolate& isolate, IR::Sequence& sequence);
+		SequenceMapping(ClassdefTable& cdeftable, Yuni::Mutex& mutex, Logs::Report& report, IR::Sequence& sequence);
 
-		bool map(Atom& root, uint32_t offset = 0);
+		bool map(Atom& parentAtom, uint32_t offset = 0);
 
 
 	public:
-		//! Isolate
-		Isolate& isolate;
+		//! The classdef table (must be protected by 'mutex' in some passes)
+		ClassdefTable& cdeftable;
+		//! Mutex for the cdeftable
+		Yuni::Mutex& mutex;
+
 		//! Blueprint root element
 		std::unique_ptr<AtomStackFrame> atomStack;
 		//! Last lvid (for pushed parameters)
@@ -72,11 +76,19 @@ namespace Mapping
 		const char* currentFilename = nullptr;
 		uint32_t currentLine = 0;
 		uint32_t currentOffset = 0;
+
 		bool needAtomDbgFileReport = false;
 		bool needAtomDbgOffsetReport = false;
-
 		//! Flag to evaluate the whole sequence, or only a portion of it
 		bool evaluateWholeSequence = true;
+
+		//! The first atom created by the mapping
+		// This value might be used when a mapping is done on the fly
+		// (while instanciating code for example)
+		Atom* firstAtomCreated = nullptr;
+
+		//! Prefix to prepend for the first atom created by the mapping
+		AnyString prefixNameForFirstAtomCreated;
 
 		//! cursor for iterating through all opcocdes
 		IR::Instruction** cursor = nullptr;

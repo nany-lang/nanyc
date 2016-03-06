@@ -69,6 +69,8 @@ namespace Nany
 
 			const std::pair<AnyString, Vardef>& operator [] (uint index) const;
 
+			void swap(Parameters&);
+
 			//! Parameter name
 			const AnyString& name(uint index) const;
 			//! Var def
@@ -127,10 +129,11 @@ namespace Nany
 		//! Get if the atom is publicly accessible
 		bool isPublicOrPublished() const;
 
-		/*!
-		** \brief Get if the atom has a return type
-		*/
+		//! Get if the atom has a return type
 		bool hasReturnType() const;
+
+		//! Get if the atom has generic type parameters
+		bool hasGenericParameters() const;
 
 		/*!
 		** \brief Get if this atom can access (use) another one
@@ -231,7 +234,7 @@ namespace Nany
 		** \param[in,out] The signature. If the instance is found, its return type
 		**  will be updated accordingly
 		*/
-		uint32_t findInstance(IR::Sequence*& sequence, Signature& signature);
+		uint32_t findInstance(IR::Sequence*& sequence, Atom*& remapAtom, Signature& signature);
 		//! Find Instance ID
 		uint32_t findInstanceID(const IR::Sequence&) const;
 
@@ -255,7 +258,8 @@ namespace Nany
 		** \param sequence The sequence itself (must not be null)
 		** \param symbolname The complete symbol name (ex: "func A.foo(b: ref __i32): ref __i32")
 		*/
-		uint32_t assignInstance(const Signature& signature, IR::Sequence* sequence, const AnyString& symbolname);
+		uint32_t assignInstance(const Signature& signature, IR::Sequence* sequence,
+			const AnyString& symbolname, Atom* remapAtom);
 
 		//! Mark as invalid a given signature
 		uint32_t assignInvalidInstance(const Signature& signature);
@@ -370,6 +374,8 @@ namespace Nany
 		Parameters parameters;
 		//! Template parameters
 		Parameters tmplparams;
+		//! Template parameters just for printing informations (such as errors)
+		Parameters tmplparamsForPrinting;
 
 		//! The maximum number of variables / classdefs registered for the atom
 		uint localVariablesCount = 0u;
@@ -422,7 +428,13 @@ namespace Nany
 		//! All children
 		std::multimap<AnyString, Ptr> pChildren;
 		//! All code instances
-		std::unordered_map<Signature, std::pair<uint32_t, IR::Sequence*>> pInstancesBySign;
+		//std::unordered_map<Signature, std::pair<uint32_t, IR::Sequence*>> pInstancesBySign;
+		struct SignatureMetadata {
+			uint32_t instanceid = (uint32_t) -1;
+			Atom* remapAtom = nullptr;
+			IR::Sequence* sequence = nullptr;
+		};
+		std::unordered_map<Signature, SignatureMetadata> pInstancesBySign;
 		//! Symbol names for instances in `pInstances`
 		std::vector<Yuni::String> pSymbolInstances;
 

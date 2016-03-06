@@ -278,9 +278,11 @@ namespace Instanciate
 			{
 				atomBuiltinCast = Atom::Ptr::WeakPointer(cdeftable.atoms().core.object[R]);
 				assert(atomBuiltinCast != nullptr);
+				assert(not atomBuiltinCast->hasGenericParameters());
 			}
 
-			if (unlikely(not instanciateAtomClass(*atomBuiltinCast)))
+			bool instok = instanciateAtomClass(*atomBuiltinCast);
+			if (unlikely(not instok))
 				return false;
 
 			auto& opc = cdeftable.substitute(lvid);

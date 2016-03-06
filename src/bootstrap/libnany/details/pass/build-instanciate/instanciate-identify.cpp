@@ -358,9 +358,6 @@ namespace Instanciate
 					}
 				}
 
-				// instanciating the type itself, to resolve member variables
-				if (atom.isClass() and not atom.classinfo.isInstanciated)
-					return instanciateAtomClass(atom);
 				return true;
 			}
 
@@ -376,7 +373,7 @@ namespace Instanciate
 			case 0: // no identifier found from 'atom map'
 			{
 				if (debugmode)
-					error() << "failed identify %" << operands.self << ".%" << operands.lvid;
+					error() << "debug: failed identify %" << operands.self << ".%" << operands.lvid;
 				return complainUnknownIdentifier(selfAtom, frame->atom, name);
 			}
 		}

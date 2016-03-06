@@ -145,7 +145,7 @@ namespace Nany
 		LVID substituteAtomID() const;
 
 		//! Resize the substitutes for the current layer
-		void substituteResize(uint count);
+		void substituteResize(uint32_t count);
 
 		//! Make substitutes permanent
 		void mergeSubstitutes();

@@ -85,7 +85,9 @@ namespace Nany
 			? table.classdef(atom.parameters.vardef(index).clid)
 			: table.classdef(atom.tmplparams.vardef(index).clid);
 
+		// checking the parameter type
 		resultinfo.strategy = TypeCheck::isSimilarTo(table, nullptr, cdef, paramdef, pAllowImplicit);
+
 		if (unlikely(canGenerateReport) and resultinfo.strategy == TypeCheck::Match::none)
 		{
 			report.get().trace() << "failed to push"
@@ -121,13 +123,12 @@ namespace Nany
 
 	TypeCheck::Match FuncOverloadMatch::validate(Atom& atom, bool allowImplicit)
 	{
+		assert(atom.isFunction() or atom.isClass());
+
 		// some reset
 		result.params.clear();
 		result.tmplparams.clear();
 		result.funcToCall = &atom;
-
-		if (unlikely(not atom.isFunction()))
-			return TypeCheck::Match::none;
 
 		// trivial check, too many parameters for this overload
 		if (atom.parameters.size() < (uint32_t) input.params.indexed.size())
@@ -174,6 +175,14 @@ namespace Nany
 				}
 			}
 
+			if (not input.tmplparams.named.empty())
+			{
+				if (unlikely(canGenerateReport))
+					report.get().error() << "named generic type parameters not implemented yet";
+				return TypeCheck::Match::none;
+			}
+
+
 			// trying to resolve indexed parameters (if they match)
 			for (uint32_t i = 0; i != (uint32_t) input.params.indexed.size(); ++i)
 			{
@@ -211,17 +220,10 @@ namespace Nany
 				}
 			}
 
-			if (not input.tmplparams.named.empty())
-			{
-				if (unlikely(canGenerateReport))
-					report.get().error() << "named generic type parameters not implemented yet";
-				return TypeCheck::Match::none;
-			}
-
 			// check for missing default values for generic types
 			for (size_t i = input.tmplparams.indexed.size(); i < result.tmplparams.size(); ++i)
 			{
-				if (nullptr == result.tmplparams[i].cdef or result.tmplparams[i].cdef->clid.isVoid()) // undefined - TODO: default values
+				if (not result.tmplparams[i].cdef or result.tmplparams[i].cdef->clid.isVoid()) // undefined - TODO: default values
 				{
 					if (unlikely(canGenerateReport))
 					{
@@ -229,8 +231,8 @@ namespace Nany
 						if (not atom.isClassMember())
 							++ix;
 						auto hint = (report.get().hint());
-						hint << atom.caption(table) << ": no type provided for the ";
-						hint << "generic type parameter '";
+						hint << atom.caption(table);
+						hint << ": no type provided for the generic type parameter '";
 						hint << atom.tmplparams.name((uint32_t) i) << '\'';
 					}
 					return TypeCheck::Match::none;
@@ -240,7 +242,7 @@ namespace Nany
 			// check for missing default values
 			for (size_t i = input.params.indexed.size(); i < result.params.size(); ++i)
 			{
-				if (nullptr == result.params[i].cdef or result.params[i].cdef->clid.isVoid()) // undefined - TODO: default values
+				if (not result.params[i].cdef or result.params[i].cdef->clid.isVoid()) // undefined - TODO: default values
 				{
 					if (unlikely(canGenerateReport))
 					{

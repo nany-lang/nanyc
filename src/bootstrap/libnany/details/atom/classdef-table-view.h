@@ -60,7 +60,12 @@ namespace Nany
 		void printClassdef(Yuni::String& out, const CLID&, const Classdef&) const;
 		//@}
 
+
+		//! The original table (const)
 		const ClassdefTable& originalTable() const;
+		//! The original table
+		ClassdefTable& originalTable();
+
 
 	private:
 		ClassdefTable& table;

@@ -167,7 +167,7 @@ namespace Nany
 
 
 
-	void ClassdefTable::bulkCreate(std::vector<CLID>& out, yuint32 atomid, uint count)
+	void ClassdefTable::bulkCreate(std::vector<CLID>& out, yuint32 atomid, uint32_t count)
 	{
 		assert(atomid > 0);
 
@@ -185,8 +185,7 @@ namespace Nany
 			// check that the entry does not already exists
 			assert(pClassdefs.find(clid) == pClassdefs.end());
 			// insert the new classdef
-			auto* newClassdef = new Classdef(clid);
-			pClassdefs.insert(std::make_pair(clid, newClassdef));
+			pClassdefs.insert(std::make_pair(clid, new Classdef{clid}));
 		}
 	}
 
@@ -196,10 +195,13 @@ namespace Nany
 		assert(atom != nullptr and "invalid atom");
 
 		// TODO use an alternate (and more efficient) container for this special classdefs
-		const CLID& clid = CLID::AtomMapID(atom->atomid);
-		auto* newClassdef = new Classdef(clid);
-		newClassdef->mutateToAtom(atom);
-		pClassdefs.insert(std::make_pair(clid, newClassdef));
+		if (atom)
+		{
+			const CLID& clid = CLID::AtomMapID(atom->atomid);
+			auto* newClassdef = new Classdef(clid);
+			newClassdef->mutateToAtom(atom);
+			pClassdefs.insert(std::make_pair(clid, newClassdef));
+		}
 	}
 
 
@@ -454,10 +456,10 @@ namespace Nany
 	}
 
 
-	void ClassdefTable::substituteResize(uint count)
+	void ClassdefTable::substituteResize(uint32_t count)
 	{
 		uint32_t previous = layer.count;
-		if (not (count > previous))
+		if (count <= previous)
 			return;
 
 		layer.count = count;
