@@ -23,6 +23,7 @@ namespace Nany
 			importNSLCore(*this);
 			importNSLCoreString(intrinsics);
 			importNSLOSProcess(intrinsics);
+			importNSLIONative(intrinsics);
 		}
 	}
 

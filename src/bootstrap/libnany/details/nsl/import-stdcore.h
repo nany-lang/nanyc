@@ -22,6 +22,12 @@ namespace Nany
 	/*!
 	** \brief Import intrinsics related to process manipulation
 	*/
+	void importNSLIONative(IntrinsicTable&);
+
+	/*!
+	** \brief Import intrinsics related to process manipulation
+	*/
 	void importNSLOSProcess(IntrinsicTable&);
+
 
 } // namespace Nany
