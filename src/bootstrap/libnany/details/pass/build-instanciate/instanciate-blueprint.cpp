@@ -1,4 +1,5 @@
 #include "instanciate.h"
+#include <iostream>
 
 using namespace Yuni;
 
@@ -74,15 +75,6 @@ namespace Instanciate
 				--layerDepthLimit;
 
 				uint32_t atomid = operands.atomid;
-				AnyString atomname = currentSequence.stringrefs[operands.name];
-
-				if (frame != nullptr and canGenerateCode())
-				{
-					if (kind == IR::ISA::Blueprint::funcdef)
-						out.emitBlueprintFunc(atomname, atomid);
-					else
-						out.emitBlueprintClass(atomname, atomid);
-				}
 
 				auto* atom = cdeftable.atoms().findAtom(atomid);
 				if (unlikely(nullptr == atom))
@@ -91,17 +83,55 @@ namespace Instanciate
 					break;
 				}
 
-				// create new frame
-				pushNewFrame(*atom);
-				frame->blueprintOpcodeOffset = currentSequence.offsetOf(**cursor);
-
-				if (kind == IR::ISA::Blueprint::funcdef)
+				// 2 cases can be encountered:
+				// - a normal class definition: 'operands.lvid' will be equal to 0
+				//   since there is no lvid to update (linked to nothing)
+				// - an anonymous class (in the middle of a function for example):
+				//   'operands.lvid' will be different from 0. However, when the class
+				//   will be instanciated, we will be called again, but without any current 'frame'
+				if (operands.lvid == 0 or !frame)
 				{
-					if (atomname[0] == '^') // operator !
+					// declare a new class
+
+					AnyString atomname = currentSequence.stringrefs[operands.name];
+					if (frame != nullptr and canGenerateCode())
 					{
-						// some special actions must be triggered according the operator name
-						adjustSettingsNewFuncdefOperator(atomname);
+						if (kind == IR::ISA::Blueprint::funcdef)
+							out.emitBlueprintFunc(atomname, atomid);
+						else
+							out.emitBlueprintClass(atomname, atomid);
 					}
+
+					// create new frame
+					pushNewFrame(*atom);
+					frame->blueprintOpcodeOffset = currentSequence.offsetOf(**cursor);
+
+					if (kind == IR::ISA::Blueprint::funcdef)
+					{
+						if (atomname[0] == '^') // operator !
+						{
+							// some special actions must be triggered according the operator name
+							adjustSettingsNewFuncdefOperator(atomname);
+						}
+					}
+				}
+				else
+				{
+					// anonymous classes - ignore the section and instanciate the class
+
+					// .. but update the lvid on-the-fly first
+					cdeftable.substitute(operands.lvid).mutateToAtom(atom);
+
+					(*cursor)++; // go to the next opcode, which should be blueprint.size
+					auto& blueprintsize = (**cursor).to<IR::ISA::Op::pragma>();
+					assert(blueprintsize.opcode == (uint32_t) IR::ISA::Op::pragma);
+					assert(blueprintsize.value.blueprintsize >= 2);
+
+					*cursor += blueprintsize.value.blueprintsize - 2; // -2: blueprint:class+blueprint:size
+					assert((**cursor).opcodes[0] == (uint32_t) IR::ISA::Op::end);
+
+					if (not instanciateAtomClass(*atom)) // instanciating the class
+						return;
 				}
 				break;
 			}

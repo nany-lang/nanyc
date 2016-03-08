@@ -474,14 +474,14 @@ namespace IR
 		operands.lvid   = 0u;
 	}
 
-	inline uint32_t Sequence::emitBlueprintClass()
+	inline uint32_t Sequence::emitBlueprintClass(uint32_t lvid)
 	{
 		uint32_t offset = pSize;
 		auto& operands  = emit<ISA::Op::blueprint>();
 		operands.kind   = (uint32_t) IR::ISA::Blueprint::classdef;
 		operands.name   = 0u;
 		operands.atomid = static_cast<uint32_t>(-1);
-		operands.lvid   = 0u;
+		operands.setLVID(lvid);
 		return offset;
 	}
 

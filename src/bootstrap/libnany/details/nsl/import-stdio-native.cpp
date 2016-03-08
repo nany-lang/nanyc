@@ -43,7 +43,7 @@ namespace Builtin
 		return p;
 	}
 
-	static bool yn_io_file_save(nytctx_t* tctx, void* flnmptr, void* contentptr)
+	static bool yn_io_file_save(nytctx_t*, void* flnmptr, void* contentptr)
 	{
 		auto* filename = reinterpret_cast<String*>(flnmptr);
 		auto* content  = reinterpret_cast<String*>(contentptr);

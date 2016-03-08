@@ -520,7 +520,10 @@ namespace // anonymous
 				{
 					printEOL();
 
-					out << tabs << "func id:";
+					out << tabs;
+					if (operands.lvid != 0)
+						out << '%' << operands.lvid << " = ";
+					out << "func id:";
 					uint32_t  atomid = operands.atomid;
 					if (atomid != (uint32_t) -1)
 						out << atomid;
@@ -558,7 +561,11 @@ namespace // anonymous
 				case ISA::Blueprint::classdef:
 				{
 					printEOL();
-					out << tabs << "class ";
+					out << tabs;
+					if (operands.lvid != 0)
+						out << '%' << operands.lvid << " = ";
+					out << "class ";
+
 					printString(operands.name);
 					printEOL();
 					out << tabs << '{';

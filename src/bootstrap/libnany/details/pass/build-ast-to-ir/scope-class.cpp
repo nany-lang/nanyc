@@ -138,10 +138,14 @@ namespace Producer
 
 
 
-	bool Scope::visitASTClass(const Node& node, LVID* /*localvar*/)
+	bool Scope::visitASTClass(const Node& node, LVID* localvar)
 	{
 		assert(node.rule == rgClass);
 		assert(not node.children.empty());
+
+		uint32_t lvid = 0;
+		if (localvar) // create the lvid before the new scope
+			lvid = *localvar = nextvar();
 
 		// new scope
 		IR::Producer::Scope scope{*this};
@@ -150,10 +154,11 @@ namespace Producer
 		scope.kind = Scope::Kind::kclass;
 		scope.broadcastNextVarID = false;
 
+
 		auto& out = sequence();
 
 		// creating a new blueprint for the function
-		uint32_t bpoffset = out.emitBlueprintClass();
+		uint32_t bpoffset = out.emitBlueprintClass(lvid);
 		uint32_t bpoffsiz = out.emitBlueprintSize();
 		uint32_t bpoffsck = out.emitStackSizeIncrease();
 
