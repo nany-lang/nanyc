@@ -143,7 +143,6 @@ namespace Producer
 							case '"':  context.reuse.string.text += '"'; break;
 							case 'a':  context.reuse.string.text += '\a'; break;
 							case 'b':  context.reuse.string.text += '\b'; break;
-							case 'e':  context.reuse.string.text += '\e'; break;
 							case 'f':  context.reuse.string.text += '\f'; break;
 							case 'c':  /* produce no further output */ break;
 							default: error(child) << "invalid escaped character '\\" << child.text << '\''; return false;
