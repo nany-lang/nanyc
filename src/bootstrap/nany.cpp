@@ -162,7 +162,7 @@ static inline int execute(int argc, char** argv, const Options& options)
 
 
 
-YUNI_MAIN_CONSOLE(argc, argv)
+int main(int argc, char** argv)
 {
 	argv0 = argv[0];
 	if (YUNI_UNLIKELY(argc <= 1))
