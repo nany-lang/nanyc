@@ -281,8 +281,8 @@ namespace Instanciate
 				assert(not atomBuiltinCast->hasGenericParameters());
 			}
 
-			bool instok = instanciateAtomClass(*atomBuiltinCast);
-			if (unlikely(not instok))
+			Atom* remapAtom = instanciateAtomClass(*atomBuiltinCast);
+			if (unlikely(nullptr == remapAtom))
 				return false;
 
 			auto& opc = cdeftable.substitute(lvid);
