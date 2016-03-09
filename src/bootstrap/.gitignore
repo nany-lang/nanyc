@@ -16,6 +16,7 @@ CPackConfig.cmake
 *.vcxproj*
 
 # yuni related stuff
+*~
 /ext/yuni/src/ProfileBuild.cmake
 /ext/yuni/src/compiler-flags-debug-cc
 /ext/yuni/src/compiler-flags-debug-cxx
