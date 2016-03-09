@@ -11,6 +11,10 @@ CPackConfig.cmake
 /*.tgz
 /cmake-build-settings.txt
 
+# Visual Studio stuff
+*.sln
+*.vcxproj*
+
 # yuni related stuff
 /ext/yuni/src/ProfileBuild.cmake
 /ext/yuni/src/compiler-flags-debug-cc
