@@ -596,7 +596,7 @@ dict: notext
 // --- IF ---
 
 if-then: notext
-	wp tk-then wp expr-with-semicolon | error-semicolon
+	wp (tk-then wp)? expr-with-semicolon | error-semicolon
 
 if-else: notext
 	wp tk-else wp expr-with-semicolon
