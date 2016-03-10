@@ -73,6 +73,8 @@ set(ny_core_files
 	# std.io
 	"${nsl_root}/std.io/native/native.ny"
 	"${nsl_root}/std.io/native/file.ny"
+	# std.env
+	"${nsl_root}/std.env/env.ny"
 	)
 
 set(__nany_stdcore)
@@ -499,6 +501,7 @@ add_library(libnany ${mode_libnany}
 	details/nsl/import-stdcore-string.cpp
 	details/nsl/import-stdos-process.cpp
 	details/nsl/import-stdio-native.cpp
+	details/nsl/import-stdenv.cpp
 	${nysrc_nsl_stdcore}
 
 	# misc

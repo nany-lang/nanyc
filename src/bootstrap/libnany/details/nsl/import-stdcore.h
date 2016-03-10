@@ -29,5 +29,10 @@ namespace Nany
 	*/
 	void importNSLOSProcess(IntrinsicTable&);
 
+	/*!
+	** \brief Import intrinsics related to environment variables manipulation
+	*/
+	void importNSLEnv(IntrinsicTable&);
+
 
 } // namespace Nany

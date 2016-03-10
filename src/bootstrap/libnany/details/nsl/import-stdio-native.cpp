@@ -34,7 +34,7 @@ namespace Builtin
 
 	static void* yn_io_file_load(nytctx_t* tctx, void* flnmptr)
 	{
-		void* p = tctx->context->memory.allocate(tctx->context, sizeof(flnmptr));
+		void* p = tctx->context->memory.allocate(tctx->context, sizeof(String));
 		auto* string = new (p) String{};
 
 		auto* filename = reinterpret_cast<String*>(flnmptr);
