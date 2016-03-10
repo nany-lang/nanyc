@@ -44,6 +44,12 @@ namespace // anonymous
 		}
 
 
+		void print(const Operand<Op::negation>& operands)
+		{
+			out << tabs << '%' << operands.lvid << " = not %" << operands.lhs;
+		}
+
+
 		template<class T> void printOperator(const T& operands, const AnyString& opname)
 		{
 			out << tabs << '%' << operands.lvid << " = %" << operands.lhs << ' ' << opname << " %" << operands.rhs;

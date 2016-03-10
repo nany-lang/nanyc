@@ -195,6 +195,14 @@ namespace ISA
 		uint32_t rhs;
 	};
 
+	template<> struct Operand<Nany::IR::ISA::Op::negation> final
+	{
+		constexpr static const char* opname() { return "negation"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		uint32_t lhs;
+	};
+
 	template<> struct Operand<Nany::IR::ISA::Op::fadd> final
 	{
 		constexpr static const char* opname() { return "fadd"; }

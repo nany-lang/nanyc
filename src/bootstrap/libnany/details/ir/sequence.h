@@ -110,6 +110,9 @@ namespace IR
 		//! Emit AND
 		void emitMOD(uint32_t lvid, uint32_t lhs, uint32_t rhs);
 
+		//! Emit not
+		void emitNOT(uint32_t lvid, uint32_t lhs);
+
 		//! Emit +
 		void emitADD(uint32_t lvid, uint32_t lhs, uint32_t rhs);
 		//! Emit -

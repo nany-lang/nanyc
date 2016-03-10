@@ -120,6 +120,14 @@ namespace IR
 	}
 
 
+	inline void Sequence::emitNOT(uint32_t lvid, uint32_t lhs)
+	{
+		auto& operands = emit<ISA::Op::negation>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+	}
+
+
 	inline void Sequence::emitFADD(uint32_t lvid, uint32_t lhs, uint32_t rhs)
 	{
 		auto& operands = emit<ISA::Op::fadd>();

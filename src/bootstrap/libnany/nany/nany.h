@@ -1,4 +1,4 @@
- /*
+/*
 ** Nany - https://nany.io
 ** This Source Code Form is subject to the terms of the Mozilla Public
 ** License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -43,9 +43,9 @@
 ** \brief Export / import a libnany symbol (function)
 */
 #if defined(LIBNANY_DLL_EXPORT)
-#	define NY_EXPORT   LIBNANY_VISIBILITY_EXPORT
+#	define NY_EXPORT LIBNANY_VISIBILITY_EXPORT
 #else
-#	define NY_EXPORT   LIBNANY_VISIBILITY_IMPORT
+#	define NY_EXPORT LIBNANY_VISIBILITY_IMPORT
 #endif
 
 

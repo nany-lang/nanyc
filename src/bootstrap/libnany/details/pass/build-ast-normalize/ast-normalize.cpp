@@ -45,6 +45,7 @@ namespace Nany
 			void normalizeExprReorderOperators(Nany::Node& node);
 			void normalizeExprTransformOperatorsToFuncCall(Nany::Node& node);
 			void transformExprNodeToFuncCall(Nany::Node& node);
+			void transformExprNodeToFuncCallNOT(Nany::Node& node);
 			void transformExprAssignmentToFuncCall(Nany::Node& node);
 
 			void appendNewBoolNode(Node& parent, bool onoff);
@@ -103,6 +104,43 @@ namespace Nany
 				pDuplicationSuccess = false;
 				nmspc.first = "__error__";
 			}
+		}
+
+
+		inline void ASTReplicator::transformExprNodeToFuncCallNOT(Nany::Node& node)
+		{
+			// AST structure: not EXPR
+			//
+			// - expr-comparison
+			//     - operator-not
+			//     - EXPR
+			//
+			assert(node.children.size() == 2);
+			uint32_t lhsIndex = 1;
+
+			//  - identifier: ^not
+			//      - call
+			//           - call-parameter
+			//                - a
+			//
+
+			// promote the current node before any changes within the subtree
+			ast.nodeRulePromote(node, rgIdentifier);
+			node.text = "^not";
+
+			// create a new subtree
+			auto& call = *ast.nodeCreate(rgCall);
+			auto& lhs  = *ast.nodeAppend(call, {rgCallParameter, rgExpr});
+
+			// re-parent lhs
+			ast.nodeReparentAtTheEnd(*(node.children[lhsIndex]), node, lhsIndex, lhs);
+
+			// remove all remaining nodes
+			node.children.clear();
+
+			// re-parent the new node 'call'
+			AST::metadata(call).parent = &node;
+			node.children.push_back(&call);
 		}
 
 
@@ -244,8 +282,8 @@ namespace Nany
 					// transform all expressions '<op> rhs' into function calls
 					case Nany::rgExprNot:
 					{
-						// TODO
-						++i; // go to the next child
+						transformExprNodeToFuncCallNOT(child);
+						--i; // go to the next child
 						break;
 					}
 

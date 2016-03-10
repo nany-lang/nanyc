@@ -183,18 +183,94 @@ namespace Instanciate
 	}
 
 
+	bool SequenceBuilder::instanciateIntrinsicNOT(uint32_t lvid)
+	{
+		assert(pushedparams.func.indexed.size() == 1);
+		uint32_t lhs  = pushedparams.func.indexed[0].lvid;
+		auto& cdeflhs = cdeftable.classdefFollowClassMember(CLID{frame->atomid, lhs});
+
+		Atom* atomBuiltinCast = nullptr;
+
+		nytype_t builtinlhs = cdeflhs.kind;
+		if (builtinlhs == nyt_any) // implicit access to the internal 'pod' variable
+		{
+			auto* atom = cdeftable.findClassdefAtom(cdeflhs);
+			if (atom != nullptr and atom->builtinMapping != nyt_void)
+			{
+				atomBuiltinCast = atom;
+				builtinlhs = atom->builtinMapping;
+				uint32_t newlvid = createLocalVariables();
+				out.emitFieldget(newlvid, lhs, 0);
+				lhs = newlvid;
+			}
+		}
+
+		if (unlikely(builtinlhs != nyt_bool))
+			return complainIntrinsicParameter("not", 0, cdeflhs);
+
+		// --- result of the operator
+
+		if (atomBuiltinCast != nullptr)
+		{
+			// implicit convertion from builtin __bool to object bool
+			atomBuiltinCast = Atom::Ptr::WeakPointer(cdeftable.atoms().core.object[nyt_bool]);
+			assert(atomBuiltinCast != nullptr);
+			assert(not atomBuiltinCast->hasGenericParameters());
+
+			Atom* remapAtom = instanciateAtomClass(*atomBuiltinCast);
+			if (unlikely(nullptr == remapAtom))
+				return false;
+
+			auto& opc = cdeftable.substitute(lvid);
+			opc.mutateToAtom(atomBuiltinCast);
+			opc.qualifiers.ref = true;
+
+			if (canGenerateCode())
+			{
+				// creating two variables on the stack
+				uint32_t opresult   = createLocalVariables(2);
+				uint32_t sizeoflvid = opresult + 1;
+
+				// RESULT: opresult: the first one is the result of the operation (and, +, -...)
+				cdeftable.substitute(opresult).mutateToBuiltin(nyt_bool);
+				out.emitNOT(opresult, lhs);
+
+				// SIZEOF: the second variable on the stack is `sizeof(<object>)`
+				// (sizeof the object to allocate)
+				cdeftable.substitute(sizeoflvid).mutateToBuiltin(nyt_u64);
+				out.emitSizeof(sizeoflvid, atomBuiltinCast->atomid);
+
+				// ALLOC: memory allocation of the new temporary object
+				out.emitMemalloc(lvid, sizeoflvid);
+				out.emitRef(lvid);
+				frame->lvids[lvid].autorelease = true;
+				// reset the internal value of the object
+				out.emitFieldset(opresult, /*self*/lvid, 0); // builtin
+			}
+		}
+		else
+		{
+			// no convertion to perform, direct call
+			cdeftable.substitute(lvid).mutateToBuiltin(nyt_bool);
+			if (canGenerateCode())
+				out.emitNOT(lvid, lhs);
+		}
+		return true;
+	}
+
+
 	template<nytype_t R, bool AcceptBool, bool AcceptInt, bool AcceptFloat,
 		void (IR::Sequence::* M)(uint32_t, uint32_t, uint32_t)>
 	inline bool SequenceBuilder::instanciateIntrinsicOperator(uint32_t lvid, const char* const name)
 	{
 		assert(pushedparams.func.indexed.size() == 2);
 		uint32_t lhs  = pushedparams.func.indexed[0].lvid;
-		auto& cdeflhs   = cdeftable.classdefFollowClassMember(CLID{frame->atomid, lhs});
+		auto& cdeflhs = cdeftable.classdefFollowClassMember(CLID{frame->atomid, lhs});
 
 		Atom* atomBuiltinCast = nullptr;
 
 		nytype_t builtinlhs = cdeflhs.kind;
-		if (builtinlhs == nyt_any)
+		if (builtinlhs == nyt_any) // implicit access to the internal 'pod' variable
 		{
 			auto* atom = cdeftable.findClassdefAtom(cdeflhs);
 			if (atom != nullptr and atom->builtinMapping != nyt_void)
@@ -211,7 +287,7 @@ namespace Instanciate
 		auto& cdefrhs = cdeftable.classdefFollowClassMember(CLID{frame->atomid, rhs});
 		nytype_t builtinrhs = cdefrhs.kind;
 
-		if (builtinrhs == nyt_any)
+		if (builtinrhs == nyt_any) // implicit access to the internal 'pod' variable
 		{
 			auto* atom = cdeftable.findClassdefAtom(cdefrhs);
 			if (atom != nullptr and (atom->builtinMapping != nyt_void))
@@ -494,6 +570,8 @@ namespace Instanciate
 		{"or",              { &SequenceBuilder::instanciateIntrinsicOR,        2 }},
 		{"xor",             { &SequenceBuilder::instanciateIntrinsicXOR,       2 }},
 		{"mod",             { &SequenceBuilder::instanciateIntrinsicMOD,       2 }},
+		//
+		{"not",             { &SequenceBuilder::instanciateIntrinsicNOT,       1 }},
 		//
 		{"add",             { &SequenceBuilder::instanciateIntrinsicADD,       2 }},
 		{"sub",             { &SequenceBuilder::instanciateIntrinsicSUB,       2 }},

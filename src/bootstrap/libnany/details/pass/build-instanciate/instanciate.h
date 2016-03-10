@@ -93,6 +93,8 @@ namespace Instanciate
 			void (IR::Sequence::* M)(uint32_t, uint32_t, uint32_t)>
 		bool instanciateIntrinsicOperator(uint32_t lvid, const char* const name);
 
+		bool instanciateIntrinsicNOT(uint32_t);
+
 		bool instanciateIntrinsicAND(uint32_t);
 		bool instanciateIntrinsicOR(uint32_t);
 		bool instanciateIntrinsicXOR(uint32_t);

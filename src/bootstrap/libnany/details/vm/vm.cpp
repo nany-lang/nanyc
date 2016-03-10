@@ -221,6 +221,13 @@ namespace // anonymous
 		{
 		}
 
+		inline void visit(const IR::ISA::Operand<IR::ISA::Op::negation>& opr)
+		{
+			VM_PRINT_OPCODE(operands);
+			assert(opr.lvid < registerCount and opr.lhs < registerCount);
+			registers[opr.lvid].u64 = not registers[opr.lhs].u64;
+		}
+
 		inline void visit(const IR::ISA::Operand<IR::ISA::Op::intrinsic>& opr)
 		{
 			VM_PRINT_OPCODE(operands);
