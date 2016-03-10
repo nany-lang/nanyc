@@ -148,6 +148,7 @@ namespace Instanciate
 						opc.mutateToBuiltin(nyt_pointer);
 						opc.qualifiers.ref = false;
 						out.emitStore_u64(operands.lvid, 0);
+						frame->lvids[operands.lvid].synthetic = false;
 						return true;
 					}
 					break;
