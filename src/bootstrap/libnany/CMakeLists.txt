@@ -441,7 +441,6 @@ addsrc(
 	"c-api/sandbox.cpp"
 	"c-api/bind.cpp"
 	"c-api/source.cpp"
-	"c-api/utilities.cpp"
 	"c-api/validator.cpp"
 	"c-api/bugreport.cpp"
 	"c-api/visibility.cpp"

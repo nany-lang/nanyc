@@ -742,7 +742,7 @@ NY_EXPORT  nybool_t nany_print_ast_from_memory_n(const char* content, size_t len
 ** \param filename An arbitrary filename (utf-8 c-string)
 ** \return nytrue if the file has been successfully parsed, false otherwise
 */
-inline nybool_t nany_utility_validator_check_file(const char* filename);
+inline nybool_t nany_try_parse_file(const char* const filename);
 /*!
 ** \brief Check if a filename is a valid nany source code
 **
@@ -750,7 +750,7 @@ inline nybool_t nany_utility_validator_check_file(const char* filename);
 ** \param length Length of the filename
 ** \return nytrue if the file has been successfully parsed, false otherwise
 */
-NY_EXPORT nybool_t nany_utility_validator_check_file_n(const char* filename, size_t length);
+NY_EXPORT nybool_t nany_try_parse_file_n(const char* filename, size_t length);
 
 
 /*!

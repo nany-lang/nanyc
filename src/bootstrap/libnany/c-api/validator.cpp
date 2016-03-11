@@ -13,12 +13,11 @@ using namespace Yuni;
 namespace // anonymous
 {
 
-	static inline bool walkThroughAllNodes(const Nany::Node& allnodes)
+	static inline bool tryFindErrorNode(const Nany::Node& allnodes)
 	{
 		std::vector<std::reference_wrapper<const Nany::Node>> stack;
 		stack.reserve(128); // to reduce memory reallocations
 		stack.push_back(std::cref(allnodes));
-
 		do
 		{
 			auto& node = stack.back().get();
@@ -33,17 +32,20 @@ namespace // anonymous
 		return true;
 	}
 
-
 } // anonymous namespace
 
 
 
-
-extern "C" nybool_t nany_utility_validator_check_file_n(const char* filename, size_t length)
+extern "C" nybool_t nany_try_parse_file_n(const char* const filename, size_t length)
 {
-	Nany::Parser parser;
-	AnyString path{filename, (uint32_t)length};
-	bool success = parser.loadFromFile(path);
-	bool ret = (success and parser.root and walkThroughAllNodes(*(parser.root)));
+	bool ret = false;
+	try
+	{
+		String path{filename, static_cast<uint32_t>(length)};
+		Nany::Parser parser;
+		bool success = parser.loadFromFile(path);
+		ret = (success and parser.root and tryFindErrorNode(*(parser.root)));
+	}
+	catch (...) {}
 	return ret ? nytrue : nyfalse;
 }
