@@ -10,9 +10,9 @@ using namespace Yuni;
 
 
 
-
 namespace Nany
 {
+
 
 	FuncOverloadMatch::FuncOverloadMatch(Logs::Report report, const ClassdefTableView& table)
 		: report(std::ref(report))

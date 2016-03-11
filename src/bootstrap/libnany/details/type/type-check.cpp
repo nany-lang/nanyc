@@ -106,26 +106,26 @@ namespace TypeCheck
 
 
 
-	Match isSimilarTo(const ClassdefTable& table, const CTarget* target, const Classdef& cdef, const Classdef& to,
+	Match isSimilarTo(const ClassdefTable& table, const CTarget* target, const Classdef& from, const Classdef& to,
 		bool allowImplicit)
 	{
 		// identity
-		// (note: comparing only the address of 'cdef' and 'to' is not good enough
+		// (note: comparing only the address of 'from' and 'to' is not good enough
 		//   since symlink may exist in the table.classdef table)
-		if (cdef.clid == to.clid)
+		if (from.clid == to.clid)
 			return Match::strictEqual;
 
-		// the target accepts anything, even 'const' objects
+		// constness
+		if (from.qualifiers.constant and (not to.qualifiers.constant))
+			return Match::none;
+
+		// the target accepts anything
 		if (to.isAny())
 			return Match::strictEqual;
 
-		// invalid constness
-		if (cdef.qualifiers.constant and (not to.qualifiers.constant))
-			return Match::none;
-
 		// same builtin, identity as weel
-		if (to.isBuiltinOrVoid() or cdef.isBuiltinOrVoid())
-			return (cdef.kind == to.kind) ? Match::strictEqual : Match::none;
+		if (to.isBuiltinOrVoid() or from.isBuiltinOrVoid())
+			return (from.kind == to.kind) ? Match::strictEqual : Match::none;
 
 
 		const Atom* toAtom = table.findClassdefAtom(to);
@@ -133,15 +133,15 @@ namespace TypeCheck
 			return Match::none;
 
 		auto similarity = Match::none;
-		if (cdef.hasAtom())
+		if (from.hasAtom())
 		{
-			similarity = isAtomSimilarTo(table, target, *cdef.atom, *toAtom);
+			similarity = isAtomSimilarTo(table, target, *from.atom, *toAtom);
 			if (similarity == Match::none)
 				return Match::none;
 		}
 
 		// follow-ups
-		for (auto& clid: cdef.followup.extends)
+		for (auto& clid: from.followup.extends)
 		{
 			auto extendSimilarity = isSimilarTo(table, target, table.classdef(clid), to, allowImplicit);
 			if (Match::none == extendSimilarity)

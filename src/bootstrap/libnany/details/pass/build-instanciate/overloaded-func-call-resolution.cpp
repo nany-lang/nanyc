@@ -86,9 +86,9 @@ namespace Nany
 
 		if (unlikely(0 == suitableCount)) // sorry. nothing.
 		{
-			// hum nothing has been, let's do another loop for generating a report
 			if (false)
 			{
+				// let's do another loop for generating a report (currently done by the caller)
 				overloadMatch.canGenerateReport = true;
 				auto err = (report.error() << "cannot call ");
 				overloadMatch.report = std::ref(err);
