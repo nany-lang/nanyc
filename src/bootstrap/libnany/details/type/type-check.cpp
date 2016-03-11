@@ -121,7 +121,7 @@ namespace TypeCheck
 
 		// the target accepts anything
 		if (to.isAny())
-			return Match::strictEqual;
+			return Match::equal;
 
 		// same builtin, identity as weel
 		if (to.isBuiltinOrVoid() or from.isBuiltinOrVoid())
