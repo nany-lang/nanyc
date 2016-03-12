@@ -77,6 +77,9 @@ error-parenthese:
 error-bracket:
 	[^\[\]\r\n]+
 
+error-interval:
+	[^:\[\]\r\n]+
+
 error-parenthese-or-bracket:
 	[^()\[\]\r\n]+
 
@@ -183,7 +186,7 @@ tk-new: notext
 	'new' sp
 
 tk-dot: notext
-	'.'
+	'.' [^.]^
 tk-dot-dot: notext
 	'..'
 
@@ -527,9 +530,8 @@ interval-bound-end:
 	':]' | ':['
 
 interval: notext
-	interval-bound-start
-		(wp expr wp tk-dot-dot wp expr wp interval-bound-end)
-		| error-bracket
+	interval-bound-start wp
+	((expr wp tk-dot-dot wp expr)|error-interval wp interval-bound-end) | error-interval
 
 array: notext
 	tk-bracket-open
@@ -630,14 +632,14 @@ do-while: notext, important
 // --- FOR ---
 
 for-do: notext
-	tk-do wp expr-with-semicolon
+	tk-do expr-with-semicolon
 
 for-else: notext
 	tk-else wp expr-with-semicolon
 
 for: notext, important
 	tk-for
-		(in  wp for-do  (wp for-else)?)
+		(in|error-eol  wp for-do  (wp for-else)?)
 		| error-eol
 
 
