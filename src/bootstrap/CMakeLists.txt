@@ -176,5 +176,17 @@ add_executable(nyt-check-syntax  check-syntax.cpp)
 target_link_libraries(nyt-check-syntax PRIVATE libnany yuni-static-core)
 
 
+#
+# Test
+#
+get_filename_component(nany_tests_root "${CMAKE_CURRENT_LIST_DIR}/../../tests/" REALPATH)
+add_custom_target(check
+	DEPENDS nyt-check-syntax
+	COMMAND "$<TARGET_FILE:nyt-check-syntax>" "--use-filename-convention" "${nany_tests_root}/parsing"
+	COMMAND "$<TARGET_FILE:nyt-check-syntax>"
+		"${nany_tests_root}/build"
+		"${nany_tests_root}/contest"
+		"${nany_tests_root}/benchmark"
+	VERBATIM)
 
 # The end !
