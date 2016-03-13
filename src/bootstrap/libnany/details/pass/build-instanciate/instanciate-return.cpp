@@ -70,12 +70,23 @@ namespace Instanciate
 						}
 						case TypeCheck::Match::equal:
 						{
-							auto err = (error() << "implicit conversions are not allowed in 'return'");
-							auto hint = err.hint();
-							cdef.print((hint << "got '"), cdeftable);
-							expectedCdef.print((hint << "', expected '"), cdeftable);
-							hint << '\'';
-							return;
+							if (expectedCdef.isAny())
+							{
+								// conversion from 'void' to 'any' is not considered as a perfect match
+								// but it will be perfectly fine in this case
+								// ex: func foo -> somethingThatReturnsVoid();
+								returnCLIDForReference = cdef.clid;
+							}
+							else
+							{
+								auto err = (error() << "implicit conversion is not allowed in 'return'");
+								auto hint = err.hint();
+								cdef.print((hint << "got '"), cdeftable);
+								expectedCdef.print((hint << "', expected '"), cdeftable);
+								hint << '\'';
+								return;
+							}
+							break;
 						}
 						case TypeCheck::Match::none:
 						{
