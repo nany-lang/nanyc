@@ -21,6 +21,9 @@ namespace Instanciate
 		err.message.origins.location.filename   = currentFilename;
 		err.message.origins.location.pos.line   = currentLine;
 		err.message.origins.location.pos.offset = currentOffset;
+
+		if (debugmode)
+			err << "{opc+" << currentSequence.offsetOf(**cursor) << "} ";
 		return err;
 	}
 
@@ -30,6 +33,9 @@ namespace Instanciate
 		wrn.message.origins.location.filename   = currentFilename;
 		wrn.message.origins.location.pos.line   = currentLine;
 		wrn.message.origins.location.pos.offset = currentOffset;
+
+		if (debugmode)
+			wrn << "{opc+" << currentSequence.offsetOf(**cursor) << "} ";
 		return wrn;
 	}
 
@@ -41,6 +47,9 @@ namespace Instanciate
 		ice.message.origins.location.filename   = currentFilename;
 		ice.message.origins.location.pos.line   = currentLine;
 		ice.message.origins.location.pos.offset = currentOffset;
+
+		if (debugmode)
+			ice << "{opc+" << currentSequence.offsetOf(**cursor) << "} ";
 
 		// assert on the variable 'success' to not make the compiler
 		// complain on the attribute ‘noreturn’
