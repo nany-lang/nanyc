@@ -24,9 +24,16 @@ namespace // anonymous
 		const Sequence& sequence;
 		const Instruction** cursor = nullptr;
 		const Nany::AtomMap* atommap = nullptr;
+		Yuni::ShortString64 lineHeader;
+		uint32_t lastOffset = (uint32_t) -1;
 
 
-		Printer(S& out, const Sequence& sequence) : out(out), sequence(sequence) {}
+		Printer(S& out, const Sequence& sequence)
+			: out(out), sequence(sequence)
+		{
+			lineHeader << "           ";
+		}
+
 		void indent()   { tabs.append("    ", 4); }
 		void unindent() { tabs.chop(4); }
 		void printEOL() { out += '\n'; }
@@ -37,22 +44,43 @@ namespace // anonymous
 			out << '@' << sid << "\"" << text << "\"";
 		}
 
+		S& line()
+		{
+			auto offset = sequence.offsetOf(**cursor);
+			if (offset != lastOffset)
+			{
+				lastOffset = offset;
+				Yuni::ShortString64 offsetstr;
+				offsetstr << offset;
+				Yuni::ShortString64 tmp;
+				tmp.resize(8, ".");
+				tmp.overwriteRight(offsetstr);
+				out << tmp << " | ";
+			}
+			else
+			{
+				out << lineHeader;
+			}
+			out << tabs;
+			return out;
+		}
+
 
 		void print(const Operand<Op::nop>&)
 		{
-			out << tabs << "nop";
+			line() << "nop";
 		}
 
 
 		void print(const Operand<Op::negation>& operands)
 		{
-			out << tabs << '%' << operands.lvid << " = not %" << operands.lhs;
+			line() << '%' << operands.lvid << " = not %" << operands.lhs;
 		}
 
 
 		template<class T> void printOperator(const T& operands, const AnyString& opname)
 		{
-			out << tabs << '%' << operands.lvid << " = %" << operands.lhs << ' ' << opname << " %" << operands.rhs;
+			line() << '%' << operands.lvid << " = %" << operands.lhs << ' ' << opname << " %" << operands.rhs;
 		}
 
 		void print(const Operand<Op::eq>& operands)
@@ -199,7 +227,7 @@ namespace // anonymous
 
 		void print(const Operand<Op::qualifiers>& operands)
 		{
-			out << tabs << "qualifier %" << operands.lvid << ": ";
+			line() << "qualifier %" << operands.lvid << ": ";
 			out << (operands.flag ? '+' : '-');
 			switch (operands.qualifier)
 			{
@@ -224,20 +252,20 @@ namespace // anonymous
 
 		void print(const Operand<Op::assign>& operands)
 		{
-			out << tabs << '%' << operands.lhs << " = assign %" << operands.rhs;
+			line() << '%' << operands.lhs << " = assign %" << operands.rhs;
 		}
 
 
 		void print(const Operand<Op::fieldget>& operands)
 		{
-			out << tabs << '%' << operands.lvid << " = fieldget u64 %" << operands.self;
+			line() << '%' << operands.lvid << " = fieldget u64 %" << operands.self;
 			out << '.' << operands.var;
 		}
 
 
 		void print(const Operand<Op::fieldset>& operands)
 		{
-			out << tabs << "fieldset %" << operands.self;
+			line() << "fieldset %" << operands.self;
 			out << '.' << operands.var;
 			out << " = %" << operands.lvid;
 		}
@@ -245,7 +273,7 @@ namespace // anonymous
 
 		void print(const Operand<Op::stackalloc>& operands)
 		{
-			out << tabs << "alloca %" << operands.lvid;
+			line() << "alloca %" << operands.lvid;
 			out << ": ";
 			out << nany_type_to_cstring((nytype_t) operands.type);
 
@@ -255,30 +283,30 @@ namespace // anonymous
 
 		void print(const Operand<Op::storeConstant>& operands)
 		{
-			out << tabs << '%' << operands.lvid << " = constant ";
+			line() << '%' << operands.lvid << " = constant ";
 			out << (void*) operands.value.u64;
 			out << " (.u64: " << operands.value.u64 << ", .f64: " << operands.value.f64 << ')';
 		}
 
 		void print(const Operand<Op::storeText>& operands)
 		{
-			out << tabs << '%' << operands.lvid << " = text ";
+			line() << '%' << operands.lvid << " = text ";
 			printString(operands.text);
 		}
 
 		void print(const Operand<Op::store>& operands)
 		{
-			out << tabs << '%' << operands.lvid << " = %" << operands.source;
+			line() << '%' << operands.lvid << " = %" << operands.source;
 		}
 
 		void print(const Operand<Op::ret>& operands)
 		{
-			out << tabs << "return %" << operands.lvid;
+			line() << "return %" << operands.lvid;
 		}
 
 		void print(const Operand<Op::stacksize>& operands)
 		{
-			out << tabs << "stack.size +" << operands.add;
+			line() << "stack.size +" << operands.add;
 		}
 
 
@@ -286,11 +314,11 @@ namespace // anonymous
 		{
 			if (operands.name == 0)
 			{
-				out << tabs << "push %";
+				line() << "push %";
 			}
 			else
 			{
-				out << tabs << "push ";
+				line() << "push ";
 				printString(operands.name);
 				out << " %";
 			}
@@ -301,11 +329,11 @@ namespace // anonymous
 		{
 			if (operands.name == 0)
 			{
-				out << tabs << "tpush %";
+				line() << "tpush %";
 			}
 			else
 			{
-				out << tabs << "tpush ";
+				line() << "tpush ";
 				printString(operands.name);
 				out << " %";
 			}
@@ -314,7 +342,7 @@ namespace // anonymous
 
 		void print(const Operand<Op::call>& operands)
 		{
-			out << tabs << '%' << operands.lvid << " = call ";
+			line() << '%' << operands.lvid << " = call ";
 			if (operands.instanceid == (uint32_t) -1)
 			{
 				out << '%' << operands.ptr2func;
@@ -329,7 +357,7 @@ namespace // anonymous
 
 		void print(const Operand<Op::intrinsic>& operands)
 		{
-			out << tabs << '%' << operands.lvid << " = intrinsic ";
+			line() << '%' << operands.lvid << " = intrinsic ";
 			if (operands.iid != (uint32_t) -1)
 				out << "id:" << operands.iid;
 			else
@@ -340,7 +368,7 @@ namespace // anonymous
 		{
 			if (operands.text != 0) // not empty
 			{
-				out << tabs << "// ";
+				line() << "// ";
 				auto text = sequence.stringrefs[operands.text];
 				if (not text.contains('\n'))
 				{
@@ -350,7 +378,7 @@ namespace // anonymous
 				{
 					YString s = text;
 					YString r;
-					r << '\n' << tabs << "// ";
+					r << '\n' << lineHeader <<  tabs << "// ";
 					s.replace("\n", r);
 					s.trimRight();
 					out << '@' << operands.text << ' ' << s;
@@ -362,7 +390,7 @@ namespace // anonymous
 
 		void print(const Operand<Op::namealias>& operands)
 		{
-			out << tabs << "alias ";
+			line() << "alias ";
 			printString(operands.name);
 			out << " -> %" << operands.lvid;
 		}
@@ -370,26 +398,26 @@ namespace // anonymous
 
 		void print(const Operand<Op::debugfile>& operands)
 		{
-			out << tabs << "dbg source file '";
+			line() << "dbg source file '";
 			printString(operands.filename);
 			out << '\'';
 		}
 
 		void print(const Operand<Op::debugpos>& operands)
 		{
-			out << tabs << "dbg l." << operands.line << ',' << operands.offset;
+			line() << "dbg l." << operands.line << ',' << operands.offset;
 		}
 
 
 		void print(const Operand<Op::self>& operands)
 		{
-			out << tabs << "self %" << operands.self;
+			line() << "self %" << operands.self;
 		}
 
 
 		void print(const Operand<Op::identify>& operands)
 		{
-			out << tabs << '%' << operands.lvid << " = identify ";
+			line() << '%' << operands.lvid << " = identify ";
 			if (operands.self != 0)
 				out << '%' << operands.self << " . ";
 			printString(operands.text);
@@ -397,50 +425,49 @@ namespace // anonymous
 
 		void print(const Operand<Op::ensureresolved>& operands)
 		{
-			out << tabs << "ensure resolved %" << operands.lvid;
+			line() << "ensure resolved %" << operands.lvid;
 		}
 
 
 		void print(const Operand<Op::label>& operands)
 		{
-			out << tabs << "label " << operands.label << ":";
+			line() << "label " << operands.label << ":";
 		}
 
 
 		void print(const Operand<Op::jmp>& operands)
 		{
-			out << tabs << "jmp " << operands.label;
+			line() << "jmp " << operands.label;
 		}
 
 		void print(const Operand<Op::jz>& operands)
 		{
-			out << tabs << "jz %" << operands.lvid << " == 0, %" << operands.result;
+			line() << "jz %" << operands.lvid << " == 0, %" << operands.result;
 			out << ", goto lbl " << operands.label;
 		}
 
 		void print(const Operand<Op::jnz>& operands)
 		{
-			out << tabs << "jnz %" << operands.lvid << " != 0, %" << operands.result;
+			line() << "jnz %" << operands.lvid << " != 0, %" << operands.result;
 			out << ", goto lbl " << operands.label;
 		}
 
 
-
 		void print(const Operand<Op::scope>&)
 		{
-			out << tabs << '{';
+			line() << '{';
 			indent();
 		}
 
 		void print(const Operand<Op::end>&)
 		{
 			unindent();
-			out << tabs << '}';
+			line() << '}';
 		}
 
 		void print(const Operand<Op::follow>& operands)
 		{
-			out << tabs << '%';
+			line() << '%';
 			if (0 == operands.symlink)
 				out << operands.follower << " follows -> %" << operands.lvid;
 			else
@@ -449,34 +476,36 @@ namespace // anonymous
 
 		void print(const Operand<Op::classdefsizeof>& operands)
 		{
-			out << tabs << '%' << operands.lvid << " = sizeof (%" << operands.type << " or atomid " << operands.type << ')';
+			line() << '%' << operands.lvid << " = sizeof (%" << operands.type;
+			out << " or atomid " << operands.type << ')';
 		}
 
 		void print(const Operand<Op::allocate>& operands)
 		{
-			out << tabs << '%' << operands.lvid << " = allocate %" << operands.atomid << " or atomid " << operands.atomid;
+			line() << '%' << operands.lvid << " = allocate %" << operands.atomid;
+			out << " or atomid " << operands.atomid;
 		}
 
 
 		void print(const Operand<Op::memalloc>& operands)
 		{
-			out << tabs << '%' << operands.lvid << " = memory.allocate %" << operands.regsize << " bytes";
+			line() << '%' << operands.lvid << " = memory.allocate %" << operands.regsize << " bytes";
 		}
 
 		void print(const Operand<Op::memfree>& operands)
 		{
-			out << tabs << "memory.free %" << operands.lvid << " size %" << operands.regsize;
+			line() << "memory.free %" << operands.lvid << " size %" << operands.regsize;
 		}
 
 
 		void print(const Operand<Op::ref>& operands)
 		{
-			out << tabs << "+ref %" << operands.lvid;
+			line() << "+ref %" << operands.lvid;
 		}
 
 		void print(const Operand<Op::unref>& operands)
 		{
-			out << tabs << "-unref %" << operands.lvid;
+			line() << "-unref %" << operands.lvid;
 			if (operands.atomid != 0)
 			{
 				out << " {atom id:";
@@ -486,7 +515,7 @@ namespace // anonymous
 
 		void print(const Operand<Op::dispose>& operands)
 		{
-			out << tabs << "dispose %" << operands.lvid;
+			line() << "dispose %" << operands.lvid;
 			if (operands.atomid != 0)
 			{
 				out << " {atom id:";
@@ -497,13 +526,13 @@ namespace // anonymous
 
 		void print(const Operand<Op::typeisobject>& operands)
 		{
-			out << tabs << "type is object %" << operands.lvid;
+			line() << "type is object %" << operands.lvid;
 		}
 
 
 		void print(const Operand<Op::inherit>& operands)
 		{
-			out << tabs << '%' << operands.lhs << " inherits ";
+			line() << '%' << operands.lhs << " inherits ";
 			switch (operands.inherit)
 			{
 				case 2:
@@ -526,7 +555,7 @@ namespace // anonymous
 				{
 					printEOL();
 
-					out << tabs;
+					line();
 					if (operands.lvid != 0)
 						out << '%' << operands.lvid << " = ";
 					out << "func id:";
@@ -539,27 +568,27 @@ namespace // anonymous
 					out << ' ';
 					printString(operands.name);
 					printEOL();
-					out << tabs << '{';
+					line() << '{';
 					indent();
 					break;
 				}
 				case ISA::Blueprint::param:
 				{
-					out << tabs << "param ";
+					line() << "param ";
 					printString(operands.name);
 					out << ": %" << static_cast<uint32_t>(operands.lvid);
 					break;
 				}
 				case ISA::Blueprint::gentypeparam:
 				{
-					out << tabs << "type param ";
+					line() << "type param ";
 					printString(operands.name);
 					out << ": %" << static_cast<uint32_t>(operands.lvid);
 					break;
 				}
 				case ISA::Blueprint::paramself:
 				{
-					out << tabs << "param ";
+					line() << "param ";
 					printString(operands.name);
 					out << ", %" << (uint32_t) operands.lvid << " [self assign]";
 					break;
@@ -567,20 +596,20 @@ namespace // anonymous
 				case ISA::Blueprint::classdef:
 				{
 					printEOL();
-					out << tabs;
+					line();
 					if (operands.lvid != 0)
 						out << '%' << operands.lvid << " = ";
 					out << "class ";
 
 					printString(operands.name);
 					printEOL();
-					out << tabs << '{';
+					line() << '{';
 					indent();
 					printEOL();
 
 					// ID
 					uint32_t  atomid = operands.atomid;
-					out << tabs << "// atomid: ";
+					line() << "// atomid: ";
 					if (atomid != (uint32_t) -1)
 						out << atomid;
 					else
@@ -589,14 +618,14 @@ namespace // anonymous
 				}
 				case ISA::Blueprint::vardef:
 				{
-					out << tabs << "var ";
+					line() << "var ";
 					printString(operands.name);
 					out << ": %" << (uint32_t) operands.lvid;
 					break;
 				}
 				case ISA::Blueprint::typealias:
 				{
-					out << tabs << "typealias ";
+					line() << "typealias ";
 					printString(operands.name);
 					out << ": %" << (uint32_t) operands.lvid;
 					if (operands.atomid != (uint32_t) -1)
@@ -605,17 +634,17 @@ namespace // anonymous
 				}
 				case ISA::Blueprint::namespacedef:
 				{
-					out << tabs << "namespace ";
+					line() << "namespace ";
 					printString(operands.name);
 					break;
 				}
 
 				case ISA::Blueprint::unit:
 				{
-					out << tabs << "unit ";
+					line() << "unit ";
 					printString(operands.name);
 					printEOL();
-					out << tabs << '{';
+					line() << '{';
 					indent();
 					break;
 				}
@@ -630,37 +659,37 @@ namespace // anonymous
 				{
 					case Pragma::codegen:
 					{
-						out << tabs << "pragma codegen ";
+						line() << "pragma codegen ";
 						out << ((operands.value.codegen != 0) ? "enable" : "disable");
 						break;
 					}
 					case Pragma::blueprintsize:
 					{
 						auto size = operands.value.blueprintsize;
-						out << tabs << "// blueprint size " << size << " opcodes (";
+						line() << "// blueprint size " << size << " opcodes (";
 						out << (size * sizeof(Instruction)) << " bytes)";
 						break;
 					}
 					case Pragma::visibility:
 					{
 						auto* text = nany_visibility_to_cstring((nyvisibility_t) operands.value.visibility);
-						out << tabs << "pragma visibility " << text;
+						line() << "pragma visibility " << text;
 						break;
 					}
 					case Pragma::bodystart:
 					{
-						out << tabs << "pragma body start";
+						line() << "pragma body start";
 						break;
 					}
 					case Pragma::shortcircuit:
 					{
-						out << tabs << "pragma shortcircuit ";
+						line() << "pragma shortcircuit ";
 						out << ((operands.value.shortcircuit) ? "__true" : "__false");
 						break;
 					}
 					case Pragma::shortcircuitOpNopOffset:
 					{
-						out << tabs << "pragma shortcircuit metadata: label: ";
+						line() << "pragma shortcircuit metadata: label: ";
 						out << operands.value.shortcircuitMetadata.label;
 						out << ", tmpvar: ";
 						out << (1 + operands.value.shortcircuitMetadata.label);
@@ -668,24 +697,24 @@ namespace // anonymous
 					}
 					case Pragma::builtinalias:
 					{
-						out << tabs << "pragma builtinalias ";
+						line() << "pragma builtinalias ";
 						printString(operands.value.builtinalias.namesid);
 						break;
 					}
 					case Pragma::suggest:
 					{
-						out << tabs << "pragma suggest ";
+						line() << "pragma suggest ";
 						out << (operands.value.suggest != 0 ? "true" : "false");
 						break;
 					}
 					case Pragma::unknown:
 					case Pragma::max:
-						out << tabs << "<invalid pragma identifier>";
+						line() << "<invalid pragma identifier>";
 						break;
 				}
 			}
 			else
-				out << tabs << "<invalid pragma identifier>";
+				line() << "<invalid pragma identifier>";
 		}
 
 
