@@ -24,19 +24,14 @@ namespace Instanciate
 		nytype_t type = (nytype_t) operands.type;
 		if (type != nyt_any)
 		{
-			auto& cdef  = cdeftable.classdef(CLID{frame->atomid, operands.lvid});
-			if (cdef.isAny())
+			auto& spare = cdeftable.substitute(operands.lvid);
+			if (type != nyt_void)
 			{
-				// type propagation
-				auto& spare = cdeftable.substitute(operands.lvid);
-				if (type != nyt_void)
-				{
-					lvidinfo.synthetic = false;
-					spare.mutateToBuiltin(type);
-				}
-				else
-					spare.mutateToVoid();
+				lvidinfo.synthetic = false;
+				spare.mutateToBuiltin(type);
 			}
+			else
+				spare.mutateToVoid();
 		}
 
 		// copy only variable instances

@@ -356,8 +356,14 @@ namespace Instanciate
 	bool SequenceBuilder::complainInvalidType(const Classdef& from, const Classdef& to)
 	{
 		auto err = (error() << "cannot convert '");
+		if (debugmode)
+			err << from.clid << ':';
 		from.print(err.data().message, cdeftable, false);
+
 		err << "' to '";
+
+		if (debugmode)
+			err << to.clid << ':';
 		to.print(err.data().message, cdeftable, false);
 		err << "' in variable assignment";
 		return false;
