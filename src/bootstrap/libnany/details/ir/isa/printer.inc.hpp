@@ -46,20 +46,21 @@ namespace // anonymous
 
 		S& line()
 		{
-			auto offset = sequence.offsetOf(**cursor);
-			if (offset != lastOffset)
+			if (cursor)
 			{
-				lastOffset = offset;
-				Yuni::ShortString64 offsetstr;
-				offsetstr << ' ' << offset;
-				Yuni::ShortString64 tmp;
-				tmp.resize(8, ".");
-				tmp.overwriteRight(offsetstr);
-				out << tmp << " | ";
-			}
-			else
-			{
-				out << lineHeader;
+				auto offset = sequence.offsetOf(**cursor);
+				if (offset != lastOffset)
+				{
+					lastOffset = offset;
+					Yuni::ShortString64 offsetstr;
+					offsetstr << ' ' << offset;
+					Yuni::ShortString64 tmp;
+					tmp.resize(8, ".");
+					tmp.overwriteRight(offsetstr);
+					out << tmp << " | ";
+				}
+				else
+					out << lineHeader;
 			}
 			out << tabs;
 			return out;
