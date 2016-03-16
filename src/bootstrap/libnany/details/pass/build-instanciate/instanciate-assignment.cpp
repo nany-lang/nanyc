@@ -13,18 +13,17 @@ namespace Pass
 namespace Instanciate
 {
 
-	enum class AssignStrategy
-	{
-		rawregister,
-		ref,
-		deepcopy,
-	};
-
-
 
 	bool SequenceBuilder::instanciateAssignment(AtomStackFrame& frame, LVID lhs, LVID rhs, bool canDisposeLHS,
 		bool checktype, bool forceDeepcopy)
 	{
+		enum class AssignStrategy
+		{
+			rawregister,
+			ref,
+			deepcopy,
+		};
+
 		// lhs and rhs can not be null, but they can be identical, to force a clone
 		// when required for example
 		if (unlikely(lhs == 0 or rhs == 0 or lhs == rhs))
@@ -81,8 +80,17 @@ namespace Instanciate
 		}
 
 		// type propagation
-		if (not canDisposeLHS)
-			cdeftable.substitute(lhs).import(cdefrhs);
+		//if (not canDisposeLHS)
+		//	cdeftable.substitute(lhs).import(cdefrhs);
+		if (not cdefrhs.isBuiltin())
+		{
+			auto* rhsAtom = cdeftable.findClassdefAtom(cdefrhs);
+			if (unlikely(nullptr == rhsAtom))
+				return (ICE() << "invalid atom for left-side assignment");
+			cdeftable.substitute(lhs).mutateToAtom(rhsAtom);
+		}
+		else
+			cdeftable.substitute(lhs).mutateToBuiltin(cdefrhs.kind);
 
 
 		// can lhs be acquires ?
@@ -117,11 +125,10 @@ namespace Instanciate
 			strategy = AssignStrategy::rawregister;
 
 
-		auto& lhsLvidinfo = frame.lvids[lhs];
 		if (lhsCanBeAcquired)
-			lhsLvidinfo.autorelease = true;
+			frame.lvids[lhs].autorelease = true;
 
-		auto& origin = lhsLvidinfo.origin.varMember;
+		auto& origin = frame.lvids[lhs].origin.varMember;
 		bool isMemberVariable = (origin.atomid != 0);
 
 
@@ -156,7 +163,7 @@ namespace Instanciate
 			case AssignStrategy::ref:
 			{
 				// preserve the origin of the value
-				lhsLvidinfo.origin = frame.lvids[rhs].origin;
+				frame.lvids[lhs].origin = frame.lvids[rhs].origin;
 
 				if (canGenerateCode())
 				{
@@ -280,7 +287,25 @@ namespace Instanciate
 		LVID rhs = pushedparams.func.indexed[0].lvid;
 		pushedparams.func.indexed.clear();
 
-		return instanciateAssignment(*frame, lhs, rhs);
+		bool assigned = instanciateAssignment(*frame, lhs, rhs);
+		if (unlikely(not assigned))
+		{
+			frame->invalidate(operands.lvid);
+			return false;
+		}
+
+		auto& cdeflhs = cdeftable.classdef(CLID{frame->atomid, lhs});
+		cdeftable.substitute(operands.lvid).import(cdeflhs);
+		if (canBeAcquired(cdeflhs))
+		{
+			frame->lvids[operands.lvid].autorelease = true;
+			if (canGenerateCode())
+			{
+				out.emitStore(operands.lvid, lhs);
+				out.emitRef(operands.lvid);
+			}
+		}
+		return true;
 	}
 
 
