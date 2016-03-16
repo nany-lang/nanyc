@@ -37,7 +37,7 @@ namespace Instanciate
 		//! LVID marked as dynamic
 		bool isConstexpr = false;
 		//! LVID marked as assignment '=' (for name/call resolution)
-		bool isAssignment = false;
+		bool pointerAssignment = false;
 		//! flag to remember if the variable has been used
 		bool hasBeenUsed = false;
 		//! unref at the end of the scope

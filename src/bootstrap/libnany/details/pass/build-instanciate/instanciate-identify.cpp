@@ -68,7 +68,7 @@ namespace Instanciate
 		if (name == '=') // it is an assignment, not a real method call
 		{
 			// remember this special case
-			frame->lvids[operands.lvid].isAssignment = true;
+			frame->lvids[operands.lvid].pointerAssignment = true;
 			// for consistency checks, after transformations on the AST, '=' should be a method call
 			// we should have something like: 'foo.=(rhs)'
 			if (unlikely(0 == operands.self))
@@ -81,7 +81,7 @@ namespace Instanciate
 			if (not frame->verify(operands.self))
 				return false;
 
-			if (frame->lvids[operands.self].isAssignment)
+			if (frame->lvids[operands.self].pointerAssignment)
 			{
 				// since self was marked as an 'assignment', we're trying to resolve here '^()'
 				if (unlikely(name != "^()"))
@@ -91,7 +91,7 @@ namespace Instanciate
 				}
 
 				// remember this special case
-				frame->lvids[operands.lvid].isAssignment = true;
+				frame->lvids[operands.lvid].pointerAssignment = true;
 				return true;
 			}
 		}

@@ -32,7 +32,7 @@ namespace Instanciate
 
 		auto* atomptr = cdeftable.findClassdefAtom(cdef);
 		if (unlikely(atomptr == nullptr))
-			return (ICE() << "invalid 'any' type for " << clid);
+			return (ICE() << "invalid pseudo type 'any' for %" << operands.lvid << " (in " << clid << ')');
 		auto& atom = *atomptr;
 
 		switch (atom.type)

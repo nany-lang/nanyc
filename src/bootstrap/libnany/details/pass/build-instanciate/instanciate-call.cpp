@@ -24,7 +24,7 @@ namespace Instanciate
 			return false;
 
 		// assignment should be handled somewhere else
-		assert(not frame->lvids[operands.ptr2func].isAssignment);
+		assert(not frame->lvids[operands.ptr2func].pointerAssignment);
 
 		if (unlikely(frame->lvids[operands.ptr2func].markedAsAny))
 			return error() << "can not perform member lookup on 'any'";
@@ -296,15 +296,18 @@ namespace Instanciate
 		// the result is not a synthetic object
 		frame->lvids[operands.lvid].synthetic = false;
 
-		bool checkpoint = ((not frame->lvids[operands.ptr2func].isAssignment)
+		bool checkpoint = ((not frame->lvids[operands.ptr2func].pointerAssignment)
 			? emitFuncCall(operands)
 			: instanciateAssignment(operands));
 
-		if (checkpoint)
+		if (shortcircuit.label != 0)
 		{
-			if (shortcircuit.label != 0 and canGenerateCode())
+			if (checkpoint and canGenerateCode())
 				checkpoint = generateShortCircuitInstrs(operands.lvid);
 		}
+
+		// always remove pushed parameters, whatever the result
+		pushedparams.clear();
 
 		if (unlikely(not checkpoint))
 		{
@@ -314,9 +317,6 @@ namespace Instanciate
 			// happened before reaching the code responsible for minimal evaluation
 			shortcircuit.label = 0;
 		}
-
-		// always remove pushed parameters, whatever the result
-		pushedparams.clear();
 	}
 
 
