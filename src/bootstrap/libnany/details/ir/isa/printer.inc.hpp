@@ -51,7 +51,7 @@ namespace // anonymous
 			{
 				lastOffset = offset;
 				Yuni::ShortString64 offsetstr;
-				offsetstr << offset;
+				offsetstr << ' ' << offset;
 				Yuni::ShortString64 tmp;
 				tmp.resize(8, ".");
 				tmp.overwriteRight(offsetstr);
