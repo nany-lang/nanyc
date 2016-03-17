@@ -302,7 +302,10 @@ namespace // anonymous
 
 		void print(const Operand<Op::ret>& operands)
 		{
-			line() << "return %" << operands.lvid;
+			if (operands.lvid == 0)
+				line() << "return void";
+			else
+				line() << "return %" << operands.lvid;
 		}
 
 		void print(const Operand<Op::stacksize>& operands)

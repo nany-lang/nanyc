@@ -159,9 +159,17 @@ namespace Instanciate
 			assert(not isVoid);
 			auto& cdefRetDeduced = cdeftable.classdefFollowClassMember(returnCLIDForReference);
 
-			spare.import(cdefRetDeduced);
-			if (not cdefRetDeduced.isBuiltinOrVoid())
-				spare.mutateToAtom(cdeftable.findClassdefAtom(cdefRetDeduced));
+			if (cdefRetDeduced.isVoid())
+			{
+				spare.mutateToVoid();
+				isVoid = true;
+			}
+			else
+			{
+				spare.import(cdefRetDeduced);
+				if (not cdefRetDeduced.isBuiltinOrVoid())
+					spare.mutateToAtom(cdeftable.findClassdefAtom(cdefRetDeduced));
+			}
 		}
 		else
 		{
@@ -178,30 +186,31 @@ namespace Instanciate
 
 		if (canGenerateCode())
 		{
-			uint32_t retlvid;
-			switch (strategy)
+			if (strategy != TypeCheck::Match::none)
 			{
-				case TypeCheck::Match::strictEqual:
-				case TypeCheck::Match::equal:
-				{
-					// acquire the returned object (before releasing variable of the current scope)
-					retlvid = operands.lvid;
-					if (not isVoid)
-						tryToAcquireObject(retlvid, spare);
-					break;
-				}
-				case TypeCheck::Match::none:
-				{
-					assert(false and "invalid return value strategy");
-					ICE() << "invalid return value";
-					return;
-				}
-			}
+				if (debugmode)
+					out.emitComment("return from func");
 
-			// release all variables declared in the function
-			releaseScopedVariables(0);
-			// the return value
-			out.emitReturn(retlvid);
+				uint32_t retlvid;
+				// acquire the returned object (before releasing variables of the current scope)
+				if (not isVoid)
+				{
+					retlvid = operands.lvid;
+					tryToAcquireObject(retlvid, spare);
+				}
+				else
+					retlvid = 0;
+
+				// release all variables declared in the function
+				releaseScopedVariables(0 /*all scopes*/);
+				// the return value
+				out.emitReturn(retlvid);
+			}
+			else
+			{
+				assert(false and "invalid return value strategy");
+				ICE() << "invalid return value";
+			}
 		}
 	}
 
