@@ -137,6 +137,13 @@ namespace Instanciate
 		auto& origin = frame.lvids[lhs].origin.varMember;
 		bool isMemberVariable = (origin.atomid != 0);
 
+		if (isMemberVariable and unlikely(origin.self == 0))
+		{
+			auto ice = (ICE() << "invalid member assignment with invalid 'self'");
+			if (debugmode)
+				ice << " (as %" << cdeflhs.clid << " = %" << cdefrhs.clid << ')';
+			return false;
+		}
 
 		if (debugmode and canGenerateCode())
 		{
@@ -169,7 +176,8 @@ namespace Instanciate
 			case AssignStrategy::ref:
 			{
 				// preserve the origin of the value
-				frame.lvids[lhs].origin = frame.lvids[rhs].origin;
+				frame.lvids[lhs].origin.memalloc = frame.lvids[rhs].origin.memalloc;
+				frame.lvids[lhs].origin.returnedValue = frame.lvids[rhs].origin.returnedValue;
 
 				if (canGenerateCode())
 				{
