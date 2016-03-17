@@ -17,13 +17,6 @@ namespace Instanciate
 	bool SequenceBuilder::instanciateAssignment(AtomStackFrame& frame, LVID lhs, LVID rhs, bool canDisposeLHS,
 		bool checktype, bool forceDeepcopy)
 	{
-		enum class AssignStrategy
-		{
-			rawregister,
-			ref,
-			deepcopy,
-		};
-
 		// lhs and rhs can not be null, but they can be identical, to force a clone
 		// when required for example
 		if (unlikely(lhs == 0 or rhs == 0 or lhs == rhs))
@@ -80,22 +73,35 @@ namespace Instanciate
 		}
 
 		// type propagation
-		//if (not canDisposeLHS)
-		//	cdeftable.substitute(lhs).import(cdefrhs);
-		if (not cdefrhs.isBuiltin())
 		{
-			auto* rhsAtom = cdeftable.findClassdefAtom(cdefrhs);
-			if (unlikely(nullptr == rhsAtom))
-				return (ICE() << "invalid atom for left-side assignment");
-			cdeftable.substitute(lhs).mutateToAtom(rhsAtom);
+			if (cdefrhs.isVoid())
+			{
+				// trying to assign ? this is acceptable between void values (or any)
+				cdeftable.substitute(lhs).mutateToVoid();
+				frame.lvids[lhs].autorelease = false;
+				return true;
+			}
+
+			if (not cdefrhs.isBuiltin())
+			{
+				auto* rhsAtom = cdeftable.findClassdefAtom(cdefrhs);
+				if (unlikely(nullptr == rhsAtom))
+					return (ICE() << "invalid atom for left-side assignment");
+				cdeftable.substitute(lhs).mutateToAtom(rhsAtom);
+			}
+			else
+				cdeftable.substitute(lhs).mutateToBuiltin(cdefrhs.kind);
 		}
-		else
-			cdeftable.substitute(lhs).mutateToBuiltin(cdefrhs.kind);
 
 
 		// can lhs be acquires ?
 		bool lhsCanBeAcquired = canBeAcquired(cdeflhs);
 
+
+		// Determining the strategy for copying the two values
+		enum class AssignStrategy {
+			rawregister, ref, deepcopy,
+		};
 		// deep copy by default
 		auto strategy = AssignStrategy::deepcopy;
 

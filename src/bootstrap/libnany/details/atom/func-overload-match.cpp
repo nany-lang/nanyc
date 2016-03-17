@@ -4,6 +4,7 @@
 #include "details/atom/classdef-table-view.h"
 #include "details/reporting/report.h"
 #include "libnany-config.h"
+#include <iostream>
 
 using namespace Yuni;
 
@@ -290,22 +291,27 @@ namespace Nany
 			}
 			case 0:
 			{
-				// return type must be void
+				// no return value, the return type MUST be void
 				if (not atom.returnType.clid.isVoid())
 				{
 					auto& atomRettype = table.classdef(atom.returnType.clid);
-					if (unlikely(not atomRettype.isVoid()))
+					if (atomRettype.isVoid())
+						break;
+
+					// The returned type can be any, which can be void then
+					if (atomRettype.kind == nyt_any and !table.findClassdefAtom(atomRettype))
+						break;
+
+					if (unlikely(canGenerateReport))
 					{
-						if (unlikely(canGenerateReport))
-						{
-							auto err = report.get().hint() << "returned type does not match, got '";
-							if (debugmode)
-								err << atomRettype.clid;
-							atomRettype.print(err.message.message, table, false);
-							err << "', expected 'void'";
-						}
-						return TypeCheck::Match::none;
+						auto err = report.get().hint() << "returned type does not match, got '";
+						if (debugmode)
+							err << atomRettype.clid;
+						atomRettype.print(err.message.message, table, false);
+						err << "', expected 'void'";
 					}
+					std::cout << "PIKO\n";
+					return TypeCheck::Match::none;
 				}
 				break;
 			}
