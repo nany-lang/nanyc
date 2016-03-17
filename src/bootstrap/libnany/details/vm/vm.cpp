@@ -135,6 +135,15 @@ namespace // anonymous
 			const Atom* dtor = map.findAtom(dtorid);
 			assert(dtor != nullptr);
 
+			if (false) // traces
+			{
+				std::cout << " .. DESTROY " << (void*) object << " aka '"
+					<< dtor->caption() << "' at opc+" << sequence.get().offsetOf(**cursor) << '\n';
+				stacktrace.dump(context, map);
+				std::cout << '\n';
+			}
+
+
 			// the parent class
 			const Atom* classobject = dtor->parent;
 			assert(classobject != nullptr);
