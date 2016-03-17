@@ -273,8 +273,13 @@ namespace Nany
 						if (unlikely(canGenerateReport))
 						{
 							auto err = report.get().hint() << "returned type does not match, got '";
+							if (debugmode)
+								err << atomRettype.clid;
 							atomRettype.print(err.message.message, table, false);
 							err << "', expected '";
+
+							if (debugmode)
+								err << wantedRettype.clid;
 							wantedRettype.print(err.message.message, table, false);
 							err << '\'';
 						}
@@ -294,6 +299,8 @@ namespace Nany
 						if (unlikely(canGenerateReport))
 						{
 							auto err = report.get().hint() << "returned type does not match, got '";
+							if (debugmode)
+								err << atomRettype.clid;
 							atomRettype.print(err.message.message, table, false);
 							err << "', expected 'void'";
 						}
