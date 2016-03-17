@@ -82,7 +82,7 @@ static inline bool initializeContext(nycontext_t& ctx, const Options& options)
 	else
 	{
 		nycontext_memory_t memalloc;
-		nany_mem_alloc_init_with_limit(&memalloc, memoryLimit);
+		nany_memalloc_init_with_limit(&memalloc, memoryLimit);
 		if (nyfalse == nany_initialize(&ctx, nullptr, &memalloc))
 			return false;
 	}

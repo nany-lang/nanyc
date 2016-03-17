@@ -154,7 +154,7 @@ static void nymemalloc_withlimit_release(nycontext_t* ctx, void* ptr, size_t siz
 }
 
 
-extern "C" void nany_mem_alloc_init_with_limit(nycontext_memory_t* mem, size_t limit)
+extern "C" void nany_memalloc_init_with_limit(nycontext_memory_t* mem, size_t limit)
 {
 	if (YUNI_LIKELY(mem))
 	{

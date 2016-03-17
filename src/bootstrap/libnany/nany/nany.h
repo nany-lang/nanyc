@@ -515,7 +515,7 @@ NY_EXPORT void nany_memalloc_init_default(nycontext_memory_t*);
 /*!
 ** \nbrief Set to the default C memory allocator with
 */
-NY_EXPORT void nany_mem_alloc_init_with_limit(nycontext_memory_t*, size_t limit);
+NY_EXPORT void nany_memalloc_init_with_limit(nycontext_memory_t*, size_t limit);
 
 
 
