@@ -58,7 +58,7 @@ namespace Instanciate
 			{
 				auto& subatom = subatomref.get();
 				if (debugmode)
-					out.emitComment(String() << "initialization for " << subatom.name);
+					out.emitComment(String() << "initialization for " << subatom.name << " via default-init");
 
 				uint32_t instanceid = static_cast<uint32_t>(-1);
 				bool localSuccess = instanciateAtomFunc(instanceid, subatom, /*ret*/0, /*self*/2);
@@ -74,13 +74,13 @@ namespace Instanciate
 		else
 		{
 			auto& selfParameters = *(frame->selfParameters.get());
-			auto noSelfParam = selfParameters.end();
+			auto selfparamlistEnd = selfParameters.end();
+			if (debugmode)
+				out.emitComment(String() << "initialization with " << selfParameters.size() << " self-parameter(s)");
 
 			for (auto& subatomref: atomvars)
 			{
 				auto& subatom = subatomref.get();
-				if (debugmode)
-					out.emitComment(String() << "initialization for " << subatom.name);
 
 				// extracting varname from ^default-var-%42-varname
 				auto endOffset = subatom.name.find_last_of('-');
@@ -92,8 +92,11 @@ namespace Instanciate
 				bool localSuccess = instanciateAtomFunc(instanceid, subatom, /*ret*/0, /*self*/2);
 
 				auto selfIT = selfParameters.find(varname);
-				if (selfIT == noSelfParam)
+				if (selfIT == selfparamlistEnd)
 				{
+					if (debugmode)
+						out.emitComment(String() << "initialization for " << subatom.name << " via default-init");
+
 					if (localSuccess)
 					{
 						out.emitPush(2); // %2 -> self
@@ -102,6 +105,9 @@ namespace Instanciate
 				}
 				else
 				{
+					if (debugmode)
+						out.emitComment(String() << "initialization for " << subatom.name << " via self-parameter");
+
 					if (localSuccess)
 					{
 						// lvid of the parameter value
@@ -125,6 +131,10 @@ namespace Instanciate
 							return (void)(ICE() << "invalid atom for self init " << varname);
 
 						out.emitFieldset(lvid, /*self*/ 2, varatom->varinfo.effectiveFieldIndex);
+
+						// acquire 'lvid' to keep it alive
+						if (canBeAcquired(cdef))
+							out.emitRef(lvid);
 					}
 
 					// mark it as 'used' to suppress spurious error reporting
