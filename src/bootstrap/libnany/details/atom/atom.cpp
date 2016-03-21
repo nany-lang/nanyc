@@ -277,7 +277,7 @@ namespace Nany
 	}
 
 
-	bool Atom::performNameLookupOnChildren(std::vector<std::reference_wrapper<Atom>>& list, const AnyString& name)
+	bool Atom::performNameLookupOnChildren(std::vector<std::reference_wrapper<Atom>>& list, const AnyString& name, bool* singleHop)
 	{
 		assert(not name.empty());
 
@@ -298,6 +298,11 @@ namespace Nany
 			return true; // let's continue
 		});
 
+		if (success and name == "^()") // operator () resolved by a real atom
+		{
+			if (singleHop)
+				*singleHop = true;
+		}
 		return success;
 	}
 

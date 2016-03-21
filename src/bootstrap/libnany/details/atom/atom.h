@@ -162,7 +162,8 @@ namespace Nany
 		** \param[out] list A non-empty list if several overloads have been found
 		** \return True if at least one overload has been found
 		*/
-		bool performNameLookupOnChildren(std::vector<std::reference_wrapper<Atom>>& list, const AnyString& name);
+		bool performNameLookupOnChildren(std::vector<std::reference_wrapper<Atom>>& list, const AnyString& name,
+			bool* singleHop = nullptr);
 
 		/*!
 		** \brief Get if this atom has a child member

@@ -56,8 +56,11 @@ namespace Instanciate
 			// double indirection - TODO find a beter way
 			//  %y = %x."foo"
 			//  %z = resolve %y."^()" - due to intermediate representation of func call
+			//
+			// In some other cases, only one is needed, especially for functors
 			assert(referer < frame->lvids.size());
-			referer = frame->lvids[referer].referer;
+			if (not frame->lvids[referer].singleHopForReferer)
+				referer = frame->lvids[referer].referer;
 		}
 
 		if (referer != 0)

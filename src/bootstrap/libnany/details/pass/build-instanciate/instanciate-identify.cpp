@@ -262,6 +262,7 @@ namespace Instanciate
 			if (unlikely(self.isBuiltinOrVoid()))
 				return complainInvalidMemberRequestNonClass(name, self.kind);
 
+			bool& singleHop = frame->lvids[operands.self].singleHopForReferer;
 
 			selfAtom = cdeftable.findClassdefAtom(self);
 			if (selfAtom != nullptr) // the parent has been fully resolved
@@ -270,14 +271,14 @@ namespace Instanciate
 				// solution should be available
 				assert(frame->resolvePerCLID[self.clid].empty());
 
-				selfAtom->performNameLookupOnChildren(multipleResults, name);
+				selfAtom->performNameLookupOnChildren(multipleResults, name, &singleHop);
 			}
 			else
 			{
 				auto& selfSolutions = frame->resolvePerCLID[self.clid];
 				multipleResults.reserve(selfSolutions.size());
 				for (auto& atomElement: selfSolutions)
-					atomElement.get().performNameLookupOnChildren(multipleResults, name);
+					atomElement.get().performNameLookupOnChildren(multipleResults, name, &singleHop);
 			}
 		}
 

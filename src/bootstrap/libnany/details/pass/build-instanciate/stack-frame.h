@@ -44,6 +44,9 @@ namespace Instanciate
 		bool autorelease = false;
 		//! Flag for synthetic values (type, func...) contrary to real user variables
 		bool synthetic = true;
+		//! Flag to determine whether the referer of the referer should be taken or not
+		// (used for resolving 'self')
+		bool singleHopForReferer = false;
 
 		//! The scope depth when the variable has been declared
 		int scope = -1; // -1: no scope, : 0 first scope
