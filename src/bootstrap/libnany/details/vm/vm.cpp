@@ -42,6 +42,14 @@ namespace Nany
 namespace VM
 {
 
+	//! Pattern for memset alloc regions (debug)
+	constexpr static const int patternAlloc = 0xCD;
+
+	//! Pattern for memset free regions (debug)
+	constexpr static const int patternFree = 0xCD;
+
+
+
 
 namespace // anonymous
 {
@@ -160,6 +168,9 @@ namespace // anonymous
 				// func call
 				call(0, dtor->atomid, instanceid);
 			}
+
+			if (debugmode)
+				memset(object, patternFree, classsizeof);
 
 			// sandbox release
 			context.memory.release(&context, object, static_cast<size_t>(classsizeof));
@@ -720,7 +731,7 @@ namespace // anonymous
 				throw std::bad_alloc();
 
 			if (debugmode)
-				memset(pointer, 0xEF, size);
+				memset(pointer, patternAlloc, size);
 
 			pointer[0] = 0; // init ref counter
 			registers[operands.lvid].u64 = reinterpret_cast<uint64_t>(pointer);
@@ -744,7 +755,7 @@ namespace // anonymous
 				throw (String{"pointer "} << (void*) object << " size mismatch: got " << size);
 
 			if (debugmode)
-				memset(object, 0xCD, size);
+				memset(object, patternFree, size);
 
 			context.memory.release(&context, object, size);
 			memchecker.forget(object);
