@@ -107,8 +107,6 @@ namespace Producer
 				}
 			}
 
-			nytype_t implicitcast = type;
-
 			if (numdef.part1 != 0)
 			{
 				bool invalidcast = false;
@@ -122,7 +120,7 @@ namespace Producer
 							case 64: invalidcast = (numdef.part1 > std::numeric_limits<int32_t>::max()); break;
 							case 32: invalidcast = (numdef.part1 > std::numeric_limits<int32_t>::max()); break;
 							case 16: invalidcast = (numdef.part1 > std::numeric_limits<int16_t>::max()); break;
-							case  8: invalidcast = (numdef.part1 > std::numeric_limits<int8_t>::max()); break;
+							case  8: invalidcast = (numdef.part1 > std::numeric_limits< int8_t>::max()); break;
 						}
 					}
 					else
@@ -132,7 +130,7 @@ namespace Producer
 							case 64: break;
 							case 32: invalidcast = (numdef.part1 > std::numeric_limits<uint32_t>::max()); break;
 							case 16: invalidcast = (numdef.part1 > std::numeric_limits<uint16_t>::max()); break;
-							case  8: invalidcast = (numdef.part1 > std::numeric_limits<uint8_t>::max()); break;
+							case  8: invalidcast = (numdef.part1 > std::numeric_limits< uint8_t>::max()); break;
 						}
 					}
 				}
@@ -148,7 +146,7 @@ namespace Producer
 								case 64: invalidcast = (sv < std::numeric_limits<int32_t>::min()); break;
 								case 32: invalidcast = (sv < std::numeric_limits<int32_t>::min()); break;
 								case 16: invalidcast = (sv < std::numeric_limits<int16_t>::min()); break;
-								case  8: invalidcast = (sv < std::numeric_limits<int8_t>::min()); break;
+								case  8: invalidcast = (sv < std::numeric_limits< int8_t>::min()); break;
 							}
 						}
 						else
@@ -166,7 +164,7 @@ namespace Producer
 				}
 			}
 
-			hardcodedlvid = createLocalBuiltinInt64(node, implicitcast, numdef.part1);
+			hardcodedlvid = createLocalBuiltinInt64(node, type, numdef.part1);
 		}
 		else
 		{
@@ -215,14 +213,13 @@ namespace Producer
 				expr->children.push_back(cache.lvidnode);
 			}
 
+			assert(not cn.empty());
 			context.reuse.literal.classname->text = cn;
 			ShortString16 lvidstr;
 			lvidstr = hardcodedlvid;
 			context.reuse.literal.lvidnode->text = lvidstr;
 
-
 			bool success = visitASTExprNew(*(context.reuse.literal.node), localvar);
-
 			//if (debugmode)
 			//{
 			//	// to not print invalid data in the debugger
