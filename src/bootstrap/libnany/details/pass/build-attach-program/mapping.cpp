@@ -156,7 +156,6 @@ namespace Mapping
 				// create a new atom in the global type table
 				auto* newVarAtom = cdeftable.atoms.createVardef(atom, varname);
 				assert(newVarAtom != nullptr);
-				newVarAtom->usedDefined = true;
 
 				cdeftable.registerAtom(newVarAtom);
 				newVarAtom->returnType.clid.reclass(atom.atomid, operands.lvid);
@@ -214,7 +213,6 @@ namespace Mapping
 				// create a new atom in the global type table
 				auto* newFuncAtom = cdeftable.atoms.createFuncdef(atom, funcname);
 				assert(newFuncAtom != nullptr);
-				newFuncAtom->usedDefined      = true;
 				newFuncAtom->opcodes.sequence  = &currentSequence;
 				newFuncAtom->opcodes.offset   = currentSequence.offsetOf(operands);
 				// create a pseudo classdef to easily retrieve the real atom from a clid
@@ -265,7 +263,6 @@ namespace Mapping
 					cdeftable.registerAtom(newClassAtom);
 				}
 
-				newClassAtom->usedDefined     = true;
 				newClassAtom->opcodes.sequence = &currentSequence;
 				newClassAtom->opcodes.offset  = currentSequence.offsetOf(operands);
 
@@ -293,7 +290,6 @@ namespace Mapping
 					cdeftable.registerAtom(newAliasAtom);
 				}
 
-				newAliasAtom->usedDefined     = true;
 				newAliasAtom->opcodes.sequence = &currentSequence;
 				newAliasAtom->opcodes.offset  = currentSequence.offsetOf(operands);
 
@@ -333,7 +329,6 @@ namespace Mapping
 				MutexLocker locker{mutex};
 				Atom* newRoot = cdeftable.atoms.createNamespace(parentAtom, nmname);
 				assert(newRoot != nullptr);
-				newRoot->usedDefined = true;
 				// create a pseudo classdef to easily retrieve the real atom from a clid
 				cdeftable.registerAtom(newRoot);
 				pushNewFrame(*newRoot);
@@ -348,7 +343,6 @@ namespace Mapping
 					MutexLocker locker{mutex};
 					newRoot = cdeftable.atoms.createUnit(parentAtom, currentFilename);
 					assert(newRoot != nullptr);
-					newRoot->usedDefined = true;
 					// create a pseudo classdef to easily retrieve the real atom from a clid
 					cdeftable.registerAtom(newRoot);
 				}

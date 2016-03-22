@@ -410,9 +410,6 @@ namespace Nany
 		//! Flag to suppress spurious error messages and code generation
 		bool hasErrors = false;
 
-		//! True if the atom has been defined by the user
-		bool usedDefined = false;
-
 		//! Can be used for error reporting
 		bool canBeSuggestedInErrReporting = true;
 
