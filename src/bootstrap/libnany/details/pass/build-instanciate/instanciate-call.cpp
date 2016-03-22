@@ -1,7 +1,6 @@
 #include "instanciate.h"
 #include "instanciate-atom.h"
 #include "overloaded-func-call-resolution.h"
-#include <iostream>
 
 using namespace Yuni;
 
@@ -140,7 +139,6 @@ namespace Instanciate
 
 			// retrieving the list of all available solutions
 			// (from previous call to opcode 'resolve')
-			std::cout << " SOLVING : " << cdefFuncToCall.clid << "!!\n";
 			auto it = frame->partiallyResolved.find(cdefFuncToCall.clid);
 			if (unlikely(it == frame->partiallyResolved.end()))
 				return complainOperand(IR::Instruction::fromOpcode(operands), "no solution available");
