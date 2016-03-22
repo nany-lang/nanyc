@@ -37,6 +37,11 @@ namespace Producer
 		};
 
 
+		static constexpr inline bool validNumberOfBits(uint32_t bits)
+		{
+			return bits == 32 or bits == 64 or bits == 16 or bits == 8;
+		}
+
 
 		static bool convertASTNumberToDouble(double& value, uint64 part1, const AnyString& part2, char sign)
 		{
@@ -328,11 +333,8 @@ namespace Producer
 								if (likely(subnode.text.size() < 10))
 								{
 									numdef.bits = subnode.text.to<uint>();
-									if (unlikely(numdef.bits != 64 and numdef.bits != 32 and numdef.bits != 16 and numdef.bits != 8))
-									{
-										error(subnode) << "invalid integer size";
-										return false;
-									}
+									if (unlikely(not validNumberOfBits(numdef.bits)))
+										return (error(subnode) << "invalid integer size");
 								}
 								else
 								{
