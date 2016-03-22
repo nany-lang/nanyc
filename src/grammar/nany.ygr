@@ -864,6 +864,7 @@ function: notext, important
 expr-with-semicolon: hidden
 	expr | error-semicolon (wp tk-semicolon)?
 
+// all sub expr, ordered by priority ASC
 expr: notext
 	expr-no-node
 
@@ -876,6 +877,16 @@ expr-no-node: hidden
 expr-stream: notext
 	operator-stream wp ex-stream | error-semicolon
 ex-stream: hidden
+	ex-logic (wp expr-logic)*
+
+expr-logic: notext // OR
+	operator-logic wp ex-logic | error-semicolon
+ex-logic: hidden
+	ex-logic-and (wp expr-logic-and)*
+
+expr-logic-and: notext // AND
+	operator-logic-and wp ex-logic-and | error-semicolon
+ex-logic-and: hidden
 	ex-comparison (wp expr-comparison)*
 
 expr-comparison: notext
@@ -886,17 +897,6 @@ ex-comparison: hidden
 expr-assignment: notext
 	operator-assignment wp ex-assignment | error-semicolon
 ex-assignment: hidden
-	ex-logic (wp expr-logic)*
-
-
-expr-logic: notext
-	operator-logic wp ex-logic | error-semicolon
-ex-logic: hidden
-	ex-logic-and (wp expr-logic-and)*
-
-expr-logic-and: notext
-	operator-logic-and wp ex-logic-and | error-semicolon
-ex-logic-and: hidden
 	ex-add (wp expr-add)*
 
 
