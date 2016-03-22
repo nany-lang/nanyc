@@ -128,18 +128,9 @@ namespace Producer
 
 			// param 2 - expr
 			{
-				Node::Ptr callparam = new Node{rgCallParameter};
-				call->children.push_back(callparam);
-
-				uint index = varAssign.findFirst(rgExpr);
-				if (unlikely(not (index < varAssign.children.size())))
-				{
-					assert(false and "no node <expr> in <var-assign>");
-					return false;
-				}
-				callparam->children.push_back(varAssign.children[index]);
+				reuse.callparam = new Node{rgCallParameter};
+				call->children.push_back(reuse.callparam);
 			}
-
 			// param text varname
 			{
 				Node::Ptr callparam = new Node{rgCallParameter};
@@ -153,8 +144,21 @@ namespace Producer
 		}
 
 		reuse.funcname->text = funcName;
-		reuse.varname->text = varname;
-		return visitASTFunc(*(reuse.node));
+		reuse.varname->text  = varname;
+
+		// Updating the EXPR
+		uint index = varAssign.findFirst(rgExpr);
+		if (unlikely(not (index < varAssign.children.size())))
+		{
+			assert(false and "no node <expr> in <var-assign>");
+			return false;
+		}
+		reuse.callparam->children.push_back(varAssign.children[index]);
+
+		bool success = visitASTFunc(*(reuse.node));
+
+		reuse.callparam->children.clear();
+		return success;
 	}
 
 
