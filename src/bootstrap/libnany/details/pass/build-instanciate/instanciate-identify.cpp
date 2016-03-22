@@ -219,6 +219,12 @@ namespace Instanciate
 					auto* varAtom = cdeftable.findClassdefAtom(varcdef);
 					if (unlikely(varAtom == nullptr))
 					{
+						if (varcdef.isVoid())
+						{
+							cdeftable.substitute(cdef.clid.lvid()).mutateToVoid();
+							return true;
+						}
+
 						ICE() << "invalid atom for local scope variable. clid: " << CLID{frame->atomid, lvidVar}
 							<< ", " << (uint32_t) varcdef.kind;
 						return false;
