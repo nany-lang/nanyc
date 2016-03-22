@@ -43,8 +43,9 @@ namespace Instanciate
 	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::storeText>& operands)
 	{
 		uint32_t sid = out.emitStoreText(operands.lvid, currentSequence.stringrefs[operands.text]);
-		frame->lvids[operands.lvid].synthetic = false;
-		frame->lvids[operands.lvid].text_sid = sid;
+		auto& lvidinfo = frame->lvids[operands.lvid];
+		lvidinfo.synthetic = false;
+		lvidinfo.text_sid  = sid;
 	}
 
 

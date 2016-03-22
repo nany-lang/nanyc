@@ -1,6 +1,7 @@
 #include "instanciate.h"
 #include "instanciate-atom.h"
 #include "overloaded-func-call-resolution.h"
+#include <iostream>
 
 using namespace Yuni;
 
@@ -80,9 +81,14 @@ namespace Instanciate
 				if (nullptr == atom)
 				{
 					// the solutions should all have the same parent
-					auto& solutions = frame->resolvePerCLID[cdefFuncToCall.clid];
-					callParent = (not solutions.empty())
-						? solutions[0].get().parent : nullptr;
+					auto it = frame->partiallyResolved.find(cdefFuncToCall.clid);
+					if (it != frame->partiallyResolved.end())
+					{
+						auto& solutions = it->second;
+						callParent = (not solutions.empty()) ? solutions[0].get().parent : nullptr;
+					}
+					else
+						callParent = nullptr;
 				}
 				else
 					callParent = atom->parent;
@@ -134,7 +140,12 @@ namespace Instanciate
 
 			// retrieving the list of all available solutions
 			// (from previous call to opcode 'resolve')
-			auto& solutions = frame->resolvePerCLID[cdefFuncToCall.clid];
+			std::cout << " SOLVING : " << cdefFuncToCall.clid << "!!\n";
+			auto it = frame->partiallyResolved.find(cdefFuncToCall.clid);
+			if (unlikely(it == frame->partiallyResolved.end()))
+				return complainOperand(IR::Instruction::fromOpcode(operands), "no solution available");
+
+			auto& solutions = it->second;
 			if (unlikely(solutions.empty()))
 				return complainOperand(IR::Instruction::fromOpcode(operands), "no solution available");
 
@@ -152,7 +163,7 @@ namespace Instanciate
 		}
 		else
 		{
-			assert(frame->resolvePerCLID[cdefFuncToCall.clid].empty());
+			assert(0 == frame->partiallyResolved.count(cdefFuncToCall.clid));
 
 			// no overload, the func to call is known
 			if (unlikely(not atom->isFunction()))

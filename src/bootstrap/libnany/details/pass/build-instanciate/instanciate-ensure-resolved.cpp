@@ -20,7 +20,7 @@ namespace Instanciate
 			return false;
 
 		CLID clid{frame->atomid, operands.lvid};
-		if (unlikely(not frame->resolvePerCLID[clid].empty()))
+		if (unlikely(0 != frame->partiallyResolved.count(clid)))
 		{
 			// auto& resolveList = frame->resolvePerCLID[clid];
 			return complainMultipleOverloads(operands.lvid);

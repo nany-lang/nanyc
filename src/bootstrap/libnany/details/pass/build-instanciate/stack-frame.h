@@ -124,22 +124,22 @@ namespace Instanciate
 		//! The atom
 		Atom& atom;
 		//! Current atomid
-		yuint32 atomid = 0;
-		//! Information on local registers
-		std::vector<LVIDInfo> lvids;
+		uint32_t atomid = 0u;
 		//! Current scope depth
 		int scope = 0;
-
-		//! list of return values
-		std::vector<ReturnValueMarker> returnValues;
+		//! Information on local registers
+		std::vector<LVIDInfo> lvids;
 
 		//! List of possible solutions per clid
 		// TODO use a more efficient container
-		std::unordered_map<CLID, std::vector<std::reference_wrapper<Atom>>> resolvePerCLID;
+		std::unordered_map<CLID, std::vector<std::reference_wrapper<Atom>>> partiallyResolved;
 
 		//! Self parameters for ctors
 		// {varname/parameter} -> {lvid, used flag}
 		std::unique_ptr<std::unordered_map<AnyString, std::pair<LVID, bool>>> selfParameters;
+
+		//! list of return values
+		std::vector<ReturnValueMarker> returnValues;
 
 		uint32_t blueprintOpcodeOffset = (uint32_t) -1;
 

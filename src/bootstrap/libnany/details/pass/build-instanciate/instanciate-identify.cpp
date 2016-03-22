@@ -112,7 +112,7 @@ namespace Instanciate
 		}
 
 		// list of all possible atoms when resolving 'name'
-		multipleResults.clear();
+		assert(multipleResults.empty());
 		// Self, if any
 		Atom* selfAtom = nullptr;
 		// local variable ?
@@ -129,9 +129,8 @@ namespace Instanciate
 				{
 					if (name == "any") // any - nothing to resolve
 					{
-						multipleResults.clear();
 						frame->lvids[operands.lvid].markedAsAny = true;
-						frame->resolvePerCLID[cdef.clid].clear();
+						frame->partiallyResolved.erase(cdef.clid);
 						cdeftable.substitute(operands.lvid).mutateToAny();
 						return true;
 					}
@@ -141,8 +140,7 @@ namespace Instanciate
 				{
 					if (name == "null")
 					{
-						multipleResults.clear();
-						frame->resolvePerCLID[cdef.clid].clear(); // just in case
+						frame->partiallyResolved.erase(cdef.clid); // just in case
 
 						auto& opc = cdeftable.substitute(operands.lvid);
 						opc.mutateToBuiltin(nyt_pointer);
@@ -157,8 +155,7 @@ namespace Instanciate
 				{
 					if (name == "void")
 					{
-						multipleResults.clear();
-						frame->resolvePerCLID[cdef.clid].clear();
+						frame->partiallyResolved.erase(cdef.clid);
 						cdeftable.substitute(operands.lvid).mutateToVoid();
 						return true;
 					}
@@ -166,10 +163,9 @@ namespace Instanciate
 				}
 				case '_':
 				{
-					if (name[1] == '_')
+					if (name.size() > 1 and name[1] == '_')
 					{
-						multipleResults.clear();
-						frame->resolvePerCLID[cdef.clid].clear(); // just in case
+						frame->partiallyResolved.erase(cdef.clid); // just in case
 
 						if (name == "__false")
 						{
@@ -269,16 +265,21 @@ namespace Instanciate
 			{
 				// since the parent has been fully resolved, no multiple
 				// solution should be available
-				assert(frame->resolvePerCLID[self.clid].empty());
+				assert(frame->partiallyResolved.count(self.clid) == 0
+					or frame->partiallyResolved[self.clid].empty());
 
 				selfAtom->performNameLookupOnChildren(multipleResults, name, &singleHop);
 			}
 			else
 			{
-				auto& selfSolutions = frame->resolvePerCLID[self.clid];
-				multipleResults.reserve(selfSolutions.size());
-				for (auto& atomElement: selfSolutions)
-					atomElement.get().performNameLookupOnChildren(multipleResults, name, &singleHop);
+				auto it = frame->partiallyResolved.find(self.clid);
+				if (it != frame->partiallyResolved.end())
+				{
+					auto& selfSolutions = it->second;
+					multipleResults.reserve(selfSolutions.size());
+					for (auto& atomE: selfSolutions)
+						atomE.get().performNameLookupOnChildren(multipleResults, name, &singleHop);
+				}
 			}
 		}
 
@@ -368,7 +369,7 @@ namespace Instanciate
 				// multiple solutions are possible (probably for a func call)
 				// keeping the solutions for later resolution by the real func call
 				// (with parameters to find the most appropriate one)
-				frame->resolvePerCLID[cdef.clid].swap(multipleResults);
+				frame->partiallyResolved[cdef.clid].swap(multipleResults);
 				return true;
 			}
 
@@ -391,6 +392,7 @@ namespace Instanciate
 		bool ok = identify(operands);
 		if (unlikely(not ok))
 			frame->invalidate(operands.lvid);
+		multipleResults.clear();
 	}
 
 

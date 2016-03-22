@@ -94,19 +94,23 @@ namespace Instanciate
 		if (debugmode)
 			err << ' ' << clid;
 
-		auto& solutions = frame->resolvePerCLID[clid];
-		for (size_t i = 0; i != solutions.size(); ++i)
+		auto it = frame->partiallyResolved.find(clid);
+		if (it != frame->partiallyResolved.end())
 		{
-			auto& atom = solutions[i].get();
-			auto hint = err.hint();
-			hint.message.origins.location.filename   = atom.origin.filename;
-			hint.message.origins.location.pos.line   = atom.origin.line;
-			hint.message.origins.location.pos.offset = atom.origin.offset;
+			auto& solutions = it->second;
+			for (size_t i = 0; i != solutions.size(); ++i)
+			{
+				auto& atom = solutions[i].get();
+				auto hint = err.hint();
+				hint.message.origins.location.filename   = atom.origin.filename;
+				hint.message.origins.location.pos.line   = atom.origin.line;
+				hint.message.origins.location.pos.offset = atom.origin.offset;
 
-			hint << '\'';
-			hint << cdeftable.keyword(atom) << ' ';
-			atom.retrieveCaption(hint.text(), cdeftable);
-			hint << "' is a suitable candidate";
+				hint << '\'';
+				hint << cdeftable.keyword(atom) << ' ';
+				atom.retrieveCaption(hint.text(), cdeftable);
+				hint << "' is a suitable candidate";
+			}
 		}
 		return false;
 	}
