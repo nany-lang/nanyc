@@ -159,6 +159,26 @@ namespace Producer
 					break;
 				}
 
+				case rgFunctionKindView:
+				{
+					if (kindchild.children.empty())
+					{
+						// default view
+						funcname = "^view^default";
+					}
+					else
+					{
+						auto& symbolname = *(kindchild.children[0]);
+						AnyString name = scope.getSymbolNameFromASTNode(symbolname);
+						if (not checkForValidIdentifierName(scope.report(), symbolname, name, false))
+							return false;
+
+						funcname.clear();
+						funcname << "^view^" << name;
+					}
+					break;
+				}
+
 				default:
 					return scope.ICEUnexpectedNode(kindchild, "[funckind]");
 			}
