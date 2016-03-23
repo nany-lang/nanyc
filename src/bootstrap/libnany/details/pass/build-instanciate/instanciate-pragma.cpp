@@ -120,7 +120,8 @@ namespace Instanciate
 					// ignore the current blueprint
 					//*cursor += operands.value.blueprintsize;
 					assert(frame != nullptr);
-					auto startOffset = frame->blueprintOpcodeOffset;
+					assert(frame->offsetOpcodeBlueprint != (uint32_t) -1);
+					auto startOffset = frame->offsetOpcodeBlueprint;
 					auto count = operands.value.blueprintsize;
 
 					if (unlikely(count < 3))

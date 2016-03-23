@@ -17,7 +17,7 @@ namespace Instanciate
 	{
 		assert(frame != nullptr);
 		assert(canGenerateCode());
-		assert(lastOpcodeStacksizeOffset != (uint32_t) -1);
+		assert(frame->offsetOpcodeStacksize != (uint32_t) -1);
 
 		// special location: in a constructor - initializing all variables with their def value
 		// note: do not keep a reference on 'out.at...', since the internal buffer might be reized

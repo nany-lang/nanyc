@@ -366,8 +366,6 @@ namespace Instanciate
 		//! Flag to generate variable member cloning after opcode 'stack size'
 		bool generateClassVarsAutoClone = false;
 
-		uint32_t lastOpcodeStacksizeOffset = (uint32_t) -1;
-
 		//! Flag to skip code instanciation as soon as the opcode blueprint size is encountered
 		bool shouldSkipCurrentAtom = false;
 

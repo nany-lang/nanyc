@@ -69,7 +69,6 @@ namespace Instanciate
 				pushedparams.clear();
 				generateClassVarsAutoInit = false;
 				generateClassVarsAutoRelease = false;
-				lastOpcodeStacksizeOffset = (uint32_t) -1;
 
 				assert(layerDepthLimit > 0);
 				--layerDepthLimit;
@@ -104,7 +103,7 @@ namespace Instanciate
 
 					// create new frame
 					pushNewFrame(*atom);
-					frame->blueprintOpcodeOffset = currentSequence.offsetOf(**cursor);
+					frame->offsetOpcodeBlueprint = currentSequence.offsetOf(**cursor);
 
 					if (kind == IR::ISA::Blueprint::funcdef)
 					{
@@ -219,7 +218,7 @@ namespace Instanciate
 				}
 
 				pushNewFrame(*atom);
-				frame->blueprintOpcodeOffset = currentSequence.offsetOf(**cursor);
+				frame->offsetOpcodeBlueprint = currentSequence.offsetOf(**cursor);
 				break;
 			}
 

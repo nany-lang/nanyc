@@ -124,11 +124,14 @@ namespace Instanciate
 
 	uint32_t SequenceBuilder::createLocalVariables(uint32_t count)
 	{
-		assert(lastOpcodeStacksizeOffset != (uint32_t) -1);
 		assert(frame != nullptr);
+		assert(frame->offsetOpcodeStacksize != (uint32_t) -1);
 		assert(count > 0);
 
-		auto& operands = out.at<IR::ISA::Op::stacksize>(lastOpcodeStacksizeOffset);
+		if (unlikely(frame->offsetOpcodeStacksize == (uint32_t) -1))
+			throw String{} << "invalid stack size opcode offset";
+
+		auto& operands = out.at<IR::ISA::Op::stacksize>(frame->offsetOpcodeStacksize);
 		uint32_t startOffset = operands.add;
 		int scope = frame->scope;
 

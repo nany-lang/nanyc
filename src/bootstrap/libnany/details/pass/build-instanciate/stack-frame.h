@@ -141,7 +141,10 @@ namespace Instanciate
 		//! list of return values
 		std::vector<ReturnValueMarker> returnValues;
 
-		uint32_t blueprintOpcodeOffset = (uint32_t) -1;
+		//! Offset where the current blueprint is declared
+		uint32_t offsetOpcodeBlueprint = (uint32_t) -1;
+		//! Offset where the stack size is declared
+		uint32_t offsetOpcodeStacksize = (uint32_t) -1;
 
 		//! Linked list frames
 		AtomStackFrame* previous = nullptr;
