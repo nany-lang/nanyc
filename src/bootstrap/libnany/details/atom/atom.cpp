@@ -92,8 +92,15 @@ namespace Nany
 							else
 								out << "<invalid-field>";
 						}
+						else if (name.startsWith("^view^"))
+						{
+							out += ':';
+							out.append(name.c_str() + 6, name.size() - 6);
+						}
 						else
+						{
 							out.append(name.c_str() + 1, name.size() - 1);
+						}
 					}
 					break;
 				}
@@ -443,7 +450,7 @@ namespace Nany
 				return (name[0] != '^')
 					? "func"
 					: ((not name.startsWith("^default-var-%"))
-						? "operator"
+						? (not name.startsWith("^view^") ? "operator" : "view")
 						: "<default-init>");
 			}
 			case Type::classdef:     return "class";
