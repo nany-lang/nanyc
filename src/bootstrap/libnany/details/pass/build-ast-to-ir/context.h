@@ -52,6 +52,17 @@ namespace Producer
 		//@}
 
 
+		//! \name Reuse nodes
+		//@{
+		//! re-use objects for classes (ctor)
+		void prepareReuseForClasses();
+		//! re-use objects for literals
+		void prepareReuseForLiterals();
+		//! re-use objects for clusores
+		void prepareReuseForClosures();
+		//@}
+
+
 	public:
 		//! Linked IR sequence
 		Sequence& sequence;
@@ -98,6 +109,11 @@ namespace Producer
 				Node* funcname;
 			}
 			operatorClone;
+
+			struct {
+				Node::Ptr node;
+			}
+			closure;
 		}
 		reuse;
 

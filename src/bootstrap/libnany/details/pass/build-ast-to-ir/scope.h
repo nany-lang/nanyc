@@ -175,6 +175,9 @@ namespace Producer
 		template<bool BuiltinT, class DefT> bool generateNumberCode(uint32_t& localvar, const DefT& numdef, const Node&);
 		void emitTmplParametersIfAny();
 
+		void prepareClosureNodeExpr(Node::Ptr& out);
+
+
 	private:
 		//! Next local variable
 		LVID pNextVarID = 0u;

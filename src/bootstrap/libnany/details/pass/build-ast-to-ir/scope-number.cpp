@@ -188,30 +188,7 @@ namespace Producer
 		else
 		{
 			if (!context.reuse.literal.node)
-			{
-				// new (+2)
-				//     type-decl
-				//     |   identifier: i64
-				//     call (+3)
-				//         call-parameter
-				//             expr
-				//                 register: <lvid>
-				auto& cache = context.reuse.literal;
-				cache.node = new Node{rgNew};
-				Node::Ptr typeDecl = new Node{rgTypeDecl};
-				cache.node->children.push_back(typeDecl);
-				cache.classname = new Node{rgIdentifier};
-				typeDecl->children.push_back(cache.classname);
-
-				Node::Ptr call = new Node{rgCall};
-				cache.node->children.push_back(call);
-				Node::Ptr callParam = new Node{rgCallParameter};
-				call->children.push_back(callParam);
-				Node::Ptr expr = new Node{rgExpr};
-				callParam->children.push_back(expr);
-				cache.lvidnode = new Node{rgRegister};
-				expr->children.push_back(cache.lvidnode);
-			}
+				context.prepareReuseForLiterals();
 
 			assert(not cn.empty());
 			context.reuse.literal.classname->text = cn;

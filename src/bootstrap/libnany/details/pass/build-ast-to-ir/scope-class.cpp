@@ -2,7 +2,6 @@
 #include "details/pass/build-ast-to-ir/scope.h"
 #include "libnany-config.h"
 #include "details/utils/check-for-valid-identifier-name.h"
-#include "details/ast/ast.h"
 
 using namespace Yuni;
 
@@ -110,10 +109,7 @@ namespace Producer
 			auto& reuse = scope.context.reuse;
 
 			if (!reuse.operatorDefault.node)
-				reuse.operatorDefault.node = AST::createNodeFunc(reuse.operatorDefault.funcname);
-
-			if (!reuse.operatorClone.node)
-				reuse.operatorClone.node = AST::createNodeFuncCrefParam(reuse.operatorClone.funcname, "rhs");
+				scope.context.prepareReuseForClasses();
 
 			reuse.operatorDefault.funcname->text = "^default-new";
 			success &= scope.visitASTFunc(*reuse.operatorDefault.node);
