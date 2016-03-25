@@ -17,9 +17,9 @@ namespace Producer
 {
 
 
-	bool Scope::visitASTExprSwitch(const Node& node)
+	bool Scope::visitASTExprSwitch(const AST::Node& node)
 	{
-		assert(node.rule == rgSwitch);
+		assert(node.rule == AST::rgSwitch);
 		bool success = true;
 
 		if (debugmode)
@@ -39,27 +39,27 @@ namespace Producer
 
 		// the current implementation generates a 'if' statement for each 'case'
 		// these variables are for simulating an AST node
-		Node::Ptr exprCase = new Node{rgExpr};
-		Node::Ptr cond = AST::createNodeIdentifier("^==");
+		AST::Node::Ptr exprCase = new AST::Node{AST::rgExpr};
+		AST::Node::Ptr cond = AST::createNodeIdentifier("^==");
 		exprCase->children.push_back(cond);
-		Node::Ptr call = new Node{rgCall};
+		AST::Node::Ptr call = new AST::Node{AST::rgCall};
 		cond->children.push_back(call);
 
 		// lhs
-		Node::Ptr lhs = new Node{rgCallParameter};
+		AST::Node::Ptr lhs = new AST::Node{AST::rgCallParameter};
 		call->children.push_back(lhs);
 		ShortString16 lvidstr;
-		Node::Ptr lhsExpr = new Node{rgExpr};
+		AST::Node::Ptr lhsExpr = new AST::Node{AST::rgExpr};
 		lhs->children.push_back(lhsExpr);
-		Node::Ptr lhsValue = new Node{rgRegister};
+		AST::Node::Ptr lhsValue = new AST::Node{AST::rgRegister};
 		lhsExpr->children.push_back(lhsValue);
 
-		Node::Ptr rhs = new Node{rgCallParameter};
+		AST::Node::Ptr rhs = new AST::Node{AST::rgCallParameter};
 		call->children.push_back(rhs);
 
 
 		// using a scope for the body to have proper variable scoping
-		Node bodyScope{rgScope};
+		AST::Node bodyScope{AST::rgScope};
 
 		//! list of labels to update (to jump at the end of the switch-case when a cond matches)
 		std::vector<uint32_t> labels;
@@ -72,7 +72,7 @@ namespace Producer
 
 			switch (child.rule)
 			{
-				case rgSwitchCase:
+				case AST::rgSwitchCase:
 				{
 					if (debugmode)
 						out.emitComment("case");
@@ -96,7 +96,7 @@ namespace Producer
 					break;
 				}
 
-				case rgSwitchExpr:
+				case AST::rgSwitchExpr:
 				{
 					if (child.children.size() == 1)
 					{

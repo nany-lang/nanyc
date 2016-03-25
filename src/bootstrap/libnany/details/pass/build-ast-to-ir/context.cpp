@@ -52,19 +52,19 @@ namespace Producer
 
 		auto& cache = reuse.literal;
 
-		cache.node = new Node{rgNew};
-		Node::Ptr typeDecl = new Node{rgTypeDecl};
+		cache.node = new AST::Node{AST::rgNew};
+		AST::Node::Ptr typeDecl = new AST::Node{AST::rgTypeDecl};
 		cache.node->children.push_back(typeDecl);
-		cache.classname = new Node{rgIdentifier};
+		cache.classname = new AST::Node{AST::rgIdentifier};
 		typeDecl->children.push_back(cache.classname);
 
-		Node::Ptr call = new Node{rgCall};
+		AST::Node::Ptr call = new AST::Node{AST::rgCall};
 		cache.node->children.push_back(call);
-		Node::Ptr callParam = new Node{rgCallParameter};
+		AST::Node::Ptr callParam = new AST::Node{AST::rgCallParameter};
 		call->children.push_back(callParam);
-		Node::Ptr expr = new Node{rgExpr};
+		AST::Node::Ptr expr = new AST::Node{AST::rgExpr};
 		callParam->children.push_back(expr);
-		cache.lvidnode = new Node{rgRegister};
+		cache.lvidnode = new AST::Node{AST::rgRegister};
 		expr->children.push_back(cache.lvidnode);
 	}
 
@@ -81,7 +81,7 @@ namespace Producer
 
 	void Context::prepareReuseForClosures()
 	{
-		reuse.closure.node = new Node{rgExpr};
+		reuse.closure.node = new AST::Node{AST::rgExpr};
 
 		// expr
 		//     expr-value
@@ -102,14 +102,14 @@ namespace Producer
 		//                         |                   expr
 		//                         |                   |   ...
 
-		Node::Ptr exprValue = new Node{rgExprValue};
+		AST::Node::Ptr exprValue = new AST::Node{AST::rgExprValue};
 		reuse.closure.node->children.push_back(exprValue);
-		Node::Ptr exprValueNew = new Node{rgNew};
+		AST::Node::Ptr exprValueNew = new AST::Node{AST::rgNew};
 		exprValue->children.push_back(exprValueNew);
 
-		Node::Ptr nnew = new Node{rgNew};
+		AST::Node::Ptr nnew = new AST::Node{AST::rgNew};
 		exprValueNew->children.push_back(nnew);
-		Node::Ptr typedecl = new Node{rgTypeDecl};
+		AST::Node::Ptr typedecl = new AST::Node{AST::rgTypeDecl};
 		nnew->children.push_back(typedecl);
 	}
 

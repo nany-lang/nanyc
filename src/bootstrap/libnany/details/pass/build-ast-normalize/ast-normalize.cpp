@@ -26,29 +26,29 @@ namespace Nany
 		public:
 			explicit ASTReplicator(ASTHelper& ast, Logs::Report);
 
-			bool run(Node& fileRootnode, Node& newroot);
+			bool run(AST::Node& fileRootnode, AST::Node& newroot);
 
 
 		public:
 			//! File namespace (alias)
-			std::pair<YString, Nany::Node*> nmspc;
+			std::pair<YString, AST::Node*> nmspc;
 
 
 		private:
-			bool duplicateNode(Nany::Node& out, const Nany::Node& node);
-			void iterateThroughChildren(const Nany::Node& node, Nany::Node& newNode);
-			void collectNamespace(const Nany::Node& node);
+			bool duplicateNode(AST::Node& out, const AST::Node& node);
+			void iterateThroughChildren(const AST::Node& node, AST::Node& newNode);
+			void collectNamespace(const AST::Node& node);
 
-			bool generateErrorFromErrorNode(const Nany::Node& node);
+			bool generateErrorFromErrorNode(const AST::Node& node);
 
-			void normalizeExpression(Nany::Node& node);
-			void normalizeExprReorderOperators(Nany::Node& node);
-			void normalizeExprTransformOperatorsToFuncCall(Nany::Node& node);
-			void transformExprNodeToFuncCall(Nany::Node& node);
-			void transformExprNodeToFuncCallNOT(Nany::Node& node);
-			void transformExprAssignmentToFuncCall(Nany::Node& node);
+			void normalizeExpression(AST::Node& node);
+			void normalizeExprReorderOperators(AST::Node& node);
+			void normalizeExprTransformOperatorsToFuncCall(AST::Node& node);
+			void transformExprNodeToFuncCall(AST::Node& node);
+			void transformExprNodeToFuncCallNOT(AST::Node& node);
+			void transformExprAssignmentToFuncCall(AST::Node& node);
 
-			void appendNewBoolNode(Node& parent, bool onoff);
+			void appendNewBoolNode(AST::Node& parent, bool onoff);
 
 
 		private:
@@ -79,9 +79,9 @@ namespace Nany
 		}
 
 
-		inline void ASTReplicator::iterateThroughChildren(const Nany::Node& node, Nany::Node& newNode)
+		inline void ASTReplicator::iterateThroughChildren(const AST::Node& node, AST::Node& newNode)
 		{
-			node.each([&] (const Nany::Node& subnode) -> bool
+			node.each([&] (const AST::Node& subnode) -> bool
 			{
 				duplicateNode(newNode, subnode);
 				return true;
@@ -89,13 +89,13 @@ namespace Nany
 		}
 
 
-		void ASTReplicator::collectNamespace(const Nany::Node& node)
+		void ASTReplicator::collectNamespace(const AST::Node& node)
 		{
-			auto entity = node.xpath({rgEntity});
+			auto entity = node.xpath({AST::rgEntity});
 			assert(!(!entity) and "mismatch grammar");
 			nmspc.first.clear();
-			nmspc.second = const_cast<Nany::Node*>(&node);
-			entity->extractChildText(nmspc.first, Nany::rgIdentifier, ".");
+			nmspc.second = const_cast<AST::Node*>(&node);
+			entity->extractChildText(nmspc.first, Nany::AST::rgIdentifier, ".");
 
 			uint32_t depth = nmspc.first.countChar('.');
 			if (depth + 1 >= Config::maxNamespaceDepth)
@@ -107,7 +107,7 @@ namespace Nany
 		}
 
 
-		inline void ASTReplicator::transformExprNodeToFuncCallNOT(Nany::Node& node)
+		inline void ASTReplicator::transformExprNodeToFuncCallNOT(AST::Node& node)
 		{
 			// AST structure: not EXPR
 			//
@@ -125,12 +125,12 @@ namespace Nany
 			//
 
 			// promote the current node before any changes within the subtree
-			ast.nodeRulePromote(node, rgIdentifier);
+			ast.nodeRulePromote(node, AST::rgIdentifier);
 			node.text = "^not";
 
 			// create a new subtree
-			auto& call = *ast.nodeCreate(rgCall);
-			auto& lhs  = *ast.nodeAppend(call, {rgCallParameter, rgExpr});
+			auto& call = *ast.nodeCreate(AST::rgCall);
+			auto& lhs  = *ast.nodeAppend(call, {AST::rgCallParameter, AST::rgExpr});
 
 			// re-parent lhs
 			ast.nodeReparentAtTheEnd(*(node.children[lhsIndex]), node, lhsIndex, lhs);
@@ -144,7 +144,7 @@ namespace Nany
 		}
 
 
-		inline void ASTReplicator::transformExprNodeToFuncCall(Nany::Node& node)
+		inline void ASTReplicator::transformExprNodeToFuncCall(AST::Node& node)
 		{
 			// AST structure: foo() < expr;  (raw output from the parser)
 			//
@@ -182,13 +182,13 @@ namespace Nany
 			//
 
 			// promote the current node before any changes within the subtree
-			ast.nodeRulePromote(node, rgIdentifier);
+			ast.nodeRulePromote(node, AST::rgIdentifier);
 			node.text = opname;
 
 			// create a new subtree
-			auto& call = *ast.nodeCreate(rgCall);
-			auto& lhs  = *ast.nodeAppend(call, {rgCallParameter, rgExpr});
-			auto& rhs  = *ast.nodeAppend(call, {rgCallParameter, rgExpr});
+			auto& call = *ast.nodeCreate(AST::rgCall);
+			auto& lhs  = *ast.nodeAppend(call, {AST::rgCallParameter, AST::rgExpr});
+			auto& rhs  = *ast.nodeAppend(call, {AST::rgCallParameter, AST::rgExpr});
 
 			// re-parent rhs first, otherwise the index will be invalidated
 			ast.nodeReparentAtTheEnd(*(node.children[rhsIndex]), node, rhsIndex, rhs);
@@ -204,7 +204,7 @@ namespace Nany
 		}
 
 
-		inline void ASTReplicator::transformExprAssignmentToFuncCall(Nany::Node& node)
+		inline void ASTReplicator::transformExprAssignmentToFuncCall(AST::Node& node)
 		{
 			// AST structure: foo() += expr; - or anything that should be asked to the object itself
 			//
@@ -218,7 +218,7 @@ namespace Nany
 			auto& operatorNode = *(node.children[0]);
 			uint32_t rhsIndex = 1;
 			auto& rhs = *(node.children[rhsIndex]);
-			assert(operatorNode.rule == rgOperatorAssignment);
+			assert(operatorNode.rule == AST::rgOperatorAssignment);
 
 			// the operator is not an assignment. the input will be transformed into
 			//
@@ -230,45 +230,45 @@ namespace Nany
 			//              - parameter
 			//                   - rhs
 			//
-			ast.nodeRulePromote(node, rgExprSubDot);
-			ast.nodeRulePromote(operatorNode, rgIdentifier);
+			ast.nodeRulePromote(node, AST::rgExprSubDot);
+			ast.nodeRulePromote(operatorNode, AST::rgIdentifier);
 
 			// normalizing the operator
 			operatorNode.text = normalizeOperatorName(operatorNode.text);
 
-			auto& call = *ast.nodeAppend(operatorNode, rgCall);
-			auto& expr = *ast.nodeAppend(call, {rgCallParameter, rgExpr});
+			auto& call = *ast.nodeAppend(operatorNode, AST::rgCall);
+			auto& expr = *ast.nodeAppend(call, {AST::rgCallParameter, AST::rgExpr});
 
 			ast.nodeReparentAtTheEnd(rhs, node, rhsIndex, expr);
 		}
 
 
 
-		void ASTReplicator::normalizeExprTransformOperatorsToFuncCall(Nany::Node& node)
+		void ASTReplicator::normalizeExprTransformOperatorsToFuncCall(AST::Node& node)
 		{
 			// go for children, the container may change between each iteration
 			for (uint32_t i = 0; i < static_cast<uint32_t>(node.children.size()); )
 			{
-				Nany::Node& child = *(node.children[i]);
+				AST::Node& child = *(node.children[i]);
 
 				switch (child.rule)
 				{
 					// transform all expressions 'lhs <operator> rhs' into a global func call
 					// (like in 'a < b' -> '<(a, b)')
-					case Nany::rgExprAdd:
-					case Nany::rgExprStream:
-					case Nany::rgExprComparison:
-					case Nany::rgExprLogic:
-					case Nany::rgExprLogicAnd:
-					case Nany::rgExprFactor:
-					case Nany::rgExprPower:
+					case AST::rgExprAdd:
+					case AST::rgExprStream:
+					case AST::rgExprComparison:
+					case AST::rgExprLogic:
+					case AST::rgExprLogicAnd:
+					case AST::rgExprFactor:
+					case AST::rgExprPower:
 					{
 						transformExprNodeToFuncCall(child); // foo < rhs, using global operators
 						--i; // go back to the node before
 						break;
 					}
 
-					case Nany::rgExprAssignment:
+					case AST::rgExprAssignment:
 					{
 						// transform all expressions 'lhs <operator> rhs' into a member func call
 						// (like in 'a += b' -> 'a.+=(b)')
@@ -280,7 +280,7 @@ namespace Nany
 					}
 
 					// transform all expressions '<op> rhs' into function calls
-					case Nany::rgExprNot:
+					case AST::rgExprNot:
 					{
 						transformExprNodeToFuncCallNOT(child);
 						--i; // go to the next child
@@ -301,13 +301,13 @@ namespace Nany
 		}
 
 
-		void ASTReplicator::normalizeExprReorderOperators(Nany::Node& node)
+		void ASTReplicator::normalizeExprReorderOperators(AST::Node& node)
 		{
 			bool canReorder;
 			switch (node.rule)
 			{
-				case rgCall:
-				case rgIntrinsic: canReorder = false; break;
+				case AST::rgCall:
+				case AST::rgIntrinsic: canReorder = false; break;
 				default: canReorder = true;
 			}
 
@@ -319,14 +319,14 @@ namespace Nany
 				{
 					switch (node.children[i]->rule)
 					{
-						case Nany::rgExprAdd:
-						case Nany::rgExprStream:
-						case Nany::rgExprComparison:
-						case Nany::rgExprLogic:
-						case Nany::rgExprLogicAnd:
-						case Nany::rgExprFactor:
-						case Nany::rgExprPower:
-						case Nany::rgExprNot:
+						case AST::rgExprAdd:
+						case AST::rgExprStream:
+						case AST::rgExprComparison:
+						case AST::rgExprLogic:
+						case AST::rgExprLogicAnd:
+						case AST::rgExprFactor:
+						case AST::rgExprPower:
+						case AST::rgExprNot:
 						{
 							if (i > 0)
 							{
@@ -342,17 +342,17 @@ namespace Nany
 
 									// do not re-parent nodes related to the structure of expressions
 									// ('operators as exceptions')
-									case Nany::rgOperatorAll:
-									case Nany::rgOperatorKind:
-									case Nany::rgOperatorAdd:
-									case Nany::rgOperatorAssignment:
-									case Nany::rgOperatorComparison:
-									case Nany::rgOperatorFactor:
-									case Nany::rgOperatorLogic:
-									case Nany::rgOperatorLogicAnd:
-									case Nany::rgOperatorPower:
-									case Nany::rgOperatorNot:
-									case Nany::rgOperatorStream:
+									case AST::rgOperatorAll:
+									case AST::rgOperatorKind:
+									case AST::rgOperatorAdd:
+									case AST::rgOperatorAssignment:
+									case AST::rgOperatorComparison:
+									case AST::rgOperatorFactor:
+									case AST::rgOperatorLogic:
+									case AST::rgOperatorLogicAnd:
+									case AST::rgOperatorPower:
+									case AST::rgOperatorNot:
+									case AST::rgOperatorStream:
 										break;
 								}
 							}
@@ -368,9 +368,9 @@ namespace Nany
 				// go for children, the container may change between each iteration
 				for (uint32_t i = 0; i < static_cast<uint32_t>(node.children.size()); ++i)
 				{
-					Nany::Node& child = *(node.children[i]);
+					AST::Node& child = *(node.children[i]);
 
-					if (child.rule == rgIdentifier)
+					if (child.rule == AST::rgIdentifier)
 					{
 						// try to rearrange the following pattern:
 						// - identifier
@@ -392,11 +392,11 @@ namespace Nany
 
 							switch (nrule)
 							{
-								case rgExprSubDot:
-								case rgTypeSubDot:
-								case rgCall:
-								case rgExprTemplate:
-								case rgExprSubArray:
+								case AST::rgExprSubDot:
+								case AST::rgTypeSubDot:
+								case AST::rgCall:
+								case AST::rgExprTemplate:
+								case AST::rgExprSubArray:
 									ast.nodeReparentAtTheEnd(nextChild, node, i + 1, child);
 									break;
 								default:
@@ -414,7 +414,7 @@ namespace Nany
 
 
 
-		inline void ASTReplicator::normalizeExpression(Nany::Node& node)
+		inline void ASTReplicator::normalizeExpression(AST::Node& node)
 		{
 			if (likely(pDuplicationSuccess))
 			{
@@ -425,7 +425,7 @@ namespace Nany
 
 
 
-		bool ASTReplicator::generateErrorFromErrorNode(const Nany::Node& node)
+		bool ASTReplicator::generateErrorFromErrorNode(const AST::Node& node)
 		{
 			pDuplicationSuccess = false;
 
@@ -442,7 +442,7 @@ namespace Nany
 		}
 
 
-		void ASTReplicator::appendNewBoolNode(Node& parent, bool onoff)
+		void ASTReplicator::appendNewBoolNode(AST::Node& parent, bool onoff)
 		{
 			// expr-group
 			// |   new (+2)
@@ -452,32 +452,33 @@ namespace Nany
 			// |           call-parameter
 			// |               expr
 			// |                   identifier: __true
-			auto& group   = *ast.nodeAppend(parent, rgExprGroup);
-			auto& newnode = *ast.nodeAppend(group, rgNew);
+			auto& group   = *ast.nodeAppend(parent, AST::rgExprGroup);
+			auto& newnode = *ast.nodeAppend(group, AST::rgNew);
 
-			auto& typeDecl = *ast.nodeAppend(newnode, rgTypeDecl);
-			auto& id       = *ast.nodeAppend(typeDecl, rgIdentifier);
+			auto& typeDecl = *ast.nodeAppend(newnode, AST::rgTypeDecl);
+			auto& id       = *ast.nodeAppend(typeDecl, AST::rgIdentifier);
 			id.text = "bool";
 
 			if (onoff)
 			{
-				auto& value = *ast.nodeAppend(newnode, {rgCall, rgCallParameter, rgExpr, rgIdentifier});
+				auto& value =
+					*ast.nodeAppend(newnode, {AST::rgCall, AST::rgCallParameter, AST::rgExpr, AST::rgIdentifier});
 				value.text = "__true";
 			}
 		}
 
 
-		bool ASTReplicator::duplicateNode(Nany::Node& parent, const Nany::Node& node)
+		bool ASTReplicator::duplicateNode(AST::Node& parent, const AST::Node& node)
 		{
 			// rule of the current node
 			// [this value might be changed during the node analysis]
 			auto rule = node.rule;
 
 			// ignore all nodes representing a token (tk-*), comments as well
-			if (Nany::ShouldIgnoreASTRuleForDuplication(rule))
+			if (AST::shouldIgnoreForDuplication(rule))
 				return true;
 
-			if (unlikely(Nany::ASTRuleIsError(rule)))
+			if (unlikely(AST::ruleIsError(rule)))
 				return generateErrorFromErrorNode(node);
 
 			switch (rule)
@@ -487,18 +488,18 @@ namespace Nany
 					break;
 				}
 
-				case rgNamespace:
+				case AST::rgNamespace:
 				{
 					collectNamespace(node);
 					return true; // ignore the node
 				}
 
-				case rgIdentifier:
+				case AST::rgIdentifier:
 				{
 					switch (parent.rule)
 					{
-						case rgExprValue:
-						case rgExpr:
+						case AST::rgExprValue:
+						case AST::rgExpr:
 						{
 							if (node.text == "true" or node.text == "false")
 							{
@@ -513,22 +514,22 @@ namespace Nany
 					break;
 				}
 
-				case rgExpr:
+				case AST::rgExpr:
 				{
 					assert(not node.children.empty());
-					auto& firstChild = (((node.children.size() == 1 and node.firstChild().rule == rgExprValue)
+					auto& firstChild = (((node.children.size() == 1 and node.firstChild().rule == AST::rgExprValue)
 						? node.firstChild() : node))
 							.firstChild();
 
 					switch (firstChild.rule) // avoid the creation of some useless nodes
 					{
-						case rgClass:
-						case rgVar:
-						case rgTypedef:
-						case rgFor:
-						case rgWhile:
-						case rgDoWhile:
-						case rgReturn:
+						case AST::rgClass:
+						case AST::rgVar:
+						case AST::rgTypedef:
+						case AST::rgFor:
+						case AST::rgWhile:
+						case AST::rgDoWhile:
+						case AST::rgReturn:
 							return duplicateNode(parent, firstChild);
 						default:
 							break; // let's continue
@@ -536,42 +537,55 @@ namespace Nany
 					break;
 				}
 
-				case rgExprGroup:
+				case AST::rgExprGroup:
 				{
 					// remove useless groups (obvious useless parenthesis)
 					switch (node.children.size())
 					{
 						case 3:
 						{
-							if (node.children[0]->rule == rgTkParentheseOpen and node.children[2]->rule == rgTkParentheseClose)
+							if (node.children[0]->rule == AST::rgTkParentheseOpen and node.children[2]->rule == AST::rgTkParentheseClose)
 							{
 								auto& middle = *(node.children[1]);
-								if (middle.rule == rgIdentifier or middle.rule == rgExprGroup or middle.rule == rgNew)
-									return duplicateNode(parent, middle);
+								switch (middle.rule)
+								{
+									case AST::rgIdentifier:
+									case AST::rgExprGroup:
+									case AST::rgNew:
+										return duplicateNode(parent, middle);
+									default:
+										break;
+								}
 							}
 							break;
 						}
 						case 1:
 						{
 							auto& firstChild = node.firstChild();
-							auto  frl = firstChild.rule;
-							if (frl == rgExprGroup or frl == rgIdentifier or frl == rgNew)
-								return duplicateNode(parent, firstChild);
+							switch (firstChild.rule)
+							{
+								case AST::rgIdentifier:
+								case AST::rgExprGroup:
+								case AST::rgNew:
+									return duplicateNode(parent, firstChild);
+								default:
+									break;
+							}
 							break;
 						}
 					}
 					break;
 				}
 
-				case rgReturnInline:
+				case AST::rgReturnInline:
 				{
-					rule = rgReturn; // transform the 'return-inline' into a simple 'return'
+					rule = AST::rgReturn; // transform the 'return-inline' into a simple 'return'
 					break;
 				}
 
-				case rgFuncBody:
+				case AST::rgFuncBody:
 				{
-					assert(parent.rule == rgFunction);
+					assert(parent.rule == AST::rgFunction);
 
 					// if the function is declared using a lambda operator (func foo -> 42, the return type
 					// is optional (and deduced), contrary to the other form "func foo: any {return 42; }"
@@ -579,14 +593,15 @@ namespace Nany
 					//
 					// The AST will be normalized to avoid so many differences and a return type node
 					// will be added if none has been given and if a 'return-inline' node is present.
-					if (not (parent.findFirst(rgFuncReturnType) < (uint32_t) parent.children.size()))
+					if (not (parent.findFirst(AST::rgFuncReturnType) < (uint32_t) parent.children.size()))
 					{
 						// the parent does not declare any return type.
 						// do the body has a 'return-inline' node ?
-						if (node.findFirst(rgReturnInline) < (uint32_t) node.children.size())
+						if (node.findFirst(AST::rgReturnInline) < (uint32_t) node.children.size())
 						{
 							// all conditions are met. No type is present but should be
-							auto returnType = ast.nodeAppend(parent, {rgFuncReturnType, rgType, rgTypeDecl, rgIdentifier});
+							auto returnType =
+								ast.nodeAppend(parent, {AST::rgFuncReturnType, AST::rgType, AST::rgTypeDecl, AST::rgIdentifier});
 							returnType->text = "any";
 						}
 					}
@@ -614,8 +629,8 @@ namespace Nany
 					break;
 				}
 
-				case Nany::rgExpr:
-				case Nany::rgExprValue:
+				case AST::rgExpr:
+				case AST::rgExprValue:
 				{
 					// some expr might be statements
 					if (likely(not node.children.empty()))
@@ -627,42 +642,40 @@ namespace Nany
 					break;
 				}
 
-				case Nany::rgVar:
+				case AST::rgVar:
 				{
 					// duplicate all children
 					iterateThroughChildren(node, *newNode);
 
 					// to avoid conflicts in the grammar, 'type-decl' does not use 'expr' for declaring
 					// a type but must be normalized as well
-					uint32_t varTypeNode = newNode->findFirst(rgVarType);
+					uint32_t varTypeNode = newNode->findFirst(AST::rgVarType);
 					if (varTypeNode < newNode->children.size())
 						normalizeExpression(*(newNode->children[varTypeNode]));
 					break;
 				}
 
-				case rgFuncBody:
+				case AST::rgFuncBody:
 				{
 					if (likely(not node.children.empty()))
 						iterateThroughChildren(node, *newNode);
 					break;
 				}
-
-				case rgClassBody:
+				case AST::rgClassBody:
 				{
 					if (likely(not node.children.empty()))
 						iterateThroughChildren(node, *newNode);
 					break;
 				}
 			}
-
 			return true;
 		}
 
 
-		inline bool ASTReplicator::run(Nany::Node& fileRootnode, Node& newroot)
+		inline bool ASTReplicator::run(AST::Node& fileRootnode, AST::Node& newroot)
 		{
 			bool success = true;
-			fileRootnode.each([&] (const Nany::Node& subnode) -> bool
+			fileRootnode.each([&] (const AST::Node& subnode) -> bool
 			{
 				success &= duplicateNode(newroot, subnode);
 				return true;
@@ -688,15 +701,15 @@ namespace Nany
 		auto& ast       = buildinfo.parsing.ast;
 
 		//! Reset the root node
-		buildinfo.parsing.rootnode = ast.nodeCreate(Nany::rgStart);
+		buildinfo.parsing.rootnode = ast.nodeCreate(AST::rgStart);
 		bool success = false;
 
-		if (parser.root and (parser.root->rule == Nany::rgStart))
+		if (parser.root and (parser.root->rule == AST::rgStart))
 		{
 			if (Config::Traces::printASTBeforeNormalize)
 			{
 				Clob out;
-				Node::Export(out, *parser.root);
+				AST::Node::Export(out, *parser.root);
 				report.trace() << "before normalization:\n" << out;
 			}
 
@@ -708,7 +721,7 @@ namespace Nany
 			if (Config::Traces::printASTAfterNormalize)
 			{
 				Clob out;
-				Node::Export(out, *(buildinfo.parsing.rootnode));
+				AST::Node::Export(out, *(buildinfo.parsing.rootnode));
 				report.trace() << "after normalization:\n" << out;
 			}
 		}

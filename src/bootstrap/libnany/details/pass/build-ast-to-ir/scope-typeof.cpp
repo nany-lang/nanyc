@@ -15,18 +15,18 @@ namespace Producer
 {
 
 
-	bool Scope::visitASTExprTypeof(const Node& node, LVID& localvar)
+	bool Scope::visitASTExprTypeof(const AST::Node& node, LVID& localvar)
 	{
-		assert(node.rule == rgTypeof);
+		assert(node.rule == AST::rgTypeof);
 
 		// reset the value of the localvar, result of the expr
 		localvar = 0;
-		Node* expr = nullptr;
+		AST::Node* expr = nullptr;
 
 		for (auto& childptr: node.children)
 		{
 			auto& child = *childptr;
-			if (child.rule == rgCall)
+			if (child.rule == AST::rgCall)
 			{
 				if (child.children.size() != 1)
 				{
@@ -34,10 +34,10 @@ namespace Producer
 					return false;
 				}
 				auto& parameter = *(child.children[0]);
-				if (parameter.rule != rgCallParameter or parameter.children.size() != 1)
+				if (parameter.rule != AST::rgCallParameter or parameter.children.size() != 1)
 					return ICEUnexpectedNode(parameter, "ir/typeof/param");
 
-				expr = Node::Ptr::WeakPointer(parameter.children[0]);
+				expr = AST::Node::Ptr::WeakPointer(parameter.children[0]);
 			}
 			else
 				return ICEUnexpectedNode(child, "[ir/typeof]");

@@ -42,13 +42,13 @@ namespace Nany
 		struct
 		{
 			//! Nany parser for the current content
-			Nany::Parser parser;
+			AST::Parser parser;
 			//! Namespace of the file
-			std::pair<YString, Nany::Node*> nmspc;
+			std::pair<YString, AST::Node*> nmspc;
 			//! AST manipulation
 			ASTHelper ast;
 			//! Root node
-			Node::Ptr rootnode;
+			AST::Node::Ptr rootnode;
 
 			//! The original sequence, generated from the normalized AST
 			IR::Sequence sequence;

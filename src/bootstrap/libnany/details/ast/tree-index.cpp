@@ -9,7 +9,7 @@ namespace Nany
 {
 
 	//! Index nodes from a particular type ?
-	static std::array<bool, (uint) Nany::ruleCount> indexEnabled;
+	static std::array<bool, AST::ruleCount> indexEnabled;
 
 
 
@@ -22,12 +22,12 @@ namespace Nany
 		if (not isInitialized)
 		{
 			isInitialized = true;
-			indexEnabled[(uint) rgIf] = true;
-			indexEnabled[(uint) rgVar] = true;
-			indexEnabled[(uint) rgClass] = true;
-			indexEnabled[(uint) rgFunction] = true;
-			indexEnabled[(uint) rgTypedef] = true;
-			indexEnabled[(uint) rgStringInterpolation] = true;
+			indexEnabled[static_cast<uint32_t>(AST::rgIf)] = true;
+			indexEnabled[static_cast<uint32_t>(AST::rgVar)] = true;
+			indexEnabled[static_cast<uint32_t>(AST::rgClass)] = true;
+			indexEnabled[static_cast<uint32_t>(AST::rgFunction)] = true;
+			indexEnabled[static_cast<uint32_t>(AST::rgTypedef)] = true;
+			indexEnabled[static_cast<uint32_t>(AST::rgStringInterpolation)] = true;
 		}
 	}
 
@@ -39,15 +39,15 @@ namespace Nany
 	}
 
 
-	bool ASTHelper::isIndexEnabled(enum Nany::ASTRule rule) const
+	bool ASTHelper::isIndexEnabled(enum AST::Rule rule) const
 	{
 		return indexEnabled[(uint) rule];
 	}
 
 
-	Nany::Node* ASTHelper::nodeCreate(enum Nany::ASTRule rule)
+	AST::Node* ASTHelper::nodeCreate(enum AST::Rule rule)
 	{
-		auto* node = new Nany::Node{rule};
+		auto* node = new AST::Node{rule};
 		if (indexEnabled[(uint) rule])
 			index[(uint) rule].insert(node);
 		node->metadata = Sema::Metadata::create(node);
@@ -55,7 +55,7 @@ namespace Nany
 	}
 
 
-	Nany::Node* ASTHelper::nodeAppend(Nany::Node& parent, enum Nany::ASTRule rule)
+	AST::Node* ASTHelper::nodeAppend(AST::Node& parent, enum AST::Rule rule)
 	{
 		auto* node = nodeCreate(rule);
 		node->offset = parent.offset;
@@ -66,7 +66,7 @@ namespace Nany
 	}
 
 
-	Nany::Node* ASTHelper::nodeAppendAsOriginal(Nany::Node& parent, enum Nany::ASTRule rule)
+	AST::Node* ASTHelper::nodeAppendAsOriginal(AST::Node& parent, enum AST::Rule rule)
 	{
 		auto* node = nodeAppend(parent, rule);
 		AST::metadata(node).fromASTTransformation = false;
@@ -74,7 +74,7 @@ namespace Nany
 	}
 
 
-	inline void ASTHelper::nodeRemoveFromIndex(Nany::Node& node)
+	inline void ASTHelper::nodeRemoveFromIndex(AST::Node& node)
 	{
 		if (indexEnabled[(uint) node.rule])
 		{
@@ -86,20 +86,20 @@ namespace Nany
 	}
 
 
-	inline void ASTHelper::nodeAddIndex(Nany::Node& node)
+	inline void ASTHelper::nodeAddIndex(AST::Node& node)
 	{
 		if (indexEnabled[(uint) node.rule])
 			index[(uint) node.rule].insert(&node);
 	}
 
 
-	void ASTHelper::nodeReparentAtTheEnd(Nany::Node& node, Nany::Node& oldParent, uint index, Nany::Node& newParent)
+	void ASTHelper::nodeReparentAtTheEnd(AST::Node& node, AST::Node& oldParent, uint index, AST::Node& newParent)
 	{
 		assert(&node != &newParent and "should not be similar");
 		assert(index < oldParent.children.size());
 
 		// acquire node pointer
-		Node::Ptr ptr = &node;
+		AST::Node::Ptr ptr = &node;
 
 		// remove first it from the old parent
 		oldParent.children.erase(oldParent.children.begin() + index);
@@ -111,7 +111,7 @@ namespace Nany
 	}
 
 
-	void ASTHelper::nodeReparentAtTheBegining(Nany::Node& node, Nany::Node& oldParent, uint index, Nany::Node& newParent)
+	void ASTHelper::nodeReparentAtTheBegining(AST::Node& node, AST::Node& oldParent, uint index, AST::Node& newParent)
 	{
 		assert(&node != &newParent and "should not be similar");
 		assert(index < oldParent.children.size());
@@ -126,7 +126,7 @@ namespace Nany
 	}
 
 
-	void ASTHelper::nodeRulePromote(Nany::Node& node, enum Nany::ASTRule rule)
+	void ASTHelper::nodeRulePromote(AST::Node& node, enum AST::Rule rule)
 	{
 		node.rule = rule;
 	}

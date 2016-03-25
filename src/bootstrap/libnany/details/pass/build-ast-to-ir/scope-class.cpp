@@ -27,21 +27,21 @@ namespace Producer
 		public:
 			ClassInspector(Scope& scope);
 
-			bool inspect(const Node& node);
+			bool inspect(const AST::Node& node);
 
 
 		public:
 			//! Parent scope
 			Scope& scope;
 			//! Class body
-			const Node* body = nullptr;
+			const AST::Node* body = nullptr;
 
 			//! name of the class (if any)
 			ClassnameType classname;
 
 
 		private:
-			bool inspectClassname(const Node&);
+			bool inspectClassname(const AST::Node&);
 			void createDefaultOperators();
 
 		}; // class ClassInspector
@@ -56,7 +56,7 @@ namespace Producer
 		}
 
 
-		inline bool ClassInspector::inspectClassname(const Node& node)
+		inline bool ClassInspector::inspectClassname(const AST::Node& node)
 		{
 			classname = scope.getSymbolNameFromASTNode(node);
 			return not classname.empty()
@@ -64,7 +64,7 @@ namespace Producer
 		}
 
 
-		inline bool ClassInspector::inspect(const Node& node)
+		inline bool ClassInspector::inspect(const AST::Node& node)
 		{
 			// exit status
 			bool success = true;
@@ -74,21 +74,21 @@ namespace Producer
 				auto& child = *childptr;
 				switch (child.rule)
 				{
-					case rgSymbolName:
+					case AST::rgSymbolName:
 					{
 						success &= inspectClassname(child);
 						break;
 					}
-					case rgClassBody:
+					case AST::rgClassBody:
 					{
 						body = &child;
 						break;
 					}
-					case rgVisibility:
+					case AST::rgVisibility:
 					{
 						/*currently ignore */ break;
 					}
-					case rgClassTemplateParams:
+					case AST::rgClassTemplateParams:
 					{
 						success &= scope.visitASTDeclGenericTypeParameters(child);
 						break;
@@ -134,9 +134,9 @@ namespace Producer
 
 
 
-	bool Scope::visitASTClass(const Node& node, LVID* localvar)
+	bool Scope::visitASTClass(const AST::Node& node, LVID* localvar)
 	{
-		assert(node.rule == rgClass);
+		assert(node.rule == AST::rgClass);
 		assert(not node.children.empty());
 
 		uint32_t lvid = 0;
@@ -165,7 +165,7 @@ namespace Producer
 		bool success = true;
 
 		// evaluate the whole function, and grab the node body for continuing evaluation
-		auto* body = ([&]() -> const Node*
+		auto* body = ([&]() -> const AST::Node*
 		{
 			ClassInspector inspector{scope};
 			success = inspector.inspect(node);

@@ -31,13 +31,13 @@ namespace Sema
 		// initializing handlers
 		static Yuni::Mutex mutex;
 		mutex.lock();
-		Nany::Node::metadataRelease = callbackMetadataRelease;
-		Nany::Node::metadataClone   = callbackMetadataClone;
+		AST::Node::metadataRelease = callbackMetadataRelease;
+		AST::Node::metadataClone   = callbackMetadataClone;
 		mutex.unlock();
 	}
 
 
-	inline Metadata::Metadata(Nany::Node* originalNode)
+	inline Metadata::Metadata(AST::Node* originalNode)
 	{
 		this->originalNode = originalNode;
 	}
@@ -51,7 +51,7 @@ namespace Sema
 	}
 
 
-	Metadata* Metadata::create(Nany::Node* originalNode)
+	Metadata* Metadata::create(AST::Node* originalNode)
 	{
 		return new Metadata{originalNode};
 	}

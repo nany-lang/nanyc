@@ -19,15 +19,15 @@ namespace Producer
 {
 
 
-	inline bool
-	Scope::visitASTVarValueInitialization(LVID& localvar, const Node& varAssign, const Node& varnodeDecl, const AnyString& varname)
+	inline bool Scope::visitASTVarValueInitialization(LVID& localvar, const AST::Node& varAssign,
+		const AST::Node& varnodeDecl, const AnyString& varname)
 	{
 		for (auto& assignptr: varAssign.children)
 		{
 			auto& assignChild = *assignptr;
 			switch (assignChild.rule)
 			{
-				case rgExpr:
+				case AST::rgExpr:
 				{
 					setErrorFrom(assignChild);
 					bool success = visitASTExpr(assignChild, localvar);
@@ -39,7 +39,7 @@ namespace Producer
 					}
 					break;
 				}
-				case rgOperatorKind:
+				case AST::rgOperatorKind:
 				{
 					break; // operator =
 				}
@@ -51,7 +51,7 @@ namespace Producer
 	}
 
 
-	inline bool Scope::generateTypeofForClassVar(LVID& lvid, const Node& varAssign)
+	inline bool Scope::generateTypeofForClassVar(LVID& lvid, const AST::Node& varAssign)
 	{
 		// typeof (+2)
 		//	 tk-typeof, typeof
@@ -60,17 +60,17 @@ namespace Producer
 		//		 call-parameter
 		//		 |   expr
 		//		 |	   identifier: A
-		Node::Ptr typeofn = new Node{rgTypeof};
+		AST::Node::Ptr typeofn = new AST::Node{AST::rgTypeof};
 
-		Node::Ptr call = new Node{rgCall};
+		AST::Node::Ptr call = new AST::Node{AST::rgCall};
 		typeofn->children.push_back(call);
 
 		// first parameter - the expr
 		{
-			Node::Ptr param = new Node{rgCallParameter};
+			AST::Node::Ptr param = new AST::Node{AST::rgCallParameter};
 			call->children.push_back(param);
 
-			uint index = varAssign.findFirst(rgExpr);
+			uint index = varAssign.findFirst(AST::rgExpr);
 			if (unlikely(not (index < varAssign.children.size())))
 			{
 				assert(false and "no node <expr> in <var-assign>");
@@ -82,7 +82,7 @@ namespace Producer
 	}
 
 
-	inline bool Scope::generateInitFuncForClassVar(const AnyString& varname, LVID lvid, const Node& varAssign)
+	inline bool Scope::generateInitFuncForClassVar(const AnyString& varname, LVID lvid, const AST::Node& varAssign)
 	{
 		// name of the generated func for initialize the class variable
 		ShortString64 funcName;
@@ -102,10 +102,10 @@ namespace Producer
 		{
 			reuse.node = AST::createNodeFunc(reuse.funcname);
 
-			Node::Ptr funcBody = new Node{rgFuncBody};
+			AST::Node::Ptr funcBody = new AST::Node{AST::rgFuncBody};
 			(reuse.node)->children.push_back(funcBody);
 
-			Node::Ptr expr = new Node{rgExpr};
+			AST::Node::Ptr expr = new AST::Node{AST::rgExpr};
 			funcBody->children.push_back(expr);
 
 			// intrinsic (+2)
@@ -119,26 +119,26 @@ namespace Producer
 			//           call-parameter
 			//           |   expr
 			//           |       <expr B>
-			Node::Ptr intrinsic = new Node{rgIntrinsic};
+			AST::Node::Ptr intrinsic = new AST::Node{AST::rgIntrinsic};
 			expr->children.push_back(intrinsic);
 			intrinsic->children.push_back(AST::createNodeIdentifier("^fieldset"));
 
-			Node::Ptr call = new Node{rgCall};
+			AST::Node::Ptr call = new AST::Node{AST::rgCall};
 			intrinsic->children.push_back(call);
 
 			// param 2 - expr
 			{
-				reuse.callparam = new Node{rgCallParameter};
+				reuse.callparam = new AST::Node{AST::rgCallParameter};
 				call->children.push_back(reuse.callparam);
 			}
 			// param text varname
 			{
-				Node::Ptr callparam = new Node{rgCallParameter};
+				AST::Node::Ptr callparam = new AST::Node{AST::rgCallParameter};
 				call->children.push_back(callparam);
-				Node::Ptr pexpr = new Node{rgExpr};
+				AST::Node::Ptr pexpr = new AST::Node{AST::rgExpr};
 				callparam->children.push_back(pexpr);
 
-				reuse.varname = new Node{rgStringLiteral};
+				reuse.varname = new AST::Node{AST::rgStringLiteral};
 				pexpr->children.push_back(reuse.varname);
 			}
 		}
@@ -147,7 +147,7 @@ namespace Producer
 		reuse.varname->text  = varname;
 
 		// Updating the EXPR
-		uint index = varAssign.findFirst(rgExpr);
+		uint index = varAssign.findFirst(AST::rgExpr);
 		if (unlikely(not (index < varAssign.children.size())))
 		{
 			assert(false and "no node <expr> in <var-assign>");
@@ -163,18 +163,18 @@ namespace Producer
 
 
 
-	bool Scope::visitASTVar(const Node& node)
+	bool Scope::visitASTVar(const AST::Node& node)
 	{
-		assert(node.rule == rgVar);
+		assert(node.rule == AST::rgVar);
 		assert(not node.children.empty());
 
 		// variable name
 		AnyString varname;
 		bool ref = false;
 		bool constant = false;
-		Node* varnodeDecl = nullptr;
-		Node* varAssign = nullptr;
-		Node* varType = nullptr;
+		AST::Node* varnodeDecl = nullptr;
+		AST::Node* varAssign = nullptr;
+		AST::Node* varType = nullptr;
 		bool isProperty = false;
 
 		for (auto& childptr: node.children)
@@ -182,7 +182,7 @@ namespace Producer
 			auto& child = *childptr;
 			switch (child.rule)
 			{
-				case rgIdentifier:
+				case AST::rgIdentifier:
 				{
 					varnodeDecl = &child;
 					varname = child.text;
@@ -191,44 +191,44 @@ namespace Producer
 						return false;
 					break;
 				}
-				case rgVarAssign:
+				case AST::rgVarAssign:
 				{
 					varAssign = &child;
 					break;
 				}
-				case rgVarProperty:
+				case AST::rgVarProperty:
 				{
 					isProperty = true;
 					varAssign = &child;
 					break;
 				}
 
-				case rgVarType:
+				case AST::rgVarType:
 				{
 					varType = &child;
-					if (child.children.size() == 1 and child.children[0]->rule == rgType)
-						varType = Node::Ptr::WeakPointer(child.children[0]);
+					if (child.children.size() == 1 and child.children[0]->rule == AST::rgType)
+						varType = AST::Node::Ptr::WeakPointer(child.children[0]);
 					else
 						error(child) << "invalid type definition";
 					break;
 				}
 
-				case rgVarByValue:
+				case AST::rgVarByValue:
 				{
 					break; // nothing to do
 				}
-				case rgConst:
+				case AST::rgConst:
 				{
 					constant = true;
 					warning(child) << "'const' in var declaration is currently not supported";
 					break;
 				}
-				case rgRef:
+				case AST::rgRef:
 				{
 					ref = true;
 					break;
 				}
-				case rgCref:
+				case AST::rgCref:
 				{
 					warning(child) << "'const' in var declaration is currently not supported";
 					ref = true;
@@ -236,7 +236,7 @@ namespace Producer
 					break;
 				}
 
-				case rgFuncParamVariadic:
+				case AST::rgFuncParamVariadic:
 				{
 					error(child) << "variadic parameter not allowed in variable definition";
 					return false;
@@ -314,6 +314,7 @@ namespace Producer
 						return false;
 					break;
 				}
+
 				case Kind::kfunc:
 				{
 					// create the variable itself
@@ -377,7 +378,6 @@ namespace Producer
 
 		return true;
 	}
-
 
 
 

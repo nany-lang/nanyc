@@ -5,13 +5,6 @@
 #pragma warning(disable: 4251)
 #endif
 
-
-/*!
-** \brief Prefix for named function operators (new, renew, copy...)
-*/
-#define NANY_OPERATOR_NAME_PREFIX "@"
-
-
 #define likely(X)    YUNI_LIKELY(X)
 #define unlikely(X)  YUNI_UNLIKELY(X)
 
@@ -28,20 +21,19 @@ namespace Nany
 	//! Local var ID
 	typedef yuint32 LVID;
 
-	static inline bool  lvidIsAny(LVID lvid) { return lvid == (LVID) -1; }
+	static inline constexpr bool lvidIsAny(LVID lvid) { return lvid == (LVID) -1; }
 
 
 	class CTarget;
-	class Node;
 	class Atom;
 	class ClassdefTable;
 	class ClassdefTableView;
-
 	class Intrinsic;
-
 
 } // namespace Nany
 
+
+namespace Nany { namespace AST { class Node; } }
 
 
 namespace Nany

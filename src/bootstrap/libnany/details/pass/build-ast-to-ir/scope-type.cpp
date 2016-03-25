@@ -14,9 +14,9 @@ namespace IR
 namespace Producer
 {
 
-	bool Scope::visitASTExprTypeDecl(const Node& node, LVID& localvar)
+	bool Scope::visitASTExprTypeDecl(const AST::Node& node, LVID& localvar)
 	{
-		assert(node.rule == rgTypeDecl);
+		assert(node.rule == AST::rgTypeDecl);
 		localvar = 0;
 
 		if (node.children.size() == 1)
@@ -39,7 +39,7 @@ namespace Producer
 			else
 			{
 				// anonymous / inline class definitnio
-				if (identifier.rule == rgClass)
+				if (identifier.rule == AST::rgClass)
 				{
 					//error(identifier) << "anonymous classes are not supported yet";
 					//return false;
@@ -55,9 +55,9 @@ namespace Producer
 
 
 
-	bool Scope::visitASTType(const Node& node, LVID& localvar)
+	bool Scope::visitASTType(const AST::Node& node, LVID& localvar)
 	{
-		assert(node.rule == rgType);
+		assert(node.rule == AST::rgType);
 		assert(not node.children.empty());
 
 		bool success = true;
@@ -72,7 +72,7 @@ namespace Producer
 
 			switch (child.rule)
 			{
-				case rgTypeDecl:
+				case AST::rgTypeDecl:
 				{
 					if (unlikely(localvar != 0))
 						return ICEUnexpectedNode(child, "[ir/new/several calls]");
@@ -85,15 +85,15 @@ namespace Producer
 					break;
 				}
 
-				case rgTypeQualifier:
+				case AST::rgTypeQualifier:
 				{
 					for (auto& qualifier: child.children)
 					{
 						switch (qualifier->rule)
 						{
-							case rgRef:   isRef   = true; break;
-							case rgConst: isConst = true; break;
-							case rgCref:  isRef   = true; isConst = true; break;
+							case AST::rgRef:   isRef   = true; break;
+							case AST::rgConst: isConst = true; break;
+							case AST::rgCref:  isRef   = true; isConst = true; break;
 							default:
 								success = ICEUnexpectedNode(child, "[ir/type-qualifier]");
 						}
@@ -101,7 +101,7 @@ namespace Producer
 					break;
 				}
 
-				case rgClass:
+				case AST::rgClass:
 				{
 					break;
 				}

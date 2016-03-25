@@ -15,9 +15,9 @@ namespace IR
 namespace Producer
 {
 
-	inline bool Scope::visitASTExprCallParameters(const Node& node, uint32_t shortcircuitlabel)
+	inline bool Scope::visitASTExprCallParameters(const AST::Node& node, uint32_t shortcircuitlabel)
 	{
-		assert(node.rule == rgCall);
+		assert(node.rule == AST::rgCall);
 		// parameter index
 		uint paramCount = 0;
 		// at least one named-parameter has been encountered ?
@@ -38,8 +38,8 @@ namespace Producer
 			auto& child = *childptr;
 			switch (child.rule)
 			{
-				case rgCallParameter:
-				case rgCallNamedParameter:
+				case AST::rgCallParameter:
+				case AST::rgCallNamedParameter:
 				{
 					if (unlikely(paramCount >= Config::maxPushedParameters))
 					{
@@ -48,7 +48,7 @@ namespace Producer
 					}
 
 					// is the parameter named ?
-					bool isNamed = (child.rule == rgCallNamedParameter);
+					bool isNamed = (child.rule == AST::rgCallNamedParameter);
 					// detect mixed-up named and indexed parameters
 					if (not isNamed)
 					{
@@ -69,7 +69,7 @@ namespace Producer
 						auto& paramchild = *paramChildptr;
 						switch (paramchild.rule)
 						{
-							case rgExpr:
+							case AST::rgExpr:
 							{
 								// this func call may be used by some boolean operators so we may
 								// want to evaluate the second argument only if the first argument
@@ -110,7 +110,7 @@ namespace Producer
 								}
 								break;
 							}
-							case rgIdentifier:
+							case AST::rgIdentifier:
 							{
 								if (likely(isNamed))
 								{
@@ -131,7 +131,7 @@ namespace Producer
 					break;
 				}
 
-				//case rgCallNamedParameter:
+				//case AST::rgCallNamedParameter:
 				default:
 					return ICEUnexpectedNode(child, "[ir/expr/call]");
 			}
@@ -155,9 +155,9 @@ namespace Producer
 
 
 
-	bool Scope::visitASTExprCall(const Node* node, LVID& localvar, const Node* parent)
+	bool Scope::visitASTExprCall(const AST::Node* node, LVID& localvar, const AST::Node* parent)
 	{
-		assert(!node or node->rule == rgCall);
+		assert(!node or node->rule == AST::rgCall);
 
 		emitDebugpos(node);
 
@@ -185,7 +185,7 @@ namespace Producer
 			// member may have to be read, or maybe it should not be done at all)
 
 			// this flag will only prepare some room for additional opcodes if required
-			bool shortcircuit = (parent != nullptr and parent->rule == rgIdentifier)
+			bool shortcircuit = (parent != nullptr and parent->rule == AST::rgIdentifier)
 				and (node->children.size() == 2)
 				and (parent->text == "^and" or parent->text == "^or");
 

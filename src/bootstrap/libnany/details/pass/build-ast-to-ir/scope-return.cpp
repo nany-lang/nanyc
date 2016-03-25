@@ -14,9 +14,9 @@ namespace Producer
 {
 
 
-	bool Scope::visitASTExprReturn(const Node& node)
+	bool Scope::visitASTExprReturn(const AST::Node& node)
 	{
-		assert(node.rule == rgReturn);
+		assert(node.rule == AST::rgReturn);
 		// assert(not node.children.empty()); -- a return may be empty
 
 		bool success = true;
@@ -29,7 +29,7 @@ namespace Producer
 
 			switch (child.rule)
 			{
-				case rgExpr:
+				case AST::rgExpr:
 				{
 					IR::OpcodeScopeLocker opscope{out};
 					LVID localvar;

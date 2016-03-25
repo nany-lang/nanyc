@@ -16,7 +16,7 @@ namespace Producer
 {
 
 
-	bool Scope::visitASTExprClosure(const Node& node, uint32_t& localvar)
+	bool Scope::visitASTExprClosure(const AST::Node& node, uint32_t& localvar)
 	{
 		bool success = true;
 		for (auto& childptr: node.children)
@@ -32,7 +32,7 @@ namespace Producer
 		if (!context.reuse.closure.node)
 			context.prepareReuseForClosures();
 
-		Node::Ptr expr = context.reuse.closure.node;
+		AST::Node::Ptr expr = context.reuse.closure.node;
 
 		return success;
 	}

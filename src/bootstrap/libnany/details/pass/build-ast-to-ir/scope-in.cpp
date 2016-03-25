@@ -16,7 +16,7 @@ namespace Producer
 {
 
 
-	bool Scope::visitASTExprIn(const Node& node, LVID& localvar)
+	bool Scope::visitASTExprIn(const AST::Node& node, LVID& localvar)
 	{
 		// Example: i in a | i > 10
 		//
@@ -96,7 +96,7 @@ namespace Producer
 			auto& child = *childptr;
 			switch (child.rule)
 			{
-				case rgInFilter:
+				case AST::rgInFilter:
 				{
 					ICE(child) << "predicate for views not implemented yet";
 					break;

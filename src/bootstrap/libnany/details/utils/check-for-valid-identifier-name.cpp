@@ -95,7 +95,7 @@ namespace Nany
 	}
 
 
-	bool checkForValidIdentifierName(Logs::Report& report, const Nany::Node& node, const AnyString& name,
+	bool checkForValidIdentifierName(Logs::Report& report, const AST::Node& node, const AnyString& name,
 		bool isOperator, bool isType)
 	{
 		// do never accept empty names

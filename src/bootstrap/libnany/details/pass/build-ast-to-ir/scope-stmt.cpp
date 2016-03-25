@@ -14,18 +14,18 @@ namespace Producer
 {
 
 
-	bool Scope::visitASTStmt(const Node& orignode)
+	bool Scope::visitASTStmt(const AST::Node& orignode)
 	{
-		auto& node = (orignode.rule == rgExpr
-			and orignode.children.size() == 1 and orignode.children[0]->rule == rgExprValue)
+		auto& node = (orignode.rule == AST::rgExpr
+			and orignode.children.size() == 1 and orignode.children[0]->rule == AST::rgExprValue)
 			? *(orignode.children[0])
 			: orignode;
 
 		switch (node.rule)
 		{
 			// expressions
-			case rgExpr:
-			case rgExprValue:
+			case AST::rgExpr:
+			case AST::rgExprValue:
 			{
 				// Special case: Standalone function
 				// Normal functions are defined within a generic expression (but only from a stmt)
@@ -39,30 +39,30 @@ namespace Producer
 					auto& child = *(node.children[0]);
 					switch (child.rule)
 					{
-						case rgIf:       return visitASTExprIfStmt(child);
-						case rgFunction: return visitASTFunc(child);
-						case rgSwitch:   return visitASTExprSwitch(child);
+						case AST::rgIf:       return visitASTExprIfStmt(child);
+						case AST::rgFunction: return visitASTFunc(child);
+						case AST::rgSwitch:   return visitASTExprSwitch(child);
 						default: {}
 					}
 				}
 				// no break here - same as `expr-group`
 			}
-			case rgExprGroup:
+			case AST::rgExprGroup:
 			{
 				IR::OpcodeScopeLocker opscope{sequence()};
 				LVID localvar;
 				return visitASTExpr(node, localvar, /*allowScope:*/true);
 			}
 
-			case rgScope:   return visitASTExprScope(node);
-			case rgWhile:   return visitASTExprWhile(node);
-			case rgDoWhile: return visitASTExprDoWhile(node);
-			case rgVar:     return visitASTVar(node);
-			case rgReturn:  return visitASTExprReturn(node);
-			case rgClass:   return visitASTClass(node);
-			case rgTypedef: return visitASTTypedef(node);
+			case AST::rgScope:   return visitASTExprScope(node);
+			case AST::rgWhile:   return visitASTExprWhile(node);
+			case AST::rgDoWhile: return visitASTExprDoWhile(node);
+			case AST::rgVar:     return visitASTVar(node);
+			case AST::rgReturn:  return visitASTExprReturn(node);
+			case AST::rgClass:   return visitASTClass(node);
+			case AST::rgTypedef: return visitASTTypedef(node);
 
-			case rgClassVisibility: /*currently ignored */ return true;
+			case AST::rgClassVisibility: /*currently ignored */ return true;
 
 			default: return ICEUnexpectedNode(node, "[ir/stmt]");
 		}

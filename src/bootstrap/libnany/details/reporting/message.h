@@ -9,8 +9,6 @@
 
 
 
-namespace Nany { class Node; }
-
 namespace Nany
 {
 namespace Logs

@@ -15,9 +15,9 @@ namespace Producer
 {
 
 
-	bool Scope::visitASTExprWhile(const Node& node)
+	bool Scope::visitASTExprWhile(const AST::Node& node)
 	{
-		assert(node.rule == rgWhile);
+		assert(node.rule == AST::rgWhile);
 		assert(not node.children.empty());
 
 		uint32_t childcount = static_cast<uint32_t>(node.children.size());
@@ -82,9 +82,9 @@ namespace Producer
 	}
 
 
-	bool Scope::visitASTExprDoWhile(const Node& node)
+	bool Scope::visitASTExprDoWhile(const AST::Node& node)
 	{
-		assert(node.rule == rgDoWhile);
+		assert(node.rule == AST::rgDoWhile);
 		assert(not node.children.empty());
 
 		uint32_t childcount = static_cast<uint32_t>(node.children.size());

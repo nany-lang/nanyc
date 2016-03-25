@@ -15,7 +15,7 @@ namespace IR
 namespace Producer
 {
 
-	bool Scope::visitASTExprStringLiteral(const Node& node, LVID& localvar)
+	bool Scope::visitASTExprStringLiteral(const AST::Node& node, LVID& localvar)
 	{
 		// when called, this rule represents an internal cstring
 		// thus, this function is not called by an user-defined string
@@ -25,9 +25,9 @@ namespace Producer
 	}
 
 
-	bool Scope::visitASTExprString(const Node& node, yuint32& localvar)
+	bool Scope::visitASTExprString(const AST::Node& node, yuint32& localvar)
 	{
-		assert(node.rule == rgString);
+		assert(node.rule == AST::rgString);
 
 		// transform string literals into implicit `new string()`
 		//
@@ -44,10 +44,10 @@ namespace Producer
 			//     type-decl
 			//     |   identifier: string
 			auto& cache = context.reuse.string;
-			cache.createObject = new Node{rgNew};
-			Node::Ptr typeDecl = new Node{rgTypeDecl};
+			cache.createObject = new AST::Node{AST::rgNew};
+			AST::Node::Ptr typeDecl = new AST::Node{AST::rgTypeDecl};
 			cache.createObject->children.push_back(typeDecl);
-			Node::Ptr classname = new Node{rgIdentifier};
+			AST::Node::Ptr classname = new AST::Node{AST::rgIdentifier};
 			typeDecl->children.push_back(classname);
 			classname->text = "string";
 		}
@@ -64,7 +64,7 @@ namespace Producer
 		out.emitIdentify(calllvid, "^()", idlvid); // functor
 
 		context.reuse.string.text.clear();
-		Node* firstLiteralNode = nullptr;
+		AST::Node* firstLiteralNode = nullptr;
 
 		auto flush = [&]() {
 			emitDebugpos(*firstLiteralNode);
@@ -82,7 +82,7 @@ namespace Producer
 			auto& child = *childptr;
 			switch (child.rule)
 			{
-				case rgStringLiteral:
+				case AST::rgStringLiteral:
 				{
 					if (not child.text.empty())
 					{
@@ -93,7 +93,7 @@ namespace Producer
 					break;
 				}
 
-				case rgStringInterpolation:
+				case AST::rgStringInterpolation:
 				{
 					if (child.children.empty())
 						break;
@@ -108,7 +108,7 @@ namespace Producer
 					for (auto& ptr: child.children)
 					{
 						auto& expr = *ptr;
-						if (unlikely(expr.rule != rgExpr))
+						if (unlikely(expr.rule != AST::rgExpr))
 							return ICEUnexpectedNode(expr, "[string-interpolation]");
 
 						// creating a scope for temporary expression (string interpolation)
@@ -126,7 +126,7 @@ namespace Producer
 					break;
 				}
 
-				case rgCharExtended:
+				case AST::rgCharExtended:
 				{
 					if (nullptr == firstLiteralNode)
 						firstLiteralNode = &child;

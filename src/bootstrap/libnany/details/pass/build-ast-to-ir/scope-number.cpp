@@ -76,7 +76,7 @@ namespace Producer
 
 
 	template<bool BuiltinT, class DefT>
-	inline bool Scope::generateNumberCode(uint32_t& localvar, const DefT& numdef, const Node& node)
+	inline bool Scope::generateNumberCode(uint32_t& localvar, const DefT& numdef, const AST::Node& node)
 	{
 		// checking for invalid float values
 		nytype_t type = nyt_void;
@@ -210,9 +210,9 @@ namespace Producer
 
 
 
-	bool Scope::visitASTExprNumber(const Node& node, yuint32& localvar)
+	bool Scope::visitASTExprNumber(const AST::Node& node, yuint32& localvar)
 	{
-		assert(node.rule == rgNumber);
+		assert(node.rule == AST::rgNumber);
 		assert(not node.children.empty());
 
 		// Number definition
@@ -227,14 +227,14 @@ namespace Producer
 		{
 			switch (childptr->rule)
 			{
-				case rgNumberValue: // standard number definition
+				case AST::rgNumberValue: // standard number definition
 				{
 					bool firstPart = true;
 					for (auto& subnodeptr: childptr->children)
 					{
 						switch (subnodeptr->rule)
 						{
-							case rgInteger:
+							case AST::rgInteger:
 							{
 								if (likely(firstPart))
 								{
@@ -265,7 +265,7 @@ namespace Producer
 					break;
 				}
 
-				case rgNumberSign: // + -
+				case AST::rgNumberSign: // + -
 				{
 					assert(not childptr->text.empty() and "invalid ast");
 					numdef.sign = childptr->text[0];
@@ -273,14 +273,14 @@ namespace Producer
 					break;
 				}
 
-				case rgNumberQualifier: // unsigned / signed / float
+				case AST::rgNumberQualifier: // unsigned / signed / float
 				{
 					for (auto& subnodeptr: childptr->children)
 					{
 						auto& subnode = *(subnodeptr);
 						switch (subnode.rule)
 						{
-							case rgNumberQualifierType:
+							case AST::rgNumberQualifierType:
 							{
 								assert(not subnode.text.empty());
 								uint offset = 0;
@@ -302,7 +302,7 @@ namespace Producer
 								}
 								break;
 							}
-							case rgInteger:
+							case AST::rgInteger:
 							{
 								if (likely(subnode.text.size() < 10))
 								{

@@ -9,21 +9,21 @@ namespace AST
 {
 
 
-	inline Sema::Metadata& metadata(Nany::Node& node)
+	inline Sema::Metadata& metadata(AST::Node& node)
 	{
 		assert(node.metadata);
 		return *((Sema::Metadata*) node.metadata);
 	}
 
 
-	inline const Sema::Metadata& metadata(const Nany::Node& node)
+	inline const Sema::Metadata& metadata(const AST::Node& node)
 	{
 		assert(node.metadata);
 		return *((const Sema::Metadata*) node.metadata);
 	}
 
 
-	inline Sema::Metadata& metadata(Nany::Node* node)
+	inline Sema::Metadata& metadata(AST::Node* node)
 	{
 		assert(node);
 		assert(node->metadata);
@@ -31,7 +31,7 @@ namespace AST
 	}
 
 
-	inline const Sema::Metadata& metadata(const Nany::Node* node)
+	inline const Sema::Metadata& metadata(const AST::Node* node)
 	{
 		assert(node);
 		assert(node->metadata);
@@ -39,7 +39,7 @@ namespace AST
 	}
 
 
-	inline Sema::Metadata& metadata(Nany::Node::Ptr& node)
+	inline Sema::Metadata& metadata(AST::Node::Ptr& node)
 	{
 		assert(!(!node));
 		assert(node->metadata);
@@ -61,7 +61,6 @@ namespace AST
 			return identifier;
 		}
 	}
-
 
 
 	template<class S> bool retrieveEntityString(S& out, const Node& node)

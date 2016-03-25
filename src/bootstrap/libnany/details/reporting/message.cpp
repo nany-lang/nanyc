@@ -10,6 +10,7 @@ namespace Nany
 namespace Logs
 {
 
+
 	Message& Message::createEntry(Level level)
 	{
 		Message* entry = new Message{level};
@@ -33,8 +34,6 @@ namespace Logs
 			}
 		}
 	}
-
-
 
 
 
@@ -109,26 +108,32 @@ namespace Logs
 						#endif
 						break;
 					}
-
 					case Level::trace:
+					{
 						System::Console::SetTextColor(out, System::Console::purple);
 						out << "      ::";
 						System::Console::ResetTextColor(out);
 						out << sep;
 						break;
+					}
 					case Level::verbose:
+					{
 						System::Console::SetTextColor(out, System::Console::green);
 						out << "      ::";
 						System::Console::ResetTextColor(out);
 						out << sep;
 						break;
+					}
 					case Level::ICE:
+					{
 						System::Console::SetTextColor(out, System::Console::red);
 						out << "     ICE" << sep;
 						break;
-
+					}
 					case Level::none:
+					{
 						break;
+					}
 				}
 
 				for (uint32_t i = indent; i--; )
@@ -233,9 +238,6 @@ namespace Logs
 		String tmp;
 		printMessage(out, *this, 0, tmp);
 	}
-
-
-
 
 
 

@@ -15,9 +15,9 @@ namespace Producer
 {
 
 
-	bool Scope::visitASTExprIntrinsic(const Node& node, LVID& localvar)
+	bool Scope::visitASTExprIntrinsic(const AST::Node& node, LVID& localvar)
 	{
-		assert(node.rule == rgIntrinsic);
+		assert(node.rule == AST::rgIntrinsic);
 		assert(not node.children.empty());
 
 		bool success = true;
@@ -29,14 +29,14 @@ namespace Producer
 
 			switch (child.rule)
 			{
-				case rgEntity:
+				case AST::rgEntity:
 				{
 					for (auto& entityptr: child.children)
 					{
 						auto& entity = *entityptr;
 						switch (entity.rule)
 						{
-							case rgIdentifier:
+							case AST::rgIdentifier:
 							{
 								if (not intrinsicname.empty())
 									intrinsicname += '.';
@@ -53,13 +53,13 @@ namespace Producer
 					break;
 				}
 
-				case rgIdentifier:
+				case AST::rgIdentifier:
 				{
 					intrinsicname = child.text;
 					break;
 				}
 
-				case rgCall:
+				case AST::rgCall:
 				{
 					success &= visitASTExprCallParameters(child);
 					break;

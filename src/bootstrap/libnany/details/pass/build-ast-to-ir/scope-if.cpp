@@ -15,7 +15,7 @@ namespace Producer
 {
 
 
-	bool Scope::generateIfStmt(const Node& expr, const Node& thenc, const Node* elseptr, uint32_t* customjmpthenOffset)
+	bool Scope::generateIfStmt(const AST::Node& expr, const AST::Node& thenc, const AST::Node* elseptr, uint32_t* customjmpthenOffset)
 	{
 		// output sequence
 		auto& out = sequence();
@@ -101,7 +101,7 @@ namespace Producer
 	}
 
 
-	bool Scope::generateIfExpr(uint32_t& ifret, const Node& expr, const Node& thenc, const Node& elsec)
+	bool Scope::generateIfExpr(uint32_t& ifret, const AST::Node& expr, const AST::Node& thenc, const AST::Node& elsec)
 	{
 		// output sequence
 		auto& out = sequence();
@@ -188,9 +188,9 @@ namespace Producer
 
 
 
-	bool Scope::visitASTExprIfStmt(const Node& node)
+	bool Scope::visitASTExprIfStmt(const AST::Node& node)
 	{
-		assert(node.rule == rgIf);
+		assert(node.rule == AST::rgIf);
 		assert(node.children.size() >= 2);
 
 		// the condition to evaluate
@@ -209,7 +209,7 @@ namespace Producer
 				// if-then-else
 				auto& condition  = *(node.children[0]);
 				auto& thenc = *(node.children[1]);
-				auto* elsec = Node::Ptr::WeakPointer(node.children[2]);
+				auto* elsec = AST::Node::Ptr::WeakPointer(node.children[2]);
 				return generateIfStmt(condition, thenc, elsec);
 			}
 			default:
@@ -222,9 +222,9 @@ namespace Producer
 	}
 
 
-	bool Scope::visitASTExprIfExpr(const Node& node, LVID& localvar)
+	bool Scope::visitASTExprIfExpr(const AST::Node& node, LVID& localvar)
 	{
-		assert(node.rule == rgIf);
+		assert(node.rule == AST::rgIf);
 		assert(node.children.size() >= 2);
 
 		localvar = 0u;

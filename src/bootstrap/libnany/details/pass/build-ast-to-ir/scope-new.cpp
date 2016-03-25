@@ -16,9 +16,9 @@ namespace Producer
 {
 
 
-	bool Scope::visitASTExprNew(const Node& node, LVID& localvar)
+	bool Scope::visitASTExprNew(const AST::Node& node, LVID& localvar)
 	{
-		assert(node.rule == rgNew);
+		assert(node.rule == AST::rgNew);
 		if (unlikely(node.children.empty()))
 			return false;
 
@@ -26,7 +26,7 @@ namespace Producer
 
 		// create a new variable for the result
 		LVID rettype = 0;
-		const Node* call = nullptr;
+		const AST::Node* call = nullptr;
 
 		for (auto& childptr: node.children)
 		{
@@ -34,7 +34,7 @@ namespace Producer
 
 			switch (child.rule)
 			{
-				case rgTypeDecl:
+				case AST::rgTypeDecl:
 				{
 					if (unlikely(rettype != 0))
 						return ICEUnexpectedNode(child, "[ir/new/several calls]");
@@ -55,7 +55,7 @@ namespace Producer
 					}
 					break;
 				}
-				case rgCall:
+				case AST::rgCall:
 				{
 					call = &child;
 					break;

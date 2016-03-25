@@ -6,7 +6,6 @@
 
 
 
-
 namespace Nany
 {
 namespace IR
@@ -39,60 +38,60 @@ namespace Producer
 		//@}
 
 
-		//! \name Node visitor
+		//! \name AST::Node visitor
 		//@{
 		//! Visit an unknown node
-		bool visitAST(Node&);
+		bool visitAST(AST::Node&);
 
-		bool visitASTStmt(const Node&);
-		bool visitASTFunc(const Node&);
-		bool visitASTClass(const Node&, LVID* localvar = nullptr);
-		bool visitASTType(const Node&, LVID& localvar);
-		bool visitASTTypedef(const Node&);
+		bool visitASTStmt(const AST::Node&);
+		bool visitASTFunc(const AST::Node&);
+		bool visitASTClass(const AST::Node&, LVID* localvar = nullptr);
+		bool visitASTType(const AST::Node&, LVID& localvar);
+		bool visitASTTypedef(const AST::Node&);
 
-		bool visitASTVar(const Node&);
-		bool visitASTVarValueInitialization(LVID&, const Node&, const Node&, const AnyString&);
+		bool visitASTVar(const AST::Node&);
+		bool visitASTVarValueInitialization(LVID&, const AST::Node&, const AST::Node&, const AnyString&);
 
-		bool visitASTExpr(const Node&, LVID& localvar, bool allowScope = false);
-		bool visitASTExprIntrinsic(const Node&, LVID& localvar);
-		bool visitASTExprReturn(const Node&);
-		bool visitASTExprContinuation(const Node&, LVID& localvar, bool allowScope = false);
-		bool visitASTExprIdentifier(const Node&, LVID& localvar);
-		bool visitASTExprCall(const Node*, LVID& localvar, const Node* parent = nullptr); // func call
-		bool visitASTExprCallParameters(const Node&, uint32_t shortcircuitlabel = 0); // parameters of a func call
-		bool visitASTExprSubDot(const Node&, LVID& localvar);
-		bool visitASTExprScope(const Node&);
-		bool visitASTExprNumber(const Node&, LVID& localvar);
-		bool visitASTExprString(const Node&, LVID& localvar);
-		bool visitASTExprStringLiteral(const Node&, LVID& localvar);
-		bool visitASTExprNew(const Node&, LVID& localvar);
-		bool visitASTExprTypeDecl(const Node&, LVID& localvar);
-		bool visitASTExprTypeof(const Node&, LVID& localvar);
-		bool visitASTExprIfStmt(const Node&);
-		bool visitASTExprIfExpr(const Node&, LVID& localvar);
-		bool visitASTExprWhile(const Node&);
-		bool visitASTExprDoWhile(const Node&);
-		bool visitASTExprSwitch(const Node&);
-		bool visitASTExprIn(const Node&, LVID& localvar);
-		bool visitASTExprClosure(const Node&, uint32_t& localvar);
+		bool visitASTExpr(const AST::Node&, LVID& localvar, bool allowScope = false);
+		bool visitASTExprIntrinsic(const AST::Node&, LVID& localvar);
+		bool visitASTExprReturn(const AST::Node&);
+		bool visitASTExprContinuation(const AST::Node&, LVID& localvar, bool allowScope = false);
+		bool visitASTExprIdentifier(const AST::Node&, LVID& localvar);
+		bool visitASTExprCall(const AST::Node*, LVID& localvar, const AST::Node* parent = nullptr); // func call
+		bool visitASTExprCallParameters(const AST::Node&, uint32_t shortcircuitlabel = 0); // parameters of a func call
+		bool visitASTExprSubDot(const AST::Node&, LVID& localvar);
+		bool visitASTExprScope(const AST::Node&);
+		bool visitASTExprNumber(const AST::Node&, LVID& localvar);
+		bool visitASTExprString(const AST::Node&, LVID& localvar);
+		bool visitASTExprStringLiteral(const AST::Node&, LVID& localvar);
+		bool visitASTExprNew(const AST::Node&, LVID& localvar);
+		bool visitASTExprTypeDecl(const AST::Node&, LVID& localvar);
+		bool visitASTExprTypeof(const AST::Node&, LVID& localvar);
+		bool visitASTExprIfStmt(const AST::Node&);
+		bool visitASTExprIfExpr(const AST::Node&, LVID& localvar);
+		bool visitASTExprWhile(const AST::Node&);
+		bool visitASTExprDoWhile(const AST::Node&);
+		bool visitASTExprSwitch(const AST::Node&);
+		bool visitASTExprIn(const AST::Node&, LVID& localvar);
+		bool visitASTExprClosure(const AST::Node&, uint32_t& localvar);
 
-		bool visitASTExprTemplate(const Node&, LVID& localvar);
-		bool visitASTExprTemplateParameter(const Node& node);
-		bool visitASTDeclGenericTypeParameters(const Node&);
-		bool visitASTDeclSingleGenericTypeParameter(const Node&);
+		bool visitASTExprTemplate(const AST::Node&, LVID& localvar);
+		bool visitASTExprTemplateParameter(const AST::Node& node);
+		bool visitASTDeclGenericTypeParameters(const AST::Node&);
+		bool visitASTDeclSingleGenericTypeParameter(const AST::Node&);
 		//@}
 
 
 		//! \name Typeinfo / variables
 		//@{
 		//! Create a new local builtin float
-		LVID createLocalBuiltinFloat64(const Node&, nytype_t type, double value);
+		LVID createLocalBuiltinFloat64(const AST::Node&, nytype_t type, double value);
 		//! Create a new local builtin integer
-		LVID createLocalBuiltinInt64(const Node&, nytype_t type, yuint64 value);
+		LVID createLocalBuiltinInt64(const AST::Node&, nytype_t type, yuint64 value);
 		//! Create a new local builtin 'void'
-		LVID createLocalBuiltinVoid(const Node&);
+		LVID createLocalBuiltinVoid(const AST::Node&);
 		//! Create a new local variable 'any'
-		LVID createLocalBuiltinAny(const Node&);
+		LVID createLocalBuiltinAny(const AST::Node&);
 
 		//! Reserve a new variable id
 		LVID reserveLocalVariable();
@@ -114,15 +113,15 @@ namespace Producer
 		void comment();
 
 		//! Emit opcode related to the current position (in the current source)
-		void emitDebugpos(const Node& node);
-		void emitDebugpos(const Node* node);
+		void emitDebugpos(const AST::Node& node);
+		void emitDebugpos(const AST::Node* node);
 		void addDebugCurrentFilename();
 		void addDebugCurrentFilename(const AnyString& filename);
 		void addDebugCurrentPosition(uint line, uint offset);
-		void fetchLineAndOffsetFromNode(const Node& node, yuint32& line, yuint32& offset) const;
+		void fetchLineAndOffsetFromNode(const AST::Node& node, yuint32& line, yuint32& offset) const;
 
-		bool generateIfStmt(const Node& expr, const Node& thenc, const Node* elsec = nullptr, uint32_t* customjmpthenOffset = nullptr);
-		bool generateIfExpr(uint32_t& ifret, const Node& expr, const Node& thenc, const Node& elsec);
+		bool generateIfStmt(const AST::Node& expr, const AST::Node& thenc, const AST::Node* elsec = nullptr, uint32_t* customjmpthenOffset = nullptr);
+		bool generateIfExpr(uint32_t& ifret, const AST::Node& expr, const AST::Node& thenc, const AST::Node& elsec);
 
 
 		//! \name Utilities
@@ -136,7 +135,7 @@ namespace Producer
 		bool hasDebuginfo() const;
 
 		//! Get the name from a 'symbol-name' node (empty if error)
-		AnyString getSymbolNameFromASTNode(const Node& node);
+		AnyString getSymbolNameFromASTNode(const AST::Node& node);
 		//@}
 
 
@@ -146,16 +145,16 @@ namespace Producer
 		Logs::Report& report();
 		//! Generate an error "ICE: unexecpected node..."
 		// \return Always false
-		bool ICEUnexpectedNode(const Node& node, const AnyString& location) const;
+		bool ICEUnexpectedNode(const AST::Node& node, const AnyString& location) const;
 		//! Generate an error "ICE: <msg>"
 		// \return Always false
-		Logs::Report ICE(const Node& node) const;
+		Logs::Report ICE(const AST::Node& node) const;
 
-		Logs::Report error(const Node& node);
-		Logs::Report warning(const Node& node);
+		Logs::Report error(const AST::Node& node);
+		Logs::Report warning(const AST::Node& node);
 
-		void setErrorFrom(Logs::Report& report, const Node& node) const;
-		void setErrorFrom(const Node& node) const;
+		void setErrorFrom(Logs::Report& report, const AST::Node& node) const;
+		void setErrorFrom(const AST::Node& node) const;
 		//@}
 
 
@@ -172,12 +171,12 @@ namespace Producer
 
 
 	private:
-		bool generateInitFuncForClassVar(const AnyString& varname, LVID, const Node& varAssign);
-		bool generateTypeofForClassVar(LVID&, const Node& varAssign);
-		template<bool BuiltinT, class DefT> bool generateNumberCode(uint32_t& localvar, const DefT& numdef, const Node&);
+		bool generateInitFuncForClassVar(const AnyString& varname, LVID, const AST::Node& varAssign);
+		bool generateTypeofForClassVar(LVID&, const AST::Node& varAssign);
+		template<bool BuiltinT, class DefT> bool generateNumberCode(uint32_t& localvar, const DefT& numdef, const AST::Node&);
 		void emitTmplParametersIfAny();
 
-		void prepareClosureNodeExpr(Node::Ptr& out);
+		void prepareClosureNodeExpr(AST::Node::Ptr& out);
 
 
 	private:

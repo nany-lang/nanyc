@@ -78,40 +78,40 @@ namespace Producer
 
 		struct {
 			struct {
-				Node::Ptr node;
-				Node::Ptr classname;
-				Node::Ptr lvidnode;
+				AST::Node::Ptr node;
+				AST::Node::Ptr classname;
+				AST::Node::Ptr lvidnode;
 			}
 			literal;
 
 			struct {
-				Node::Ptr createObject;
+				AST::Node::Ptr createObject;
 				YString text;
 			}
 			string;
 
 			struct {
-				Node::Ptr node;
-				Node* funcname = nullptr;
-				Node* varname = nullptr;
-				Node* callparam = nullptr;
+				AST::Node::Ptr node;
+				AST::Node* funcname = nullptr;
+				AST::Node* varname = nullptr;
+				AST::Node* callparam = nullptr;
 			}
 			func;
 
 			struct {
-				Node::Ptr node;
-				Node* funcname = nullptr;
+				AST::Node::Ptr node;
+				AST::Node* funcname = nullptr;
 			}
 			operatorDefault;
 
 			struct {
-				Node::Ptr node;
-				Node* funcname;
+				AST::Node::Ptr node;
+				AST::Node* funcname;
 			}
 			operatorClone;
 
 			struct {
-				Node::Ptr node;
+				AST::Node::Ptr node;
 			}
 			closure;
 		}

@@ -15,18 +15,18 @@ namespace IR
 namespace Producer
 {
 
-	bool Scope::visitASTTypedef(const Node& node)
+	bool Scope::visitASTTypedef(const AST::Node& node)
 	{
-		assert(node.rule == rgTypedef);
+		assert(node.rule == AST::rgTypedef);
 		AnyString typedefname;
-		const Node* typeexpr = nullptr;
+		const AST::Node* typeexpr = nullptr;
 
 		for (auto& childptr: node.children)
 		{
 			auto& child = *childptr;
 			switch (child.rule)
 			{
-				case rgIdentifier:
+				case AST::rgIdentifier:
 				{
 					typedefname = child.text;
 					bool ok = checkForValidIdentifierName(report(), child, typedefname, false, true);
@@ -34,7 +34,7 @@ namespace Producer
 						return false;
 					break;
 				}
-				case rgType:
+				case AST::rgType:
 				{
 					typeexpr = &child;
 					break;

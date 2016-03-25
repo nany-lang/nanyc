@@ -15,12 +15,12 @@ namespace Producer
 {
 
 
-	bool Scope::ICEUnexpectedNode(const Node& node, const AnyString& location) const
+	bool Scope::ICEUnexpectedNode(const AST::Node& node, const AnyString& location) const
 	{
-		if (not Nany::ASTRuleIsError(node.rule))
+		if (not AST::ruleIsError(node.rule))
 		{
 			auto report = context.report.ICE();
-			auto rulename = Nany::ASTRuleToString(node.rule);
+			auto rulename = AST::ruleToString(node.rule);
 			report << "unexpected node '" << rulename << '\'';
 			if (not location.empty())
 				report << ' ' << location;
@@ -31,7 +31,7 @@ namespace Producer
 	}
 
 
-	Logs::Report Scope::error(const Node& node)
+	Logs::Report Scope::error(const AST::Node& node)
 	{
 		auto err = context.report.error();
 		setErrorFrom(err, node);
@@ -39,7 +39,7 @@ namespace Producer
 	}
 
 
-	Logs::Report Scope::warning(const Node& node)
+	Logs::Report Scope::warning(const AST::Node& node)
 	{
 		auto err = context.report.warning();
 		setErrorFrom(err, node);
@@ -47,7 +47,7 @@ namespace Producer
 	}
 
 
-	Logs::Report Scope::ICE(const Node& node) const
+	Logs::Report Scope::ICE(const AST::Node& node) const
 	{
 		auto ice = context.report.ICE();
 		setErrorFrom(ice, node);
@@ -56,7 +56,7 @@ namespace Producer
 
 
 
-	void Scope::fetchLineAndOffsetFromNode(const Node& node, yuint32& line, yuint32& offset) const
+	void Scope::fetchLineAndOffsetFromNode(const AST::Node& node, yuint32& line, yuint32& offset) const
 	{
 		if (node.offset > 0)
 		{
@@ -81,7 +81,7 @@ namespace Producer
 	}
 
 
-	void Scope::emitDebugpos(const Node& node)
+	void Scope::emitDebugpos(const AST::Node& node)
 	{
 		if (likely(node.offset > 0))
 		{
@@ -95,13 +95,13 @@ namespace Producer
 	}
 
 
-	AnyString Scope::getSymbolNameFromASTNode(const Node& node)
+	AnyString Scope::getSymbolNameFromASTNode(const AST::Node& node)
 	{
-		assert(node.rule == rgSymbolName);
+		assert(node.rule == AST::rgSymbolName);
 		assert(node.children.size() == 1);
 
 		auto& identifier = *(node.children[0]);
-		if (unlikely(identifier.rule != rgIdentifier))
+		if (unlikely(identifier.rule != AST::rgIdentifier))
 		{
 			ICEUnexpectedNode(node, "expected identifier");
 			return AnyString{};

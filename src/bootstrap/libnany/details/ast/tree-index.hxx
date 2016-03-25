@@ -8,7 +8,7 @@ namespace Nany
 
 
 	template<class T>
-	inline bool ASTHelper::each(enum Nany::ASTRule rule, const T& callback)
+	inline bool ASTHelper::each(enum AST::Rule rule, const T& callback)
 	{
 		assert(isIndexEnabled(rule) and "index not enabled");
 		auto& set = index[(uint) rule];
@@ -22,7 +22,7 @@ namespace Nany
 	}
 
 
-	inline void ASTHelper::nodeCopyOffsetText(Nany::Node& dest, const Nany::Node& source)
+	inline void ASTHelper::nodeCopyOffsetText(AST::Node& dest, const AST::Node& source)
 	{
 		dest.offset    = source.offset;
 		dest.offsetEnd = source.offsetEnd;
@@ -30,7 +30,7 @@ namespace Nany
 	}
 
 
-	inline void ASTHelper::nodeCopyOffsetAndOriginalNode(Nany::Node& dest, const Nany::Node& source)
+	inline void ASTHelper::nodeCopyOffsetAndOriginalNode(AST::Node& dest, const AST::Node& source)
 	{
 		dest.offset    = source.offset;
 		dest.offsetEnd = source.offsetEnd;
@@ -38,7 +38,7 @@ namespace Nany
 	}
 
 
-	inline void ASTHelper::nodeCopyOffsetTextAndOriginalNode(Nany::Node& dest, const Nany::Node& source)
+	inline void ASTHelper::nodeCopyOffsetTextAndOriginalNode(AST::Node& dest, const AST::Node& source)
 	{
 		dest.offset    = source.offset;
 		dest.offsetEnd = source.offsetEnd;
@@ -48,7 +48,7 @@ namespace Nany
 
 
 	template<class T>
-	void ASTHelper::nodeEachParent(Nany::Node& node, const T& callback)
+	void ASTHelper::nodeEachParent(AST::Node& node, const T& callback)
 	{
 		auto* parent = AST::metadata(node).parent;
 		while (parent)
@@ -61,16 +61,16 @@ namespace Nany
 
 
 	template<class T>
-	void ASTHelper::nodeEachItemInXPath(Nany::Node& node, const T& callback)
+	void ASTHelper::nodeEachItemInXPath(AST::Node& node, const T& callback)
 	{
 		enum
 		{
 			revStackHardCodedSize = 64,
 		};
-		Nany::Node* reverseStack[revStackHardCodedSize];
+		AST::Node* reverseStack[revStackHardCodedSize];
 		uint index = 0;
 		// when the stack size is greater than `revStackHardCodedSize`
-		std::vector<Nany::Node*> reverseDynStack;
+		std::vector<AST::Node*> reverseDynStack;
 
 		auto* parent = AST::metadata(node).parent;
 		while (parent)
@@ -114,9 +114,10 @@ namespace Nany
 	}
 
 
-	inline Nany::Node* ASTHelper::nodeAppend(Nany::Node& parent, std::initializer_list<enum Nany::ASTRule> list)
+	inline AST::Node*
+	ASTHelper::nodeAppend(AST::Node& parent, std::initializer_list<enum AST::Rule> list)
 	{
-		Nany::Node* node = &parent;
+		AST::Node* node = &parent;
 		for (auto it: list)
 			node = nodeAppend(*node, it);
 		return node;

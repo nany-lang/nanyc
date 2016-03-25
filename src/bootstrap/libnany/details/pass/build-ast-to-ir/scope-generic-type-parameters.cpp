@@ -19,15 +19,15 @@ namespace Producer
 {
 
 
-	inline bool Scope::visitASTDeclSingleGenericTypeParameter(const Node& node)
+	inline bool Scope::visitASTDeclSingleGenericTypeParameter(const AST::Node& node)
 	{
-		assert(node.rule == rgFuncParam);
+		assert(node.rule == AST::rgFuncParam);
 		for (auto& childptr: node.children)
 		{
 			auto& child = *childptr;
 			switch (child.rule)
 			{
-				case rgIdentifier:
+				case AST::rgIdentifier:
 				{
 					const AnyString& name = child.text;
 					if (not checkForValidIdentifierName(report(), child, name))
@@ -35,13 +35,13 @@ namespace Producer
 					sequence().emitBlueprintGenericTypeParam(nextvar(), name);
 					break;
 				}
-				case rgVarType:
+				case AST::rgVarType:
 				{
 					error(child)
 						<< "type definition for generic type parameters is currently not supported";
 					return false;
 				}
-				case rgVarAssign:
+				case AST::rgVarAssign:
 				{
 					error(child)
 						<< "default value for generic type parameters not implemented";
@@ -55,9 +55,9 @@ namespace Producer
 	}
 
 
-	bool Scope::visitASTDeclGenericTypeParameters(const Node& node)
+	bool Scope::visitASTDeclGenericTypeParameters(const AST::Node& node)
 	{
-		assert(node.rule == rgClassTemplateParams);
+		assert(node.rule == AST::rgClassTemplateParams);
 		if (unlikely(node.children.empty()))
 			return true;
 
@@ -72,7 +72,7 @@ namespace Producer
 			auto& child = *childptr;
 			switch (child.rule)
 			{
-				case rgFuncParam:
+				case AST::rgFuncParam:
 				{
 					success &= visitASTDeclSingleGenericTypeParameter(child);
 					break;
@@ -88,11 +88,11 @@ namespace Producer
 
 
 
-	inline bool Scope::visitASTExprTemplateParameter(const Node& node)
+	inline bool Scope::visitASTExprTemplateParameter(const AST::Node& node)
 	{
-		assert(node.rule == rgCallTemplateParameter or node.rule == rgCallTemplateNamedParameter);
+		assert(node.rule == AST::rgCallTemplateParameter or node.rule == AST::rgCallTemplateNamedParameter);
 
-		const Node* type = nullptr;
+		const AST::Node* type = nullptr;
 		AnyString name;
 
 		for (auto& childptr: node.children)
@@ -101,12 +101,12 @@ namespace Producer
 
 			switch (child.rule)
 			{
-				case rgType:
+				case AST::rgType:
 				{
 					type = &child;
 					break;
 				}
-				case rgIdentifier:
+				case AST::rgIdentifier:
 				{
 					name = child.text;
 					break;
@@ -132,16 +132,16 @@ namespace Producer
 
 
 
-	bool Scope::visitASTExprTemplate(const Node& node, LVID& localvar)
+	bool Scope::visitASTExprTemplate(const AST::Node& node, LVID& localvar)
 	{
-		assert(node.rule == rgExprTemplate or node.rule == rgExprTypeTemplate);
+		assert(node.rule == AST::rgExprTemplate or node.rule == AST::rgExprTypeTemplate);
 
 		for (auto& childptr: node.children)
 		{
 			auto& child = *childptr;
 			switch (child.rule)
 			{
-				case rgCallTemplateParameters:
+				case AST::rgCallTemplateParameters:
 				{
 					lastPushedTmplParams.clear();
 					lastPushedTmplParams.reserve(child.children.size());
@@ -152,8 +152,8 @@ namespace Producer
 						auto& param = *ptr;
 						switch (param.rule)
 						{
-							case rgCallTemplateParameter:
-							case rgCallTemplateNamedParameter:
+							case AST::rgCallTemplateParameter:
+							case AST::rgCallTemplateNamedParameter:
 							{
 								success &= visitASTExprTemplateParameter(param);
 								break;
@@ -167,14 +167,14 @@ namespace Producer
 						return false;
 					break;
 				}
-				case rgExprSubDot:
+				case AST::rgExprSubDot:
 				{
 					bool e = visitASTExprSubDot(child, localvar);
 					if (unlikely(not e))
 						return false;
 					break;
 				}
-				case rgCall:
+				case AST::rgCall:
 				{
 					bool e = visitASTExprCall(&child, localvar, &node);
 					if (unlikely(not e))

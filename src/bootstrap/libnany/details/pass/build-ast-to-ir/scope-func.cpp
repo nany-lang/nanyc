@@ -32,14 +32,14 @@ namespace Producer
 			//! Default
 			FuncInspector(Scope& scope);
 
-			bool inspect(const Node& node);
+			bool inspect(const AST::Node& node);
 
 
 		public:
 			//! Parent scope
 			Scope& scope;
 			//! Func body
-			const Node* body = nullptr;
+			const AST::Node* body = nullptr;
 
 			//! name of the function
 			FuncnameType funcname;
@@ -49,12 +49,12 @@ namespace Producer
 
 
 		private:
-			bool inspectVisibility(const Node&);
-			bool inspectKind(const Node&);
-			bool inspectParameters(const Node*, const Node*);
-			bool inspectReturnType(const Node&);
-			bool inspectSingleParameter(uint pindex, const Node&, uint32_t paramoffset);
-			bool inspectAttributes(const Node&);
+			bool inspectVisibility(const AST::Node&);
+			bool inspectKind(const AST::Node&);
+			bool inspectParameters(const AST::Node*, const AST::Node*);
+			bool inspectReturnType(const AST::Node&);
+			bool inspectSingleParameter(uint pindex, const AST::Node&, uint32_t paramoffset);
+			bool inspectAttributes(const AST::Node&);
 
 		private:
 			//! Flag to determine whether the 'self' parameter is implicit
@@ -75,7 +75,7 @@ namespace Producer
 		{}
 
 
-		inline bool FuncInspector::inspectVisibility(const Node& node)
+		inline bool FuncInspector::inspectVisibility(const AST::Node& node)
 		{
 			bool success = true;
 
@@ -116,7 +116,7 @@ namespace Producer
 		}
 
 
-		inline bool FuncInspector::inspectKind(const Node& node)
+		inline bool FuncInspector::inspectKind(const AST::Node& node)
 		{
 			if (unlikely(node.children.size() != 1))
 				return scope.ICEUnexpectedNode(node, "[funckind/child]");
@@ -127,7 +127,7 @@ namespace Producer
 				//
 				// func/operator definition
 				//
-				case rgFunctionKindFunction:
+				case AST::rgFunctionKindFunction:
 				{
 					if (unlikely(kindchild.children.size() != 1))
 						return scope.ICEUnexpectedNode(kindchild, "[funckindfunc/child]");
@@ -140,13 +140,13 @@ namespace Producer
 					break;
 				}
 
-				case rgFunctionKindOperator:
+				case AST::rgFunctionKindOperator:
 				{
 					if (unlikely(kindchild.children.size() != 1))
 						return scope.ICEUnexpectedNode(kindchild, "[funckindfunc/child]");
 
 					auto& opname = *(kindchild.children[0]);
-					if (unlikely(opname.rule != rgFunctionKindOpname or not opname.children.empty()))
+					if (unlikely(opname.rule != AST::rgFunctionKindOpname or not opname.children.empty()))
 						return scope.ICEUnexpectedNode(opname, "[funckindfunc/child]");
 
 					if (not checkForValidIdentifierName(scope.report(), opname, opname.text, true))
@@ -159,7 +159,7 @@ namespace Producer
 					break;
 				}
 
-				case rgFunctionKindView:
+				case AST::rgFunctionKindView:
 				{
 					if (kindchild.children.empty())
 					{
@@ -186,9 +186,9 @@ namespace Producer
 		}
 
 
-		inline bool FuncInspector::inspectSingleParameter(uint pindex, const Node& node, uint32_t paramoffset)
+		inline bool FuncInspector::inspectSingleParameter(uint pindex, const AST::Node& node, uint32_t paramoffset)
 		{
-			assert(node.rule == rgFuncParam and "invalid func param node");
+			assert(node.rule == AST::rgFuncParam and "invalid func param node");
 
 			// lvid for the parameter
 			uint32_t lvid = pindex + 1 + 1; // params are 2-based (1 is the return type)
@@ -214,11 +214,11 @@ namespace Producer
 
 				switch (child.rule)
 				{
-					case rgRef:   ref = true; break;
-					case rgConst: constant = true; break;
-					case rgCref:  ref = constant = true; break;
+					case AST::rgRef:   ref = true; break;
+					case AST::rgConst: constant = true; break;
+					case AST::rgCref:  ref = constant = true; break;
 
-					case rgIdentifier: // name of the parameter
+					case AST::rgIdentifier: // name of the parameter
 					{
 						if (checkForValidIdentifierName(scope.report(), child, child.text, false))
 						{
@@ -232,7 +232,7 @@ namespace Producer
 						break;
 					}
 
-					case rgVarType:
+					case AST::rgVarType:
 					{
 						LVID paramtype = 0;
 
@@ -241,7 +241,7 @@ namespace Producer
 							auto& childtype = *childtypeptr;
 							switch (childtype.rule)
 							{
-								case rgType:
+								case AST::rgType:
 								{
 									success &= scope.visitASTType(childtype, paramtype);
 									break;
@@ -261,7 +261,7 @@ namespace Producer
 						break;
 					}
 
-					case rgFuncParamSelf:
+					case AST::rgFuncParamSelf:
 					{
 						if (likely(isNewOperator))
 						{
@@ -276,7 +276,7 @@ namespace Producer
 						break;
 					}
 
-					case rgFuncParamVariadic:
+					case AST::rgFuncParamVariadic:
 					{
 						scope.error(child) << "variadic parameters not implemented";
 						success = false;
@@ -317,14 +317,14 @@ namespace Producer
 		}
 
 
-		bool FuncInspector::inspectParameters(const Node* node, const Node* nodeTypeParams)
+		bool FuncInspector::inspectParameters(const AST::Node* node, const AST::Node* nodeTypeParams)
 		{
 			// total number of parameters
 			uint32_t paramCount;
 
 			if (node != nullptr)
 			{
-				assert(node->rule == rgFuncParams and "invalid func params node");
+				assert(node->rule == AST::rgFuncParams and "invalid func params node");
 				// determining the total number of parameters for the function
 				// if within a class, a implicit parameter 'self' will be added to each function
 				paramCount = static_cast<uint32_t>(node->children.size());
@@ -407,9 +407,9 @@ namespace Producer
 		}
 
 
-		inline bool FuncInspector::inspectReturnType(const Node& node)
+		inline bool FuncInspector::inspectReturnType(const AST::Node& node)
 		{
-			assert(node.rule == rgFuncReturnType and "invalid return type node");
+			assert(node.rule == AST::rgFuncReturnType and "invalid return type node");
 			if (debugmode)
 				scope.comment("return type"); // comment for clarity in code
 
@@ -421,7 +421,7 @@ namespace Producer
 				auto& child = *childptr;
 				switch (child.rule)
 				{
-					case rgType:
+					case AST::rgType:
 					{
 						success &= scope.visitASTType(child, rettype);
 						break;
@@ -447,21 +447,21 @@ namespace Producer
 		}
 
 
-		bool FuncInspector::inspectAttributes(const Node& node)
+		bool FuncInspector::inspectAttributes(const AST::Node& node)
 		{
-			assert(node.rule == rgAttributes);
+			assert(node.rule == AST::rgAttributes);
 			auto& out = scope.sequence();
 
 			for (auto& childptr: node.children)
 			{
 				auto& child = *childptr;
-				if (YUNI_UNLIKELY(child.rule != rgAttributesParameter))
+				if (YUNI_UNLIKELY(child.rule != AST::rgAttributesParameter))
 					return scope.ICEUnexpectedNode(child, "invalid node, not attribute parameter");
 				if (YUNI_UNLIKELY(child.children.size() != 2))
 					return scope.ICEUnexpectedNode(child, "invalid attribute parameter node");
-				if (YUNI_UNLIKELY(ASTRuleIsError(child.children[1]->rule)))
+				if (YUNI_UNLIKELY(AST::ruleIsError(child.children[1]->rule)))
 					return false;
-				if (YUNI_UNLIKELY(child.children[0]->rule != rgEntity))
+				if (YUNI_UNLIKELY(child.children[0]->rule != AST::rgEntity))
 					return scope.ICEUnexpectedNode(child, "invalid attribute parameter name");
 
 				ShortString64 attrname;
@@ -471,7 +471,7 @@ namespace Producer
 				if (attrname == "shortcircuit")
 				{
 					ShortString64 value;
-					if (YUNI_UNLIKELY(child.children[1]->rule == rgEntity))
+					if (YUNI_UNLIKELY(child.children[1]->rule == AST::rgEntity))
 						AST::retrieveEntityString(value, *(child.children[1]));
 					if (value.empty() or (value != "__true" and value != "__false"))
 					{
@@ -485,7 +485,7 @@ namespace Producer
 				if (attrname == "builtinalias")
 				{
 					ShortString64 value;
-					if (YUNI_UNLIKELY(child.children[1]->rule == rgEntity))
+					if (YUNI_UNLIKELY(child.children[1]->rule == AST::rgEntity))
 						AST::retrieveEntityString(value, *(child.children[1]));
 
 					out.emitPragmaBuiltinAlias(value);
@@ -495,7 +495,7 @@ namespace Producer
 				if (attrname == "suggest")
 				{
 					ShortString64 value;
-					if (YUNI_UNLIKELY(child.children[1]->rule == rgEntity))
+					if (YUNI_UNLIKELY(child.children[1]->rule == AST::rgEntity))
 						AST::retrieveEntityString(value, *(child.children[1]));
 					bool onoff = true;
 					if (value.empty() or not value.to(onoff))
@@ -517,29 +517,29 @@ namespace Producer
 
 
 
-		inline bool FuncInspector::inspect(const Node& node)
+		inline bool FuncInspector::inspect(const AST::Node& node)
 		{
 			// exit status
 			bool success = true;
 			// the node related to parameters
-			const Node* nodeParams = nullptr;
+			const AST::Node* nodeParams = nullptr;
 			// the node related to template parameters
-			const Node* nodeGenTParams = nullptr;
+			const AST::Node* nodeGenTParams = nullptr;
 			// the node related to the return type
-			const Node* nodeReturnType = nullptr;
+			const AST::Node* nodeReturnType = nullptr;
 
 			for (auto& childptr: node.children)
 			{
 				auto& child = *childptr;
 				switch (child.rule)
 				{
-					case rgFunctionKind:   { success &= inspectKind(child); break; }
-					case rgFuncParams:     { nodeParams = &child; break; }
-					case rgVisibility:     { success &= inspectVisibility(child); break; }
-					case rgFuncReturnType: { nodeReturnType = &child; break; }
-					case rgFuncBody:       { body = &child; break; }
-					case rgAttributes:     { success = inspectAttributes(child); break; }
-					case rgClassTemplateParams: { nodeGenTParams = &child; break; }
+					case AST::rgFunctionKind:   { success &= inspectKind(child); break; }
+					case AST::rgFuncParams:     { nodeParams = &child; break; }
+					case AST::rgVisibility:     { success &= inspectVisibility(child); break; }
+					case AST::rgFuncReturnType: { nodeReturnType = &child; break; }
+					case AST::rgFuncBody:       { body = &child; break; }
+					case AST::rgAttributes:     { success = inspectAttributes(child); break; }
+					case AST::rgClassTemplateParams: { nodeGenTParams = &child; break; }
 					default:
 						success &= scope.ICEUnexpectedNode(child, "[func]");
 				}
@@ -585,9 +585,9 @@ namespace Producer
 
 
 
-	bool Scope::visitASTFunc(const Node& node)
+	bool Scope::visitASTFunc(const AST::Node& node)
 	{
-		assert(node.rule == rgFunction);
+		assert(node.rule == AST::rgFunction);
 		assert(not node.children.empty());
 
 		// new scope
@@ -611,7 +611,7 @@ namespace Producer
 		bool isOperator = false;
 
 		// evaluate the whole function, and grab the node body for continuing evaluation
-		auto* body = ([&]() -> const Node*
+		auto* body = ([&]() -> const AST::Node*
 		{
 			FuncInspector inspector{scope};
 			success = inspector.inspect(node);

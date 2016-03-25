@@ -55,7 +55,7 @@ namespace Producer
 	}
 
 
-	inline bool Scope::visitAST(Node& node)
+	inline bool Scope::visitAST(AST::Node& node)
 	{
 		return visitASTStmt(node);
 	}
@@ -118,28 +118,28 @@ namespace Producer
 		return ++pNextVarID;
 	}
 
-	inline LVID Scope::createLocalBuiltinVoid(const Node& node)
+	inline LVID Scope::createLocalBuiltinVoid(const AST::Node& node)
 	{
 		emitDebugpos(node);
 		return sequence().emitStackalloc(nextvar(), nyt_void);
 	}
 
 
-	inline LVID Scope::createLocalBuiltinAny(const Node& node)
+	inline LVID Scope::createLocalBuiltinAny(const AST::Node& node)
 	{
 		emitDebugpos(node);
 		return sequence().emitStackalloc(nextvar(), nyt_any);
 	}
 
 
-	inline LVID Scope::createLocalBuiltinFloat64(const Node& node, nytype_t type, double value)
+	inline LVID Scope::createLocalBuiltinFloat64(const AST::Node& node, nytype_t type, double value)
 	{
 		emitDebugpos(node);
 		return sequence().emitStackalloc_f64(nextvar(), type, value);
 	}
 
 
-	inline LVID Scope::createLocalBuiltinInt64(const Node& node, nytype_t type, yuint64 value)
+	inline LVID Scope::createLocalBuiltinInt64(const AST::Node& node, nytype_t type, yuint64 value)
 	{
 		emitDebugpos(node);
 		return sequence().emitStackalloc_u64(nextvar(), type, value);
@@ -174,7 +174,7 @@ namespace Producer
 	}
 
 
-	inline void Scope::setErrorFrom(Logs::Report& report, const Node& node) const
+	inline void Scope::setErrorFrom(Logs::Report& report, const AST::Node& node) const
 	{
 		uint line, offset;
 		fetchLineAndOffsetFromNode(node, line, offset);
@@ -183,20 +183,20 @@ namespace Producer
 	}
 
 
-	inline void Scope::setErrorFrom(const Node& node) const
+	inline void Scope::setErrorFrom(const AST::Node& node) const
 	{
 		setErrorFrom(context.report, node);
 	}
 
 
-	inline void Scope::emitDebugpos(const Node* node)
+	inline void Scope::emitDebugpos(const AST::Node* node)
 	{
 		if (node)
 			emitDebugpos(*node);
 	}
 
 
-	inline bool Scope::visitASTExprSubDot(const Node& node, LVID& localvar)
+	inline bool Scope::visitASTExprSubDot(const AST::Node& node, LVID& localvar)
 	{
 		sequence().emitEnsureTypeResolved(localvar);
 		return visitASTExprContinuation(node, localvar);
