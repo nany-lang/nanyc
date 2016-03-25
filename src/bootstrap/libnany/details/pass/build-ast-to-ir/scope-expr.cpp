@@ -61,6 +61,9 @@ namespace Producer
 				case rgExprTemplate:
 				case rgExprTypeTemplate: success &= visitASTExprTemplate(child, localvar); break;
 
+				case rgIn:         success &= visitASTExprIn(child, localvar); break;
+				case rgFunction:   success &= visitASTExprClosure(child, localvar); break;
+
 				// special for internal AST manipulation
 				case rgRegister:   localvar = child.text.to<uint32_t>(); break;
 
@@ -70,7 +73,7 @@ namespace Producer
 					break;
 				} // fallthru ok - if not then unexpected
 				default:
-					success = ICEUnexpectedNode(child, "[ir/expr/continuation]");
+					success = ICEUnexpectedNode(child, "[expr/continuation]");
 			}
 		}
 		return success;

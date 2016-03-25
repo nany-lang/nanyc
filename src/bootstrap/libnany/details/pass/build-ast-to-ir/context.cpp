@@ -106,6 +106,11 @@ namespace Producer
 		reuse.closure.node->children.push_back(exprValue);
 		Node::Ptr exprValueNew = new Node{rgNew};
 		exprValue->children.push_back(exprValueNew);
+
+		Node::Ptr nnew = new Node{rgNew};
+		exprValueNew->children.push_back(nnew);
+		Node::Ptr typedecl = new Node{rgTypeDecl};
+		nnew->children.push_back(typedecl);
 	}
 
 
