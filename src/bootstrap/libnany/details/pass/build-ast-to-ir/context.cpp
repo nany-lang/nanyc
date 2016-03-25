@@ -79,6 +79,52 @@ namespace Producer
 	}
 
 
+	void Context::prepareReuseForVariableMembers()
+	{
+		reuse.func.node = AST::createNodeFunc(reuse.func.funcname);
+
+		AST::Node::Ptr funcBody = new AST::Node{AST::rgFuncBody};
+		(reuse.func.node)->children.push_back(funcBody);
+
+		AST::Node::Ptr expr = new AST::Node{AST::rgExpr};
+		funcBody->children.push_back(expr);
+
+		// intrinsic (+2)
+		//       entity (+3)
+		//       |   identifier: nanyc
+		//       |   identifier: fieldset
+		//       call (+7)
+		//           call-parameter
+		//           |   expr
+		//           |       <expr A>
+		//           call-parameter
+		//           |   expr
+		//           |       <expr B>
+		AST::Node::Ptr intrinsic = new AST::Node{AST::rgIntrinsic};
+		expr->children.push_back(intrinsic);
+		intrinsic->children.push_back(AST::createNodeIdentifier("^fieldset"));
+
+		AST::Node::Ptr call = new AST::Node{AST::rgCall};
+		intrinsic->children.push_back(call);
+
+		// param 2 - expr
+		{
+			reuse.func.callparam = new AST::Node{AST::rgCallParameter};
+			call->children.push_back(reuse.func.callparam);
+		}
+		// param text varname
+		{
+			AST::Node::Ptr callparam = new AST::Node{AST::rgCallParameter};
+			call->children.push_back(callparam);
+			AST::Node::Ptr pexpr = new AST::Node{AST::rgExpr};
+			callparam->children.push_back(pexpr);
+
+			reuse.func.varname = new AST::Node{AST::rgStringLiteral};
+			pexpr->children.push_back(reuse.func.varname);
+		}
+	}
+
+
 	void Context::prepareReuseForClosures()
 	{
 		reuse.closure.node = new AST::Node{AST::rgExpr};

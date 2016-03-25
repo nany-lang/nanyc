@@ -82,7 +82,8 @@ namespace Producer
 	}
 
 
-	inline bool Scope::generateInitFuncForClassVar(const AnyString& varname, LVID lvid, const AST::Node& varAssign)
+	inline bool
+	Scope::generateInitFuncForClassVar(const AnyString& varname, LVID lvid, const AST::Node& varAssign)
 	{
 		// name of the generated func for initialize the class variable
 		ShortString64 funcName;
@@ -96,55 +97,11 @@ namespace Producer
 		// the first parameter is the result of the default value
 		// the second parameter is the register where the name of member has been stored
 
-		auto& reuse = context.reuse.func;
+		if (!context.reuse.func.node)
+			context.prepareReuseForVariableMembers();
 
-		if (!reuse.node)
-		{
-			reuse.node = AST::createNodeFunc(reuse.funcname);
-
-			AST::Node::Ptr funcBody = new AST::Node{AST::rgFuncBody};
-			(reuse.node)->children.push_back(funcBody);
-
-			AST::Node::Ptr expr = new AST::Node{AST::rgExpr};
-			funcBody->children.push_back(expr);
-
-			// intrinsic (+2)
-			//       entity (+3)
-			//       |   identifier: nanyc
-			//       |   identifier: fieldset
-			//       call (+7)
-			//           call-parameter
-			//           |   expr
-			//           |       <expr A>
-			//           call-parameter
-			//           |   expr
-			//           |       <expr B>
-			AST::Node::Ptr intrinsic = new AST::Node{AST::rgIntrinsic};
-			expr->children.push_back(intrinsic);
-			intrinsic->children.push_back(AST::createNodeIdentifier("^fieldset"));
-
-			AST::Node::Ptr call = new AST::Node{AST::rgCall};
-			intrinsic->children.push_back(call);
-
-			// param 2 - expr
-			{
-				reuse.callparam = new AST::Node{AST::rgCallParameter};
-				call->children.push_back(reuse.callparam);
-			}
-			// param text varname
-			{
-				AST::Node::Ptr callparam = new AST::Node{AST::rgCallParameter};
-				call->children.push_back(callparam);
-				AST::Node::Ptr pexpr = new AST::Node{AST::rgExpr};
-				callparam->children.push_back(pexpr);
-
-				reuse.varname = new AST::Node{AST::rgStringLiteral};
-				pexpr->children.push_back(reuse.varname);
-			}
-		}
-
-		reuse.funcname->text = funcName;
-		reuse.varname->text  = varname;
+		context.reuse.func.funcname->text = funcName;
+		context.reuse.func.varname->text  = varname;
 
 		// Updating the EXPR
 		uint index = varAssign.findFirst(AST::rgExpr);
@@ -153,11 +110,11 @@ namespace Producer
 			assert(false and "no node <expr> in <var-assign>");
 			return false;
 		}
-		reuse.callparam->children.push_back(varAssign.children[index]);
+		context.reuse.func.callparam->children.push_back(varAssign.children[index]);
 
-		bool success = visitASTFunc(*(reuse.node));
+		bool success = visitASTFunc(*(context.reuse.func.node));
 
-		reuse.callparam->children.clear();
+		context.reuse.func.callparam->children.clear();
 		return success;
 	}
 

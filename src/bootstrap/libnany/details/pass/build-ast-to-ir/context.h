@@ -60,6 +60,8 @@ namespace Producer
 		void prepareReuseForLiterals();
 		//! re-use objects for clusores
 		void prepareReuseForClosures();
+		//! re-use objects for variable members
+		void prepareReuseForVariableMembers();
 		//@}
 
 
