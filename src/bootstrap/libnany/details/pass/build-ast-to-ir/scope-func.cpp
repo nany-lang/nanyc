@@ -410,6 +410,9 @@ namespace Producer
 		inline bool FuncInspector::inspectReturnType(const AST::Node& node)
 		{
 			assert(node.rule == AST::rgFuncReturnType and "invalid return type node");
+
+			if (node.children.empty())
+				return true;
 			if (debugmode)
 				scope.comment("return type"); // comment for clarity in code
 

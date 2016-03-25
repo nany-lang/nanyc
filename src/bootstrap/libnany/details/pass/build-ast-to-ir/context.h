@@ -108,12 +108,15 @@ namespace Producer
 
 			struct {
 				AST::Node::Ptr node;
-				AST::Node* funcname;
+				AST::Node* funcname = nullptr;
 			}
 			operatorClone;
 
 			struct {
 				AST::Node::Ptr node;
+				AST::Node* funcbody = nullptr;
+				AST::Node* params = nullptr;
+				AST::Node* rettype = nullptr;
 			}
 			closure;
 		}

@@ -140,23 +140,35 @@ namespace Producer
 		//                         |       function (+2)
 		//                         |           function-kind
 		//                         |           |   function-kind-operator (+2)
-		//                         |           |       tk-operator
 		//                         |           |       function-kind-opname: ()
 		//                         |           func-body
 		//                         |               return-inline (+3)
-		//                         |                   tk-arrow: ->
 		//                         |                   expr
 		//                         |                   |   ...
 
-		AST::Node::Ptr exprValue = new AST::Node{AST::rgExprValue};
-		reuse.closure.node->children.push_back(exprValue);
-		AST::Node::Ptr exprValueNew = new AST::Node{AST::rgNew};
-		exprValue->children.push_back(exprValueNew);
+		auto& exprValue = reuse.closure.node->append<AST::rgExprValue>();
+		auto& nnew      = exprValue.append<AST::rgNew>();
+		auto& typedecl  = nnew.append<AST::rgTypeDecl>();
+		auto& nclass    = typedecl.append<AST::rgClass>();
+		auto& cbody     = nclass.append<AST::rgClassBody>();
+		auto& bodyExpr  = cbody.append<AST::rgExpr>();
+		auto& bodyValue = bodyExpr.append<AST::rgExprValue>();
 
-		AST::Node::Ptr nnew = new AST::Node{AST::rgNew};
-		exprValueNew->children.push_back(nnew);
-		AST::Node::Ptr typedecl = new AST::Node{AST::rgTypeDecl};
-		nnew->children.push_back(typedecl);
+		auto& func = bodyValue.append<AST::rgFunction>();
+
+		auto& funcKind = func.append<AST::rgFunctionKind>();
+		auto& kindOp   = funcKind.append<AST::rgFunctionKindOperator>();
+		auto& funcname = kindOp.append<AST::rgFunctionKindOpname>();
+		funcname.text = "()";
+
+		auto& params = func.append<AST::rgFuncParam>();
+		reuse.closure.params = &params;
+
+		auto& rettype = func.append<AST::rgFuncReturnType>();
+		reuse.closure.rettype = &rettype;
+
+		auto& funcBody = func.append<AST::rgFuncBody>();
+		reuse.closure.funcbody = &funcBody;
 	}
 
 
