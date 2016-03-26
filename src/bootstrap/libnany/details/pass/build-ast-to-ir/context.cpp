@@ -229,8 +229,8 @@ namespace Producer
 		reuse.inset.predicate = &ret;
 
 		reuse.inset.premadeAlwaysTrue = new AST::Node{AST::rgExpr};
-		auto& alwaysTrue = reuse.inset.premadeAlwaysTrue->append(AST::rgExprValue);
-		alwaysTrue.append(AST::rgIdentifier);
+		auto& alwaysTrue = reuse.inset.premadeAlwaysTrue->append(AST::rgExprValue, AST::rgIdentifier);
+		alwaysTrue.text = "true";
 	}
 
 
