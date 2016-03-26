@@ -14,7 +14,7 @@ static bool  printAST(const AnyString filename, bool unixcolors)
 	if (filename.empty())
 		return false;
 
-	Nany::Parser parser;
+	Nany::AST::Parser parser;
 	if (not parser.loadFromFile(filename))
 		return false;
 
@@ -22,7 +22,7 @@ static bool  printAST(const AnyString filename, bool unixcolors)
 		return false;
 
 	Clob out;
-	Nany::Node::Export(out, *parser.root, unixcolors);
+	Nany::AST::Node::Export(out, *parser.root, unixcolors);
 
 	std::cout.write(out.c_str(), out.size());
 	return true;
