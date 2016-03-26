@@ -16,6 +16,14 @@ namespace Instanciate
 	void SequenceBuilder::declareNamedVariable(const AnyString& name, LVID lvid, bool autoreleased)
 	{
 		assert(frame != nullptr);
+
+		if (unlikely(name.empty()))
+		{
+			ICE() << "got empty variable name";
+			frame->invalidate(lvid);
+			return;
+		}
+
 		auto& lr = frame->lvids[lvid];
 		lr.file.line   = currentLine;
 		lr.file.offset = currentOffset;
@@ -27,6 +35,8 @@ namespace Instanciate
 			lr.scope           = frame->scope;
 			lr.userDefinedName = name;
 			lr.hasBeenUsed     = false;
+			if (name[0] == '%')
+				lr.warning.unused = false;
 
 			lr.autorelease = autoreleased
 				// If an error has already been reported on this lvid, we
@@ -39,6 +49,7 @@ namespace Instanciate
 		else
 		{
 			lr.errorReported = true;
+			frame->invalidate(lvid);
 			complainRedeclared(name, previousDecl);
 		}
 	}
