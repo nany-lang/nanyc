@@ -18,7 +18,7 @@ namespace Producer
 	bool Scope::visitASTFor(const AST::Node& node)
 	{
 		// Name of the target ref for each element in the container
-		AnyString elementname;
+		ShortString16 elementname;
 		// output sequence
 		auto& out = sequence();
 		// lvid of the view
@@ -69,7 +69,7 @@ namespace Producer
 			mnode->text = lvidstr;
 
 		ShortString32 cursorname;
-		cursorname << "cursor_" << lvidstr;
+		cursorname << "%cursor_" << lvidstr;
 		for (auto*& mnode: context.reuse.loops.cursorname)
 			mnode->text = cursorname;
 

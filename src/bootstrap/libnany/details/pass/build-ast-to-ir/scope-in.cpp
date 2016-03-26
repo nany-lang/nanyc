@@ -14,7 +14,7 @@ namespace Producer
 {
 
 
-	bool Scope::visitASTExprIn(const AST::Node& node, LVID& localvar, AnyString& elementname)
+	bool Scope::visitASTExprIn(const AST::Node& node, LVID& localvar, ShortString16& elementname)
 	{
 		// lvid representing the input container
 		AST::Node* container = nullptr;
@@ -74,7 +74,7 @@ namespace Producer
 		context.reuse.inset.viewname->text = "^view^default";
 
 		if (elementname.empty())
-			elementname = "_";
+			elementname << "%vr" << nextvar();
 		context.reuse.inset.elementname->text = elementname;
 
 		if (!predicate)
@@ -89,7 +89,7 @@ namespace Producer
 	bool Scope::visitASTExprIn(const AST::Node& node, LVID& localvar)
 	{
 		// Name of the target ref for each element in the container
-		AnyString elementname;
+		ShortString16 elementname;
 		return visitASTExprIn(node, localvar, elementname);
 	}
 
