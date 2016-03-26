@@ -146,28 +146,27 @@ namespace Producer
 		//						 |				   expr
 		//						 |				   |   ...
 
-		auto& exprValue = reuse.closure.node->append<AST::rgExprValue>();
-		auto& nnew	  = exprValue.append<AST::rgNew>();
-		auto& typedecl  = nnew.append<AST::rgTypeDecl>();
-		auto& nclass	= typedecl.append<AST::rgClass>();
-		auto& cbody	 = nclass.append<AST::rgClassBody>();
-		auto& bodyExpr  = cbody.append<AST::rgExpr>();
-		auto& bodyValue = bodyExpr.append<AST::rgExprValue>();
+		auto& exprValue = reuse.closure.node->append(AST::rgExprValue);
+		auto& nnew	    = exprValue.append(AST::rgNew);
+		auto& typedecl  = nnew.append(AST::rgTypeDecl);
+		auto& nclass	= typedecl.append(AST::rgClass);
+		auto& cbody	    = nclass.append(AST::rgClassBody);
+		auto& bodyExpr  = cbody.append(AST::rgExpr);
+		auto& bodyValue = bodyExpr.append(AST::rgExprValue);
 
-		auto& func = bodyValue.append<AST::rgFunction>();
+		auto& func = bodyValue.append(AST::rgFunction);
 
-		auto& funcKind = func.append<AST::rgFunctionKind>();
-		auto& kindOp   = funcKind.append<AST::rgFunctionKindOperator>();
-		auto& funcname = kindOp.append<AST::rgFunctionKindOpname>();
+		auto& funcname =
+			func.append(AST::rgFunctionKind, AST::rgFunctionKindOperator, AST::rgFunctionKindOpname);
 		funcname.text = "()";
 
-		auto& params = func.append<AST::rgFuncParam>();
+		auto& params = func.append(AST::rgFuncParam);
 		reuse.closure.params = &params;
 
-		auto& rettype = func.append<AST::rgFuncReturnType>();
+		auto& rettype = func.append(AST::rgFuncReturnType);
 		reuse.closure.rettype = &rettype;
 
-		auto& funcBody = func.append<AST::rgFuncBody>();
+		auto& funcBody = func.append(AST::rgFuncBody);
 		reuse.closure.funcbody = &funcBody;
 	}
 
@@ -203,42 +202,184 @@ namespace Producer
 		//                                                   identifier: predicate
 		//
 		reuse.inset.node = new AST::Node{AST::rgExpr};
-		auto& exprValue = reuse.inset.node->append<AST::rgExprValue>();
+		auto& exprValue = reuse.inset.node->append(AST::rgExprValue);
 
-		auto& exprGroup = exprValue.append<AST::rgExprGroup>();
+		auto& exprGroup = exprValue.append(AST::rgExprGroup);
 		reuse.inset.container = &exprGroup;
 
-		auto& subexpr = exprValue.append<AST::rgExprSubDot>();
-		auto& viewname = subexpr.append<AST::rgIdentifier>();
+		auto& viewname = exprValue.append(AST::rgExprSubDot, AST::rgIdentifier);
 		reuse.inset.viewname = &viewname;
 
-		auto& call = viewname.append<AST::rgCall>();
-		auto& parameter = call.append<AST::rgCallParameter>();
-		auto& paramExpr = parameter.append<AST::rgExpr>();
-		auto& paramExprValue = paramExpr.append<AST::rgExprValue>();
-		auto& func = paramExprValue.append<AST::rgFunction>();
-		auto& kind = func.append<AST::rgFunctionKind>();
-		kind.append<AST::rgFunctionKindFunction>();
+		auto& call = viewname.append(AST::rgCall);
+		auto& paramExprValue = call.append(AST::rgCallParameter, AST::rgExpr, AST::rgExprValue);
+		auto& func = paramExprValue.append(AST::rgFunction);
+		func.append(AST::rgFunctionKind, AST::rgFunctionKindFunction);
 
-		auto& funcparams = func.append<AST::rgFuncParams>();
-		auto& funcparam = funcparams.append<AST::rgFuncParam>();
-		funcparam.append<AST::rgCref>();
-		auto& cursorname = funcparam.append<AST::rgIdentifier>();
-		reuse.inset.cursorname = &cursorname;
+		auto& funcparams = func.append(AST::rgFuncParams);
+		auto& funcparam = funcparams.append(AST::rgFuncParam);
+		funcparam.append(AST::rgCref);
+		auto& cursorname = funcparam.append(AST::rgIdentifier);
+		reuse.inset.elementname = &cursorname;
 
-		auto& rettype = func.append<AST::rgFuncReturnType>();
-		auto& type = rettype.append<AST::rgType>();
-		auto& typequalifier = type.append<AST::rgTypeQualifier>();
-		typequalifier.append<AST::rgRef>();
+		auto& qualifiers = func.append(AST::rgFuncReturnType, AST::rgType, AST::rgTypeQualifier);
+		qualifiers.append(AST::rgRef);
 
-		auto& funcbody = func.append<AST::rgFuncBody>();
-		auto& ret = funcbody.append<AST::rgReturn>();
+		auto& funcbody = func.append(AST::rgFuncBody);
+		auto& ret = funcbody.append(AST::rgReturn);
 		reuse.inset.predicate = &ret;
 
 		reuse.inset.premadeAlwaysTrue = new AST::Node{AST::rgExpr};
-		auto& alwaysTrue = reuse.inset.premadeAlwaysTrue->append<AST::rgExprValue>();
-		alwaysTrue.append<AST::rgIdentifier>();
+		auto& alwaysTrue = reuse.inset.premadeAlwaysTrue->append(AST::rgExprValue);
+		alwaysTrue.append(AST::rgIdentifier);
 	}
+
+
+
+	void Context::prepareReuseForLoops()
+	{
+		// scope
+		//     expr
+		//         expr-value
+		//             if (+2)
+		//                 expr
+		//                 |   identifier: ^not
+		//                 |       call
+		//                 |           call-parameter
+		//                 |               expr
+		//                 |                   expr-value
+		//                 |                       identifier: myview
+		//                 |                           expr-sub-dot
+		//                 |                               identifier: empty
+		//                 |                                   call
+		//                 if-then
+		//                     expr
+		//                         expr-value
+		//                             scope (+2)
+		//                                 var (+3)
+		//                                 |   ref
+		//                                 |   identifier: cursor
+		//                                 |   var-assign (+2)
+		//                                 |       operator-kind
+		//                                 |       |   operator-assignment: =
+		//                                 |       expr
+		//                                 |           expr-value
+		//                                 |               identifier: myview
+		//                                 |                   expr-sub-dot
+		//                                 |                       identifier: cursor
+		//                                 |                           call
+		//                                 expr
+		//                                     expr-value
+		//                                         if (+2)
+		//                                             expr
+		//                                             |   expr-value
+		//                                             |       identifier: cursor
+		//                                             |           expr-sub-dot
+		//                                             |               identifier: findfirst
+		//                                             |                   call
+		//                                             if-then
+		//                                                 expr
+		//                                                     expr-value
+		//                                                         scope
+		//                                                             do-while (+2)
+		//                                                                 expr
+		//                                                                 |   expr-value
+		//                                                                 |       scope (+2)
+		//                                                                 |           var (+3)
+		//                                                                 |           |   ref
+		//                                                                 |           |   identifier: i
+		//                                                                 |           |   var-assign (+2)
+		//                                                                 |           |       operator-kind
+		//                                                                 |           |       |   operator-assignment: =
+		//                                                                 |           |       expr
+		//                                                                 |           |           expr-value
+		//                                                                 |           |               identifier: cursor
+		//                                                                 |           |                   expr-sub-dot
+		//                                                                 |           |                       identifier: get
+		//                                                                 |           |                           call
+		//                                                                 |           expr
+		//                                                                 |               expr-value
+		//                                                                 |                   scope
+		//                                                                 |                       <.. user code here ..>
+		//                                                                 expr
+		//                                                                     expr-value
+		//                                                                         identifier: cursor
+		//                                                                             expr-sub-dot
+		//                                                                                 identifier: next
+		//                                                                                     call
+
+		reuse.loops.node = new AST::Node{AST::rgExpr};
+		auto& nif = reuse.loops.node->append(AST::rgExprValue, AST::rgIf);
+
+		// condition if, "if empty"
+		{
+			auto& identifier = nif.append(AST::rgExpr, AST::rgIdentifier);
+			identifier.text = "^not";
+			auto& param = identifier.append(AST::rgCall, AST::rgCallParameter);
+			auto& viewname = param.append(AST::rgExpr, AST::rgExprValue, AST::rgRegister);
+			reuse.loops.viewlvid[0] = &viewname;
+			auto& empty = viewname.append(AST::rgExprSubDot, AST::rgIdentifier);
+			empty.text = "empty";
+			empty.append(AST::rgCall);
+		}
+
+		// if not empty, then...
+		auto& ifthen = nif.append(AST::rgIfThen);
+		auto& scope = ifthen.append(AST::rgExpr, AST::rgExprValue, AST::rgScope);
+
+		// capture the cursor
+		{
+			auto& var = scope.append(AST::rgVar);
+			var.append(AST::rgRef);
+			reuse.loops.cursorname[0] = &var.append(AST::rgIdentifier);
+			auto& varAssign = var.append(AST::rgVarAssign);
+			auto& opassign = varAssign.append(AST::rgOperatorKind, AST::rgOperatorAssignment);
+			opassign.text = "=";
+
+			auto& value = varAssign.append(AST::rgExpr, AST::rgExprValue, AST::rgRegister);
+			reuse.loops.viewlvid[1] = &value;
+			auto& cursorCall = value.append(AST::rgExprSubDot, AST::rgIdentifier);
+			cursorCall.text = "cursor";
+			cursorCall.append(AST::rgCall);
+		}
+
+		auto& ifFindFirst = scope.append(AST::rgExpr, AST::rgExprValue, AST::rgIf);
+		// if findFirst condition
+		{
+			auto& value = ifFindFirst.append(AST::rgExpr, AST::rgExprValue, AST::rgIdentifier);
+			reuse.loops.cursorname[1] = &value;
+			auto& cursorCall = value.append(AST::rgExprSubDot, AST::rgIdentifier);
+			cursorCall.text = "findFirst";
+			cursorCall.append(AST::rgCall);
+		}
+		// .. then
+		auto& beforescope = ifFindFirst.append(AST::rgIfThen);
+		auto& scopeThen = beforescope.append(AST::rgExpr, AST::rgExprValue, AST::rgScope);
+
+		auto& dowhile = scopeThen.append(AST::rgDoWhile);
+		auto& scopeFor = dowhile.append(AST::rgExpr, AST::rgExprValue, AST::rgScope);
+
+		auto& varElement = scopeFor.append(AST::rgVar);
+		varElement.append(AST::rgRef);
+		reuse.loops.elementname = &varElement.append(AST::rgIdentifier);
+		auto& varGet = varElement.append(AST::rgVarAssign);
+		auto& assign = varGet.append(AST::rgOperatorKind, AST::rgOperatorAssignment);
+		assign.text = "=";
+		auto& cursorGet = varGet.append(AST::rgExpr, AST::rgExprValue, AST::rgIdentifier);
+		reuse.loops.cursorname[2] = &cursorGet;
+		auto& get = cursorGet.append(AST::rgExprSubDot, AST::rgIdentifier);
+		get.text = "get";
+		get.append(AST::rgCall);
+
+		reuse.loops.scope = &scopeFor.append(AST::rgExpr, AST::rgExprValue, AST::rgScope);
+
+		auto& cursorEnd = dowhile.append(AST::rgExpr, AST::rgExprValue, AST::rgIdentifier);
+		reuse.loops.cursorname[3] = &cursorEnd;
+		auto& next = cursorEnd.append(AST::rgExprSubDot, AST::rgIdentifier);
+		next.text = "next";
+		next.append(AST::rgCall);
+	}
+
+
 
 
 

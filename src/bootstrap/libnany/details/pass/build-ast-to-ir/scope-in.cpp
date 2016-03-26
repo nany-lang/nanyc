@@ -1,7 +1,5 @@
 #include <yuni/yuni.h>
 #include "details/pass/build-ast-to-ir/scope.h"
-#include "details/utils/check-for-valid-identifier-name.h"
-#include "libnany-config.h"
 
 using namespace Yuni;
 
@@ -16,10 +14,8 @@ namespace Producer
 {
 
 
-	bool Scope::visitASTExprIn(const AST::Node& node, LVID& localvar)
+	bool Scope::visitASTExprIn(const AST::Node& node, LVID& localvar, AnyString& elementname)
 	{
-		// Name of the target ref for each element in the container
-		AnyString cursorname;
 		// lvid representing the input container
 		AST::Node* container = nullptr;
 		AST::Node* predicate = nullptr;
@@ -37,7 +33,7 @@ namespace Producer
 					if (unlikely(identifier.rule != AST::rgIdentifier))
 						return ICE(identifier) << "identifier expected";
 
-					cursorname = identifier.text;
+					elementname = identifier.text;
 					break;
 				}
 
@@ -77,9 +73,9 @@ namespace Producer
 		context.reuse.inset.container->children.push_back(container);
 		context.reuse.inset.viewname->text = "^view^default";
 
-		if (cursorname.empty())
-			cursorname = "_";
-		context.reuse.inset.cursorname->text = cursorname;
+		if (elementname.empty())
+			elementname = "_";
+		context.reuse.inset.elementname->text = elementname;
 
 		if (!predicate)
 			predicate = AST::Node::Ptr::WeakPointer(context.reuse.inset.premadeAlwaysTrue);
@@ -87,6 +83,14 @@ namespace Producer
 		context.reuse.inset.predicate->children.push_back(predicate);
 
 		return visitASTExpr(*context.reuse.inset.node, localvar);
+	}
+
+
+	bool Scope::visitASTExprIn(const AST::Node& node, LVID& localvar)
+	{
+		// Name of the target ref for each element in the container
+		AnyString elementname;
+		return visitASTExprIn(node, localvar, elementname);
 	}
 
 

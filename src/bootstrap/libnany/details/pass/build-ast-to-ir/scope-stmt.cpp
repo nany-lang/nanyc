@@ -58,6 +58,7 @@ namespace Producer
 			case AST::rgWhile:   return visitASTExprWhile(node);
 			case AST::rgDoWhile: return visitASTExprDoWhile(node);
 			case AST::rgVar:     return visitASTVar(node);
+			case AST::rgFor:     return visitASTFor(node);
 			case AST::rgReturn:  return visitASTExprReturn(node);
 			case AST::rgClass:   return visitASTClass(node);
 			case AST::rgTypedef: return visitASTTypedef(node);

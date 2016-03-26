@@ -64,6 +64,8 @@ namespace Producer
 		void prepareReuseForVariableMembers();
 		//! re-use objects for in
 		void prepareReuseForIn();
+		//! re-use objects for for..do
+		void prepareReuseForLoops();
 		//@}
 
 
@@ -126,11 +128,20 @@ namespace Producer
 				AST::Node::Ptr node;
 				AST::Node* container = nullptr;
 				AST::Node* viewname = nullptr;
-				AST::Node* cursorname = nullptr;
+				AST::Node* elementname = nullptr;
 				AST::Node* predicate = nullptr;
 				AST::Node::Ptr premadeAlwaysTrue;
 			}
 			inset;
+
+			struct {
+				AST::Node::Ptr node;
+				std::array<AST::Node*,2> viewlvid;
+				std::array<AST::Node*,4> cursorname;
+				AST::Node* elementname = nullptr;
+				AST::Node* scope;
+			}
+			loops;
 		}
 		reuse;
 

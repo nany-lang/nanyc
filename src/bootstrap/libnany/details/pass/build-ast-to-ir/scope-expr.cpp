@@ -23,6 +23,19 @@ namespace Producer
 		sequence().emitIdentify(rid, node.text, localvar);
 		localvar = rid;
 
+		if (not node.children.empty())
+			return visitASTExprContinuation(node, localvar);
+		return true;
+	}
+
+
+	inline bool Scope::visitASTExprRegister(const AST::Node& node, LVID& localvar)
+	{
+		assert(not node.text.empty());
+		localvar = node.text.to<uint32_t>();
+		assert(localvar != 0);
+		if (node.children.empty())
+			return true;
 		return visitASTExprContinuation(node, localvar);
 	}
 
@@ -65,7 +78,7 @@ namespace Producer
 				case AST::rgFunction:   success &= visitASTExprClosure(child, localvar); break;
 
 				// special for internal AST manipulation
-				case AST::rgRegister:   localvar = child.text.to<uint32_t>(); break;
+				case AST::rgRegister:   success &= visitASTExprRegister(child, localvar); break;
 
 				// scope may appear in expr (when expr are actually statements)
 				case AST::rgScope:  if (allowScope) {

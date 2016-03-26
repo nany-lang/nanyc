@@ -48,6 +48,7 @@ namespace Producer
 		bool visitASTClass(const AST::Node&, LVID* localvar = nullptr);
 		bool visitASTType(const AST::Node&, LVID& localvar);
 		bool visitASTTypedef(const AST::Node&);
+		bool visitASTFor(const AST::Node&);
 
 		bool visitASTVar(const AST::Node&);
 		bool visitASTVarValueInitialization(LVID&, const AST::Node&, const AST::Node&, const AnyString&);
@@ -57,6 +58,7 @@ namespace Producer
 		bool visitASTExprReturn(const AST::Node&);
 		bool visitASTExprContinuation(const AST::Node&, LVID& localvar, bool allowScope = false);
 		bool visitASTExprIdentifier(const AST::Node&, LVID& localvar);
+		bool visitASTExprRegister(const AST::Node&, LVID& localvar);
 		bool visitASTExprCall(const AST::Node*, LVID& localvar, const AST::Node* parent = nullptr); // func call
 		bool visitASTExprCallParameters(const AST::Node&, uint32_t shortcircuitlabel = 0); // parameters of a func call
 		bool visitASTExprSubDot(const AST::Node&, LVID& localvar);
@@ -73,6 +75,7 @@ namespace Producer
 		bool visitASTExprDoWhile(const AST::Node&);
 		bool visitASTExprSwitch(const AST::Node&);
 		bool visitASTExprIn(const AST::Node&, LVID& localvar);
+		bool visitASTExprIn(const AST::Node&, LVID& localvar, AnyString& elementname);
 		bool visitASTExprClosure(const AST::Node&, uint32_t& localvar);
 
 		bool visitASTExprTemplate(const AST::Node&, LVID& localvar);
