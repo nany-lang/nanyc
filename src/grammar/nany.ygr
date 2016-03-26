@@ -699,14 +699,14 @@ in-vars: notext
 
 in-container: notext
 	// expr optional to make the grammar more flexible
-	| (expr-value) // to reduce the priority of 'each i in ...'
-	| (tk-parenthese-open wp expr-no-node? wp tk-parenthese-close)
+	| (tk-parenthese-open wp expr-group wp tk-parenthese-close)
+	| expr-value // to reduce the priority of 'each i in ...'
 
-in-filter: notext
+in-predicate: notext
 	tk-pipe wp expr
 
 in: important, notext
-	(tk-in | (in-vars wp tk-in)) in-container (wp in-filter)?
+	(tk-in | (in-vars wp tk-in)) in-container (wp in-predicate)?
 
 each: important, notext
 	tk-each in

@@ -62,6 +62,8 @@ namespace Producer
 		void prepareReuseForClosures();
 		//! re-use objects for variable members
 		void prepareReuseForVariableMembers();
+		//! re-use objects for in
+		void prepareReuseForIn();
 		//@}
 
 
@@ -119,6 +121,16 @@ namespace Producer
 				AST::Node* rettype = nullptr;
 			}
 			closure;
+
+			struct {
+				AST::Node::Ptr node;
+				AST::Node* container = nullptr;
+				AST::Node* viewname = nullptr;
+				AST::Node* cursorname = nullptr;
+				AST::Node* predicate = nullptr;
+				AST::Node::Ptr premadeAlwaysTrue;
+			}
+			inset;
 		}
 		reuse;
 

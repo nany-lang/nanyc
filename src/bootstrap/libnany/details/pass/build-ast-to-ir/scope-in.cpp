@@ -18,94 +18,75 @@ namespace Producer
 
 	bool Scope::visitASTExprIn(const AST::Node& node, LVID& localvar)
 	{
-		// Example: i in a | i > 10
-		//
-		//in (+4)
-		//	in-vars
-		//	|   identifier: i
-		//	tk-in
-		//	in-container
-		//	|   expr-value
-		//	|       identifier: a
-		//	in-filter (+2)
-		//		tk-pipe: |
-		//		expr (+2)
-		//			expr-value
-		//			|   identifier: i
-		//			expr-comparison (+2)
-		//				operator-comparison: >
-		//				expr-value
-		//					number
-		//						number-value: 10
-		//							integer: 10
-		//
-		// .. will be converted into ..
-		//
-		//
-		//   expr
-		//	   expr-value (+4)
-		//		   tk-parenthese-open, (
-		//		   expr-group
-		//		   |   expr-value
-		//		   |	   identifier: a
-		//		   tk-parenthese-close, )
-		//		   expr-sub-dot (+3)
-		//			   tk-dot
-		//			   identifier: makeview
-		//			   call (+3)
-		//				   tk-parenthese-open, (
-		//				   call-parameter
-		//				   |   expr
-		//				   |	   expr-value
-		//				   |		   new (+2)
-		//				   |			   tk-new
-		//				   |			   type-decl
-		//				   |				   class (+2)
-		//				   |					   tk-class
-		//				   |					   class-body (+3)
-		//				   |						   tk-brace-open, {
-		//				   |						   expr
-		//				   |			  expr-value
-		//				   |				  function (+4)
-		//				   |					  function-kind
-		//				   |					  |   function-kind-operator (+2)
-		//				   |					  |	   tk-operator
-		//				   |					  |	   function-kind-opname: ()
-		//				   |					  func-params (+3)
-		//				   |					  |   tk-parenthese-open, (
-		//				   |					  |   func-param (+2)
-		//				   |					  |   |   cref
-		//				   |					  |   |   identifier: i
-		//				   |					  |   tk-parenthese-close, )
-		//				   |					  func-return-type (+2)
-		//				   |					  |   tk-colon
-		//				   |					  |   type
-		//				   |					  |	   type-qualifier
-		//				   |					  |		   ref
-		//				   |					  func-body
-		//				   |						  return-inline (+3)
-		//				   |							  tk-arrow: ->
-		//				   |							  expr
-		//				   |				 expr-value
-		//				   |					 identifier: true
+		// Name of the target ref for each element in the container
+		AnyString cursorname;
+		// lvid representing the input container
+		AST::Node* container = nullptr;
+		AST::Node* predicate = nullptr;
 
-
-		bool success = true;
 		for (auto& childptr: node.children)
 		{
 			auto& child = *childptr;
 			switch (child.rule)
 			{
-				case AST::rgInFilter:
+				case AST::rgInVars:
 				{
-					ICE(child) << "predicate for views not implemented yet";
+					if (unlikely(child.children.size() != 1))
+						return error(child) << "only one cursor name is allowed in views";
+					auto& identifier = child.firstChild();
+					if (unlikely(identifier.rule != AST::rgIdentifier))
+						return ICE(identifier) << "identifier expected";
+
+					cursorname = identifier.text;
+					break;
+				}
+
+				case AST::rgInContainer:
+				{
+					if (unlikely(child.children.size() != 1))
+						return ICE(child) << "invalid expression";
+
+					container = &child.firstChild();
+					break;
+				}
+
+				case AST::rgInPredicate:
+				{
+					if (unlikely(child.children.size() != 1))
+						return ICE(child) << "invalid predicate expr";
+					auto& expr = child.firstChild();
+					if (unlikely(expr.rule != AST::rgExpr))
+						return ICE(expr) << "invalid node type for predicate";
+
+					warning(expr) << "predicates in views are not fully implemented";
+					predicate = &expr;
 					break;
 				}
 				default:
-					success = ICEUnexpectedNode(child, "[expr/in]");
+					return ICEUnexpectedNode(child, "[expr/in]");
 			}
 		}
-		return success;
+
+		if (unlikely(!container))
+			return ICE(node) << "invalid view container expr";
+
+		if (!context.reuse.inset.node)
+			context.prepareReuseForIn();
+
+		context.reuse.inset.container->children.clear();
+		context.reuse.inset.container->children.push_back(container);
+		context.reuse.inset.viewname->text = "^view^default";
+
+		if (cursorname.empty())
+			cursorname = "_";
+		context.reuse.inset.cursorname->text = cursorname;
+
+		if (!predicate)
+			predicate = AST::Node::Ptr::WeakPointer(context.reuse.inset.premadeAlwaysTrue);
+		context.reuse.inset.predicate->children.clear();
+		context.reuse.inset.predicate->children.push_back(predicate);
+
+		return visitASTExpr(*context.reuse.inset.node, localvar);
 	}
 
 

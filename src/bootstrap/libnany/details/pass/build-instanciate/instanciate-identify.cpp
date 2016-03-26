@@ -382,7 +382,7 @@ namespace Instanciate
 			case 0: // no identifier found from 'atom map'
 			{
 				if (debugmode)
-					error() << "debug: failed identify %" << operands.self << ".%" << operands.lvid;
+					error() << "debug: failed identify '" << name << "' %" << operands.self << ".%" << operands.lvid;
 				return complainUnknownIdentifier(selfAtom, frame->atom, name);
 			}
 		}

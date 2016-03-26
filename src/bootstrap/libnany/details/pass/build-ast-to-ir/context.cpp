@@ -43,12 +43,12 @@ namespace Producer
 	void Context::prepareReuseForLiterals()
 	{
 		// new (+2)
-		//     type-decl
-		//     |   identifier: i64
-		//     call (+3)
-		//         call-parameter
-		//             expr
-		//                 register: <lvid>
+		//	 type-decl
+		//	 |   identifier: i64
+		//	 call (+3)
+		//		 call-parameter
+		//			 expr
+		//				 register: <lvid>
 
 		auto& cache = reuse.literal;
 
@@ -90,16 +90,16 @@ namespace Producer
 		funcBody->children.push_back(expr);
 
 		// intrinsic (+2)
-		//       entity (+3)
-		//       |   identifier: nanyc
-		//       |   identifier: fieldset
-		//       call (+7)
-		//           call-parameter
-		//           |   expr
-		//           |       <expr A>
-		//           call-parameter
-		//           |   expr
-		//           |       <expr B>
+		//	   entity (+3)
+		//	   |   identifier: nanyc
+		//	   |   identifier: fieldset
+		//	   call (+7)
+		//		   call-parameter
+		//		   |   expr
+		//		   |	   <expr A>
+		//		   call-parameter
+		//		   |   expr
+		//		   |	   <expr B>
 		AST::Node::Ptr intrinsic = new AST::Node{AST::rgIntrinsic};
 		expr->children.push_back(intrinsic);
 		intrinsic->children.push_back(AST::createNodeIdentifier("^fieldset"));
@@ -130,27 +130,27 @@ namespace Producer
 		reuse.closure.node = new AST::Node{AST::rgExpr};
 
 		// expr
-		//     expr-value
-		//         new
-		//             type-decl
-		//                 class
-		//                     class-body
-		//                         expr
-		//                         |   expr-value
-		//                         |       function (+2)
-		//                         |           function-kind
-		//                         |           |   function-kind-operator (+2)
-		//                         |           |       function-kind-opname: ()
-		//                         |           func-body
-		//                         |               return-inline (+3)
-		//                         |                   expr
-		//                         |                   |   ...
+		//	 expr-value
+		//		 new
+		//			 type-decl
+		//				 class
+		//					 class-body
+		//						 expr
+		//						 |   expr-value
+		//						 |	   function (+2)
+		//						 |		   function-kind
+		//						 |		   |   function-kind-operator (+2)
+		//						 |		   |	   function-kind-opname: ()
+		//						 |		   func-body
+		//						 |			   return-inline (+3)
+		//						 |				   expr
+		//						 |				   |   ...
 
 		auto& exprValue = reuse.closure.node->append<AST::rgExprValue>();
-		auto& nnew      = exprValue.append<AST::rgNew>();
+		auto& nnew	  = exprValue.append<AST::rgNew>();
 		auto& typedecl  = nnew.append<AST::rgTypeDecl>();
-		auto& nclass    = typedecl.append<AST::rgClass>();
-		auto& cbody     = nclass.append<AST::rgClassBody>();
+		auto& nclass	= typedecl.append<AST::rgClass>();
+		auto& cbody	 = nclass.append<AST::rgClassBody>();
 		auto& bodyExpr  = cbody.append<AST::rgExpr>();
 		auto& bodyValue = bodyExpr.append<AST::rgExprValue>();
 
@@ -172,6 +172,73 @@ namespace Producer
 	}
 
 
+	void Context::prepareReuseForIn()
+	{
+		// expr
+		//   expr-value (+2)
+		//       expr-group
+		//       |   expr-value
+		//       |       identifier: expr
+		//       expr-sub-dot
+		//           identifier: makeview
+		//               call
+		//                   call-parameter
+		//                       expr
+		//                           expr-value
+		//                               function (+4)
+		//                                   function-kind
+		//                                   |   function-kind-function
+		//                                   func-params
+		//                                   |   func-param (+2)
+		//                                   |       cref
+		//                                   |       identifier: i
+		//                                   func-return-type
+		//                                   |   type
+		//                                   |       type-qualifier
+		//                                   |           ref
+		//                                   func-body
+		//                                       return
+		//                                           expr
+		//                                               expr-value
+		//                                                   identifier: predicate
+		//
+		reuse.inset.node = new AST::Node{AST::rgExpr};
+		auto& exprValue = reuse.inset.node->append<AST::rgExprValue>();
+
+		auto& exprGroup = exprValue.append<AST::rgExprGroup>();
+		reuse.inset.container = &exprGroup;
+
+		auto& subexpr = exprValue.append<AST::rgExprSubDot>();
+		auto& viewname = subexpr.append<AST::rgIdentifier>();
+		reuse.inset.viewname = &viewname;
+
+		auto& call = viewname.append<AST::rgCall>();
+		auto& parameter = call.append<AST::rgCallParameter>();
+		auto& paramExpr = parameter.append<AST::rgExpr>();
+		auto& paramExprValue = paramExpr.append<AST::rgExprValue>();
+		auto& func = paramExprValue.append<AST::rgFunction>();
+		auto& kind = func.append<AST::rgFunctionKind>();
+		kind.append<AST::rgFunctionKindFunction>();
+
+		auto& funcparams = func.append<AST::rgFuncParams>();
+		auto& funcparam = funcparams.append<AST::rgFuncParam>();
+		funcparam.append<AST::rgCref>();
+		auto& cursorname = funcparam.append<AST::rgIdentifier>();
+		reuse.inset.cursorname = &cursorname;
+
+		auto& rettype = func.append<AST::rgFuncReturnType>();
+		auto& type = rettype.append<AST::rgType>();
+		auto& typequalifier = type.append<AST::rgTypeQualifier>();
+		typequalifier.append<AST::rgRef>();
+
+		auto& funcbody = func.append<AST::rgFuncBody>();
+		auto& ret = funcbody.append<AST::rgReturn>();
+		reuse.inset.predicate = &ret;
+
+		reuse.inset.premadeAlwaysTrue = new AST::Node{AST::rgExpr};
+		auto& alwaysTrue = reuse.inset.premadeAlwaysTrue->append<AST::rgExprValue>();
+		alwaysTrue.append<AST::rgIdentifier>();
+	}
 
 
 
