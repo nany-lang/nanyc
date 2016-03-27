@@ -57,12 +57,12 @@ namespace Nany
 
 	inline bool Atom::isMemberVariable() const
 	{
-		return type == Type::vardef;
+		return type == Type::vardef and parent and (parent->type == Type::classdef);
 	}
 
 	inline bool Atom::isClassMember() const
 	{
-		return (type != Type::classdef) and (parent != nullptr) and (parent->type == Type::classdef);
+		return (type != Type::classdef) and parent and (parent->type == Type::classdef);
 	}
 
 
