@@ -21,6 +21,7 @@ namespace Producer
 			? *(orignode.children[0])
 			: orignode;
 
+		emitDebugpos(node);
 		switch (node.rule)
 		{
 			// expressions

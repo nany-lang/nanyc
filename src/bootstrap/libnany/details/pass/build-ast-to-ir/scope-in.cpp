@@ -82,6 +82,7 @@ namespace Producer
 		context.reuse.inset.predicate->children.clear();
 		context.reuse.inset.predicate->children.push_back(predicate);
 
+		emitDebugpos(node);
 		return visitASTExpr(*context.reuse.inset.node, localvar);
 	}
 

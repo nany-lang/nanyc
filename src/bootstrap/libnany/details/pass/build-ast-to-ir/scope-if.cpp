@@ -34,6 +34,7 @@ namespace Producer
 				out.emitComment("if-cond");
 			OpcodeScopeLocker opscopeCond{out};
 			uint32_t exprEval = 0;
+			emitDebugpos(expr);
 			success &= visitASTExpr(expr, exprEval, false);
 			out.emitAssign(condlvid, exprEval, false);
 		}

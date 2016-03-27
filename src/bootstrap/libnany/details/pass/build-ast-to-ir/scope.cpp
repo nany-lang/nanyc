@@ -83,7 +83,7 @@ namespace Producer
 
 	void Scope::emitDebugpos(const AST::Node& node)
 	{
-		if (likely(node.offset > 0))
+		if (node.offset > 0)
 		{
 			auto it = context.offsetToLine.lower_bound(node.offset);
 			if (it != context.offsetToLine.end())

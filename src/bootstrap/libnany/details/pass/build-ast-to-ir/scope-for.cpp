@@ -63,6 +63,7 @@ namespace Producer
 		if (!context.reuse.loops.node)
 			context.prepareReuseForLoops();
 
+		emitDebugpos(node);
 		ShortString16 lvidstr;
 		lvidstr << viewlvid;
 		for (auto*& mnode: context.reuse.loops.viewlvid)
