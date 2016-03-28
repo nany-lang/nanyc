@@ -8,6 +8,11 @@
 
 namespace Nany
 {
+namespace Pass
+{
+namespace Instanciate
+{
+
 
 	bool OverloadedFuncCallResolver::resolve(const std::vector<std::reference_wrapper<Atom>>& solutions)
 	{
@@ -135,6 +140,7 @@ namespace Nany
 					};
 					info.canGenerateCode = canGenerateCode;
 					info.canGenerateErrors = canGenerateErrors;
+					info.parent = parent;
 
 					if (InstanciateAtom(info))
 					{
@@ -180,4 +186,6 @@ namespace Nany
 
 
 
+} // namespace Instanciate
+} // namespace Pass
 } // namespace Nany

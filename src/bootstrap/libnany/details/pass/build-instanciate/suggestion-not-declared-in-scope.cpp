@@ -102,7 +102,7 @@ namespace Instanciate
 		if (unlikely(name.empty())) // should never happen
 			return (error() << "invalid empty identifier name");
 
-		if (self and self->hasErrors) // error already reported
+		if (self and self->flags(Atom::Flags::error)) // error already reported
 			return false;
 
 		auto err = error();

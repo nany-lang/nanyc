@@ -28,7 +28,7 @@ namespace Instanciate
 	bool SequenceBuilder::instanciateAtomClassClone(Atom& atom, uint32_t lvid, uint32_t rhs)
 	{
 		assert(atom.isClass());
-		if (unlikely(atom.hasErrors))
+		if (unlikely(atom.flags(Atom::Flags::error)))
 			return false;
 
 		// first, try to find the user-defined clone function (if any)
@@ -81,7 +81,7 @@ namespace Instanciate
 		if (unlikely(not atom.isClass()))
 			return (ICE() << "trying to call the destructor of a non-class atom");
 
-		if (unlikely(atom.hasErrors)) // error already reported
+		if (unlikely(atom.flags(Atom::Flags::error)))
 			return false;
 
 		// first, try to find the user-defined dtor function (if any)
@@ -165,6 +165,7 @@ namespace Instanciate
 		Pass::Instanciate::InstanciateData info{newReport, atom, cdeftable, context, params, tmplparams};
 		info.parentAtom = &(frame->atom);
 		info.shouldMergeLayer = true;
+		info.parent = this;
 
 		auto* sequence = Pass::Instanciate::InstanciateAtom(info);
 		report.subgroup().appendEntry(newReport);
@@ -183,8 +184,8 @@ namespace Instanciate
 			return &resAtom;
 		}
 
-		atom.hasErrors = true;
-		resAtom.hasErrors = true;
+		atom.flags += Atom::Flags::error;
+		resAtom.flags += Atom::Flags::error;
 		return nullptr;
 	}
 
@@ -255,6 +256,7 @@ namespace Instanciate
 		// even within a typeof, any new instanciation must see their code generated
 		// (and its errors generated)
 		info.canGenerateCode = true; // canGenerateCode();
+		info.parent = this;
 
 		auto* sequence = InstanciateAtom(info);
 		report.appendEntry(subreport);
@@ -479,8 +481,7 @@ namespace Instanciate
 			// creaa new atom branch for the new instanciation if the atom is a generic class
 			if (previousAtom.isClass() and previousAtom.hasGenericParameters())
 			{
-				bool cok = createNewAtom(info, previousAtom, report);
-				if (unlikely(not cok))
+				if (not createNewAtom(info, previousAtom, report))
 					return nullptr;
 			}
 
@@ -497,7 +498,7 @@ namespace Instanciate
 
 			// instanciate the sequence attached to the atom
 			auto builder = std::make_unique<SequenceBuilder>
-				(report.subgroup(), newView, info.context, *outIR, inputIR);
+				(report.subgroup(), newView, info.context, *outIR, inputIR, info.parent);
 
 			builder->pushParametersFromSignature(atom.atomid, signature);
 			if (info.parentAtom)

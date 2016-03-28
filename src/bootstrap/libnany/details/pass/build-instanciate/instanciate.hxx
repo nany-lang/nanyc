@@ -10,6 +10,7 @@ namespace Pass
 namespace Instanciate
 {
 
+
 	inline void SequenceBuilder::pushNewFrame(Atom& atom)
 	{
 		auto* newframe = (AtomStackFrame*) context.memory.allocate(&context, sizeof(AtomStackFrame));

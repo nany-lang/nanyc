@@ -8,6 +8,7 @@
 #include "details/context/context.h"
 #include "libnany-traces.h"
 #include "instanciate-atom.h"
+#include <iostream>
 
 using namespace Yuni;
 
@@ -25,7 +26,7 @@ namespace Instanciate
 
 
 	SequenceBuilder::SequenceBuilder(Logs::Report report, ClassdefTableView& cdeftable, nycontext_t& context,
-		IR::Sequence& out, IR::Sequence& sequence)
+		IR::Sequence& out, IR::Sequence& sequence, SequenceBuilder* parent)
 		: cdeftable(cdeftable)
 		, context(context)
 		, intrinsics(((Context*) context.internal)->intrinsics)
@@ -33,6 +34,7 @@ namespace Instanciate
 		, currentSequence(sequence)
 		, overloadMatch(report, cdeftable)
 		, report(report)
+		, parent(parent)
 	{
 		// reduce memory (re)allocations
 		multipleResults.reserve(8); // arbitrary value

@@ -14,7 +14,6 @@
 namespace Nany
 {
 	class IntrinsicTable;
-	class OverloadedFuncCallResolver;
 }
 
 
@@ -26,6 +25,7 @@ namespace Instanciate
 {
 
 	struct InstanciateData;
+	class OverloadedFuncCallResolver;
 
 
 	struct IndexedParameter final
@@ -61,7 +61,7 @@ namespace Instanciate
 		//@{
 		//! Default constructor (importSignature must be called after)
 		SequenceBuilder(Logs::Report report, ClassdefTableView&, nycontext_t& context,
-			IR::Sequence& out, IR::Sequence& sequence);
+			IR::Sequence& out, IR::Sequence& sequence, SequenceBuilder* parent = nullptr);
 
 		//! Prepare the first local registers according the given signature
 		void pushParametersFromSignature(LVID atomid, const Signature&);
@@ -171,7 +171,7 @@ namespace Instanciate
 
 
 		//! perform type resolution and fetch data (local variable, func...)
-		bool identify(const IR::ISA::Operand<IR::ISA::Op::identify>& operands);
+		bool identify(const IR::ISA::Operand<IR::ISA::Op::identify>& operands, bool firstChance = true);
 		bool ensureResolve(const IR::ISA::Operand<IR::ISA::Op::ensureresolved>& operands);
 
 		Atom& resolveTypeAlias(Atom& atom, bool& success);
@@ -205,6 +205,8 @@ namespace Instanciate
 
 		bool generateShortCircuitInstrs(uint32_t retlvid);
 
+		bool tryToCaptureVariable(const AnyString& name);
+
 		//! \name Help for memory management
 		//@{
 		//! Get if a value from a register can be acquired (ref counting)
@@ -222,6 +224,7 @@ namespace Instanciate
 
 		//! Create 'count' new local variables and return the first lvid
 		uint32_t createLocalVariables(uint32_t count = 1);
+
 		//@}
 
 
@@ -377,6 +380,9 @@ namespace Instanciate
 		// exit status
 		mutable bool success = true;
 		friend class Nany::IR::Sequence;
+
+		//! Previous sequence builder
+		SequenceBuilder* parent = nullptr;
 
 	public:
 		//! Flag to determine weather sub atoms can be instanciated in the same time

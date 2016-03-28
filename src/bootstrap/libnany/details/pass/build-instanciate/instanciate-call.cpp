@@ -148,7 +148,7 @@ namespace Instanciate
 				return complainOperand(IR::Instruction::fromOpcode(operands), "no solution available");
 
 
-			OverloadedFuncCallResolver resolver{report, overloadMatch, cdeftable, context};
+			OverloadedFuncCallResolver resolver{this, report, overloadMatch, cdeftable, context};
 			if (unlikely(not resolver.resolve(solutions)))
 				return complainMultipleOverloads(operands.ptr2func, solutions, resolver);
 

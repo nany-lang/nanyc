@@ -56,7 +56,7 @@ namespace Instanciate
 	}
 
 
-	inline bool SequenceBuilder::identify(const IR::ISA::Operand<IR::ISA::Op::identify>& operands)
+	bool SequenceBuilder::identify(const IR::ISA::Operand<IR::ISA::Op::identify>& operands, bool firstChance)
 	{
 		AnyString name = currentSequence.stringrefs[operands.text];
 
@@ -300,7 +300,7 @@ namespace Instanciate
 					? resultAtom
 					: resolveTypeAlias(resultAtom, aliasSuccess);
 
-				if (unlikely(not aliasSuccess or atom.hasErrors))
+				if (unlikely(not aliasSuccess or atom.flags(Atom::Flags::error)))
 					return false;
 
 				// if the resolution is simple (aka only one solution), it is possible that the
@@ -381,8 +381,21 @@ namespace Instanciate
 
 			case 0: // no identifier found from 'atom map'
 			{
+				// nothing has been found, trying capturing variable from anonymous classes
+				if (firstChance and frame->atom.canCaptureVariabes())
+				{
+					if (tryToCaptureVariable(name)) // let's try again !
+						return identify(operands, /*no second chance*/ false);
+				}
+
+				// UNKNOWN identifier
 				if (debugmode)
-					error() << "debug: failed identify '" << name << "' %" << operands.self << ".%" << operands.lvid;
+				{
+					auto err = (error() << "debug: failed identify '" << name);
+					err << "' %" << operands.self << ".%" << operands.lvid;
+					if (not firstChance)
+						err << " (SECOND TRY - ICE!)";
+				}
 				return complainUnknownIdentifier(selfAtom, frame->atom, name);
 			}
 		}

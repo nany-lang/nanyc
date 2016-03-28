@@ -592,6 +592,20 @@ namespace Nany
 	}
 
 
+	bool Atom::findParent(const Atom& atom) const
+	{
+		const Atom* p = this;
+		do
+		{
+			p = p->parent;
+			if (p == &atom)
+				return true;
+		}
+		while (p);
+		return false;
+	}
+
+
 
 
 } // namespace Nany

@@ -121,7 +121,11 @@ namespace Instanciate
 					// .. but update the lvid on-the-fly first
 					cdeftable.substitute(operands.lvid).mutateToAtom(atom);
 
+					// allow capture out-of-scope variables
+					atom->flags += Atom::Flags::captureVariables;
+
 					(*cursor)++; // go to the next opcode, which should be blueprint.size
+
 					auto& blueprintsize = (**cursor).to<IR::ISA::Op::pragma>();
 					assert(blueprintsize.opcode == (uint32_t) IR::ISA::Op::pragma);
 					assert(blueprintsize.value.blueprintsize >= 2);

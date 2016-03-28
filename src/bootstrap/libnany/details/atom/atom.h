@@ -3,6 +3,7 @@
 #include <yuni/core/smartptr/intrusive.h>
 #include <yuni/core/string.h>
 #include <yuni/core/noncopyable.h>
+#include <yuni/core/flags.h>
 #include "details/fwd.h"
 #include "details/utils/clid.h"
 #include "vardef.h"
@@ -54,6 +55,16 @@ namespace Nany
 			typealias,
 			//! Unit (source file)
 			unit,
+		};
+
+		enum class Flags
+		{
+			//! Flag to allow this atom in error reporting
+			suggestInReport,
+			//! Flag to allow this atom (and the sub-functions) to capture variables
+			captureVariables,
+			//! Flag to suppress spurious error messages and code generation
+			error,
 		};
 
 		struct Parameters final
@@ -141,6 +152,11 @@ namespace Nany
 		bool canAccessTo(const Atom&) const;
 
 		/*!
+		** \brief Get if the atom can capture out-of-scope variables
+		*/
+		bool canCaptureVariabes() const;
+
+		/*!
 		** \brief Perform a name lookup from the local scope to the top root atom
 		**
 		** This method is meant to be called several times with the same input (The input
@@ -210,6 +226,11 @@ namespace Nany
 		** the string representing its name
 		*/
 		void renameChild(const AnyString& from, const AnyString& to);
+
+		/*!
+		** \brief Determine whether an atom is a parent to the current atom
+		*/
+		bool findParent(const Atom& atom) const;
 
 		//! Get the number of children
 		uint32_t size() const;
@@ -407,12 +428,13 @@ namespace Nany
 		//! Name of the current atom
 		AnyString name;
 
-		//! Flag to suppress spurious error messages and code generation
-		bool hasErrors = false;
-
 		//! Can be used for error reporting
 		bool canBeSuggestedInErrReporting = true;
 
+		//! Allow captured variables from anonymous classes
+		bool allowCapturedVariables = false;
+
+		Yuni::Flags<Flags> flags;
 
 	private:
 		//! Default constructor

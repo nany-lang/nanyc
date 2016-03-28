@@ -14,6 +14,14 @@
 
 namespace Nany
 {
+namespace Pass
+{
+namespace Instanciate
+{
+
+	class SequenceBuilder;
+
+
 
 	/*!
 	** \brief Helper for resolving func call
@@ -26,12 +34,13 @@ namespace Nany
 
 
 	public:
-		OverloadedFuncCallResolver(Logs::Report report, FuncOverloadMatch& overloadMatch, ClassdefTableView& cdeftable,
+		OverloadedFuncCallResolver(SequenceBuilder* parent, Logs::Report report, FuncOverloadMatch& overloadMatch, ClassdefTableView& cdeftable,
 			nycontext_t& context)
 			: overloadMatch(overloadMatch)
 			, report(report)
 			, cdeftable(cdeftable)
 			, context(context)
+			, parent(parent)
 		{}
 
 		bool resolve(const std::vector<std::reference_wrapper<Atom>>& solutions);
@@ -53,11 +62,10 @@ namespace Nany
 		//! All suitable solutions
 		std::vector<bool> suitable;
 		// total number of suitable solutions (<= suitable.size())
-		uint suitableCount = 0;
+		uint32_t suitableCount = 0;
 
 		//! All subreports for suitable solutions
 		std::vector<Logs::Message::Ptr> subreports;
-
 
 	private:
 		FuncOverloadMatch& overloadMatch;
@@ -71,6 +79,8 @@ namespace Nany
 		ClassdefTableView& cdeftable;
 		//! Parent context
 		nycontext_t& context;
+		//! Parent Sequence builder, if any
+		SequenceBuilder* parent = nullptr;;
 
 	}; // class OverloadedFuncCallResolver
 
@@ -79,4 +89,6 @@ namespace Nany
 
 
 
+} // namespace Instanciate
+} // namespace Pass
 } // namespace Nany

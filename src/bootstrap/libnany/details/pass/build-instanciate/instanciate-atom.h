@@ -13,6 +13,8 @@ namespace Pass
 namespace Instanciate
 {
 
+	class SequenceBuilder;
+
 
 	struct InstanciateData final
 	{
@@ -55,6 +57,9 @@ namespace Instanciate
 
 		//! Make the layer persistent
 		bool shouldMergeLayer = false;
+
+		//! Parent
+		SequenceBuilder* parent = nullptr;
 	};
 
 	IR::Sequence* InstanciateAtom(InstanciateData& info);
