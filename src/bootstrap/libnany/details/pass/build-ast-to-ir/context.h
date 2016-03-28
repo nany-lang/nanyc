@@ -6,6 +6,7 @@
 #include "details/reporting/report.h"
 #include "details/grammar/nany.h"
 #include <map>
+#include <array>
 #include <cassert>
 
 
