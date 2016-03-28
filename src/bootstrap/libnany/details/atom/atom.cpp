@@ -38,8 +38,14 @@ namespace Nany
 
 	bool Atom::canAccessTo(const Atom& atom) const
 	{
-		// same ancestor ? requesting access to a namespace ?
-		if ((parent == atom.parent) or (atom.type == Type::namespacedef))
+		if (atom.isNamespace()) // all namespaces are accessble
+			return true;
+
+		if (this == &atom) // same...
+			return true;
+
+		// belonging to a class ?
+		if (parent and parent == atom.parent and isClassMember())
 			return true;
 
 		// get if the targets are identical
