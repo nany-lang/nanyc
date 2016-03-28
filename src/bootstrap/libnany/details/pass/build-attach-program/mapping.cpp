@@ -387,7 +387,10 @@ namespace Mapping
 			case IR::ISA::Pragma::suggest:
 			{
 				bool onoff = (0 != operands.value.suggest);
-				atomStack->atom.canBeSuggestedInErrReporting = onoff;
+				if (not onoff)
+					atomStack->atom.flags -= Atom::Flags::suggestInReport;
+				else
+					atomStack->atom.flags += Atom::Flags::suggestInReport;
 				break;
 			}
 

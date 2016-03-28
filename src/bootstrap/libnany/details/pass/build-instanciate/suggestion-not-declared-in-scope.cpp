@@ -207,7 +207,7 @@ namespace Instanciate
 				for (auto& candidateptr: pair.second)
 				{
 					auto& candidate = candidateptr.get();
-					if (candidate.canBeSuggestedInErrReporting)
+					if (candidate.flags(Atom::Flags::suggestInReport))
 					{
 						auto suggest = (err.suggest() << cdeftable.keyword(candidate) << ' ');
 						candidate.retrieveCaption(suggest.data().message, cdeftable);

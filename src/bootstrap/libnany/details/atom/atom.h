@@ -331,6 +331,9 @@ namespace Nany
 		//! Atom unique ID (32-bits only, used for classification)
 		yuint32 atomid = 0u;
 
+		//! Atom flags
+		Yuni::Flags<Flags> flags = {Flags::suggestInReport};
+
 		//! Various information for vardef only (class member)
 		struct
 		{
@@ -368,10 +371,10 @@ namespace Nany
 
 		//! Flag to determine whether this entry is a blueprint or a namespace
 		const Type type;
-		//! Parent node
-		Atom* parent = nullptr;
 		//! Visibility
 		nyvisibility_t visibility = nyv_public;
+		//! Parent node
+		Atom* parent = nullptr;
 
 		//! Origins
 		struct
@@ -400,7 +403,7 @@ namespace Nany
 		Parameters tmplparamsForPrinting;
 
 		//! The maximum number of variables / classdefs registered for the atom
-		uint localVariablesCount = 0u;
+		uint32_t localVariablesCount = 0u;
 
 		//! The original IR sequence
 		struct
@@ -428,13 +431,6 @@ namespace Nany
 		//! Name of the current atom
 		AnyString name;
 
-		//! Can be used for error reporting
-		bool canBeSuggestedInErrReporting = true;
-
-		//! Allow captured variables from anonymous classes
-		bool allowCapturedVariables = false;
-
-		Yuni::Flags<Flags> flags;
 
 	private:
 		//! Default constructor

@@ -182,7 +182,7 @@ namespace Instanciate
 			for (size_t i = 0; i != solutions.size(); ++i)
 			{
 				auto& atom = solutions[i].get();
-				if (atom.canBeSuggestedInErrReporting)
+				if (atom.flags(Atom::Flags::suggestInReport))
 				{
 					auto hint  = (err.hint() << "see ");
 					hint.message.origins.location.filename   = atom.origin.filename;
