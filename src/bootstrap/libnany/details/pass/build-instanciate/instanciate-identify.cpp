@@ -392,8 +392,10 @@ namespace Instanciate
 				if (debugmode)
 				{
 					auto err = (error() << "debug: failed identify '" << name);
-					err << "' %" << operands.self << ".%" << operands.lvid;
-					if (not firstChance)
+					err << "' in atom: " << frame->atomid << " aka '" << frame->atom.caption();
+					err << "', self: %" << operands.self;
+					err << ", lvid: %" << operands.lvid;
+					if (unlikely(not firstChance))
 						err << " (SECOND TRY - ICE!)";
 				}
 				return complainUnknownIdentifier(selfAtom, frame->atom, name);
