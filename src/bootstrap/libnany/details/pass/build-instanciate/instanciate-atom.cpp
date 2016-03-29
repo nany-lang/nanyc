@@ -288,6 +288,7 @@ namespace Instanciate
 
 	inline void SequenceBuilder::pushParametersFromSignature(LVID atomid, const Signature& signature)
 	{
+		assert(frame == NULL);
 		assert(atomid != 0);
 		// magic constant +2
 		//  * +1: all clid are 1-based (0 is reserved for the atom itself, not for an internal var)

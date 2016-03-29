@@ -528,6 +528,15 @@ namespace ISA
 		uint32_t regsize;
 	};
 
+	template<> struct Operand<Nany::IR::ISA::Op::memfill> final
+	{
+		constexpr static const char* opname() { return "memfill"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		uint32_t regsize;
+		uint32_t pattern;
+	};
+
 
 
 

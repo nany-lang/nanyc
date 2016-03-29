@@ -761,6 +761,26 @@ namespace // anonymous
 			memchecker.forget(object);
 		}
 
+		void visit(const IR::ISA::Operand<IR::ISA::Op::memfill>& operands)
+		{
+			VM_PRINT_OPCODE(operands);
+			assert(operands.lvid < registerCount);
+			assert(operands.regsize < registerCount);
+			assert(operands.pattern < registerCount);
+
+			uint64_t* object = reinterpret_cast<uint64_t*>(registers[operands.lvid].u64);
+			VM_CHECK_POINTER(object, operands);
+			size_t size = static_cast<size_t>(registers[operands.regsize].u64);
+			size += sizeof(uint64_t); // reference counter
+			uint8_t pattern = static_cast<uint8_t>(registers[operands.pattern].u64);
+
+			if (YUNI_UNLIKELY(not memchecker.checkObjectSize(object, static_cast<size_t>(size))))
+				throw (String{"pointer "} << (void*) object << " size mismatch: got " << size);
+
+			memset(object, pattern, size);
+		}
+
+
 
 		template<IR::ISA::Op O> void visit(const IR::ISA::Operand<O>& operands)
 		{

@@ -130,6 +130,8 @@ namespace ISA //!< Instruction Set Architecture
 		memalloc,
 		//! Free a region of memory previously allocated by 'memalloc'
 		memfree,
+		//! Fill a memory with a pattern
+		memfill,
 
 		//! label
 		label,
@@ -253,6 +255,7 @@ namespace ISA //!< Instruction Set Architecture
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::pragma) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::memalloc) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::memfree) \
+				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::memfill) \
 				\
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::label) \
 				\

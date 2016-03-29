@@ -153,6 +153,8 @@ namespace IR
 		uint32_t emitMemalloc(uint32_t lvid, uint32_t regsize);
 		//! Emit a memfree opcode and get the register
 		void emitMemFree(uint32_t lvid, uint32_t regsize);
+		//! Emit a memfill
+		void emitMemFill(uint32_t lvid, uint32_t regsize, uint32_t pattern);
 
 		//! Enter a namespace def
 		void emitNamespace(const AnyString& name);

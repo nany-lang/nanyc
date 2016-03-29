@@ -501,6 +501,11 @@ namespace // anonymous
 			line() << "memory.free %" << operands.lvid << " size %" << operands.regsize;
 		}
 
+		void print(const Operand<Op::memfill>& operands)
+		{
+			line() << "memory.fill %" << operands.lvid << " size %" << operands.regsize;
+		}
+
 
 		void print(const Operand<Op::ref>& operands)
 		{

@@ -88,6 +88,7 @@ namespace Instanciate
 		bool instanciateIntrinsicSizeof(uint32_t lvid);
 		bool instanciateIntrinsicMemalloc(uint32_t lvid);
 		bool instanciateIntrinsicMemFree(uint32_t lvid);
+		bool instanciateIntrinsicMemfill(uint32_t lvid);
 
 		template<nytype_t R, bool AcceptBool, bool AcceptInt, bool AcceptFloat,
 			void (IR::Sequence::* M)(uint32_t, uint32_t, uint32_t)>

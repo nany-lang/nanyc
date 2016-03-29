@@ -169,7 +169,7 @@ namespace Instanciate
 
 		uint32_t objlvid = pushedparams.func.indexed[0].lvid;
 		auto& cdef = cdeftable.classdefFollowClassMember(CLID{frame->atomid, objlvid});
-		if (cdef.kind != nyt_u64)
+		if (cdef.kind != nyt_pointer)
 			return complainIntrinsicParameter("memory.dispose", 0, cdef, "'__u64'");
 
 		uint32_t size = pushedparams.func.indexed[1].lvid;
@@ -179,6 +179,31 @@ namespace Instanciate
 
 		if (canGenerateCode())
 			out.emitMemFree(objlvid, size);
+		return true;
+	}
+
+
+	bool SequenceBuilder::instanciateIntrinsicMemfill(uint32_t lvid)
+	{
+		cdeftable.substitute(lvid).mutateToVoid();
+
+		uint32_t objlvid = pushedparams.func.indexed[0].lvid;
+		auto& cdef = cdeftable.classdefFollowClassMember(CLID{frame->atomid, objlvid});
+		if (cdef.kind != nyt_pointer)
+			return complainIntrinsicParameter("memory.memset", 0, cdef, "'__pointer'");
+
+		uint32_t size = pushedparams.func.indexed[1].lvid;
+		auto& cdefsize = cdeftable.classdefFollowClassMember(CLID{frame->atomid, size});
+		if (unlikely(not cdefsize.isBuiltingUnsigned()))
+			return complainIntrinsicParameter("memory.memset", 1, cdef, "'__u64'");
+
+		uint32_t patternlvid = pushedparams.func.indexed[2].lvid;
+		auto& cdefpattern = cdeftable.classdefFollowClassMember(CLID{frame->atomid, size});
+		if (unlikely(not cdefpattern.isBuiltingUnsigned()))
+			return complainIntrinsicParameter("memory.memset", 2, cdef, "'__u32'");
+
+		if (canGenerateCode())
+			out.emitMemFill(objlvid, size, patternlvid);
 		return true;
 	}
 
@@ -562,6 +587,7 @@ namespace Instanciate
 		{"addressof",       { &SequenceBuilder::instanciateIntrinsicAddressof, 1 }},
 		{"memory.allocate", { &SequenceBuilder::instanciateIntrinsicMemalloc,  1 }},
 		{"memory.dispose",  { &SequenceBuilder::instanciateIntrinsicMemFree,   2 }},
+		{"memory.fill",     { &SequenceBuilder::instanciateIntrinsicMemfill,   3 }},
 		{"ref",             { &SequenceBuilder::instanciateIntrinsicRef,       1 }},
 		{"unref",           { &SequenceBuilder::instanciateIntrinsicUnref,     1 }},
 		{"sizeof",          { &SequenceBuilder::instanciateIntrinsicSizeof,    1 }},
