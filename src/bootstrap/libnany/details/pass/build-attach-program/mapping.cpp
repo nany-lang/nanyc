@@ -188,11 +188,21 @@ namespace Mapping
 					? frame.atom.parameters : frame.atom.tmplparams;
 				parameters.append(clid, name);
 
-				// keep somewhere that this definition is a variable instance
+
 				MutexLocker locker{mutex};
+				// information about the parameter itself
 				auto& cdef = cdeftable.classdef(clid);
 				cdef.instance = not isTemplate;
 				cdef.qualifiers.ref = false; // should not be 'ref' by default, contrary to all other classdefs
+
+				if (isTemplate)
+				{
+					// if a generic type parameter, generating an implicit typedef
+					Atom& atom = atomStack->currentAtomNotUnit();
+					auto* newAliasAtom = cdeftable.atoms.createTypealias(atom, name);
+					cdeftable.registerAtom(newAliasAtom);
+					newAliasAtom->returnType.clid = cdef.clid; // type of the typedef
+				}
 				break;
 			}
 
