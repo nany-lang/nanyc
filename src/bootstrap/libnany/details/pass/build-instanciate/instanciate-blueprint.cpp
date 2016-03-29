@@ -149,6 +149,11 @@ namespace Instanciate
 				bool isvar = (kind == IR::ISA::Blueprint::param);
 				cdef.instance = isvar;
 				frame->lvids[lvid].synthetic = (not isvar);
+
+				// Do not emit warning for 'unused variable' on template parameters
+				if (kind == IR::ISA::Blueprint::gentypeparam)
+					frame->lvids[lvid].warning.unused = false;
+
 				// param name
 				const auto& name = currentSequence.stringrefs[operands.name];
 				// declare the new name as locally accessible
