@@ -284,11 +284,34 @@ namespace Instanciate
 	}
 
 
+
+
+	constexpr const nytype_t promotion[nyt_count][nyt_count] =
+	{
+		/*void*/ {nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,},
+		/*any*/  {nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,},
+		/*ptr*/  {nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,},
+		/*bool*/ {nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,},
+		/*u8 */  {nyt_void,nyt_void,nyt_void,nyt_void,nyt_u8,  nyt_u16, nyt_u32, nyt_u64, nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,},
+		/*u16*/  {nyt_void,nyt_void,nyt_void,nyt_void,nyt_u16, nyt_u16, nyt_u32, nyt_u64, nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,},
+		/*u32*/  {nyt_void,nyt_void,nyt_void,nyt_void,nyt_u32, nyt_u32, nyt_u32, nyt_u64, nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,},
+		/*u64*/  {nyt_void,nyt_void,nyt_void,nyt_void,nyt_u64, nyt_u64, nyt_u64, nyt_u64, nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,},
+		/*i8 */  {nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_i8,  nyt_i16, nyt_i32, nyt_i64, nyt_void,nyt_void,},
+		/*i16*/  {nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_i16, nyt_i16, nyt_i32, nyt_i64, nyt_void,nyt_void,},
+		/*i32*/  {nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_i32, nyt_i32, nyt_i32, nyt_i64, nyt_void,nyt_void,},
+		/*i64*/  {nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_i64, nyt_i64, nyt_i64, nyt_i64, nyt_void,nyt_void,},
+		/*f32*/  {nyt_void,nyt_void,nyt_void,nyt_void,nyt_f32, nyt_f32, nyt_f32, nyt_void,nyt_f32, nyt_f32, nyt_f32, nyt_void,nyt_f32, nyt_f64, },
+		/*f64*/  {nyt_void,nyt_void,nyt_void,nyt_void,nyt_f64, nyt_f64, nyt_f64, nyt_f64, nyt_f64, nyt_f64, nyt_f64, nyt_f64, nyt_f64, nyt_f64, },
+	};
+
+
 	template<nytype_t R, bool AcceptBool, bool AcceptInt, bool AcceptFloat,
 		void (IR::Sequence::* M)(uint32_t, uint32_t, uint32_t)>
 	inline bool SequenceBuilder::emitBuiltinOperator(uint32_t lvid, const char* const name)
 	{
 		assert(pushedparams.func.indexed.size() == 2);
+
+		// -- LHS - PARAMETER 0 --
 		uint32_t lhs  = pushedparams.func.indexed[0].lvid;
 		auto& cdeflhs = cdeftable.classdefFollowClassMember(CLID{frame->atomid, lhs});
 
@@ -308,6 +331,7 @@ namespace Instanciate
 			}
 		}
 
+		// -- RHS - PARAMETER 1 --
 		uint32_t rhs  = pushedparams.func.indexed[1].lvid;
 		auto& cdefrhs = cdeftable.classdefFollowClassMember(CLID{frame->atomid, rhs});
 		nytype_t builtinrhs = cdefrhs.kind;
@@ -325,10 +349,16 @@ namespace Instanciate
 			}
 		}
 
-		if (unlikely(builtinlhs != builtinrhs))
+
+		// -- implicit type promotion --
+		if (builtinlhs != builtinrhs)
 		{
-			complainIntrinsicParameter(name, 0, cdeflhs);
-			return complainIntrinsicParameter(name, 1, cdefrhs);
+			builtinlhs = promotion[builtinlhs][builtinrhs];
+			if (unlikely(builtinlhs == nyt_void))
+			{
+				complainIntrinsicParameter(name, 0, cdeflhs);
+				return complainIntrinsicParameter(name, 1, cdefrhs);
+			}
 		}
 
 		switch (builtinlhs)
