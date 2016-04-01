@@ -90,9 +90,6 @@ namespace Instanciate
 		bool instanciateIntrinsicMemFree(uint32_t lvid);
 		bool instanciateIntrinsicMemfill(uint32_t lvid);
 
-		template<nytype_t R, bool AcceptBool, bool AcceptInt, bool AcceptFloat,
-			void (IR::Sequence::* M)(uint32_t, uint32_t, uint32_t)>
-		bool instanciateIntrinsicOperator(uint32_t lvid, const char* const name);
 
 		bool instanciateIntrinsicNOT(uint32_t);
 
@@ -170,6 +167,9 @@ namespace Instanciate
 		template<IR::ISA::Op O> void visit(const IR::ISA::Operand<O>&);
 		//@}
 
+		template<nytype_t R, bool AcceptBool, bool AcceptInt, bool AcceptFloat,
+			void (IR::Sequence::* M)(uint32_t, uint32_t, uint32_t)>
+		bool emitBuiltinOperator(uint32_t lvid, const char* const name);
 
 		//! perform type resolution and fetch data (local variable, func...)
 		bool identify(const IR::ISA::Operand<IR::ISA::Op::identify>& operands, bool firstChance = true);
