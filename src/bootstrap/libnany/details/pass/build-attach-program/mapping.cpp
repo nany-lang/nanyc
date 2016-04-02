@@ -256,25 +256,34 @@ namespace Mapping
 				AnyString classname = currentSequence.stringrefs[operands.name];
 
 				Atom* newClassAtom;
+				// create a new atom in the global type table
+				if (prefixNameForFirstAtomCreated.empty())
 				{
 					MutexLocker locker{mutex};
-					// create a new atom in the global type table
-					if (prefixNameForFirstAtomCreated.empty())
-					{
-						newClassAtom = cdeftable.atoms.createClassdef(atom, classname);
-					}
-					else
-					{
-						String tmpname{prefixNameForFirstAtomCreated};
-						prefixNameForFirstAtomCreated.clear();
-						newClassAtom = cdeftable.atoms.createClassdef(atom, tmpname << classname);
-					}
+					newClassAtom = cdeftable.atoms.createClassdef(atom, classname);
+					// create a pseudo classdef to easily retrieve the real atom from a clid
+					cdeftable.registerAtom(newClassAtom);
+				}
+				else
+				{
+					String tmpname;
+					tmpname.reserve(classname.size() + prefixNameForFirstAtomCreated.size());
+					tmpname << prefixNameForFirstAtomCreated << classname;
+					prefixNameForFirstAtomCreated.clear();
+
+					MutexLocker locker{mutex};
+					newClassAtom = cdeftable.atoms.createClassdef(atom, tmpname);
 					// create a pseudo classdef to easily retrieve the real atom from a clid
 					cdeftable.registerAtom(newClassAtom);
 				}
 
+				assert(newClassAtom != nullptr);
 				newClassAtom->opcodes.sequence = &currentSequence;
-				newClassAtom->opcodes.offset  = currentSequence.offsetOf(operands);
+				newClassAtom->opcodes.offset   = currentSequence.offsetOf(operands);
+
+				// anonymous class declaration
+				if (operands.lvid != 0)
+					newClassAtom->flags += Atom::Flags::captureVariables;
 
 				// update atomid
 				operands.atomid = newClassAtom->atomid;

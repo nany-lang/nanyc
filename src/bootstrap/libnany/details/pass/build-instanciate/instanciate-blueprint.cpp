@@ -101,8 +101,9 @@ namespace Instanciate
 							out.emitBlueprintClass(atomname, atomid);
 					}
 
-					// create new frame
+					// create new frame, and populating the associated variable 'frame'
 					pushNewFrame(*atom);
+					assert(frame);
 					frame->offsetOpcodeBlueprint = currentSequence.offsetOf(**cursor);
 
 					if (kind == IR::ISA::Blueprint::funcdef)
@@ -116,16 +117,19 @@ namespace Instanciate
 				}
 				else
 				{
-					// anonymous classes - ignore the section and instanciate the class
-
-					// .. but update the lvid on-the-fly first
+					// anonymous class
+					// The flag Atom::Flags::captureVariables should already be set via 'mapping'
+					assert(atom->flags(Atom::Flags::captureVariables));
+					// updating the attached lvid for automatic type declaration
 					cdeftable.substitute(operands.lvid).mutateToAtom(atom);
 
-					// allow capture out-of-scope variables
-					atom->flags += Atom::Flags::captureVariables;
+					// ignoring completely this blueprint, so the cursor will be
+					// moved to its final corresponding opcode 'end'
 
-					(*cursor)++; // go to the next opcode, which should be blueprint.size
+					// next opcode, which should be blueprint.size
+					(*cursor)++;
 
+					// getting the size and moving the cursor
 					auto& blueprintsize = (**cursor).to<IR::ISA::Op::pragma>();
 					assert(blueprintsize.opcode == (uint32_t) IR::ISA::Op::pragma);
 					assert(blueprintsize.value.blueprintsize >= 2);
@@ -133,7 +137,8 @@ namespace Instanciate
 					*cursor += blueprintsize.value.blueprintsize - 2; // -2: blueprint:class+blueprint:size
 					assert((**cursor).opcodes[0] == (uint32_t) IR::ISA::Op::end);
 
-					if (not instanciateAtomClass(*atom)) // instanciating the class
+					bool instok = instanciateAtomClass(*atom); // instanciating the class
+					if (unlikely(not instok))
 						return;
 				}
 				break;
