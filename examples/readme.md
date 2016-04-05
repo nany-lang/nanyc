@@ -71,8 +71,8 @@ public func main(args)
     }
 }
 ```
-- [ ] feature not implemented yet
-
+- [ ] feature not fully implemented yet
+- 
 
 
 ## Working with I/O, reading a file line by line
@@ -86,7 +86,7 @@ public func main
         console.error << “failed to read ‘” << e.filename << “: ” << e.reason << ‘\n’;
 }
 ```
-- [ ] feature not implemented yet
+- [ ] feature not fully implemented yet
 
 
 
@@ -112,7 +112,7 @@ public func main
         console << v.name << “ = ” << v.value << ‘\n’;
 }
 ```
-- [ ] feature not implemented yet
+- [ ] feature not fully implemented yet
 
 
 
@@ -156,7 +156,7 @@ public func main(args)
     console << "total number of files : " << howManyFiles << “\n”;
 }
 ```
-- [ ] feature not implemented yet
+- [ ] feature not fully implemented yet
 
 
 
@@ -213,4 +213,4 @@ public func main
 	console << "new radius: \(radius)\n";
 }
 ```
-- [ ] feature not implemented yet
+- [ ] feature not fully implemented yet
