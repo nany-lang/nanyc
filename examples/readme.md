@@ -71,8 +71,9 @@ public func main(args)
     }
 }
 ```
+
 - [ ] feature not fully implemented yet
-- 
+
 
 
 ## Working with I/O, reading a file line by line
