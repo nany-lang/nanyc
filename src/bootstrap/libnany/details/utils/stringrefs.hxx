@@ -70,22 +70,6 @@ namespace Nany
 	}
 
 
-	inline void StringRefs::checkInternalPointer(const AnyString& name) const
-	{
-		#ifndef NDEBUG
-		auto it = pIndex.find(name);
-		if (it != pIndex.cend())
-		{
-			auto& element = it->first;
-			assert(element.c_str() == name.c_str());
-		}
-		else
-			assert(false and "string not found !");
-		#else
-		(void) name;
-		#endif
-	}
-
 
 
 

@@ -44,8 +44,6 @@ namespace Nany
 		void clear();
 
 
-		void checkInternalPointer(const AnyString& name) const;
-
 		size_t inspectMemoryUsage() const;
 
 
