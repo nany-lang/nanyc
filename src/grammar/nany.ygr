@@ -848,7 +848,7 @@ function: notext, important
 	function-kind wp
 	(
 		(class-template-params wp)?
-		(func-params wp)? (func-return-type wp)?
+		(func-params wp)? func-return-type? wp
 		tk-semicolon | func-body
 	)
 	| error-eol
