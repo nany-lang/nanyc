@@ -54,6 +54,7 @@ namespace Nany
 		** \brief Retrieve a classdef from its ID without using the current layer
 		*/
 		const Classdef& rawclassdef(const CLID&) const;
+		Classdef& rawclassdef(const CLID&);
 
 		//! Retrieve the real classdef from its ID (or from the current layer) even if a class member
 		const Classdef& classdefFollowClassMember(const CLID&) const;
@@ -97,7 +98,12 @@ namespace Nany
 		/*!
 		** \brief Bulk create several class id
 		*/
-		void bulkCreate(std::vector<CLID>& out, yuint32 atomid, uint count);
+		void bulkCreate(std::vector<CLID>& out, uint32_t atomid, uint32_t count);
+
+		/*!
+		** \brief Bulk append class id
+		*/
+		void bulkAppend(uint32_t atomid, uint32_t offset, uint32_t count);
 
 		/*!
 		** \brief Register an Atom (created from blueprints)
@@ -170,13 +176,14 @@ namespace Nany
 		inline bool nameLookupForSelfInterface(Classdef& classdef);
 
 	private:
+		//! Current overlay layer
+		//! \see class ClassdefTableView
 		struct LayerItem final
 		{
 			void swap(LayerItem& rhs);
 
 			//! The atom id associated to the current layer
-			LVID atomid = (LVID) -1;
-
+			uint32_t atomid = (uint32_t) -1;
 			//! Max substitutes
 			// \note On some STL implementation, std::vector.size is rather ineficient (distance(end - begin))
 			uint32_t count = 0;

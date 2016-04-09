@@ -35,6 +35,12 @@ namespace Nany
 		return type == Type::classdef;
 	}
 
+	inline bool Atom::isCtor() const
+	{
+		return isOperator() and parent and (parent->type == Type::classdef)
+			and (name == "^new" or name == "^default-new");
+	}
+
 	inline bool Atom::isUnit() const
 	{
 		return type == Type::unit;

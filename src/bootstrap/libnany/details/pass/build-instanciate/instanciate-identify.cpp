@@ -56,10 +56,11 @@ namespace Instanciate
 	}
 
 
-	bool SequenceBuilder::identify(const IR::ISA::Operand<IR::ISA::Op::identify>& operands, bool firstChance)
-	{
-		AnyString name = currentSequence.stringrefs[operands.text];
 
+
+	bool SequenceBuilder::identify(const IR::ISA::Operand<IR::ISA::Op::identify>& operands,
+		const AnyString& name, bool firstChance)
+	{
 		// keeping traces of the code logic
 		frame->lvids[operands.lvid].resolvedName = name;
 		frame->lvids[operands.lvid].referer = operands.self;
@@ -226,7 +227,7 @@ namespace Instanciate
 						}
 
 						ICE() << "invalid atom for local scope variable. clid: " << CLID{frame->atomid, lvidVar}
-							<< ", " << (uint32_t) varcdef.kind;
+						<< ", " << (uint32_t) varcdef.kind;
 						return false;
 					}
 					multipleResults.emplace_back(std::ref(*varAtom));
@@ -272,7 +273,7 @@ namespace Instanciate
 				// since the parent has been fully resolved, no multiple
 				// solution should be available
 				assert(frame->partiallyResolved.count(self.clid) == 0
-					or frame->partiallyResolved[self.clid].empty());
+					   or frame->partiallyResolved[self.clid].empty());
 
 				selfAtom->performNameLookupOnChildren(multipleResults, name, &singleHop);
 			}
@@ -309,11 +310,12 @@ namespace Instanciate
 				if (atom.isMemberVariable())
 				{
 					assert(not isLocalVariable and "a member variable cannot be a local variable");
+					assert(not atom.returnType.clid.isVoid());
 
 					// member variable - the real type is held by 'returnType'
 					auto& cdefvar = cdeftable.classdef(atom.returnType.clid);
-					auto* atomvar = cdeftable.findClassdefAtom(cdefvar);
-					if (unlikely(not (atomvar or cdefvar.isBuiltin())))
+					auto* atomvar = (not cdefvar.isBuiltin()) ? cdeftable.findClassdefAtom(cdefvar) : nullptr;
+					if (unlikely(!atomvar and not cdefvar.isBuiltin()))
 						return (ICE() << "invalid variable member type for " << atom.fullname());
 
 					auto& spare = cdeftable.substitute(operands.lvid);
@@ -322,19 +324,35 @@ namespace Instanciate
 						spare.mutateToAtom(atomvar);
 
 					uint32_t self = operands.self;
-					if (self == 0) // implicit 'self'
+					if (self == 0) // implicit 'self' ?
 					{
-						// retrieving the local self
-						if (unlikely(not frame->atom.isClassMember()))
-							return (ICE() << "invalid 'self' object");
-						self = 2; // 1: return type, 2: self parameter
+						if (frame->atom.isClassMember())
+						{
+							// 'self' is given by the first parameter
+							self = 2; // 1: return type, 2: first parameter
+						}
+						else
+						{
+							// no 'self' available since it just does not exist, which can be expected
+							// for type resolution (the type resolution is done directly from the atom class,
+							// where the initialization is done via a proxy function)
+							// It's ok for type resolution since we already know we're dealing with a variable member)
+							if (frame->atom.isClass() and (not canGenerateCode()))
+							{
+								// 'self' can stay null
+							}
+							else
+							{
+								return (ICE() << "identify: invalid 'self' object for '" << name << "' from '"
+									<< frame->atom.caption() << '\'');
+							}
+						}
 					}
 
 					auto& lvidinfo = frame->lvids[operands.lvid];
 					lvidinfo.synthetic = false;
 
 					auto& origin  = lvidinfo.origin.varMember;
-					assert(self != 0);
 					assert(atom.atomid != 0);
 					origin.self   = self;
 					origin.atomid = atom.atomid;
@@ -343,6 +361,7 @@ namespace Instanciate
 					if (canGenerateCode())
 					{
 						// read the address
+						assert(self != 0 and "'self can be null only for type resolution'");
 						out.emitFieldget(operands.lvid, self, atom.varinfo.effectiveFieldIndex);
 						tryToAcquireObject(operands.lvid, cdefvar);
 					}
@@ -366,7 +385,6 @@ namespace Instanciate
 							acquireObject(operands.lvid);
 					}
 				}
-
 				return true;
 			}
 
@@ -381,24 +399,29 @@ namespace Instanciate
 
 			case 0: // no identifier found from 'atom map'
 			{
-				// nothing has been found, trying capturing variable from anonymous classes
-				if (firstChance and frame->atom.canCaptureVariabes())
+				// nothing has been found
+				// trying capturing variable from anonymous classes
+				if (firstChance)
 				{
-					if (tryToCaptureVariable(name)) // let's try again !
-						return identify(operands, /*no second chance*/ false);
-				}
+					if (frame->atom.canCaptureVariabes())
+					{
+						if (identifyCapturedVar(operands, name))
+							return true;
+					}
 
-				// UNKNOWN identifier
-				if (debugmode)
-				{
-					auto err = (error() << "debug: failed identify '" << name);
-					err << "' in atom: " << frame->atomid << " aka '" << frame->atom.caption();
-					err << "', self: %" << operands.self;
-					err << ", lvid: %" << operands.lvid;
-					if (unlikely(not firstChance))
-						err << " (SECOND TRY - ICE!)";
+					// UNKNOWN identifier
+					if (debugmode)
+					{
+						auto err = (error() << "debug: failed identify '" << name);
+						err << "' in atom: " << frame->atomid << " aka '" << frame->atom.caption();
+						err << "', self: %" << operands.self;
+						err << ", lvid: %" << operands.lvid;
+						if (unlikely(not firstChance))
+							err << " (SECOND TRY - ICE!)";
+					}
+					return complainUnknownIdentifier(selfAtom, frame->atom, name);
 				}
-				return complainUnknownIdentifier(selfAtom, frame->atom, name);
+				break;
 			}
 		}
 		return false;
@@ -410,7 +433,8 @@ namespace Instanciate
 	{
 		assert(frame != nullptr);
 
-		bool ok = identify(operands);
+		AnyString name = currentSequence.stringrefs[operands.text];
+		bool ok = identify(operands, name);
 		if (unlikely(not ok))
 			frame->invalidate(operands.lvid);
 		multipleResults.clear();

@@ -11,6 +11,7 @@
 #include "details/ir/fwd.h"
 #include "signature.h"
 #include <unordered_map>
+#include <unordered_set>
 #include <map>
 #include "libnany-config.h"
 
@@ -59,12 +60,14 @@ namespace Nany
 
 		enum class Flags
 		{
-			//! Flag to allow this atom in error reporting
+			//! Allow this atom in error reporting
 			suggestInReport,
-			//! Flag to allow this atom (and the sub-functions) to capture variables
+			//! Allow this atom (and the sub-functions) to capture variables
 			captureVariables,
-			//! Flag to suppress spurious error messages and code generation
+			//! Suppress error messages related to this atom (and code generation)
 			error,
+			//! Append captured variables when calling this function (ctor)
+			pushCapturedVariables,
 		};
 
 		struct Parameters final
@@ -136,6 +139,8 @@ namespace Nany
 		bool isTypeAlias() const;
 		//! Get if the atom is an unit
 		bool isUnit() const;
+		//! Get if the atom is a constructor
+		bool isCtor() const;
 
 		//! Get if the atom is publicly accessible
 		bool isPublicOrPublished() const;
@@ -430,6 +435,9 @@ namespace Nany
 
 		//! Name of the current atom
 		AnyString name;
+
+		//! List of potential candidates for being captured
+		std::unique_ptr<std::unordered_set<AnyString>> candidatesForCapture;
 
 
 	private:

@@ -72,10 +72,9 @@ namespace Nany
 		}
 		auto& result = *(it->second);
 
-		if (result.clid.atomid() == layer.atomid)
+		if (result.clid.atomid() == layer.atomid) // dealing with hard links
 		{
 			auto lvid = result.clid.lvid();
-
 			assert(lvid < layer.count);
 			if (layer.flags[lvid])
 				return layer.storage[lvid];
@@ -99,6 +98,20 @@ namespace Nany
 	}
 
 
+	Classdef& ClassdefTable::rawclassdef(const CLID& clid)
+	{
+		assert(not clid.isVoid() and "invalid clid");
+		// TODO use an alternate (and more efficient) container for the special classdefs atomid=0
+
+		auto it = pClassdefs.find(clid);
+		if (unlikely(it == pClassdefs.end()))
+		{
+			assert(false and "failed to find clid");
+			it = pClassdefs.find(CLID{});
+		}
+		return *(it->second);
+	}
+
 
 	const Classdef& ClassdefTable::classdef(const CLID& clid) const
 	{
@@ -121,10 +134,9 @@ namespace Nany
 		}
 		auto& result = *(it->second);
 
-		if (result.clid.atomid() == layer.atomid)
+		if (result.clid.atomid() == layer.atomid) // dealing with hard links
 		{
 			auto lvid = result.clid.lvid();
-
 			assert(lvid < layer.count);
 			if (layer.flags[lvid])
 				return layer.storage[lvid];
@@ -167,7 +179,7 @@ namespace Nany
 
 
 
-	void ClassdefTable::bulkCreate(std::vector<CLID>& out, yuint32 atomid, uint32_t count)
+	void ClassdefTable::bulkCreate(std::vector<CLID>& out, uint32_t atomid, uint32_t count)
 	{
 		assert(atomid > 0);
 
@@ -189,6 +201,20 @@ namespace Nany
 		}
 	}
 
+	void ClassdefTable::bulkAppend(uint32_t atomid, uint32_t offset, uint32_t count)
+	{
+		assert(atomid > 0);
+		for (uint32_t i = offset; i < count; ++i)
+		{
+			// the new classid, made from the atom id
+			CLID clid{atomid, i};
+
+			// check that the entry does not already exists
+			assert(pClassdefs.find(clid) == pClassdefs.end());
+			// insert the new classdef
+			pClassdefs.insert(std::make_pair(clid, new Classdef{clid}));
+		}
+	}
 
 	void ClassdefTable::registerAtom(Atom* atom)
 	{
@@ -465,14 +491,15 @@ namespace Nany
 		layer.count = count;
 		layer.flags.resize(count);
 		for (uint32_t i = previous; i != count; ++i)
-			layer.flags[i] = true;
+			layer.flags[i] = false; // true;
 
 		layer.storage.reserve(count);
+		assert(layer.storage.size() <= count);
 		for (uint32_t i = static_cast<uint32_t>(layer.storage.size()); i != count; ++i)
 			layer.storage.emplace_back(CLID{layer.atomid, i});
 
 		// checking for missing classdef
-		// functions are sometimes generated on the fly (ctor, clone...)
+		// functions are sometimes generating on the fly (ctor, clone...)
 		for (uint32_t i = previous; i != count; ++i)
 		{
 			CLID clid{layer.atomid, i};
@@ -524,6 +551,7 @@ namespace Nany
 
 	Classdef& ClassdefTable::addSubstitute(nytype_t kind, Atom* atom, const Qualifiers& qualifiers) const
 	{
+		// atom can be null
 		layer.flags.push_back(true);
 		layer.storage.emplace_back();
 		++layer.count;
@@ -542,7 +570,7 @@ namespace Nany
 		ret.qualifiers = qualifiers;
 		// set clid
 		ret.clid.reclass(layer.atomid, layer.count - 1);
-		return layer.storage.back();
+		return ret;
 	}
 
 

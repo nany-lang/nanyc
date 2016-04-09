@@ -125,17 +125,7 @@ namespace Instanciate
 
 					// ignoring completely this blueprint, so the cursor will be
 					// moved to its final corresponding opcode 'end'
-
-					// next opcode, which should be blueprint.size
-					(*cursor)++;
-
-					// getting the size and moving the cursor
-					auto& blueprintsize = (**cursor).to<IR::ISA::Op::pragma>();
-					assert(blueprintsize.opcode == (uint32_t) IR::ISA::Op::pragma);
-					assert(blueprintsize.value.blueprintsize >= 2);
-
-					*cursor += blueprintsize.value.blueprintsize - 2; // -2: blueprint:class+blueprint:size
-					assert((**cursor).opcodes[0] == (uint32_t) IR::ISA::Op::end);
+					currentSequence.moveCursorFromBlueprintToEnd(*cursor);
 
 					bool instok = instanciateAtomClass(*atom); // instanciating the class
 					if (unlikely(not instok))

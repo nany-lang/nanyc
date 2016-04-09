@@ -68,6 +68,11 @@ namespace IR
 		//! Go to a previous label
 		void jumpToLabelBackward(const Instruction*& cursor, uint32_t label) const;
 
+		//! Move the cursor at the end of the blueprint
+		void moveCursorFromBlueprintToEnd(Instruction*& cursor) const;
+		//! Move the cursor at the end of the blueprint
+		void moveCursorFromBlueprintToEnd(const Instruction*& cursor) const;
+
 
 		//! Emit a NOP instruction
 		void emitNop();
@@ -293,6 +298,16 @@ namespace IR
 		//! Visit each instruction (const)
 		template<class T> void each(T& visitor, uint32_t offset = 0);
 		template<class T> void each(T& visitor, uint32_t offset = 0) const;
+
+		/*!
+		** \brief Iterate through all opcodes and increment all lvid
+		**
+		** This method is used to insert a posteriori new lvid (for capturing variables for ex.)
+		** \param inc The value to add to all lvid
+		** \param greaterThan Increment only lvid strictly greater than X
+		** \param offset First opcode
+		*/
+		void increaseAllLVID(uint32_t inc, uint32_t greaterThan, uint32_t offset = 0);
 		//@}
 
 

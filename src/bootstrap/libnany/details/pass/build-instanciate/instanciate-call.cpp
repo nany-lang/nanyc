@@ -14,6 +14,59 @@ namespace Pass
 namespace Instanciate
 {
 
+	namespace // anonymous
+	{
+
+		template<class P, class O>
+		static inline bool fetchPushedParameters(const P& pushedparams, O& overloadMatch, const AtomStackFrame& frame)
+		{
+			uint32_t atomid = frame.atomid;
+
+			// parameters
+			for (auto indxparm: pushedparams.func.indexed)
+			{
+				if (not frame.verify(indxparm.lvid))
+					return false;
+				overloadMatch.input.params.indexed.emplace_back(CLID{atomid, indxparm.lvid});
+			}
+			// named parameters
+			for (auto nmparm: pushedparams.func.named)
+			{
+				if (not frame.verify(nmparm.lvid))
+					return false;
+				overloadMatch.input.params.named.emplace_back(std::make_pair(nmparm.name, CLID{atomid, nmparm.lvid}));
+			}
+
+			// template parameters
+			for (auto indxparm: pushedparams.gentypes.indexed)
+			{
+				if (not frame.verify(indxparm.lvid))
+					return false;
+				overloadMatch.input.tmplparams.indexed.emplace_back(CLID{atomid, indxparm.lvid});
+			}
+			// named template parameters
+			for (auto nmparm: pushedparams.gentypes.named)
+			{
+				if (not frame.verify(nmparm.lvid))
+					return false;
+				overloadMatch.input.tmplparams.named.emplace_back(std::make_pair(nmparm.name, CLID{atomid, nmparm.lvid}));
+			}
+			return true;
+		}
+
+
+		static inline bool atomIsCtor(const Atom* atom)
+		{
+			if (atom and atom->isCtor())
+				return true;
+			return false;
+		}
+
+
+	} // anonymous namespace
+
+
+
 
 	inline bool SequenceBuilder::emitFuncCall(const IR::ISA::Operand<IR::ISA::Op::call>& operands)
 	{
@@ -67,8 +120,18 @@ namespace Instanciate
 		{
 			auto& cdefReferer = cdeftable.classdef(CLID{atomid, referer});
 			const Atom* selfAtom = cdeftable.findClassdefAtom(cdefReferer);
+
 			if (selfAtom and selfAtom->type != Atom::Type::namespacedef)
+			{
 				overloadMatch.input.params.indexed.emplace_back(CLID{atomid, referer});
+
+				// get the captured variables and push them as named parameters
+				if (selfAtom->flags(Atom::Flags::pushCapturedVariables))
+				{
+					if (atomIsCtor(atom))
+						pushCapturedVarsAsParameters(*selfAtom);
+				}
+			}
 		}
 		else
 		{
@@ -101,35 +164,9 @@ namespace Instanciate
 		}
 
 
-		// parameters
-		for (auto indxparm: pushedparams.func.indexed)
-		{
-			if (not frame->verify(indxparm.lvid))
-				return false;
-			overloadMatch.input.params.indexed.emplace_back(CLID{atomid, indxparm.lvid});
-		}
-		// named parameters
-		for (auto nmparm: pushedparams.func.named)
-		{
-			if (not frame->verify(nmparm.lvid))
-				return false;
-			overloadMatch.input.params.named.emplace_back(std::make_pair(nmparm.name, CLID{atomid, nmparm.lvid}));
-		}
-
-		// template parameters
-		for (auto indxparm: pushedparams.gentypes.indexed)
-		{
-			if (not frame->verify(indxparm.lvid))
-				return false;
-			overloadMatch.input.tmplparams.indexed.emplace_back(CLID{atomid, indxparm.lvid});
-		}
-		// named template parameters
-		for (auto nmparm: pushedparams.gentypes.named)
-		{
-			if (not frame->verify(nmparm.lvid))
-				return false;
-			overloadMatch.input.tmplparams.named.emplace_back(std::make_pair(nmparm.name, CLID{atomid, nmparm.lvid}));
-		}
+		// Get all parameters (indexed, named, generic types...)
+		if (not fetchPushedParameters(pushedparams, overloadMatch, *frame))
+			return false;
 
 
 		if (nullptr == atom)

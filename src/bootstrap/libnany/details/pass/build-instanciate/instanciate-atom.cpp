@@ -132,6 +132,7 @@ namespace Instanciate
 		if (atom.tmplparams.empty())
 			atom.classinfo.isInstanciated = true;
 
+
 		overloadMatch.clear(); // reset
 
 		for (auto& param: pushedparams.gentypes.indexed)
@@ -160,6 +161,10 @@ namespace Instanciate
 		tmplparams.swap(overloadMatch.result.tmplparams);
 
 		Logs::Message::Ptr newReport;
+
+		// determine captured variables before instanciating the class
+		if (!!atom.candidatesForCapture)
+			captureVariables(atom);
 
 
 		Pass::Instanciate::InstanciateData info{newReport, atom, cdeftable, context, params, tmplparams};

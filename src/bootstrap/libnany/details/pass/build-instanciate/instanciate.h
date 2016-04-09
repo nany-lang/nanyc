@@ -172,8 +172,13 @@ namespace Instanciate
 		bool emitBuiltinOperator(uint32_t lvid, const char* const name);
 
 		//! perform type resolution and fetch data (local variable, func...)
-		bool identify(const IR::ISA::Operand<IR::ISA::Op::identify>& operands, bool firstChance = true);
+		bool identify(const IR::ISA::Operand<IR::ISA::Op::identify>& operands, const AnyString& name, bool firstChance = true);
+		bool identifyCapturedVar(const IR::ISA::Operand<IR::ISA::Op::identify>& operands, const AnyString& name);
 		bool ensureResolve(const IR::ISA::Operand<IR::ISA::Op::ensureresolved>& operands);
+
+		//! Try to capture variables from a list of potentiel candidates created by the mapping
+		void captureVariables(Atom& atom);
+
 
 		Atom& resolveTypeAlias(Atom& atom, bool& success);
 
@@ -188,6 +193,7 @@ namespace Instanciate
 
 
 		bool emitFuncCall(const IR::ISA::Operand<IR::ISA::Op::call>& operands);
+		bool pushCapturedVarsAsParameters(const Atom& atomclass);
 
 		bool instanciateAssignment(const IR::ISA::Operand<IR::ISA::Op::call>& operands);
 		bool instanciateAssignment(AtomStackFrame& frame, LVID lhs, LVID rhs, bool canDisposeLHS = true,
@@ -205,8 +211,6 @@ namespace Instanciate
 		void generateMemberVarDefaultClone();
 
 		bool generateShortCircuitInstrs(uint32_t retlvid);
-
-		bool tryToCaptureVariable(const AnyString& name);
 
 		//! \name Help for memory management
 		//@{

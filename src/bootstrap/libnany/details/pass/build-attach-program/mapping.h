@@ -34,7 +34,19 @@ namespace Mapping
 		// Next frame
 		std::unique_ptr<AtomStackFrame> next;
 
-	public:
+		//! Information for capturing variables
+		struct CaptureVariables {
+			//! Get if allowed to capture variables
+			bool enabled() const { return atom != nullptr; }
+			void enabled(Atom*);
+
+			//! Try to list of all unknown identifiers, potential candidates for capture
+			Atom* atom = nullptr;
+			//! all local named variables (name / scope)
+			std::unordered_map<AnyString, uint32_t> knownVars;
+		}
+		capture;
+
 		Atom& currentAtomNotUnit()
 		{
 			return (not atom.isUnit()) ? atom : (*(atom.parent));

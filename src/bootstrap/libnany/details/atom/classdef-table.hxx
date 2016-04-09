@@ -9,10 +9,10 @@ namespace Nany
 
 	inline void ClassdefTable::LayerItem::swap(ClassdefTable::LayerItem& rhs)
 	{
-		std::swap(atomid,  rhs.atomid);
-		std::swap(flags,   rhs.flags);
-		std::swap(storage, rhs.storage);
-		std::swap(count,   rhs.count);
+		std::swap(atomid,   rhs.atomid);
+		std::swap(flags,    rhs.flags);
+		std::swap(storage,  rhs.storage);
+		std::swap(count,    rhs.count);
 	}
 
 

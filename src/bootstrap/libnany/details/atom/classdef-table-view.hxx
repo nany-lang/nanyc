@@ -19,6 +19,7 @@ namespace Nany
 	inline ClassdefTableView::ClassdefTableView(ClassdefTableView& view, LVID atomid, uint count)
 		: table(view.table)
 	{
+		// preparing the new layer via the local data, then swapping
 		previous.atomid = atomid;
 
 		// reminder: parameters are 2-based
@@ -28,6 +29,7 @@ namespace Nany
 		previous.flags.reserve(count + 2); // parameters are 2-base
 		previous.storage.reserve((count + 2) * 2); // arbitrary, but at least 'count+2'
 
+		// swap the layer
 		previous.swap(table.layer);
 		canSwap = true;
 	}

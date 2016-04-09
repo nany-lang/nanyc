@@ -26,45 +26,40 @@ namespace Instanciate
 		{
 			if (source.empty())
 				return target.size();
-
 			if (target.empty())
 				return source.size();
 
-			// our matrix
 			std::vector<std::vector<uint>>  matrix(source.size() + 1);
-
-			// Size the vectors in the 2.nd dimension. Unfortunately C++ doesn't
-			// allow for allocation on declaration of 2.nd dimension of vec of vec
-			for (uint i = 0; i <= source.size(); ++i)
+			for (uint32_t i = 0; i <= source.size(); ++i)
 				matrix[i].resize(target.size() + 1);
 
-			for (uint i = 0; i <= source.size(); ++i)
+			for (uint32_t i = 0; i <= source.size(); ++i)
 				matrix[i][0] = i;
 
-			for (uint j = 0; j <= target.size(); ++j)
+			for (uint32_t j = 0; j <= target.size(); ++j)
 				matrix[0][j] = j;
 
-			for (uint i = 1; i <= source.size(); ++i)
+			for (uint32_t i = 1; i <= source.size(); ++i)
 			{
 				auto s_i = source[i - 1];
 
 				// Step 4
-				for (uint j = 1; j <= target.size(); ++j)
+				for (uint32_t j = 1; j <= target.size(); ++j)
 				{
 					auto t_j = target[j - 1];
 
-					uint cost = (s_i == t_j) ? 0 : 1;
+					uint32_t cost = (s_i == t_j) ? 0 : 1;
 
 					// Step 6
-					uint above = matrix[i - 1][j];
-					uint left  = matrix[i][j - 1];
-					uint diag  = matrix[i - 1][j - 1];
+					uint32_t above = matrix[i - 1][j];
+					uint32_t left  = matrix[i][j - 1];
+					uint32_t diag  = matrix[i - 1][j - 1];
 
-					uint cell = std::min(above + 1, std::min(left + 1, diag + cost));
+					uint32_t cell = std::min(above + 1, std::min(left + 1, diag + cost));
 
 					if (i > 2 and j > 2)
 					{
-						uint trans = matrix[i - 2][j - 2] + 1;
+						uint32_t trans = matrix[i - 2][j - 2] + 1;
 
 						if (source[i - 2] != t_j)
 							++trans;
@@ -137,10 +132,10 @@ namespace Instanciate
 		// trying local variables first
 		if (self == nullptr and not unknownIsOperator)
 		{
-			uint note;
+			uint32_t note;
 
 			// reverse order, to get the nearest first
-			uint i = (uint) frame->lvids.size();
+			uint32_t i = (uint) frame->lvids.size();
 			while (i-- > 0)
 			{
 				auto& crlcvr = frame->lvids[i];
@@ -180,7 +175,7 @@ namespace Instanciate
 				{
 					if (&child != &atom and (not child.isOperator()))
 					{
-						uint note;
+						uint32_t note;
 						if (stringsAreCloseEnough(note, name, child.name))
 							dict[note].emplace_back(std::cref(child));
 					}

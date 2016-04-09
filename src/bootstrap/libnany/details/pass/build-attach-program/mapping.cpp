@@ -1,5 +1,4 @@
 #include "mapping.h"
-#include <iostream>
 
 using namespace Yuni;
 
@@ -56,6 +55,20 @@ namespace Mapping
 		success = false;
 	}
 
+
+	inline void AtomStackFrame::CaptureVariables::enabled(Atom* newatom)
+	{
+		atom = newatom;
+		atom->flags += Atom::Flags::captureVariables;
+
+		if (!newatom->candidatesForCapture)
+		{
+			typedef decltype(newatom->candidatesForCapture) Set;
+			newatom->candidatesForCapture = std::make_unique<Set::element_type>();
+		}
+	}
+
+
 	template<IR::ISA::Op O>
 	inline void SequenceMapping::printError(const IR::ISA::Operand<O>& operands, AnyString msg)
 	{
@@ -95,10 +108,9 @@ namespace Mapping
 			return;
 
 		auto& stackframe     = *atomStack;
-		auto atomid          = stackframe.atom.atomid;
+		auto  atomid         = stackframe.atom.atomid;
 		auto& clidFuncToCall = stackframe.classdefs[operands.ptr2func];
 		auto& clidRetValue   = stackframe.classdefs[operands.lvid];
-
 
 		// update all underlying types
 		{
@@ -152,6 +164,9 @@ namespace Mapping
 				if (unlikely(atom.type != Atom::Type::classdef))
 					return printError(operands, "vardef: invalid parent atom");
 
+				if (atomStack->capture.enabled())
+					atomStack->capture.knownVars[varname] = atomStack->scope;
+
 				MutexLocker locker{mutex};
 				// create a new atom in the global type table
 				auto* newVarAtom = cdeftable.atoms.createVardef(atom, varname);
@@ -188,6 +203,9 @@ namespace Mapping
 					? frame.atom.parameters : frame.atom.tmplparams;
 				parameters.append(clid, name);
 
+				if (frame.capture.enabled())
+					frame.capture.knownVars[name] = frame.scope;
+
 
 				MutexLocker locker{mutex};
 				// information about the parameter itself
@@ -221,25 +239,32 @@ namespace Mapping
 
 				MutexLocker locker{mutex};
 				// create a new atom in the global type table
-				auto* newFuncAtom = cdeftable.atoms.createFuncdef(atom, funcname);
-				assert(newFuncAtom != nullptr);
-				newFuncAtom->opcodes.sequence  = &currentSequence;
-				newFuncAtom->opcodes.offset   = currentSequence.offsetOf(operands);
+				auto* newatom = cdeftable.atoms.createFuncdef(atom, funcname);
+				assert(newatom != nullptr);
+				newatom->opcodes.sequence  = &currentSequence;
+				newatom->opcodes.offset   = currentSequence.offsetOf(operands);
 				// create a pseudo classdef to easily retrieve the real atom from a clid
-				cdeftable.registerAtom(newFuncAtom);
+				cdeftable.registerAtom(newatom);
 
-				operands.atomid = newFuncAtom->atomid;
+				operands.atomid = newatom->atomid;
 
 				// return type
-				newFuncAtom->returnType.clid.reclass(newFuncAtom->atomid, 1);
+				newatom->returnType.clid.reclass(newatom->atomid, 1);
 
 				// requires additional information
 				needAtomDbgFileReport = true;
 				needAtomDbgOffsetReport = true;
-				pushNewFrame(*newFuncAtom);
+				pushNewFrame(*newatom);
+
+				// capture unknown variables ?
+				if (newatom->isClassMember() and newatom->parent->flags(Atom::Flags::captureVariables))
+				{
+					atomStack->capture.enabled(newatom->parent);
+					newatom->flags += Atom::Flags::captureVariables;
+				}
 
 				if (!firstAtomCreated)
-					firstAtomCreated = newFuncAtom;
+					firstAtomCreated = newatom;
 				break;
 			}
 
@@ -277,13 +302,8 @@ namespace Mapping
 					cdeftable.registerAtom(newClassAtom);
 				}
 
-				assert(newClassAtom != nullptr);
 				newClassAtom->opcodes.sequence = &currentSequence;
 				newClassAtom->opcodes.offset   = currentSequence.offsetOf(operands);
-
-				// anonymous class declaration
-				if (operands.lvid != 0)
-					newClassAtom->flags += Atom::Flags::captureVariables;
 
 				// update atomid
 				operands.atomid = newClassAtom->atomid;
@@ -291,6 +311,9 @@ namespace Mapping
 				needAtomDbgFileReport = true;
 				needAtomDbgOffsetReport = true;
 				pushNewFrame(*newClassAtom);
+
+				if (operands.lvid != 0)
+					atomStack->capture.enabled(newClassAtom);
 
 				if (!firstAtomCreated)
 					firstAtomCreated = newClassAtom;
@@ -478,6 +501,18 @@ namespace Mapping
 			if (scope > 0)
 			{
 				--scope;
+
+				if (atomStack->capture.enabled())
+				{
+					auto& set = atomStack->capture.knownVars;
+					for (auto it = set.begin(); it != set.end(); )
+					{
+						if (it->second > scope)
+							it = set.erase(it);
+						else
+							++it;
+					}
+				}
 			}
 			else
 			{
@@ -562,6 +597,8 @@ namespace Mapping
 		if (unlikely(operands.text == 0))
 			return printError(operands, "invalid symbol name");
 		AnyString name = currentSequence.stringrefs[operands.text];
+		if (unlikely(name.empty()))
+			return printError(operands, "invalid empty identifier");
 
 		lastLVID = operands.lvid;
 		auto& atomFrame = *atomStack;
@@ -570,12 +607,19 @@ namespace Mapping
 		assert(operands.lvid < localClassdefs.size());
 		auto& clid = localClassdefs[operands.lvid];
 
-
 		if (operands.self == 0)
 		{
-			// directly resolving a symbol accessible from the current scope
-			// in this pass, we will only resolve local variables (and parameters)
-			// all function calls must be resolved later
+			// try to determine whether a new variable should be captured
+			if (atomFrame.capture.enabled())
+			{
+				if (name[0] != '^' and atomFrame.capture.knownVars.count(name) == 0)
+				{
+					// not 100% sure, but this unknown name might be a variable to capture
+					Atom& atm = *atomFrame.capture.atom;
+					atm.candidatesForCapture->insert(name);
+					atomFrame.capture.knownVars[name] = 0; // no scope
+				}
+			}
 
 			MutexLocker locker{mutex};
 			// will see later - currently unknown

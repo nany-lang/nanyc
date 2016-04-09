@@ -23,20 +23,24 @@ namespace Instanciate
 			// cloning all function parameters (only non-ref parameters)
 			//
 			uint32_t count = atom.parameters.size();
-			atom.parameters.each([&](uint32_t i, const AnyString&, const Vardef& vardef)
+			atom.parameters.each([&](uint32_t i, const AnyString& name, const Vardef& vardef)
 			{
+				if (name[0] == '^') // captured
+					return;
+
 				// lvid for the given parameter
-				uint32_t lvid  = i + 1 + 1; // 1 based, 1: return type
+				uint32_t lvid  = i + 1 + 1; // 1: return type, 2: first parameter
+				assert(lvid < frame->lvids.size());
 				frame->lvids[lvid].synthetic = false;
 
 				if (not cdeftable.classdef(vardef.clid).qualifiers.ref)
 				{
-					// a register has already been reserved for cloning parameters
-					uint32_t clone = 2 + count + i;
-
 					if (debugmode and canGenerateCode())
 						out.emitComment(String{} << "\n ----- ---- deep copy parameter " << i);
 
+					// a register has already been reserved for cloning parameters
+					uint32_t clone = 2 + count + i; // 1: return type, 2: first parameter
+					assert(clone < frame->lvids.size());
 					// the new value is not synthetic
 					frame->lvids[clone].synthetic = false;
 

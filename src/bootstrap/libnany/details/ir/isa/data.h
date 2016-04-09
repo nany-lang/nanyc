@@ -24,6 +24,8 @@ namespace ISA
 	{
 		constexpr static const char* opname() { return "nop"; }
 		uint32_t opcode;
+
+		template<class T> void eachLVID(T&) {}
 	};
 
 
@@ -35,7 +37,10 @@ namespace ISA
 		uint32_t lvid;
 		uint32_t lhs;
 		uint32_t rhs;
+
+		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::neq> final
 	{
@@ -44,6 +49,8 @@ namespace ISA
 		uint32_t lvid;
 		uint32_t lhs;
 		uint32_t rhs;
+
+		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
 
 
@@ -54,6 +61,8 @@ namespace ISA
 		uint32_t lvid;
 		uint32_t lhs;
 		uint32_t rhs;
+
+		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
 
 	template<> struct Operand<Nany::IR::ISA::Op::flte> final
@@ -63,7 +72,10 @@ namespace ISA
 		uint32_t lvid;
 		uint32_t lhs;
 		uint32_t rhs;
+
+		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::fgt> final
 	{
@@ -72,7 +84,10 @@ namespace ISA
 		uint32_t lvid;
 		uint32_t lhs;
 		uint32_t rhs;
+
+		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::fgte> final
 	{
@@ -81,6 +96,8 @@ namespace ISA
 		uint32_t lvid;
 		uint32_t lhs;
 		uint32_t rhs;
+
+		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
 
 
@@ -91,7 +108,10 @@ namespace ISA
 		uint32_t lvid;
 		uint32_t lhs;
 		uint32_t rhs;
+
+		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::lte> final
 	{
@@ -100,7 +120,10 @@ namespace ISA
 		uint32_t lvid;
 		uint32_t lhs;
 		uint32_t rhs;
+
+		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::ilt> final
 	{
@@ -109,7 +132,10 @@ namespace ISA
 		uint32_t lvid;
 		uint32_t lhs;
 		uint32_t rhs;
+
+		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::ilte> final
 	{
@@ -118,7 +144,10 @@ namespace ISA
 		uint32_t lvid;
 		uint32_t lhs;
 		uint32_t rhs;
+
+		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::gt> final
 	{
@@ -127,7 +156,10 @@ namespace ISA
 		uint32_t lvid;
 		uint32_t lhs;
 		uint32_t rhs;
+
+		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::gte> final
 	{
@@ -136,7 +168,10 @@ namespace ISA
 		uint32_t lvid;
 		uint32_t lhs;
 		uint32_t rhs;
+
+		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::igt> final
 	{
@@ -145,7 +180,10 @@ namespace ISA
 		uint32_t lvid;
 		uint32_t lhs;
 		uint32_t rhs;
+
+		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::igte> final
 	{
@@ -154,6 +192,8 @@ namespace ISA
 		uint32_t lvid;
 		uint32_t lhs;
 		uint32_t rhs;
+
+		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
 
 
@@ -165,7 +205,10 @@ namespace ISA
 		uint32_t lvid;
 		uint32_t lhs;
 		uint32_t rhs;
+
+		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::opor> final
 	{
@@ -174,7 +217,10 @@ namespace ISA
 		uint32_t lvid;
 		uint32_t lhs;
 		uint32_t rhs;
+
+		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::opxor> final
 	{
@@ -183,6 +229,8 @@ namespace ISA
 		uint32_t lvid;
 		uint32_t lhs;
 		uint32_t rhs;
+
+		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
 
 
@@ -193,7 +241,10 @@ namespace ISA
 		uint32_t lvid;
 		uint32_t lhs;
 		uint32_t rhs;
+
+		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::negation> final
 	{
@@ -201,7 +252,10 @@ namespace ISA
 		uint32_t opcode;
 		uint32_t lvid;
 		uint32_t lhs;
+
+		template<class T> void eachLVID(T& c) { c(lvid, lhs); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::fadd> final
 	{
@@ -210,7 +264,9 @@ namespace ISA
 		uint32_t lvid;
 		uint32_t lhs;
 		uint32_t rhs;
+		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::fsub> final
 	{
@@ -219,7 +275,10 @@ namespace ISA
 		uint32_t lvid;
 		uint32_t lhs;
 		uint32_t rhs;
+
+		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::fmul> final
 	{
@@ -228,7 +287,10 @@ namespace ISA
 		uint32_t lvid;
 		uint32_t lhs;
 		uint32_t rhs;
+
+		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::fdiv> final
 	{
@@ -237,6 +299,8 @@ namespace ISA
 		uint32_t lvid;
 		uint32_t lhs;
 		uint32_t rhs;
+
+		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
 
 
@@ -247,7 +311,10 @@ namespace ISA
 		uint32_t lvid;
 		uint32_t lhs;
 		uint32_t rhs;
+
+		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::sub> final
 	{
@@ -256,7 +323,10 @@ namespace ISA
 		uint32_t lvid;
 		uint32_t lhs;
 		uint32_t rhs;
+
+		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::mul> final
 	{
@@ -265,7 +335,10 @@ namespace ISA
 		uint32_t lvid;
 		uint32_t lhs;
 		uint32_t rhs;
+
+		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::div> final
 	{
@@ -274,7 +347,10 @@ namespace ISA
 		uint32_t lvid;
 		uint32_t lhs;
 		uint32_t rhs;
+
+		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::imul> final
 	{
@@ -283,7 +359,10 @@ namespace ISA
 		uint32_t lvid;
 		uint32_t lhs;
 		uint32_t rhs;
+
+		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::idiv> final
 	{
@@ -292,6 +371,8 @@ namespace ISA
 		uint32_t lvid;
 		uint32_t lhs;
 		uint32_t rhs;
+
+		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
 
 
@@ -308,7 +389,9 @@ namespace ISA
 		uint32_t lvid; // dest pointer
 		uint32_t self;
 		uint32_t var;
+		template<class T> void eachLVID(T& c) { c(lvid, self); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::fieldset> final
 	{
@@ -317,6 +400,7 @@ namespace ISA
 		uint32_t lvid; // value
 		uint32_t self;
 		uint32_t var;
+		template<class T> void eachLVID(T& c) { c(lvid, self); }
 	};
 
 
@@ -326,6 +410,7 @@ namespace ISA
 		constexpr static const char* opname() { return "stacksize"; }
 		uint32_t opcode;
 		uint32_t add;
+		template<class T> void eachLVID(T&) {}
 	};
 
 
@@ -334,7 +419,9 @@ namespace ISA
 		constexpr static const char* opname() { return "comment"; }
 		uint32_t opcode;
 		uint32_t text;
+		template<class T> void eachLVID(T&) {}
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::stackalloc> final
 	{
@@ -343,7 +430,9 @@ namespace ISA
 		uint32_t lvid;
 		uint32_t type;    // nytype_t
 		uint32_t atomid;  // atom id if (type == any)
+		template<class T> void eachLVID(T& c) { c(lvid); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::storeConstant> final
 	{
@@ -351,7 +440,9 @@ namespace ISA
 		uint32_t opcode;
 		uint32_t lvid;
 		union { uint64_t u64; double f64; } value;
+		template<class T> void eachLVID(T& c) { c(lvid); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::storeText> final
 	{
@@ -359,6 +450,7 @@ namespace ISA
 		uint32_t opcode;
 		uint32_t lvid;
 		uint32_t text;
+		template<class T> void eachLVID(T& c) { c(lvid); }
 	};
 
 
@@ -368,14 +460,18 @@ namespace ISA
 		uint32_t opcode;
 		uint32_t lvid;
 		uint32_t source;
+		template<class T> void eachLVID(T& c) { c(lvid); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::ret> final
 	{
 		constexpr static const char* opname() { return "ret"; }
 		uint32_t opcode;
 		uint32_t lvid;
+		template<class T> void eachLVID(T& c) { c(lvid); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::push> final
 	{
@@ -383,7 +479,9 @@ namespace ISA
 		uint32_t opcode;
 		uint32_t lvid;
 		uint32_t name; // if named parameter
+		template<class T> void eachLVID(T& c) { c(lvid); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::tpush> final
 	{
@@ -391,7 +489,9 @@ namespace ISA
 		uint32_t opcode;
 		uint32_t lvid;
 		uint32_t name; // if named parameter
+		template<class T> void eachLVID(T& c) { c(lvid); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::call> final
 	{
@@ -400,7 +500,9 @@ namespace ISA
 		uint32_t lvid;
 		uint32_t ptr2func; // or atomid
 		uint32_t instanceid;
+		template<class T> void eachLVID(T& c) { c(lvid, ptr2func); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::intrinsic> final
 	{
@@ -411,14 +513,18 @@ namespace ISA
 		uint32_t iid;
 		// intrinsic name
 		uint32_t intrinsic;
+		template<class T> void eachLVID(T& c) { c(lvid); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::debugfile> final
 	{
 		constexpr static const char* opname() { return "debugfile"; }
 		uint32_t opcode;
 		uint32_t filename;
+		template<class T> void eachLVID(T&) {}
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::namealias> final
 	{
@@ -426,6 +532,7 @@ namespace ISA
 		uint32_t opcode;
 		uint32_t lvid;
 		uint32_t name;
+		template<class T> void eachLVID(T& c) { c(lvid); }
 	};
 
 
@@ -435,18 +542,23 @@ namespace ISA
 		uint32_t opcode;
 		uint32_t line;
 		uint32_t offset;
+		template<class T> void eachLVID(T&) {}
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::scope> final
 	{
 		constexpr static const char* opname() { return "scope"; }
 		uint32_t opcode;
+		template<class T> void eachLVID(T&) {}
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::end> final
 	{
 		constexpr static const char* opname() { return "end"; }
 		uint32_t opcode;
+		template<class T> void eachLVID(T&) {}
 	};
 
 
@@ -457,6 +569,7 @@ namespace ISA
 		uint32_t lvid;
 		uint32_t qualifier; // 1: ref, 2: const
 		uint32_t flag;
+		template<class T> void eachLVID(T& c) { c(lvid); }
 	};
 
 
@@ -468,6 +581,7 @@ namespace ISA
 		uint32_t inherit;
 		uint32_t lhs;
 		uint32_t rhs;
+		template<class T> void eachLVID(T& c) { c(lhs, rhs); }
 	};
 
 
@@ -477,6 +591,7 @@ namespace ISA
 		constexpr static const char* opname() { return "label"; }
 		uint32_t opcode;
 		uint32_t label;
+		template<class T> void eachLVID(T&) {}
 	};
 
 
@@ -485,7 +600,9 @@ namespace ISA
 		constexpr static const char* opname() { return "jmp"; }
 		uint32_t opcode;
 		uint32_t label;
+		template<class T> void eachLVID(T&) {}
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::jz> final
 	{
@@ -494,7 +611,9 @@ namespace ISA
 		uint32_t lvid;   // the local variable
 		uint32_t result; // local variable to set to 1 if jump
 		uint32_t label;
+		template<class T> void eachLVID(T& c) { c(lvid, result); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::jnz> final
 	{
@@ -503,6 +622,7 @@ namespace ISA
 		uint32_t lvid;   // the local variable
 		uint32_t result; // local variable to set to 1 if jump
 		uint32_t label;
+		template<class T> void eachLVID(T& c) { c(lvid, result); }
 	};
 
 
@@ -517,6 +637,7 @@ namespace ISA
 		uint32_t opcode;
 		uint32_t lvid;
 		uint32_t regsize;
+		template<class T> void eachLVID(T& c) { c(lvid, regsize); }
 	};
 
 
@@ -526,7 +647,9 @@ namespace ISA
 		uint32_t opcode;
 		uint32_t lvid;
 		uint32_t regsize;
+		template<class T> void eachLVID(T& c) { c(lvid, regsize); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::memfill> final
 	{
@@ -535,6 +658,7 @@ namespace ISA
 		uint32_t lvid;
 		uint32_t regsize;
 		uint32_t pattern;
+		template<class T> void eachLVID(T& c) { c(lvid, regsize); }
 	};
 
 
@@ -559,6 +683,8 @@ namespace ISA
 			struct { uint32_t label; } shortcircuitMetadata;
 		}
 		value;
+
+		template<class T> void eachLVID(T&) {}
 	};
 
 
@@ -582,6 +708,7 @@ namespace ISA
 			union {uint32_t i; uint32_t lvid:28; } converter {newlvid};
 			lvid = converter.lvid;
 		}
+		template<class T> void eachLVID(T& c) { uint32_t cplvid = lvid; c(cplvid); setLVID(cplvid); }
 	};
 
 
@@ -591,6 +718,7 @@ namespace ISA
 		constexpr static const char* opname() { return "self"; }
 		uint32_t opcode;
 		uint32_t self;
+		template<class T> void eachLVID(T& c) { c(self); }
 	};
 
 
@@ -601,14 +729,18 @@ namespace ISA
 		uint32_t lvid;
 		uint32_t self;
 		uint32_t text;
+		template<class T> void eachLVID(T& c) { c(lvid, self); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::ensureresolved> final
 	{
 		constexpr static const char* opname() { return "ensureresolved"; }
 		uint32_t opcode;
 		uint32_t lvid;
+		template<class T> void eachLVID(T& c) { c(lvid); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::assign> final
 	{
@@ -617,6 +749,7 @@ namespace ISA
 		uint32_t lhs;
 		uint32_t rhs;
 		uint32_t disposelhs;
+		template<class T> void eachLVID(T& c) { c(lhs, rhs); }
 	};
 
 
@@ -627,14 +760,18 @@ namespace ISA
 		uint32_t lvid;
 		uint32_t follower;
 		uint32_t symlink;
+		template<class T> void eachLVID(T& c) { c(lvid, follower); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::typeisobject> final
 	{
 		constexpr static const char* opname() { return "typeisobject"; }
 		uint32_t opcode;
 		uint32_t lvid;
+		template<class T> void eachLVID(T& c) { c(lvid); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::classdefsizeof> final
 	{
@@ -642,14 +779,18 @@ namespace ISA
 		uint32_t opcode;
 		uint32_t lvid;
 		uint32_t type; // lvid or atomid
+		template<class T> void eachLVID(T& c) { c(lvid, type); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::ref> final
 	{
 		constexpr static const char* opname() { return "ref"; }
 		uint32_t opcode;
 		uint32_t lvid;
+		template<class T> void eachLVID(T& c) { c(lvid); }
 	};
+
 
 	template<> struct Operand<Nany::IR::ISA::Op::unref> final
 	{
@@ -661,6 +802,8 @@ namespace ISA
 		uint32_t atomid; // or atomid
 		// destructor to call
 		uint32_t instanceid;
+
+		template<class T> void eachLVID(T& c) { c(lvid); }
 	};
 
 
@@ -671,6 +814,7 @@ namespace ISA
 		uint32_t lvid;
 		// atomid
 		uint32_t atomid; // or atomid
+		template<class T> void eachLVID(T& c) { c(lvid); }
 	};
 
 
@@ -684,6 +828,8 @@ namespace ISA
 		uint32_t atomid; // or atomid
 		// destructor to call
 		uint32_t instanceid;
+
+		template<class T> void eachLVID(T& c) { c(lvid); }
 	};
 
 
@@ -697,7 +843,8 @@ namespace ISA
 	Yuni::String print(const Sequence&, const Nany::IR::Instruction&, const AtomMap* = nullptr);
 
 	template<Nany::IR::ISA::Op O>
-	inline Yuni::String print(const Sequence& sequence, const Nany::IR::ISA::Operand<O>& operands, const AtomMap* map = nullptr)
+	inline Yuni::String
+	print(const Sequence& sequence, const Nany::IR::ISA::Operand<O>& operands, const AtomMap* map = nullptr)
 	{
 		return print(sequence, reinterpret_cast<const Nany::IR::Instruction&>(operands), map);
 	}

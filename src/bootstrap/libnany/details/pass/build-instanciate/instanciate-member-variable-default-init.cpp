@@ -29,6 +29,43 @@ namespace Instanciate
 		if (parentAtom.empty())
 			return;
 
+
+		// process captured variables
+		if (parentAtom.flags(Atom::Flags::captureVariables))
+		{
+			funcAtom.parameters.each([&](uint32_t i, const AnyString& name, const Vardef& vardef)
+			{
+				if (name[0] == '^') // captured variable "^trap^xxx"
+				{
+					uint32_t lvid = 1 + 1 + i; // 1: return type, 2: first parameter
+					auto& cdef = cdeftable.classdef(vardef.clid);
+					assert(cdef.qualifiers.ref and "captured variables must be passed by reference");
+
+					auto& spare = cdeftable.substitute(lvid);
+					spare.import(cdef);
+
+					// retrieving real atom from name to get the field index
+					const Atom* varatom = nullptr;
+					parentAtom.eachChild(name, [&](const Atom& atom) -> bool
+					{
+						varatom = &atom;
+						return false;
+					});
+					if (unlikely(!varatom))
+						return (void)(ICE() << "invalid atom for automatic initialization of captured variable '" << name << '\'');
+
+					out.emitFieldset(lvid, /*self*/ 2, varatom->varinfo.effectiveFieldIndex);
+
+					// acquire 'lvid' to keep it alive
+					if (canBeAcquired(cdef))
+						out.emitRef(lvid);
+				}
+			});
+		}
+
+
+		// process user-defined parameters
+
 		std::vector<std::reference_wrapper<Atom>> atomvars;
 		atomvars.reserve(parentAtom.size());
 
@@ -61,7 +98,7 @@ namespace Instanciate
 					out.emitComment(String() << "initialization for " << subatom.name << " via default-init");
 
 				uint32_t instanceid = static_cast<uint32_t>(-1);
-				bool localSuccess = instanciateAtomFunc(instanceid, subatom, /*ret*/0, /*self*/2);
+				bool localSuccess = instanciateAtomFunc(instanceid, subatom, /*ret*/ 0, /*self*/ 2);
 
 				if (likely(localSuccess))
 				{
@@ -128,7 +165,7 @@ namespace Instanciate
 							return false;
 						});
 						if (unlikely(!varatom))
-							return (void)(ICE() << "invalid atom for self init " << varname);
+							return (void)(ICE() << "invalid atom for automatic initialization of variable '" << varname << "'");
 
 						out.emitFieldset(lvid, /*self*/ 2, varatom->varinfo.effectiveFieldIndex);
 
