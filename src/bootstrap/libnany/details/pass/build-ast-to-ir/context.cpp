@@ -160,7 +160,7 @@ namespace Producer
 			func.append(AST::rgFunctionKind, AST::rgFunctionKindOperator, AST::rgFunctionKindOpname);
 		funcname.text = "()";
 
-		auto& params = func.append(AST::rgFuncParam);
+		auto& params = func.append(AST::rgFuncParams);
 		reuse.closure.params = &params;
 
 		auto& rettype = func.append(AST::rgFuncReturnType);
