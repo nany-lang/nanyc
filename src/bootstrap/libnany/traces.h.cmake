@@ -43,8 +43,13 @@ namespace Traces
 	//! Print ATOM table
 	static constexpr bool printPreAtomTable = all or false;
 
+
+	//! Print all types
+	static constexpr bool printAllTypeDefinitions = all or false;
+
 	//! Print classdef table
 	static constexpr bool printClassdefTable = all or recommended or false;
+
 
 	//! Print opcodes generated from AST
 	static constexpr bool printSourceOpcodeSequence = all or recommended or false;

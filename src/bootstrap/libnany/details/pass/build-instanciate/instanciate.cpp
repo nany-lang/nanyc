@@ -48,7 +48,7 @@ namespace Instanciate
 
 	SequenceBuilder::~SequenceBuilder()
 	{
-		if (Config::Traces::printClassdefTable)
+		if (Config::Traces::printAllTypeDefinitions)
 			printClassdefTable();
 
 		auto* frm = frame;

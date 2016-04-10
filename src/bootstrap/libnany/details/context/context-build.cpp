@@ -34,7 +34,7 @@ namespace Nany
 				report.info(); // for beauty
 				report.info(); // for beauty
 			}
-			if (Config::Traces::printClassdefTable)
+			if (Config::Traces::printAllTypeDefinitions)
 			{
 				auto trace = (report.trace() << "CLASSDEF PER ATOM\n");
 				ClassdefTableView{table}.print(trace.data().message, false);

@@ -436,13 +436,13 @@ namespace Nany
 			if (not isAlias) // do not handle aliases
 			{
 				bool success = nameLookupForClassdef(cdef);
-				if (Config::Traces::printClassdefTable and not success)
+				if (Config::Traces::printAllTypeDefinitions and not success)
 					remainings.push_back(cdef);
 			}
 		}
 
 		/*
-		if (Config::Traces::printClassdefTable)
+		if (Config::Traces::printAllTypeDefinitions)
 		{
 			auto trace = report.trace();
 			print(trace.text(), false);
