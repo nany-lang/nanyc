@@ -77,7 +77,7 @@ set(ny_core_files
 	"${nsl_root}/std.env/env.ny"
 
 	# std.memory
-	"${nsl_root}/std.memory/allocator.ny"
+	#"${nsl_root}/std.memory/allocator.ny"
 	)
 
 set(__nany_stdcore)
