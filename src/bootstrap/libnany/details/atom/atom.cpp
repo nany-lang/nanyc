@@ -395,13 +395,14 @@ namespace Nany
 	void Atom::printInstances(Clob& out, const AtomMap& atommap) const
 	{
 		assert(instances.size() == pSymbolInstances.size());
-		Clob prgm;
+		String prgm;
 
 		for (size_t i = 0; i != instances.size(); ++i)
 		{
 			out << pSymbolInstances[i] << " // " << atomid << " #" << i << "\n{\n";
 
 			instances[i].get()->print(prgm, &atommap);
+
 			prgm.replace("\n", "\n    ");
 			prgm.trimRight();
 			out << prgm << "\n}\n";

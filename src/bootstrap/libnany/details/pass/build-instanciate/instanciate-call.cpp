@@ -278,6 +278,7 @@ namespace Instanciate
 
 		if (not frame->verify(lvid))
 			return false;
+
 		uint32_t offset = frame->lvids[lvid].offsetDeclOut;
 		if (unlikely(not (offset > 0 and offset < out.opcodeCount())))
 			return (ICE() << "invalid opcode offset for generating shortcircuit");
@@ -292,10 +293,7 @@ namespace Instanciate
 		{
 			auto* atom = cdeftable.findClassdefAtom(cdef);
 			if (unlikely(cdeftable.atoms().core.object[nyt_bool] != atom))
-			{
-				error() << "boolean expected";
-				return false;
-			}
+				return (error() << "boolean expected");
 
 			uint32_t newlvid = out.at<IR::ISA::Op::stackalloc>(offset).lvid;
 			++offset;

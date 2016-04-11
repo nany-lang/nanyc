@@ -37,6 +37,7 @@ namespace IR
 		~Sequence();
 		//@}
 
+
 		//! \name Opcodes
 		//@{
 		//! Fetch an instruction at a given offset
@@ -295,8 +296,9 @@ namespace IR
 		void emitJnz(uint32_t lvid, uint32_t result, uint32_t label);
 
 
-		//! Visit each instruction (const)
+		//! Visit each instruction
 		template<class T> void each(T& visitor, uint32_t offset = 0);
+		//! Visit each instruction (const)
 		template<class T> void each(T& visitor, uint32_t offset = 0) const;
 
 		/*!
@@ -340,8 +342,6 @@ namespace IR
 		//@{
 		//! Print the sequence to a string
 		void print(Yuni::String& out, const AtomMap* = nullptr) const;
-		//! Print the sequence to a clob
-		void print(Yuni::Clob& out, const AtomMap* = nullptr) const;
 		//@}
 
 

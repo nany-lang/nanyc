@@ -32,10 +32,12 @@ namespace IR
 			grow(instrCount);
 	}
 
+
 	inline uint32_t Sequence::opcodeCount() const
 	{
 		return pSize;
 	}
+
 
 	inline uint32_t Sequence::capacity() const
 	{
@@ -63,7 +65,6 @@ namespace IR
 		static_assert(sizeof(Instruction) >= sizeof(ISA::Operand<O>), "pSize mismatch");
 		return reinterpret_cast<ISA::Operand<O>&>(pBody[offset]);
 	}
-
 
 
 	template<ISA::Op O> inline const ISA::Operand<O>& Sequence::at(uint32_t offset) const
@@ -532,6 +533,7 @@ namespace IR
 		return offset;
 	}
 
+
 	inline uint32_t Sequence::emitBlueprintGenericTypeParam(LVID lvid)
 	{
 		uint32_t offset = pSize;
@@ -554,6 +556,7 @@ namespace IR
 		operands.setLVID(lvid);
 		return offset;
 	}
+
 
 	inline uint32_t Sequence::emitBlueprintParam(LVID lvid)
 	{
@@ -583,6 +586,7 @@ namespace IR
 		operands.lvid  = lvid;
 		operands.value.u64 = value;
 	}
+
 
 	inline void Sequence::emitStore_f64(uint32_t lvid, double value)
 	{
@@ -618,6 +622,7 @@ namespace IR
 		return lvid;
 	}
 
+
 	inline uint32_t Sequence::emitStackalloc_f64(uint32_t lvid, nytype_t type, double value)
 	{
 		emitStackalloc(lvid, type);
@@ -632,6 +637,7 @@ namespace IR
 		emitStoreText(lvid, text);
 		return lvid;
 	}
+
 
 	inline void Sequence::emitStore(uint32_t lvid, uint32_t source)
 	{
@@ -667,12 +673,14 @@ namespace IR
 		return lvid;
 	}
 
+
 	inline void Sequence::emitMemFree(uint32_t lvid, uint32_t regsize)
 	{
 		auto& operands   = emit<ISA::Op::memfree>();
 		operands.lvid    = lvid;
 		operands.regsize = regsize;
 	}
+
 
 	inline void Sequence::emitMemFill(uint32_t lvid, uint32_t regsize, uint32_t pattern)
 	{
@@ -715,7 +723,6 @@ namespace IR
 	{
 		emit<ISA::Op::comment>().text = 0;
 	}
-
 
 
 	inline void Sequence::emitSelf(uint32_t self)
@@ -782,6 +789,7 @@ namespace IR
 		operands.name  = stringrefs.ref(name);
 	}
 
+
 	inline void Sequence::emitCall(uint32_t lvid, uint32_t ptr2func)
 	{
 		auto& operands = emit<ISA::Op::call>();
@@ -789,6 +797,7 @@ namespace IR
 		operands.ptr2func = ptr2func;
 		operands.instanceid = (uint32_t) -1;
 	}
+
 
 	inline void Sequence::emitCall(uint32_t lvid, uint32_t atomid, uint32_t instanceid)
 	{
@@ -846,6 +855,7 @@ namespace IR
 		emit<ISA::Op::jmp>().label = label;
 	}
 
+
 	inline void Sequence::emitJz(uint32_t lvid, uint32_t result, uint32_t label)
 	{
 		auto& opc  = emit<ISA::Op::jz>();
@@ -853,6 +863,7 @@ namespace IR
 		opc.result = result;
 		opc.label  = label;
 	}
+
 
 	inline void Sequence::emitJnz(uint32_t lvid, uint32_t result, uint32_t label)
 	{
@@ -903,6 +914,7 @@ namespace IR
 		return r;
 	}
 
+
 	template<ISA::Op O>
 	inline uint32_t Sequence::offsetOf(const ISA::Operand<O>& instr) const
 	{
@@ -921,6 +933,7 @@ namespace IR
 	{
 		cursor = pBody + pSize;
 	}
+
 
 	inline void Sequence::invalidateCursor(Instruction*& cursor) const
 	{

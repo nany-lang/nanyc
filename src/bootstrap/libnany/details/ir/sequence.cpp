@@ -86,19 +86,10 @@ namespace IR
 	}
 
 
-	void Sequence::print(Clob& out, const AtomMap* atommap) const
-	{
-		using namespace ISA;
-		out.reserve(out.size() + pSize * 20); // arbitrary
-		Printer<Clob> printer{out, *this};
-		printer.atommap = atommap;
-		each(printer);
-	}
-
 	void Sequence::print(YString& out, const AtomMap* atommap) const
 	{
-		using namespace ISA;
-		out.reserve(out.size() + pSize * 20); // arbitrary
+		using namespace IR::ISA;
+		out.reserve(out.size() + (pSize * 100)); // arbitrary
 		Printer<String> printer{out, *this};
 		printer.atommap = atommap;
 		each(printer);

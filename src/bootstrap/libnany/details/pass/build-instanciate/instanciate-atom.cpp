@@ -388,7 +388,7 @@ namespace Instanciate
 			auto entry = trace.trace();
 			entry.message.prefix << symbolName;
 
-			Clob text;
+			String text;
 			out.print(text, &newView.atoms());
 			text.replace("\n", "\n    ");
 			text.trimRight();

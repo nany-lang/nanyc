@@ -410,7 +410,7 @@ namespace Instanciate
 
 		nytype_t rettype = (R == nyt_any) ? builtinlhs : R;
 
-		if (atomBuiltinCast != nullptr)
+		if (atomBuiltinCast != nullptr) // the result is a real instance
 		{
 			// implicit convertion from builtin (__i32...) to object (i32...)
 			if (R != nyt_any) // force the result type
@@ -430,6 +430,9 @@ namespace Instanciate
 
 			if (canGenerateCode())
 			{
+				if (debugmode)
+					out.emitComment(ShortString32() << "builtin " << name);
+
 				// creating two variables on the stack
 				uint32_t opresult   = createLocalVariables(2);
 				uint32_t sizeoflvid = opresult + 1;
@@ -456,7 +459,11 @@ namespace Instanciate
 			// no convertion to perform, direct call
 			cdeftable.substitute(lvid).mutateToBuiltin(rettype);
 			if (canGenerateCode())
+			{
+				if (debugmode)
+					out.emitComment(ShortString32() << "builtin " << name);
 				(out.*M)(lvid, lhs, rhs);
+			}
 		}
 		return true;
 	}
