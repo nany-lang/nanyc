@@ -57,16 +57,10 @@ namespace IR
 	}
 
 
-	size_t Sequence::sizeInBytes() const
-	{
-		return pCapacity * sizeof(Instruction) + stringrefs.inspectMemoryUsage();
-	}
-
-
 	void Sequence::grow(uint32_t N)
 	{
 		auto newcapa = pCapacity;
-		do { newcapa += 1000000; } while (newcapa < N);
+		do { newcapa += 1000; } while (newcapa < N);
 		pCapacity = newcapa;
 
 		pBody = (Instruction*)::std::realloc(pBody, sizeof(Instruction) * newcapa);

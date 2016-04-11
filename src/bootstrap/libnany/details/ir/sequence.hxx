@@ -13,9 +13,16 @@ namespace Nany
 namespace IR
 {
 
+
 	inline Sequence::~Sequence()
 	{
 		std::free(pBody);
+	}
+
+
+	inline size_t Sequence::sizeInBytes() const
+	{
+		return pCapacity * sizeof(Instruction) + stringrefs.sizeInBytes();
 	}
 
 
@@ -79,7 +86,7 @@ namespace IR
 
 	template<ISA::Op O> inline ISA::Operand<O>& Sequence::emit()
 	{
-		if (unlikely(pCapacity < pSize + 1))
+		if (unlikely(not ((pSize + 1) < pCapacity)))
 			grow(pSize + 1);
 
 		static_assert(sizeof(Instruction) >= sizeof(ISA::Operand<O>), "pSize mismatch");

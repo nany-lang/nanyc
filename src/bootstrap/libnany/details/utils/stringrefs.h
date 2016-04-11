@@ -43,8 +43,8 @@ namespace Nany
 		//! Clear the container
 		void clear();
 
-
-		size_t inspectMemoryUsage() const;
+		//! Get the size in bytes occupied by this object
+		size_t sizeInBytes() const;
 
 
 		//! \name Operators

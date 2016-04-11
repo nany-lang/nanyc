@@ -33,9 +33,9 @@ namespace Nany
 	}
 
 
-	size_t StringRefs::inspectMemoryUsage() const
+	size_t StringRefs::sizeInBytes() const
 	{
-		size_t s = sizeof(void*) * pRefs.max_size();
+		size_t s = sizeof(void*) * pRefs.capacity();
 		for (auto& element: pRefs)
 			s += element.size + 1;
 		// arbitrary
