@@ -26,10 +26,10 @@ namespace IR
 	}
 
 
-	inline void Sequence::reserve(uint32_t N)
+	inline void Sequence::reserve(uint32_t instrCount)
 	{
-		if (pCapacity < N)
-			grow(N);
+		if (pCapacity < instrCount)
+			grow(instrCount);
 	}
 
 	inline uint32_t Sequence::opcodeCount() const

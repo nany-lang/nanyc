@@ -325,7 +325,7 @@ namespace IR
 		//! Shrink the memory used by the pBody
 		void shrink();
 		//! Reserve enough memory for N instructions
-		void reserve(uint32_t N);
+		void reserve(uint32_t instrCount);
 		//@}
 
 
@@ -352,7 +352,7 @@ namespace IR
 
 	private:
 		//! grow to accept N instructions
-		void grow(uint32_t newcapa);
+		void grow(uint32_t instrCount);
 
 	private:
 		//! Size of the sequence

@@ -57,10 +57,10 @@ namespace IR
 	}
 
 
-	void Sequence::grow(uint32_t N)
+	void Sequence::grow(uint32_t instrCount)
 	{
 		auto newcapa = pCapacity;
-		do { newcapa += 1000; } while (newcapa < N);
+		do { newcapa += 1000; } while (newcapa < instrCount);
 		pCapacity = newcapa;
 
 		pBody = (Instruction*)::std::realloc(pBody, sizeof(Instruction) * newcapa);
