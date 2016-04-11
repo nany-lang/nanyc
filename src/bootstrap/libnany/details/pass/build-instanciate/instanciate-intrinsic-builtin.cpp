@@ -222,6 +222,8 @@ namespace Instanciate
 			auto* atom = cdeftable.findClassdefAtom(cdeflhs);
 			if (atom != nullptr and atom->builtinMapping != nyt_void)
 			{
+				if (debugmode)
+					out.emitComment("reading inner 'pod' variable");
 				atomBuiltinCast = atom;
 				builtinlhs = atom->builtinMapping;
 				uint32_t newlvid = createLocalVariables();
@@ -323,6 +325,9 @@ namespace Instanciate
 			auto* atom = cdeftable.findClassdefAtom(cdeflhs);
 			if (atom != nullptr and atom->builtinMapping != nyt_void)
 			{
+				if (debugmode)
+					out.emitComment("reading inner 'pod' variable");
+
 				atomBuiltinCast = atom;
 				builtinlhs = atom->builtinMapping;
 				uint32_t newlvid = createLocalVariables();
@@ -341,6 +346,9 @@ namespace Instanciate
 			auto* atom = cdeftable.findClassdefAtom(cdefrhs);
 			if (atom != nullptr and (atom->builtinMapping != nyt_void))
 			{
+				if (debugmode)
+					out.emitComment("reading inner 'pod' variable");
+
 				atomBuiltinCast = atom;
 				builtinrhs = atom->builtinMapping;
 				uint32_t newlvid = createLocalVariables();
