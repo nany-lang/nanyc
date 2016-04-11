@@ -888,17 +888,6 @@ namespace IR
 	}
 
 
-	inline const void* Sequence::pointer(uint32_t offset) const
-	{
-		return reinterpret_cast<const void*>(pBody + offset);
-	}
-
-	inline Yuni::String Sequence::gdbMemoryWatch(uint32_t offset) const
-	{
-		return YString{} << "awatch (char[" << sizeof(Instruction) << "]) *" << pointer(offset);
-	}
-
-
 	inline uint32_t Sequence::offsetOf(const Instruction& instr) const
 	{
 		assert(pSize > 0 and pCapacity > 0);

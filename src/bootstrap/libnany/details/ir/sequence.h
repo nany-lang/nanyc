@@ -342,12 +342,6 @@ namespace IR
 		void print(Yuni::String& out, const AtomMap* = nullptr) const;
 		//! Print the sequence to a clob
 		void print(Yuni::Clob& out, const AtomMap* = nullptr) const;
-
-		//! Get the raw pointer of an offset in memory (for "watching" changes from gdb)
-		const void* pointer(uint32_t offset) const;
-
-		//! Get the gdb command to watch changes of a given offset
-		Yuni::String gdbMemoryWatch(uint32_t offset) const;
 		//@}
 
 
