@@ -35,7 +35,7 @@ static void* nymemalloc_default_allocate(nycontext_t* ctx, size_t size)
 	assert(0 != size);
 	assert(ctx != nullptr);
 	void* p = ::malloc(size);
-	if (YUNI_LIKELY(!p) and ctx->memory.on_not_enough_memory)
+	if (YUNI_UNLIKELY(!p) and ctx->memory.on_not_enough_memory)
 		ctx->memory.on_not_enough_memory(ctx, nyfalse);
 	return p;
 }
@@ -46,7 +46,7 @@ static void* nymemalloc_default_reallocate(nycontext_t* ctx, void* ptr, size_t, 
 	assert(0 != newsize);
 	assert(ctx != nullptr);
 	void* p = ::realloc(ptr, newsize);
-	if (YUNI_LIKELY(!p) and ctx->memory.on_not_enough_memory)
+	if (YUNI_UNLIKELY(!p and ctx->memory.on_not_enough_memory))
 		ctx->memory.on_not_enough_memory(ctx, nyfalse);
 	return p;
 }
@@ -58,9 +58,9 @@ static void nymemalloc_default_release(nycontext_t*, void* ptr, size_t)
 }
 
 
-extern "C" void nany_memalloc_init_default(nycontext_memory_t* mem)
+extern "C" void nany_memalloc_set_default(nycontext_memory_t* mem)
 {
-	if (YUNI_LIKELY(mem))
+	if (mem)
 	{
 		mem->allocate   = &nymemalloc_default_allocate;
 		mem->reallocate = &nymemalloc_default_reallocate;
@@ -81,10 +81,10 @@ static void* nymemalloc_withlimit_allocate(nycontext_t* ctx, size_t size)
 	assert(0 != size);
 	assert(ctx != nullptr);
 	// TODO not thread safe
-	if (YUNI_LIKELY((ctx->reserved.mem0 += size) < ctx->memory.limit_mem_size))
+	if ((ctx->reserved.mem0 += size) < ctx->memory.limit_mem_size)
 	{
 		void* p = ::malloc(size);
-		if (YUNI_LIKELY(p))
+		if (p)
 			return p;
 
 		if (ctx->memory.on_not_enough_memory)
@@ -111,10 +111,10 @@ static void* nymemalloc_withlimit_reallocate(nycontext_t* ctx, void* ptr, size_t
 	if (newsize > oldsize)
 	{
 		// TODO not thread safe
-		if (YUNI_LIKELY((ctx->reserved.mem0 += (newsize - oldsize)) < ctx->memory.limit_mem_size))
+		if ((ctx->reserved.mem0 += (newsize - oldsize)) < ctx->memory.limit_mem_size)
 		{
 			void* p = ::realloc(ptr, newsize);
-			if (YUNI_LIKELY(p))
+			if (p)
 				return p;
 
 			ctx->reserved.mem0 -= newsize - oldsize;
@@ -129,7 +129,7 @@ static void* nymemalloc_withlimit_reallocate(nycontext_t* ctx, void* ptr, size_t
 	else
 	{
 		void* p = ::realloc(ptr, newsize);
-		if (YUNI_LIKELY(p))
+		if (p)
 		{
 			ctx->reserved.mem0 -= oldsize - newsize;
 			return p;
@@ -145,7 +145,7 @@ static void* nymemalloc_withlimit_reallocate(nycontext_t* ctx, void* ptr, size_t
 static void nymemalloc_withlimit_release(nycontext_t* ctx, void* ptr, size_t size)
 {
 	assert(ctx != nullptr);
-	if (YUNI_LIKELY(ptr))
+	if (ptr)
 	{
 		free(ptr);
 		// TODO not thread safe
@@ -154,9 +154,9 @@ static void nymemalloc_withlimit_release(nycontext_t* ctx, void* ptr, size_t siz
 }
 
 
-extern "C" void nany_memalloc_init_with_limit(nycontext_memory_t* mem, size_t limit)
+extern "C" void nany_memalloc_set_with_limit(nycontext_memory_t* mem, size_t limit)
 {
-	if (YUNI_LIKELY(mem))
+	if (mem)
 	{
 		mem->allocate   = &nymemalloc_withlimit_allocate;
 		mem->reallocate = &nymemalloc_withlimit_reallocate;

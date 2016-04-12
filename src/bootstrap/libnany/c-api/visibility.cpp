@@ -10,7 +10,7 @@ using namespace Yuni;
 
 
 
-extern "C" nyvisibility_t  nany_cstring_to_visibility_n(const char* text, size_t length)
+extern "C" nyvisibility_t  nany_cstring_to_visibility_n(const char* const text, size_t length)
 {
 	AnyString s{text, (uint32_t)length};
 	s.trim();

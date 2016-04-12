@@ -98,7 +98,7 @@ nany_initialize(nycontext_t* ctx, const nycontext_t* inherit, const nycontext_me
 
 			// memory
 			if (nullptr == allocator)
-				nany_memalloc_init_default(&ctx->memory);
+				nany_memalloc_set_default(&ctx->memory);
 			else
 				ctx->memory = *allocator;
 

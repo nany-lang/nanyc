@@ -105,7 +105,7 @@ enum nytask_status_t
 	/*! The task is waiting for being launched */
 	nys_idle,
 	/*! The task has been canceled */
-	nys_canceled,
+	nys_canceled
 };
 typedef enum nytask_status_t  nytask_status_t;
 
@@ -145,27 +145,12 @@ typedef enum /* nytype_t */
 	nyt_f64,
 
 	/*! The total number of intrinsic types */
-	nyt_count,
+	nyt_count
 
 } nytype_t;
 
 
 
-/*!
-** \brief Type of a target (set of source files)
-*/
-typedef enum /* nytarget_type_t */
-{
-	/*! Unknown target */
-	nyg_unknown  = 0,
-	/*! target built as a module */
-	nyg_module,
-	/*! target built as a shared library */
-	nyg_library,
-	/*! target built as a standalone program */
-	nyg_program,
-
-} nytarget_type_t;
 
 
 
@@ -239,7 +224,7 @@ enum
 	/*! Append content instead of rewrite */
 	nyio_flag_append                = (1 << 5),
 	/*! Reset the size of the file to 0 */
-	nyio_flag_truncate              = (1 << 6),
+	nyio_flag_truncate              = (1 << 6)
 };
 
 
@@ -269,7 +254,7 @@ typedef enum /* nyerr_level_t */
 	/*! Debug level */
 	nyee_trace = 0,
 	/*! no message */
-	nyee_none,
+	nyee_none
 
 } nyerr_level_t;
 
@@ -282,7 +267,7 @@ typedef uint32_t nybind_flag_t;
 enum
 {
 	/*! Default settings */
-	nybind_default = 0,
+	nybind_default = 0
 };
 
 
@@ -295,9 +280,8 @@ enum
 
 
 
-typedef struct nycontext_t nycontext_t;
-
-typedef struct nytctx_t nytctx_t;
+struct nycontext_t; /* forward */
+struct nytctx_t;
 
 /*!
 ** \brief Nany Thread Context
@@ -308,7 +292,7 @@ typedef struct nytctx_t
 	nycontext_t* context;
 
 	/*! event: a new thread is destroyed */
-	void (*on_thread_destroy)(nytctx_t*);
+	void (*on_thread_destroy)(struct nytctx_t*);
 
 	/*! Opaque internal data */
 	void* internal;
@@ -486,7 +470,7 @@ NY_EXPORT void nany_dispose(nycontext_t** ctx);
 /*!
 ** \brief Initialize a context already allocated
 **
-** This method can be used with the context is allocated on the stack
+** This method can be used when the context is allocated on the stack
 ** \param inherit A context to inherit from (can be NULL)
 ** \param allocator Custom allocator functions (can be NULL)
 **
@@ -499,7 +483,7 @@ nany_initialize(nycontext_t*, const nycontext_t* inherit, const nycontext_memory
 /*!
 ** \brief Uninitialize a context (without freeing the memory)
 **
-** This method can be used with the context is stack allocated on the stack
+** This method can be used when the context is allocated on the stack
 ** \param inherit A context to inherit from (can be NULL)
 */
 NY_EXPORT void nany_uninitialize(nycontext_t*);
@@ -508,14 +492,14 @@ NY_EXPORT void nany_uninitialize(nycontext_t*);
 
 
 /*!
-** \nbrief Set to the default C memory allocator
+** \nbrief Switch to the standard C memory allocator
 */
-NY_EXPORT void nany_memalloc_init_default(nycontext_memory_t*);
+NY_EXPORT void nany_memalloc_set_default(nycontext_memory_t*);
 
 /*!
-** \nbrief Set to the default C memory allocator with
+** \nbrief Switch to the std C memory allocator with bounds checking
 */
-NY_EXPORT void nany_memalloc_init_with_limit(nycontext_memory_t*, size_t limit);
+NY_EXPORT void nany_memalloc_set_with_limit(nycontext_memory_t*, size_t limit);
 
 
 
@@ -674,7 +658,7 @@ nany_bind_n(nycontext_t*, const char* name, size_t length, nybind_flag_t flags, 
 /*!
 ** \brief Create a new queue service
 **
-** \return A new queue service (if not null), which must be released by `nany_queueservice_release()`
+** \return A new queue service (if not null), which must be released by `nany_queueservice_unref()`
 */
 NY_EXPORT nyqueueservice_t* nany_queueservice_create();
 
@@ -753,18 +737,22 @@ inline nybool_t nany_try_parse_file(const char* const filename);
 NY_EXPORT nybool_t nany_try_parse_file_n(const char* filename, size_t length);
 
 
+
+
+/*! \name Utilities for internal types */
+/*@{*/
 /*!
 ** \brief Convert a C-String representing a visibility level
 **
 ** An empty value will represent a "default" visibility (nyv_undefined)
 */
-inline nyvisibility_t  nany_cstring_to_visibility(const char* text);
+inline nyvisibility_t  nany_cstring_to_visibility(const char* const text);
 /*!
 ** \brief Convert a C-String representing a visibility level (with given length)
 **
 ** An empty value will represent a "default" visibility (nyv_undefined)
 */
-NY_EXPORT nyvisibility_t  nany_cstring_to_visibility_n(const char* text, size_t length);
+NY_EXPORT nyvisibility_t  nany_cstring_to_visibility_n(const char* const text, size_t length);
 
 /*!
 ** \brief Convert a visibility to a C-String representation
@@ -778,7 +766,7 @@ NY_EXPORT const char* nany_visibility_to_cstring(nyvisibility_t);
 ** \param text An arbitrary text (ex: "__uint64")
 ** \return The corresponding type (ex: nyt_uint64)
 */
-inline nytype_t  nany_cstring_to_type(const char* text);
+inline nytype_t  nany_cstring_to_type(const char* const text);
 
 /*!
 ** \brief Convert a string into the builtin type (with length provided)
@@ -786,13 +774,16 @@ inline nytype_t  nany_cstring_to_type(const char* text);
 ** \param text An arbitrary text (ex: "__uint64")
 ** \return The corresponding type (ex: nyt_uint64)
 */
-NY_EXPORT nytype_t  nany_cstring_to_type_n(const char* text, size_t length);
+NY_EXPORT nytype_t  nany_cstring_to_type_n(const char* const text, size_t length);
 
 /*!
 ** \brief Convert a type into a c-string
 */
 NY_EXPORT const char* nany_type_to_cstring(nytype_t);
 
+/*!
+** \brief Get the size in bytes of a Nany type
+*/
 NY_EXPORT size_t  nany_type_sizeof(nytype_t);
 /*@}*/
 

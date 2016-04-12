@@ -1,9 +1,7 @@
+#include <yuni/yuni.h>
+#include <yuni/core/string/string.h>
 #include <nany/nany.h>
-#include <yuni/core/bit/bit.h>
-#include "details/type/builtin.h"
-#include "details/fwd.h"
 #include <unordered_map>
-#include <map>
 
 using namespace Yuni;
 
@@ -30,9 +28,9 @@ static const std::unordered_map<AnyString, nytype_t> translationStringToDef
 
 extern "C" nytype_t  nany_cstring_to_type_n(const char* const text, size_t length)
 {
-	if (likely(length > 3 and length < 128 and text and text[0] == '_' and text[1] == '_'))
+	if (length > 3 and length < 16 and text and text[0] == '_' and text[1] == '_')
 	{
-		auto it = translationStringToDef.find(AnyString{text, (uint32_t)length});
+		auto it = translationStringToDef.find(AnyString{text, static_cast<uint32_t>(length)});
 		return (it != translationStringToDef.cend()) ? it->second : nyt_void;
 	}
 	return nyt_void;

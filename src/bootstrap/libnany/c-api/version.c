@@ -1,6 +1,10 @@
 #include "nany/nany.h"
 #include "libnany-version.h"
 
+// NOTE
+//
+// This file is intentionnaly a C file to abort the compilation if nany.h
+// does not use ansi C
 
 
 

@@ -355,7 +355,6 @@ addsrc(
 	GROUP "details/type"
 	FILES
 	"details/type/builtin.h"
-	"details/type/builtin.cpp"
 	"details/type/type-check.cpp"
 	"details/type/type-check.h")
 
@@ -451,6 +450,7 @@ addsrc(
 	"c-api/validator.cpp"
 	"c-api/bugreport.cpp"
 	"c-api/visibility.cpp"
+	"c-api/type.cpp"
 	"c-api/version.c"
 	"c-api/common-debuginfo.hxx")
 
@@ -476,6 +476,8 @@ add_library(libnany ${mode_libnany}
 	nany/nany.h
 	nany/nany.hxx
 
+	${nysrc_c_api}
+
 	${nysrc_details_pass_build_ast_from_source}
 	${nysrc_details_pass_build_ast_normalize}
 	${nysrc_details_pass_build_ast_to_ir}
@@ -493,8 +495,6 @@ add_library(libnany ${mode_libnany}
 	${nysrc_details_intrinsic}
 	${nysrc_details_context}
 	${nysrc_details_reporting}
-
-	${nysrc_c_api}
 
 	# Semantic Analysis
 	details/sema/metadata.cpp

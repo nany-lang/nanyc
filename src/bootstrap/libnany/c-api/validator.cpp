@@ -39,13 +39,16 @@ namespace // anonymous
 extern "C" nybool_t nany_try_parse_file_n(const char* const filename, size_t length)
 {
 	bool ret = false;
-	try
+	if (length != 0 and length < 16*1024 and filename != nullptr)
 	{
-		String path{filename, static_cast<uint32_t>(length)};
-		Nany::AST::Parser parser;
-		bool success = parser.loadFromFile(path);
-		ret = (success and parser.root and tryFindErrorNode(*(parser.root)));
+		try
+		{
+			String path{filename, static_cast<uint32_t>(length)};
+			Nany::AST::Parser parser;
+			bool success = parser.loadFromFile(path);
+			ret = (success and parser.root and tryFindErrorNode(*(parser.root)));
+		}
+		catch (...) {}
 	}
-	catch (...) {}
 	return ret ? nytrue : nyfalse;
 }

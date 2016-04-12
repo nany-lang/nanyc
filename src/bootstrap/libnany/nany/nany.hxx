@@ -16,12 +16,13 @@ inline size_t nany_type_sizeof(nytype_t type)
 {
 	switch (type)
 	{
+		case nyt_u32:     return sizeof(uint32_t);
+		case nyt_u64:     return sizeof(uint64_t);
+
 		case nyt_pointer: return sizeof(size_t);
 		case nyt_bool:    return sizeof(uint8_t);
 		case nyt_u8:      return sizeof(uint8_t);
 		case nyt_u16:     return sizeof(uint16_t);
-		case nyt_u32:     return sizeof(uint32_t);
-		case nyt_u64:     return sizeof(uint64_t);
 		case nyt_i8:      return sizeof(int8_t);
 		case nyt_i16:     return sizeof(int16_t);
 		case nyt_i32:     return sizeof(int32_t);
@@ -57,14 +58,14 @@ inline nybool_t  nany_try_parse_file(const char* const filename)
 }
 
 
-inline nyvisibility_t  nany_cstring_to_visibility(const char* text)
+inline nyvisibility_t  nany_cstring_to_visibility(const char* const text)
 {
 	size_t length = (text ? (uint32_t) strlen(text) : 0u);
 	return nany_cstring_to_visibility_n(text, length);
 }
 
 
-inline nytype_t nany_cstring_to_type(const char* text)
+inline nytype_t nany_cstring_to_type(const char* const text)
 {
 	size_t length = (text ? (uint32_t) strlen(text) : 0u);
 	return nany_cstring_to_type_n(text, length);
