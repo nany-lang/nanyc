@@ -1,4 +1,4 @@
-file(STRINGS "${CMAKE_CURRENT_LIST_DIR}/../../build-settings.txt" file_settings_data)
+file(STRINGS "${CMAKE_CURRENT_LIST_DIR}/../../../build-settings.txt" file_settings_data)
 
 foreach (line ${file_settings_data})
 	if (NOT "${line}" MATCHES "^//.*$")
