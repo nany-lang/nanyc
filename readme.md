@@ -11,17 +11,19 @@ code or bytecode, or to be run as script.
 Overview of the Nany Programming Language
 -----------------------------------------
 
-[Would you like to know more?](examples/)
+[Few examples to give you a taste of Nany](examples/)
 
 
 
-Build Status
-------------
+How to build Nany
+-----------------
 
 | Platform  | Build Status |
 | :------------- | :------------- |
 | GNU/Linux, MacOS, `gcc-4.9` (via travis-ci)  | [![Build Status](https://api.travis-ci.org/nany-lang/nany.png)](https://travis-ci.org/nany-lang/nany)  |
 | Windows, `VS2015` (via appveyor)  | [![Build Status](https://ci.appveyor.com/api/projects/status/github/nany-lang/nany)](https://ci.appveyor.com/project/milipili/nany)  |
+
+[Building Nany on your platform](src/readme.md)
 
 
 
