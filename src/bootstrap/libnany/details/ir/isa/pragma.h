@@ -33,6 +33,9 @@ namespace ISA //!< Instruction Set Architecture
 		shortcircuit,
 		//! shortcircuit sequence offset of 'nop' instructions
 		shortcircuitOpNopOffset,
+		//! Shortcircuit mutate '__bool' to 'bool'
+		shortcircuitMutateToBool,
+
 		//! Builtin alias
 		builtinalias,
 

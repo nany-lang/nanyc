@@ -31,7 +31,7 @@ namespace Producer
 		uint32_t condlvid = out.emitStackalloc(nextvar(), nyt_bool);
 		{
 			if (debugmode)
-				out.emitComment("if-cond");
+				out.emitComment("if-cond-stmt");
 			OpcodeScopeLocker opscopeCond{out};
 			uint32_t exprEval = 0;
 			emitDebugpos(expr);
@@ -48,7 +48,7 @@ namespace Producer
 		// if-then...
 		{
 			if (debugmode)
-				out.emitComment("if-stmt-then");
+				out.emitComment("then-stmt");
 
 			// stmt
 			{
@@ -80,7 +80,7 @@ namespace Producer
 		{
 			assert(elseptr != nullptr);
 			if (debugmode)
-				out.emitComment("if-stmt-else");
+				out.emitComment("else-stmt");
 
 			// stmt
 			{
@@ -122,7 +122,7 @@ namespace Producer
 		uint32_t condlvid = out.emitStackalloc(nextvar(), nyt_bool);
 		{
 			if (debugmode)
-				out.emitComment("if-cond");
+				out.emitComment("if-cond-expr");
 			OpcodeScopeLocker opscopeCond{out};
 			uint32_t exprEval = 0;
 			success &= visitASTExpr(expr, exprEval, false);
@@ -138,7 +138,7 @@ namespace Producer
 		// if-then...
 		{
 			if (debugmode)
-				out.emitComment("if-expr-then");
+				out.emitComment("then-expr");
 
 			{
 				OpcodeScopeLocker opscopeThen{out};
@@ -161,7 +161,7 @@ namespace Producer
 		if (hasElseClause)
 		{
 			if (debugmode)
-				out.emitComment("if-expr-else");
+				out.emitComment("else-expr");
 
 			{
 				out.emitLabel(labelElse);

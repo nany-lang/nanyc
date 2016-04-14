@@ -258,10 +258,14 @@ namespace IR
 		void emitPragmaAllowCodeGeneration(bool enabled);
 		//! Emit opcode that indicates the begining of a func body
 		void emitPragmaFuncBody();
+
 		//! Emit pragma shortcircuit
 		void emitPragmaShortcircuit(bool evalvalue);
 		//! Emit pragma shortcircuit opcode 'nop' offset
 		void emitPragmaShortcircuitMetadata(uint32_t label);
+		//! Emit pragma shortcircuit opcode 
+		void emitPragmaShortcircuitMutateToBool(uint32_t lvid, uint32_t  source);
+
 		//! Emit pragma builtinalias
 		void emitPragmaBuiltinAlias(const AnyString& name);
 		//! Emit pragma suggest

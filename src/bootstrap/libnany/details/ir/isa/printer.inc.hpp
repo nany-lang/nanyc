@@ -704,6 +704,12 @@ namespace // anonymous
 						out << (1 + operands.value.shortcircuitMetadata.label);
 						break;
 					}
+					case Pragma::shortcircuitMutateToBool:
+					{
+						line() << "pragma shortcircuit mutate to bool: %";
+						out << operands.value.shortcircuitMutate.lvid;
+						out << " = new bool %" << operands.value.shortcircuitMutate.source;
+					}
 					case Pragma::builtinalias:
 					{
 						line() << "pragma builtinalias ";

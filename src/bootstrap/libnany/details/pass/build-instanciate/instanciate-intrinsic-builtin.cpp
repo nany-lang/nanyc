@@ -410,7 +410,7 @@ namespace Instanciate
 
 		nytype_t rettype = (R == nyt_any) ? builtinlhs : R;
 
-		if (atomBuiltinCast != nullptr) // the result is a real instance
+		if (atomBuiltinCast != nullptr and shortcircuit.label == 0) // the result is a real instance
 		{
 			// implicit convertion from builtin (__i32...) to object (i32...)
 			if (R != nyt_any) // force the result type

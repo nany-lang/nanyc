@@ -1,6 +1,7 @@
 #include "instanciate.h"
 #include "instanciate-atom.h"
 #include "overloaded-func-call-resolution.h"
+#include <iostream>
 
 using namespace Yuni;
 
@@ -275,8 +276,9 @@ namespace Instanciate
 		// (with the exact value shortcircuit.label + 1), followed by a few 'nop' opcodes
 		uint32_t label = shortcircuit.label;
 		uint32_t lvid  = label + 1;
+		uint32_t lvidBoolResult = label + 2;
 
-		if (not frame->verify(lvid))
+		if (not frame->verify(lvid) or not frame->verify(lvidBoolResult))
 			return false;
 
 		uint32_t offset = frame->lvids[lvid].offsetDeclOut;
@@ -297,6 +299,8 @@ namespace Instanciate
 
 			uint32_t newlvid = out.at<IR::ISA::Op::stackalloc>(offset).lvid;
 			++offset;
+			std::cout << "------ " << out.at(offset).opcodes[0] << '\n';
+			std::cout << "------ " << (uint32_t) IR::ISA::Op::label << '\n';
 			assert(out.at(offset).opcodes[0] == static_cast<uint32_t>(IR::ISA::Op::nop));
 
 			auto& fieldget  = out.at<IR::ISA::Op::fieldget>(offset);

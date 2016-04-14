@@ -382,14 +382,14 @@ namespace IR
 
 	inline void Sequence::emitPragmaSuggest(bool onoff)
 	{
-		auto& opc = emit<ISA::Op::pragma>();
+		auto& opc  = emit<ISA::Op::pragma>();
 		opc.pragma = static_cast<uint32_t>(IR::ISA::Pragma::suggest);
 		opc.value.suggest = static_cast<uint32_t>(onoff);
 	}
 
 	inline void Sequence::emitPragmaBuiltinAlias(const AnyString& name)
 	{
-		auto& opc = emit<ISA::Op::pragma>();
+		auto& opc  = emit<ISA::Op::pragma>();
 		opc.pragma = static_cast<uint32_t>(IR::ISA::Pragma::builtinalias);
 		opc.value.builtinalias.namesid = stringrefs.ref(name);
 	}
@@ -397,16 +397,25 @@ namespace IR
 
 	inline void Sequence::emitPragmaShortcircuit(bool evalvalue)
 	{
-		auto& opc = emit<ISA::Op::pragma>();
+		auto& opc  = emit<ISA::Op::pragma>();
 		opc.pragma = static_cast<uint32_t>(IR::ISA::Pragma::shortcircuit);
 		opc.value.shortcircuit = static_cast<uint32_t>(evalvalue);
 	}
 
 	inline void Sequence::emitPragmaShortcircuitMetadata(uint32_t label)
 	{
-		auto& opc = emit<ISA::Op::pragma>();
+		auto& opc  = emit<ISA::Op::pragma>();
 		opc.pragma = static_cast<uint32_t>(IR::ISA::Pragma::shortcircuitOpNopOffset);
 		opc.value.shortcircuitMetadata.label = label;
+	}
+
+
+	inline void Sequence::emitPragmaShortcircuitMutateToBool(uint32_t lvid, uint32_t source)
+	{
+		auto& opc  = emit<ISA::Op::pragma>();
+		opc.pragma = static_cast<uint32_t>(IR::ISA::Pragma::shortcircuitMutateToBool);
+		opc.value.shortcircuitMutate.lvid = lvid;
+		opc.value.shortcircuitMutate.source = source;
 	}
 
 

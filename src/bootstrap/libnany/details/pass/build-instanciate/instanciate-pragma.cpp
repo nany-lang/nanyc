@@ -153,6 +153,39 @@ namespace Instanciate
 				break;
 			}
 
+			case IR::ISA::Pragma::shortcircuitMutateToBool:
+			{
+				uint32_t lvid = operands.value.shortcircuitMutate.lvid;
+				uint32_t source = operands.value.shortcircuitMutate.source;
+
+				frame->lvids[lvid].synthetic = false;
+
+				if (true)
+				{
+					auto& instr = *(*cursor - 1);
+					assert(instr.opcodes[0] == static_cast<uint32_t>(IR::ISA::Op::stackalloc));
+					uint32_t sizeoflvid = instr.to<IR::ISA::Op::stackalloc>().lvid;
+
+					// sizeof
+					auto& atombool = *(cdeftable.atoms().core.object[nyt_bool]);
+					out.emitSizeof(sizeoflvid, atombool.atomid);
+
+					auto& opc = cdeftable.substitute(lvid);
+					opc.mutateToAtom(&atombool);
+					opc.qualifiers.ref = true;
+
+					// ALLOC: memory allocation of the new temporary object
+					out.emitMemalloc(lvid, sizeoflvid);
+					out.emitRef(lvid);
+					frame->lvids[lvid].autorelease = true;
+					// reset the internal value of the object
+					out.emitFieldset(source, /*self*/lvid, 0); // builtin
+				}
+				else
+					out.emitStore(lvid, source);
+				break;
+			}
+
 			case IR::ISA::Pragma::suggest:
 			case IR::ISA::Pragma::builtinalias:
 			case IR::ISA::Pragma::shortcircuit:

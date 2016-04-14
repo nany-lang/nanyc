@@ -412,14 +412,12 @@ namespace Mapping
 			{
 				break;
 			}
-
 			case IR::ISA::Pragma::builtinalias:
 			{
 				Atom& atom = atomStack->atom;
 				atom.builtinalias = currentSequence.stringrefs[operands.value.builtinalias.namesid];
 				break;
 			}
-
 			case IR::ISA::Pragma::shortcircuit:
 			{
 				bool onoff = (0 != operands.value.shortcircuit);
@@ -440,6 +438,7 @@ namespace Mapping
 			case IR::ISA::Pragma::visibility:
 			case IR::ISA::Pragma::bodystart:
 			case IR::ISA::Pragma::shortcircuitOpNopOffset:
+			case IR::ISA::Pragma::shortcircuitMutateToBool:
 			case IR::ISA::Pragma::unknown:
 			case IR::ISA::Pragma::max:
 			{
