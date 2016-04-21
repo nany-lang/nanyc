@@ -2,7 +2,7 @@
 #include "details/ir/sequence.h"
 #include "nany/nany.h"
 #include "details/atom/atom-map.h"
-#include "details/context/context.h"
+#include "details/context/build.h"
 #include "libnany-config.h"
 
 
@@ -19,7 +19,7 @@ namespace VM
 		/*!
 		** \brief Create a brand new program
 		*/
-		Program(nycontext_t&, const AtomMap&);
+		Program(Build&, const AtomMap&);
 
 		/*!
 		** \brief Create a program from another program
@@ -34,12 +34,21 @@ namespace VM
 		*/
 		bool execute(uint32_t atomid, uint32_t instanceid);
 
+		/*!
+		** \brief Print a message on the console
+		*/
+		void printStderr(const AnyString& msg);
+
+		nyprogram_t* self();
+		const nyprogram_t* self() const;
+
 
 	public:
-		// TODO make it independent from the compilation process
+		//! Settings
+		nyprogram_cf_t cf;
 
-		//! User context
-		nycontext_t& context;
+		//! User build
+		Build& build;
 		//! Atom Map
 		const AtomMap& map;
 

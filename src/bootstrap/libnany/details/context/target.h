@@ -16,17 +16,17 @@ namespace Yuni { namespace Job { class Taskgroup; }}
 namespace Nany
 {
 
-	class Context;
+	class Project;
 	class BuildInfoContext;
 
 
 
 	class CTarget final
-		: public Yuni::IIntrusiveSmartPtr<CTarget, false, Yuni::Policy::ObjectLevelLockable>
+		: public Yuni::IIntrusiveSmartPtr<CTarget, false, Yuni::Policy::SingleThreaded>
 	{
 	public:
 		//! The class ancestor
-		typedef Yuni::IIntrusiveSmartPtr<CTarget, false, Yuni::Policy::ObjectLevelLockable>  Ancestor;
+		typedef Yuni::IIntrusiveSmartPtr<CTarget, false, Yuni::Policy::SingleThreaded>  Ancestor;
 		//! The most suitable smart ptr for the class
 		typedef Ancestor::SmartPtrType<CTarget>::Ptr  Ptr;
 		//! Threading policy
@@ -42,13 +42,16 @@ namespace Nany
 		//! \name Constructor & Destructor
 		//@{
 		//! Default constructor
-		explicit CTarget(Context* ctx, const AnyString& name);
+		explicit CTarget(nyproject_t*, const AnyString& name);
 		//! Copy constructor
-		CTarget(Context* ctx, const CTarget&);
+		CTarget(nyproject_t*, const CTarget&);
+
 		//! Destructor
 		~CTarget();
 		//@}
 
+		//! Target name
+		AnyString name() const;
 
 		//! Rename the target
 		bool rename(AnyString newname);
@@ -59,9 +62,7 @@ namespace Nany
 
 		void build(BuildInfoContext&, Yuni::Job::Taskgroup& task, Logs::Report& report);
 
-		//! not enough memory
-		void notifyNotEnoughMemory() const;
-		void notifyErrorFileAccess(const AnyString&) const;
+		template<class T> void eachSource(const T& callback);
 
 
 		//! \name Operators
@@ -72,12 +73,9 @@ namespace Nany
 
 
 	private:
-		void resetContext(Context* ctx);
-		void fetchSourceList(BuildInfoContext&);
+		//! Attached project
+		nyproject_t* project = nullptr;
 
-	private:
-		//! Parent context
-		Context* pContext = nullptr;
 		//! Name of the target
 		Yuni::ShortString64 pName;
 		//! All sources attached to the target

@@ -5,13 +5,18 @@
 namespace Nany
 {
 
-	inline void CTarget::resetContext(Context* ctx)
+	inline AnyString CTarget::name() const
 	{
-		ThreadingPolicy::MutexLocker locker{*this};
-		pContext = ctx;
+		return pName;
 	}
 
 
+	template<class T>
+	inline void CTarget::eachSource(const T& callback)
+	{
+		for (auto& ptr: pSources)
+			callback(*ptr);
+	}
 
 
 

@@ -8,6 +8,7 @@
 #include "libnany-config.h"
 #include "details/reporting/report.h"
 #include <memory>
+#include "details/context/build.h"
 
 using namespace Yuni;
 
@@ -63,49 +64,28 @@ namespace Nany
 
 	bool Source::isOutdated(yint64& lastModified) const
 	{
-		ThreadingPolicy::MutexLocker locker{*this};
 		return isOutdatedWL(lastModified);
 	}
 
 
-	void Source::clean()
+	bool Source::build(Build& build)
 	{
-		// BuildInfo will be deleted outside the critical section
-		decltype(pBuildInfo) deleter;
+		bool success = false;
+		yint64 modified = build.buildtime;
 
-		{
-			ThreadingPolicy::MutexLocker locker{*this};
-			std::swap(pBuildInfo, deleter);
-			pLastCompiled = 0;
-
-			if (pType == Type::file)
-			{
-				pContent.clear();
-				pContent.shrink();
-			}
-		}
-	}
-
-
-	bool Source::build(BuildInfoContext& ctx, Logs::Report& reporttarget)
-	{
-		bool astSuccess = false;
-		yint64 modified = ctx.buildtime;
-
-		ThreadingPolicy::MutexLocker locker{*this};
 		try
 		{
 			if (not isOutdatedWL(modified))
 			{
-				astSuccess = true; // not modified
+				success = true; // not modified
 			}
 			else
 			{
 				if (modified <= 0)
-					modified = ctx.buildtime;
+					modified = build.buildtime;
 
 				// create a new report entry
-				auto report = reporttarget.subgroup();
+				auto report = Logs::Report{*build.messages}.subgroup();
 
 				// reporting
 				if (pFilename.first() != '{')
@@ -121,15 +101,19 @@ namespace Nany
 				}
 
 				// assuming it will succeed, will be reverted to false as soon as something goes wrong
-				astSuccess = true;
+				success = true;
 
 				if (pType == Type::file)
 				{
 					pContent.clear();
 					pContent.shrink();
-					astSuccess = (IO::errNone == IO::File::LoadFromFile(pContent, pFilename));
-					if (unlikely(not astSuccess and pTarget))
-						pTarget->notifyErrorFileAccess(pFilename);
+					success = (IO::errNone == IO::File::LoadFromFile(pContent, pFilename));
+					if (unlikely(not success and pTarget))
+					{
+						auto f = build.cf.on_error_file_eacces;
+						if (f)
+							f(build.project.self(), build.self(), pFilename.c_str(), pFilename.size());
+					}
 				}
 
 				// reset build-info
@@ -138,70 +122,51 @@ namespace Nany
 				pBuildInfo.reset(nullptr); // making sure that the memory is released first
 				pBuildInfo = std::make_unique<BuildInfoSource>();
 
-				if (astSuccess) // file not opened
+				if (success) // file not opened
 				{
 					// creates an AST from source code
-					astSuccess &= passASTFromSourceWL();
+					success &= passASTFromSourceWL();
 					// duplicates the AST and normalize it on-the-fly
-					astSuccess &= passDuplicateAndNormalizeASTWL(report);
+					success &= passDuplicateAndNormalizeASTWL(report);
 					// uses the normalized AST to generate high-level nany-IR
-					astSuccess &= passTransformASTToIRWL(report);
+					success &= passTransformASTToIRWL(report);
 
 					// attach the new sequence to the execution context
-					if (astSuccess)
+					if (success)
 					{
 						auto& sequence = pBuildInfo->parsing.sequence;
-						astSuccess &= ctx.isolate.attach(sequence, report);
+						success &= build.attach(sequence, report);
 					}
 				}
 
 				// keep the result of the process somewhere
-				pBuildInfo->parsing.success = astSuccess;
+				pBuildInfo->parsing.success = success;
 			}
 		}
 		catch (std::bad_alloc&)
 		{
-			if (pTarget)
-				pTarget->notifyNotEnoughMemory();
-			astSuccess = false;
+			build.printStderr("ICE: not enough memory");
+			success = false;
 		}
 		catch (...)
 		{
-			auto report = reporttarget.subgroup();
+			auto report = Logs::Report{*build.messages};
 			report.ICE() << "uncaught exception when building '" << pFilename << "'";
-			astSuccess = false;
+			success = false;
 		}
 
-		if (not astSuccess)
+		if (not success)
 		{
 			pLastCompiled = 0; // error
-
 			// update the global status
-			MutexLocker buildMutexLocker{ctx};
-			ctx.success = false;
+			build.success = false;
 		}
 		else
 			pLastCompiled = modified;
 
-		return astSuccess;
+		return success;
 	}
 
-
-
-	void Source::build(BuildInfoContext& ctx, Yuni::Job::Taskgroup& task, Logs::Report& reporttarget)
-	{
-		Source* self = this;
-		self->addRef();
-
-		async(task, [&,self](Job::IJob&) -> bool
-		{
-			bool success = self->build(ctx, reporttarget);
-			// release the internal refcount but not delete ourselves
-			self->release();
-
-			return success;
-		});
-	}
 
 
 

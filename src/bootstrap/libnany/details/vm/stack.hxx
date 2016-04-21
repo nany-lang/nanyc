@@ -20,7 +20,7 @@ namespace VM
 		}
 
 		DataRegister* registers = current->cursor;
-		current->cursor += count;
+		current->cursor  += count;
 		current->remains -= count;
 		if (Yuni::debugmode)
 			memset(registers, 0xDE, sizeof(DataRegister) * count);

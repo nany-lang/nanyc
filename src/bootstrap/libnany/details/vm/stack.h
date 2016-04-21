@@ -1,6 +1,7 @@
 #pragma once
 #include "types.h"
 #include "nany/nany.h"
+#include "details/context/build.h"
 
 
 
@@ -15,7 +16,7 @@ namespace VM
 	class Stack final
 	{
 	public:
-		explicit Stack(nycontext_t&);
+		explicit Stack(Build&);
 		~Stack();
 
 		/*!
@@ -45,7 +46,7 @@ namespace VM
 
 		Chunk* current = nullptr;
 		Chunk* allocated = nullptr;
-		nycontext_t& context;
+		Build& build;
 	};
 
 

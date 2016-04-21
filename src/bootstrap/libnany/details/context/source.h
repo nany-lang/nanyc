@@ -17,16 +17,16 @@ namespace Nany
 
 	class CTarget;
 	class BuildInfoSource;
-	class BuildInfoContext;
+	class Build;
 
 
 
 	class Source final
-		: public Yuni::IIntrusiveSmartPtr<Source, false, Yuni::Policy::ObjectLevelLockable>
+		: public Yuni::IIntrusiveSmartPtr<Source, false, Yuni::Policy::SingleThreaded>
 	{
 	public:
 		//! The class ancestor
-		typedef Yuni::IIntrusiveSmartPtr<Source, false, Yuni::Policy::ObjectLevelLockable>  Ancestor;
+		typedef Yuni::IIntrusiveSmartPtr<Source, false, Yuni::Policy::SingleThreaded>  Ancestor;
 		//! The most suitable smart ptr for the class
 		typedef Ancestor::SmartPtrType<Source>::Ptr  Ptr;
 		//! Threading policy
@@ -55,17 +55,10 @@ namespace Nany
 		*/
 		bool isOutdated(yint64& lastModified) const;
 
-		void clean();
-
-		/*!
-		** \brief Add a task for building this source
-		*/
-		void build(BuildInfoContext&, Yuni::Job::Taskgroup& task, Logs::Report& report);
-
 		/*!
 		** \brief Build this source
 		*/
-		bool build(BuildInfoContext&, Logs::Report& report);
+		bool build(Build&);
 
 		Source& operator = (const Source&) = delete;
 

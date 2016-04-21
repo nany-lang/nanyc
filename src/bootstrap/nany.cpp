@@ -8,11 +8,34 @@
 #include <iostream>
 #include <cassert>
 #include <limits.h>
+#include <memory>
 
 using namespace Yuni;
 
 static const char* argv0 = "";
 
+
+
+
+namespace std
+{
+	template<> struct default_delete<nyproject_t>
+	{
+		void operator () (nyproject_t* ptr)
+		{
+			nany_project_unref(&ptr);
+		}
+	};
+
+	template<> struct default_delete<nybuild_t>
+	{
+		void operator () (nybuild_t* ptr)
+		{
+			nany_build_unref(&ptr);
+		}
+	};
+
+} // namespace std
 
 
 struct Options
@@ -66,52 +89,59 @@ static int unknownOption(const AnyString& name)
 }
 
 
-static inline bool initializeContext(nycontext_t& ctx, const Options& options)
+static inline std::unique_ptr<nyproject_t> createProject(const Options& options)
 {
-	size_t memoryLimit = options.memoryLimit;
-	if (memoryLimit == 0)
-		memoryLimit = static_cast<size_t>(System::Environment::ReadAsUInt64("NANY_MEMORY_LIMIT", 0));
+	nyproject_cf_t cf;
+	nany_project_cf_reset(&cf);
 
-	if (memoryLimit == 0)
+	size_t limit = options.memoryLimit;
+	if (limit == 0)
+		limit = static_cast<size_t>(System::Environment::ReadAsUInt64("NANY_MEMORY_LIMIT", 0));
+
+	if (limit != 0)
+		nany_memalloc_set_with_limit(&cf.allocator, limit);
+
+	return std::unique_ptr<nyproject_t>{nany_project_create_ref(&cf)};
+}
+
+
+static bool compile(const char* argv0, const Options& options)
+{
+	auto project = createProject(options);
+	if (!project)
+		return false;
+
+	// sources
 	{
-		// internal: using nullptr should be slighty faster than
-		// using 'nany_memalloc_init_default' + custom memalloc as parameter
-		if (nyfalse == nany_initialize(&ctx, nullptr, nullptr))
+		String file;
+		IO::Canonicalize(file, argv0);
+		auto r = nany_project_add_source_from_file_n(project.get(), file.c_str(), file.size());
+		if (r != nytrue)
 			return false;
 	}
-	else
-	{
-		nycontext_memory_t memalloc;
-		nany_memalloc_set_with_limit(&memalloc, memoryLimit);
-		if (nyfalse == nany_initialize(&ctx, nullptr, &memalloc))
-			return false;
-	}
 
-	// for concurrent build, create a queue service if more than
-	// one concurrent job is allowed
-	if (options.jobs > 1)
-		ctx.mt.queueservice = nany_queueservice_create();
-	return true;
+	nybuild_cf_t cf;
+	nany_build_cf_reset(&cf, project.get());
+	auto build = std::unique_ptr<nybuild_t>{nany_build_prepare(project.get(), &cf)};
+	if (!build)
+		return false;
+
+	if (nyfalse == nany_build(build.get()))
+		return false;
+
+	return false;
 }
 
 
 static inline int execute(int argc, char** argv, const Options& options)
 {
 	assert(argc >= 1);
+
+	compile(argv[0], options);
+
 	int exitstatus = 66;
-
-	// nany context
-	nycontext_t ctx;
-	bool init = initializeContext(ctx, options);
-	if (YUNI_UNLIKELY(not init))
-		return exitstatus;
-
-	// sources
-	String scriptfile;
-	IO::Canonicalize(scriptfile, argv[0]);
-	auto r = nany_source_add_from_file_n(&ctx, scriptfile.c_str(), scriptfile.size());
-	init = (r == nytrue);
-
+	return exitstatus;
+	/*
 	// building
 	bool buildstatus;
 	if (init)
@@ -153,7 +183,7 @@ static inline int execute(int argc, char** argv, const Options& options)
 		}
 	}
 
-	nany_uninitialize(&ctx);
+	nany_uninitialize(&ctx);*/
 	return exitstatus;
 }
 

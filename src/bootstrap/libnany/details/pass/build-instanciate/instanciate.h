@@ -1,8 +1,8 @@
 #pragma once
 #include <yuni/yuni.h>
 #include <yuni/core/string/string.h>
+#include "details/context/build.h"
 #include "details/atom/classdef-table-view.h"
-#include "details/ir/isa/opcodes.h"
 #include "details/ir/isa/data.h"
 #include "details/atom/func-overload-match.h"
 #include "details/ir/sequence.h"
@@ -14,6 +14,7 @@
 namespace Nany
 {
 	class IntrinsicTable;
+	class Build;
 }
 
 
@@ -60,8 +61,8 @@ namespace Instanciate
 		//! \name Constructor & Destructor
 		//@{
 		//! Default constructor (importSignature must be called after)
-		SequenceBuilder(Logs::Report report, ClassdefTableView&, nycontext_t& context,
-			IR::Sequence& out, IR::Sequence& sequence, SequenceBuilder* parent = nullptr);
+		SequenceBuilder(Logs::Report, ClassdefTableView&, Build&,
+			IR::Sequence& out, IR::Sequence&, SequenceBuilder* parent = nullptr);
 
 		//! Prepare the first local registers according the given signature
 		void pushParametersFromSignature(LVID atomid, const Signature&);
@@ -323,8 +324,8 @@ namespace Instanciate
 
 		// Isolate
 		ClassdefTableView cdeftable;
-		//! Context
-		nycontext_t& context;
+		//! Build context
+		Build& build;
 		//! intrinsics
 		const IntrinsicTable& intrinsics;
 		// New opcode sequence

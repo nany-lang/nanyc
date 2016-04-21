@@ -1,10 +1,7 @@
 #include "nany/nany.h"
-#include <yuni/core/system/console/console.h>
 #include <yuni/string.h>
 
 using namespace Yuni;
-
-
 
 
 
@@ -14,8 +11,7 @@ extern "C" nyvisibility_t  nany_cstring_to_visibility_n(const char* const text, 
 {
 	AnyString s{text, (uint32_t)length};
 	s.trim();
-
-	if (s.empty())
+	if (YUNI_UNLIKELY(s.empty()))
 		return nyv_default;
 
 	switch (s[0])
@@ -45,7 +41,7 @@ extern "C" nyvisibility_t  nany_cstring_to_visibility_n(const char* const text, 
 
 extern "C" const char* nany_visibility_to_cstring(nyvisibility_t visibility)
 {
-	static constexpr const char* const values[(uint) nyv_max] =
+	static constexpr const char* const values[(uint32_t) nyv_max] =
 	{
 		"undefined",
 		"default",
@@ -55,6 +51,6 @@ extern "C" const char* nany_visibility_to_cstring(nyvisibility_t visibility)
 		"public",
 		"published"
 	};
-	uint index = (uint) visibility;
-	return (index < (uint) nyv_max) ? values[index] : values[index];
+	uint32_t index = (uint32_t) visibility;
+	return (index < (uint32_t) nyv_max) ? values[index] : values[index];
 }

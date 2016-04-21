@@ -14,47 +14,45 @@ namespace Builtin
 {
 
 
-	static void* yn_string_new(nytctx_t* tctx)
+	static void* yn_string_new(nyprogram_cf_t* tctx)
 	{
-		void* p = tctx->context->memory.allocate(tctx->context, sizeof(String));
-		return new (p) String{};
+		return tctx_allocate<String>(tctx);
 	}
 
-	static void yn_string_delete(nytctx_t* tctx, void* string)
+	static void yn_string_delete(nyprogram_cf_t* tctx, void* string)
 	{
-		(reinterpret_cast<String*>(string))->~String();
-		tctx->context->memory.release(tctx->context, string, sizeof(String));
+		tctx_deallocate(tctx, reinterpret_cast<String*>(string));
 	}
 
-	static uint64_t yn_string_size(nytctx_t*, void* string)
+	static uint64_t yn_string_size(nyprogram_cf_t*, void* string)
 	{
 		return (reinterpret_cast<String*>(string))->size();
 	}
 
-	static void yn_string_append_str(nytctx_t*, void* string, void* rhs)
+	static void yn_string_append_str(nyprogram_cf_t*, void* string, void* rhs)
 	{
 		auto& other = *(reinterpret_cast<String*>(rhs));
 		reinterpret_cast<String*>(string)->append(other);
 	}
 
-	static void yn_string_append_cstring(nytctx_t*, void* string, void* ptr, uint64_t size)
+	static void yn_string_append_cstring(nyprogram_cf_t*, void* string, void* ptr, uint64_t size)
 	{
 		const char* const text = reinterpret_cast<const char* const>(ptr);
 		reinterpret_cast<String*>(string)->append(text, static_cast<uint32_t>(size));
 	}
 
 
-	static void yn_string_clear(nytctx_t*, void* string)
+	static void yn_string_clear(nyprogram_cf_t*, void* string)
 	{
 		reinterpret_cast<String*>(string)->clear();
 	}
 
 
 
-	static void yn_string_cout(nytctx_t* tctx, void* string)
+	static void yn_string_cout(nyprogram_cf_t* tctx, void* string)
 	{
 		auto& str = *(reinterpret_cast<String*>(string));
-		tctx->context->console.write_stdout(tctx->context, str.c_str(), str.size());
+		tctx_print(tctx, str);
 	}
 
 
@@ -64,7 +62,7 @@ namespace Builtin
 	template<> struct IntCast<int16_t> { typedef int32_t value; };
 	template<> struct IntCast<uint16_t> { typedef uint32_t value; };
 
-	template<class T> static void yn_string_append(nytctx_t*, void* string, T value)
+	template<class T> static void yn_string_append(nyprogram_cf_t*, void* string, T value)
 	{
 		reinterpret_cast<String*>(string)->append(static_cast<typename IntCast<T>::value>(value));
 	}

@@ -12,13 +12,10 @@ namespace Nany
 namespace VM
 {
 
-	Stack::Stack(nycontext_t& context)
-		: context(context)
+	Stack::Stack(Build& build)
+		: build(build)
 	{
-		current = (Chunk*) context.memory.allocate(&context, sizeof(Chunk));
-		if (YUNI_UNLIKELY(!current))
-			throw std::bad_alloc();
-
+		current = build.allocate<Chunk>();
 		current->remains  = Chunk::max;
 		current->next     = nullptr;
 		current->previous = nullptr;
@@ -30,10 +27,11 @@ namespace VM
 	Stack::~Stack()
 	{
 		auto* c = allocated;
+		assert(c != nullptr);
 		do
 		{
 			auto* previous = c->previous;
-			context.memory.release(&context, c, sizeof(Chunk));
+			build.deallocate(c);
 			c = previous;
 		}
 		while (c);
@@ -42,10 +40,7 @@ namespace VM
 
 	void Stack::expandChunk()
 	{
-		Chunk* chunk = (Chunk*) context.memory.allocate(&context, sizeof(Chunk));
-		if (!chunk)
-			throw std::bad_alloc();
-
+		auto* chunk     = build.allocate<Chunk>();
 		chunk->next     = nullptr;
 		chunk->previous = current;
 		chunk->remains  = Chunk::max;
@@ -53,6 +48,7 @@ namespace VM
 		current->next   = chunk;
 		allocated = chunk;
 	}
+
 
 
 

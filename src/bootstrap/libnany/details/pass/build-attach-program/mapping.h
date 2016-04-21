@@ -6,7 +6,7 @@
 #include "details/atom/atom.h"
 #include "details/reporting/report.h"
 #include "details/ir/isa/opcodes.h"
-#include "details/context/isolate.h"
+#include "details/ir/instruction.h"
 
 
 

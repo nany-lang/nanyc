@@ -2,7 +2,6 @@
 #include "details/ir/isa/data.h"
 #include "details/atom/atom.h"
 #include "details/intrinsic/intrinsic-table.h"
-#include "details/context/context.h"
 #include "stacktrace.h"
 #include "memchecker.h"
 #include <iostream>
@@ -86,10 +85,8 @@ namespace // anonymous
 
 		//! Source sequence
 		std::reference_wrapper<const IR::Sequence> sequence;
-		//! User context
-		nycontext_t& context;
-		//! Thread context
-		nytctx_t threadcontext;
+		//! Settings
+		nyprogram_cf_t cf;
 
 		//! All user-defined intrinsics
 		const IntrinsicTable& userDefinedIntrinsics;
@@ -99,38 +96,52 @@ namespace // anonymous
 		//! Reference to the current iterator
 		const IR::Instruction** cursor = nullptr;
 
+		//! Attached program
+		const Program& program;
+
 
 	public:
-		ThreadContext(const AtomMap& map, nycontext_t& context, const IR::Sequence& sequence)
-			: stack(context)
-			, map(map)
+		ThreadContext(const Program& program, const IR::Sequence& sequence)
+			: stack(program.build)
+			, map(program.map)
 			, sequence(std::cref(sequence))
-			, context(context)
-			, userDefinedIntrinsics(((Context*)context.internal)->intrinsics)
+			, cf(program.cf)
+			, userDefinedIntrinsics(program.build.intrinsics)
+			, program(program)
 		{
+			// set the current thread context
+			cf.tctx = reinterpret_cast<nytctx_t*>(this);
+
+			// dynamic C calls
 			dyncall = dcNewCallVM(4096);
 			dcMode(dyncall, DC_CALL_C_DEFAULT);
-
-			memset(&threadcontext, 0x0, sizeof(threadcontext));
-			threadcontext.internal = this;
-			threadcontext.context = &context;
 		}
 
 		~ThreadContext()
 		{
 			if (dyncall)
 				dcFree(dyncall);
-			memchecker.printLeaksIfAny(context);
+			memchecker.printLeaksIfAny(cf);
 		}
+
+		//! Allocate a new memory region
+		template<class T> T* allocateraw(size_t size);
+		//! delete a memory region
+		void deallocate(void* object, size_t size);
+
+		/*!
+		** \brief Print a message on the console
+		*/
+		void printStderr(const AnyString& msg);
 
 
 		inline void triggerEventsDestroy()
 		{
-			if (threadcontext.on_thread_destroy)
+			/*if (threadcontext.on_thread_destroy)
 				threadcontext.on_thread_destroy(&threadcontext);
 
 			if (context.mt.on_thread_destroy)
-				context.mt.on_thread_destroy(&threadcontext);
+				context.mt.on_thread_destroy(&threadcontext);*/
 		}
 
 
@@ -147,7 +158,7 @@ namespace // anonymous
 			{
 				std::cout << " .. DESTROY " << (void*) object << " aka '"
 					<< dtor->caption() << "' at opc+" << sequence.get().offsetOf(**cursor) << '\n';
-				stacktrace.dump(context, map);
+				stacktrace.dump(program.build, map);
 				std::cout << '\n';
 			}
 
@@ -173,7 +184,7 @@ namespace // anonymous
 				memset(object, patternFree, classsizeof);
 
 			// sandbox release
-			context.memory.release(&context, object, static_cast<size_t>(classsizeof));
+			deallocate(object, static_cast<size_t>(classsizeof));
 			memchecker.forget(object);
 		}
 
@@ -253,7 +264,7 @@ namespace // anonymous
 		{
 			VM_PRINT_OPCODE(operands);
 			dcReset(dyncall);
-			dcArgPointer(dyncall, &threadcontext);
+			dcArgPointer(dyncall, &cf);
 
 			auto& intrinsic = userDefinedIntrinsics[opr.iid];
 			for (uint32_t i = 0; i != funcparamCount; ++i)
@@ -726,10 +737,7 @@ namespace // anonymous
 			size_t size = static_cast<size_t>(registers[operands.regsize].u64);
 			size += sizeof(uint64_t); // reference counter
 
-			uint64_t* pointer = (uint64_t*) context.memory.allocate(&context, size);
-			if (unlikely(!pointer))
-				throw std::bad_alloc();
-
+			uint64_t* pointer = allocateraw<uint64_t>(size);
 			if (debugmode)
 				memset(pointer, patternAlloc, size);
 
@@ -757,7 +765,7 @@ namespace // anonymous
 			if (debugmode)
 				memset(object, patternFree, size);
 
-			context.memory.release(&context, object, size);
+			deallocate(object, size);
 			memchecker.forget(object);
 		}
 
@@ -829,33 +837,53 @@ namespace // anonymous
 			}
 			catch (const std::exception& e)
 			{
-				String msg;
-				msg << "\n\nexception: " << e.what() << '\n';
-				context.console.write_stderr(&context, msg.c_str(), msg.size());
+				printStderr("\n\nexception: ");
+				printStderr(e.what());
+				printStderr("\n");
 			}
 			catch (const String& incoming)
 			{
-				String msg;
-				msg << "\n\nexception: " << incoming << '\n';
-				context.console.write_stderr(&context, msg.c_str(), msg.size());
+				printStderr("\n\nexception: ");
+				printStderr(incoming);
+				printStderr("\n");
 			}
 			catch (...)
 			{
-				AnyString msg{"\n\nexception: unexpected error\n"};
-				context.console.write_stderr(&context, msg.c_str(), msg.size());
+				printStderr("\n\nexception: unexpected error\n");
 			}
 
-			stacktrace.dump(context, map);
+			stacktrace.dump(program.build, map);
 
 			// invalid data related to allocated pointers to avoid invalid err messages
 			memchecker.clear();
 			throw CodeAbort{}; // re-throw
-			return (uint64_t) -1;
+			return static_cast<uint64_t>(-1);
 		}
 
-
-
 	}; // class ThreadContext
+
+
+
+	template<class T> inline T* ThreadContext::allocateraw(size_t size)
+	{
+		T* ptr = (T*) cf.allocator.allocate(&cf.allocator, size);
+		if (YUNI_UNLIKELY(!ptr))
+			throw std::bad_alloc();
+		return ptr;
+	}
+
+
+	inline void ThreadContext::deallocate(void* object, size_t size)
+	{
+		assert(object != nullptr);
+		cf.allocator.deallocate(&cf.allocator, object, size);
+	}
+
+
+	inline void ThreadContext::printStderr(const AnyString& msg)
+	{
+		cf.console.write_stderr(cf.console.internal, msg.c_str(), msg.size());
+	}
 
 
 
@@ -873,16 +901,8 @@ namespace // anonymous
 
 		try
 		{
-			if (context.program.on_start)
-			{
-				const char* argv[] = { "script.ny" };
-				auto query = context.program.on_start(&context, 1, argv);
-				if (unlikely(nyfalse == query))
-					throw CodeAbort();
-			}
-
 			auto& sequence = map.sequence(atomid, instanceid);
-			ThreadContext thrctx{map, context, sequence};
+			ThreadContext thrctx{*this, sequence};
 
 			thrctx.stacktrace.push(atomid, instanceid);
 			retvalue = thrctx.invoke(sequence);
@@ -898,31 +918,21 @@ namespace // anonymous
 		}
 		catch (const std::exception& e)
 		{
-			String msg; msg << "error: exception: " << e.what() << '\n';
-			context.console.write_stderr(&context, msg.c_str(), msg.size());
+			printStderr("error: exception: ");
+			printStderr(e.what());
+			printStderr("\n");
 		}
 		catch (...)
 		{
-			AnyString txt{"error: exception received: aborting\n"};
-			context.console.write_stderr(&context, txt.c_str(), txt.size());
-		}
-
-
-		if (success)
-		{
-			if (context.program.on_stop)
-				context.program.on_stop(&context, 0);
-		}
-		else
-		{
-			if (context.program.on_failed)
-				context.program.on_failed(&context, 0);
+			printStderr("error: exception received: aborting\n");
 		}
 
 		// always flush to make sure that the listener will update the output
-		// (mainly when embedded into a C/C++ application)
-		context.console.flush_stderr(&context);
-		context.console.flush_stdout(&context);
+		// (especially useful when embedded into a C/C++ application)
+		if (cf.console.flush_stderr)
+			cf.console.flush_stderr(cf.console.internal);
+		if (cf.console.flush_stdout)
+			cf.console.flush_stdout(cf.console.internal);
 		return success;
 	}
 

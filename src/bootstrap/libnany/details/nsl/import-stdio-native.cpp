@@ -14,36 +14,35 @@ namespace Builtin
 {
 
 
-	static bool yn_io_exists(nytctx_t*, void* flnmptr)
+	static bool yn_io_exists(nyprogram_cf_t*, void* flnmptr)
 	{
 		auto* filename = reinterpret_cast<String*>(flnmptr);
 		return (filename) ? IO::Exists(*filename) : false;
 	}
 
-	static bool yn_io_file_exists(nytctx_t*, void* flnmptr)
+	static bool yn_io_file_exists(nyprogram_cf_t*, void* flnmptr)
 	{
 		auto* filename = reinterpret_cast<String*>(flnmptr);
 		return (filename) ? IO::File::Exists(*filename) : false;
 	}
 
-	static uint64_t yn_io_file_size(nytctx_t*, void* flnmptr)
+	static uint64_t yn_io_file_size(nyprogram_cf_t*, void* flnmptr)
 	{
 		auto* filename = reinterpret_cast<String*>(flnmptr);
 		return (filename) ? IO::File::Size(*filename) : 0u;
 	}
 
-	static void* yn_io_file_load(nytctx_t* tctx, void* flnmptr)
+	static void* yn_io_file_load(nyprogram_cf_t* tctx, void* flnmptr)
 	{
-		void* p = tctx->context->memory.allocate(tctx->context, sizeof(String));
-		auto* string = new (p) String{};
+		auto* string = tctx_allocate<String>(tctx);
 
 		auto* filename = reinterpret_cast<String*>(flnmptr);
 		if (filename)
 			IO::File::LoadFromFile(*string, *filename, (uint64_t) -1);
-		return p;
+		return string;
 	}
 
-	static bool yn_io_file_save(nytctx_t*, void* flnmptr, void* contentptr)
+	static bool yn_io_file_save(nyprogram_cf_t*, void* flnmptr, void* contentptr)
 	{
 		auto* filename = reinterpret_cast<String*>(flnmptr);
 		auto* content  = reinterpret_cast<String*>(contentptr);
@@ -52,7 +51,7 @@ namespace Builtin
 			: false;
 	}
 
-	static bool yn_io_file_append(nytctx_t*, void* flnmptr, void* contentptr)
+	static bool yn_io_file_append(nyprogram_cf_t*, void* flnmptr, void* contentptr)
 	{
 		auto* filename = reinterpret_cast<String*>(flnmptr);
 		auto* content  = reinterpret_cast<String*>(contentptr);
@@ -61,7 +60,7 @@ namespace Builtin
 			: false;
 	}
 
-	static bool yn_io_file_erase(nytctx_t*, void* flnmptr)
+	static bool yn_io_file_erase(nyprogram_cf_t*, void* flnmptr)
 	{
 		auto* filename = reinterpret_cast<String*>(flnmptr);
 		return (filename) ? (IO::errNone == IO::File::Delete(*filename)) : false;

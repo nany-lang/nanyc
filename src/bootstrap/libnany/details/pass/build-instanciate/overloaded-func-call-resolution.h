@@ -1,5 +1,6 @@
 #pragma once
 #include <yuni/yuni.h>
+#include "details/context/build.h"
 #include "details/reporting/report.h"
 #include "details/atom/func-overload-match.h"
 #include "details/ir/sequence.h"
@@ -35,11 +36,11 @@ namespace Instanciate
 
 	public:
 		OverloadedFuncCallResolver(SequenceBuilder* parent, Logs::Report report, FuncOverloadMatch& overloadMatch, ClassdefTableView& cdeftable,
-			nycontext_t& context)
+			Build& build)
 			: overloadMatch(overloadMatch)
 			, report(report)
 			, cdeftable(cdeftable)
-			, context(context)
+			, build(build)
 			, parent(parent)
 		{}
 
@@ -77,8 +78,8 @@ namespace Instanciate
 		std::vector<bool> solutionsThatCanBeInstanciated;
 		//!
 		ClassdefTableView& cdeftable;
-		//! Parent context
-		nycontext_t& context;
+		//! Parent build
+		Build& build;
 		//! Parent Sequence builder, if any
 		SequenceBuilder* parent = nullptr;;
 

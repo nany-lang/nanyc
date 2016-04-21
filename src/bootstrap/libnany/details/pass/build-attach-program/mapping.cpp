@@ -1,4 +1,7 @@
 #include "mapping.h"
+#include "details/atom/classdef-table-view.h"
+#include "details/ir/isa/pragma.h"
+#include "details/ir/sequence.h"
 
 using namespace Yuni;
 
@@ -280,7 +283,7 @@ namespace Mapping
 
 				AnyString classname = currentSequence.stringrefs[operands.name];
 
-				Atom* newClassAtom;
+				Atom* newClassAtom = nullptr;
 				// create a new atom in the global type table
 				if (prefixNameForFirstAtomCreated.empty())
 				{
@@ -325,7 +328,7 @@ namespace Mapping
 				Atom& atom = atomStack->currentAtomNotUnit();
 
 				AnyString classname = currentSequence.stringrefs[operands.name];
-				Atom* newAliasAtom;
+				Atom* newAliasAtom = nullptr;
 				{
 					MutexLocker locker{mutex};
 					newAliasAtom = cdeftable.atoms.createTypealias(atom, classname);

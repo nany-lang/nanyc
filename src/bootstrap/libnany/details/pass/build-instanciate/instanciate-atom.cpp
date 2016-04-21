@@ -1,5 +1,4 @@
 #include "instanciate.h"
-#include "details/context/isolate.h"
 #include <memory>
 #include "details/reporting/report.h"
 #include "details/atom/func-overload-match.h"
@@ -167,7 +166,7 @@ namespace Instanciate
 			captureVariables(atom);
 
 
-		Pass::Instanciate::InstanciateData info{newReport, atom, cdeftable, context, params, tmplparams};
+		Pass::Instanciate::InstanciateData info{newReport, atom, cdeftable, build, params, tmplparams};
 		info.parentAtom = &(frame->atom);
 		info.shouldMergeLayer = true;
 		info.parent = this;
@@ -246,7 +245,7 @@ namespace Instanciate
 
 		// instanciate the called func
 		Logs::Message::Ptr subreport;
-		InstanciateData info{subreport, funcAtom, cdeftable, context, params, tmplparams};
+		InstanciateData info{subreport, funcAtom, cdeftable, build, params, tmplparams};
 		bool instok = doInstanciateAtomFunc(subreport, info, retlvid);
 		instanceid = info.instanceid;
 
@@ -504,7 +503,7 @@ namespace Instanciate
 
 			// instanciate the sequence attached to the atom
 			auto builder = std::make_unique<SequenceBuilder>
-				(report.subgroup(), newView, info.context, *outIR, inputIR, info.parent);
+				(report.subgroup(), newView, info.build, *outIR, inputIR, info.parent);
 
 			builder->pushParametersFromSignature(atom.atomid, signature);
 			if (info.parentAtom)

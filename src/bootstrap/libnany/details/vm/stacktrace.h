@@ -3,6 +3,7 @@
 #include <yuni/string.h>
 #include <vector>
 #include "details/atom/atom-map.h"
+#include "details/context/build.h"
 
 
 
@@ -16,7 +17,7 @@ namespace VM
 	{
 		static void push(uint32_t, uint32_t) {}
 		static void pop() {}
-		static void dump(nycontext_t&) {}
+		static void dump(Build&) {}
 	};
 
 
@@ -71,7 +72,7 @@ namespace VM
 
 
 		//! Export the whole stack to a string
-		void dump(nycontext_t&, const AtomMap&) const;
+		void dump(Build&, const AtomMap&) const;
 
 		//! deleted Operator assignment
 		Stacktrace& operator = (const Stacktrace&) = delete;

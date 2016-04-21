@@ -108,9 +108,9 @@ namespace Nany
 		if (B::hasReturnValue)
 			intrinsic.rettype = CTypeToNanyType<typename B::ReturnType>::type;
 
-		// the first argument if the thread context
+		// the first argument must be the thread context
 		static_assert(Yuni::Static::Type::Equal<
-			typename B::template Argument<0>::Type, nytctx_t*>::Yes, "requires 'nytctx_t*'");
+			typename B::template Argument<0>::Type, nyprogram_cf_t*>::Yes, "requires 'nytctx_t*'");
 
 		if (B::argumentCount > 1)
 		{

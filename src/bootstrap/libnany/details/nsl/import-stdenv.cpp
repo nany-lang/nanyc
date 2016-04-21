@@ -15,7 +15,7 @@ namespace Builtin
 {
 
 
-	static void yn_env_set(nytctx_t*, void* varname, void* content)
+	static void yn_env_set(nyprogram_cf_t*, void* varname, void* content)
 	{
 		if (varname)
 		{
@@ -27,7 +27,8 @@ namespace Builtin
 		}
 	}
 
-	static void yn_env_unset(nytctx_t*, void* varname)
+
+	static void yn_env_unset(nyprogram_cf_t*, void* varname)
 	{
 		if (varname)
 		{
@@ -37,11 +38,9 @@ namespace Builtin
 	}
 
 
-	static void* yn_env_read(nytctx_t* tctx, void* varname, void* defvalue)
+	static void* yn_env_read(nyprogram_cf_t* tctx, void* varname, void* defvalue)
 	{
-		void* p = tctx->context->memory.allocate(tctx->context, sizeof(String));
-		auto* string = new (p) String{};
-
+		auto* string = tctx_allocate<String>(tctx);
 		if (varname)
 		{
 			AnyString name = *(reinterpret_cast<String*>(varname));
@@ -54,11 +53,11 @@ namespace Builtin
 			if (defvalue)
 				*string = *(reinterpret_cast<String*>(defvalue));
 		}
-		return p;
+		return string;
 	}
 
 
-	static bool yn_env_read_as_bool(nytctx_t*, void* varname, bool defvalue)
+	static bool yn_env_read_as_bool(nyprogram_cf_t*, void* varname, bool defvalue)
 	{
 		if (varname)
 		{
@@ -68,7 +67,7 @@ namespace Builtin
 		return defvalue;
 	}
 
-	static int64_t yn_env_read_as_i64(nytctx_t*, void* varname, int64_t defvalue)
+	static int64_t yn_env_read_as_i64(nyprogram_cf_t*, void* varname, int64_t defvalue)
 	{
 		if (varname)
 		{
@@ -78,7 +77,7 @@ namespace Builtin
 		return defvalue;
 	}
 
-	static uint64_t yn_env_read_as_u64(nytctx_t*, void* varname, uint64_t defvalue)
+	static uint64_t yn_env_read_as_u64(nyprogram_cf_t*, void* varname, uint64_t defvalue)
 	{
 		if (varname)
 		{
@@ -88,7 +87,7 @@ namespace Builtin
 		return defvalue;
 	}
 
-	static bool yn_env_exists(nytctx_t*, void* varname)
+	static bool yn_env_exists(nyprogram_cf_t*, void* varname)
 	{
 		if (varname)
 		{

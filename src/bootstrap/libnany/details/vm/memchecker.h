@@ -13,6 +13,7 @@ namespace Nany
 namespace VM
 {
 
+	class Program;
 
 	template<bool EnabledT>
 	struct MemChecker final
@@ -74,15 +75,15 @@ namespace VM
 		}
 
 
-		void printLeaksIfAny(nycontext_t& context) const
+		void printLeaksIfAny(const nyprogram_cf_t& cf) const
 		{
 			if (YUNI_UNLIKELY(not ownedPointers.empty()))
-				printLeaks(context);
+				printLeaks(cf);
 		}
 
 
 	private:
-		void printLeaks(nycontext_t&) const;
+		void printLeaks(const nyprogram_cf_t&) const;
 
 	private:
 		struct AllocInfo

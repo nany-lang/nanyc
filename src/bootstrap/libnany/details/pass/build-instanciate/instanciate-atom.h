@@ -1,5 +1,6 @@
 #pragma once
 #include <yuni/yuni.h>
+#include "details/context/build.h"
 #include "details/reporting/report.h"
 #include "details/atom/atom.h"
 #include "details/atom/func-overload-match.h"
@@ -18,13 +19,13 @@ namespace Instanciate
 
 	struct InstanciateData final
 	{
-		InstanciateData(Logs::Message::Ptr& report, Atom& atom, ClassdefTableView& cdeftable, nycontext_t& context,
+		InstanciateData(Logs::Message::Ptr& report, Atom& atom, ClassdefTableView& cdeftable, Build& build,
 			decltype(FuncOverloadMatch::result.params)& params,
 			decltype(FuncOverloadMatch::result.params)& tmplparams)
 			: report(report)
 			, atom(atom)
 			, cdeftable(cdeftable)
-			, context(context)
+			, build(build)
 			, params(params)
 			, tmplparams(tmplparams)
 		{
@@ -41,7 +42,7 @@ namespace Instanciate
 		//! The original view to the classdef table
 		ClassdefTableView& cdeftable;
 		//! Context
-		nycontext_t& context;
+		Build& build;
 
 		//! Parameters used for instanciation
 		decltype(FuncOverloadMatch::result.params)& params;
