@@ -10,23 +10,28 @@ namespace VM
 {
 
 
-	void MemChecker<true>::printLeaks(nycontext_t& context) const
+	void MemChecker<true>::printLeaks(const nyprogram_cf_t& cf) const
 	{
-		String msg;
-		msg.reserve(64 + (uint32_t) ownedPointers.size() * 36); // arbitrary
+		auto print = [&](const AnyString& msg) {
+			cf.console.write_stderr(cf.console.internal, msg.c_str(), msg.size());
+		};
 
-		msg << "\n\n=== nany vm: memory leaks detected in ";
-		msg << ownedPointers.size() << " blocks ===\n";
+		String msg;
+		print("\n\n=== nany vm: memory leaks detected in ");
+		msg << ownedPointers.size();
+		print(msg);
+		print(" blocks ===\n");
 
 		for (auto& pair: ownedPointers)
 		{
+			msg.clear();
 			msg << "    block " << (void*) pair.first << ' ';
 			msg << pair.second.objsize << " bytes at ";
 			msg << pair.second.origin;
 			msg << '\n';
+			print(msg);
 		}
-		msg << '\n';
-		context.console.write_stderr(&context, msg.c_str(), msg.size());
+		print("\n");
 	}
 
 

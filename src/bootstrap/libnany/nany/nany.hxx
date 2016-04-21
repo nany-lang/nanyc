@@ -12,6 +12,19 @@ extern "C"
 #endif
 
 
+
+inline void nany_memalloc_copy(nyallocator_t* out, const nyallocator_t* const src)
+{
+	memcpy(out, src, sizeof(nyallocator_t));
+}
+
+
+inline void nany_console_cf_copy(nyconsole_t* out, const nyconsole_t* const src)
+{
+	memcpy(out, src, sizeof(nyconsole_t));
+}
+
+
 inline size_t nany_type_sizeof(nytype_t type)
 {
 	switch (type)
@@ -34,20 +47,6 @@ inline size_t nany_type_sizeof(nytype_t type)
 		case nyt_count: break;
 	}
 	return 0;
-}
-
-
-inline nybool_t nany_source_add_from_file(nycontext_t* ctx, const char* const filename)
-{
-	size_t length = (filename ? strlen(filename) : 0u);
-	return nany_source_add_from_file_n(ctx, filename, length);
-}
-
-
-inline nybool_t nany_source_add(nycontext_t* ctx, const char* const text)
-{
-	size_t length = (text ? strlen(text) : 0u);
-	return nany_source_add_n(ctx, text, length);
 }
 
 

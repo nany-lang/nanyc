@@ -1,4 +1,4 @@
-#include "details/context/isolate.h"
+#include "details/context/build.h"
 #include "details/atom/classdef-table.h"
 #include "details/reporting/report.h"
 #include "libnany-config.h"
@@ -15,7 +15,7 @@ namespace Nany
 {
 
 
-	bool Isolate::attach(IR::Sequence& sequence, Logs::Report& report, bool owned)
+	bool Build::attach(IR::Sequence& sequence, Logs::Report& report, bool owned)
 	{
 		// keep the sequence somewhere
 		{
@@ -23,9 +23,11 @@ namespace Nany
 			pAttachedSequences.push_back(AttachedSequenceRef{&sequence, owned});
 		}
 
-		Pass::Mapping::SequenceMapping mapper{classdefTable, mutex, report, sequence};
-		return mapper.map(classdefTable.atoms.root);
+		Pass::Mapping::SequenceMapping mapper{cdeftable, mutex, report, sequence};
+		return mapper.map(cdeftable.atoms.root);
 	}
+
+
 
 
 

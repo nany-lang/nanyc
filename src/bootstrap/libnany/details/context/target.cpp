@@ -1,6 +1,6 @@
 #include <yuni/yuni.h>
 #include <yuni/job/queue/service.h>
-#include "details/context/context.h"
+#include "details/context/project.h"
 #include "details/context/target.h"
 #include "details/context/build-info.h"
 #include "details/fwd.h"
@@ -31,14 +31,16 @@ namespace Nany
 	}
 
 
-	CTarget::CTarget(Context* ctx, const AnyString& name)
-		: pContext(ctx)
+	CTarget::CTarget(nyproject_t* project, const AnyString& name)
+		: project(project)
 		, pName{name}
-	{}
+	{
+		Nany::ref(project).targets.all.insert(std::make_pair(AnyString{pName}, this));
+	}
 
 
-	CTarget::CTarget(Context* ctx, const CTarget& rhs) // assuming that rhs is already protected
-		: pContext(ctx)
+	CTarget::CTarget(nyproject_t* project, const CTarget& rhs) // assuming that rhs is already protected
+		: project(project)
 		, pName(rhs.pName)
 	{
 		if (not rhs.pSources.empty())
@@ -48,7 +50,6 @@ namespace Nany
 			{
 				auto& source = *ptr;
 
-				Source::ThreadingPolicy::MutexLocker locker{source};
 				Source::Ptr newsource{new Source(this, source)};
 				pSources.push_back(newsource);
 				auto& ref = *newsource;
@@ -68,12 +69,16 @@ namespace Nany
 				}
 			}
 		}
+
+		Nany::ref(project).targets.all.insert(std::make_pair(AnyString{pName}, this));
 	}
 
 
 	CTarget::~CTarget()
 	{
-		ThreadingPolicy::MutexLocker locker{*this};
+		// remove this target from the list of all targ
+		if (project)
+			Nany::ref(project).targets.all.erase(AnyString{pName});
 
 		for (auto& ptr: pSources)
 			ptr->resetTarget(nullptr); // detach from parent
@@ -85,34 +90,12 @@ namespace Nany
 	}
 
 
-	void CTarget::notifyNotEnoughMemory() const
-	{
-		// TODO to be removed
-		ThreadingPolicy::MutexLocker locker{*this};
-		if (pContext)
-			pContext->usercontext.memory.on_not_enough_memory(&(pContext->usercontext), nyfalse);
-	}
-
-
-	void CTarget::notifyErrorFileAccess(const AnyString& filename) const
-	{
-		ThreadingPolicy::MutexLocker locker{*this};
-		if (pContext)
-		{
-			auto func = pContext->usercontext.build.on_err_file_access;
-			if (func)
-				func(&(pContext->usercontext), filename.c_str(), filename.size());
-		}
-	}
-
-
 	bool CTarget::rename(AnyString newname)
 	{
 		newname.trim();
 		if (not IsNameValid(newname))
 			return false;
 
-		ThreadingPolicy::MutexLocker locker{*this};
 		if (pName.empty()) // disallow renaming of the default target
 			return false;
 
@@ -120,10 +103,10 @@ namespace Nany
 		if (newname == pName)
 			return true; // id - nothing to do
 
-		if (pContext != nullptr)
+		if (project != nullptr)
 		{
-			auto& map = pContext->pTargets;
-			if (map.count(newname) != 0)
+			auto& map = Nany::ref(project).targets.all;
+			if (map.count(newname) != 0) // failed to rename
 				return false;
 
 			addRef(); // keep me alive - just in case - called from the context
@@ -145,8 +128,6 @@ namespace Nany
 		{
 			Source::Ptr source{new Source(this, Source::Type::memory, name, content)};
 
-			ThreadingPolicy::MutexLocker locker{*this};
-
 			auto it = pSourcesByName.find(source->pFilename);
 			if (it == pSourcesByName.end())
 				pSourcesByName.insert(std::make_pair(AnyString{source->pFilename}, std::ref(*source)));
@@ -164,8 +145,6 @@ namespace Nany
 		{
 			auto source = std::make_unique<Source>(this, Source::Type::file, filename, AnyString());
 
-			ThreadingPolicy::MutexLocker locker{*this};
-
 			auto it = pSourcesByFilename.find(source->pFilename);
 			if (it == pSourcesByFilename.end())
 				pSourcesByFilename.insert(std::make_pair(AnyString{source->pFilename}, std::ref(*source)));
@@ -176,14 +155,6 @@ namespace Nany
 		}
 	}
 
-
-	void CTarget::fetchSourceList(BuildInfoContext& ctxbuildinfo)
-	{
-		ThreadingPolicy::MutexLocker locker{*this};
-		ctxbuildinfo.sources.reserve(ctxbuildinfo.sources.size() + pSources.size());
-		for (auto& ptr: pSources)
-			ctxbuildinfo.sources.push_back(ptr);
-	}
 
 
 

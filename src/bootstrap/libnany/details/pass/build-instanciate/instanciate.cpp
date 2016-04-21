@@ -1,14 +1,12 @@
+#include "details/context/build.h"
 #include "instanciate.h"
-#include "details/context/isolate.h"
-#include <memory>
 #include "details/reporting/report.h"
 #include "details/atom/func-overload-match.h"
 #include "details/reporting/message.h"
 #include "details/utils/origin.h"
-#include "details/context/context.h"
 #include "libnany-traces.h"
 #include "instanciate-atom.h"
-#include <iostream>
+#include <memory>
 
 using namespace Yuni;
 
@@ -25,11 +23,11 @@ namespace Instanciate
 {
 
 
-	SequenceBuilder::SequenceBuilder(Logs::Report report, ClassdefTableView& cdeftable, nycontext_t& context,
+	SequenceBuilder::SequenceBuilder(Logs::Report report, ClassdefTableView& cdeftable, Build& build,
 		IR::Sequence& out, IR::Sequence& sequence, SequenceBuilder* parent)
 		: cdeftable(cdeftable)
-		, context(context)
-		, intrinsics(((Context*) context.internal)->intrinsics)
+		, build(build)
+		, intrinsics(build.intrinsics)
 		, out(out)
 		, currentSequence(sequence)
 		, overloadMatch(report, cdeftable)
@@ -55,8 +53,7 @@ namespace Instanciate
 		while (frm)
 		{
 			auto* previous = frm->previous;
-			frm->~AtomStackFrame();
-			context.memory.release(&context, frm, sizeof(AtomStackFrame));
+			build.deallocate(frm);
 			frm = previous;
 		}
 	}
@@ -365,8 +362,17 @@ namespace Instanciate
 namespace Nany
 {
 
-	bool Isolate::instanciate(Logs::Report report, const AnyString& entrypoint)
+
+	bool Build::instanciate(const AnyString& entrypoint, const nytype_t* args, uint32_t& atomid, uint32_t& instanceid)
 	{
+		Nany::Logs::Report report{*messages.get()};
+
+		if (unlikely(args))
+		{
+			report.error() << "arguments for atom instanciation is not supported yet";
+			return false;
+		}
+
 		// lock the isolate
 		MutexLocker locker{mutex};
 
@@ -374,7 +380,7 @@ namespace Nany
 		Atom* entrypointAtom = nullptr;
 		{
 			bool canContinue = true;
-			classdefTable.atoms.root.eachChild(entrypoint, [&](Atom& child) -> bool
+			cdeftable.atoms.root.eachChild(entrypoint, [&](Atom& child) -> bool
 			{
 				if (entrypointAtom != nullptr)
 				{
@@ -403,16 +409,30 @@ namespace Nany
 		}
 
 		// parameters for the signature
-		decltype(FuncOverloadMatch::result.params)  params;
-		decltype(FuncOverloadMatch::result.params)  tmplparams;
+		decltype(FuncOverloadMatch::result.params) params;
+		decltype(FuncOverloadMatch::result.params) tmplparams;
 		Logs::Message::Ptr newReport;
 
-		ClassdefTableView cdeftblView{classdefTable};
+		ClassdefTableView cdeftblView{cdeftable};
 
-		Pass::Instanciate::InstanciateData info{newReport, *entrypointAtom, cdeftblView, context, params, tmplparams};
+		Pass::Instanciate::InstanciateData info{
+			newReport, *entrypointAtom, cdeftblView, *this, params, tmplparams
+		};
 		auto* sequence = Pass::Instanciate::InstanciateAtom(info);
 		report.appendEntry(newReport);
-		return (nullptr != sequence);
+
+		if (nullptr != sequence)
+		{
+			atomid = entrypointAtom->atomid;
+			instanceid = info.instanceid;
+			return true;
+		}
+		else
+		{
+			atomid = (uint32_t) -1;
+			instanceid = (uint32_t) -1;
+			return false;
+		}
 	}
 
 

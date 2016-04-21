@@ -14,36 +14,34 @@ namespace Builtin
 {
 
 
-	static bool yn_io_exists(nytctx_t*, void* flnmptr)
+	static bool yn_io_exists(nyvm_t*, void* flnmptr)
 	{
 		auto* filename = reinterpret_cast<String*>(flnmptr);
 		return (filename) ? IO::Exists(*filename) : false;
 	}
 
-	static bool yn_io_file_exists(nytctx_t*, void* flnmptr)
+	static bool yn_io_file_exists(nyvm_t*, void* flnmptr)
 	{
 		auto* filename = reinterpret_cast<String*>(flnmptr);
 		return (filename) ? IO::File::Exists(*filename) : false;
 	}
 
-	static uint64_t yn_io_file_size(nytctx_t*, void* flnmptr)
+	static uint64_t yn_io_file_size(nyvm_t*, void* flnmptr)
 	{
 		auto* filename = reinterpret_cast<String*>(flnmptr);
 		return (filename) ? IO::File::Size(*filename) : 0u;
 	}
 
-	static void* yn_io_file_load(nytctx_t* tctx, void* flnmptr)
+	static void* yn_io_file_load(nyvm_t* vm, void* flnmptr)
 	{
-		void* p = tctx->context->memory.allocate(tctx->context, sizeof(String));
-		auto* string = new (p) String{};
-
+		auto* string   = vm_allocate<String>(vm);
 		auto* filename = reinterpret_cast<String*>(flnmptr);
 		if (filename)
 			IO::File::LoadFromFile(*string, *filename, (uint64_t) -1);
-		return p;
+		return string;
 	}
 
-	static bool yn_io_file_save(nytctx_t*, void* flnmptr, void* contentptr)
+	static bool yn_io_file_save(nyvm_t*, void* flnmptr, void* contentptr)
 	{
 		auto* filename = reinterpret_cast<String*>(flnmptr);
 		auto* content  = reinterpret_cast<String*>(contentptr);
@@ -52,7 +50,7 @@ namespace Builtin
 			: false;
 	}
 
-	static bool yn_io_file_append(nytctx_t*, void* flnmptr, void* contentptr)
+	static bool yn_io_file_append(nyvm_t*, void* flnmptr, void* contentptr)
 	{
 		auto* filename = reinterpret_cast<String*>(flnmptr);
 		auto* content  = reinterpret_cast<String*>(contentptr);
@@ -61,7 +59,7 @@ namespace Builtin
 			: false;
 	}
 
-	static bool yn_io_file_erase(nytctx_t*, void* flnmptr)
+	static bool yn_io_file_erase(nyvm_t*, void* flnmptr)
 	{
 		auto* filename = reinterpret_cast<String*>(flnmptr);
 		return (filename) ? (IO::errNone == IO::File::Delete(*filename)) : false;

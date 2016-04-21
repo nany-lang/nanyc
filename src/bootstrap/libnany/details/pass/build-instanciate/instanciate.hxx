@@ -13,8 +13,7 @@ namespace Instanciate
 
 	inline void SequenceBuilder::pushNewFrame(Atom& atom)
 	{
-		auto* newframe = (AtomStackFrame*) context.memory.allocate(&context, sizeof(AtomStackFrame));
-		new (newframe) AtomStackFrame(atom);
+		auto* newframe = build.allocate<AtomStackFrame>(atom);
 		newframe->previous = frame;
 		frame = newframe;
 	}

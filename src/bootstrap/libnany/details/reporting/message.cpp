@@ -36,12 +36,10 @@ namespace Logs
 	}
 
 
-
 	namespace // anonymous
 	{
 
-		template<class T>
-		static void printMessage(T& out, const Message& message, uint32_t indent, String& tmp)
+		static void printMessage(nyconsole_t& out, const Message& message, uint32_t indent, String& xx, bool unify)
 		{
 			#ifndef YUNI_OS_WINDOWS
 			static const AnyString sep = " \u205E ";
@@ -51,41 +49,51 @@ namespace Logs
 
 			Message::ThreadingPolicy::MutexLocker locker{message};
 
+			// which output ?
+			nyconsole_output_t omode = (unify or (message.level != Level::error and message.level != Level::warning))
+				? nycout : nycerr;
+			// function writer
+			auto wrfn = (omode == nycout) ? out.write_stdout : out.write_stderr;
+
+			auto print = [&](const AnyString& text) {
+				wrfn(out.internal, text.c_str(), text.size());
+			};
+
 			if (message.level != Level::none)
 			{
 				switch (message.level)
 				{
 					case Level::error:
 					{
-						System::Console::SetTextColor(out, System::Console::red);
+						out.set_color(out.internal, omode, nyc_red);
 						#ifndef YUNI_OS_WINDOWS
-						out << "   error \u220E ";
+						print("   error \u220E ");
 						#else
-						out << "   error > ";
+						print("   error > ");
 						#endif
 						break;
 					}
 					case Level::warning:
 					{
-						System::Console::SetTextColor(out, System::Console::yellow);
-						out << " warning > ";
+						out.set_color(out.internal, omode, nyc_yellow);
+						print(" warning > ");
 						break;
 					}
 					case Level::info:
 					{
 						if (message.section.empty())
 						{
-							System::Console::ResetTextColor(out);
-							out << "        " << sep;
+							out.set_color(out.internal, omode, nyc_none);
+							print("        ");
+							print(sep);
 						}
 						else
 						{
-							ShortString16 sect{"        "};
-							sect.overwriteRight(message.section);
-							System::Console::SetTextColor(out, System::Console::lightblue);
-							out << sect;
-							//System::Console::ResetTextColor(out);
-							out << sep;
+							out.set_color(out.internal, omode, nyc_lightblue);
+							xx = "        ";
+							xx.overwriteRight(message.section);
+							xx << sep;
+							print(xx);
 						}
 						break;
 					}
@@ -93,41 +101,44 @@ namespace Logs
 					case Level::hint:
 					case Level::suggest:
 					{
-						System::Console::ResetTextColor(out);
-						out << "        " << sep;
+						out.set_color(out.internal, omode, nyc_none);
+						print("        ");
+						print(sep);
 						break;
 					}
 
 					case Level::success:
 					{
-						System::Console::SetTextColor(out, System::Console::green);
+						out.set_color(out.internal, omode, nyc_green);
 						#ifndef YUNI_OS_WINDOWS
-						out << "      \u2713 " << sep;
+						print("      \u2713 ");
 						#else
-						out << "        " << sep;
+						print("        ");
 						#endif
+						print(sep);
 						break;
 					}
 					case Level::trace:
 					{
-						System::Console::SetTextColor(out, System::Console::purple);
-						out << "      ::";
-						System::Console::ResetTextColor(out);
-						out << sep;
+						out.set_color(out.internal, omode, nyc_purple);
+						print("      ::");
+						out.set_color(out.internal, omode, nyc_none);
+						print(sep);
 						break;
 					}
 					case Level::verbose:
 					{
-						System::Console::SetTextColor(out, System::Console::green);
-						out << "      ::";
-						System::Console::ResetTextColor(out);
-						out << sep;
+						out.set_color(out.internal, omode, nyc_green);
+						print("      ::");
+						out.set_color(out.internal, omode, nyc_none);
+						print(sep);
 						break;
 					}
 					case Level::ICE:
 					{
-						System::Console::SetTextColor(out, System::Console::red);
-						out << "     ICE" << sep;
+						out.set_color(out.internal, omode, nyc_red);
+						print("     ICE");
+						print(sep);
 						break;
 					}
 					case Level::none:
@@ -137,55 +148,63 @@ namespace Logs
 				}
 
 				for (uint32_t i = indent; i--; )
-					out.write("    ", 4);
+					print("    ");
 
 				if (not message.prefix.empty())
 				{
-					System::Console::SetTextColor(out, System::Console::white);
-					out << message.prefix;
+					out.set_color(out.internal, omode, nyc_white);
+					print(message.prefix);
 				}
 
 				if (message.level == Level::suggest)
 				{
-					System::Console::SetTextColor(out, System::Console::lightblue);
-					out << "suggest: ";
+					out.set_color(out.internal, omode, nyc_lightblue);
+					print("suggest: ");
 				}
 				else if (message.level == Level::hint)
 				{
-					System::Console::SetTextColor(out, System::Console::lightblue);
-					out << "hint: ";
+					out.set_color(out.internal, omode, nyc_lightblue);
+					print("hint: ");
 				}
 
 				if (not message.origins.location.target.empty())
 				{
-					System::Console::ResetTextColor(out);
-					out << '{' << message.origins.location.target;
-					out.write("} ", 2);
+					out.set_color(out.internal, omode, nyc_none);
+					print("{");
+					print(message.origins.location.target);
+					print("} ");
 				}
 
 				if (not message.origins.location.filename.empty())
 				{
-					System::Console::SetTextColor(out, System::Console::white);
-					out << message.origins.location.filename;
+					out.set_color(out.internal, omode, nyc_white);
+					xx = message.origins.location.filename;
 
 					if (message.origins.location.pos.line > 0)
 					{
-						out << ':';
-						out << message.origins.location.pos.line;
+						xx << ':';
+						xx << message.origins.location.pos.line;
 						if (message.origins.location.pos.offset != 0)
 						{
-							out << ':' << message.origins.location.pos.offset;
+							xx << ':';
+							xx << message.origins.location.pos.offset;
 							if (message.origins.location.pos.offsetEnd != 0)
-								out << '-' << message.origins.location.pos.offsetEnd;
+							{
+								xx << '-';
+								xx << message.origins.location.pos.offsetEnd;
+							}
 						}
+						print(xx);
 					}
-					out.write(": ", 2);
+					xx << ": ";
+					print(xx);
 				}
 
 
 				if (not message.message.empty())
 				{
-					System::Console::ResetTextColor(out);
+					out.set_color(out.internal, omode, nyc_none);
+
 					String msg{message.message};
 					msg.trimRight(" \t\r\n");
 					msg.replace("\t", "    "); // tabs
@@ -193,50 +212,40 @@ namespace Logs
 					auto firstLF = msg.find('\n');
 					if (firstLF < message.message.size())
 					{
-						tmp.clear() <<"\n        " << sep;
+						xx.clear() <<"\n        " << sep;
 						for (uint i = indent; i--; )
-							tmp.write("    ", 4);
+							xx.write("    ", 4);
 
 						bool addLF = false;
 						msg.words("\n", [&](const AnyString& word) -> bool
 						{
 							if (addLF)
-								out << tmp;
-							out << word;
+								print(xx);
+							print(word);
 							addLF = true;
 							return true;
 						});
 					}
 					else
-						out << msg;
+						print(msg);
 				}
 
-				out << '\n';
+				print("\n");
 				++indent;
 			}
 
 			for (auto& ptr: message.entries)
-				printMessage(out, *ptr, indent, tmp);
+				printMessage(out, *ptr, indent, xx, unify);
 		}
 
 
 	} // anonymous namespace
 
 
-
-
-	void Message::print(std::ostream& out) const
+	void Message::print(nyconsole_t& out, bool unify)
 	{
 		String tmp;
-		printMessage(out, *this, 0, tmp);
-		out << std::flush;
-	}
-
-
-	void Message::print(Clob& out) const
-	{
-		String tmp;
-		printMessage(out, *this, 0, tmp);
+		printMessage(out, *this, 0, tmp, unify);
 	}
 
 

@@ -11,7 +11,6 @@
 
 
 
-struct nytcontext_t;
 
 
 
@@ -29,6 +28,8 @@ namespace Nany
 	class ClassdefTable;
 	class ClassdefTableView;
 	class Intrinsic;
+
+
 
 } // namespace Nany
 

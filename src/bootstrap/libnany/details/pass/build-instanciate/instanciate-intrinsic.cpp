@@ -32,10 +32,10 @@ namespace Instanciate
 					return true;
 
 				// intrinsic not found, trying discover mode
-				if (context.build.on_intrinsic_discover)
+				if (build.cf.on_binding_discovery)
 				{
-					auto retry = context.build.on_intrinsic_discover(&context, name.c_str(), name.size());
-					if (retry != nyfalse)
+					auto retry = build.cf.on_binding_discovery(build.self(), name.c_str(), name.size());
+					if (retry == nytrue)
 						intrinsic = intrinsics.find(name);
 				}
 				if (intrinsic == nullptr)

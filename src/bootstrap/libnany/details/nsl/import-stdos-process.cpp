@@ -15,7 +15,7 @@ namespace Builtin
 {
 
 
-	static bool yn_os_process_execute(nytctx_t*, void* string, uint32_t timeout)
+	static bool yn_os_process_execute(nyvm_t*, void* string, uint32_t timeout)
 	{
 		AnyString cmd = *(reinterpret_cast<String*>(string));
 		return Process::Execute(cmd, timeout);

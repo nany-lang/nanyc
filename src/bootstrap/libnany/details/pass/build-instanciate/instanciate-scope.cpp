@@ -45,8 +45,7 @@ namespace Instanciate
 
 					// destroy the frame
 					auto* previous = frame->previous;
-					frame->~AtomStackFrame();
-					context.memory.release(&context, frame, sizeof(AtomStackFrame));
+					build.deallocate(frame);
 					frame = previous;
 
 					++layerDepthLimit;

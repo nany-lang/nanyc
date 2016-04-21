@@ -22,7 +22,7 @@ namespace // anonymous
 {
 
 	template<bool FromFileT>
-	static inline bool  nany_print_ast(const AnyString text, int fd, bool unixcolors)
+	static inline bool nany_print_ast(const AnyString& text, int fd, bool unixcolors)
 	{
 		if (unlikely(fd < 0))
 			return false;
@@ -63,15 +63,25 @@ namespace // anonymous
 
 extern "C" nybool_t nany_print_ast_from_file_n(const char* filename, size_t length, int fd, nybool_t unixcolors)
 {
-	bool colors = (unixcolors == nytrue);
-	bool ok = nany_print_ast<true>(AnyString{filename, (uint32_t) length}, fd, colors);
-	return ok ? nytrue : nyfalse;
+	try
+	{
+		bool colors = (unixcolors == nytrue);
+		bool ok = nany_print_ast<true>(AnyString{filename, (uint32_t) length}, fd, colors);
+		return ok ? nytrue : nyfalse;
+	}
+	catch (...) {}
+	return nyfalse;
 }
 
 
 extern "C" nybool_t nany_print_ast_from_memory_n(const char* content, size_t length, int fd, nybool_t unixcolors)
 {
-	bool colors = (unixcolors == nytrue);
-	bool ok = nany_print_ast<false>(AnyString{content, (uint32_t) length}, fd, colors);
-	return ok ? nytrue : nyfalse;
+	try
+	{
+		bool colors = (unixcolors == nytrue);
+		bool ok = nany_print_ast<false>(AnyString{content, (uint32_t) length}, fd, colors);
+		return ok ? nytrue : nyfalse;
+	}
+	catch (...) {}
+	return nyfalse;
 }

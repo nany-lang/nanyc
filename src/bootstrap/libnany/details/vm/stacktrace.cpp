@@ -1,4 +1,5 @@
 #include "stacktrace.h"
+#include "details/context/build.h"
 
 using namespace Yuni;
 
@@ -25,7 +26,7 @@ namespace VM
 	}
 
 
-	void Stacktrace<true>::dump(nycontext_t& ctx, const AtomMap& map) const
+	void Stacktrace<true>::dump(Build& build, const AtomMap& map) const
 	{
 		// this routine does not allocate memory to handle extreme situations
 
@@ -36,30 +37,30 @@ namespace VM
 		{
 			auto& frame = *pointer;
 
-			ctx.console.write_stderr(&ctx, "    at #", 8);
+			build.printStderr("    at #");
 			tmp.clear();
 			tmp << i << ": ";
-			ctx.console.write_stderr(&ctx, tmp.c_str(), tmp.size());
+			build.printStderr(tmp);
 			const auto& caption = map.fetchSequenceCaption(frame.atomidInstance[0], frame.atomidInstance[1]);
-			ctx.console.write_stderr(&ctx, caption.c_str(), caption.size());
+			build.printStderr(caption);
 
-			ctx.console.write_stderr(&ctx, "\n       '", 9);
+			build.printStderr("\n       '");
 
 			auto* atom = map.findAtom(frame.atomidInstance[0]);
 			if (atom)
 			{
-				ctx.console.write_stderr(&ctx, atom->origin.filename.c_str(), atom->origin.filename.size());
+				build.printStderr(atom->origin.filename);
 				if (atom->origin.line != 0)
 				{
 					tmp.clear();
 					tmp << ':' << atom->origin.line;
-					ctx.console.write_stderr(&ctx, tmp.c_str(), tmp.size());
+					build.printStderr(tmp);
 				}
 			}
 			else
-				ctx.console.write_stderr(&ctx, "<invalid-atom>", 14);
+				build.printStderr("<invalid-atom>");
 
-			ctx.console.write_stderr(&ctx, "'\n", 2);
+			build.printStderr("'\n");
 		}
 	}
 

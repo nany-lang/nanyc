@@ -135,7 +135,7 @@ namespace Instanciate
 
 					// trying to instanciate the solution
 					Pass::Instanciate::InstanciateData info{
-						newReport, solutionAtom, cdeftable, context,
+						newReport, solutionAtom, cdeftable, build,
 						parameters[r].first, parameters[r].second
 					};
 					info.canGenerateCode = canGenerateCode;
