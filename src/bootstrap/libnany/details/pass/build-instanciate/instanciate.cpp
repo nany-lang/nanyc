@@ -363,8 +363,16 @@ namespace Nany
 {
 
 
-	bool Build::instanciate(Logs::Report report, const AnyString& entrypoint)
+	bool Build::instanciate(const AnyString& entrypoint, const nytype_t* args)
 	{
+		Nany::Logs::Report report{*messages.get()};
+
+		if (unlikely(args))
+		{
+			report.error() << "arguments for atom instanciation is not supported yet";
+			return false;
+		}
+
 		// lock the isolate
 		MutexLocker locker{mutex};
 

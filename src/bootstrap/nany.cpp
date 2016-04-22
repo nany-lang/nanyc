@@ -14,6 +14,9 @@ using namespace Yuni;
 
 static const char* argv0 = "";
 
+#define likely(X)    YUNI_LIKELY(X)
+#define unlikely(X)  YUNI_UNLIKELY(X)
+
 
 
 
@@ -96,7 +99,7 @@ static inline std::unique_ptr<nyproject_t> createProject(const Options& options)
 
 	size_t limit = options.memoryLimit;
 	if (limit == 0)
-		limit = static_cast<size_t>(System::Environment::ReadAsUInt64("NANY_MEMORY_LIMIT", 0));
+		limit = static_cast<size_t>(System::Environment::ReadAsUInt64("NANY_MEMORY_LIMIT"));
 
 	if (limit != 0)
 		nany_memalloc_set_with_limit(&cf.allocator, limit);
@@ -107,6 +110,7 @@ static inline std::unique_ptr<nyproject_t> createProject(const Options& options)
 
 static bool compile(const char* argv0, const Options& options)
 {
+	// PROJECT
 	auto project = createProject(options);
 	if (!project)
 		return false;
@@ -116,19 +120,31 @@ static bool compile(const char* argv0, const Options& options)
 		String file;
 		IO::Canonicalize(file, argv0);
 		auto r = nany_project_add_source_from_file_n(project.get(), file.c_str(), file.size());
-		if (r != nytrue)
+		if (unlikely(r == nyfalse))
 			return false;
 	}
 
+	// BUILD
 	nybuild_cf_t cf;
 	nany_build_cf_reset(&cf, project.get());
 	auto build = std::unique_ptr<nybuild_t>{nany_build_prepare(project.get(), &cf)};
 	if (!build)
 		return false;
 
-	if (nyfalse == nany_build(build.get()))
-		return false;
+	do
+	{
+		auto bStatus = nany_build(build.get());
+		if (unlikely(bStatus == nyfalse))
+			break;
 
+		if (unlikely(options.verbose))
+			nany_build_print_report_to_console(build.get(), nyfalse);
+		return true;
+	}
+	while (false);
+
+	// an error has occured
+	nany_build_print_report_to_console(build.get(), nyfalse);
 	return false;
 }
 
@@ -215,6 +231,7 @@ int main(int argc, char** argv)
 					if (carg[2] != '\0') // to handle '--' option
 					{
 						AnyString arg{carg};
+
 						if (arg == "--help")
 							return printUsage(argv[0]);
 						if (arg == "--version")
@@ -254,7 +271,7 @@ int main(int argc, char** argv)
 		//
 		return execute(argc - firstarg, argv + firstarg, options);
 	}
-	catch (std::bad_alloc&)
+	catch (const std::bad_alloc&)
 	{
 		std::cerr << '\n' << argv0 << ": error: failed to allocate memory\n";
 	}

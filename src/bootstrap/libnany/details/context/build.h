@@ -48,9 +48,6 @@ namespace Nany
 		//! Call the destructor and release this
 		void destroy();
 
-
-		void prepare();
-
 		/*!
 		** \brief Compile the project
 		*/
@@ -64,7 +61,7 @@ namespace Nany
 		/*!
 		** \brief Try to instanciate an entry point
 		*/
-		bool instanciate(Logs::Report report, const AnyString& entrypoint);
+		bool instanciate(const AnyString& entrypoint, const nytype_t* args);
 
 
 		/*!

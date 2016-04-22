@@ -8,6 +8,7 @@
 #define __LIBNANY_NANY_C_H__
 #include "../nany/types.h"
 #include "../nany/memalloc.h"
+#include "../nany/console.h"
 
 
 
@@ -38,32 +39,6 @@ NY_EXPORT int nany_get_version(int* major, int* minor, int* patch);
 NY_EXPORT const char* nany_website_url();
 /*@}*/
 
-
-
-
-/*! \name Console Management */
-/*@{*/
-typedef struct nyconsole_cf_t
-{
-	/*! Write some data to STDOUT */
-	void (*write_stdout)(void*, const char* text, size_t length);
-	/*! Write some data to STDERR */
-	void (*write_stderr)(void*, const char* text, size_t length);
-	/*! Flush STDOUT */
-	void (*flush_stdout)(void*);
-	/*! Flush STDERR */
-	void (*flush_stderr)(void*);
-
-	/*! Internal opaque pointer*/
-	void* internal;
-	/*! Flush STDERR */
-	void (*release)(void**);
-}
-nyconsole_cf_t;
-
-/*! Initialize a project configuration */
-NY_EXPORT void nany_console_cf_set_stdcout(nyconsole_cf_t*);
-/*@}*/
 
 
 
@@ -195,12 +170,25 @@ NY_EXPORT nybuild_t* nany_build_prepare(nyproject_t*, const nybuild_cf_t*);
 */
 NY_EXPORT nybool_t nany_build(nybuild_t*);
 
+/*!
+** \brief Instanciate an atom given a signature
+**
+** \param build Build context
+** \param atom Atom name (ex: "main", "my.namespace.foo")
+** \param atom_len Length of the atom name
+** \param args List of argument types, null terminated
+*/
+NY_EXPORT nybool_t nany_build_atom(nybuild_t* build, const char* atom, size_t atom_len, const nytype_t* args);
+
 
 /*! Acquire a project */
 NY_EXPORT void nany_build_ref(nybuild_t*);
 
 /*! Unref a project and destroy if required (and set the pointer to null) */
 NY_EXPORT void nany_build_unref(nybuild_t**);
+
+/*! Print the build report to the console */
+NY_EXPORT void nany_build_print_report_to_console(nybuild_t*, nybool_t unify);
 
 /*! Initialize a project configuration */
 NY_EXPORT void nany_build_cf_reset(nybuild_cf_t* cf, const nyproject_t* project);

@@ -34,7 +34,7 @@ namespace Nany
 	}
 
 
-	void Build::prepare()
+	void Build::init()
 	{
 		targets.clear();
 		sources.clear();
@@ -63,6 +63,9 @@ namespace Nany
 			importNSLIONative(intrinsics);
 			importNSLEnv(intrinsics);
 		}
+
+		if (cf.on.create)
+			cf.on.create(self(), project.self());
 	}
 
 
@@ -74,14 +77,12 @@ namespace Nany
 
 		try
 		{
-			do
+			if (unlikely(sources.empty()))
 			{
-				if (YUNI_UNLIKELY(sources.empty()))
-				{
-					report.error() << "no target to build";
-					break;
-				}
-
+				report.error() << "no target to build";
+			}
+			else
+			{
 				// initialization of some global data
 				Nany::Sema::Metadata::initialize(); // TODO remove those methods
 				Nany::ASTHelper::initialize();
@@ -92,11 +93,30 @@ namespace Nany
 				for (auto& src: sources)
 					success &= src.get().build(*this);
 
+				//
+				// -- intermediate name lookup
+				//
+				// TODO remove this method
+				// report.info() << "intermediate name resolution";
+				bool successNameLookup = cdeftable.performNameLookup();
+				if (unlikely(not successNameLookup and success))
+					report.warning() << "name lookup failed";
+
+				//
+				// -- Core Objects (bool, u32, u64, f32, ...)
+				//
+				success &= successNameLookup
+					and cdeftable.atoms.fetchAndIndexCoreObjects(report);
+
+				//
+				// -- instanciate
+				//
+				success = success and instanciate("main", /*args*/ nullptr);
+
 				// end
-				duration = DateTime::NowMilliSeconds() - buildtime;
+				duration += DateTime::NowMilliSeconds() - buildtime;
 				return success;
 			}
-			while (false);
 		}
 		catch (const std::bad_alloc&)
 		{
@@ -120,7 +140,7 @@ namespace Nany
 		}
 
 		success = false;
-		duration = DateTime::NowMilliSeconds() - buildtime;
+		duration += DateTime::NowMilliSeconds() - buildtime;
 		return false;
 	}
 

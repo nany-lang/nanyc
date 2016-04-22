@@ -5,6 +5,7 @@
 #include <yuni/core/noncopyable.h>
 #include "fwd.h"
 #include "levels.h"
+#include "nany/nany.h"
 #include <iosfwd>
 
 
@@ -37,8 +38,7 @@ namespace Logs
 
 		void appendEntry(const Message::Ptr& message);
 
-		void print(std::ostream&) const;
-		void print(Yuni::Clob&) const;
+		void print(nyconsole_cf_t&, bool unify = false);
 
 		bool isClassifiedAsError() const
 		{

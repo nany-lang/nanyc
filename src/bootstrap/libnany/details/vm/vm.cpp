@@ -929,10 +929,11 @@ namespace // anonymous
 
 		// always flush to make sure that the listener will update the output
 		// (especially useful when embedded into a C/C++ application)
-		if (cf.console.flush_stderr)
-			cf.console.flush_stderr(cf.console.internal);
-		if (cf.console.flush_stdout)
-			cf.console.flush_stdout(cf.console.internal);
+		if (cf.console.flush)
+		{
+			cf.console.flush(cf.console.internal, nycerr);
+			cf.console.flush(cf.console.internal, nycout);
+		}
 		return success;
 	}
 

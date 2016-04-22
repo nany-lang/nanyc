@@ -102,6 +102,28 @@ extern "C" nybool_t nany_build(nybuild_t* ptr)
 }
 
 
+extern "C" nybool_t nany_build_atom(nybuild_t* ptr, const char* atom, size_t atom_len, const nytype_t* args)
+{
+	if (ptr and atom and *atom != '\0' and atom_len > 0 and atom_len < 1024)
+	{
+		AnyString atomname{atom, static_cast<uint32_t>(atom_len)};
+		Nany::ref(ptr).instanciate(atomname, args);
+	}
+	return nyfalse;
+}
+
+
+extern "C" void nany_build_print_report_to_console(nybuild_t* ptr, nybool_t unify)
+{
+	if (ptr)
+	{
+		auto& build = Nany::ref(ptr);
+		if (!!build.messages)
+			build.messages->print(build.cf.console, (unify != nyfalse));
+	}
+}
+
+
 extern "C" void nany_build_ref(nybuild_t* build)
 {
 	if (build)

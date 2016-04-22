@@ -48,13 +48,6 @@ namespace Nany
 	}
 
 
-	inline void Build::init()
-	{
-		if (cf.on.create)
-			cf.on.create(self(), project.self());
-	}
-
-
 	template<class T, typename... Args> inline T* Build::allocate(Args&&... args)
 	{
 		T* object = (T*) cf.allocator.allocate(&cf.allocator, sizeof(T));
