@@ -68,11 +68,6 @@ typedef struct nyconsole_cf_t
 	/*! Set the text color */
 	void (*set_color)(void*, nyconsole_output_t, nycolor_t);
 
-	/*! Flag to determine whether colors are supported or not */
-	nybool_t has_colors_cout;
-	/*! Flag to determine whether colors are supported or not */
-	nybool_t has_colors_cerr;
-
 	/*! Internal opaque pointer*/
 	void* internal;
 	/*! Flush STDERR */
