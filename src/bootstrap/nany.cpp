@@ -192,53 +192,7 @@ static inline int execute(int argc, char** argv, Options& options)
 	}
 
 	return exitstatus;
-	/*
-	// building
-	bool buildstatus;
-	if (init)
-	{
-		nyreport_t* report = nullptr;
-		buildstatus = (nany_build(&ctx, &report) == nytrue);
-
-		// report printing
-		// if an error has occured or if in verbose mode
-		if (YUNI_UNLIKELY((not buildstatus) or options.verbose))
-			(buildstatus ? nany_report_print_stdout : nany_report_print_stderr)(report);
-
-		nany_report_unref(&report);
-	}
-	else
-		buildstatus = false;
-
-	// executing the program
-	if (buildstatus)
-	{
-		if (argc == 1)
-		{
-			const char* nargv[] = { scriptfile.c_str(), nullptr };
-			exitstatus = nany_run_main(&ctx, 1, nargv);
-		}
-		else
-		{
-			auto** nargv = (const char**)::malloc(((size_t) argc + 1) * sizeof(const char**));
-			if (nargv)
-			{
-				for (int i = 1; i < argc; ++i)
-					nargv[i] = argv[i];
-				nargv[0]    = scriptfile.c_str();
-				nargv[argc] = nullptr;
-
-				exitstatus = nany_run_main(&ctx, argc, nargv);
-				free(nargv);
-			}
-		}
-	}
-
-	nany_uninitialize(&ctx);*/
-	return exitstatus;
 }
-
-
 
 
 
