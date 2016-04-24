@@ -167,6 +167,25 @@ enum
 };
 
 
+/*! Opaque Thread Object */
+typedef struct nythread_t nythread_t;
+
+
+/*! Opaque Project Object */
+typedef struct nyproject_t nyproject_t;
+/*! Opaque Target Object */
+typedef struct nytarget_t nytarget_t;
+/*! Opaque structure to a source */
+typedef struct nysource_t nysource_t;
+
+/*! Build */
+typedef struct nybuild_t nybuild_t;
+
+/*! VM Program */
+typedef struct nyprogram_t nyprogram_t;
+/*! VM Thread Context */
+typedef struct nythread_t nytctx_t;
+
 
 
 

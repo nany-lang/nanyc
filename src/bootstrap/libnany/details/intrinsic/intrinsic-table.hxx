@@ -110,7 +110,7 @@ namespace Nany
 
 		// the first argument must be the thread context
 		static_assert(Yuni::Static::Type::Equal<
-			typename B::template Argument<0>::Type, nyprogram_cf_t*>::Yes, "requires 'nytctx_t*'");
+			typename B::template Argument<0>::Type, nyvm_t*>::Yes, "requires 'nytctx_t*'");
 
 		if (B::argumentCount > 1)
 		{

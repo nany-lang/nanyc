@@ -272,7 +272,12 @@ addsrc(
 	NAME  nysrc_details_vm
 	GROUP "details/vm"
 	FILES
+	"details/vm/program.cpp"
+	"details/vm/program.hxx"
+	"details/vm/program.h"
 	"details/vm/vm.cpp"
+	"details/vm/vm.h"
+	"details/vm/vm.hxx"
 	"details/vm/memchecker.h"
 	"details/vm/memchecker.cpp"
 	"details/vm/stacktrace.h"
@@ -280,9 +285,7 @@ addsrc(
 	"details/vm/stack.cpp"
 	"details/vm/stack.h"
 	"details/vm/stack.hxx"
-	"details/vm/types.h"
-	"details/vm/vm.hxx"
-	"details/vm/vm.h")
+	"details/vm/types.h")
 
 
 addsrc(

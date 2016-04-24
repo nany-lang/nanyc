@@ -24,8 +24,8 @@ namespace Nany
 
 	void Build::destroy()
 	{
-		if (cf.on.destroy)
-			cf.on.destroy(self(), project.self());
+		if (cf.on_destroy)
+			cf.on_destroy(self(), project.self());
 
 		this->~Build();
 
@@ -64,8 +64,8 @@ namespace Nany
 			importNSLEnv(intrinsics);
 		}
 
-		if (cf.on.create)
-			cf.on.create(self(), project.self());
+		if (cf.on_create)
+			cf.on_create(self(), project.self());
 	}
 
 
@@ -111,7 +111,8 @@ namespace Nany
 				//
 				// -- instanciate
 				//
-				success = success and instanciate("main", /*args*/ nullptr);
+				const nytype_t* argtypes = nullptr;
+				success = success and instanciate("main", argtypes, main.atomid, main.instanceid);
 
 				// end
 				duration += DateTime::NowMilliSeconds() - buildtime;

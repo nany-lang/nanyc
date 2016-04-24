@@ -32,9 +32,9 @@ namespace Instanciate
 					return true;
 
 				// intrinsic not found, trying discover mode
-				if (build.cf.on.binding_discovery)
+				if (build.cf.on_binding_discovery)
 				{
-					auto retry = build.cf.on.binding_discovery(build.self(), name.c_str(), name.size());
+					auto retry = build.cf.on_binding_discovery(build.self(), name.c_str(), name.size());
 					if (retry == nytrue)
 						intrinsic = intrinsics.find(name);
 				}

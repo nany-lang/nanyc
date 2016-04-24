@@ -26,7 +26,7 @@ namespace std
 	{
 		void operator () (nyproject_t* ptr)
 		{
-			nany_project_unref(&ptr);
+			nany_project_unref(ptr);
 		}
 	};
 
@@ -34,7 +34,15 @@ namespace std
 	{
 		void operator () (nybuild_t* ptr)
 		{
-			nany_build_unref(&ptr);
+			nany_build_unref(ptr);
+		}
+	};
+
+	template<> struct default_delete<nyprogram_t>
+	{
+		void operator () (nyprogram_t* ptr)
+		{
+			nany_program_unref(ptr);
 		}
 	};
 
@@ -49,6 +57,9 @@ struct Options
 	uint32_t jobs = 1;
 	//! Memory limit (zero means unlimited)
 	size_t memoryLimit = 0;
+
+	//! The new argv0
+	String argv0;
 };
 
 
@@ -95,7 +106,7 @@ static int unknownOption(const AnyString& name)
 static inline std::unique_ptr<nyproject_t> createProject(const Options& options)
 {
 	nyproject_cf_t cf;
-	nany_project_cf_reset(&cf);
+	nany_project_cf_init(&cf);
 
 	size_t limit = options.memoryLimit;
 	if (limit == 0)
@@ -104,32 +115,30 @@ static inline std::unique_ptr<nyproject_t> createProject(const Options& options)
 	if (limit != 0)
 		nany_memalloc_set_with_limit(&cf.allocator, limit);
 
-	return std::unique_ptr<nyproject_t>{nany_project_create_ref(&cf)};
+	return std::unique_ptr<nyproject_t>{nany_project_create(&cf)};
 }
 
 
-static bool compile(const char* argv0, const Options& options)
+static inline std::unique_ptr<nyprogram_t> compile(const AnyString& argv0, Options& options)
 {
 	// PROJECT
 	auto project = createProject(options);
 	if (!project)
-		return false;
+		return nullptr;
 
-	// sources
-	{
-		String file;
-		IO::Canonicalize(file, argv0);
-		auto r = nany_project_add_source_from_file_n(project.get(), file.c_str(), file.size());
-		if (unlikely(r == nyfalse))
-			return false;
-	}
+	// SOURCE
+	auto& file = options.argv0;
+	IO::Canonicalize(file, argv0);
+	auto r = nany_project_add_source_from_file_n(project.get(), file.c_str(), file.size());
+	if (unlikely(r == nyfalse))
+		return nullptr;
 
 	// BUILD
 	nybuild_cf_t cf;
-	nany_build_cf_reset(&cf, project.get());
+	nany_build_cf_init(&cf, project.get());
 	auto build = std::unique_ptr<nybuild_t>{nany_build_prepare(project.get(), &cf)};
 	if (!build)
-		return false;
+		return nullptr;
 
 	do
 	{
@@ -138,24 +147,50 @@ static bool compile(const char* argv0, const Options& options)
 			break;
 
 		if (unlikely(options.verbose))
-			nany_build_print_report_to_console(build.get(), nyfalse);
-		return true;
+			nany_build_print_report_to_console(build.get());
+
+		nyprogram_cf_t pcf;
+		nany_program_cf_init(&pcf, &cf);
+		return std::unique_ptr<nyprogram_t>(nany_program_prepare(build.get(), &pcf));
 	}
 	while (false);
 
 	// an error has occured
-	nany_build_print_report_to_console(build.get(), nyfalse);
-	return false;
+	nany_build_print_report_to_console(build.get());
+	return nullptr;
 }
 
 
-static inline int execute(int argc, char** argv, const Options& options)
+static inline int execute(int argc, char** argv, Options& options)
 {
 	assert(argc >= 1);
 
-	compile(argv[0], options);
-
+	auto program = compile(argv[0], options);
 	int exitstatus = 66;
+
+	if (!!program)
+	{
+		if (argc == 1)
+		{
+			const char* nargv[] = { options.argv0.c_str(), nullptr };
+			exitstatus = nany_main(program.get(), 1, nargv);
+		}
+		else
+		{
+			auto** nargv = (const char**)::malloc(((size_t) argc + 1) * sizeof(const char**));
+			if (nargv)
+			{
+				nargv[0] = options.argv0.c_str();
+				for (int i = 1; i < argc; ++i)
+					nargv[i] = argv[i];
+				nargv[argc] = nullptr;
+
+				exitstatus = nany_main(program.get(), argc, nargv);
+				free(nargv);
+			}
+		}
+	}
+
 	return exitstatus;
 	/*
 	// building

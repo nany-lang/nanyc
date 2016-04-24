@@ -61,7 +61,7 @@ namespace Nany
 		/*!
 		** \brief Try to instanciate an entry point
 		*/
-		bool instanciate(const AnyString& entrypoint, const nytype_t* args);
+		bool instanciate(const AnyString& entrypoint, const nytype_t* args, uint32_t& atomid, uint32_t& instanceid);
 
 
 		/*!
@@ -114,6 +114,11 @@ namespace Nany
 		//! success
 		bool success = false;
 
+		struct {
+			uint32_t atomid = (uint32_t) -1;
+			uint32_t instanceid = (uint32_t) -1;
+		}
+		main;
 
 	private:
 		//! Destructor, deallocate() must be called

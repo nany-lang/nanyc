@@ -9,7 +9,7 @@ using namespace Yuni;
 
 
 
-extern "C" void nany_build_cf_reset(nybuild_cf_t* cf, const nyproject_t* project)
+extern "C" void nany_build_cf_init(nybuild_cf_t* cf, const nyproject_t* project)
 {
 	assert(cf != NULL);
 	memset(cf, 0x0, sizeof(nybuild_cf_t));
@@ -25,74 +25,58 @@ extern "C" void nany_build_cf_reset(nybuild_cf_t* cf, const nyproject_t* project
 }
 
 
-
-namespace // anonymous
-{
-
-	static inline nybuild_t* create_nany_build(nyproject_t* ptr, const nybuild_cf_t* cf, bool async)
-	{
-		if (ptr)
-		{
-			auto& project = Nany::ref(ptr);
-			Nany::Build* build;
-			try
-			{
-				if (cf)
-				{
-					if (cf->on.query and (nyfalse == cf->on.query(ptr)))
-						return nullptr;
-
-					auto& allocator = const_cast<nyallocator_t&>(cf->allocator);
-					void* inplace = allocator.allocate(&allocator, sizeof(Nany::Build));
-					if (!inplace)
-						return nullptr;
-					build = new (inplace) Nany::Build(project, *cf, async);
-				}
-				else
-				{
-					nybuild_cf_t ncf;
-					nany_build_cf_reset(&ncf, ptr);
-
-					auto& allocator = const_cast<nyallocator_t&>(cf->allocator);
-					void* inplace = allocator.allocate(&allocator, sizeof(Nany::Build));
-					if (!inplace)
-						return nullptr;
-					build = new (inplace) Nany::Build(project, *cf, async);
-				}
-			}
-			catch (...)
-			{
-				return nullptr;
-			}
-
-			try
-			{
-				// making sure that user-events do not destroy the project by mistake
-				build->addRef();
-				// initialize the project after incrementing the ref count
-				build->init();
-				// make a copy of all targets to be independant from the project
-				build->prepare();
-
-				return build->self();
-			}
-			catch (...)
-			{
-				build->destroy();
-			}
-		}
-		return nullptr;
-	}
-
-
-} // anonymous namespace
-
-
-
-
 extern "C" nybuild_t* nany_build_prepare(nyproject_t* ptr, const nybuild_cf_t* cf)
 {
-	return create_nany_build(ptr, cf, false);
+	if (ptr)
+	{
+		constexpr bool async = false;
+		auto& project = Nany::ref(ptr);
+		Nany::Build* build;
+		try
+		{
+			if (cf)
+			{
+				if (cf->on_query and (nyfalse == cf->on_query(ptr)))
+					return nullptr;
+
+				auto& allocator = const_cast<nyallocator_t&>(cf->allocator);
+				void* inplace = allocator.allocate(&allocator, sizeof(Nany::Build));
+				if (!inplace)
+					return nullptr;
+				build = new (inplace) Nany::Build(project, *cf, async);
+			}
+			else
+			{
+				nybuild_cf_t ncf;
+				nany_build_cf_init(&ncf, ptr);
+
+				auto& allocator = const_cast<nyallocator_t&>(cf->allocator);
+				void* inplace = allocator.allocate(&allocator, sizeof(Nany::Build));
+				if (!inplace)
+					return nullptr;
+				build = new (inplace) Nany::Build(project, *cf, async);
+			}
+		}
+		catch (...)
+		{
+			return nullptr;
+		}
+
+		try
+		{
+			// making sure that user-events do not destroy the project by mistake
+			build->addRef();
+			// initialize the project after incrementing the ref count
+			build->init();
+
+			return build->self();
+		}
+		catch (...)
+		{
+			build->destroy();
+		}
+	}
+	return nullptr;
 }
 
 
@@ -102,24 +86,13 @@ extern "C" nybool_t nany_build(nybuild_t* ptr)
 }
 
 
-extern "C" nybool_t nany_build_atom(nybuild_t* ptr, const char* atom, size_t atom_len, const nytype_t* args)
-{
-	if (ptr and atom and *atom != '\0' and atom_len > 0 and atom_len < 1024)
-	{
-		AnyString atomname{atom, static_cast<uint32_t>(atom_len)};
-		Nany::ref(ptr).instanciate(atomname, args);
-	}
-	return nyfalse;
-}
-
-
-extern "C" void nany_build_print_report_to_console(nybuild_t* ptr, nybool_t unify)
+extern "C" void nany_build_print_report_to_console(nybuild_t* ptr)
 {
 	if (ptr)
 	{
 		auto& build = Nany::ref(ptr);
 		if (!!build.messages)
-			build.messages->print(build.cf.console, (unify != nyfalse));
+			build.messages->print(build.cf.console, false);
 	}
 }
 
@@ -131,13 +104,12 @@ extern "C" void nany_build_ref(nybuild_t* build)
 }
 
 
-extern "C" void nany_build_unref(nybuild_t** ptr)
+extern "C" void nany_build_unref(nybuild_t* ptr)
 {
-	if (ptr and *ptr)
+	if (ptr)
 	{
-		auto& build = Nany::ref(*ptr);
+		auto& build = Nany::ref(ptr);
 		if (build.release())
 			build.destroy();
-		*ptr = nullptr;
 	}
 }

@@ -62,7 +62,7 @@ namespace Nany
 
 	private:
 		//! Destructor, private, destroy() must be used instead
-		~Project() = default;
+		~Project();
 
 	}; // class Project
 

@@ -44,56 +44,48 @@ NY_EXPORT const char* nany_website_url();
 
 /*! \name Project management */
 /*@{*/
-/*! Opaque Project Object */
-typedef struct nyproject_t nyproject_t;
-/*! Opaque Target Object */
-typedef struct nytarget_t nytarget_t;
-/*! Opaque structure to a source */
-typedef struct nysource_t nysource_t;
-
-
 /*! Project Configuration */
 typedef struct nyproject_cf_t
 {
 	/*! Memory allocator */
 	nyallocator_t allocator;
 
-	struct {
-		/*! A project has been created */
-		void (*create)(nyproject_t*);
-		/*! A project has been destroyed */
-		void (*destroy)(nyproject_t*);
+	/*! A project has been created */
+	void (*on_create)(nyproject_t*);
+	/*! A project has been destroyed */
+	void (*on_destroy)(nyproject_t*);
 
-		struct {
-			/*! A new target has been added */
-			void (*added)(nyproject_t*, nytarget_t*);
-			/*! A target has been removed */
-			void (*removed)(nyproject_t*, nytarget_t*);
-		}
-		target;
-	}
-	on;
+	/*! A new target has been added */
+	void (*on_target_added)(nyproject_t*, nytarget_t*);
+	/*! A target has been removed */
+	void (*on_target_removed)(nyproject_t*, nytarget_t*);
 }
 nyproject_cf_t;
-
-
 
 
 /*!
 ** \brief Create a new nany project
 **
 ** \param cf Configuration (can be null)
+** \return A ref-counted pointer to the new project. NULL if the operation failed. The returned
+**   object must be released by `nany_project_unref`
 */
-NY_EXPORT nyproject_t* nany_project_create_ref(const nyproject_cf_t* cf);
+NY_EXPORT nyproject_t* nany_project_create(const nyproject_cf_t* cf);
 
-/*! Acquire a project */
-NY_EXPORT void nany_project_ref(nyproject_t*);
+/*!
+** \brief Acquire a project
+** \param project Project pointer (can be null)
+*/
+NY_EXPORT void nany_project_ref(nyproject_t* project);
 
-/*! Unref a project and destroy if required (and set the pointer to null)*/
-NY_EXPORT void nany_project_unref(nyproject_t**);
+/*!
+** \brief Unref a project and destroy it if required
+** \param project A Project pointer (can be null)
+*/
+NY_EXPORT void nany_project_unref(nyproject_t* project);
 
 /*! Initialize a project configuration */
-NY_EXPORT void nany_project_cf_reset(nyproject_cf_t*);
+NY_EXPORT void nany_project_cf_init(nyproject_cf_t*);
 
 
 /*! Add a source file to the default target */
@@ -120,10 +112,6 @@ NY_EXPORT nybool_t nany_trylock(const nyproject_t*);
 
 /*! \name Build */
 /*@{*/
-/*! Opaque Project Object */
-typedef struct nybuild_t nybuild_t;
-
-
 /*! Project Configuration */
 typedef struct nybuild_cf_t
 {
@@ -133,26 +121,23 @@ typedef struct nybuild_cf_t
 	/*! Console output */
 	nyconsole_cf_t console;
 
-	struct {
-		/*! A project has been created */
-		void (*create)(nybuild_t*, nyproject_t*);
-		/*! A project has been destroyed */
-		void (*destroy)(nybuild_t*, nyproject_t*);
+	/*! A project has been created */
+	void (*on_create)(nybuild_t*, nyproject_t*);
+	/*! A project has been destroyed */
+	void (*on_destroy)(nybuild_t*, nyproject_t*);
 
-		/*! Query if a new build can be started */
-		nybool_t (*query)(const nyproject_t*);
-		/*! A new build has been started */
-		void (*begin)(const nyproject_t*, nybuild_t*);
+	/*! Query if a new build can be started */
+	nybool_t (*on_query)(const nyproject_t*);
+	/*! A new build has been started */
+	void (*on_begin)(const nyproject_t*, nybuild_t*);
 
-		/*! Progress report */
-		nybool_t (*progress)(const nyproject_t*, nybuild_t*, const char* id, const char* element, uint32_t percent);
-		/*! Try to discover a new binding */
-		nybool_t (*binding_discovery)(nybuild_t*, const char* name, uint32_t size);
+	/*! Progress report */
+	nybool_t (*on_progress)(const nyproject_t*, nybuild_t*, const char* id, const char* element, uint32_t percent);
+	/*! Try to discover a new binding */
+	nybool_t (*on_binding_discovery)(nybuild_t*, const char* name, uint32_t size);
 
-		/*! A build has terminated */
-		void (*end)(const nyproject_t*, nybuild_t*, nybool_t success);
-	}
-	on;
+	/*! A build has terminated */
+	void (*on_end)(const nyproject_t*, nybuild_t*, nybool_t success);
 
 	void (*on_error_file_eacces)(const nyproject_t*, nybuild_t*, const char*, uint32_t);
 }
@@ -171,27 +156,27 @@ NY_EXPORT nybuild_t* nany_build_prepare(nyproject_t*, const nybuild_cf_t*);
 NY_EXPORT nybool_t nany_build(nybuild_t*);
 
 /*!
-** \brief Instanciate an atom given a signature
+** \brief Print the build report to the console
 **
-** \param build Build context
-** \param atom Atom name (ex: "main", "my.namespace.foo")
-** \param atom_len Length of the atom name
-** \param args List of argument types, null terminated
+** \param build A build object (can be null)
 */
-NY_EXPORT nybool_t nany_build_atom(nybuild_t* build, const char* atom, size_t atom_len, const nytype_t* args);
+NY_EXPORT void nany_build_print_report_to_console(nybuild_t* build);
 
 
-/*! Acquire a project */
-NY_EXPORT void nany_build_ref(nybuild_t*);
 
-/*! Unref a project and destroy if required (and set the pointer to null) */
-NY_EXPORT void nany_build_unref(nybuild_t**);
-
-/*! Print the build report to the console */
-NY_EXPORT void nany_build_print_report_to_console(nybuild_t*, nybool_t unify);
+/*!
+** \brief Acquire a build
+** \param build build pointer (can be null)
+*/
+NY_EXPORT void nany_build_ref(nybuild_t* build);
+/*!
+** \brief Unref a build and destroy it if required
+** \param build A build pointer (can be null)
+*/
+NY_EXPORT void nany_build_unref(nybuild_t* build);
 
 /*! Initialize a project configuration */
-NY_EXPORT void nany_build_cf_reset(nybuild_cf_t* cf, const nyproject_t* project);
+NY_EXPORT void nany_build_cf_init(nybuild_cf_t* cf, const nyproject_t* project);
 /*@}*/
 
 
@@ -202,13 +187,6 @@ NY_EXPORT void nany_build_cf_reset(nybuild_cf_t* cf, const nyproject_t* project)
 
 /*! \name Program */
 /*@{*/
-/*! Opaque Project Object */
-typedef struct nyprogram_t nyprogram_t;
-/*! Opaque Thread */
-typedef struct nythread_t nythread_t;
-/*! Opaque Thread Context */
-typedef struct nythread_t nytctx_t;
-
 /*! Program Configuration */
 typedef struct nyprogram_cf_t
 {
@@ -220,7 +198,7 @@ typedef struct nyprogram_cf_t
 	/*! A new program has been started */
 	nybool_t (*on_begin)(nyprogram_t*);
 	/*! A new thread is created */
-	nybool_t (*on_thread_create)(nyprogram_t*, nythread_t* parent, const char* name, uint32_t size);
+	nybool_t (*on_thread_create)(nyprogram_t*, nytctx_t*, nythread_t* parent, const char* name, uint32_t size);
 	/*! A thread has been destroyed */
 	void (*on_thread_destroy)(nyprogram_t*, nythread_t*);
 
@@ -228,36 +206,58 @@ typedef struct nyprogram_cf_t
 	void (*on_error)(const nyprogram_t*, const char** backtrace, uint32_t size);
 	/*! A program has stopped */
 	void (*on_end)(const nyprogram_t*, int exitcode);
-
-	/*! current program (if any) */
-	nyprogram_t* program;
-	/*! current thread context */
-	nytctx_t* tctx;
 }
 nyprogram_cf_t;
 
 
+/*! Context at runtime for native C calls */
+typedef struct nyvm_t
+{
+	/*! Allocator */
+	nyallocator_t* allocator;
+	/*! Current program */
+	nyprogram_t* program;
+	/*! Current thread */
+	nytctx_t* tctx;
+	/*! Console */
+	nyconsole_cf_t* console;
+}
+nyvm_t;
 
 
 /*!
-** \brief Create a new program
+** \brief Create a byte code program from a given build
+**
+** \param build A build
 */
-NY_EXPORT nyprogram_t* nany_program_prepare(const nybuild_t*, const nyprogram_cf_t*);
+NY_EXPORT nyprogram_t* nany_program_prepare(nybuild_t* build, const nyprogram_cf_t* cf);
 
-/*! Acquire a project */
-NY_EXPORT void nany_program_ref(nyprogram_t*);
+/*!
+** \brief Execute a Nany program
+**
+** \param program Bytecode nany program
+** \param argc Number of arguments (always >= 1)
+** \param argv A null terminated list of arguments. The first argument is the full path
+**    to the program/script. Arguments must use the UTF8 encoding
+** \return Exit status code
+*/
+NY_EXPORT int nany_main(nyprogram_t* program, int argc, const char** argv);
 
-/*! Unref a project and destroy if required */
-NY_EXPORT void nany_program_unref(nyprogram_t**);
 
-/*! Run */
-NY_EXPORT int nany_main(nyprogram_t*, int argc, const char** argv);
 
-/*! Cancel a program */
-NY_EXPORT void nany_abort(nyprogram_t*);
+/*!
+** \brief Acquire a program
+** \param program program pointer (can be null)
+*/
+NY_EXPORT void nany_program_ref(nyprogram_t* program);
+/*!
+** \brief Unref a program and destroy it if required
+** \param program A program pointer (can be null)
+*/
+NY_EXPORT void nany_program_unref(nyprogram_t* program);
 
 /*! Initialize a project configuration */
-NY_EXPORT void nany_program_cf_reset(nyprogram_cf_t* cf);
+NY_EXPORT void nany_program_cf_init(nyprogram_cf_t* cf, const nybuild_cf_t*);
 /*@}*/
 
 

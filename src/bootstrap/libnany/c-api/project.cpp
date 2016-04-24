@@ -6,7 +6,7 @@ using namespace Yuni;
 
 
 
-extern "C" void nany_project_cf_reset(nyproject_cf_t* cf)
+extern "C" void nany_project_cf_init(nyproject_cf_t* cf)
 {
 	assert(cf != NULL);
 	memset(cf, 0x0, sizeof(nyproject_cf_t));
@@ -14,7 +14,7 @@ extern "C" void nany_project_cf_reset(nyproject_cf_t* cf)
 }
 
 
-extern "C" nyproject_t* nany_project_create_ref(const nyproject_cf_t* cf)
+extern "C" nyproject_t* nany_project_create(const nyproject_cf_t* cf)
 {
 	Nany::Project* project;
 	try
@@ -30,7 +30,7 @@ extern "C" nyproject_t* nany_project_create_ref(const nyproject_cf_t* cf)
 		else
 		{
 			nyproject_cf_t ncf;
-			nany_project_cf_reset(&ncf);
+			nany_project_cf_init(&ncf);
 
 			auto& allocator = const_cast<nyallocator_t&>(ncf.allocator);
 			void* inplace = allocator.allocate(&allocator, sizeof(Nany::Project));
@@ -68,14 +68,13 @@ extern "C" void nany_project_ref(nyproject_t* project)
 }
 
 
-extern "C" void nany_project_unref(nyproject_t** ptr)
+extern "C" void nany_project_unref(nyproject_t* ptr)
 {
-	if (ptr and *ptr)
+	if (ptr)
 	{
-		auto& project = Nany::ref(*ptr);
+		auto& project = Nany::ref(ptr);
 		if (project.release())
 			project.destroy();
-		*ptr = nullptr;
 	}
 }
 

@@ -1,9 +1,8 @@
 #pragma once
+#include <yuni/yuni.h>
+#include "program.h"
 #include "details/ir/sequence.h"
-#include "nany/nany.h"
-#include "details/atom/atom-map.h"
-#include "details/context/build.h"
-#include "libnany-config.h"
+
 
 
 
@@ -12,52 +11,43 @@ namespace Nany
 namespace VM
 {
 
-
-	class Program final
+	class ThreadContext final
 	{
 	public:
-		/*!
-		** \brief Create a brand new program
-		*/
-		Program(Build&, const AtomMap&);
+		//! Default constructor
+		explicit ThreadContext(Program& program, const AnyString& name);
+		//! Clone a thread context
+		explicit ThreadContext(ThreadContext&);
+		//! Destructor
+		~ThreadContext() = default;
 
-		/*!
-		** \brief Create a program from another program
-		**
-		** This constructor can be used to create a new execution stack
-		** (for example in a new thread)
-		*/
-		explicit Program(Program& inherit);
-
-		/*!
-		** \brief Execute the main entry point
-		*/
-		bool execute(uint32_t atomid, uint32_t instanceid);
+		//! Get the equivalent C type
+		nytctx_t* self();
+		//! Get the equivalent C type (const)
+		const nytctx_t* self() const;
 
 		/*!
 		** \brief Print a message on the console
 		*/
 		void printStderr(const AnyString& msg);
 
-		nyprogram_t* self();
-		const nyprogram_t* self() const;
+
+		void triggerEventsDestroy();
+
+		uint64_t invoke(const IR::Sequence& callee, uint32_t atomid, uint32_t instanceid);
 
 
 	public:
-		//! Settings
-		nyprogram_cf_t cf;
+		//! Attached program
+		Program& program;
 
-		//! User build
-		Build& build;
-		//! Atom Map
-		const AtomMap& map;
+		nyprogram_cf_t& cf;
 
-		//! Return value, a pod or an object
-		uint64_t retvalue = 0;
-		//! Does the program own the sequence ?
-		bool ownsSequence = false;
+		//! Thread name
+		Yuni::ShortString32 name;
 
-	}; // class Program
+	}; // class ThreadContext
+
 
 
 

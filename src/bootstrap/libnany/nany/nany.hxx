@@ -19,6 +19,10 @@ inline void nany_memalloc_copy(nyallocator_t* out, const nyallocator_t* const sr
 }
 
 
+inline void nany_console_cf_copy(nyconsole_cf_t* out, const nyconsole_cf_t* const src)
+{
+	memcpy(out, src, sizeof(nyconsole_cf_t));
+}
 
 
 inline size_t nany_type_sizeof(nytype_t type)

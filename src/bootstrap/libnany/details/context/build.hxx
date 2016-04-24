@@ -1,5 +1,6 @@
 #pragma once
 #include "build.h"
+#include <iostream>
 
 
 
@@ -84,6 +85,7 @@ namespace Nany
 	{
 		cf.console.write_stderr(cf.console.internal, msg.c_str(), msg.size());
 	}
+
 
 
 } // namespace Nany

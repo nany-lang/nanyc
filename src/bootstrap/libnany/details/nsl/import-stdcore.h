@@ -39,54 +39,54 @@ namespace Nany
 	void importNSLEnv(IntrinsicTable&);
 
 
-	template<class T, typename... Args> T* tctx_allocate(nyprogram_cf_t* const tctx, Args&&... args);
+	template<class T, typename... Args> T* vm_allocate(nyvm_t* const vm, Args&&... args);
 
-	template<class T> T* tctx_allocateraw(nyprogram_cf_t* const tctx, size_t size);
+	template<class T> T* vm_allocateraw(nyvm_t* const vm, size_t size);
 
-	template<class T> void tctx_deallocate(nyprogram_cf_t* const tctx, T* object);
+	template<class T> void vm_deallocate(nyvm_t* const vm, T* object);
 
-	void tctx_deallocate(nyprogram_cf_t* const tctx, void* object, size_t size);
+	void vm_deallocate(nyvm_t* const vm, void* object, size_t size);
 
-	void tctx_print(nyprogram_cf_t* const tctx, const AnyString& msg);
+	void vm_print(nyvm_t* const vm, const AnyString& msg);
 
 
 
-	template<class T, typename... Args> inline T* tctx_allocate(nyprogram_cf_t* const tctx, Args&&... args)
+	template<class T, typename... Args> inline T* vm_allocate(nyvm_t* const vm, Args&&... args)
 	{
-		assert(tctx);
-		T* object = (T*) tctx->allocator.allocate(&tctx->allocator, sizeof(T));
+		assert(vm);
+		T* object = (T*) vm->allocator->allocate(vm->allocator, sizeof(T));
 		if (YUNI_UNLIKELY(!object))
 			throw std::bad_alloc();
 		new (object) T(std::forward<Args>(args)...);
 		return object;
 	}
 
-	template<class T> inline T* tctx_allocateraw(nyprogram_cf_t* const tctx, size_t size)
+	template<class T> inline T* vm_allocateraw(nyvm_t* const vm, size_t size)
 	{
-		T* ptr = (T*) tctx->allocator.allocate(&tctx->allocator, size);
+		T* ptr = (T*) vm->allocator->allocate(vm->allocator, size);
 		if (YUNI_UNLIKELY(!ptr))
 			throw std::bad_alloc();
 		return ptr;
 	}
 
 
-	template<class T> inline void tctx_deallocate(nyprogram_cf_t* const tctx, T* object)
+	template<class T> inline void vm_deallocate(nyvm_t* const vm, T* object)
 	{
 		assert(object != nullptr);
 		object->~T();
-		tctx->allocator.deallocate(&tctx->allocator, object, sizeof(T));
+		vm->allocator->deallocate(vm->allocator, object, sizeof(T));
 	}
 
-	inline void tctx_deallocate(nyprogram_cf_t* const tctx, void* object, size_t size)
+	inline void vm_deallocate(nyvm_t* const vm, void* object, size_t size)
 	{
 		assert(object != nullptr);
-		tctx->allocator.deallocate(&tctx->allocator, object, size);
+		vm->allocator->deallocate(vm->allocator, object, size);
 	}
 
 
-	inline void tctx_print(nyprogram_cf_t* const tctx, const AnyString& msg)
+	inline void vm_print(nyvm_t* const vm, const AnyString& msg)
 	{
-		tctx->console.write_stdout(tctx->console.internal, msg.c_str(), msg.size());
+		vm->console->write_stdout(vm->console->internal, msg.c_str(), msg.size());
 	}
 
 

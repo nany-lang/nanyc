@@ -21,15 +21,15 @@ namespace Nany
 		if (Config::importNSL)
 			importNSLCore(*this);
 
-		if (cf.on.create)
-			cf.on.create(self());
+		if (cf.on_create)
+			cf.on_create(self());
 	}
 
 
 	void Project::destroy()
 	{
-		if (cf.on.destroy)
-			cf.on.destroy(self());
+		if (cf.on_destroy)
+			cf.on_destroy(self());
 
 		this->~Project();
 

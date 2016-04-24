@@ -77,6 +77,11 @@ nyconsole_cf_t;
 
 /*! Initialize a project configuration */
 NY_EXPORT void nany_console_cf_set_stdcout(nyconsole_cf_t*);
+
+/*!
+** \nbrief Copy Cf
+*/
+NY_EXPORT void nany_console_cf_copy(nyconsole_cf_t* out, const nyconsole_cf_t* const src);
 /*@}*/
 
 

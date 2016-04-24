@@ -14,35 +14,34 @@ namespace Builtin
 {
 
 
-	static bool yn_io_exists(nyprogram_cf_t*, void* flnmptr)
+	static bool yn_io_exists(nyvm_t*, void* flnmptr)
 	{
 		auto* filename = reinterpret_cast<String*>(flnmptr);
 		return (filename) ? IO::Exists(*filename) : false;
 	}
 
-	static bool yn_io_file_exists(nyprogram_cf_t*, void* flnmptr)
+	static bool yn_io_file_exists(nyvm_t*, void* flnmptr)
 	{
 		auto* filename = reinterpret_cast<String*>(flnmptr);
 		return (filename) ? IO::File::Exists(*filename) : false;
 	}
 
-	static uint64_t yn_io_file_size(nyprogram_cf_t*, void* flnmptr)
+	static uint64_t yn_io_file_size(nyvm_t*, void* flnmptr)
 	{
 		auto* filename = reinterpret_cast<String*>(flnmptr);
 		return (filename) ? IO::File::Size(*filename) : 0u;
 	}
 
-	static void* yn_io_file_load(nyprogram_cf_t* tctx, void* flnmptr)
+	static void* yn_io_file_load(nyvm_t* vm, void* flnmptr)
 	{
-		auto* string = tctx_allocate<String>(tctx);
-
+		auto* string   = vm_allocate<String>(vm);
 		auto* filename = reinterpret_cast<String*>(flnmptr);
 		if (filename)
 			IO::File::LoadFromFile(*string, *filename, (uint64_t) -1);
 		return string;
 	}
 
-	static bool yn_io_file_save(nyprogram_cf_t*, void* flnmptr, void* contentptr)
+	static bool yn_io_file_save(nyvm_t*, void* flnmptr, void* contentptr)
 	{
 		auto* filename = reinterpret_cast<String*>(flnmptr);
 		auto* content  = reinterpret_cast<String*>(contentptr);
@@ -51,7 +50,7 @@ namespace Builtin
 			: false;
 	}
 
-	static bool yn_io_file_append(nyprogram_cf_t*, void* flnmptr, void* contentptr)
+	static bool yn_io_file_append(nyvm_t*, void* flnmptr, void* contentptr)
 	{
 		auto* filename = reinterpret_cast<String*>(flnmptr);
 		auto* content  = reinterpret_cast<String*>(contentptr);
@@ -60,7 +59,7 @@ namespace Builtin
 			: false;
 	}
 
-	static bool yn_io_file_erase(nyprogram_cf_t*, void* flnmptr)
+	static bool yn_io_file_erase(nyvm_t*, void* flnmptr)
 	{
 		auto* filename = reinterpret_cast<String*>(flnmptr);
 		return (filename) ? (IO::errNone == IO::File::Delete(*filename)) : false;

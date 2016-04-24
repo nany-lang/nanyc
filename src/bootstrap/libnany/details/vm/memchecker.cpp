@@ -1,5 +1,4 @@
 #include "memchecker.h"
-#include "details/vm/vm.h"
 
 using namespace Yuni;
 

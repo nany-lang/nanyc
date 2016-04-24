@@ -363,7 +363,7 @@ namespace Nany
 {
 
 
-	bool Build::instanciate(const AnyString& entrypoint, const nytype_t* args)
+	bool Build::instanciate(const AnyString& entrypoint, const nytype_t* args, uint32_t& atomid, uint32_t& instanceid)
 	{
 		Nany::Logs::Report report{*messages.get()};
 
@@ -409,8 +409,8 @@ namespace Nany
 		}
 
 		// parameters for the signature
-		decltype(FuncOverloadMatch::result.params)  params;
-		decltype(FuncOverloadMatch::result.params)  tmplparams;
+		decltype(FuncOverloadMatch::result.params) params;
+		decltype(FuncOverloadMatch::result.params) tmplparams;
 		Logs::Message::Ptr newReport;
 
 		ClassdefTableView cdeftblView{cdeftable};
@@ -420,7 +420,19 @@ namespace Nany
 		};
 		auto* sequence = Pass::Instanciate::InstanciateAtom(info);
 		report.appendEntry(newReport);
-		return (nullptr != sequence);
+
+		if (nullptr != sequence)
+		{
+			atomid = entrypointAtom->atomid;
+			instanceid = info.instanceid;
+			return true;
+		}
+		else
+		{
+			atomid = (uint32_t) -1;
+			instanceid = (uint32_t) -1;
+			return false;
+		}
 	}
 
 

@@ -11,6 +11,16 @@ namespace Nany
 	{}
 
 
+	inline Project::~Project()
+	{
+		// this container must be destroyed first
+		targets.all.clear();
+
+		targets.anonym = nullptr;
+		targets.nsl = nullptr;
+	}
+
+
 	inline nyproject_t* Project::self()
 	{
 		return reinterpret_cast<nyproject_t*>(this);
