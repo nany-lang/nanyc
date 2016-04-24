@@ -10,7 +10,7 @@
 
 
 
-static void* nany_allocate(nyallocator_t* restrict alloc, size_t size)
+static void* nany_allocate(nyallocator_t* alloc, size_t size)
 {
 	assert(0 != size);
 	assert(alloc != NULL);
@@ -25,7 +25,7 @@ static void* nany_allocate(nyallocator_t* restrict alloc, size_t size)
 }
 
 
-static void* nany_reallocate(nyallocator_t* restrict alloc, void* restrict ptr, size_t oldsize, size_t newsize)
+static void* nany_reallocate(nyallocator_t* alloc, void* ptr, size_t oldsize, size_t newsize)
 {
 	void* p;
 
@@ -40,7 +40,7 @@ static void* nany_reallocate(nyallocator_t* restrict alloc, void* restrict ptr, 
 }
 
 
-static void nany_free(nyallocator_t* restrict allocator, void* restrict ptr, size_t size)
+static void nany_free(nyallocator_t* allocator, void* ptr, size_t size)
 {
 	(void) allocator;
 	(void) size;
@@ -52,7 +52,7 @@ static void nany_free(nyallocator_t* restrict allocator, void* restrict ptr, siz
 }
 
 
-void nany_memalloc_set_default(nyallocator_t* restrict allocator)
+void nany_memalloc_set_default(nyallocator_t* allocator)
 {
 	if (allocator)
 	{
@@ -71,7 +71,7 @@ void nany_memalloc_set_default(nyallocator_t* restrict allocator)
 
 
 
-static void* nyallocator_withlimit_allocate(nyallocator_t* restrict allocator, size_t size)
+static void* nyallocator_withlimit_allocate(nyallocator_t* allocator, size_t size)
 {
 	void* p;
 
@@ -102,7 +102,7 @@ static void* nyallocator_withlimit_allocate(nyallocator_t* restrict allocator, s
 }
 
 
-static void* nyallocator_withlimit_reallocate(nyallocator_t* restrict allocator, void* restrict ptr, size_t oldsize, size_t newsize)
+static void* nyallocator_withlimit_reallocate(nyallocator_t* allocator, void* ptr, size_t oldsize, size_t newsize)
 {
 	void* p;
 
@@ -146,7 +146,7 @@ static void* nyallocator_withlimit_reallocate(nyallocator_t* restrict allocator,
 }
 
 
-static void nyallocator_withlimit_release(nyallocator_t* restrict allocator, void* ptr, size_t size)
+static void nyallocator_withlimit_release(nyallocator_t* allocator, void* ptr, size_t size)
 {
 	assert(allocator != NULL);
 	if (ptr)
@@ -162,7 +162,7 @@ static void nyallocator_withlimit_release(nyallocator_t* restrict allocator, voi
 }
 
 
-void nany_memalloc_set_with_limit(nyallocator_t* restrict allocator, size_t limit)
+void nany_memalloc_set_with_limit(nyallocator_t* allocator, size_t limit)
 {
 	if (allocator)
 	{
