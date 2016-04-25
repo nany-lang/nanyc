@@ -119,7 +119,7 @@ typedef struct nybuild_cf_t
 	nyallocator_t allocator;
 
 	/*! Console output */
-	nyconsole_cf_t console;
+	nyconsole_t console;
 
 	/*! A project has been created */
 	void (*on_create)(nybuild_t*, nyproject_t*);
@@ -193,7 +193,7 @@ typedef struct nyprogram_cf_t
 	/*! Memory allocator */
 	nyallocator_t allocator;
 	/*! Console output */
-	nyconsole_cf_t console;
+	nyconsole_t console;
 
 	/*! A new program has been started */
 	nybool_t (*on_begin)(nyprogram_t*);
@@ -220,7 +220,7 @@ typedef struct nyvm_t
 	/*! Current thread */
 	nytctx_t* tctx;
 	/*! Console */
-	nyconsole_cf_t* console;
+	nyconsole_t* console;
 }
 nyvm_t;
 

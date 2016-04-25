@@ -71,7 +71,7 @@ static void nany_console_set_color(void* internal, nyconsole_output_t out, nycol
 }
 
 
-extern "C" void nany_console_cf_set_stdcout(nyconsole_cf_t* cf)
+extern "C" void nany_console_cf_set_stdcout(nyconsole_t* cf)
 {
 	if (cf)
 	{

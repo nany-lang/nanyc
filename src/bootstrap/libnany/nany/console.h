@@ -57,7 +57,7 @@ nycolor_t;
 
 /*! \name Console Management */
 /*@{*/
-typedef struct nyconsole_cf_t
+typedef struct nyconsole_t
 {
 	/*! Write some data to STDOUT */
 	void (*write_stdout)(void*, const char* text, size_t length);
@@ -73,15 +73,15 @@ typedef struct nyconsole_cf_t
 	/*! Flush STDERR */
 	void (*release)(void**);
 }
-nyconsole_cf_t;
+nyconsole_t;
 
 /*! Initialize a project configuration */
-NY_EXPORT void nany_console_cf_set_stdcout(nyconsole_cf_t*);
+NY_EXPORT void nany_console_cf_set_stdcout(nyconsole_t*);
 
 /*!
 ** \nbrief Copy Cf
 */
-NY_EXPORT void nany_console_cf_copy(nyconsole_cf_t* out, const nyconsole_cf_t* const src);
+NY_EXPORT void nany_console_cf_copy(nyconsole_t* out, const nyconsole_t* const src);
 /*@}*/
 
 

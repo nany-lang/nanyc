@@ -38,7 +38,7 @@ namespace Logs
 
 		void appendEntry(const Message::Ptr& message);
 
-		void print(nyconsole_cf_t&, bool unify = false);
+		void print(nyconsole_t&, bool unify = false);
 
 		bool isClassifiedAsError() const
 		{

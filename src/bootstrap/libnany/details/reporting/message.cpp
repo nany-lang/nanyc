@@ -39,7 +39,7 @@ namespace Logs
 	namespace // anonymous
 	{
 
-		static void printMessage(nyconsole_cf_t& out, const Message& message, uint32_t indent, String& xx, bool unify)
+		static void printMessage(nyconsole_t& out, const Message& message, uint32_t indent, String& xx, bool unify)
 		{
 			#ifndef YUNI_OS_WINDOWS
 			static const AnyString sep = " \u205E ";
@@ -242,7 +242,7 @@ namespace Logs
 	} // anonymous namespace
 
 
-	void Message::print(nyconsole_cf_t& out, bool unify)
+	void Message::print(nyconsole_t& out, bool unify)
 	{
 		String tmp;
 		printMessage(out, *this, 0, tmp, unify);
