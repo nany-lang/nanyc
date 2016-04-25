@@ -189,4 +189,109 @@ add_custom_target(check
 		"${nany_tests_root}/benchmark"
 	VERBATIM)
 
+
+
+
+
+install(TARGETS nany
+	RUNTIME DESTINATION "bin"
+	COMPONENT "nany")
+
+
+
+add_custom_target(install-libnany
+	DEPENDS libnany
+	COMMAND 
+		"${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=libnany"
+		-P "${CMAKE_BINARY_DIR}/cmake_install.cmake")
+
+add_custom_target(install-nany
+	DEPENDS nany
+	COMMAND 
+		"${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=nany"
+		-P "${CMAKE_BINARY_DIR}/cmake_install.cmake")
+
+add_custom_target(install-libnany-dev
+  DEPENDS libnany
+  COMMAND 
+      "${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=libnany-dev"
+      -P "${CMAKE_BINARY_DIR}/cmake_install.cmake")
+
+
+
+macro(create_rules_for_packages output)
+	if (NOT WIN32 AND NOT APPLE)
+		set(destdir "/tmp/__nany-install-${nany_version}/")
+		set(dev "dev")
+		if ("${output}" STREQUAL "rpm")
+			set(dev "devel")
+		endif()
+
+		add_custom_target(package-${output}
+			DEPENDS libnany
+			COMMAND rm -rf "${destdir}"
+
+			COMMAND "${CMAKE_COMMAND}" "-E" echo ""
+			COMMAND "${CMAKE_COMMAND}" "-E" echo "notes: to install 'fpm' on debian:"
+			COMMAND "${CMAKE_COMMAND}" "-E" echo "           apt-get install ruby-dev gcc make"
+			COMMAND "${CMAKE_COMMAND}" "-E" echo "           gem install fpm"
+			COMMAND "${CMAKE_COMMAND}" "-E" echo "       to install 'fpm' on redhat/centos:"
+			COMMAND "${CMAKE_COMMAND}" "-E" echo "           yum install ruby-devel gcc make"
+			COMMAND "${CMAKE_COMMAND}" "-E" echo "           gem install fpm"
+			COMMAND "${CMAKE_COMMAND}" "-E" echo ""
+
+			COMMAND "DESTDIR=${destdir}/libnany" "${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=libnany"
+				-P "${CMAKE_BINARY_DIR}/cmake_install.cmake"
+			COMMAND fpm -f -s dir -t ${output}
+				--name libnany
+				--version "\"${nany_version}\""
+				--url "\"${nany_website}\""
+				--vendor "Nany"
+				--description "\"Nany Headers\""
+				--license "${nany_license}"
+				--maintainer "${nany_contact}"
+				--verbose
+				-p "../../distrib/"
+				-C "${destdir}/libnany"
+
+			COMMAND "DESTDIR=${destdir}/nany" "${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=nany"
+				-P "${CMAKE_BINARY_DIR}/cmake_install.cmake"
+			COMMAND fpm -f -s dir -t ${output}
+				--name nany
+				--version "\"${nany_version}\""
+				--url "\"${nany_website}\""
+				--vendor "Nany"
+				--description "\"Nany Programming Language\""
+				--license "${nany_license}"
+				--maintainer "${nany_contact}"
+				--depends libnany
+				--verbose
+				-p "../../distrib/"
+				-C "${destdir}/nany"
+
+			COMMAND "DESTDIR=${destdir}/dev" "${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=libnany-dev"
+				-P "${CMAKE_BINARY_DIR}/cmake_install.cmake"
+			COMMAND fpm -f -s dir -t ${output}
+				-a all 
+				--name libnany-${dev}
+				--version "\"${nany_version}\""
+				--url "\"${nany_website}\""
+				--vendor Nany
+				--description "\"Libnany\""
+				--license "${nany_license}"
+				--maintainer "${nany_contact}"
+				--depends libnany
+				--verbose
+				-p "../../distrib/"
+				-C "${destdir}/dev"
+
+			COMMAND rm -rf "${destdir}")
+	endif()
+endmacro()
+
+
+
+create_rules_for_packages(deb)
+create_rules_for_packages(rpm)
+
 # The end !

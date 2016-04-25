@@ -12,6 +12,8 @@ before_install:
     - if [ $TRAVIS_OS_NAME == linux ]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; fi
     - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get update; fi
     - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install -qq gcc-4.9 g++-4.9 cmake uuid-dev; fi
+    - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install -qq ruby-dev gcc make; fi
+    - if [ $TRAVIS_OS_NAME == linux ]; then sudo gem install fpm; fi
     - if [ $TRAVIS_OS_NAME == macos ]; then brew install ossp-uuid; fi
     - if [ $TRAVIS_OS_NAME == linux ]; then export NPROC=$(nproc); fi
     - if [ $TRAVIS_OS_NAME == macos ]; then export NPROC=1; fi
@@ -23,6 +25,7 @@ script:
     - cd src/bootstrap
     - cmake . -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
     - make -j ${NPROC}
+    - make package-deb
 notifications:
     slack:
         rooms:

@@ -457,6 +457,15 @@ addsrc(
 	"c-api/version.c")
 
 
+addsrc(
+	NAME  nysrc_public_headers
+	GROUP "public-headers"
+	FILES
+	"nany/types.h"
+	"nany/console.h"
+	"nany/memalloc.h"
+	"nany/nany.hxx"
+	"nany/nany.h")
 
 
 
@@ -473,11 +482,12 @@ add_library(libnany-grammar STATIC EXCLUDE_FROM_ALL
 add_dependencies(libnany-grammar nany-grammar-cpp)
 
 
+
+
+
 add_library(libnany ${mode_libnany}
 	# public headers
-	nany/nany.h
-	nany/types.h
-	nany/nany.hxx
+	${nysrc_public_headers}
 
 	${nysrc_c_api}
 
@@ -554,11 +564,11 @@ add_dependencies(libnany nany-grammar-cpp)
 add_dependencies(libnany nyt-nanyfile-to-cstring)
 
 
+
 install(TARGETS libnany
-	LIBRARY DESTINATION lib
-	ARCHIVE DESTINATION lib
+	LIBRARY DESTINATION "lib/libnany/${nany_version}"
 	COMPONENT "libnany")
 
-
-
-# The end !
+install(FILES ${nysrc_public_headers} 
+	DESTINATION "include/libnany/${nany_version}/nany"
+	COMPONENT "libnany-dev")
