@@ -20,7 +20,7 @@ $ git submodule update --init --recursive
 
 Generate the makefiles:
 ```
-$ cd bootstrap
+$ cd src/bootstrap
 $ cmake .
 
 ```
@@ -36,7 +36,7 @@ $ make -j $(nproc)
 
 Generate the MS Projects:
 ```
-$ cd bootstrap
+$ cd src/bootstrap
 $ cmake . -G "Visual Studio 14 2015 Win64"
 ```
 
@@ -47,3 +47,34 @@ $ msbuild nany-boostrap.sln
 
 **Note**: For automating the build process with Visual Build Tools, please refer
 to the `appveyor.yml` file at the root directory of the repository.
+
+
+Generating packages for Debian/Redhat
+-------------------------------------
+
+**notes**: [fpm](https://github.com/jordansissel/fpm) (Effing Package Management) is required for generating deb/rpm packages
+
+### Debian packages
+Installing `fpm`:
+```
+$ apt-get install ruby-dev gcc make
+$ gem install fpm
+```
+
+```
+$ cd src/bootstrap
+$ make package-deb
+```
+
+### RedHat/CentOS packages:
+
+Installing `fpm`:
+```
+$ yum install ruby-devel gcc make
+$ gem install fpm
+```
+
+```
+$ cd src/bootstrap
+$ make package-rpm
+```
