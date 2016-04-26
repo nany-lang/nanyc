@@ -1,24 +1,31 @@
 sudo: required
 dist: trusty
-language: cpp
+language: ruby
 os:
     - linux
 compiler:
     - gcc
+rvm:
+    - 2.2.3
 env:
     - BUILD_TYPE=debug
     - BUILD_TYPE=release
 before_install:
     - if [ $TRAVIS_OS_NAME == linux ]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; fi
     - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get update; fi
-    - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install -qq gcc-4.9 g++-4.9 cmake uuid-dev; fi
-    - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install -qq gem ruby-dev gcc make; fi
-    - if [ $TRAVIS_OS_NAME == linux ]; then sudo gem install fpm; fi
+    - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install -qq build-essential gcc-4.9 g++-4.9 cmake uuid-dev; fi
+    - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install -qq gem ruby-dev gcc make bsdtar rpm lintian python-setuptools; fi
+    - if [ $TRAVIS_OS_NAME == linux ]; then rvm use 2.2.3 --install --binary --fuzzy; fi
+    - if [ $TRAVIS_OS_NAME == linux ]; then ruby --version; rvm --version; bundle --version; gem --version; fi
+    - if [ $TRAVIS_OS_NAME == linux ]; then gem install fpm; fi
+    - if [ $TRAVIS_OS_NAME == linux ]; then gem env; fi
     - if [ $TRAVIS_OS_NAME == macos ]; then brew install ossp-uuid; fi
     - if [ $TRAVIS_OS_NAME == linux ]; then export NPROC=$(nproc); fi
     - if [ $TRAVIS_OS_NAME == macos ]; then export NPROC=1; fi
 install:
-    - if [ $TRAVIS_OS_NAME == linux -a "$CXX" == "g++" ]; then export CC="gcc-4.9"; fi
+    - if [ $TRAVIS_OS_NAME == linux -a "$CC" == "" ]; then export CC="gcc-4.9"; fi
+    - if [ $TRAVIS_OS_NAME == linux -a "$CXX" == "" ]; then export CXX="g++-4.9"; fi
+    - if [ $TRAVIS_OS_NAME == linux -a "$CC" == "gcc" ]; then export CC="gcc-4.9"; fi
     - if [ $TRAVIS_OS_NAME == linux -a "$CXX" == "g++" ]; then export CXX="g++-4.9"; fi
 script:
     - env
@@ -26,6 +33,7 @@ script:
     - cmake . -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
     - make -j ${NPROC}
     - make package-deb
+    - cd ../../ && ls -lh ./distrib
 notifications:
     slack:
         rooms:
