@@ -9,6 +9,11 @@ include(CMakeParseArguments)
 include("cmake/messages.cmake")
 
 nmessage("Nany Compiler Suite c++/bootstrap")
+nmessage("")
+nmessage("cmake ${CMAKE_VERSION} in '${CMAKE_SYSTEM}' ${CMAKE_SYSTEM_PROCESSOR}")
+nmessage("  from '${CMAKE_COMMAND}', '${CMAKE_ROOT}'")
+nmessage("current listdir: ${CMAKE_CURRENT_LIST_DIR}")
+nmessage("")
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "" OR (NOT "${CMAKE_BUILD_TYPE}" STREQUAL "release" AND NOT "${CMAKE_BUILD_TYPE}" STREQUAL "debug"))
 	# release by default
