@@ -22,7 +22,6 @@ namespace IR
 
 
 	class Sequence;
-	class Atom;
 	class ClassdefRef;
 
 
