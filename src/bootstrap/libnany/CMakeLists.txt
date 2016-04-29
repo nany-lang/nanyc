@@ -478,7 +478,6 @@ endif()
 add_library(libnany-grammar STATIC EXCLUDE_FROM_ALL
 	${nysrc_grammar}
 	${nysrc_details_grammar})
-
 add_dependencies(libnany-grammar nany-grammar-cpp)
 
 
@@ -538,6 +537,7 @@ set_target_properties(libnany-grammar PROPERTIES
 	VERSION   "${nany_version_major}.${nany_version_minor}.${nany_version_patch}"
 	SOVERSION "${nany_version_major}")
 
+target_link_libraries(libnany-grammar PRIVATE yuni-static-core)
 target_link_libraries(libnany PRIVATE
 	yuni-static-core libnany-grammar dyncall_s)
 

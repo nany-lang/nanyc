@@ -6,8 +6,6 @@ include(CMakeParseArguments)
 # for information related to nany, see settings.txt
 
 
-
-
 include("cmake/messages.cmake")
 
 nmessage("Nany Compiler Suite c++/bootstrap")
@@ -127,24 +125,28 @@ endif()
 #
 # Compilation Flags
 #
-
 file(READ "${CMAKE_CURRENT_BINARY_DIR}/ext/yuni/src/compiler-flags-debug-cc"    YN_FLAGS_C_DEBUG)
 file(READ "${CMAKE_CURRENT_BINARY_DIR}/ext/yuni/src/compiler-flags-release-cc"  YN_FLAGS_C_RELEASE)
 file(READ "${CMAKE_CURRENT_BINARY_DIR}/ext/yuni/src/compiler-flags-debug-cxx"   YN_FLAGS_CXX_DEBUG)
 file(READ "${CMAKE_CURRENT_BINARY_DIR}/ext/yuni/src/compiler-flags-release-cxx" YN_FLAGS_CXX_RELEASE)
 
-set(extra_flags "")
-if (UNIX)
-	if (CMAKE_COMPILER_IS_GNUCC)
-		set(extra_flags "${extra_flags} -fvisibility=hidden")
+set(extra_flags_debug "")
+set(extra_flags_release "")
+
+if (CMAKE_COMPILER_IS_GNUCXX)
+	check_cxx_compiler_flag("-flto" NANY_HAS_LTO)
+	if (NANY_HAS_LTO)
+		# linking issues with LTO currently
+		#set(extra_flags_release "${extra_flags_release} -flto")
+		#set(CMAKE_STATIC_LINKER_FLAGS_RELEASE}" ${CMAKE_STATIC_LINKER_FLAGS_RELEASE} -flto")
+		#set(CMAKE_SHARED_LINKER_FLAGS_RELEASE}" ${CMAKE_SHARED_LINKER_FLAGS_RELEASE} -flto")
 	endif()
 endif()
 
-
-set(CMAKE_C_FLAGS_DEBUG     "${YN_FLAGS_C_DEBUG}")
-set(CMAKE_C_FLAGS_RELEASE   "${YN_FLAGS_C_RELEASE}")
-set(CMAKE_CXX_FLAGS_DEBUG   "${YN_FLAGS_CXX_DEBUG}")
-set(CMAKE_CXX_FLAGS_RELEASE "${YN_FLAGS_CXX_RELEASE}")
+set(CMAKE_C_FLAGS_DEBUG     "${YN_FLAGS_C_DEBUG} ${extra_flags_debug}")
+set(CMAKE_C_FLAGS_RELEASE   "${YN_FLAGS_C_RELEASE} ${extra_flags_release}")
+set(CMAKE_CXX_FLAGS_DEBUG   "${YN_FLAGS_CXX_DEBUG} ${extra_flags_debug}")
+set(CMAKE_CXX_FLAGS_RELEASE "${YN_FLAGS_CXX_RELEASE} ${extra_flags_release}")
 
 
 
@@ -169,8 +171,13 @@ set_target_properties(nany PROPERTIES
 	VERSION "${nany_version_major}.${nany_version_minor}.${nany_version_patch}")
 
 
-add_executable(nyt-print-ast  print-ast.cpp)
-target_link_libraries(nyt-print-ast PRIVATE libnany-grammar yuni-static-core)
+# note: this executable does not rely on `libnany` library on purpose
+# (if something goes wrong with libnany, it might be essential to simply print the input AST)
+add_executable(nyt-print-ast
+	print-ast.cpp ${nysrc_grammar} ${nysrc_details_grammar})
+target_include_directories(nyt-print-ast PRIVATE "${CMAKE_CURRENT_LIST_DIR}/libnany")
+add_dependencies(nyt-print-ast nany-grammar-cpp)
+target_link_libraries(nyt-print-ast PRIVATE yuni-static-core libnany-grammar)
 
 add_executable(nyt-check-syntax  check-syntax.cpp)
 target_link_libraries(nyt-check-syntax PRIVATE libnany yuni-static-core)
