@@ -74,5 +74,3 @@ version: ${nany_version}
 version_string: ${nany_version_string}
 version_metadata: ${nany_version_metadata}
 ")
-
-

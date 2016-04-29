@@ -22,7 +22,7 @@ nmessage("configuration: ${CMAKE_BUILD_TYPE}")
 set(CMAKE_DISABLE_SOURCE_CHANGES  ON)
 
 include("cmake/utils.cmake")
-include("cmake/settings.cmake")
+include("cmake/build-settings.cmake")
 
 
 
