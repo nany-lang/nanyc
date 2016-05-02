@@ -19,12 +19,13 @@ namespace Nany
 		// !!internal: using `pName` and not `name`, since the internal pointer
 		// is not the same
 		auto& prj = Nany::ref(project);
+		AnyString name{pName};
 
 		// add the target in the project
-		prj.targets.all.insert(std::make_pair(AnyString{pName}, this));
+		prj.targets.all.insert(std::make_pair(name, this));
 		// event
 		if (prj.cf.on_target_added)
-			prj.cf.on_target_added(project, self());
+			prj.cf.on_target_added(project, self(), name.c_str(), name.size());
 	}
 
 
@@ -34,12 +35,13 @@ namespace Nany
 		if (project)
 		{
 			auto& prj = Nany::ref(project);
+			AnyString name{pName};
 
 			// event
 			if (prj.cf.on_target_removed)
-				prj.cf.on_target_removed(project, self());
+				prj.cf.on_target_removed(project, self(), name.c_str(), name.size());
 			// remove the target from the list of all targets
-			prj.targets.all.erase(AnyString{pName});
+			prj.targets.all.erase(name);
 			// reset project pointer
 			project = nullptr;
 		}
