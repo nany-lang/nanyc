@@ -53,8 +53,8 @@ namespace Nany
 		//! Target name
 		AnyString name() const;
 
-		//! Rename the target
-		bool rename(AnyString newname);
+		nytarget_t* self();
+		const nytarget_t* self() const;
 
 		void addSource(const AnyString& name, const AnyString& content);
 		void addSourceFromFile(const AnyString& filename);
@@ -71,6 +71,12 @@ namespace Nany
 		CTarget& operator = (const CTarget&) = delete;
 		//@}
 
+
+	private:
+		//! Register the target to the attached project
+		void registerTargetToProject();
+		//! Remove the target from the list of all targets from the project
+		void unregisterTargetFromProject();
 
 	private:
 		//! Attached project

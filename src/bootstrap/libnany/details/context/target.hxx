@@ -5,6 +5,18 @@
 namespace Nany
 {
 
+	inline nytarget_t* CTarget::self()
+	{
+		return reinterpret_cast<nytarget_t*>(this);
+	}
+
+
+	inline const nytarget_t* CTarget::self() const
+	{
+		return reinterpret_cast<const nytarget_t*>(this);
+	}
+
+
 	inline AnyString CTarget::name() const
 	{
 		return pName;

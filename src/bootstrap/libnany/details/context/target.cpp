@@ -13,21 +13,36 @@ using namespace Yuni;
 namespace Nany
 {
 
-	bool CTarget::IsNameValid(const AnyString& name) noexcept
+
+	inline void CTarget::registerTargetToProject()
 	{
-		if (name.size() < 2 or name.size() >= decltype(pName)::chunkSize)
-			return false;
+		// !!internal: using `pName` and not `name`, since the internal pointer
+		// is not the same
+		auto& prj = Nany::ref(project);
 
-		if (not AnyString::IsAlpha(name[0]))
-			return false;
+		// add the target in the project
+		prj.targets.all.insert(std::make_pair(AnyString{pName}, this));
+		// event
+		if (prj.cf.on_target_added)
+			prj.cf.on_target_added(project, self());
+	}
 
-		for (size_t i = 1; i != name.size(); ++i)
+
+	inline void CTarget::unregisterTargetFromProject()
+	{
+		// remove this target from the list of all targ
+		if (project)
 		{
-			auto c = name[(uint)i];
-			if (not AnyString::IsAlpha(c) and not AnyString::IsDigit(c) and c != '-')
-				return false;
+			auto& prj = Nany::ref(project);
+
+			// event
+			if (prj.cf.on_target_removed)
+				prj.cf.on_target_removed(project, self());
+			// remove the target from the list of all targets
+			prj.targets.all.erase(AnyString{pName});
+			// reset project pointer
+			project = nullptr;
 		}
-		return true;
 	}
 
 
@@ -35,11 +50,11 @@ namespace Nany
 		: project(project)
 		, pName{name}
 	{
-		Nany::ref(project).targets.all.insert(std::make_pair(AnyString{pName}, this));
+		registerTargetToProject();
 	}
 
 
-	CTarget::CTarget(nyproject_t* project, const CTarget& rhs) // assuming that rhs is already protected
+	CTarget::CTarget(nyproject_t* project, const CTarget& rhs)
 		: project(project)
 		, pName(rhs.pName)
 	{
@@ -54,7 +69,7 @@ namespace Nany
 				pSources.push_back(newsource);
 				auto& ref = *newsource;
 
-				switch (newsource->pType)
+				switch (ref.pType)
 				{
 					case Source::Type::memory:
 					{
@@ -70,55 +85,21 @@ namespace Nany
 			}
 		}
 
-		Nany::ref(project).targets.all.insert(std::make_pair(AnyString{pName}, this));
+		registerTargetToProject();
 	}
 
 
 	CTarget::~CTarget()
 	{
-		// remove this target from the list of all targ
-		if (project)
-			Nany::ref(project).targets.all.erase(AnyString{pName});
+		unregisterTargetFromProject();
 
 		for (auto& ptr: pSources)
-			ptr->resetTarget(nullptr); // detach from parent
+			ptr->resetTarget(nullptr); // detach all sources from parent
 
 		// force cleanup
 		pSourcesByName.clear();
 		pSourcesByFilename.clear();
 		pSources.clear();
-	}
-
-
-	bool CTarget::rename(AnyString newname)
-	{
-		newname.trim();
-		if (not IsNameValid(newname))
-			return false;
-
-		if (pName.empty()) // disallow renaming of the default target
-			return false;
-
-		// copy & lowercase
-		if (newname == pName)
-			return true; // id - nothing to do
-
-		if (project != nullptr)
-		{
-			auto& map = Nany::ref(project).targets.all;
-			if (map.count(newname) != 0) // failed to rename
-				return false;
-
-			addRef(); // keep me alive - just in case - called from the context
-			map.erase(AnyString{pName});
-			pName = newname;
-			map.insert(std::make_pair(AnyString{pName}, this));
-			release(); // do not handle the result to avoid invalid destruction when no smarptr is involved
-		}
-		else
-			pName = newname; // nothing else to do
-
-		return true;
 	}
 
 
@@ -153,6 +134,24 @@ namespace Nany
 
 			pSources.emplace_back(source.release());
 		}
+	}
+
+
+	bool CTarget::IsNameValid(const AnyString& name) noexcept
+	{
+		if (unlikely(name.size() < 2 or not (name.size() < decltype(pName)::chunkSize)))
+			return false;
+
+		if (unlikely(not AnyString::IsAlpha(name[0])))
+			return false;
+
+		for (size_t i = 1; i < name.size(); ++i)
+		{
+			auto c = name[(uint)i];
+			if (not AnyString::IsAlpha(c) and not AnyString::IsDigit(c) and c != '-')
+				return false;
+		}
+		return true;
 	}
 
 
