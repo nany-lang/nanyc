@@ -9,7 +9,7 @@ using namespace Yuni;
 union internal_t
 {
 	void* pointer;
-	nybool_t colors[3];
+	uint8_t colors[4];
 };
 
 static void nany_console_stdcout(void*, const char* text, size_t length)
@@ -37,10 +37,12 @@ static void nany_console_flush(void*, nyconsole_output_t out)
 
 static void nany_console_set_color(void* internal, nyconsole_output_t out, nycolor_t color)
 {
+	assert(internal != nullptr);
+	assert((uint32_t) out == nycout or (uint32_t) out == nycerr);
 	internal_t flags;
 	flags.pointer = internal;
 
-	if (flags.colors[out] != nyfalse)
+	if (flags.colors[out] != 0)
 	{
 		// which output
 		auto& o = (out == nycout) ? std::cout : std::cerr;
@@ -81,11 +83,13 @@ extern "C" void nany_console_cf_set_stdcout(nyconsole_t* cf)
 		cf->flush        = &nany_console_flush;
 
 		internal_t internal;
-		internal.colors[0]      = nyfalse;
-		internal.colors[nycout] = System::Console::IsStdoutTTY() ? nytrue : nyfalse;
-		internal.colors[nycerr] = System::Console::IsStderrTTY() ? nytrue : nyfalse;
-		cf->internal = internal.pointer;
+		static_assert(sizeof(internal.colors) <= sizeof(internal.pointer), "size mismatch");
 
+		internal.colors[0]      = 0;
+		internal.colors[nycout] = System::Console::IsStdoutTTY() ? 1 : 0;
+		internal.colors[nycerr] = System::Console::IsStderrTTY() ? 1 : 0;
+		internal.colors[3]      = 1; // to always have a non-null value to ease debugging
+		cf->internal = internal.pointer;
 		cf->release  = nullptr;
 	}
 }

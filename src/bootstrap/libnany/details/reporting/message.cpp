@@ -39,12 +39,13 @@ namespace Logs
 	namespace // anonymous
 	{
 
-		static void printMessage(nyconsole_t& out, const Message& message, uint32_t indent, String& xx, bool unify)
+		template<bool unify>
+		static void printMessage(nyconsole_t& out, const Message& message, uint32_t indent, String& xx)
 		{
 			#ifndef YUNI_OS_WINDOWS
-			static const AnyString sep = " \u205E ";
+			#define SEP " \u205E "
 			#else
-			static const AnyString sep = " : ";
+			#define SEP " : "
 			#endif
 
 			Message::ThreadingPolicy::MutexLocker locker{message};
@@ -54,10 +55,8 @@ namespace Logs
 				? nycout : nycerr;
 			// function writer
 			auto wrfn = (omode == nycout) ? out.write_stdout : out.write_stderr;
-
-			auto print = [&](const AnyString& text) {
-				wrfn(out.internal, text.c_str(), text.size());
-			};
+			// print method
+			auto print = [&](const AnyString& s) { wrfn(out.internal, s.c_str(), s.size()); };
 
 			if (message.level != Level::none)
 			{
@@ -66,17 +65,15 @@ namespace Logs
 					case Level::error:
 					{
 						out.set_color(out.internal, omode, nyc_red);
-						#ifndef YUNI_OS_WINDOWS
-						print("   error \u220E ");
-						#else
-						print("   error > ");
-						#endif
+						print("   error" SEP);
+						out.set_color(out.internal, omode, nyc_none);
 						break;
 					}
 					case Level::warning:
 					{
 						out.set_color(out.internal, omode, nyc_yellow);
-						print(" warning > ");
+						print(" warning" SEP);
+						out.set_color(out.internal, omode, nyc_none);
 						break;
 					}
 					case Level::info:
@@ -84,38 +81,36 @@ namespace Logs
 						if (message.section.empty())
 						{
 							out.set_color(out.internal, omode, nyc_none);
-							print("        ");
-							print(sep);
+							print("        " SEP);
 						}
 						else
 						{
 							out.set_color(out.internal, omode, nyc_lightblue);
 							xx = "        ";
 							xx.overwriteRight(message.section);
-							xx << sep;
+							xx << SEP;
 							print(xx);
+							out.set_color(out.internal, omode, nyc_none);
 						}
 						break;
 					}
-
 					case Level::hint:
 					case Level::suggest:
 					{
 						out.set_color(out.internal, omode, nyc_none);
-						print("        ");
-						print(sep);
+						print("        " SEP);
+						out.set_color(out.internal, omode, nyc_none);
 						break;
 					}
-
 					case Level::success:
 					{
 						out.set_color(out.internal, omode, nyc_green);
 						#ifndef YUNI_OS_WINDOWS
-						print("      \u2713 ");
+						print("      \u2713 " SEP);
 						#else
-						print("        ");
+						print("      ok" SEP);
 						#endif
-						print(sep);
+						out.set_color(out.internal, omode, nyc_none);
 						break;
 					}
 					case Level::trace:
@@ -123,7 +118,7 @@ namespace Logs
 						out.set_color(out.internal, omode, nyc_purple);
 						print("      ::");
 						out.set_color(out.internal, omode, nyc_none);
-						print(sep);
+						print(SEP);
 						break;
 					}
 					case Level::verbose:
@@ -131,45 +126,53 @@ namespace Logs
 						out.set_color(out.internal, omode, nyc_green);
 						print("      ::");
 						out.set_color(out.internal, omode, nyc_none);
-						print(sep);
+						print(SEP);
 						break;
 					}
 					case Level::ICE:
 					{
 						out.set_color(out.internal, omode, nyc_red);
-						print("     ICE");
-						print(sep);
+						print("     ICE" SEP);
+						out.set_color(out.internal, omode, nyc_none);
 						break;
 					}
 					case Level::none:
 					{
+						// unreachable - cf condition above
 						break;
 					}
 				}
 
-				for (uint32_t i = indent; i--; )
-					print("    ");
+				if (indent)
+				{
+					xx.clear();
+					for (uint32_t i = indent; i--; )
+						xx << "    ";
+					print(xx);
+				}
 
 				if (not message.prefix.empty())
 				{
 					out.set_color(out.internal, omode, nyc_white);
 					print(message.prefix);
+					out.set_color(out.internal, omode, nyc_none);
 				}
 
 				if (message.level == Level::suggest)
 				{
 					out.set_color(out.internal, omode, nyc_lightblue);
 					print("suggest: ");
+					out.set_color(out.internal, omode, nyc_none);
 				}
 				else if (message.level == Level::hint)
 				{
 					out.set_color(out.internal, omode, nyc_lightblue);
 					print("hint: ");
+					out.set_color(out.internal, omode, nyc_none);
 				}
 
 				if (not message.origins.location.target.empty())
 				{
-					out.set_color(out.internal, omode, nyc_none);
 					print("{");
 					print(message.origins.location.target);
 					print("} ");
@@ -198,21 +201,24 @@ namespace Logs
 					}
 					xx << ": ";
 					print(xx);
+					out.set_color(out.internal, omode, nyc_none);
 				}
 
 
 				if (not message.message.empty())
 				{
-					out.set_color(out.internal, omode, nyc_none);
-
 					String msg{message.message};
 					msg.trimRight(" \t\r\n");
 					msg.replace("\t", "    "); // tabs
 
 					auto firstLF = msg.find('\n');
-					if (firstLF < message.message.size())
+					if (not (firstLF < message.message.size()))
 					{
-						xx.clear() <<"\n        " << sep;
+						print(msg);
+					}
+					else
+					{
+						xx.clear() << "\n        " SEP;
 						for (uint i = indent; i--; )
 							xx.write("    ", 4);
 
@@ -226,8 +232,6 @@ namespace Logs
 							return true;
 						});
 					}
-					else
-						print(msg);
 				}
 
 				print("\n");
@@ -235,7 +239,7 @@ namespace Logs
 			}
 
 			for (auto& ptr: message.entries)
-				printMessage(out, *ptr, indent, xx, unify);
+				printMessage<unify>(out, *ptr, indent, xx);
 		}
 
 
@@ -244,8 +248,15 @@ namespace Logs
 
 	void Message::print(nyconsole_t& out, bool unify)
 	{
-		String tmp;
-		printMessage(out, *this, 0, tmp, unify);
+		assert(out.set_color);
+		if (out.set_color and out.write_stderr and out.write_stdout)
+		{
+			String tmp;
+			if (unify)
+				printMessage<true>(out, *this, 0, tmp);
+			else
+				printMessage<false>(out, *this, 0, tmp);
+		}
 	}
 
 
