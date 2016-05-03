@@ -3,6 +3,12 @@
 
 using namespace Yuni;
 
+#ifndef YUNI_OS_WINDOWS
+#define SEP " \u205E "
+#else
+#define SEP " : "
+#endif
+
 
 
 namespace Nany
@@ -42,12 +48,6 @@ namespace Logs
 		template<bool unify>
 		static void printMessage(nyconsole_t& out, const Message& message, uint32_t indent, String& xx)
 		{
-			#ifndef YUNI_OS_WINDOWS
-			#define SEP " \u205E "
-			#else
-			#define SEP " : "
-			#endif
-
 			Message::ThreadingPolicy::MutexLocker locker{message};
 
 			// which output ?
