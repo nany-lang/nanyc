@@ -38,11 +38,19 @@ namespace Nany
 		~FuncOverloadMatch() = default;
 		//@}
 
+		/*!
+		** \brief Clear all input/output parameters
+		*/
 		void clear();
 
+		/*!
+		** \brief Try to determine if the given func can be called given the input param types
+		*/
 		TypeCheck::Match validate(Atom& atom, bool allowImplicit = true);
 
-
+		/*!
+		** \brief Export input parameters
+		*/
 		void printInputParameters(YString& out) const;
 
 
@@ -85,7 +93,8 @@ namespace Nany
 
 	private:
 		template<bool IsTmpl>
-		inline TypeCheck::Match pushParameter(Atom& atom, yuint32 index, const CLID& clid);
+		inline TypeCheck::Match pushParameter(Atom& atom, uint32_t index, const CLID& clid);
+		void complainParamTypeMismatch(bool isGenType, const Classdef&, const Atom&, uint32_t, const Classdef&);
 
 	private:
 		const ClassdefTableView& table;

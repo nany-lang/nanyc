@@ -311,6 +311,8 @@ namespace Instanciate
 		bool complainInvalidSelfRefForVariableAssignment(uint32_t lvid) const;
 
 		bool complainMissingOperator(Atom&, const AnyString& name) const;
+
+		bool complainCannotCall(Atom& atom, FuncOverloadMatch& overloadMatch);
 		//@}
 
 

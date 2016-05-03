@@ -71,9 +71,39 @@ namespace Nany
 	}
 
 
+	void FuncOverloadMatch::complainParamTypeMismatch(bool isGenType, const Classdef& cdef, const Atom& atom, uint32_t i, const Classdef& paramdef)
+	{
+		report.get().trace() << "failed to push"
+			<< (isGenType ? " generic value " : " value ")
+			<< cdef.clid << " to "
+			<< (CLID{atom.atomid,0})
+			<< ":'" << atom.name << "' parameter index " << i;
+
+		auto hint = report.get().hint();
+		switch (i)
+		{
+			case 0:  hint << "1st"; break;
+			case 1:  hint << "2nd"; break;
+			case 2:  hint << "3rd"; break;
+			default: hint << (i + 1) << "th";
+		}
+		if (isGenType)
+			hint << " generic";
+		hint << " parameter, got '";
+		cdef.print(hint.message.message, table, false);
+		if (debugmode)
+			hint << ' ' << cdef.clid;
+
+		hint << "', expected '";
+		paramdef.print(hint.message.message, table, false);
+		if (debugmode)
+			hint << ' ' << paramdef.clid;
+		hint << '\'';
+	}
+
+
 	template<bool isTmpl>
-	inline TypeCheck::Match
-	FuncOverloadMatch::pushParameter(Atom& atom, yuint32 index, const CLID& clid)
+	inline TypeCheck::Match FuncOverloadMatch::pushParameter(Atom& atom, uint32_t index, const CLID& clid)
 	{
 		// force reset
 		auto& cdef = table.classdef(clid);
@@ -89,34 +119,10 @@ namespace Nany
 		// checking the parameter type
 		resultinfo.strategy = TypeCheck::isSimilarTo(table, nullptr, cdef, paramdef, pAllowImplicit);
 
-		if (unlikely(canGenerateReport) and resultinfo.strategy == TypeCheck::Match::none)
+		if (resultinfo.strategy == TypeCheck::Match::none)
 		{
-			report.get().trace() << "failed to push"
-				<< (isTmpl ? " generic value " : " value ")
-				<< cdef.clid << " to parameter "
-				<< (CLID{atom.atomid,0})
-				<< " '" << atom.name << "' index " << index;
-
-			auto err = report.get().hint();
-			switch (index)
-			{
-				case 0: err << "1st"; break;
-				case 1: err << "2nd"; break;
-				case 2: err << "3rd"; break;
-				default: err << (index + 1) << "th";
-			}
-			if (isTmpl)
-				err << " generic";
-			err << " parameter, got '";
-			cdef.print(err.message.message, table, false);
-			if (debugmode)
-				err << ' ' << cdef.clid;
-
-			err << "', expected '";
-			paramdef.print(err.message.message, table, false);
-			if (debugmode)
-				err << ' ' << paramdef.clid;
-			err << '\'';
+			if (unlikely(canGenerateReport))
+				complainParamTypeMismatch(isTmpl, cdef, atom, index, paramdef);
 		}
 		return resultinfo.strategy;
 	}

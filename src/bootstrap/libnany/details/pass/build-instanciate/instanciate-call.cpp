@@ -209,16 +209,7 @@ namespace Instanciate
 			overloadMatch.canGenerateReport = false;
 			// try to validate the func call
 			if (unlikely(TypeCheck::Match::none == overloadMatch.validate(*atom)))
-			{
-				// no match, re-launching the process with error-enabled logging
-				overloadMatch.canGenerateReport = true;
-				auto err = (error() << "cannot call '" << cdeftable.keyword(*atom) << ' ');
-				atom->retrieveCaption(err.data().message, cdeftable);
-				err << '\'';
-				overloadMatch.report = std::ref(err);
-				overloadMatch.validate(*atom);
-				return false;
-			}
+				return complainCannotCall(*atom, overloadMatch);
 
 			// get new parameters
 			params.swap(overloadMatch.result.params);

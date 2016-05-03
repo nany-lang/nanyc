@@ -411,6 +411,19 @@ namespace Instanciate
 	}
 
 
+	bool SequenceBuilder::complainCannotCall(Atom& atom, FuncOverloadMatch& overloadMatch)
+	{
+		auto err = (error() << "cannot call '" << cdeftable.keyword(atom) << ' ');
+		atom.retrieveCaption(err.data().message, cdeftable);
+		err << '\'';
+
+		// no match, re-launching the process with error-enabled logging for user-reporting
+		overloadMatch.canGenerateReport = true;
+		overloadMatch.report = std::ref(err);
+		overloadMatch.validate(atom);
+		return false;
+	}
+
 
 
 
