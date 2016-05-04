@@ -566,6 +566,7 @@ add_dependencies(libnany nyt-nanyfile-to-cstring)
 
 
 install(TARGETS libnany
+	ARCHIVE DESTINATION "lib/libnany/${nany_version}"
 	LIBRARY DESTINATION "lib/libnany/${nany_version}"
 	COMPONENT "libnany")
 
