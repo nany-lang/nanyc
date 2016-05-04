@@ -124,6 +124,28 @@ namespace Instanciate
 		bool instanciateIntrinsicIGTE(uint32_t);
 
 
+		/*!
+		** \brief Determine if an atom is fully typed and retrieve its return type into the signature
+		**
+		** Used for recursive functions
+		** \return True if fully typed, false if can not be used as a recursive function
+		*/
+		bool isAtomFullyTyped(Signature& signature, const Atom& atom) const;
+
+
+		//! \name Error reporting
+		//@{
+		//! Emit a new error entry
+		Logs::Report error() const;
+		//! Emit a new warning entry (or error)
+		Logs::Report warning() const;
+		//! Emit a new ICE log entry
+		Logs::Report ICE() const;
+		//! Emit a new ICE log entry (ICE on classdef)
+		YString ICE(const Classdef&, const AnyString& msg) const;
+		//@}
+
+
 	private:
 		//! \name Visitors for all supported opcodes
 		//@{
@@ -242,14 +264,6 @@ namespace Instanciate
 
 		//! \name Errors
 		//@{
-		//! Emit a new error entry
-		Logs::Report error() const;
-		//! Emit a new warning entry (or error)
-		Logs::Report warning() const;
-		//! Emit a new ICE log entry
-		Logs::Report ICE() const;
-		//! Emit a new ICE log entry (ICE on classdef)
-		YString ICE(const Classdef&, const AnyString& msg) const;
 
 
 		bool checkForIntrinsicParamCount(const AnyString& name, uint32_t count);

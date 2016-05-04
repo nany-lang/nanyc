@@ -134,15 +134,14 @@ namespace Instanciate
 					auto& solutionAtom = solutions[r].get();
 
 					// trying to instanciate the solution
-					Pass::Instanciate::InstanciateData info{
-						newReport, solutionAtom, cdeftable, build,
-						parameters[r].first, parameters[r].second
+					Pass::Instanciate::InstanciateData info {
+						newReport, solutionAtom, cdeftable, build, parameters[r].first, parameters[r].second
 					};
 					info.canGenerateCode = canGenerateCode;
 					info.canGenerateErrors = canGenerateErrors;
 					info.parent = parent;
 
-					if (InstanciateAtom(info))
+					if (instanciateAtom(info))
 					{
 						// nice, it works ! Keeping it (as the last good solution)
 						++instanceSuccessCount;

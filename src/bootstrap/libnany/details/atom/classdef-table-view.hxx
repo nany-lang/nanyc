@@ -94,6 +94,7 @@ namespace Nany
 	}
 
 
+
 	inline Classdef& ClassdefTableView::addSubstitute(nytype_t kind, Atom* atom, const Qualifiers& qualifiers)
 	{
 		return table.addSubstitute(kind, atom, qualifiers);

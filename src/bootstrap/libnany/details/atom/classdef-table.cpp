@@ -4,7 +4,6 @@
 #include "nany/nany.h"
 #include "libnany-traces.h"
 #include <cassert>
-#include <iostream>
 
 using namespace Yuni;
 

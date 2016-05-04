@@ -68,6 +68,11 @@ namespace Nany
 			error,
 			//! Append captured variables when calling this function (ctor)
 			pushCapturedVariables,
+			//! This func will call itself (directly or indirectly)
+			recursive,
+
+			//! Atom currently being instanciated
+			instanciating,
 		};
 
 		struct Parameters final
@@ -285,11 +290,12 @@ namespace Nany
 		** \param sequence The sequence itself (must not be null)
 		** \param symbolname The complete symbol name (ex: "func A.foo(b: ref __i32): ref __i32")
 		*/
-		uint32_t assignInstance(const Signature& signature, IR::Sequence* sequence,
-			const AnyString& symbolname, Atom* remapAtom);
+		uint32_t createInstanceID(const Signature& signature, IR::Sequence* sequence, Atom* remapAtom);
+
+		void updateInstanceID(uint32_t id, const AnyString& symbol);
 
 		//! Mark as invalid a given signature
-		uint32_t assignInvalidInstance(const Signature& signature);
+		uint32_t invalidateInstance(const Signature& signature, uint32_t id);
 		//@}
 
 
@@ -451,8 +457,8 @@ namespace Nany
 	private:
 		//! All children
 		std::multimap<AnyString, Ptr> pChildren;
+
 		//! All code instances
-		//std::unordered_map<Signature, std::pair<uint32_t, IR::Sequence*>> pInstancesBySign;
 		struct SignatureMetadata {
 			uint32_t instanceid = (uint32_t) -1;
 			Atom* remapAtom = nullptr;
@@ -460,7 +466,7 @@ namespace Nany
 		};
 		std::unordered_map<Signature, SignatureMetadata> pInstancesBySign;
 		//! Symbol names for instances in `pInstances`
-		std::vector<Yuni::String> pSymbolInstances;
+		std::vector<Yuni::String> pInstancesSymbolnames;
 
 		// nakama !
 		friend class AtomMap;

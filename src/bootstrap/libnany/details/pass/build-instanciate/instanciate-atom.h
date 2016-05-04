@@ -30,6 +30,9 @@ namespace Instanciate
 			, tmplparams(tmplparams)
 		{
 			returnType.mutateToAny();
+
+			if (!report)
+				report = new Logs::Message{Logs::Level::none};
 		}
 
 		Logs::Message::Ptr& report;
@@ -63,7 +66,7 @@ namespace Instanciate
 		SequenceBuilder* parent = nullptr;
 	};
 
-	IR::Sequence* InstanciateAtom(InstanciateData& info);
+	bool instanciateAtom(InstanciateData& info);
 
 
 

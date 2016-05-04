@@ -24,11 +24,11 @@ public func main
 ```nany
 //! Fibonacci (recursive way)
 func fibonacci(n: u64): u64
-    -> if n < 2 then n else fibonacci(n - 1) + fibonacci(n - 2);
+    -> if n < 2u then n else fibonacci(n - 1u) + fibonacci(n - 2u);
 
 public func main
 {
-    console << fibonacci(10) << ‘\n’;
+    console << fibonacci(10u64) << ‘\n’;
 }
 ```
 

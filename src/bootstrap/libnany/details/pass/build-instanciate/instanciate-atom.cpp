@@ -171,7 +171,7 @@ namespace Instanciate
 		info.shouldMergeLayer = true;
 		info.parent = this;
 
-		auto* sequence = Pass::Instanciate::InstanciateAtom(info);
+		bool instanciated = Pass::Instanciate::instanciateAtom(info);
 		report.subgroup().appendEntry(newReport);
 
 		// !!
@@ -179,7 +179,7 @@ namespace Instanciate
 		// !!
 		auto& resAtom = info.atom.get();
 
-		if (sequence != nullptr)
+		if (instanciated)
 		{
 			// the user may already have provided one or more constructors
 			// but if not the case, the default implementatio will be used instead
@@ -262,9 +262,9 @@ namespace Instanciate
 		info.canGenerateCode = true; // canGenerateCode();
 		info.parent = this;
 
-		auto* sequence = InstanciateAtom(info);
+		bool instanciated = instanciateAtom(info);
 		report.appendEntry(subreport);
-		if (unlikely(nullptr == sequence))
+		if (unlikely(not instanciated))
 			return (success = false);
 
 		if (unlikely(info.instanceid == static_cast<uint32_t>(-1)))
@@ -471,9 +471,7 @@ namespace Instanciate
 		{
 			// No IR sequence attached for the given signature,
 			// let's instanciate the function or the class !
-
-			// reporting for the current instanciation
-			info.report = new Logs::Message(Logs::Level::none); // TODO remove alloc for reporting
+			assert(!!info.report);
 			Logs::Report report{*info.report};
 
 			auto& previousAtom = info.atom.get();
@@ -494,96 +492,104 @@ namespace Instanciate
 			// the current atom
 			auto& atom = info.atom.get();
 			// the new IR sequence for the instanciated function
-			auto outIR = std::make_unique<IR::Sequence>();
+			auto* outIR = new IR::Sequence;
 			// the original IR sequence generated from the AST
 			auto& inputIR = *(atom.opcodes.sequence);
 
-			// new layer for the cdeftable
-			ClassdefTableView newView{info.cdeftable, atom.atomid, signature.parameters.size()};
+			// registering the new instanciation first
+			// (required for recursive functions)
+			info.instanceid = atom.createInstanceID(signature, outIR, nullptr);
 
-			// instanciate the sequence attached to the atom
-			auto builder = std::make_unique<SequenceBuilder>
-				(report.subgroup(), newView, info.build, *outIR, inputIR, info.parent);
-
-			builder->pushParametersFromSignature(atom.atomid, signature);
-			if (info.parentAtom)
-				builder->layerDepthLimit = 2; // allow the first one
-
-			// Read the input IR sequence, resolve all types, and generate
-			// a new IR sequence ready for execution ! (with or without optimization passes)
-			// (everything happens here)
-			bool success = builder->readAndInstanciate(atom.opcodes.offset);
-
-
-			// post-processing regarding 'stackalloc' opcodes
-			// those opcodes may not have the good declared type (most likely
-			// something like 'any')
-			// (always update even if sometimes not necessary, easier for debugging)
-			reinitStackAllocTypes(*outIR, newView, atom.atomid);
-
-			// keep all deduced types
-			if (likely(success) and info.shouldMergeLayer)
-				newView.mergeSubstitutes();
-
-			// Generating the full human readable name of the symbol with the
-			// apropriate types & qualifiers for all parameters
-			// (example: "func A.foo(b: cref __i32): ref __i32")
-			String symbolName;
-			if (success or Config::Traces::printGeneratedOpcodeSequence)
+			try
 			{
-				symbolName << newView.keyword(info.atom) << ' '; // ex: func
-				atom.retrieveCaption(symbolName, newView);  // ex: A.foo(...)...
-			}
-			if (Config::Traces::printGeneratedOpcodeSequence)
-				printGeneratedIRSequence(report, symbolName, *outIR.get(), newView);
+				// new layer for the cdeftable
+				ClassdefTableView newView{info.cdeftable, atom.atomid, signature.parameters.size()};
 
-			if (success)
-			{
-				if (atom.isFunction())
+				// instanciate the sequence attached to the atom
+				auto builder = std::make_unique<SequenceBuilder>
+					(report.subgroup(), newView, info.build, *outIR, inputIR, info.parent);
+
+				builder->pushParametersFromSignature(atom.atomid, signature);
+				if (info.parentAtom)
+					builder->layerDepthLimit = 2; // allow the first one
+
+				// Read the input IR sequence, resolve all types, and generate
+				// a new IR sequence ready for execution ! (with or without optimization passes)
+				// (everything happens here)
+				bool success = builder->readAndInstanciate(atom.opcodes.offset);
+
+
+				// post-processing regarding 'stackalloc' opcodes
+				// those opcodes may not have the good declared type (most likely
+				// something like 'any')
+				// (always update even if sometimes not necessary, easier for debugging)
+				reinitStackAllocTypes(*outIR, newView, atom.atomid);
+
+				// keep all deduced types
+				if (likely(success) and info.shouldMergeLayer)
+					newView.mergeSubstitutes();
+
+				// Generating the full human readable name of the symbol with the
+				// apropriate types & qualifiers for all parameters
+				// (example: "func A.foo(b: cref __i32): ref __i32")
+				String symbolName;
+				if (success or Config::Traces::printGeneratedOpcodeSequence)
 				{
-					// if the IR code belongs to a function, get the return type
-					// and put it into the signature (for later reuse) and into
-					// the 'info' structure for immediate use
-					auto& cdefReturn = newView.classdef(CLID{atom.atomid, 1});
-					if (not cdefReturn.isBuiltinOrVoid())
+					symbolName << newView.keyword(info.atom) << ' '; // ex: func
+					atom.retrieveCaption(symbolName, newView);  // ex: A.foo(...)...
+				}
+				if (Config::Traces::printGeneratedOpcodeSequence)
+					printGeneratedIRSequence(report, symbolName, *outIR, newView);
+
+				if (success)
+				{
+					if (atom.isFunction())
 					{
-						auto* atom = newView.findClassdefAtom(cdefReturn);
-						if (atom)
+						// if the IR code belongs to a function, get the return type
+						// and put it into the signature (for later reuse) and into
+						// the 'info' structure for immediate use
+						auto& cdefReturn = newView.classdef(CLID{atom.atomid, 1});
+						if (not cdefReturn.isBuiltinOrVoid())
 						{
-							signature.returnType.mutateToAtom(atom);
-							info.returnType.mutateToAtom(atom);
+							auto* atom = newView.findClassdefAtom(cdefReturn);
+							if (atom)
+							{
+								signature.returnType.mutateToAtom(atom);
+								info.returnType.mutateToAtom(atom);
+							}
+							else
+							{
+								report.ICE() << "invalid atom pointer in func return type for '"
+									<< symbolName << '\'';
+								success = false;
+							}
 						}
 						else
 						{
-							report.ICE() << "invalid atom pointer in func return type for '"
-								<< symbolName << '\'';
-							success = false;
+							signature.returnType.kind = cdefReturn.kind;
+							info.returnType.kind = cdefReturn.kind;
 						}
 					}
 					else
 					{
-						signature.returnType.kind = cdefReturn.kind;
-						info.returnType.kind = cdefReturn.kind;
+						// not a function, so no return value (unlikely to be used anyway)
+						signature.returnType.mutateToVoid();
+						info.returnType.mutateToVoid();
+					}
+
+					if (likely(success))
+					{
+						atom.updateInstanceID(info.instanceid, symbolName);
+						return outIR;
 					}
 				}
-				else
-				{
-					// not a function, so no return value (unlikely to be used anyway)
-					signature.returnType.mutateToVoid();
-					info.returnType.mutateToVoid();
-				}
-
-				if (likely(success))
-				{
-					info.instanceid = atom.assignInstance(signature, outIR.get(), symbolName, nullptr);
-					return outIR.release();
-				}
 			}
+			catch (...) {}
 
 			// failed to instanciate the input IR sequence. This can be expected, if trying
 			// to not instanciate the appropriate function (if several overloads are present
-			// for example). Anyway, remember that this signature is a 'no-go'.
-			info.instanceid = atom.assignInvalidInstance(signature);
+			// for example). Anyway, remembering this signature as a 'no-go'.
+			info.instanceid = atom.invalidateInstance(signature, info.instanceid);
 			return nullptr;
 		}
 
@@ -592,8 +598,99 @@ namespace Instanciate
 
 
 
+	bool SequenceBuilder::isAtomFullyTyped(Signature& signature, const Atom& atom) const
+	{
+		// looking for the parent sequence builder currently generating IR for this atom
+		// since the func is not fully instanciated yet, the real types are kept by cdeftable
+		const SequenceBuilder* parentBuilder = nullptr;
+		auto atomid = atom.atomid;
 
-	IR::Sequence* InstanciateAtom(InstanciateData& info)
+		for (auto* sb = this; sb != nullptr; )
+		{
+			auto* builderIT = sb;
+			sb = sb->parent;
+			for (auto* f = builderIT->frame; f != nullptr; f = f->previous)
+			{
+				if (f->atom.atomid == atomid)
+				{
+					sb = nullptr;
+					parentBuilder = builderIT;
+					break;
+				}
+			}
+		}
+		if (unlikely(!parentBuilder))
+			return (ICE() << "failed to find parent sequence builder");
+
+		if (not atom.tmplparams.empty())
+			return (error() << "recursive functions with generic type parameters is not supported yet");
+
+		// !! NOTE !!
+		// the func is not fully instanciated, so the real return type is not set yet
+		// (only at the end of the instanciation).
+		// However, the user-type must be already resolved in {atomid:1}, where :1 is the user return type
+
+		// the same here, it is quite probable that a substite has been added without the complete type
+		// using the 'rawclassdef' to resolve any hard link first
+
+		// checking the return type
+		if (not atom.returnType.clid.isVoid())
+		{
+			auto& raw  = parentBuilder->cdeftable.rawclassdef(CLID{atomid, 1});
+			auto& cdef = parentBuilder->cdeftable.classdef(raw.clid);
+			if (not cdef.isBuiltinOrVoid())
+			{
+				Atom* retatom = parentBuilder->cdeftable.findClassdefAtom(cdef);
+				if (unlikely(!retatom))
+					return false;
+
+				signature.returnType.mutateToAtom(retatom);
+				signature.returnType.qualifiers = cdef.qualifiers;
+			}
+			else
+				signature.returnType.mutateToVoid();
+		}
+		else
+			signature.returnType.mutateToVoid();
+
+		// checking each parameters
+		for (uint32_t p = 0; p != atom.parameters.size(); ++p)
+		{
+			auto& clid = atom.parameters.vardef(p).clid;
+
+			// cf notes above
+			auto& raw  = parentBuilder->cdeftable.rawclassdef(clid);
+			auto& cdef = parentBuilder->cdeftable.classdef(raw.clid);
+			if (not cdef.isBuiltinOrVoid())
+			{
+				if (unlikely(nullptr == parentBuilder->cdeftable.findClassdefAtom(cdef)))
+					return false;
+			}
+		}
+		return true;
+	}
+
+
+	static bool instanciateRecursiveAtom(Signature& signature, InstanciateData& info)
+	{
+		Atom& atom = info.atom.get();
+		atom.flags += Atom::Flags::recursive;
+
+		if (info.parent)
+		{
+			if (unlikely(not info.parent->isAtomFullyTyped(signature, atom)))
+			{
+				auto err = info.parent->error();
+				err << "parameters/return types must be fully defined to allow recursive func calls";
+				return false;
+			}
+			return true;
+		}
+		return false;
+	}
+
+
+	bool instanciateAtom(InstanciateData& info)
 	{
 		// prepare the matching signature
 		Signature signature;
@@ -608,16 +705,26 @@ namespace Instanciate
 			uint32_t ix = atom.findInstance(sequence, remapAtom, signature);
 			if (ix != static_cast<uint32_t>(-1))
 			{
+				if (info.atom.get().flags(Atom::Flags::instanciating))
+				{
+					// recursive function detected
+					if (unlikely(not instanciateRecursiveAtom(signature, info)))
+						return false;
+				}
+
 				info.returnType.import(signature.returnType);
 				info.instanceid = ix;
-				if (remapAtom)
+				if (remapAtom != nullptr) // the target atom may have changed
 					info.atom = std::ref(*remapAtom);
-				return sequence;
+				return true;
 			}
 		}
 
 		// instanciate the function
-		return performAtomInstanciation(info, signature);
+		info.atom.get().flags += Atom::Flags::instanciating;
+		bool success = performAtomInstanciation(info, signature);
+		info.atom.get().flags -= Atom::Flags::instanciating;
+		return success;
 	}
 
 

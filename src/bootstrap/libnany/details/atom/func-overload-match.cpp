@@ -4,7 +4,6 @@
 #include "details/atom/classdef-table-view.h"
 #include "details/reporting/report.h"
 #include "libnany-config.h"
-#include <iostream>
 
 using namespace Yuni;
 
@@ -316,7 +315,6 @@ namespace Nany
 						atomRettype.print(err.message.message, table, false);
 						err << "', expected 'void'";
 					}
-					std::cout << "PIKO\n";
 					return TypeCheck::Match::none;
 				}
 				break;

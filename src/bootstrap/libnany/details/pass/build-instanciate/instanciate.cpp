@@ -415,13 +415,13 @@ namespace Nany
 
 		ClassdefTableView cdeftblView{cdeftable};
 
-		Pass::Instanciate::InstanciateData info{
+		Pass::Instanciate::InstanciateData info {
 			newReport, *entrypointAtom, cdeftblView, *this, params, tmplparams
 		};
-		auto* sequence = Pass::Instanciate::InstanciateAtom(info);
+		bool instanciated = Pass::Instanciate::instanciateAtom(info);
 		report.appendEntry(newReport);
 
-		if (nullptr != sequence)
+		if (instanciated)
 		{
 			atomid = entrypointAtom->atomid;
 			instanceid = info.instanceid;

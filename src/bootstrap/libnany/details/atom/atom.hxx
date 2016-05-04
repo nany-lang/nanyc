@@ -255,7 +255,7 @@ namespace Nany
 	inline AnyString Atom::fetchInstanceCaption(uint32_t instanceid) const
 	{
 		return (instanceid < instances.size())
-			? AnyString{pSymbolInstances[instanceid]} : AnyString{};
+			? AnyString{pInstancesSymbolnames[instanceid]} : AnyString{};
 	}
 
 

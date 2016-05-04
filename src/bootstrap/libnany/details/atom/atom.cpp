@@ -30,7 +30,7 @@ namespace Nany
 
 	Atom::~Atom()
 	{
-		assert(instances.size() == pSymbolInstances.size());
+		assert(instances.size() == pInstancesSymbolnames.size());
 		if (opcodes.owned)
 			delete opcodes.sequence;
 	}
@@ -367,19 +367,24 @@ namespace Nany
 	}
 
 
-	uint32_t Atom::assignInvalidInstance(const Signature& signature)
+	uint32_t Atom::invalidateInstance(const Signature& signature, uint32_t id)
 	{
-		pInstancesBySign.insert(std::make_pair(signature, SignatureMetadata{}));
+		instances[id].reset(nullptr);
+
+		auto& metadata = pInstancesBySign[signature];
+		metadata.instanceid = (uint32_t) -1;
+		metadata.remapAtom  = nullptr;
+		metadata.sequence   = nullptr;
 		return (uint32_t) -1;
 	}
 
 
-	uint32_t Atom::assignInstance(const Signature& signature, IR::Sequence* sequence, const AnyString& symbolname, Atom* remapAtom)
+	uint32_t Atom::createInstanceID(const Signature& signature, IR::Sequence* sequence, Atom* remapAtom)
 	{
 		assert(sequence != nullptr);
 		uint32_t iid = (uint32_t) instances.size();
 		instances.emplace_back(sequence);
-		pSymbolInstances.emplace_back(symbolname);
+		pInstancesSymbolnames.emplace_back();
 
 		SignatureMetadata metadata;
 		metadata.instanceid = iid;
@@ -387,19 +392,24 @@ namespace Nany
 		metadata.remapAtom  = remapAtom;
 
 		pInstancesBySign.insert(std::make_pair(signature, metadata));
-		assert(instances.size() == pSymbolInstances.size());
+		assert(instances.size() == pInstancesSymbolnames.size());
 		return iid;
 	}
 
 
+	void Atom::updateInstanceID(uint32_t id, const AnyString& symbol)
+	{
+		pInstancesSymbolnames[id] = symbol;
+	}
+
 	void Atom::printInstances(Clob& out, const AtomMap& atommap) const
 	{
-		assert(instances.size() == pSymbolInstances.size());
+		assert(instances.size() == pInstancesSymbolnames.size());
 		String prgm;
 
 		for (size_t i = 0; i != instances.size(); ++i)
 		{
-			out << pSymbolInstances[i] << " // " << atomid << " #" << i << "\n{\n";
+			out << pInstancesSymbolnames[i] << " // " << atomid << " #" << i << "\n{\n";
 
 			instances[i].get()->print(prgm, &atommap);
 
@@ -426,7 +436,7 @@ namespace Nany
 		for (size_t i = 0; i != instances.size(); ++i)
 		{
 			if (&sequence == instances[i].get())
-				return pSymbolInstances[i];
+				return pInstancesSymbolnames[i];
 		}
 		return AnyString{};
 	}
