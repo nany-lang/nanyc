@@ -727,7 +727,7 @@ namespace Instanciate
 
 		// instanciate the function
 		atom.flags += Atom::Flags::instanciating;
-		bool success = performAtomInstanciation(info, signature);
+		bool success = (nullptr != performAtomInstanciation(info, signature));
 		atom.flags -= Atom::Flags::instanciating;
 		return success;
 	}
