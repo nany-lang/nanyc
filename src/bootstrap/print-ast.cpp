@@ -15,17 +15,15 @@ static bool printAST(const AnyString filename, bool unixcolors)
 		return false;
 
 	Nany::AST::Parser parser;
-	if (not parser.loadFromFile(filename))
-		return false;
+	bool success = parser.loadFromFile(filename) and parser.root != nullptr;
 
-	if (nullptr == parser.root)
-		return false;
-
-	Clob out;
-	Nany::AST::Node::Export(out, *parser.root, unixcolors);
-
-	std::cout.write(out.c_str(), out.size());
-	return true;
+	if (parser.root != nullptr)
+	{
+		Clob out;
+		Nany::AST::Node::Export(out, *parser.root, unixcolors);
+		std::cout.write(out.c_str(), out.size());
+	}
+	return success;
 }
 
 
