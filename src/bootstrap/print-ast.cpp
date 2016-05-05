@@ -9,7 +9,7 @@ using namespace Yuni;
 
 
 
-static bool  printAST(const AnyString filename, bool unixcolors)
+static bool printAST(const AnyString filename, bool unixcolors)
 {
 	if (filename.empty())
 		return false;
@@ -92,10 +92,11 @@ int main(int argc, char** argv)
 
 	// colors
 	bool withColors = ((not noColors) and System::Console::IsStdoutTTY());
+	bool success = true;
 
 	for (auto& path: filenames)
-		printAST(path, withColors);
+		success &= printAST(path, withColors);
 
-	return EXIT_SUCCESS;
+	return success ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
