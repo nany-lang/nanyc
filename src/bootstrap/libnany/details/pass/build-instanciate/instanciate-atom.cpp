@@ -598,7 +598,7 @@ namespace Instanciate
 
 
 
-	bool SequenceBuilder::isAtomFullyTyped(Signature& signature, const Atom& atom) const
+	bool SequenceBuilder::getReturnTypeForRecursiveFunc(Signature& signature, const Atom& atom) const
 	{
 		// looking for the parent sequence builder currently generating IR for this atom
 		// since the func is not fully instanciated yet, the real types are kept by cdeftable
@@ -673,19 +673,22 @@ namespace Instanciate
 
 	static bool instanciateRecursiveAtom(Signature& signature, InstanciateData& info)
 	{
-		Atom& atom = info.atom.get();
+		Atom& atom  = info.atom.get();
+		// mark the func as recursive
 		atom.flags += Atom::Flags::recursive;
-
-		if (info.parent)
+		if (unlikely(not atom.isFunction()))
 		{
-			if (unlikely(not info.parent->isAtomFullyTyped(signature, atom)))
-			{
-				auto err = info.parent->error();
-				err << "parameters/return types must be fully defined to allow recursive func calls";
-				return false;
-			}
-			return true;
+			if (info.parent)
+				info.parent->ICE() << "cannot mark non function '" << atom.caption() << "' as recursive";
+			return false;
 		}
+
+		if (info.parent and info.parent->getReturnTypeForRecursiveFunc(signature, atom))
+			return true;
+
+		signature.returnType.mutateToAny();
+		if (info.parent)
+			info.parent->error() << "parameters/return types must be fully defined to allow recursive func calls";
 		return false;
 	}
 
@@ -697,33 +700,35 @@ namespace Instanciate
 		prepareSignature(signature, info);
 		assert(info.params.size() == signature.parameters.size());
 
-		// try to pick an existing instanciation
-		{
-			IR::Sequence* sequence = nullptr;
-			auto& atom = info.atom.get();
-			Atom* remapAtom;
-			uint32_t ix = atom.findInstance(sequence, remapAtom, signature);
-			if (ix != static_cast<uint32_t>(-1))
-			{
-				if (info.atom.get().flags(Atom::Flags::instanciating))
-				{
-					// recursive function detected
-					if (unlikely(not instanciateRecursiveAtom(signature, info)))
-						return false;
-				}
+		// the atom being instanciated
+		auto& atom = info.atom.get();
+		// the existing IR sequence, if the instance already exists
+		IR::Sequence* sequence = nullptr;
+		// Another atom, if the target atom had changed
+		Atom* remapAtom = nullptr;
 
-				info.returnType.import(signature.returnType);
-				info.instanceid = ix;
-				if (remapAtom != nullptr) // the target atom may have changed
-					info.atom = std::ref(*remapAtom);
-				return true;
+		// try to pick an existing instanciation
+		uint32_t ix = atom.findInstance(sequence, remapAtom, signature);
+		if (ix != static_cast<uint32_t>(-1))
+		{
+			if (atom.flags(Atom::Flags::instanciating))
+			{
+				// recursive function detected
+				if (unlikely(not instanciateRecursiveAtom(signature, info)))
+					return false;
 			}
+
+			info.returnType.import(signature.returnType);
+			info.instanceid = ix;
+			if (remapAtom != nullptr) // the target atom may have changed
+				info.atom = std::ref(*remapAtom);
+			return true;
 		}
 
 		// instanciate the function
-		info.atom.get().flags += Atom::Flags::instanciating;
+		atom.flags += Atom::Flags::instanciating;
 		bool success = performAtomInstanciation(info, signature);
-		info.atom.get().flags -= Atom::Flags::instanciating;
+		atom.flags -= Atom::Flags::instanciating;
 		return success;
 	}
 
