@@ -2,14 +2,17 @@
 #include <yuni/yuni.h>
 #include <memory>
 #include <limits>
+#include "nany/memalloc.h"
 
 
 
 namespace Nany
 {
+namespace Memory
+{
 
 	/*!
-	** \brief Custom memory allocator using the user-defined context
+	** \brief C++ memory allocator based on the user-defined allocator
 	*/
 	template<class T>
 	class Allocator final
@@ -30,8 +33,8 @@ namespace Nany
 
 
 	public:
-		Allocator(nycontext_t& context) noexcept
-			: context(context)
+		Allocator(nyallocator_t& allocator) noexcept
+			: allocator(allocator)
 		{}
 
 		Allocator(const Allocator&) noexcept = default;
@@ -41,7 +44,7 @@ namespace Nany
 
 		pointer allocate(size_type n, const_pointer /*hint*/ = nullptr)
 		{
-			pointer p = (pointer) context.memory.allocate(&context, n * sizeof(T));
+			pointer p = (pointer) allocator.allocate(&allocator, n * sizeof(T));
 			if (YUNI_UNLIKELY(!p))
 				throw std::bad_alloc();
 			return p;
@@ -49,7 +52,7 @@ namespace Nany
 
 		void deallocate(pointer p, size_type n) noexcept
 		{
-			context.memory.release(&context, p, n * sizeof(T));
+			allocator.deallocate(&allocator, p, n * sizeof(T));
 		}
 
 		static size_type max_size() noexcept
@@ -70,23 +73,23 @@ namespace Nany
 
 		template<class U> bool operator == (const Allocator<U>& rhs) const noexcept
 		{
-			return &context == &rhs.context;
+			return &allocator == &rhs.allocator;
 		}
 
 		template<class U> bool operator != (const Allocator<U>& rhs) const noexcept
 		{
-			return &context != &rhs.context;
+			return &allocator != &rhs.allocator;
 		}
 
 
 	private:
 		//! User context
-		nycontext_t& context;
+		nyallocator_t& allocator;
 
 	}; // class Allocator
 
 
 
 
-
+} // namespace Memory
 } // namespace Nany
