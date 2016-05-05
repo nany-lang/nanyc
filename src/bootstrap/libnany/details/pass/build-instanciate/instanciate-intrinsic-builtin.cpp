@@ -288,7 +288,7 @@ namespace Instanciate
 
 
 
-	constexpr const nytype_t promotion[nyt_count][nyt_count] =
+	constexpr static const nytype_t promotion[nyt_count][nyt_count] =
 	{
 		/*void*/ {nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,},
 		/*any*/  {nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,},
@@ -367,6 +367,8 @@ namespace Instanciate
 				complainIntrinsicParameter(name, 0, cdeflhs);
 				return complainIntrinsicParameter(name, 1, cdefrhs);
 			}
+			if (atomBuiltinCast != nullptr)
+				atomBuiltinCast = Atom::Ptr::WeakPointer(cdeftable.atoms().core.object[builtinlhs]);
 		}
 
 		switch (builtinlhs)
