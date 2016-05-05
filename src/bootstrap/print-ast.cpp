@@ -15,9 +15,9 @@ static bool printAST(const AnyString filename, bool unixcolors)
 		return false;
 
 	Nany::AST::Parser parser;
-	bool success = parser.loadFromFile(filename) and parser.root != nullptr;
+	bool success = parser.loadFromFile(filename);
 
-	if (parser.root != nullptr)
+	if (parser.root != nullptr) // the AST might be empty
 	{
 		Clob out;
 		Nany::AST::Node::Export(out, *parser.root, unixcolors);

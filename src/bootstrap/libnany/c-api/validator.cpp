@@ -9,7 +9,6 @@ using namespace Yuni;
 
 
 
-
 namespace // anonymous
 {
 
@@ -38,17 +37,20 @@ namespace // anonymous
 
 extern "C" nybool_t nany_try_parse_file_n(const char* const filename, size_t length)
 {
-	bool ret = false;
+	bool success = false;
 	if (length != 0 and length < 16*1024 and filename != nullptr)
 	{
 		try
 		{
 			String path{filename, static_cast<uint32_t>(length)};
+
 			Nany::AST::Parser parser;
-			bool success = parser.loadFromFile(path);
-			ret = (success and parser.root and tryFindErrorNode(*(parser.root)));
+			success = parser.loadFromFile(path);
+
+			if (success)
+				success = (parser.root != nullptr) ? tryFindErrorNode(*(parser.root)) : true; // empty AST
 		}
 		catch (...) {}
 	}
-	return ret ? nytrue : nyfalse;
+	return success ? nytrue : nyfalse;
 }
