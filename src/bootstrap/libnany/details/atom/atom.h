@@ -341,7 +341,6 @@ namespace Nany
 	public:
 		//! Atom unique ID (32-bits only, used for classification)
 		yuint32 atomid = 0u;
-
 		//! Atom flags
 		Yuni::Flags<Flags> flags = {Flags::suggestInReport};
 
@@ -405,7 +404,6 @@ namespace Nany
 
 		//! The return type
 		Vardef returnType;
-
 		//! Parameters (for functions)
 		Parameters parameters;
 		//! Template parameters
@@ -415,6 +413,10 @@ namespace Nany
 
 		//! The maximum number of variables / classdefs registered for the atom
 		uint32_t localVariablesCount = 0u;
+
+		//! A different scope for name resolution, if not null (for plugs/outlets)
+		Atom* scopeForNameResolution = nullptr;
+
 
 		//! The original IR sequence
 		struct
@@ -435,9 +437,6 @@ namespace Nany
 		AnyString builtinalias;
 		//! Builtin type (!= nyt_void if this atom represents a builtin)
 		nytype_t builtinMapping = nyt_void;
-
-		//! A different scope for name resolution, if not null
-		Atom* scopeForNameResolution = nullptr;
 
 		//! Name of the current atom
 		AnyString name;
