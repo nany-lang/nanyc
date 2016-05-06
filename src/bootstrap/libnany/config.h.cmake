@@ -22,7 +22,7 @@ namespace Config
 	static constexpr uint32_t maxFuncDeclParameterCount = 7;
 
 	//! Maximum length for a symbol name
-	static constexpr uint32_t maxSymbolNameLength = 64;
+	static constexpr uint32_t maxSymbolNameLength = 64 - 1 /*zero-terminated*/;
 
 	//! Maxmimum number of pushed parameters for calling a function
 	static constexpr uint32_t maxPushedParameters = 32;
