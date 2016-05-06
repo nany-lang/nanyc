@@ -286,6 +286,61 @@ namespace Instanciate
 	}
 
 
+	bool SequenceBuilder::instanciateIntrinsicAssert(uint32_t lvid)
+	{
+		assert(pushedparams.func.indexed.size() == 1);
+
+		// no return value
+		cdeftable.substitute(lvid).mutateToVoid();
+
+		uint32_t lhs  = pushedparams.func.indexed[0].lvid;
+		auto& cdeflhs = cdeftable.classdefFollowClassMember(CLID{frame->atomid, lhs});
+
+		Atom* atomBuiltinCast = nullptr;
+
+		nytype_t builtinlhs = cdeflhs.kind;
+		if (builtinlhs == nyt_any) // implicit access to the internal 'pod' variable
+		{
+			auto* atom = cdeftable.findClassdefAtom(cdeflhs);
+			if (atom != nullptr and atom->builtinMapping != nyt_void)
+			{
+				if (debugmode)
+					out.emitComment("reading inner 'pod' variable");
+				atomBuiltinCast = atom;
+				builtinlhs = atom->builtinMapping;
+
+				if (canGenerateCode())
+				{
+					uint32_t newlvid = createLocalVariables();
+					out.emitFieldget(newlvid, lhs, 0);
+					lhs = newlvid;
+				}
+			}
+		}
+
+		if (unlikely(builtinlhs != nyt_bool))
+			return complainIntrinsicParameter("assert", 0, cdeflhs);
+
+		// --- result of the operator
+
+		if (atomBuiltinCast != nullptr)
+		{
+			// implicit convertion from builtin __bool to object bool
+			atomBuiltinCast = Atom::Ptr::WeakPointer(cdeftable.atoms().core.object[nyt_bool]);
+			assert(atomBuiltinCast != nullptr);
+			assert(not atomBuiltinCast->hasGenericParameters());
+
+			Atom* remapAtom = instanciateAtomClass(*atomBuiltinCast);
+			if (unlikely(nullptr == remapAtom))
+				return false;
+		}
+
+		if (canGenerateCode())
+			out.emitAssert(lhs);
+		return true;
+	}
+
+
 
 
 	constexpr static const nytype_t promotion[nyt_count][nyt_count] =
@@ -671,6 +726,8 @@ namespace Instanciate
 		{"gte",             { &SequenceBuilder::instanciateIntrinsicGTE,       2 }},
 		{"igt",             { &SequenceBuilder::instanciateIntrinsicIGT,       2 }},
 		{"igte",            { &SequenceBuilder::instanciateIntrinsicIGTE,      2 }},
+		//
+		{"assert",          { &SequenceBuilder::instanciateIntrinsicAssert,    1 }},
 	};
 
 	bool SequenceBuilder::instanciateBuiltinIntrinsic(const AnyString& name, uint32_t lvid, bool canComplain)

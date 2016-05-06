@@ -61,6 +61,7 @@ set(ny_core_files
 	"${nsl_root}/std.core/u16.ny"
 	"${nsl_root}/std.core/u8.ny"
 	"${nsl_root}/std.core/i8.ny"
+	"${nsl_root}/std.core/utils.ny"
 	# C types
 	"${nsl_root}/std.c/ctypes.ny"
 

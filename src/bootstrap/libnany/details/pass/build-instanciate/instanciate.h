@@ -90,6 +90,7 @@ namespace Instanciate
 		bool instanciateIntrinsicMemalloc(uint32_t lvid);
 		bool instanciateIntrinsicMemFree(uint32_t lvid);
 		bool instanciateIntrinsicMemfill(uint32_t lvid);
+		bool instanciateIntrinsicAssert(uint32_t lvid);
 
 
 		bool instanciateIntrinsicNOT(uint32_t);

@@ -555,6 +555,12 @@ namespace // anonymous
 		}
 
 
+		void print(const Operand<Op::opassert>& operands)
+		{
+			line() << "assert %" << operands.lvid << " != 0";
+		}
+
+
 		void print(const Operand<Op::blueprint>& operands)
 		{
 			auto kind = static_cast<IR::ISA::Blueprint>(operands.kind);

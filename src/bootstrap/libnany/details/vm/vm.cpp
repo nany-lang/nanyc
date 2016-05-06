@@ -763,6 +763,16 @@ namespace VM
 				memset(object, pattern, size);
 			}
 
+
+			void visit(const IR::ISA::Operand<IR::ISA::Op::opassert>& operands)
+			{
+				VM_PRINT_OPCODE(operands);
+				assert(operands.lvid < registerCount);
+
+				if (YUNI_UNLIKELY(registers[operands.lvid].u64 == 0))
+					throw (String{"assert"});
+			}
+
 			template<IR::ISA::Op O> void visit(const IR::ISA::Operand<O>& operands)
 			{
 				VM_PRINT_OPCODE(operands); // FALLBACK

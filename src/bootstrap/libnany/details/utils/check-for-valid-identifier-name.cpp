@@ -18,7 +18,7 @@ namespace Nany
 
 	static const std::unordered_set<AnyString> reservedKeywords =
 	{
-		"assert", "self", "override", "new", "is",
+		"self", "override", "new", "is",
 		"func", "class", "typedef",
 		"for", "while", "do", "in", "each", "if", "then", "else", "switch",
 		"return", "raise",

@@ -77,6 +77,8 @@ namespace IR
 
 		//! Emit a NOP instruction
 		void emitNop();
+		//! Emit assert instruction
+		void emitAssert(uint32_t lvid);
 
 		//! Emit equal
 		void emitEQ(uint32_t lvid, uint32_t lhs, uint32_t rhs);

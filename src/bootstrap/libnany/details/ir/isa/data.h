@@ -586,6 +586,18 @@ namespace ISA
 
 
 
+
+	template<> struct Operand<Nany::IR::ISA::Op::opassert> final
+	{
+		constexpr static const char* opname() { return "assert"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		template<class T> void eachLVID(T& c) { c(lvid); }
+	};
+
+
+
+
 	template<> struct Operand<Nany::IR::ISA::Op::label> final
 	{
 		constexpr static const char* opname() { return "label"; }
@@ -593,6 +605,7 @@ namespace ISA
 		uint32_t label;
 		template<class T> void eachLVID(T&) {}
 	};
+
 
 
 	template<> struct Operand<Nany::IR::ISA::Op::jmp> final
