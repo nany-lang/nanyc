@@ -58,6 +58,11 @@ namespace Traces
 	static constexpr bool printGeneratedOpcodeSequence = all or recommended or false;
 
 
+	//! Print opcodes after program instanciation
+	static constexpr bool capturedVariables = all or false;
+
+
+
 
 } // namespace Traces
 } // namespace Config

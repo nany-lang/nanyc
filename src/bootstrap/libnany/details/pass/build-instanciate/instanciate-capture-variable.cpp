@@ -1,4 +1,5 @@
 #include "instanciate.h"
+#include "libnany-traces.h"
 #include <string.h>
 
 using namespace Yuni;
@@ -13,34 +14,6 @@ namespace Pass
 namespace Instanciate
 {
 
-	namespace // anonymous
-	{
-
-		template<class C, class D>
-		static inline uint32_t
-		narrowDownCandidateList(AtomStackFrame& frame, C& candidates, D& capturedVars, IR::Sequence& sequence)
-		{
-			uint32_t count = 0;
-			ShortString256 newVarname;
-			for (auto& varname: candidates)
-			{
-				uint32_t lvid = frame.findLocalVariable(varname);
-				if (lvid != 0)
-				{
-					auto& element = capturedVars[count++];
-					newVarname.clear() << "^trap^" << varname;
-					// the new name must be stored somewhere
-					element.name = sequence.stringrefs.refstr(newVarname);
-					element.clid.reclass(frame.atomid, lvid);
-				}
-			}
-			return count;
-		}
-
-	} // anonymous namespace
-
-
-
 
 	void SequenceBuilder::captureVariables(Atom& atom)
 	{
@@ -54,24 +27,52 @@ namespace Instanciate
 		if (unlikely(candidates.empty()))
 			return;
 
+		// The list of variables that can be really captured
+		struct CapturedVar final {
+			AnyString name;
+			CLID clid;
+		};
+		auto capturedVars = std::make_unique<CapturedVar[]>(candidates.size());
+
+		// keeping only local variables from the proposed list
+		uint32_t count = 0;
+		{
+			if (Config::Traces::capturedVariables)
+				trace() << "capturing variables in '" << frame->atom.caption() << '\'';
+
+			ShortString128 newVarname;
+			for (auto& varname: candidates)
+			{
+				uint32_t lvid = frame->findLocalVariable(varname);
+				if (lvid != 0)
+				{
+					auto& element = capturedVars[count++];
+					newVarname.clear() << "^trap^" << varname;
+					// the new name must be stored somewhere
+					element.name = currentSequence.stringrefs.refstr(newVarname);
+					element.clid.reclass(frame->atomid, lvid);
+
+					if (Config::Traces::capturedVariables)
+						trace() << ".. capturing var: '" << varname << '\'';
+				}
+				else
+				{
+					if (Config::Traces::capturedVariables)
+						trace() << ".. capturing var: rejected non local identifier '" << varname << '\'';
+				}
+			}
+
+			if (Config::Traces::capturedVariables)
+				trace() << ".. " << count << " captured variables";
+		}
+		if (count == 0) // nothing to capture
+			return;
+
+
 		assert(atom.opcodes.sequence != nullptr and "invalid empty IR sequence");
 		if (unlikely(atom.opcodes.sequence == nullptr))
 			return;
 		auto& sequence = *atom.opcodes.sequence;
-
-		struct CapturedVar {
-			AnyString name;
-			CLID clid;
-		};
-
-		// The list of variables that can be really captured
-		auto capturedVars = std::make_unique<CapturedVar[]>(candidates.size());
-
-		// removing non-local variables (if any)
-		uint32_t count = narrowDownCandidateList(*frame, candidates, capturedVars, currentSequence);
-		if (unlikely(count == 0)) // nothing to capture
-			return;
-
 
 		auto& table = cdeftable.originalTable();
 
@@ -106,7 +107,7 @@ namespace Instanciate
 
 		for (uint32_t i = 0; i != count; ++i)
 		{
-			auto& var  = capturedVars[i];
+			auto& var = capturedVars[i];
 
 			// new atom for the new variable member
 			auto* newVarAtom = table.atoms.createVardef(atom, var.name);
@@ -126,7 +127,8 @@ namespace Instanciate
 
 			// mark the captured variables as used
 			assert(var.clid.atomid() == frame->atomid);
-			frame->lvids[var.clid.lvid()].warning.unused = false;
+			if (var.clid.atomid() == frame->atomid)
+				frame->lvids[var.clid.lvid()].warning.unused = false;
 		}
 
 		// When instanciating this method, automatically push captured variables
