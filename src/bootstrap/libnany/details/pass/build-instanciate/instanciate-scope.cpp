@@ -40,7 +40,7 @@ namespace Instanciate
 			{
 				if (frame->previous != nullptr)
 				{
-					if (Config::Traces::printClassdefTable)
+					if (Config::Traces::classdefTable)
 						printClassdefTable(report.subgroup(), *frame);
 
 					// destroy the frame

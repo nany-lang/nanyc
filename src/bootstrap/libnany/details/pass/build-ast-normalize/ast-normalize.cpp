@@ -706,7 +706,7 @@ namespace Nany
 
 		if (parser.root and (parser.root->rule == AST::rgStart))
 		{
-			if (Config::Traces::printASTBeforeNormalize)
+			if (Config::Traces::astBeforeNormalize)
 			{
 				Clob out;
 				AST::Node::Export(out, *parser.root);
@@ -718,7 +718,7 @@ namespace Nany
 			// retrieve data
 			buildinfo.parsing.nmspc.swap(cloner.nmspc);
 
-			if (Config::Traces::printASTAfterNormalize)
+			if (Config::Traces::astAfterNormalize)
 			{
 				Clob out;
 				AST::Node::Export(out, *(buildinfo.parsing.rootnode));

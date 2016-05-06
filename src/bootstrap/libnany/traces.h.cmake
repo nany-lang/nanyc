@@ -29,33 +29,33 @@ namespace Traces
 	static constexpr bool ast = false;
 
 	//! Print AST before normalization
-	static constexpr bool printASTBeforeNormalize = ast or false;
+	static constexpr bool astBeforeNormalize = ast or false;
 
 	//! Print AST after normalization
-	static constexpr bool printASTAfterNormalize  = ast or false;
+	static constexpr bool astAfterNormalize  = ast or false;
 
 
 
 
 	//! Print ATOM table
-	static constexpr bool printAtomTable = all or recommended or false;
+	static constexpr bool atomTable = all or recommended or false;
 
 	//! Print ATOM table
-	static constexpr bool printPreAtomTable = all or false;
+	static constexpr bool preAtomTable = all or false;
 
 
 	//! Print all types
-	static constexpr bool printAllTypeDefinitions = all or false;
+	static constexpr bool allTypeDefinitions = all or false;
 
 	//! Print classdef table
-	static constexpr bool printClassdefTable = all or recommended or false;
+	static constexpr bool classdefTable = all or recommended or false;
 
 
 	//! Print opcodes generated from AST
-	static constexpr bool printSourceOpcodeSequence = all or recommended or false;
+	static constexpr bool sourceOpcodeSequence = all or recommended or false;
 
 	//! Print opcodes after program instanciation
-	static constexpr bool printGeneratedOpcodeSequence = all or recommended or false;
+	static constexpr bool generatedOpcodeSequence = all or recommended or false;
 
 
 	//! Print opcodes after program instanciation

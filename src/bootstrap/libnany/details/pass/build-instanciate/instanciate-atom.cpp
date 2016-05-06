@@ -533,12 +533,12 @@ namespace Instanciate
 				// apropriate types & qualifiers for all parameters
 				// (example: "func A.foo(b: cref __i32): ref __i32")
 				String symbolName;
-				if (success or Config::Traces::printGeneratedOpcodeSequence)
+				if (success or Config::Traces::generatedOpcodeSequence)
 				{
 					symbolName << newView.keyword(info.atom) << ' '; // ex: func
 					atom.retrieveCaption(symbolName, newView);  // ex: A.foo(...)...
 				}
-				if (Config::Traces::printGeneratedOpcodeSequence)
+				if (Config::Traces::generatedOpcodeSequence)
 					printGeneratedIRSequence(report, symbolName, *outIR, newView);
 
 				if (success)
