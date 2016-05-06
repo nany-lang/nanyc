@@ -29,7 +29,13 @@ namespace VM
 		/*!
 		** \brief Print a message on the console
 		*/
-		void printStderr(const AnyString& msg);
+		void cerr(const AnyString& msg);
+		/*!
+		** \brief Print a message on the console
+		*/
+		void cerrColor(nycolor_t);
+
+		void cerrException(const AnyString& msg);
 
 
 		void triggerEventsDestroy();

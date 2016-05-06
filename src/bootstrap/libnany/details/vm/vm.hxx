@@ -33,11 +33,27 @@ namespace VM
 	{}
 
 
-	inline void ThreadContext::printStderr(const AnyString& msg)
+	inline void ThreadContext::cerr(const AnyString& msg)
 	{
 		cf.console.write_stderr(cf.console.internal, msg.c_str(), msg.size());
 	}
 
+	inline void ThreadContext::cerrColor(nycolor_t color)
+	{
+		cf.console.set_color(cf.console.internal, nycerr, color);
+	}
+
+
+	inline void ThreadContext::cerrException(const AnyString& msg)
+	{
+		cerr("\n\n");
+		cerrColor(nyc_red);
+		cerr("exception: ");
+		cerrColor(nyc_white);
+		cerr(msg);
+		cerrColor(nyc_none);
+		cerr("\n");
+	}
 
 
 } // namespace VM

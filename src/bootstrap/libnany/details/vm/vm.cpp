@@ -770,7 +770,7 @@ namespace VM
 				assert(operands.lvid < registerCount);
 
 				if (YUNI_UNLIKELY(registers[operands.lvid].u64 == 0))
-					throw (String{"assert"});
+					throw (String{"assert failed"});
 			}
 
 			template<IR::ISA::Op O> void visit(const IR::ISA::Operand<O>& operands)
@@ -820,19 +820,15 @@ namespace VM
 				}
 				catch (const std::exception& e)
 				{
-					threadContext.printStderr("\n\nexception: ");
-					threadContext.printStderr(e.what());
-					threadContext.printStderr("\n");
+					threadContext.cerrException(e.what());
 				}
 				catch (const String& incoming)
 				{
-					threadContext.printStderr("\n\nexception: ");
-					threadContext.printStderr(incoming);
-					threadContext.printStderr("\n");
+					threadContext.cerrException(incoming);
 				}
 				catch (...)
 				{
-					threadContext.printStderr("\n\nexception: unexpected error\n");
+					threadContext.cerrException("unexpected error");
 				}
 
 				stacktrace.dump(Nany::ref(threadContext.program.build), map);
@@ -917,19 +913,15 @@ namespace VM
 		}
 		catch (const std::exception& e)
 		{
-			printStderr("\n\nexception: ");
-			printStderr(e.what());
-			printStderr("\n");
+			cerrException(e.what());
 		}
 		catch (const String& incoming)
 		{
-			printStderr("\n\nexception: ");
-			printStderr(incoming);
-			printStderr("\n");
+			cerrException(incoming);
 		}
 		catch (...)
 		{
-			printStderr("\n\nexception: unexpected error\n");
+			cerrException("unexpected error");
 		}
 
 		if (cf.on_thread_destroy)
