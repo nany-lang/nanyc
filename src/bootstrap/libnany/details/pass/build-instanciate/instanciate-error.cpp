@@ -14,6 +14,15 @@ namespace Instanciate
 {
 
 
+	Logs::Report SequenceBuilder::trace() const
+	{
+		auto tr = report.trace();
+		tr.message.origins.location.filename   = currentFilename;
+		tr.message.origins.location.pos.line   = currentLine;
+		tr.message.origins.location.pos.offset = currentOffset;
+		return tr;
+	}
+
 	Logs::Report SequenceBuilder::error() const
 	{
 		success = false;

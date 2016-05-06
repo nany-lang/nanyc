@@ -141,6 +141,8 @@ namespace Instanciate
 		Logs::Report warning() const;
 		//! Emit a new ICE log entry
 		Logs::Report ICE() const;
+		//! Emit a new ICE log entry
+		Logs::Report trace() const;
 		//! Emit a new ICE log entry (ICE on classdef)
 		YString ICE(const Classdef&, const AnyString& msg) const;
 		//@}
