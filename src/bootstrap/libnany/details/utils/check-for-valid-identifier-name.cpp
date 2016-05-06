@@ -2,6 +2,7 @@
 #include "details/ast/ast.h"
 #include "details/reporting/report.h"
 #include "details/fwd.h"
+#include "libnany-config.h"
 #include <yuni/io/file.h>
 #include <unordered_set>
 #include <unordered_map>
@@ -98,10 +99,16 @@ namespace Nany
 	bool checkForValidIdentifierName(Logs::Report& report, const AST::Node& node, const AnyString& name,
 		bool isOperator, bool isType)
 	{
-		// do never accept empty names
-		if (unlikely(name.empty()))
+		// checking the name size
+		uint32_t size = name.size();
+		if (unlikely(0 == size))
+			return (report.error() << "invalid empty name");
+
+		if (unlikely(size > Config::maxSymbolNameLength))
 		{
-			report.error() << "invalid empty name";
+			auto err = report.error() << "identifier name too long";
+			auto& location = err.message.origins.location;
+			location.pos.offsetEnd = location.pos.offset + name.size();
 			return false;
 		}
 
@@ -114,7 +121,8 @@ namespace Nany
 			// names with '_' as prefix are for internal uses only
 			if (unlikely(name.first() == '_'))
 			{
-				auto err = report.error() << "invalid identifier name '" << name << "': underscore as a prefix is not allowed";
+				auto err = report.error();
+				err << "invalid identifier name '" << name << "': underscore as a prefix is not allowed";
 				err.message.origins.location.pos.offsetEnd = err.message.origins.location.pos.offset + name.size();
 				return false;
 			}
@@ -159,13 +167,6 @@ namespace Nany
 		}
 
 
-		if (unlikely(name.size() > 127u))
-		{
-			auto err = report.error() << "identifier name too long";
-			auto& location = err.message.origins.location;
-			location.pos.offsetEnd = location.pos.offset + name.size();
-			return false;
-		}
 		return true;
 	}
 
