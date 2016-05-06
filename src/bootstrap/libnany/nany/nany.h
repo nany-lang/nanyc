@@ -191,6 +191,26 @@ NY_EXPORT void nany_build_cf_init(nybuild_cf_t* cf, const nyproject_t* project);
 
 /*! \name Program */
 /*@{*/
+typedef struct nybacktrace_entry_t
+{
+	/*! Atom name (e.g. `func mynamespace.MyClass.foo(p1: Type1, p2: Type2): RetType`)*/
+	const char* atom;
+	/*! Source filename (utf8 - can be null) */
+	const char* filename;
+
+	/*! Length in bytes of the atom name (can be null) */
+	uint32_t atom_size;
+	/*! Length in bytes of the source filename (can be null) */
+	uint32_t filename_size;
+
+	/*! Line index (1-based, 0 if unknown) within the source file */
+	uint32_t line;
+	/*! Column index (1-based, 0 if unknown) within the source file for the given line */
+	uint32_t column;
+}
+nybacktrace_entry_t;
+
+
 /*! Program Configuration */
 typedef struct nyprogram_cf_t
 {
@@ -217,7 +237,7 @@ typedef struct nyprogram_cf_t
 	void (*on_thread_destroy)(nyprogram_t*, nythread_t*);
 
 	/*! Error has been received during the execution of the code */
-	void (*on_error)(const nyprogram_t*, const char** backtrace, uint32_t bt_len);
+	/* wip - void (*on_error)(const nyprogram_t*, const nybacktrace_entry_t** backtrace, uint32_t bt_len); */
 	/*!
 	** \brief The program is terminated
 	** \note This callback won't be called if `on_execute` failed
