@@ -16,9 +16,15 @@ namespace Nany
 	class BuildInfoSource final
 	{
 	public:
+		BuildInfoSource(nybuild_cf_t& cf)
+			: cf(cf)
+		{}
+
 		size_t inspectMemoryUsage() const;
 
 	public:
+		nybuild_cf_t& cf;
+
 		struct
 		{
 			//! Nany parser for the current content

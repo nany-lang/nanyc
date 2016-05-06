@@ -41,9 +41,13 @@ namespace Producer
 
 	Logs::Report Scope::warning(const AST::Node& node)
 	{
-		auto err = context.report.warning();
-		setErrorFrom(err, node);
-		return err;
+		if (context.cf.warnings_into_errors == nyfalse)
+		{
+			auto err = context.report.warning();
+			setErrorFrom(err, node);
+			return err;
+		}
+		return error(node);
 	}
 
 

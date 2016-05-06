@@ -5,6 +5,7 @@
 #include "details/ir/sequence.h"
 #include "details/reporting/report.h"
 #include "details/grammar/nany.h"
+#include "nany/nany.h"
 #include <map>
 #include <array>
 #include <cassert>
@@ -34,7 +35,7 @@ namespace Producer
 		//! \name Constructor & Destructor
 		//@{
 		//! Default constructor
-		explicit Context(Sequence& sequence, Logs::Report);
+		explicit Context(nybuild_cf_t&, Sequence&, Logs::Report);
 		//@}
 
 
@@ -71,6 +72,8 @@ namespace Producer
 
 
 	public:
+		//! Information about the current build
+		nybuild_cf_t& cf;
 		//! Linked IR sequence
 		Sequence& sequence;
 		//! Reporting

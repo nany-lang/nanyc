@@ -38,14 +38,18 @@ namespace Instanciate
 
 	Logs::Report SequenceBuilder::warning() const
 	{
-		auto wrn = report.warning();
-		wrn.message.origins.location.filename   = currentFilename;
-		wrn.message.origins.location.pos.line   = currentLine;
-		wrn.message.origins.location.pos.offset = currentOffset;
+		if (nyfalse == build.cf.warnings_into_errors)
+		{
+			auto wrn = report.warning();
+			wrn.message.origins.location.filename   = currentFilename;
+			wrn.message.origins.location.pos.line   = currentLine;
+			wrn.message.origins.location.pos.offset = currentOffset;
 
-		if (debugmode)
-			wrn << "{opc+" << currentSequence.offsetOf(**cursor) << "} ";
-		return wrn;
+			if (debugmode)
+				wrn << "{opc+" << currentSequence.offsetOf(**cursor) << "} ";
+			return wrn;
+		}
+		return error();
 	}
 
 

@@ -12,8 +12,9 @@ namespace Producer
 {
 
 
-	inline Context::Context(Sequence& sequence, Logs::Report report)
-		: sequence(sequence)
+	inline Context::Context(nybuild_cf_t& cf, Sequence& sequence, Logs::Report report)
+		: cf(cf)
+		, sequence(sequence)
 		, report(report)
 	{}
 

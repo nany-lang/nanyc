@@ -120,7 +120,7 @@ namespace Nany
 				report.data().origins.location.filename = pFilename;
 				report.data().origins.location.target.clear();
 				pBuildInfo.reset(nullptr); // making sure that the memory is released first
-				pBuildInfo = std::make_unique<BuildInfoSource>();
+				pBuildInfo = std::make_unique<BuildInfoSource>(build.cf);
 
 				if (success) // file not opened
 				{
