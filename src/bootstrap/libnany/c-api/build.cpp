@@ -2,6 +2,7 @@
 #include "nany/nany.h"
 #include "details/context/project.h"
 #include "details/context/build.h"
+#include "libnany-version.h"
 
 using namespace Yuni;
 
@@ -86,13 +87,43 @@ extern "C" nybool_t nany_build(nybuild_t* ptr)
 }
 
 
-extern "C" void nany_build_print_report_to_console(nybuild_t* ptr)
+
+
+namespace // anonymous
+{
+
+	static void nany_build_print_compiler_info_to_console(Nany::Build& build)
+	{
+		// nanyc {c++/bootstrap} v0.1.0-alpha+ed25d59 {debug}
+		{
+			Nany::Logs::Message msg{Nany::Logs::Level::info};
+			msg.section = "comp";
+			msg.prefix = "nanyc {c++/bootstrap} ";
+			msg.message << 'v' << LIBNANY_VERSION_STR;
+			if (debugmode)
+				msg.message << " {debug}";
+			msg.print(build.cf.console, false);
+		}
+	}
+
+} // anonymous namespace
+
+
+extern "C" void nany_build_print_report_to_console(nybuild_t* ptr, nybool_t print_header)
 {
 	if (ptr)
 	{
 		auto& build = Nany::ref(ptr);
-		if (!!build.messages)
-			build.messages->print(build.cf.console, false);
+
+		try
+		{
+			if (YUNI_UNLIKELY(print_header != nyfalse))
+				nany_build_print_compiler_info_to_console(build);
+
+			if (!!build.messages)
+				build.messages->print(build.cf.console, false);
+		}
+		catch (...) {}
 	}
 }
 

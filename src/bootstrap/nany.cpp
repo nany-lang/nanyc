@@ -151,7 +151,7 @@ namespace // anonymous
 				break;
 
 			if (unlikely(options.verbose))
-				nany_build_print_report_to_console(build.get());
+				nany_build_print_report_to_console(build.get(), nytrue);
 
 			nyprogram_cf_t pcf;
 			nany_program_cf_init(&pcf, &cf);
@@ -160,7 +160,8 @@ namespace // anonymous
 		while (false);
 
 		// an error has occured
-		nany_build_print_report_to_console(build.get());
+		nybool_t addHeader = (options.verbose ? nytrue : nyfalse);
+		nany_build_print_report_to_console(build.get(), addHeader);
 		return nullptr;
 	}
 

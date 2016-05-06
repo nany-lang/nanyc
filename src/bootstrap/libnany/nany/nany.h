@@ -161,9 +161,10 @@ NY_EXPORT nybool_t nany_build(nybuild_t*);
 /*!
 ** \brief Print the build report to the console
 **
-** \param build A build object (can be null)
+** \param build A build object (can be null, will do nothing)
+** \param print_header nytrue to add information about the compiler
 */
-NY_EXPORT void nany_build_print_report_to_console(nybuild_t* build);
+NY_EXPORT void nany_build_print_report_to_console(nybuild_t* build, nybool_t print_header);
 
 
 
