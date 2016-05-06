@@ -197,7 +197,6 @@ namespace Logs
 								xx << message.origins.location.pos.offsetEnd;
 							}
 						}
-						print(xx);
 					}
 					xx << ": ";
 					print(xx);
