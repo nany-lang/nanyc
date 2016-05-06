@@ -252,6 +252,7 @@ namespace Logs
 		if (out.set_color and out.write_stderr and out.write_stdout)
 		{
 			String tmp;
+			tmp.reserve(1024);
 			if (unify)
 				printMessage<true>(out, *this, 0, tmp);
 			else
