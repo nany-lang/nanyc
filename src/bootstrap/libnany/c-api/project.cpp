@@ -72,9 +72,13 @@ extern "C" void nany_project_unref(nyproject_t* ptr)
 {
 	if (ptr)
 	{
-		auto& project = Nany::ref(ptr);
-		if (project.release())
-			project.destroy();
+		try
+		{
+			auto& project = Nany::ref(ptr);
+			if (project.release())
+				project.destroy();
+		}
+		catch (...) {}
 	}
 }
 

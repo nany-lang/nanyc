@@ -86,8 +86,12 @@ extern "C" void nany_program_unref(nyprogram_t* ptr)
 {
 	if (ptr)
 	{
-		auto& program = Nany::ref(ptr);
-		if (program.release())
-			program.destroy();
+		try
+		{
+			auto& program = Nany::ref(ptr);
+			if (program.release())
+				program.destroy();
+		}
+		catch (...) {}
 	}
 }

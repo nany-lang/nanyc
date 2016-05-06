@@ -15,23 +15,35 @@ union internal_t
 static void nany_console_stdcout(void*, const char* text, size_t length)
 {
 	assert(!length or text != nullptr);
-	std::cout.write(text, static_cast<std::streamsize>(length));
+	try
+	{
+		std::cout.write(text, static_cast<std::streamsize>(length));
+	}
+	catch (...) {}
 }
 
 static void nany_console_stderr(void*, const char* text, size_t length)
 {
 	assert(!length or text != nullptr);
-	std::cerr.write(text, static_cast<std::streamsize>(length));
+	try
+	{
+		std::cerr.write(text, static_cast<std::streamsize>(length));
+	}
+	catch (...) {}
 }
 
 static void nany_console_flush(void*, nyconsole_output_t out)
 {
-	switch (out)
+	try
 	{
-		case nycout: std::cout << std::flush; break;
-		case nycerr: std::cerr << std::flush; break;
+		switch (out)
+		{
+			case nycout: std::cout << std::flush; break;
+			case nycerr: std::cerr << std::flush; break;
+		}
+		std::cout << std::flush;
 	}
-	std::cout << std::flush;
+	catch (...) {}
 }
 
 
@@ -39,37 +51,42 @@ static void nany_console_set_color(void* internal, nyconsole_output_t out, nycol
 {
 	assert(internal != nullptr);
 	assert((uint32_t) out == nycout or (uint32_t) out == nycerr);
-	internal_t flags;
-	flags.pointer = internal;
 
-	if (flags.colors[out] != 0)
+	try
 	{
-		// which output
-		auto& o = (out == nycout) ? std::cout : std::cerr;
+		internal_t flags;
+		flags.pointer = internal;
 
-		if (color == nyc_none)
+		if (flags.colors[out] != 0)
 		{
-			System::Console::ResetTextColor(o);
-		}
-		else
-		{
-			constexpr static const System::Console::Color mapping[] =
+			// which output
+			auto& o = (out == nycout) ? std::cout : std::cerr;
+
+			if (color == nyc_none)
 			{
-				System::Console::none, // none
+				System::Console::ResetTextColor(o);
+			}
+			else
+			{
+				constexpr static const System::Console::Color mapping[] =
+				{
+					System::Console::none, // none
 
-				System::Console::black,
-				System::Console::red,
-				System::Console::green,
-				System::Console::yellow,
-				System::Console::blue,
-				System::Console::purple,
-				System::Console::gray,
-				System::Console::white,
-				System::Console::lightblue,
-			};
-			System::Console::SetTextColor(o, mapping[color]);
+					System::Console::black,
+					System::Console::red,
+					System::Console::green,
+					System::Console::yellow,
+					System::Console::blue,
+					System::Console::purple,
+					System::Console::gray,
+					System::Console::white,
+					System::Console::lightblue,
+				};
+				System::Console::SetTextColor(o, mapping[color]);
+			}
 		}
 	}
+	catch (...) {}
 }
 
 

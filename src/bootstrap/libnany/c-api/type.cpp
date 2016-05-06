@@ -26,13 +26,17 @@ static const std::unordered_map<AnyString, nytype_t> translationStringToDef
 };
 
 
-extern "C" nytype_t  nany_cstring_to_type_n(const char* const text, size_t length)
+extern "C" nytype_t nany_cstring_to_type_n(const char* const text, size_t length)
 {
-	if (length > 3 and length < 16 and text and text[0] == '_' and text[1] == '_')
+	try
 	{
-		auto it = translationStringToDef.find(AnyString{text, static_cast<uint32_t>(length)});
-		return (it != translationStringToDef.cend()) ? it->second : nyt_void;
+		if (length > 3 and length < 16 and text and text[0] == '_' and text[1] == '_')
+		{
+			auto it = translationStringToDef.find(AnyString{text, static_cast<uint32_t>(length)});
+			return (it != translationStringToDef.cend()) ? it->second : nyt_void;
+		}
 	}
+	catch (...) {}
 	return nyt_void;
 }
 

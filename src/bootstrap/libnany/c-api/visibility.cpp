@@ -9,32 +9,36 @@ using namespace Yuni;
 
 extern "C" nyvisibility_t  nany_cstring_to_visibility_n(const char* const text, size_t length)
 {
-	AnyString s{text, (uint32_t)length};
-	s.trim();
-	if (YUNI_UNLIKELY(s.empty()))
-		return nyv_default;
-
-	switch (s[0])
+	try
 	{
-		case 'p':
+		AnyString s{text, (uint32_t)length};
+		s.trim();
+		if (YUNI_UNLIKELY(s.empty()))
+			return nyv_default;
+
+		switch (s[0])
 		{
-			if (s.equalsInsensitive("published"))
-				return nyv_published;
-			if (s.equalsInsensitive("public"))
-				return nyv_public;
-			if (s.equalsInsensitive("protected"))
-				return nyv_protected;
-			if (s.equalsInsensitive("private"))
-				return nyv_private;
-			break;
-		}
-		case 'i':
-		{
-			if (s.equalsInsensitive("internal"))
-				return nyv_internal;
-			break;
+			case 'p':
+			{
+				if (s.equalsInsensitive("published"))
+					return nyv_published;
+				if (s.equalsInsensitive("public"))
+					return nyv_public;
+				if (s.equalsInsensitive("protected"))
+					return nyv_protected;
+				if (s.equalsInsensitive("private"))
+					return nyv_private;
+				break;
+			}
+			case 'i':
+			{
+				if (s.equalsInsensitive("internal"))
+					return nyv_internal;
+				break;
+			}
 		}
 	}
+	catch (...) {}
 	return nyv_undefined;
 }
 

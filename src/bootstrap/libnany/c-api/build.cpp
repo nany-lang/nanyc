@@ -139,8 +139,12 @@ extern "C" void nany_build_unref(nybuild_t* ptr)
 {
 	if (ptr)
 	{
-		auto& build = Nany::ref(ptr);
-		if (build.release())
-			build.destroy();
+		try
+		{
+			auto& build = Nany::ref(ptr);
+			if (build.release())
+				build.destroy();
+		}
+		catch (...) {}
 	}
 }

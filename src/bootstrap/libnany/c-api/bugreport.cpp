@@ -15,7 +15,8 @@ extern "C" char* nany_get_info_for_bugreport()
 {
 	try
 	{
-		Clob string;
+		String string;
+		string.reserve(512);
 		string << "> nanyc {c++/bootstrap} v" << nany_version();
 		if (debugmode)
 			string << " {debug}";
