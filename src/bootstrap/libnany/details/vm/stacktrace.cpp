@@ -30,21 +30,32 @@ namespace VM
 	{
 		// this routine does not allocate memory to handle extreme situations
 
+		build.printStderr("\nStack trace:\n");
 		ShortString128 tmp;
 		uint32_t i = 0;
+		uint32_t count = 0;
 
+		for (auto* pointer = topframe; (pointer > baseframe); --pointer, ++i)
+			++count;
+
+		i = 0;
+		ShortString16 indexstr;
+		ShortString16 column;
 		for (auto* pointer = topframe; (pointer > baseframe); --pointer, ++i)
 		{
 			auto& frame = *pointer;
 
-			build.printStderr("    at #");
-			tmp.clear();
-			tmp << i << ": ";
+			indexstr.clear() << '#' << i;
+			column = "        ";
+			column.overwriteRight(indexstr);
+			build.printStderr(column);
+
+			tmp.clear() << " in '";
 			build.printStderr(tmp);
 			const auto& caption = map.fetchSequenceCaption(frame.atomidInstance[0], frame.atomidInstance[1]);
 			build.printStderr(caption);
 
-			build.printStderr("\n       '");
+			build.printStderr("' at '");
 
 			auto* atom = map.findAtom(frame.atomidInstance[0]);
 			if (atom)
