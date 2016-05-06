@@ -877,19 +877,24 @@ namespace VM
 
 	uint64_t ThreadContext::invoke(const IR::Sequence& callee, uint32_t atomid, uint32_t instanceid)
 	{
+		if (cf.on_thread_create)
+		{
+			auto r = cf.on_thread_create(program.self(), self(), nullptr, name.c_str(), name.size());
+			if (YUNI_UNLIKELY(r == nyfalse))
+			{
+				// the user is responsible for keeping the user informed
+				return static_cast<uint64_t>(-1);
+			}
+		}
+
+		uint64_t ret = (uint64_t) -1;
 		try
 		{
-			if (cf.on_thread_create)
-				cf.on_thread_create(program.self(), self(), nullptr, name.c_str(), name.size());
-
 			Executor executor{*this, callee};
 			executor.stacktrace.push(atomid, instanceid);
 			executor.invoke(callee);
 
-			if (cf.on_thread_destroy)
-				cf.on_thread_destroy(program.self(), self());
-
-			return executor.retRegister;
+			ret = executor.retRegister;
 		}
 		catch (const CodeAbort&)
 		{
@@ -916,7 +921,11 @@ namespace VM
 		{
 			printStderr("\n\nexception: unexpected error\n");
 		}
-		return static_cast<uint64_t>(-1);
+
+		if (cf.on_thread_destroy)
+			cf.on_thread_destroy(program.self(), self());
+
+		return ret;
 	}
 
 

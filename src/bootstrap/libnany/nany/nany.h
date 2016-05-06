@@ -199,17 +199,30 @@ typedef struct nyprogram_cf_t
 	/*! Console output */
 	nyconsole_t console;
 
-	/*! A new program has been started */
-	nybool_t (*on_begin)(nyprogram_t*);
-	/*! A new thread is created */
+	/*!
+	** \brief A new program has been started
+	** \return nytrue to continue the execution, nyfalse to abort it
+	*/
+	nybool_t (*on_execute)(nyprogram_t*);
+
+	/*!
+	** \brief A new thread is created
+	** \return nytrue to continue the execution of the thread. nyfalse to abort
+	*/
 	nybool_t (*on_thread_create)(nyprogram_t*, nytctx_t*, nythread_t* parent, const char* name, uint32_t size);
-	/*! A thread has been destroyed */
+	/*!
+	** \brief A thread has been destroyed
+	** \note This callback won't be called if `on_thread_create` failed
+	*/
 	void (*on_thread_destroy)(nyprogram_t*, nythread_t*);
 
-	/*! Error */
-	void (*on_error)(const nyprogram_t*, const char** backtrace, uint32_t size);
-	/*! A program has stopped */
-	void (*on_end)(const nyprogram_t*, int exitcode);
+	/*! Error has been received during the execution of the code */
+	void (*on_error)(const nyprogram_t*, const char** backtrace, uint32_t bt_len);
+	/*!
+	** \brief The program is terminated
+	** \note This callback won't be called if `on_execute` failed
+	*/
+	void (*on_terminate)(const nyprogram_t*, nybool_t error, int exitcode);
 }
 nyprogram_cf_t;
 

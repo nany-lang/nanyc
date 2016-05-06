@@ -15,6 +15,21 @@ namespace Nany
 namespace VM
 {
 
+	namespace // anonymous
+	{
+
+		static inline void flushAll(nyconsole_t& console)
+		{
+			if (console.flush)
+			{
+				console.flush(console.internal, nycerr);
+				console.flush(console.internal, nycout);
+			}
+		}
+
+
+	} // anonymous namespace
+
 
 	void Program::destroy()
 	{
@@ -28,12 +43,17 @@ namespace VM
 
 	int Program::execute(int argc, const char** argv)
 	{
+		if (cf.on_execute)
+		{
+			if (nyfalse == cf.on_execute(self()))
+				return 1;
+		}
+
 		// TODO Take input arguments into consideration
 		(void) argc;
 		(void) argv;
 
-		retvalue = 0;
-		bool success = false;
+		retvalue = 1; // EXIT_FAILURE
 		uint32_t atomid = Nany::ref(build).main.atomid;
 		uint32_t instanceid = Nany::ref(build).main.instanceid;
 
@@ -42,8 +62,18 @@ namespace VM
 			auto& sequence = map.sequence(atomid, instanceid);
 			ThreadContext thrctx{*this, "main"};
 
+			//
+			// Execute the program
+			//
 			retvalue = static_cast<int>(thrctx.invoke(sequence, atomid, instanceid));
-			success = true;
+
+			if (cf.on_terminate)
+				cf.on_terminate(self(), nytrue, retvalue);
+
+			// always flush to make sure that the listener will update the output
+			// (especially useful when embedded into a C/C++ application)
+			flushAll(cf.console);
+			return retvalue;
 		}
 		catch (const CodeAbort&)
 		{
@@ -64,14 +94,12 @@ namespace VM
 			printStderr("error: exception received: aborting\n");
 		}
 
-		// always flush to make sure that the listener will update the output
-		// (especially useful when embedded into a C/C++ application)
-		if (cf.console.flush)
-		{
-			cf.console.flush(cf.console.internal, nycerr);
-			cf.console.flush(cf.console.internal, nycout);
-		}
-		return success ? retvalue : 1;
+		if (cf.on_terminate)
+			cf.on_terminate(self(), nyfalse, retvalue);
+
+		// Always flush the output
+		flushAll(cf.console);
+		return (retvalue != 0) ? retvalue : 1; // avoid 0 if failure
 	}
 
 
