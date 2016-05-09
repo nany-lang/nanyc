@@ -7,6 +7,14 @@
 
 using namespace Yuni;
 
+#ifndef NANY_VERSION
+#error define NANY_VERSION is missing
+#endif
+
+#define likely(X)    YUNI_LIKELY(X)
+#define unlikely(X)  YUNI_UNLIKELY(X)
+
+
 
 
 static bool printAST(const AnyString filename, bool unixcolors)
@@ -27,6 +35,12 @@ static bool printAST(const AnyString filename, bool unixcolors)
 }
 
 
+static int printVersion()
+{
+	static_assert(strlen(YUNI_STRINGIZE(NANY_VERSION)) >= 5, "empty version");
+	std::cout << YUNI_STRINGIZE(NANY_VERSION) << '\n';
+	return EXIT_SUCCESS;
+}
 
 
 int main(int argc, char** argv)
@@ -35,7 +49,6 @@ int main(int argc, char** argv)
 	String::Vector filenames;
 	// no colors
 	bool noColors = false;
-
 
 	// parse the command
 	{
@@ -74,13 +87,10 @@ int main(int argc, char** argv)
 			return EXIT_SUCCESS;
 		}
 
-		if (optVersion)
-		{
-			std::cout << "0.0\n";
-			return EXIT_SUCCESS;
-		}
+		if (unlikely(optVersion))
+			return printVersion();
 
-		if (filenames.empty())
+		if (unlikely(filenames.empty()))
 		{
 			std::cerr << argv[0] << ": no input file\n";
 			return EXIT_FAILURE;
@@ -97,4 +107,3 @@ int main(int argc, char** argv)
 
 	return success ? EXIT_SUCCESS : EXIT_FAILURE;
 }
-

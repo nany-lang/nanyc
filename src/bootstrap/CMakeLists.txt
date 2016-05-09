@@ -170,22 +170,38 @@ add_subdirectory(tools)
 add_subdirectory("libnany")
 
 
+#
+# nany
+#
 add_executable(nany "nany.cpp")
 target_link_libraries(nany PRIVATE libnany yuni-static-core)
 set_target_properties(nany PROPERTIES
 	VERSION "${nany_version_major}.${nany_version_minor}.${nany_version_patch}")
 
 
+#
+# nany-dump-ast
+#
 # note: this executable does not rely on `libnany` library on purpose
 # (if something goes wrong with libnany, it might be essential to simply print the input AST)
-add_executable(nyt-print-ast
-	print-ast.cpp ${nysrc_grammar} ${nysrc_details_grammar})
-target_include_directories(nyt-print-ast PRIVATE "${CMAKE_CURRENT_LIST_DIR}/libnany")
-add_dependencies(nyt-print-ast nany-grammar-cpp)
-target_link_libraries(nyt-print-ast PRIVATE yuni-static-core libnany-grammar)
+add_executable(nany-dump-ast
+	dump-ast.cpp ${nysrc_grammar} ${nysrc_details_grammar})
+target_include_directories(nany-dump-ast PRIVATE "${CMAKE_CURRENT_LIST_DIR}/libnany")
+add_dependencies(nany-dump-ast nany-grammar-cpp)
+target_link_libraries(nany-dump-ast PRIVATE yuni-static-core libnany-grammar)
+set_target_properties(nany-dump-ast PROPERTIES
+	VERSION "${nany_version_major}.${nany_version_minor}.${nany_version_patch}")
+# nany-dump-ast does not use libnany (on purpose)
+target_compile_definitions(nany-dump-ast PRIVATE "NANY_VERSION=${nany_version_string}")
 
-add_executable(nyt-check-syntax  check-syntax.cpp)
-target_link_libraries(nyt-check-syntax PRIVATE libnany yuni-static-core)
+
+#
+# nany-check-syntax
+#
+add_executable(nany-check-syntax  check-syntax.cpp)
+target_link_libraries(nany-check-syntax PRIVATE libnany yuni-static-core)
+set_target_properties(nany-check-syntax PROPERTIES
+	VERSION "${nany_version_major}.${nany_version_minor}.${nany_version_patch}")
 
 
 #
@@ -193,9 +209,9 @@ target_link_libraries(nyt-check-syntax PRIVATE libnany yuni-static-core)
 #
 get_filename_component(nany_tests_root "${CMAKE_CURRENT_LIST_DIR}/../../tests/" REALPATH)
 add_custom_target(check
-	DEPENDS nyt-check-syntax
-	COMMAND "$<TARGET_FILE:nyt-check-syntax>" "--use-filename-convention" "${nany_tests_root}/parsing"
-	COMMAND "$<TARGET_FILE:nyt-check-syntax>"
+	DEPENDS nany-check-syntax
+	COMMAND "$<TARGET_FILE:nany-check-syntax>" "--use-filename-convention" "${nany_tests_root}/parsing"
+	COMMAND "$<TARGET_FILE:nany-check-syntax>"
 		"${nany_tests_root}/build"
 		"${nany_tests_root}/contest"
 		"${nany_tests_root}/benchmark"
