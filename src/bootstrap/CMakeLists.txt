@@ -261,11 +261,11 @@ macro(create_rules_for_packages output)
 
 			COMMAND "${CMAKE_COMMAND}" "-E" echo ""
 			COMMAND "${CMAKE_COMMAND}" "-E" echo "notes: to install 'fpm' on debian:"
-			COMMAND "${CMAKE_COMMAND}" "-E" echo "           apt-get install ruby-dev gcc make"
-			COMMAND "${CMAKE_COMMAND}" "-E" echo "           gem install fpm"
+			COMMAND "${CMAKE_COMMAND}" "-E" echo "           [sudo] apt-get install ruby-dev gcc make"
+			COMMAND "${CMAKE_COMMAND}" "-E" echo "           [sudo] gem install fpm"
 			COMMAND "${CMAKE_COMMAND}" "-E" echo "       to install 'fpm' on redhat/centos:"
-			COMMAND "${CMAKE_COMMAND}" "-E" echo "           yum install ruby-devel gcc make"
-			COMMAND "${CMAKE_COMMAND}" "-E" echo "           gem install fpm"
+			COMMAND "${CMAKE_COMMAND}" "-E" echo "           [sudo] yum install ruby-devel gcc make"
+			COMMAND "${CMAKE_COMMAND}" "-E" echo "           [sudo] gem install fpm"
 			COMMAND "${CMAKE_COMMAND}" "-E" echo ""
 
 			COMMAND "DESTDIR=${destdir}/libnany" "${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=libnany"
