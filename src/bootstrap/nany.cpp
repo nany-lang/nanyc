@@ -67,6 +67,13 @@ namespace // anonymous
 	};
 
 
+	static int printNoInputScript()
+	{
+		std::cerr << argv0 << ": no input script file\n";
+		return EXIT_FAILURE;
+	}
+
+
 	static int printUsage(const char* const argv0)
 	{
 		std::cout
@@ -209,15 +216,13 @@ int main(int argc, char** argv)
 {
 	argv0 = argv[0];
 	if (YUNI_UNLIKELY(argc <= 1))
-	{
-		std::cerr << argv0 << ": no input script file\n";
-		return EXIT_FAILURE;
-	}
+		return printNoInputScript();
 
 	try
 	{
 		Options options;
-		int firstarg = -1;
+		int firstarg = argc; // end of the list
+
 		for (int i = 1; i < argc; ++i)
 		{
 			const char* const carg = argv[i];
@@ -262,6 +267,9 @@ int main(int argc, char** argv)
 			firstarg = i;
 			break;
 		}
+
+		if (unlikely(firstarg >= argc))
+			return printNoInputScript();
 
 		//
 		// -- execute the script
