@@ -22,25 +22,25 @@ static const char* argv0 = "";
 
 namespace std
 {
-	template<> struct default_delete<nyproject_t>
+	template<> struct default_delete<nyproject_t> final
 	{
-		void operator () (nyproject_t* ptr)
+		inline void operator () (nyproject_t* ptr)
 		{
 			nany_project_unref(ptr);
 		}
 	};
 
-	template<> struct default_delete<nybuild_t>
+	template<> struct default_delete<nybuild_t> final
 	{
-		void operator () (nybuild_t* ptr)
+		inline void operator () (nybuild_t* ptr)
 		{
 			nany_build_unref(ptr);
 		}
 	};
 
-	template<> struct default_delete<nyprogram_t>
+	template<> struct default_delete<nyprogram_t> final
 	{
-		void operator () (nyprogram_t* ptr)
+		inline void operator () (nyprogram_t* ptr)
 		{
 			nany_program_unref(ptr);
 		}
@@ -53,7 +53,7 @@ namespace std
 namespace // anonymous
 {
 
-	struct Options
+	struct Options final
 	{
 		//! Verbose mode
 		bool verbose = false;
@@ -61,10 +61,11 @@ namespace // anonymous
 		uint32_t jobs = 1;
 		//! Memory limit (zero means unlimited)
 		size_t memoryLimit = 0;
-
 		//! The new argv0
 		String argv0;
 	};
+
+
 
 
 	static int printNoInputScript()
@@ -72,7 +73,6 @@ namespace // anonymous
 		std::cerr << argv0 << ": no input script file\n";
 		return EXIT_FAILURE;
 	}
-
 
 	static int printUsage(const char* const argv0)
 	{
@@ -86,7 +86,6 @@ namespace // anonymous
 		return EXIT_SUCCESS;
 	}
 
-
 	static int printBugReportInfo()
 	{
 		auto* text = nany_get_info_for_bugreport();
@@ -94,18 +93,16 @@ namespace // anonymous
 		{
 			std::cout << text;
 			::free(text);
-			return 0;
+			return EXIT_SUCCESS;
 		}
 		return EXIT_FAILURE;
 	}
-
 
 	static int printVersion()
 	{
 		std::cout << nany_version() << '\n';
 		return EXIT_SUCCESS;
 	}
-
 
 	static int unknownOption(const AnyString& name)
 	{
@@ -114,27 +111,33 @@ namespace // anonymous
 	}
 
 
+	/*!
+	** \brief Create a new nany project
+	*/
 	static inline std::unique_ptr<nyproject_t> createProject(const Options& options)
 	{
 		nyproject_cf_t cf;
 		nany_project_cf_init(&cf);
 
 		size_t limit = options.memoryLimit;
-		if (limit == 0)
+		if (unlikely(limit == 0))
 			limit = static_cast<size_t>(System::Environment::ReadAsUInt64("NANY_MEMORY_LIMIT"));
 
-		if (limit != 0)
+		if (unlikely(limit != 0))
 			nany_memalloc_set_with_limit(&cf.allocator, limit);
 
 		return std::unique_ptr<nyproject_t>{nany_project_create(&cf)};
 	}
 
 
+	/*!
+	** \brief Try to compile the input script filename
+	*/
 	static inline std::unique_ptr<nyprogram_t> compile(const AnyString& argv0, Options& options)
 	{
 		// PROJECT
 		auto project = createProject(options);
-		if (!project)
+		if (unlikely(!project))
 			return nullptr;
 
 		// SOURCE
@@ -148,7 +151,7 @@ namespace // anonymous
 		nybuild_cf_t cf;
 		nany_build_cf_init(&cf, project.get());
 		auto build = std::unique_ptr<nybuild_t>{nany_build_prepare(project.get(), &cf)};
-		if (!build)
+		if (unlikely(!build))
 			return nullptr;
 
 		do
@@ -173,6 +176,15 @@ namespace // anonymous
 	}
 
 
+	/*!
+	** \brief Execute the script in argv[0]
+	**
+	** \param argc The total number of arguments
+	** \param argv List of UTF8 arguments to pass to the script. The first one is the script to evaluate
+	**  (like `main()` for the program)
+	** \param options Evaluation options
+	** \return Exit status
+	*/
 	static inline int execute(int argc, char** argv, Options& options)
 	{
 		assert(argc >= 1);
@@ -215,7 +227,7 @@ namespace // anonymous
 int main(int argc, char** argv)
 {
 	argv0 = argv[0];
-	if (YUNI_UNLIKELY(argc <= 1))
+	if (unlikely(argc <= 1))
 		return printNoInputScript();
 
 	try
@@ -226,7 +238,7 @@ int main(int argc, char** argv)
 		for (int i = 1; i < argc; ++i)
 		{
 			const char* const carg = argv[i];
-			if (carg[0] == '-')
+			if (unlikely(carg[0] == '-'))
 			{
 				if (carg[1] == '-')
 				{
