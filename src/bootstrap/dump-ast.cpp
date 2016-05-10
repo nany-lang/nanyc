@@ -37,7 +37,7 @@ static bool printAST(const AnyString filename, bool unixcolors)
 
 static int printVersion()
 {
-	static_assert(strlen(YUNI_STRINGIZE(NANY_VERSION)) >= 5, "empty version");
+	assert(strlen(YUNI_STRINGIZE(NANY_VERSION)) >= 5 and "empty version");
 	std::cout << YUNI_STRINGIZE(NANY_VERSION) << '\n';
 	return EXIT_SUCCESS;
 }
