@@ -41,42 +41,51 @@ namespace Nany
 
 	void FuncOverloadMatch::printInputParameters(String& out) const
 	{
-		if (not input.params.indexed.empty())
+		auto paramprinter = [&](const auto& paramlist)
 		{
-			table.classdef(input.params.indexed.front()).print(out, table, false);
-
-			for (auto it = input.params.indexed.begin() + 1; it != input.params.indexed.end(); ++it)
+			if (not paramlist.indexed.empty())
 			{
-				out.write(", ", 2);
-				table.classdef(*it).print(out, table, false);
+				table.classdef(paramlist.indexed.front()).print(out, table, false);
+
+				for (auto it = paramlist.indexed.begin() + 1; it != paramlist.indexed.end(); ++it)
+				{
+					out.write(", ", 2);
+					table.classdef(*it).print(out, table, false);
+				}
 			}
+
+			if (not paramlist.named.empty())
+			{
+				if (not paramlist.indexed.empty())
+					out.write(", ", 2);
+
+				(out << paramlist.named.front().first).write(": ", 2);
+				table.classdef(paramlist.named.front().second).print(out, table, false);
+
+				for (auto it = paramlist.named.begin() + 1; it != paramlist.named.end(); ++it)
+				{
+					out.write(", ", 2);
+					(out << it->first).write(": ", 2);
+					table.classdef(it->second).print(out, table, false);
+				}
+			}
+		};
+
+		if (not input.tmplparams.indexed.empty() or not input.tmplparams.named.empty())
+		{
+			out << "<:";
+			paramprinter(input.tmplparams);
+			out << ":>";
 		}
 
-		if (not input.params.named.empty())
-		{
-			if (not input.params.indexed.empty())
-				out.write(", ", 2);
-
-			(out << input.params.named.front().first).write(": ", 2);
-			table.classdef(input.params.named.front().second).print(out, table, false);
-
-			for (auto it = input.params.named.begin() + 1; it != input.params.named.end(); ++it)
-			{
-				out.write(", ", 2);
-				(out << it->first).write(": ", 2);
-				table.classdef(it->second).print(out, table, false);
-			}
-		}
+		out << '(';
+		paramprinter(input.params);
+		out << ')';
 	}
 
 
 	void FuncOverloadMatch::complainParamTypeMismatch(bool isGenType, const Classdef& cdef, const Atom& atom, uint32_t i, const Classdef& paramdef)
 	{
-		report.get().trace() << "failed to push"
-			<< (isGenType ? " generic value " : " value ")
-			<< cdef.clid << " to "
-			<< (CLID{atom.atomid,0})
-			<< ":'" << atom.name << "' parameter index " << i;
 
 		auto hint = report.get().hint();
 		switch (i)
@@ -98,6 +107,18 @@ namespace Nany
 		if (debugmode)
 			hint << ' ' << paramdef.clid;
 		hint << '\'';
+
+		if (debugmode)
+		{
+			hint.hint() << "failed to push"
+				<< (isGenType ? " generic value " : " value ")
+				<< cdef.clid << " to " << (CLID{atom.atomid,0})
+				<< ":'" << atom.name << "' parameter index " << (i + 1);
+
+			String inputs;
+			printInputParameters(inputs);
+			hint.hint() << ">> <call> " << inputs;
+		}
 	}
 
 
