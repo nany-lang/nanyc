@@ -30,8 +30,7 @@ namespace VM
 	{
 		// this routine does not allocate memory to handle extreme situations
 
-		build.printStderr("\nStack trace:\n");
-		ShortString128 tmp;
+		build.printStderr("stack trace:\n");
 		uint32_t i = 0;
 		uint32_t count = 0;
 
@@ -39,21 +38,25 @@ namespace VM
 			++count;
 
 		i = 0;
-		ShortString16 indexstr;
-		ShortString16 column;
+		ShortString32 tmp;
+
 		for (auto* pointer = topframe; (pointer > baseframe); --pointer, ++i)
 		{
 			auto& frame = *pointer;
 
-			indexstr.clear() << '#' << i;
-			column = "        ";
-			column.overwriteRight(indexstr);
-			build.printStderr(column);
+			build.printStderr("    ");
 
-			tmp.clear() << " in '";
+			build.cerrColor(nyc_lightblue);
+			tmp.clear() << '#' << i;
 			build.printStderr(tmp);
+			build.cerrColor(nyc_none);
+
+			build.printStderr(" in '");
+
 			const auto& caption = map.fetchSequenceCaption(frame.atomidInstance[0], frame.atomidInstance[1]);
+			build.cerrColor(nyc_white);
 			build.printStderr(caption);
+			build.cerrColor(nyc_none);
 
 			build.printStderr("' at '");
 

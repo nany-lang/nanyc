@@ -68,6 +68,11 @@ namespace Nany
 		** \brief Print a message on the console
 		*/
 		void printStderr(const AnyString& msg);
+		/*!
+		** \brief Print a message on the console
+		*/
+		void cerrColor(nycolor_t);
+
 
 		//! Allocate a new object
 		template<class T, typename... Args> T* allocate(Args&&... args);

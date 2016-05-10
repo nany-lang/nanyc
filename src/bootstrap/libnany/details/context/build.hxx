@@ -86,6 +86,11 @@ namespace Nany
 		cf.console.write_stderr(cf.console.internal, msg.c_str(), msg.size());
 	}
 
+	inline void Build::cerrColor(nycolor_t color)
+	{
+		cf.console.set_color(cf.console.internal, nycerr, color);
+	}
+
 
 
 } // namespace Nany
