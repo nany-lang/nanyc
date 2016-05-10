@@ -116,6 +116,10 @@ namespace Nany
 
 				// end
 				duration += DateTime::NowMilliSeconds() - buildtime;
+
+				if (debugmode and unlikely(not success))
+					report.error() << "debug: failed to compile";
+
 				return success;
 			}
 		}
