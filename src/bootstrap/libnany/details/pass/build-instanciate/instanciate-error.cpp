@@ -370,9 +370,9 @@ namespace Instanciate
 	}
 
 
-	bool SequenceBuilder::complainInvalidType(const Classdef& from, const Classdef& to)
+	bool SequenceBuilder::complainInvalidType(const char* origin, const Classdef& from, const Classdef& to)
 	{
-		auto err = (error() << "cannot convert '");
+		auto err = (error() << origin << "cannot convert '");
 		if (debugmode)
 			err << from.clid << ':';
 		from.print(err.data().message, cdeftable, false);
@@ -382,7 +382,7 @@ namespace Instanciate
 		if (debugmode)
 			err << to.clid << ':';
 		to.print(err.data().message, cdeftable, false);
-		err << "' in variable assignment";
+		err << '\'';
 		return false;
 	}
 

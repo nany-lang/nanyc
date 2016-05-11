@@ -274,7 +274,7 @@ namespace Instanciate
 
 		bool complainUnknownIdentifier(const Atom* self, const Atom& atom, const AnyString& name);
 
-		bool complainInvalidType(const Classdef& from, const Classdef& to);
+		bool complainInvalidType(const char* origin, const Classdef& from, const Classdef& to);
 
 		bool complainMultipleOverloads(LVID lvid, const std::vector<std::reference_wrapper<Atom>>& solutions,
 			const OverloadedFuncCallResolver& resolver);

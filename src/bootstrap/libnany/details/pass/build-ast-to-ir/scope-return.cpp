@@ -39,12 +39,10 @@ namespace Producer
 					emitDebugpos(child);
 
 					uint32_t copy = sequence().emitStackalloc(nextvar(), nyt_any);
-					{
-						auto& operands    = sequence().emit<ISA::Op::follow>();
-						operands.follower = copy;
-						operands.lvid     = 1; // return type
-						operands.symlink  = 0; // true
-					}
+					auto& operands    = sequence().emit<ISA::Op::follow>();
+					operands.follower = copy;
+					operands.lvid     = 1; // return type
+					operands.symlink  = 0; // true
 
 					out.emitInheritQualifiers(copy, /*ret*/1);
 					out.emitAssign(copy, localvar, false);

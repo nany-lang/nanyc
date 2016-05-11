@@ -57,7 +57,7 @@ namespace Instanciate
 		{
 			auto similarity = TypeCheck::isSimilarTo(cdeftable, nullptr, cdef, cdefvar);
 			if (unlikely(TypeCheck::Match::none == similarity))
-				return complainInvalidType(cdef, cdefvar);
+				return complainInvalidType("fieldset: ", cdef, cdefvar);
 		}
 
 		if (canGenerateCode())

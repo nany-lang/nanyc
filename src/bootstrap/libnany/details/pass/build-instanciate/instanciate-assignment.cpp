@@ -69,7 +69,7 @@ namespace Instanciate
 		{
 			auto similarity = TypeCheck::isSimilarTo(cdeftable, nullptr, cdeflhs, cdefrhs, false);
 			if (unlikely(TypeCheck::Match::strictEqual != similarity))
-				return complainInvalidType(cdefrhs, cdeflhs);
+				return complainInvalidType(nullptr, cdefrhs, cdeflhs);
 		}
 
 		// type propagation
