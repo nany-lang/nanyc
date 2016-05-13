@@ -1,7 +1,6 @@
 #include "instanciate.h"
 #include "instanciate-atom.h"
 #include "overloaded-func-call-resolution.h"
-#include <iostream>
 
 using namespace Yuni;
 
@@ -290,8 +289,6 @@ namespace Instanciate
 
 			uint32_t newlvid = out.at<IR::ISA::Op::stackalloc>(offset).lvid;
 			++offset;
-			std::cout << "------ " << out.at(offset).opcodes[0] << '\n';
-			std::cout << "------ " << (uint32_t) IR::ISA::Op::label << '\n';
 			assert(out.at(offset).opcodes[0] == static_cast<uint32_t>(IR::ISA::Op::nop));
 
 			auto& fieldget  = out.at<IR::ISA::Op::fieldget>(offset);
