@@ -30,7 +30,7 @@ namespace Nany
 
 	Atom::~Atom()
 	{
-		assert(instances.size() == pInstancesSymbolnames.size());
+		assert(instances.size() == pInstancesMD.size());
 		if (opcodes.owned)
 			delete opcodes.sequence;
 	}
@@ -371,10 +371,12 @@ namespace Nany
 	{
 		instances[id].reset(nullptr);
 
-		auto& metadata = pInstancesBySign[signature];
-		metadata.instanceid = (uint32_t) -1;
-		metadata.remapAtom  = nullptr;
-		metadata.sequence   = nullptr;
+		pInstancesIDs[signature] = (uint32_t) -1;
+
+		auto& md = pInstancesMD[id];
+		md.sequence = nullptr;
+		md.remapAtom = nullptr;
+
 		return (uint32_t) -1;
 	}
 
@@ -382,34 +384,64 @@ namespace Nany
 	uint32_t Atom::createInstanceID(const Signature& signature, IR::Sequence* sequence, Atom* remapAtom)
 	{
 		assert(sequence != nullptr);
+
+		// the new instanceID
 		uint32_t iid = (uint32_t) instances.size();
+
 		instances.emplace_back(sequence);
-		pInstancesSymbolnames.emplace_back();
+		pInstancesMD.emplace_back();
 
-		SignatureMetadata metadata;
-		metadata.instanceid = iid;
-		metadata.sequence   = sequence;
-		metadata.remapAtom  = remapAtom;
+		auto& md = pInstancesMD[iid];
+		md.remapAtom = remapAtom;
+		md.sequence  = sequence;
 
-		pInstancesBySign.insert(std::make_pair(signature, metadata));
-		assert(instances.size() == pInstancesSymbolnames.size());
+		pInstancesIDs.insert(std::make_pair(signature, iid));
+		assert(instances.size() == pInstancesMD.size());
 		return iid;
 	}
 
 
-	void Atom::updateInstanceID(uint32_t id, const AnyString& symbol)
+	void Atom::updateInstance(uint32_t id, const AnyString& symbol, const Classdef& rettype)
 	{
-		pInstancesSymbolnames[id] = symbol;
+		auto& md = pInstancesMD[id];
+		md.rettype.import(rettype);
+		md.rettype.qualifiers = rettype.qualifiers;
+		md.symbol = symbol;
 	}
+
+
+	Tribool::Value Atom::findInstance(const Signature& signature, uint32_t& iid, Classdef& rettype, Atom*& remapAtom) const
+	{
+		auto it = pInstancesIDs.find(signature);
+		if (it != pInstancesIDs.end())
+		{
+			uint32_t id = it->second;
+			if (id != (uint32_t) -1)
+			{
+				assert(id < pInstancesMD.size());
+				auto& md  = pInstancesMD[id];
+
+				iid       = id;
+				remapAtom = md.remapAtom;
+
+				rettype.import(md.rettype);
+				rettype.qualifiers = md.rettype.qualifiers;
+				return Tribool::Value::yes;
+			}
+			return Tribool::Value::no;
+		}
+		return Tribool::Value::indeterminate;
+	}
+
 
 	void Atom::printInstances(Clob& out, const AtomMap& atommap) const
 	{
-		assert(instances.size() == pInstancesSymbolnames.size());
+		assert(instances.size() == pInstancesMD.size());
 		String prgm;
 
 		for (size_t i = 0; i != instances.size(); ++i)
 		{
-			out << pInstancesSymbolnames[i] << " // " << atomid << " #" << i << "\n{\n";
+			out << pInstancesMD[i].symbol << " // " << atomid << " #" << i << "\n{\n";
 
 			instances[i].get()->print(prgm, &atommap);
 
@@ -436,7 +468,7 @@ namespace Nany
 		for (size_t i = 0; i != instances.size(); ++i)
 		{
 			if (&sequence == instances[i].get())
-				return pInstancesSymbolnames[i];
+				return pInstancesMD[i].symbol;
 		}
 		return AnyString{};
 	}

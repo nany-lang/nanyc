@@ -64,9 +64,6 @@ namespace Nany
 		bool operator != (const Signature& rhs) const;
 
 	public:
-		//! The return type
-		Classdef returnType;
-
 		//! Function parameters (func (a, b , c))
 		Parameters parameters;
 		//! Template parameters

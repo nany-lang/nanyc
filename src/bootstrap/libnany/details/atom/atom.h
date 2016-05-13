@@ -4,6 +4,7 @@
 #include <yuni/core/string.h>
 #include <yuni/core/noncopyable.h>
 #include <yuni/core/flags.h>
+#include <yuni/core/tribool.h>
 #include "details/fwd.h"
 #include "details/utils/clid.h"
 #include "vardef.h"
@@ -261,12 +262,9 @@ namespace Nany
 		//@{
 		/*!
 		** \brief Fetch the sequence for a given signature (if any) and update the signature
-		**
-		** \param[out] Pointer to the sequence attached to the given signature
-		** \param[in,out] The signature. If the instance is found, its return type
-		**  will be updated accordingly
 		*/
-		uint32_t findInstance(IR::Sequence*& sequence, Atom*& remapAtom, Signature& signature);
+		Yuni::Tribool::Value
+		findInstance(const Signature& signature, uint32_t& iid, Classdef&, Atom*& remapAtom) const;
 		//! Find Instance ID
 		uint32_t findInstanceID(const IR::Sequence&) const;
 
@@ -292,7 +290,7 @@ namespace Nany
 		*/
 		uint32_t createInstanceID(const Signature& signature, IR::Sequence* sequence, Atom* remapAtom);
 
-		void updateInstanceID(uint32_t id, const AnyString& symbol);
+		void updateInstance(uint32_t id, const AnyString& symbol, const Classdef& rettype);
 
 		//! Mark as invalid a given signature
 		uint32_t invalidateInstance(const Signature& signature, uint32_t id);
@@ -458,14 +456,18 @@ namespace Nany
 		std::multimap<AnyString, Ptr> pChildren;
 
 		//! All code instances
-		struct SignatureMetadata {
-			uint32_t instanceid = (uint32_t) -1;
-			Atom* remapAtom = nullptr;
+		std::unordered_map<Signature, uint32_t> pInstancesIDs;
+		//! Return types per instance id
+		std::vector<Classdef> pInstancesRetTypes;
+
+		struct InstanceMetadata final {
 			IR::Sequence* sequence = nullptr;
+			Classdef rettype;
+			Atom* remapAtom = nullptr;
+			Yuni::String symbol;
 		};
-		std::unordered_map<Signature, SignatureMetadata> pInstancesBySign;
 		//! Symbol names for instances in `pInstances`
-		std::vector<Yuni::String> pInstancesSymbolnames;
+		std::vector<InstanceMetadata> pInstancesMD;
 
 		// nakama !
 		friend class AtomMap;

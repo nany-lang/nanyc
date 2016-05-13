@@ -131,7 +131,7 @@ namespace Instanciate
 		** Used for recursive functions
 		** \return True if fully typed, false if can not be used as a recursive function
 		*/
-		bool getReturnTypeForRecursiveFunc(Signature& signature, const Atom& atom) const;
+		bool getReturnTypeForRecursiveFunc(const Atom& atom, Classdef&) const;
 
 
 		//! \name Error reporting

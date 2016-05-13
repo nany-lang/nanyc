@@ -255,7 +255,7 @@ namespace Nany
 	inline AnyString Atom::fetchInstanceCaption(uint32_t instanceid) const
 	{
 		return (instanceid < instances.size())
-			? AnyString{pInstancesSymbolnames[instanceid]} : AnyString{};
+			? AnyString{pInstancesMD[instanceid].symbol} : AnyString{};
 	}
 
 
@@ -274,24 +274,6 @@ namespace Nany
 	inline bool Atom::empty() const
 	{
 		return pChildren.empty();
-	}
-
-
-	inline uint32_t Atom::findInstance(IR::Sequence*& sequence, Atom*& remapAtom, Signature& signature)
-	{
-		auto it = pInstancesBySign.find(signature);
-		if (it != pInstancesBySign.end())
-		{
-			auto& metadata = it->second;
-			sequence  = metadata.sequence;
-			remapAtom = metadata.remapAtom;
-
-			auto& storedRetType = it->first.returnType;
-			signature.returnType.import(storedRetType);
-			signature.returnType.qualifiers = storedRetType.qualifiers;
-			return metadata.instanceid;
-		}
-		return (uint32_t) -1;
 	}
 
 

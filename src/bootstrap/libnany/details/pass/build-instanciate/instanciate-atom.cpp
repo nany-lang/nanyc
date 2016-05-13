@@ -7,7 +7,6 @@
 #include "details/pass/build-attach-program/mapping.h"
 #include "libnany-traces.h"
 #include "instanciate-atom.h"
-#include <iostream>
 
 using namespace Yuni;
 
@@ -554,32 +553,26 @@ namespace Instanciate
 							auto* atom = newView.findClassdefAtom(cdefReturn);
 							if (atom)
 							{
-								signature.returnType.mutateToAtom(atom);
 								info.returnType.mutateToAtom(atom);
 							}
 							else
 							{
-								report.ICE() << "invalid atom pointer in func return type for '"
-									<< symbolName << '\'';
+								report.ICE() << "invalid atom pointer in func return type for '" << symbolName << '\'';
 								success = false;
 							}
 						}
 						else
-						{
-							signature.returnType.kind = cdefReturn.kind;
 							info.returnType.kind = cdefReturn.kind;
-						}
 					}
 					else
 					{
 						// not a function, so no return value (unlikely to be used anyway)
-						signature.returnType.mutateToVoid();
 						info.returnType.mutateToVoid();
 					}
 
 					if (likely(success))
 					{
-						atom.updateInstanceID(info.instanceid, symbolName);
+						atom.updateInstance(info.instanceid, symbolName, info.returnType);
 						return outIR;
 					}
 				}
@@ -598,7 +591,7 @@ namespace Instanciate
 
 
 
-	bool SequenceBuilder::getReturnTypeForRecursiveFunc(Signature& signature, const Atom& atom) const
+	bool SequenceBuilder::getReturnTypeForRecursiveFunc(const Atom& atom, Classdef& rettype) const
 	{
 		// looking for the parent sequence builder currently generating IR for this atom
 		// since the func is not fully instanciated yet, the real types are kept by cdeftable
@@ -644,14 +637,14 @@ namespace Instanciate
 				if (unlikely(!retatom))
 					return false;
 
-				signature.returnType.mutateToAtom(retatom);
-				signature.returnType.qualifiers = cdef.qualifiers;
+				rettype.mutateToAtom(retatom);
+				rettype.qualifiers = cdef.qualifiers;
 			}
 			else
-				signature.returnType.mutateToVoid();
+				rettype.mutateToVoid();
 		}
 		else
-			signature.returnType.mutateToVoid();
+			rettype.mutateToVoid();
 
 		// checking each parameters
 		for (uint32_t p = 0; p != atom.parameters.size(); ++p)
@@ -671,7 +664,7 @@ namespace Instanciate
 	}
 
 
-	static bool instanciateRecursiveAtom(Signature& signature, InstanciateData& info)
+	static bool instanciateRecursiveAtom(InstanciateData& info)
 	{
 		Atom& atom  = info.atom.get();
 		// mark the func as recursive
@@ -683,10 +676,10 @@ namespace Instanciate
 			return false;
 		}
 
-		if (info.parent and info.parent->getReturnTypeForRecursiveFunc(signature, atom))
+		if (info.parent and info.parent->getReturnTypeForRecursiveFunc(atom, info.returnType))
 			return true;
 
-		signature.returnType.mutateToAny();
+		info.returnType.mutateToAny();
 		if (info.parent)
 			info.parent->error() << "parameters/return types must be fully defined to allow recursive func calls";
 		return false;
@@ -702,36 +695,40 @@ namespace Instanciate
 
 		// the atom being instanciated
 		auto& atom = info.atom.get();
-		// the existing IR sequence, if the instance already exists
-		IR::Sequence* sequence = nullptr;
 		// Another atom, if the target atom had changed
 		Atom* remapAtom = nullptr;
 
-		// try to pick an existing instanciation
-		uint32_t ix = atom.findInstance(sequence, remapAtom, signature);
-		if (ix != static_cast<uint32_t>(-1))
+		auto found = atom.findInstance(signature, info.instanceid, info.returnType, remapAtom);
+		switch (found)
 		{
-			if (atom.flags(Atom::Flags::instanciating))
+			case Tribool::Value::yes:
 			{
-				// recursive function detected
-				if (unlikely(not instanciateRecursiveAtom(signature, info)))
-					return false;
+				if (atom.flags(Atom::Flags::instanciating)) // recursive func detected
+				{
+					if (unlikely(not instanciateRecursiveAtom(info)))
+						return false;
+				}
+
+				// instance already present
+				if (unlikely(remapAtom != nullptr)) // the target atom may have changed
+					info.atom = std::ref(*remapAtom);
+				return true;
 			}
-
-			info.returnType.import(signature.returnType);
-			info.instanceid = ix;
-			if (remapAtom != nullptr) // the target atom may have changed
-				info.atom = std::ref(*remapAtom);
-			return true;
+			case Tribool::Value::indeterminate:
+			{
+				// not found, the atom should be instanciated
+				atom.flags += Atom::Flags::instanciating;
+				bool success = (nullptr != performAtomInstanciation(info, signature));
+				atom.flags -= Atom::Flags::instanciating;
+				return success;
+			}
+			case Tribool::Value::no:
+			{
+				// failed to instanciate last time. error already reported
+			}
 		}
-
-		// instanciate the function
-		atom.flags += Atom::Flags::instanciating;
-		bool success = (nullptr != performAtomInstanciation(info, signature));
-		atom.flags -= Atom::Flags::instanciating;
-		return success;
+		return false;
 	}
-
 
 
 
