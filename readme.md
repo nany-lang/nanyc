@@ -31,3 +31,10 @@ Contributing
 ------------
 
 **Note**: this project uses [Zenhub](https://www.zenhub.io/) for ticket management and upvoting
+
+
+
+Resources
+---------
+
+* [Syntax highlighting for your favorite Text Editor](//github.com/nany-lang/nany-syntax)
