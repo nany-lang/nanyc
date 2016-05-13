@@ -148,14 +148,9 @@ namespace Instanciate
 				varname.prepend(".");
 
 			if (part.first() != '^')
-			{
 				varname.prepend(part);
-			}
 			else
-			{
-				varname += "operator ";
-				varname += AnyString{part, 1, part.size() - 1};
-			}
+				varname << "operator " << AnyString{part, 1, part.size() - 1};
 		}
 
 		auto err = error();
@@ -163,9 +158,9 @@ namespace Instanciate
 		if (resolver.suitableCount > 0)
 		{
 			// generating the error
-			err << "ambiguous call to overloaded function '" << varname << '(';
+			err << "ambiguous call to overloaded function '" << varname;
 			overloadMatch.printInputParameters(err.data().message);
-			err << ")'";
+			err << '\'';
 
 			for (size_t i = 0; i != solutions.size(); ++i)
 			{
@@ -188,9 +183,9 @@ namespace Instanciate
 		}
 		else
 		{
-			err << "no matching function to call '" << varname << '(';
+			err << "no matching function to call '" << varname;
 			overloadMatch.printInputParameters(err.data().message);
-			err << ")'";
+			err << '\'';
 
 			for (size_t i = 0; i != solutions.size(); ++i)
 			{
