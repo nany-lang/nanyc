@@ -1,5 +1,6 @@
 #include <yuni/yuni.h>
 #include "details/pass/build-ast-to-ir/scope.h"
+#include "details/utils/check-for-valid-identifier-name.h"
 
 using namespace Yuni;
 
@@ -14,7 +15,7 @@ namespace Producer
 {
 
 
-	bool Scope::visitASTExprIn(const AST::Node& node, LVID& localvar, ShortString16& elementname)
+	bool Scope::visitASTExprIn(const AST::Node& node, LVID& localvar, ShortString128& elementname)
 	{
 		// lvid representing the input container
 		AST::Node* container = nullptr;
@@ -32,6 +33,9 @@ namespace Producer
 					auto& identifier = child.firstChild();
 					if (unlikely(identifier.rule != AST::rgIdentifier))
 						return ICE(identifier) << "identifier expected";
+
+					if (unlikely(not checkForValidIdentifierName(context.report, child, identifier.text, false)))
+						return false;
 
 					elementname = identifier.text;
 					break;
@@ -89,8 +93,8 @@ namespace Producer
 
 	bool Scope::visitASTExprIn(const AST::Node& node, LVID& localvar)
 	{
-		// Name of the target ref for each element in the container
-		ShortString16 elementname;
+		// Name of the target ref for each element in the container (ignored here)
+		ShortString128 elementname;
 		return visitASTExprIn(node, localvar, elementname);
 	}
 

@@ -75,7 +75,7 @@ namespace Producer
 		bool visitASTExprDoWhile(const AST::Node&);
 		bool visitASTExprSwitch(const AST::Node&);
 		bool visitASTExprIn(const AST::Node&, LVID& localvar);
-		bool visitASTExprIn(const AST::Node&, LVID& localvar, Yuni::ShortString16& elementname);
+		bool visitASTExprIn(const AST::Node&, LVID& localvar, Yuni::ShortString128& elementname);
 		bool visitASTExprClosure(const AST::Node&, uint32_t& localvar);
 
 		bool visitASTExprTemplate(const AST::Node&, LVID& localvar);
