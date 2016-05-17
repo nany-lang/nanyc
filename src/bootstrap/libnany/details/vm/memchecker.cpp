@@ -9,6 +9,16 @@ namespace Nany
 namespace VM
 {
 
+	void MemChecker<true>::releaseAll(nyallocator_t& allocator)
+	{
+		if (not ownedPointers.empty())
+		{
+			for (auto& pair: ownedPointers)
+				allocator.deallocate(&allocator, (void*) pair.first, pair.second.objsize);
+			ownedPointers.clear();
+		}
+	}
+
 
 	void MemChecker<true>::printLeaks(const nyprogram_cf_t& cf) const
 	{

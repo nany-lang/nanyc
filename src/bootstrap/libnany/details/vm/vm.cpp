@@ -6,6 +6,7 @@
 #include "dyncall/dyncall.h"
 #include "details/ir/isa/data.h"
 #include <iostream>
+#include <csetjmp>
 
 
 using namespace Yuni;
@@ -17,12 +18,10 @@ using namespace Yuni;
 
 
 
-#define VM_CHECK_POINTER(P,LVID) do { if (YUNI_UNLIKELY(not memchecker.has((P)))) { \
-	/*assert(false and "invalid pointer");*/ \
-	throw (String{} << "unknown pointer " << (P) << ", opcode: +" \
-		<< sequence.get().offsetOf(**cursor) << ", " \
-		<< (Nany::IR::ISA::print(sequence.get(), operands, &map))); \
-	} } while (0)
+#define VM_CHECK_POINTER(P,LVID)  if (YUNI_UNLIKELY(not memchecker.has((P)))) \
+	{ \
+		emitUnknownPointer((P)); /*assert(false and "invalid pointer");*/ \
+	}
 
 
 
@@ -103,6 +102,8 @@ namespace VM
 
 			//! Reference to the current iterator
 			const IR::Instruction** cursor = nullptr;
+			//! Jump buffer, to handle exceptions during the execution of the program
+			std::jmp_buf jump_buffer;
 
 
 		public:
@@ -136,12 +137,71 @@ namespace VM
 				memchecker.printLeaksIfAny(threadContext.cf);
 			}
 
+			[[noreturn]] void abortMission()
+			{
+				// dump information on the console
+				stacktrace.dump(Nany::ref(threadContext.program.build), map);
+
+				// avoid spurious err messages and memory leaks when used
+				// as scripting engine
+				memchecker.releaseAll(allocator);
+				// abort the execution of the program
+				std::longjmp(jump_buffer, 666);
+			}
+
+			[[noreturn]] void emitBadAlloc()
+			{
+				threadContext.cerrException("failed to allocate memory");
+				abortMission();
+			}
+
+			[[noreturn]] void emitPointerSizeMismatch(void* object, size_t size)
+			{
+				ShortString64 msg;
+				msg << "pointer " << (void*) object << " size mismatch: got " << size;
+				threadContext.cerrException(msg);
+				abortMission();
+			}
+			[[noreturn]] void emitAssert()
+			{
+				threadContext.cerrException("assertion failed");
+				abortMission();
+			}
+			[[noreturn]] void emitUnexpectedOpcode(const AnyString& name)
+			{
+				ShortString64 msg;
+				msg << "error: unexpected opcode '" << name << '\'';
+				threadContext.cerrException(msg);
+				abortMission();
+			}
+			[[noreturn]] void emitInvalidIntrinsicParamType()
+			{
+				threadContext.cerrException("intrinsic invalid parameter type");
+				abortMission();
+			}
+			[[noreturn]] void emitInvalidReturnType()
+			{
+				threadContext.cerrException("intrinsic invalid return type");
+				abortMission();
+			}
+			[[noreturn]] void emitDividedByZero()
+			{
+				threadContext.cerrException("division by zero");
+				abortMission();
+			}
+			[[noreturn]] void emitUnknownPointer(void* p)
+			{
+				ShortString256 msg;
+				msg << "unknown pointer " << p << ", opcode: +";
+				msg << sequence.get().offsetOf(**cursor);
+				threadContext.cerrException(msg);
+				abortMission();
+			}
+
 
 			template<class T> inline T* allocateraw(size_t size)
 			{
 				T* ptr = (T*) allocator.allocate(&allocator, size);
-				if (YUNI_UNLIKELY(!ptr))
-					throw std::bad_alloc();
 				return ptr;
 			}
 
@@ -226,8 +286,6 @@ namespace VM
 
 
 
-
-
 			inline void visit(const IR::ISA::Operand<IR::ISA::Op::negation>& opr)
 			{
 				VM_PRINT_OPCODE(operands);
@@ -286,7 +344,7 @@ namespace VM
 						case nyt_void:
 						case nyt_any:
 						case nyt_count:
-							throw String{"intrinsic invalid parameter type"};
+							emitInvalidIntrinsicParamType();
 					}
 				}
 				funcparamCount = 0;
@@ -334,7 +392,7 @@ namespace VM
 						break;
 					case nyt_any:
 					case nyt_count:
-						throw String{"intrinsic invalid return type"};
+						emitInvalidReturnType();
 				}
 			}
 
@@ -366,7 +424,7 @@ namespace VM
 				assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
 				auto r = registers[opr.rhs].f64;
 				if (YUNI_UNLIKELY((uint64_t)r == 0))
-					throw std::overflow_error("Divide by zero exception");
+					emitDividedByZero();
 				registers[opr.lvid].f64 = registers[opr.lhs].f64 / r;
 			}
 
@@ -397,7 +455,7 @@ namespace VM
 				assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
 				auto r = registers[opr.rhs].u64;
 				if (YUNI_UNLIKELY(r == 0))
-					throw std::overflow_error("Divide by zero exception");
+					emitDividedByZero();
 				registers[opr.lvid].u64 = registers[opr.lhs].u64 / r;
 			}
 
@@ -415,7 +473,7 @@ namespace VM
 				assert(opr.lvid < registerCount and opr.lhs < registerCount and opr.rhs < registerCount);
 				auto r = static_cast<int64_t>(registers[opr.rhs].u64);
 				if (YUNI_UNLIKELY(r == 0))
-					throw std::overflow_error("Divide by zero exception");
+					emitDividedByZero();
 				registers[opr.lvid].u64 = static_cast<uint64_t>(static_cast<int64_t>(registers[opr.lhs].u64) / r);
 			}
 
@@ -713,6 +771,8 @@ namespace VM
 				size += sizeof(uint64_t); // reference counter
 
 				uint64_t* pointer = allocateraw<uint64_t>(size);
+				if (YUNI_UNLIKELY(!pointer))
+					return emitBadAlloc();
 				if (debugmode)
 					memset(pointer, patternAlloc, size);
 
@@ -735,7 +795,7 @@ namespace VM
 				size += sizeof(uint64_t); // reference counter
 
 				if (YUNI_UNLIKELY(not memchecker.checkObjectSize(object, static_cast<size_t>(size))))
-					throw (String{"pointer "} << (void*) object << " size mismatch: got " << size);
+					return emitPointerSizeMismatch(object, size);
 
 				if (debugmode)
 					memset(object, patternFree, size);
@@ -758,7 +818,7 @@ namespace VM
 				uint8_t pattern = static_cast<uint8_t>(registers[operands.pattern].u64);
 
 				if (YUNI_UNLIKELY(not memchecker.checkObjectSize(object, static_cast<size_t>(size))))
-					throw (String{"pointer "} << (void*) object << " size mismatch: got " << size);
+					return emitPointerSizeMismatch(object, size);
 
 				memset(object, pattern, size);
 			}
@@ -770,73 +830,43 @@ namespace VM
 				assert(operands.lvid < registerCount);
 
 				if (YUNI_UNLIKELY(registers[operands.lvid].u64 == 0))
-					throw (String{"assert failed"});
+					return emitAssert();
 			}
 
 			template<IR::ISA::Op O> void visit(const IR::ISA::Operand<O>& operands)
 			{
 				VM_PRINT_OPCODE(operands); // FALLBACK
 				(void) operands; // unused
-				throw String{}
-				<< "error: unexpected opcode '" << IR::ISA::Operand<O>::opname() << '\'';
+				return emitUnexpectedOpcode(IR::ISA::Operand<O>::opname());
 			}
 
 
 			uint64_t invoke(const IR::Sequence& callee)
 			{
-				try
-				{
-					const uint32_t framesize = callee.at<IR::ISA::Op::stacksize>(0).add + 1; // 1-based
-					#ifndef NDEBUG
-					assert(framesize < 1024 * 1024);
-					registerCount = framesize;
-					assert(callee.at<IR::ISA::Op::stacksize>(0).opcode == (uint32_t) IR::ISA::Op::stacksize);
-					#endif
+				const uint32_t framesize = callee.at<IR::ISA::Op::stacksize>(0).add + 1; // 1-based
+				#ifndef NDEBUG
+				assert(framesize < 1024 * 1024);
+				registerCount = framesize;
+				assert(callee.at<IR::ISA::Op::stacksize>(0).opcode == (uint32_t) IR::ISA::Op::stacksize);
+				#endif
 
-					registers = stack.push(framesize);
-					registers[0].u64 = 0;
-					sequence = std::cref(callee);
-					if (debugmode)
-						retRegister = (uint64_t) -1;
-					upperLabelID = 0;
+				registers = stack.push(framesize);
+				registers[0].u64 = 0;
+				sequence = std::cref(callee);
+				upperLabelID = 0;
 
-					// retrieve parameters for the func
-					for (uint32_t i = 0; i != funcparamCount; ++i)
-						registers[i + 2].u64 = funcparams[i].u64; // 2-based
-					funcparamCount = 0;
+				// retrieve parameters for the func
+				for (uint32_t i = 0; i != funcparamCount; ++i)
+					registers[i + 2].u64 = funcparams[i].u64; // 2-based
+				funcparamCount = 0;
 
-					callee.each(*this, 1); // offset: 1, avoid blueprint pragma
-					stack.pop(framesize);
-					return retRegister;
-				}
-				catch (const CodeAbort&)
-				{
-					// re-throw and does nothing (the error has already been handled)
-					throw;
-				}
-				catch (const std::bad_alloc&)
-				{
-					// already reported by the custom memory allocator
-				}
-				catch (const std::exception& e)
-				{
-					threadContext.cerrException(e.what());
-				}
-				catch (const String& incoming)
-				{
-					threadContext.cerrException(incoming);
-				}
-				catch (...)
-				{
-					threadContext.cerrException("unexpected error");
-				}
+				//
+				// iterate through all opcodes
+				//
+				callee.each(*this, 1); // offset: 1, avoid blueprint pragma
 
-				stacktrace.dump(Nany::ref(threadContext.program.build), map);
-
-				// invalid data related to allocated pointers to avoid invalid err messages
-				memchecker.clear();
-				throw CodeAbort{}; // re-throw
-				return (uint64_t) -1;
+				stack.pop(framesize);
+				return retRegister;
 			}
 
 
@@ -871,7 +901,6 @@ namespace VM
 				memchecker.atomid(memcheckPreviousAtomid);
 			}
 
-
 		}; // struct Executor
 
 
@@ -894,34 +923,17 @@ namespace VM
 		}
 
 		uint64_t ret = (uint64_t) -1;
-		try
-		{
-			Executor executor{*this, callee};
-			executor.stacktrace.push(atomid, instanceid);
-			executor.invoke(callee);
 
+		Executor executor{*this, callee};
+		executor.stacktrace.push(atomid, instanceid);
+		if (setjmp(executor.jump_buffer) != 666)
+		{
+			executor.invoke(callee);
 			ret = executor.retRegister;
 		}
-		catch (const CodeAbort&)
+		else
 		{
-			// re-throw and does nothing (the error has already been handled)
-			throw;
-		}
-		catch (const std::bad_alloc&)
-		{
-			// already reported by the custom memory allocator
-		}
-		catch (const std::exception& e)
-		{
-			cerrException(e.what());
-		}
-		catch (const String& incoming)
-		{
-			cerrException(incoming);
-		}
-		catch (...)
-		{
-			cerrException("unexpected error");
+			// execution of the program failed
 		}
 
 		if (cf.on_thread_destroy)

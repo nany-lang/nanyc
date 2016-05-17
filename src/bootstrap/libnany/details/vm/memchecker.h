@@ -27,7 +27,7 @@ namespace VM
 		static constexpr bool checkObjectSize(const uint64_t*, size_t) { return true; }
 		static constexpr bool has(const uint64_t*) { return true; }
 
-		static constexpr void clear() {}
+		static constexpr void releaseAll(nyallocator_t&) {}
 	};
 
 
@@ -45,10 +45,7 @@ namespace VM
 			return currentAtomid;
 		}
 
-		void clear()
-		{
-			ownedPointers.clear();
-		}
+		void releaseAll(nyallocator_t&);
 
 		void hold(const uint64_t* const pointer, size_t size, uint32_t lvid)
 		{
@@ -87,7 +84,7 @@ namespace VM
 		void printLeaks(const nyprogram_cf_t&) const;
 
 	private:
-		struct AllocInfo
+		struct AllocInfo final
 		{
 			size_t objsize;
 			CLID origin;
