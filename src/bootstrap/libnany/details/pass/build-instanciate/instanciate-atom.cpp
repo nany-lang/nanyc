@@ -487,6 +487,14 @@ namespace Instanciate
 					return nullptr;
 			}
 
+			if (Config::Traces::sourceOpcodeSequence)
+			{
+				String text;
+				text << "[post-IR] " << info.cdeftable.keyword(info.atom) << ' '; // ex: func
+				info.atom.get().retrieveCaption(text, info.cdeftable);  // ex: A.foo(...)...
+				printGeneratedIRSequence(report, text, *(info.atom.get().opcodes.sequence), info.cdeftable);
+			}
+
 
 			// the current atom
 			auto& atom = info.atom.get();
