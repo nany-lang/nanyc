@@ -195,11 +195,13 @@ namespace Producer
 		//                                   |   type
 		//                                   |       type-qualifier
 		//                                   |           ref
+		//                                   |       type-decl
+		//                                   |           identifier: bool
 		//                                   func-body
 		//                                       return
 		//                                           expr
 		//                                               expr-value
-		//                                                   identifier: predicate
+		//                                                   identifier: <predicate>
 		//
 		reuse.inset.node = new AST::Node{AST::rgExpr};
 		auto& exprValue = reuse.inset.node->append(AST::rgExprValue);
@@ -221,16 +223,24 @@ namespace Producer
 		auto& cursorname = funcparam.append(AST::rgIdentifier);
 		reuse.inset.elementname = &cursorname;
 
-		auto& qualifiers = func.append(AST::rgFuncReturnType, AST::rgType, AST::rgTypeQualifier);
-		qualifiers.append(AST::rgRef);
+		auto& typend = func.append(AST::rgFuncReturnType, AST::rgType);
+		auto& typedecl = typend.append(AST::rgTypeDecl, AST::rgIdentifier);
+		typedecl.text = "bool";
 
 		auto& funcbody = func.append(AST::rgFuncBody);
 		auto& ret = funcbody.append(AST::rgReturn);
 		reuse.inset.predicate = &ret;
 
+		// -- always 'true' predicate
+		// -- (when the predicate caluse `i in <set> | <predicate>` is missing)
 		reuse.inset.premadeAlwaysTrue = new AST::Node{AST::rgExpr};
-		auto& alwaysTrue = reuse.inset.premadeAlwaysTrue->append(AST::rgExprValue, AST::rgIdentifier);
-		alwaysTrue.text = "true";
+
+		auto& trueNew = reuse.inset.premadeAlwaysTrue->append(AST::rgNew);
+		auto& trueType = trueNew.append(AST::rgTypeDecl, AST::rgIdentifier);
+		trueType.text = "bool";
+		auto& trueExpr = trueNew.append(AST::rgCall, AST::rgCallParameter, AST::rgExpr);
+		auto& trueIntrin = trueExpr.append(AST::rgIdentifier);
+		trueIntrin.text = "__true";
 	}
 
 
