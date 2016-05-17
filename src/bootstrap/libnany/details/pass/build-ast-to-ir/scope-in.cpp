@@ -58,7 +58,6 @@ namespace Producer
 					if (unlikely(expr.rule != AST::rgExpr))
 						return ICE(expr) << "invalid node type for predicate";
 
-					warning(expr) << "predicates in views are not fully implemented";
 					predicate = &expr;
 					break;
 				}
