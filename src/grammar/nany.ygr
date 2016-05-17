@@ -235,8 +235,9 @@ visibility:
 
 // --- SPECIAL ---
 
-// this special token is not used in the grammar
-register: notext
+// this special token is not used in the grammar but internally to generate
+// AST nodes on the fly and to easily pass values without named variables
+register:
 	wp // unused rule
 
 
