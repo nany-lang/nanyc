@@ -433,6 +433,71 @@ namespace Instanciate
 	}
 
 
+	void SequenceBuilder::complainReturnTypeMissing(const Classdef* expected, const Classdef* usertype)
+	{
+		if (usertype != nullptr or expected != nullptr)
+		{
+			// one of the return type is void, but not both
+			if (usertype)
+			{
+				error() << "return-statement with a value, in function returning 'void'";
+			}
+
+			if (expected)
+			{
+				String tstr;
+				expected->print(tstr, cdeftable);
+				error() << "return-statement with no value, in function returning '" << tstr << '\'';
+				return;
+			}
+		}
+		else
+		{
+			ICE() << "mismatch return";
+		}
+	}
+
+
+	void SequenceBuilder::complainReturnTypeMismatch(const Classdef& expected, const Classdef& usertype)
+	{
+		auto err = (error() << "type mismatch in 'return' statement");
+		auto hint = err.hint();
+		usertype.print((hint << "got '"), cdeftable);
+		expected.print((hint << "', expected '"), cdeftable);
+		hint << '\'';
+	}
+
+
+	void SequenceBuilder::complainReturnTypeImplicitConv(const Classdef& expected, const Classdef& usertype, uint32_t line, uint32_t offset)
+	{
+		auto err = (error() << "implicit conversion is not allowed in 'return'");
+		auto hint = err.hint();
+		usertype.print((hint << "got '"), cdeftable);
+		expected.print((hint << "', expected '"), cdeftable);
+		hint << '\'';
+
+		if (line != 0)
+			hint.origins().location.pos.line   = line;
+		if (offset != 0)
+			hint.origins().location.pos.offset = offset;
+	}
+
+
+	void SequenceBuilder::complainReturnTypeMultiple(const Classdef& expected, const Classdef& usertype, uint32_t line, uint32_t offset)
+	{
+		auto err = (error() << "multiple return types in 'return'");
+		auto hint = err.hint();
+		usertype.print((hint << "got '"), cdeftable);
+		expected.print((hint << "', expected '"), cdeftable);
+		hint << '\'';
+
+		if (line != 0)
+			hint.origins().location.pos.line   = line;
+		if (offset != 0)
+			hint.origins().location.pos.offset = offset;
+	}
+
+
 
 
 } // namespace Instanciate

@@ -410,13 +410,11 @@ namespace Producer
 		inline bool FuncInspector::inspectReturnType(const AST::Node& node)
 		{
 			assert(node.rule == AST::rgFuncReturnType and "invalid return type node");
+			assert(not node.children.empty() and " should been tested already");
 
-			if (node.children.empty())
-				return true;
 			if (debugmode)
 				scope.comment("return type"); // comment for clarity in code
 
-			bool success = true;
 			LVID rettype = 0;
 
 			for (auto& childptr: node.children)
@@ -426,27 +424,34 @@ namespace Producer
 				{
 					case AST::rgType:
 					{
-						success &= scope.visitASTType(child, rettype);
+						bool ok = scope.visitASTType(child, rettype);
+						if (unlikely(not ok))
+							return false;
 						break;
 					}
 					default:
-						success &= scope.ICEUnexpectedNode(child, "[func/ret-type]");
+						return scope.ICEUnexpectedNode(child, "[func/ret-type]");
 				}
 			}
 
 			if (not lvidIsAny(rettype))
 			{
-				if (rettype != 0)
+				if (rettype == 0)
 				{
-					auto& operands    = scope.sequence().emit<ISA::Op::follow>();
-					operands.follower = 1; // params are 2-based (1 is the return type)
-					operands.lvid     = rettype;
-					operands.symlink  = 1;
+					rettype = scope.createLocalBuiltinVoid(node);
+					assert(rettype != 0);
 				}
-				else
-					scope.createLocalBuiltinVoid(node);
+
+				assert(rettype != 0);
+				auto& operands    = scope.sequence().emit<ISA::Op::follow>();
+				operands.follower = 1; // params are 2-based (1 is the return type)
+				operands.lvid     = rettype;
+				operands.symlink  = 0;
 			}
-			return success;
+
+			if (debugmode)
+				scope.comment("end return type"); // comment for clarity in code
+			return true;
 		}
 
 
@@ -539,7 +544,7 @@ namespace Producer
 					case AST::rgFunctionKind:   { success &= inspectKind(child); break; }
 					case AST::rgFuncParams:     { nodeParams = &child; break; }
 					case AST::rgVisibility:     { success &= inspectVisibility(child); break; }
-					case AST::rgFuncReturnType: { nodeReturnType = &child; break; }
+					case AST::rgFuncReturnType: { if (not child.children.empty()) nodeReturnType = &child; break; }
 					case AST::rgFuncBody:       { body = &child; break; }
 					case AST::rgAttributes:     { success = inspectAttributes(child); break; }
 					case AST::rgClassTemplateParams: { nodeGenTParams = &child; break; }

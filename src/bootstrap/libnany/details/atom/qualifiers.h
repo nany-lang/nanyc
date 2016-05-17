@@ -36,6 +36,11 @@ namespace Nany
 		*/
 		void merge(const Qualifiers&);
 
+		/*!
+		** \brief Clear
+		*/
+		void clear();
+
 
 		//! \name Operators
 		//@{

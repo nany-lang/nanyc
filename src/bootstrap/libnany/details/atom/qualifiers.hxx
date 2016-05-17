@@ -30,5 +30,14 @@ namespace Nany
 	}
 
 
+	inline void Qualifiers::clear()
+	{
+		constant.clear();
+		ref.clear();
+		nullable.clear();
+	}
+
+
+
 
 } // namespace Nany

@@ -262,6 +262,7 @@ namespace Instanciate
 			auto& cdef  = cdeftable.classdef(CLID{frame->atomid, operands.lvid});
 			auto& spare = cdeftable.substitute(operands.follower);
 			spare.import(cdef);
+			spare.qualifiers.merge(cdef.qualifiers);
 			spare.instance = true;
 		}
 	}

@@ -283,6 +283,11 @@ namespace Instanciate
 
 		bool complainRedeclared(const AnyString& name, uint32_t previousDeclaration);
 
+		void complainReturnTypeMissing(const Classdef* expected, const Classdef* usertype);
+		void complainReturnTypeMismatch(const Classdef& expected, const Classdef& usertype);
+		void complainReturnTypeImplicitConv(const Classdef& expected, const Classdef& usertype, uint32_t line = 0, uint32_t offset = 0);
+		void complainReturnTypeMultiple(const Classdef& expected, const Classdef& usertype, uint32_t line = 0, uint32_t offset = 0);
+
 		/*!
 		** \brief Complain about an unknown intrinsic
 		** \param name Intrinsic name
