@@ -23,11 +23,13 @@ namespace Producer
 		auto& out = sequence();
 		// lvid of the view
 		uint32_t viewlvid = 0;
-		AST::Node* userScope = nullptr;
+		// 'do' clause
+		AST::Node* forDoClause = nullptr;
 
 
 		if (debugmode)
 			out.emitComment("for");
+
 		OpcodeScopeLocker opscopeElse{out};
 
 		for (auto& childptr: node.children)
@@ -43,13 +45,14 @@ namespace Producer
 					bool ok = visitASTExprIn(child, viewlvid, elementname);
 					if (unlikely(not ok))
 						return false;
+
 					if (unlikely(viewlvid == 0 or viewlvid == (uint32_t) -1))
 						return ICE(child) << "invalid container lvid";
 					break;
 				}
 				case AST::rgForDo:
 				{
-					userScope = &child;
+					forDoClause = &child;
 					break;
 				}
 				default:
@@ -76,8 +79,8 @@ namespace Producer
 
 		context.reuse.loops.elementname->text = elementname;
 
-		if (userScope)
-			context.reuse.loops.scope->children = userScope->children;
+		if (forDoClause)
+			context.reuse.loops.scope->children = forDoClause->children;
 		else
 			context.reuse.loops.scope->children.clear();
 
