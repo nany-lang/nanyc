@@ -26,7 +26,7 @@ namespace VM
 			cf.console.write_stderr(cf.console.internal, msg.c_str(), msg.size());
 		};
 
-		String msg;
+		ShortString128 msg;
 		print("\n\n=== nany vm: memory leaks detected in ");
 		msg << ownedPointers.size();
 		print(msg);
