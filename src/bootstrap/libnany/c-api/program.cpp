@@ -30,35 +30,31 @@ extern "C" nyprogram_t* nany_program_prepare(nybuild_t* build, const nyprogram_c
 {
 	if (build)
 	{
-		try
+		Nany::VM::Program* program;
+		if (cf)
 		{
-			Nany::VM::Program* program;
-			if (cf)
-			{
-				auto& allocator = const_cast<nyallocator_t&>(cf->allocator);
-				void* inplace = allocator.allocate(&allocator, sizeof(Nany::VM::Program));
-				if (!inplace)
-					return nullptr;
+			auto& allocator = const_cast<nyallocator_t&>(cf->allocator);
+			void* inplace = allocator.allocate(&allocator, sizeof(Nany::VM::Program));
+			if (unlikely(!inplace))
+				return nullptr;
 
-				program = new (inplace) Nany::VM::Program(*cf, build);
-			}
-			else
-			{
-				nyprogram_cf_t ncf;
-				nany_program_cf_init(&ncf, nullptr);
-
-				auto& allocator = const_cast<nyallocator_t&>(ncf.allocator);
-				void* inplace = allocator.allocate(&allocator, sizeof(Nany::VM::Program));
-				if (!inplace)
-					return nullptr;
-
-				program = new (inplace) Nany::VM::Program(ncf, build);
-			}
-
-			program->addRef();
-			return program->self();
+			program = new (inplace) Nany::VM::Program(*cf, build);
 		}
-		catch (...) {}
+		else
+		{
+			nyprogram_cf_t ncf;
+			nany_program_cf_init(&ncf, nullptr);
+
+			auto& allocator = const_cast<nyallocator_t&>(ncf.allocator);
+			void* inplace = allocator.allocate(&allocator, sizeof(Nany::VM::Program));
+			if (unlikely(!inplace))
+				return nullptr;
+
+			program = new (inplace) Nany::VM::Program(ncf, build);
+		}
+
+		program->addRef();
+		return program->self();
 	}
 	return nullptr;
 }
@@ -86,12 +82,8 @@ extern "C" void nany_program_unref(nyprogram_t* ptr)
 {
 	if (ptr)
 	{
-		try
-		{
-			auto& program = Nany::ref(ptr);
-			if (program.release())
-				program.destroy();
-		}
-		catch (...) {}
+		auto& program = Nany::ref(ptr);
+		if (program.release())
+			program.destroy();
 	}
 }

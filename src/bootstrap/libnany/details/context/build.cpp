@@ -75,73 +75,50 @@ namespace Nany
 		Nany::Logs::Report report{*messages.get()};
 		buildtime = DateTime::NowMilliSeconds();
 
-		try
+		if (unlikely(sources.empty()))
 		{
-			if (unlikely(sources.empty()))
-			{
-				report.error() << "no target to build";
-			}
-			else
-			{
-				// initialization of some global data
-				Nany::Sema::Metadata::initialize(); // TODO remove those methods
-				Nany::ASTHelper::initialize();
-
-				success = true;
-
-				// build each source
-				for (auto& src: sources)
-					success &= src.get().build(*this);
-
-				//
-				// -- intermediate name lookup
-				//
-				// TODO remove this method
-				// report.info() << "intermediate name resolution";
-				bool successNameLookup = cdeftable.performNameLookup();
-				if (unlikely(not successNameLookup and success))
-					report.warning() << "name lookup failed";
-
-				//
-				// -- Core Objects (bool, u32, u64, f32, ...)
-				//
-				success &= successNameLookup
-					and cdeftable.atoms.fetchAndIndexCoreObjects(report);
-
-				//
-				// -- instanciate
-				//
-				const nytype_t* argtypes = nullptr;
-				success = success and instanciate("main", argtypes, main.atomid, main.instanceid);
-
-				// end
-				duration += DateTime::NowMilliSeconds() - buildtime;
-
-				if (debugmode and unlikely(not success))
-					report.error() << "debug: failed to compile";
-
-				return success;
-			}
+			report.error() << "no target to build";
 		}
-		catch (const std::bad_alloc&)
+		else
 		{
-			report.error() << "not enough memory";
-		}
-		catch (const String& msg)
-		{
-			report.ICE() << "unexpected error: " << msg;
-		}
-		catch (const char* msg)
-		{
-			report.ICE() << "unexpected error: " << msg;
-		}
-		catch (const std::exception& ex)
-		{
-			report.ICE() << "unexpected error: " << ex.what();
-		}
-		catch (...)
-		{
-			report.error() << "unexpected error";
+			// initialization of some global data
+			Nany::Sema::Metadata::initialize(); // TODO remove those methods
+			Nany::ASTHelper::initialize();
+
+			success = true;
+
+			// build each source
+			for (auto& src: sources)
+				success &= src.get().build(*this);
+
+			//
+			// -- intermediate name lookup
+			//
+			// TODO remove this method
+			// report.info() << "intermediate name resolution";
+			bool successNameLookup = cdeftable.performNameLookup();
+			if (unlikely(not successNameLookup and success))
+				report.warning() << "name lookup failed";
+
+			//
+			// -- Core Objects (bool, u32, u64, f32, ...)
+			//
+			success &= successNameLookup
+				and cdeftable.atoms.fetchAndIndexCoreObjects(report);
+
+			//
+			// -- instanciate
+			//
+			const nytype_t* argtypes = nullptr;
+			success = success and instanciate("main", argtypes, main.atomid, main.instanceid);
+
+			// end
+			duration += DateTime::NowMilliSeconds() - buildtime;
+
+			if (debugmode and unlikely(not success))
+				report.error() << "debug: failed to compile";
+
+			return success;
 		}
 
 		success = false;

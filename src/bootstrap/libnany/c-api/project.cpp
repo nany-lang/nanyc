@@ -17,47 +17,34 @@ extern "C" void nany_project_cf_init(nyproject_cf_t* cf)
 extern "C" nyproject_t* nany_project_create(const nyproject_cf_t* cf)
 {
 	Nany::Project* project;
-	try
-	{
-		if (cf)
-		{
-			auto& allocator = const_cast<nyallocator_t&>(cf->allocator);
-			void* inplace = allocator.allocate(&allocator, sizeof(Nany::Project));
-			if (!inplace)
-				return nullptr;
-			project = new (inplace) Nany::Project(*cf);
-		}
-		else
-		{
-			nyproject_cf_t ncf;
-			nany_project_cf_init(&ncf);
 
-			auto& allocator = const_cast<nyallocator_t&>(ncf.allocator);
-			void* inplace = allocator.allocate(&allocator, sizeof(Nany::Project));
-			if (!inplace)
-				return nullptr;
-			project = new (inplace) Nany::Project(ncf);
-		}
-	}
-	catch (...)
+	if (cf)
 	{
-		return nullptr;
+		auto& allocator = const_cast<nyallocator_t&>(cf->allocator);
+		void* inplace = allocator.allocate(&allocator, sizeof(Nany::Project));
+		if (unlikely(!inplace))
+			return nullptr;
+
+		project = new (inplace) Nany::Project(*cf);
+	}
+	else
+	{
+		nyproject_cf_t ncf;
+		nany_project_cf_init(&ncf);
+
+		auto& allocator = const_cast<nyallocator_t&>(ncf.allocator);
+		void* inplace = allocator.allocate(&allocator, sizeof(Nany::Project));
+		if (unlikely(!inplace))
+			return nullptr;
+		project = new (inplace) Nany::Project(ncf);
 	}
 
-	try
-	{
-		// making sure that user-events do not destroy the project by mistake
-		project->addRef();
-		// initialize the project after incrementing the ref count
-		project->init();
+	// making sure that user-events do not destroy the project by mistake
+	project->addRef();
+	// initialize the project after incrementing the ref count
+	project->init();
 
-		return project->self();
-	}
-	catch (...)
-	{
-		project->destroy();
-	}
-	return nullptr;
+	return project->self();
 }
 
 
@@ -72,13 +59,9 @@ extern "C" void nany_project_unref(nyproject_t* ptr)
 {
 	if (ptr)
 	{
-		try
-		{
-			auto& project = Nany::ref(ptr);
-			if (project.release())
-				project.destroy();
-		}
-		catch (...) {}
+		auto& project = Nany::ref(ptr);
+		if (project.release())
+			project.destroy();
 	}
 }
 
@@ -87,13 +70,9 @@ extern "C" nybool_t nany_project_add_source_from_file_n(nyproject_t* ptr, const 
 {
 	if (ptr and filename and len != 0 and len < 32*1024)
 	{
-		try
-		{
-			AnyString path{filename, static_cast<uint32_t>(len)};
-			Nany::ref(ptr).targets.anonym->addSourceFromFile(path);
-			return nytrue;
-		}
-		catch (...) {}
+		AnyString path{filename, static_cast<uint32_t>(len)};
+		Nany::ref(ptr).targets.anonym->addSourceFromFile(path);
+		return nytrue;
 	}
 	return nyfalse;
 }
@@ -114,13 +93,9 @@ extern "C" nybool_t nany_project_add_source_n(nyproject_t* ptr, const char* text
 {
 	if (ptr and text and len != 0 and len < 512 * 1024*1024) // arbitrary
 	{
-		try
-		{
-			AnyString source{text, static_cast<uint32_t>(len)};
-			Nany::ref(ptr).targets.anonym->addSource("<unknown>", source);
-			return nytrue;
-		}
-		catch (...) {}
+		AnyString source{text, static_cast<uint32_t>(len)};
+		Nany::ref(ptr).targets.anonym->addSource("<unknown>", source);
+		return nytrue;
 	}
 	return nyfalse;
 }

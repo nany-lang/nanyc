@@ -230,71 +230,59 @@ int main(int argc, char** argv)
 	if (unlikely(argc <= 1))
 		return printNoInputScript();
 
-	try
+	Options options;
+	int firstarg = argc; // end of the list
+
+	for (int i = 1; i < argc; ++i)
 	{
-		Options options;
-		int firstarg = argc; // end of the list
-
-		for (int i = 1; i < argc; ++i)
+		const char* const carg = argv[i];
+		if (unlikely(carg[0] == '-'))
 		{
-			const char* const carg = argv[i];
-			if (unlikely(carg[0] == '-'))
+			if (carg[1] == '-')
 			{
-				if (carg[1] == '-')
+				if (carg[2] != '\0') // to handle '--' option
 				{
-					if (carg[2] != '\0') // to handle '--' option
-					{
-						AnyString arg{carg};
+					AnyString arg{carg};
 
-						if (arg == "--help")
-							return printUsage(argv[0]);
-						if (arg == "--version")
-							return printVersion();
-						if (arg == "--bugreport")
-							return printBugReportInfo();
-						if (arg == "--verbose")
-						{
-							options.verbose = true;
-							continue;
-						}
-						return unknownOption(arg);
-					}
-					else
+					if (arg == "--help")
+						return printUsage(argv[0]);
+					if (arg == "--version")
+						return printVersion();
+					if (arg == "--bugreport")
+						return printBugReportInfo();
+					if (arg == "--verbose")
 					{
-						firstarg = i + 1;
-						break; // nothing must interpreted after '--'
+						options.verbose = true;
+						continue;
 					}
+					return unknownOption(arg);
 				}
 				else
 				{
-					AnyString arg{carg};
-					if (arg == "-h")
-						return printUsage(argv[0]);
-					if (arg == "-v")
-						return printVersion();
-					return unknownOption(arg);
+					firstarg = i + 1;
+					break; // nothing must interpreted after '--'
 				}
 			}
-
-			firstarg = i;
-			break;
+			else
+			{
+				AnyString arg{carg};
+				if (arg == "-h")
+					return printUsage(argv[0]);
+				if (arg == "-v")
+					return printVersion();
+				return unknownOption(arg);
+			}
 		}
 
-		if (unlikely(firstarg >= argc))
-			return printNoInputScript();
+		firstarg = i;
+		break;
+	}
 
-		//
-		// -- execute the script
-		//
-		return execute(argc - firstarg, argv + firstarg, options);
-	}
-	catch (const std::bad_alloc&)
-	{
-		std::cerr << '\n' << argv0 << ": error: failed to allocate memory\n";
-	}
-	catch (...)
-	{
-		std::cerr << '\n' << argv0 << ": error: unhandled exception\n";
-	}
-	return EXIT_FAILURE;
+	if (unlikely(firstarg >= argc))
+		return printNoInputScript();
+
+	//
+	// -- execute the script
+	//
+	return execute(argc - firstarg, argv + firstarg, options);
 }
