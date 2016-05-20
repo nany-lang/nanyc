@@ -57,15 +57,16 @@ namespace VM
 		uint32_t atomid = Nany::ref(build).main.atomid;
 		uint32_t instanceid = Nany::ref(build).main.instanceid;
 
-		try
-		{
-			auto& sequence = map.sequence(atomid, instanceid);
-			ThreadContext thrctx{*this, "main"};
+		auto& sequence = map.sequence(atomid, instanceid);
+		ThreadContext thrctx{*this, "main"};
 
-			//
-			// Execute the program
-			//
-			retvalue = static_cast<int>(thrctx.invoke(sequence, atomid, instanceid));
+		//
+		// Execute the program
+		//
+		uint64_t exitstatus;
+		if (thrctx.invoke(exitstatus, sequence, atomid, instanceid))
+		{
+			retvalue = static_cast<int>(exitstatus);
 
 			if (cf.on_terminate)
 				cf.on_terminate(self(), nytrue, retvalue);
@@ -74,24 +75,6 @@ namespace VM
 			// (especially useful when embedded into a C/C++ application)
 			flushAll(cf.console);
 			return retvalue;
-		}
-		catch (const CodeAbort&)
-		{
-			// error already handled
-		}
-		catch (const std::bad_alloc&)
-		{
-			// already reported by the custom memory allocator
-		}
-		catch (const std::exception& e)
-		{
-			printStderr("error: exception: ");
-			printStderr(e.what());
-			printStderr("\n");
-		}
-		catch (...)
-		{
-			printStderr("error: exception received: aborting\n");
 		}
 
 		if (cf.on_terminate)

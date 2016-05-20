@@ -910,36 +910,33 @@ namespace VM
 
 
 
-	uint64_t ThreadContext::invoke(const IR::Sequence& callee, uint32_t atomid, uint32_t instanceid)
+	bool ThreadContext::invoke(uint64_t& exitstatus, const IR::Sequence& callee, uint32_t atomid, uint32_t instanceid)
 	{
-		if (cf.on_thread_create)
+		// if something happens
+		exitstatus = static_cast<uint64_t>(-1);
+		// result
+		bool success = false;
+
+		if (!cf.on_thread_create
+			or nyfalse != cf.on_thread_create(program.self(), self(), nullptr, name.c_str(), name.size()))
 		{
-			auto r = cf.on_thread_create(program.self(), self(), nullptr, name.c_str(), name.size());
-			if (YUNI_UNLIKELY(r == nyfalse))
+			Executor executor{*this, callee};
+			executor.stacktrace.push(atomid, instanceid);
+			if (setjmp(executor.jump_buffer) != 666)
 			{
-				// the user is responsible for keeping the user informed
-				return static_cast<uint64_t>(-1);
+				executor.invoke(callee);
+				exitstatus = executor.retRegister;
+				success = true;
 			}
+			else
+			{
+				// execution of the program failed
+			}
+
+			if (cf.on_thread_destroy)
+				cf.on_thread_destroy(program.self(), self());
 		}
-
-		uint64_t ret = (uint64_t) -1;
-
-		Executor executor{*this, callee};
-		executor.stacktrace.push(atomid, instanceid);
-		if (setjmp(executor.jump_buffer) != 666)
-		{
-			executor.invoke(callee);
-			ret = executor.retRegister;
-		}
-		else
-		{
-			// execution of the program failed
-		}
-
-		if (cf.on_thread_destroy)
-			cf.on_thread_destroy(program.self(), self());
-
-		return ret;
+		return success;
 	}
 
 
