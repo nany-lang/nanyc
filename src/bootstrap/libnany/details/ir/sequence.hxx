@@ -722,9 +722,18 @@ namespace IR
 	}
 
 
-	inline void Sequence::emitReturn(uint32_t lvid)
+	inline void Sequence::emitReturn()
 	{
-		emit<ISA::Op::ret>().lvid = lvid;
+		auto& operands   = emit<ISA::Op::ret>();
+		operands.lvid    = 0;
+		operands.tmplvid = 0;
+	}
+
+	inline void Sequence::emitReturn(uint32_t lvid, uint32_t tmplvid)
+	{
+		auto& operands   = emit<ISA::Op::ret>();
+		operands.lvid    = lvid;
+		operands.tmplvid = tmplvid;
 	}
 
 

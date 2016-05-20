@@ -19,22 +19,28 @@ namespace Instanciate
 		//
 		//  * the most frequent, called from a method contained within a class
 		//  * from the class itself, most likely a variable
-		Atom* parent = &(frame->atom);
-		do
-		{
-			if (parent->isClass())
-			{
-				auto& cdef = cdeftable.substitute(operands.self);
-				cdef.mutateToAtom(parent);
-				cdef.qualifiers.ref = true;
-				return;
-			}
-			parent = parent->parent;
-		}
-		while (parent != nullptr);
 
-		// not found
-		error() << "invalid param atom for 'self' resolution";
+		auto& cdef = cdeftable.substitute(operands.self);
+		cdef.qualifiers.ref = true;
+		cdef.qualifiers.constant = false;
+		cdef.qualifiers.nullable = false;
+
+		auto& atom = frame->atom;
+
+		if (atom.isClassMember())
+		{
+			assert(atom.parent != nullptr and "invalid parent");
+			cdef.mutateToAtom(atom.parent);
+		}
+		else
+		{
+			if (atom.isClass())
+			{
+				cdef.mutateToAtom(&atom);
+			}
+			else
+				ICE() << "invalid 'self' opcode";
+		}
 	}
 
 

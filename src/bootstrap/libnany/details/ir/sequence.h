@@ -291,8 +291,10 @@ namespace IR
 		//! Write a field
 		void emitFieldset(uint32_t lvid, uint32_t self, uint32_t varid);
 
+		//! Emit a return opcode with no return value
+		void emitReturn();
 		//! Emit a return opcode
-		void emitReturn(uint32_t lvid = 0);
+		void emitReturn(uint32_t lvid, uint32_t tmplvid);
 
 		//! Emit an unconditional jump
 		void emitJmp(uint32_t label);
@@ -347,7 +349,7 @@ namespace IR
 		//! \name Debug
 		//@{
 		//! Print the sequence to a string
-		void print(Yuni::String& out, const AtomMap* = nullptr) const;
+		void print(Yuni::String& out, const AtomMap* = nullptr, uint32_t offset = 0) const;
 		//@}
 
 

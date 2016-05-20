@@ -469,7 +469,8 @@ namespace ISA
 		constexpr static const char* opname() { return "ret"; }
 		uint32_t opcode;
 		uint32_t lvid;
-		template<class T> void eachLVID(T& c) { c(lvid); }
+		uint32_t tmplvid; // unused by nyprogram_t
+		template<class T> void eachLVID(T& c) { c(lvid,tmplvid); }
 	};
 
 

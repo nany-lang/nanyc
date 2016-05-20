@@ -255,19 +255,6 @@ namespace Instanciate
 	}
 
 
-	inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::follow>& operands)
-	{
-		if (not operands.symlink)
-		{
-			auto& cdef  = cdeftable.classdef(CLID{frame->atomid, operands.lvid});
-			auto& spare = cdeftable.substitute(operands.follower);
-			spare.import(cdef);
-			spare.qualifiers.merge(cdef.qualifiers);
-			spare.instance = true;
-		}
-	}
-
-
 	inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::unref>& operands)
 	{
 		tryUnrefObject(operands.lvid);

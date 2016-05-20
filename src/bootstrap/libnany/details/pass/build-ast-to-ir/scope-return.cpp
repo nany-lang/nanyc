@@ -38,15 +38,9 @@ namespace Producer
 					// generate error on the begining of the expr and not the return itself
 					emitDebugpos(child);
 
-					uint32_t copy = sequence().emitStackalloc(nextvar(), nyt_any);
-					auto& operands    = sequence().emit<ISA::Op::follow>();
-					operands.follower = copy;
-					operands.lvid     = 1; // return type
-					operands.symlink  = 0; // true
+					uint32_t tmplvid = sequence().emitStackalloc(nextvar(), nyt_any);
+					out.emitReturn(localvar, tmplvid);
 
-					out.emitInheritQualifiers(copy, /*ret*/1);
-					out.emitAssign(copy, localvar, false);
-					out.emitReturn(copy);
 					hasReturnValue = true;
 					break;
 				}

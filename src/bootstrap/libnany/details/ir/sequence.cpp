@@ -86,13 +86,14 @@ namespace IR
 	}
 
 
-	void Sequence::print(YString& out, const AtomMap* atommap) const
+	void Sequence::print(YString& out, const AtomMap* atommap, uint32_t offset) const
 	{
 		using namespace IR::ISA;
 		out.reserve(out.size() + (pSize * 100)); // arbitrary
 		Printer<String> printer{out, *this};
 		printer.atommap = atommap;
-		each(printer);
+		printer.offset = offset;
+		each(printer, offset);
 	}
 
 

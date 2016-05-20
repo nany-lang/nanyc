@@ -379,7 +379,7 @@ namespace Instanciate
 
 		template<class R>
 		static inline void printGeneratedIRSequence(R& report, const String& symbolName,
-			const IR::Sequence& out, const ClassdefTableView& newView)
+			const IR::Sequence& out, const ClassdefTableView& newView, uint32_t offset = 0)
 		{
 			report.info();
 			auto trace = report.subgroup();
@@ -387,9 +387,10 @@ namespace Instanciate
 			entry.message.prefix << symbolName;
 
 			String text;
-			out.print(text, &newView.atoms());
+			out.print(text, &newView.atoms(), offset);
 			text.replace("\n", "\n    ");
 			text.trimRight();
+
 			trace.trace() << "{\n    " << text << "\n}";
 			trace.info(); // for beauty
 			trace.info(); // for beauty
@@ -492,7 +493,9 @@ namespace Instanciate
 				String text;
 				text << "[post-IR] " << info.cdeftable.keyword(info.atom) << ' '; // ex: func
 				info.atom.get().retrieveCaption(text, info.cdeftable);  // ex: A.foo(...)...
-				printGeneratedIRSequence(report, text, *(info.atom.get().opcodes.sequence), info.cdeftable);
+				auto& seqprint = *(info.atom.get().opcodes.sequence);
+				uint32_t offset = info.atom.get().opcodes.offset;
+				printGeneratedIRSequence(report, text, seqprint, info.cdeftable, offset);
 			}
 
 

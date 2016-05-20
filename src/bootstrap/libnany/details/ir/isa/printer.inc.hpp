@@ -26,6 +26,7 @@ namespace // anonymous
 		const Nany::AtomMap* atommap = nullptr;
 		Yuni::ShortString64 lineHeader;
 		uint32_t lastOffset = (uint32_t) -1;
+		uint32_t offset = 0;
 
 
 		Printer(S& out, const Sequence& sequence)
@@ -305,7 +306,7 @@ namespace // anonymous
 			if (operands.lvid == 0)
 				line() << "return void";
 			else
-				line() << "return %" << operands.lvid;
+				line() << "return %" << operands.lvid << ", copy %" << operands.tmplvid;
 		}
 
 		void print(const Operand<Op::stacksize>& operands)
@@ -467,6 +468,10 @@ namespace // anonymous
 		{
 			unindent();
 			line() << '}';
+
+			// partial print and the end-of-scope has been reached
+			if (tabs.empty() and offset != 0)
+				sequence.invalidateCursor(*cursor);
 		}
 
 		void print(const Operand<Op::follow>& operands)

@@ -462,8 +462,16 @@ namespace Instanciate
 	{
 		auto err = (error() << "type mismatch in 'return' statement");
 		auto hint = err.hint();
-		usertype.print((hint << "got '"), cdeftable);
-		expected.print((hint << "', expected '"), cdeftable);
+		if (debugmode)
+		{
+			usertype.print((hint << "got '%" << usertype.clid << ':'), cdeftable);
+			expected.print((hint << "', expected '%" << expected.clid << ':'), cdeftable);
+		}
+		else
+		{
+			usertype.print((hint << "got '"), cdeftable);
+			expected.print((hint << "', expected '"), cdeftable);
+		}
 		hint << '\'';
 	}
 
@@ -472,8 +480,16 @@ namespace Instanciate
 	{
 		auto err = (error() << "implicit conversion is not allowed in 'return'");
 		auto hint = err.hint();
-		usertype.print((hint << "got '"), cdeftable);
-		expected.print((hint << "', expected '"), cdeftable);
+		if (debugmode)
+		{
+			usertype.print((hint << "got '%" << usertype.clid << ':'), cdeftable);
+			expected.print((hint << "', expected '%" << expected.clid << ':'), cdeftable);
+		}
+		else
+		{
+			usertype.print((hint << "got '"), cdeftable);
+			expected.print((hint << "', expected '"), cdeftable);
+		}
 		hint << '\'';
 
 		if (line != 0)
@@ -487,8 +503,17 @@ namespace Instanciate
 	{
 		auto err = (error() << "multiple return types in 'return'");
 		auto hint = err.hint();
-		usertype.print((hint << "got '"), cdeftable);
-		expected.print((hint << "', expected '"), cdeftable);
+
+		if (debugmode)
+		{
+			usertype.print((hint << "got '%" << usertype.clid << ':'), cdeftable);
+			expected.print((hint << "', expected '%" << expected.clid << ':'), cdeftable);
+		}
+		else
+		{
+			usertype.print((hint << "got '"), cdeftable);
+			expected.print((hint << "', expected '"), cdeftable);
+		}
 		hint << '\'';
 
 		if (line != 0)
