@@ -323,9 +323,10 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 	o << '\n';
 
 
+	bool canBeSigned = true;
 	auto genGlobalCompareOperator = [&](AnyString op, AnyString builtin, char sign, uint32_t b, AnyString prefixA, AnyString prefixB)
 	{
-		o << "[[builtinalias: " << (issigned ? "i" : "") << builtin;
+		o << "[[builtinalias: " << (canBeSigned and issigned ? "i" : "") << builtin;
 		if (prefixA.first() == '_' or prefixB.first() == '_')
 			o << ", suggest: false";
 		o << "]] public operator ";
@@ -343,6 +344,7 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 	o << '\n';
 	o << '\n';
 
+	canBeSigned = false;
 	craft("==",  "eq",  genGlobalCompareOperator);
 	craft("!=",  "neq", genGlobalCompareOperator);
 
