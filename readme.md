@@ -1,11 +1,19 @@
+<a href="https://www.mozilla.org/en-US/MPL/2.0/">![MPL2 Licence](http://img.shields.io/badge/license-MPL2-blue.svg?style=flat-square)</a>
+<a href="https://github.com/nany-lang/nany/releases">![Version](https://badge.fury.io/gh/nany-lang%2Fnany.svg?style=flat-square)</a>
+<a href="https://travis-ci.org/nany-lang/nany">![Build Status](https://img.shields.io/travis/nany-lang/nany/master.svg?label=linux/osx&style=flat-square)</a>
+<a href="https://ci.appveyor.com/project/milipili/nany">![Build Status](https://img.shields.io/appveyor/ci/milipili/nany/master.svg?label=windows&style=flat-square)</a>
+<a href="https://github.com/nany-lang/nany/issues">![Github Issues](https://img.shields.io/github/issues/nany-lang/nany.svg?style=flat-square)</a>
+
+
+
+
 Nany Compiler
 =============
 
 Nany is a high-productivity language, meant to be either compiled to native
 code or bytecode, or to be run as script.
 
-[![Join the chat at https://gitter.im/nany-lang/nany](https://badges.gitter.im/nany-lang/nany.svg)](https://gitter.im/nany-lang/nany?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
+<a href="https://gitter.im/nany-lang/nany" target="_blank">![Github Issues](https://img.shields.io/gitter/room/nany-lang/nany.svg)</a>
 
 
 Overview of the Nany Programming Language
@@ -17,11 +25,6 @@ Overview of the Nany Programming Language
 
 How to build Nany
 -----------------
-
-| Platform  | Build Status |
-| :------------- | :------------- |
-| GNU/Linux, MacOS, `gcc-4.9` (via travis-ci)  | [![Build Status](https://api.travis-ci.org/nany-lang/nany.png)](https://travis-ci.org/nany-lang/nany)  |
-| Windows, `VS2015` (via appveyor)  | [![Build Status](https://ci.appveyor.com/api/projects/status/github/nany-lang/nany)](https://ci.appveyor.com/project/milipili/nany)  |
 
 [Building Nany on your platform](src/readme.md)
 
@@ -38,3 +41,4 @@ Resources
 ---------
 
 * [Syntax highlighting for your favorite Text Editor](//github.com/nany-lang/nany-syntax)
+
