@@ -65,9 +65,9 @@ namespace IR
 		void invalidateCursor(Instruction*& cusror) const;
 
 		//! Go to the next label
-		void jumpToLabelForward(const Instruction*& cursor, uint32_t label) const;
+		bool jumpToLabelForward(const Instruction*& cursor, uint32_t label) const;
 		//! Go to a previous label
-		void jumpToLabelBackward(const Instruction*& cursor, uint32_t label) const;
+		bool jumpToLabelBackward(const Instruction*& cursor, uint32_t label) const;
 
 		//! Move the cursor at the end of the blueprint
 		void moveCursorFromBlueprintToEnd(Instruction*& cursor) const;

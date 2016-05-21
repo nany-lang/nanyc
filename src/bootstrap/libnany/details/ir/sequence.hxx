@@ -926,16 +926,20 @@ namespace IR
 	inline uint32_t Sequence::offsetOf(const Instruction& instr) const
 	{
 		assert(pSize > 0 and pCapacity > 0);
-		assert(&instr >= pBody);
-		assert(&instr <  pBody + pSize);
+		//assert(&instr >= pBody);
+		//assert(&instr <  pBody + pSize);
 
-		auto start = reinterpret_cast<std::uintptr_t>(pBody);
-		auto end   = reinterpret_cast<std::uintptr_t>(&instr);
-		assert((end - start) / sizeof(Instruction) < 512 * 1024 * 1024); // arbitrary
+		if (&instr >= pBody and &instr < pBody + pSize)
+		{
+			auto start = reinterpret_cast<std::uintptr_t>(pBody);
+			auto end   = reinterpret_cast<std::uintptr_t>(&instr);
+			assert((end - start) / sizeof(Instruction) < 512 * 1024 * 1024); // arbitrary
 
-		uint32_t r = static_cast<uint32_t>(((end - start) / sizeof(Instruction)));
-		assert(r < pSize);
-		return r;
+			uint32_t r = static_cast<uint32_t>(((end - start) / sizeof(Instruction)));
+			assert(r < pSize);
+			return r;
+		}
+		return (uint32_t) -1;
 	}
 
 
@@ -965,7 +969,7 @@ namespace IR
 	}
 
 
-	inline void Sequence::jumpToLabelForward(const Instruction*& cursor, uint32_t label) const
+	inline bool Sequence::jumpToLabelForward(const Instruction*& cursor, uint32_t label) const
 	{
 		const auto* const end = pBody + pSize;
 		while (++cursor < end)
@@ -974,15 +978,15 @@ namespace IR
 			{
 				auto& operands = (*cursor).to<IR::ISA::Op::label>();
 				if (operands.label == label)
-					return;
+					return true;
 			}
 		}
 		// not found - the cursor is alreayd invalidated
-		throw (YString{"forward label "} << label << " not found");
+		return false;
 	}
 
 
-	inline void Sequence::jumpToLabelBackward(const Instruction*& cursor, uint32_t label) const
+	inline bool Sequence::jumpToLabelBackward(const Instruction*& cursor, uint32_t label) const
 	{
 		const auto* const base = pBody;
 		while (cursor-- > base)
@@ -991,12 +995,11 @@ namespace IR
 			{
 				auto& operands = (*cursor).to<IR::ISA::Op::label>();
 				if (operands.label == label)
-					return;
+					return true;
 			}
 		}
 		// not found - invalidate
-		invalidateCursor(cursor);
-		throw (YString{"backward label "} << label << " not found");
+		return false;
 	}
 
 

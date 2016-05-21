@@ -197,6 +197,13 @@ namespace VM
 				threadContext.cerrException(msg);
 				abortMission();
 			}
+			[[noreturn]] void emitLabelError()
+			{
+				ShortString256 msg;
+				msg << "invalid label , opcode: +" << sequence.get().offsetOf(**cursor);
+				threadContext.cerrException(msg);
+				abortMission();
+			}
 
 
 			template<class T> inline T* allocateraw(size_t size)
@@ -258,10 +265,11 @@ namespace VM
 
 			inline void gotoLabel(uint32_t label)
 			{
-				if (label > upperLabelID)
-					sequence.get().jumpToLabelForward(*cursor, label);
-				else
-					sequence.get().jumpToLabelBackward(*cursor, label);
+				bool jmpsuccess = (label > upperLabelID)
+					? sequence.get().jumpToLabelForward(*cursor, label)
+					: sequence.get().jumpToLabelBackward(*cursor, label);
+				if (unlikely(not jmpsuccess))
+					emitLabelError();
 			}
 
 
