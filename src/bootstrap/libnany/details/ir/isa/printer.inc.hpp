@@ -720,6 +720,7 @@ namespace // anonymous
 						line() << "pragma shortcircuit mutate to bool: %";
 						out << operands.value.shortcircuitMutate.lvid;
 						out << " = new bool %" << operands.value.shortcircuitMutate.source;
+						break;
 					}
 					case Pragma::builtinalias:
 					{
