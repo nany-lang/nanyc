@@ -40,5 +40,9 @@ Contributing
 Resources
 ---------
 
-* [Syntax highlighting for your favorite Text Editor](//github.com/nany-lang/nany-syntax)
+### Syntax hightlighting
 
+* [Vim](//github.com/nany-lang/nany-syntax-vim)
+* [Emacs](//github.com/nany-lang/nany-syntax-emacs)
+* [GEdit](//github.com/nany-lang/nany-syntax-gedit)
+* [Sublime](//github.com/nany-lang/nany-syntax-sublime)
