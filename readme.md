@@ -40,7 +40,7 @@ Contributing
 Resources
 ---------
 
-### Syntax hightlighting
+**Syntax hightlighting:**
 
 * [Vim](//github.com/nany-lang/nany-syntax-vim)
 * [Emacs](//github.com/nany-lang/nany-syntax-emacs)
