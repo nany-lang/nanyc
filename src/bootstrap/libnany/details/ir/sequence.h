@@ -21,8 +21,6 @@ namespace Nany
 namespace IR
 {
 
-	struct OpcodeScopeLocker;
-
 
 	class Sequence final
 	{
@@ -382,4 +380,3 @@ namespace IR
 } // namespace Nany
 
 #include "sequence.hxx"
-#include "scope-locker.h"

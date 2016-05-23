@@ -1,6 +1,6 @@
 #include <yuni/yuni.h>
 #include "details/pass/build-ast-to-ir/scope.h"
-#include <iostream>
+#include "details/ir/scope-locker.h"
 
 using namespace Yuni;
 

@@ -4,6 +4,7 @@
 #include "details/utils/check-for-valid-identifier-name.h"
 #include "details/ast/ast.h"
 #include "libnany-config.h"
+#include "details/ir/scope-locker.h"
 
 using namespace Yuni;
 

@@ -1,6 +1,7 @@
 #include "details/pass/build-ast-to-ir/scope.h"
 #include "details/grammar/nany.h"
 #include "details/ast/ast.h"
+#include "details/ir/scope-locker.h"
 #include <limits>
 
 using namespace Yuni;

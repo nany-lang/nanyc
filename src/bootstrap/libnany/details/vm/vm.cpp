@@ -197,10 +197,11 @@ namespace VM
 				threadContext.cerrException(msg);
 				abortMission();
 			}
-			[[noreturn]] void emitLabelError()
+			[[noreturn]] void emitLabelError(uint32_t label)
 			{
 				ShortString256 msg;
-				msg << "invalid label , opcode: +" << sequence.get().offsetOf(**cursor);
+				msg << "invalid label %" << label << " (upper: %" << upperLabelID;
+				msg << "), opcode: +" << sequence.get().offsetOf(**cursor);
 				threadContext.cerrException(msg);
 				abortMission();
 			}
@@ -208,8 +209,7 @@ namespace VM
 
 			template<class T> inline T* allocateraw(size_t size)
 			{
-				T* ptr = (T*) allocator.allocate(&allocator, size);
-				return ptr;
+				return (T*) allocator.allocate(&allocator, size);
 			}
 
 
@@ -269,7 +269,7 @@ namespace VM
 					? sequence.get().jumpToLabelForward(*cursor, label)
 					: sequence.get().jumpToLabelBackward(*cursor, label);
 				if (unlikely(not jmpsuccess))
-					emitLabelError();
+					emitLabelError(label);
 			}
 
 
@@ -885,10 +885,10 @@ namespace VM
 				auto* storestackptr = registers;
 				auto storesequence = sequence;
 				auto* storecursor = cursor;
-				auto labelid = upperLabelID;
 				#ifndef NDEBUG
 				auto  storestckfrmsize = registerCount;
 				#endif
+				auto labelid = upperLabelID;
 
 				uint32_t memcheckPreviousAtomid = memchecker.atomid();
 				stacktrace.push(atomfunc, instanceid);
