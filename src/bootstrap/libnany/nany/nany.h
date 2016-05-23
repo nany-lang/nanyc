@@ -221,13 +221,13 @@ typedef struct nyprogram_cf_t
 
 	/*!
 	** \brief A new program has been started
-	** \return nytrue to continue the execution, nyfalse to abort it
+	** return nytrue to continue the execution, nyfalse to abort it
 	*/
 	nybool_t (*on_execute)(nyprogram_t*);
 
 	/*!
 	** \brief A new thread is created
-	** \return nytrue to continue the execution of the thread. nyfalse to abort
+	** return nytrue to continue the execution of the thread. nyfalse to abort
 	*/
 	nybool_t (*on_thread_create)(nyprogram_t*, nytctx_t*, nythread_t* parent, const char* name, uint32_t size);
 	/*!

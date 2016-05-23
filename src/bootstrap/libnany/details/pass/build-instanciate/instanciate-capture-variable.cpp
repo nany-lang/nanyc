@@ -177,7 +177,7 @@ namespace Instanciate
 			if (not child.name.startsWith("^trap^"))
 				return true;
 
-			AnyString varname{child.name, /*offset*/ ::strlen("^trap^")};
+			AnyString varname{child.name, /*offset*/ (uint32_t)::strlen("^trap^")};
 			if (unlikely(varname.empty()))
 			{
 				ICE() << "invalid empty captured variable name";

@@ -286,10 +286,13 @@ namespace Nany
 		**
 		** \param signature The signature of the atom (parameters)
 		** \param sequence The sequence itself (must not be null)
-		** \param symbolname The complete symbol name (ex: "func A.foo(b: ref __i32): ref __i32")
 		*/
 		uint32_t createInstanceID(const Signature& signature, IR::Sequence* sequence, Atom* remapAtom);
 
+		/*!
+		** \brief Update atom instance
+		** \param symbol The complete symbol name (ex: "func A.foo(b: ref __i32): ref __i32")
+		*/
 		void updateInstance(uint32_t id, const AnyString& symbol, const Classdef& rettype);
 
 		//! Mark as invalid a given signature
