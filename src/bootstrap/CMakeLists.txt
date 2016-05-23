@@ -139,12 +139,18 @@ set(extra_flags_debug "")
 set(extra_flags_release "")
 
 if (CMAKE_COMPILER_IS_GNUCXX)
-	check_cxx_compiler_flag("-flto" NANY_HAS_LTO)
-	if (NANY_HAS_LTO)
+	check_cxx_compiler_flag("-flto" NANY_HAS_FLAG_LTO)
+	if (NANY_HAS_FLAG_LTO)
 		# linking issues with LTO currently
 		#set(extra_flags_release "${extra_flags_release} -flto")
 		#set(CMAKE_STATIC_LINKER_FLAGS_RELEASE}" ${CMAKE_STATIC_LINKER_FLAGS_RELEASE} -flto")
 		#set(CMAKE_SHARED_LINKER_FLAGS_RELEASE}" ${CMAKE_SHARED_LINKER_FLAGS_RELEASE} -flto")
+	endif()
+
+	check_cxx_compiler_flag("-Werror=unused-result" NANY_HAS_FLAG_W2R_RESULT)
+	if (NANY_HAS_FLAG_W2R_RESULT)
+		set(extra_flags_release "${extra_flags_release} -Werror=unused-result")
+		set(extra_flags_debug   "${extra_flags_debug} -Werror=unused-result")
 	endif()
 endif()
 
