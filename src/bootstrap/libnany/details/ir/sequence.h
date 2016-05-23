@@ -277,7 +277,7 @@ namespace IR
 		void emitInheritQualifiers(uint32_t lhs, uint32_t rhs);
 
 		//! Emit a label
-		void emitLabel(uint32_t labelid);
+		YUNI_ATTR_NODISCARD uint32_t emitLabel(uint32_t labelid);
 
 		//! Emit a new scope
 		void emitScope();

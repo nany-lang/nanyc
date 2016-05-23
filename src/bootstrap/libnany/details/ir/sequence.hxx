@@ -425,9 +425,10 @@ namespace IR
 	}
 
 
-	inline void Sequence::emitLabel(uint32_t labelid)
+	inline uint32_t Sequence::emitLabel(uint32_t labelid)
 	{
 		emit<IR::ISA::Op::label>().label = labelid;
+		return labelid;
 	}
 
 

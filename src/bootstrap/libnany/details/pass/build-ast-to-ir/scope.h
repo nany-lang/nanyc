@@ -25,6 +25,11 @@ namespace Producer
 			kfunc,
 			kclass,
 		};
+		struct ShortcircuitUpdate final
+		{
+			uint32_t offsetPragma = 0;
+			uint32_t offsetStackalloc = 0;
+		};
 
 	public:
 		//! \name Constructor & Destructor
@@ -60,7 +65,7 @@ namespace Producer
 		bool visitASTExprIdentifier(const AST::Node&, LVID& localvar);
 		bool visitASTExprRegister(const AST::Node&, LVID& localvar);
 		bool visitASTExprCall(const AST::Node*, LVID& localvar, const AST::Node* parent = nullptr); // func call
-		bool visitASTExprCallParameters(const AST::Node&, uint32_t shortcircuitlabel = 0); // parameters of a func call
+		bool visitASTExprCallParameters(const AST::Node&, ShortcircuitUpdate* shortcircuit = nullptr); // parameters of a func call
 		bool visitASTExprSubDot(const AST::Node&, LVID& localvar);
 		bool visitASTExprScope(const AST::Node&);
 		bool visitASTExprNumber(const AST::Node&, LVID& localvar);

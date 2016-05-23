@@ -40,11 +40,15 @@ namespace Producer
 			out.emitAssign(condlvid, exprEval, false);
 		}
 
-		uint32_t labelElse = (hasElseClause ? nextvar() : 0);
-		uint32_t labelEnd  = nextvar();
+		uint32_t labelElse = 0; // (hasElseClause ? nextvar() : 0);
+		uint32_t labelEnd  = 0; // nextvar();
 
-		// jump to the 'else' clause if false (or end)
+		// jump to the 'else' clause if false (or end) (label updated later)
+		uint32_t opOffJz = out.opcodeCount();
 		out.emitJz(condlvid, 0, (hasElseClause ? labelElse : labelEnd));
+
+		// opcode offset for jumping to label 'end' after 'then' stmt
+		uint32_t opOffIntermediateEnd = 0u;
 
 		// if-then...
 		{
@@ -67,7 +71,10 @@ namespace Producer
 			if (customjmpthenOffset == nullptr)
 			{
 				if (hasElseClause)
+				{
+					opOffIntermediateEnd = out.opcodeCount();
 					out.emitJmp(labelEnd);
+				}
 			}
 			else
 			{
@@ -85,7 +92,7 @@ namespace Producer
 
 			// stmt
 			{
-				out.emitLabel(labelElse);
+				labelElse = out.emitLabel(nextvar());
 				OpcodeScopeLocker opscopeElse{out};
 				auto& elsec = *elseptr;
 				emitDebugpos(elsec);
@@ -98,7 +105,12 @@ namespace Producer
 			}
 		}
 
-		out.emitLabel(labelEnd);
+		labelEnd = out.emitLabel(nextvar());
+
+		// post-update label ids
+		out.at<IR::ISA::Op::jz>(opOffJz).label = (hasElseClause ? labelElse : labelEnd);
+		if (opOffIntermediateEnd)
+			out.at<IR::ISA::Op::jmp>(opOffIntermediateEnd).label = labelEnd;
 		return success;
 	}
 
@@ -130,11 +142,15 @@ namespace Producer
 			out.emitAssign(condlvid, exprEval, false);
 		}
 
-		uint32_t labelElse = (hasElseClause ? nextvar() : 0);
-		uint32_t labelEnd  = nextvar();
+		uint32_t labelElse = 0; // (hasElseClause ? nextvar() : 0);
+		uint32_t labelEnd  = 0; // nextvar();
 
 		// jump to the 'else' clause if false (or end)
+		uint32_t opOffJz = out.opcodeCount();
 		out.emitJz(condlvid, 0, (hasElseClause ? labelElse : labelEnd));
+
+		// opcode offset for jumping to label 'end' after 'then' stmt
+		uint32_t opOffIntermediateEnd = 0u;
 
 		// if-then...
 		{
@@ -155,7 +171,10 @@ namespace Producer
 			}
 
 			if (hasElseClause)
+			{
+				opOffIntermediateEnd = out.opcodeCount();
 				out.emitJmp(labelEnd);
+			}
 		}
 
 		// ...else
@@ -165,7 +184,7 @@ namespace Producer
 				out.emitComment("else-expr");
 
 			{
-				out.emitLabel(labelElse);
+				labelElse = out.emitLabel(nextvar());
 				OpcodeScopeLocker opscopeElse{out};
 				emitDebugpos(elsec);
 
@@ -179,7 +198,13 @@ namespace Producer
 			}
 		}
 
-		out.emitLabel(labelEnd);
+		labelEnd = out.emitLabel(nextvar());
+
+		// post-update label ids
+		out.at<IR::ISA::Op::jz>(opOffJz).label = (hasElseClause ? labelElse : labelEnd);
+		if (opOffIntermediateEnd)
+			out.at<IR::ISA::Op::jmp>(opOffIntermediateEnd).label = labelEnd;
+
 		return success;
 	}
 

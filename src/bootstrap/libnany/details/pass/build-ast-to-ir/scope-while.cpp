@@ -38,8 +38,7 @@ namespace Producer
 		OpcodeScopeLocker opscopeWhile{out};
 
 		// the label at the very begining, to loop back
-		uint32_t labelWhile = nextvar();
-		out.emitLabel(labelWhile);
+		uint32_t labelWhile = out.emitLabel(nextvar());
 		emitDebugpos(node);
 
 		if (debugmode)
@@ -77,8 +76,7 @@ namespace Producer
 
 		// end of while, if the condition evaluation failed
 		// (and update the label id in the original jump)
-		uint32_t labelEnd = nextvar();
-		out.emitLabel(labelEnd);
+		uint32_t labelEnd = out.emitLabel(nextvar());
 		out.at<IR::ISA::Op::jz>(jumpOffset).label = labelEnd;
 
 		return success;
@@ -107,8 +105,7 @@ namespace Producer
 		OpcodeScopeLocker opscopeWhile{out};
 
 		// the label at the very begining, to loop back
-		uint32_t labelWhile = nextvar();
-		out.emitLabel(labelWhile);
+		uint32_t labelWhile = out.emitLabel(nextvar());
 		emitDebugpos(node);
 
 		// 'while' body

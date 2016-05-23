@@ -62,8 +62,8 @@ namespace Producer
 		AST::Node bodyScope{AST::rgScope};
 
 		//! list of labels to update (to jump at the end of the switch-case when a cond matches)
-		std::vector<uint32_t> labels;
-		labels.reserve(node.children.size());
+		auto labels = std::make_unique<uint32_t[]>(node.children.size());
+		uint32_t labelCount = 0;
 
 
 		for (auto& childptr: node.children)
@@ -90,8 +90,8 @@ namespace Producer
 						bodyScope.children.clear();
 						bodyScope.children.push_back(child.children[1]);
 
-						labels.emplace_back();
-						success &= generateIfStmt(*exprCase, bodyScope, /*else*/nullptr, &(labels.back()));
+						success &= generateIfStmt(*exprCase, bodyScope, /*else*/nullptr, &(labels[labelCount]));
+						++labelCount;
 					}
 					break;
 				}
@@ -115,12 +115,11 @@ namespace Producer
 			}
 		}
 
-		uint32_t labelEnd = nextvar();
-		out.emitLabel(labelEnd);
+		uint32_t labelEnd = out.emitLabel(nextvar());
 
 		// update all labels for jumping to the end
-		for (auto& offset: labels)
-			out.at<IR::ISA::Op::jmp>(offset).label = labelEnd;
+		for (uint32_t i = 0 ; i != labelCount; ++i)
+			out.at<IR::ISA::Op::jmp>(labels[i]).label = labelEnd;
 
 		return success;
 	}

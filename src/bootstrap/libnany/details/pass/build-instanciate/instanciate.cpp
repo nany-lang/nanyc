@@ -271,7 +271,8 @@ namespace Instanciate
 
 	inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::label>& operands)
 	{
-		out.emitLabel(operands.label);
+		uint32_t lbl = out.emitLabel(operands.label);
+		(void) lbl; // avoid compiler warning for `emitLabel`
 	}
 
 
