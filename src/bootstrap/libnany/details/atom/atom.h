@@ -117,6 +117,9 @@ namespace Nany
 		//! Create a dummy atom
 		static Atom* createDummy();
 
+		//! Get the atom keyword ('func', 'class', 'operator'...) of a given name
+		static void extractNames(AnyString& keyword, AnyString& varname, const AnyString& name);
+
 
 	public:
 		//! Public destructor

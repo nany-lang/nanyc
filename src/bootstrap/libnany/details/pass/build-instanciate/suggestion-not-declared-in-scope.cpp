@@ -100,36 +100,39 @@ namespace Instanciate
 			return false;
 
 		auto err = error();
-		bool unknownIsOperator = (name.first() == '^');
-		if (unknownIsOperator)
+
+		AnyString keyword, varname;
+		Atom::extractNames(keyword, varname, name);
+		bool isOperator = (not keyword.empty());
+
+		if (isOperator) // operator, view...
 		{
-			AnyString rname{name.c_str() + 1, name.size() - 1};
 			if (self)
 			{
-				err << "'operator " << rname << "' is not declared in '";
+				err << '\'' << keyword << ' ' << varname << "' is not declared in '";
 				err << cdeftable.keyword(*self) << ' ';
 				self->retrieveCaption(err.data().message, cdeftable);
 				err << '\'';
 			}
 			else
-				err << "'operator " << rname << "' is not declared in this scope";
+				err << '\'' << keyword << ' ' << varname << "' is not declared in this scope";
 		}
 		else
 		{
 			if (self)
 			{
-				err << '\'' << name << "' is not declared in '";
+				err << '\'' << varname << "' is not declared in '";
 				err << cdeftable.keyword(*self) << ' ';
 				self->retrieveCaption(err.data().message, cdeftable);
 				err << '\'';
 			}
 			else
-				err << '\'' << name << "' is not declared in this scope";
+				err << '\'' << varname << "' is not declared in this scope";
 		}
 
 
 		// trying local variables first
-		if (self == nullptr and not unknownIsOperator)
+		if (self == nullptr and not isOperator)
 		{
 			uint32_t note;
 
@@ -167,7 +170,7 @@ namespace Instanciate
 		{
 			std::map<size_t, std::vector<std::reference_wrapper<const Atom>>> dict;
 
-			if (not unknownIsOperator)
+			if (not isOperator)
 			{
 				// not an operator, can be anything
 				parentAtom->eachChild([&](const Atom& child) -> bool

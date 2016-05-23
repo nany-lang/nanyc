@@ -490,6 +490,39 @@ namespace Nany
 	}
 
 
+	void Atom::extractNames(AnyString& keyword, AnyString& varname, const AnyString& name)
+	{
+		if (not name.empty())
+		{
+			if (name[0] != '^')
+			{
+				keyword.clear();
+				varname = name;
+				return;
+			}
+			if (name.startsWith("^default-var-%"))
+			{
+				keyword = "<default-init>";
+				auto endOffset = name.find_last_of('-');
+				varname = (endOffset < name.size())
+					? AnyString{name, endOffset + 1} : AnyString{"<invalid-field>"};
+				return;
+			}
+			if (name.startsWith("^view^"))
+			{
+				keyword = "view";
+				varname = AnyString{name.c_str() + 6, name.size() - 6};
+				return;
+			}
+
+			keyword = "operator";
+			varname = AnyString{name.c_str() + 1, name.size() - 1};
+		}
+
+		keyword.clear();
+		varname.clear();
+	}
+
 	AnyString Atom::keyword() const
 	{
 		switch (type)
