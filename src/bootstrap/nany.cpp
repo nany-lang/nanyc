@@ -66,8 +66,6 @@ namespace // anonymous
 	};
 
 
-
-
 	static int printNoInputScript()
 	{
 		std::cerr << argv0 << ": no input script file\n";
@@ -154,12 +152,9 @@ namespace // anonymous
 		if (unlikely(!build))
 			return nullptr;
 
-		do
+		auto bStatus = nany_build(build.get());
+		if (bStatus != nyfalse)
 		{
-			auto bStatus = nany_build(build.get());
-			if (unlikely(bStatus == nyfalse))
-				break;
-
 			if (unlikely(options.verbose))
 				nany_build_print_report_to_console(build.get(), nytrue);
 
@@ -167,7 +162,6 @@ namespace // anonymous
 			nany_program_cf_init(&pcf, &cf);
 			return std::unique_ptr<nyprogram_t>(nany_program_prepare(build.get(), &pcf));
 		}
-		while (false);
 
 		// an error has occured
 		nybool_t addHeader = (options.verbose ? nytrue : nyfalse);
@@ -227,62 +221,65 @@ namespace // anonymous
 int main(int argc, char** argv)
 {
 	argv0 = argv[0];
-	if (unlikely(argc <= 1))
-		return printNoInputScript();
 
-	Options options;
-	int firstarg = argc; // end of the list
-
-	for (int i = 1; i < argc; ++i)
+	if (argc > 1)
 	{
-		const char* const carg = argv[i];
-		if (unlikely(carg[0] == '-'))
-		{
-			if (carg[1] == '-')
-			{
-				if (carg[2] != '\0') // to handle '--' option
-				{
-					AnyString arg{carg};
+		Options options;
+		int firstarg = argc; // end of the list
 
-					if (arg == "--help")
-						return printUsage(argv[0]);
-					if (arg == "--version")
-						return printVersion();
-					if (arg == "--bugreport")
-						return printBugReportInfo();
-					if (arg == "--verbose")
+		for (int i = 1; i < argc; ++i)
+		{
+			const char* const carg = argv[i];
+			if (unlikely(carg[0] == '-'))
+			{
+				if (carg[1] == '-')
+				{
+					if (carg[2] != '\0') // to handle '--' option
 					{
-						options.verbose = true;
-						continue;
+						AnyString arg{carg};
+
+						if (arg == "--help")
+							return printUsage(argv[0]);
+						if (arg == "--version")
+							return printVersion();
+						if (arg == "--bugreport")
+							return printBugReportInfo();
+						if (arg == "--verbose")
+						{
+							options.verbose = true;
+							continue;
+						}
+						return unknownOption(arg);
 					}
-					return unknownOption(arg);
+					else
+					{
+						// nothing must interpreted after '--'
+						firstarg = i + 1;
+						break;
+					}
 				}
 				else
 				{
-					firstarg = i + 1;
-					break; // nothing must interpreted after '--'
+					AnyString arg{carg};
+					if (arg == "-h")
+						return printUsage(argv[0]);
+					if (arg == "-v")
+						return printVersion();
+					return unknownOption(arg);
 				}
 			}
-			else
-			{
-				AnyString arg{carg};
-				if (arg == "-h")
-					return printUsage(argv[0]);
-				if (arg == "-v")
-					return printVersion();
-				return unknownOption(arg);
-			}
+
+			firstarg = i;
+			break;
 		}
 
-		firstarg = i;
-		break;
+
+		//
+		// -- execute the script
+		//
+		if (firstarg < argc)
+			return execute(argc - firstarg, argv + firstarg, options);
 	}
 
-	if (unlikely(firstarg >= argc))
-		return printNoInputScript();
-
-	//
-	// -- execute the script
-	//
-	return execute(argc - firstarg, argv + firstarg, options);
+	return printNoInputScript();
 }
