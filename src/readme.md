@@ -8,9 +8,10 @@ Building Nany C++/bootstrap
 ### Dependencies
 
  * `>=CMake-3.0`
- * C++14 compliant compilers: `>=gcc-4.9`, `>=VS2015`
+ * C++14 compliant compiler: `>=gcc-4.9`, `>=clang-3.7`, `>=VS2015`
 
-Make sure that submodules are present:
+Make sure that submodules are present (if the repository has not been cloned
+with `--recursive` option):
 ```
 $ git submodule update --init --recursive
 ```
