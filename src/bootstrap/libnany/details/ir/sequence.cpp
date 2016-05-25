@@ -102,8 +102,10 @@ namespace IR
 
 		struct WalkerIncreaseLVID final
 		{
-			WalkerIncreaseLVID(IR::Sequence& sequence)
-				: sequence(sequence)
+			WalkerIncreaseLVID(IR::Sequence& sequence, uint32_t inc, uint32_t greaterThan)
+				: greaterThan(greaterThan)
+				, inc(inc)
+				, sequence(sequence)
 			{}
 
 			void visit(IR::ISA::Operand<IR::ISA::Op::stacksize>& operands)
@@ -143,22 +145,24 @@ namespace IR
 
 			template<IR::ISA::Op O> void visit(IR::ISA::Operand<O>& operands)
 			{
+				// ask to the opcode datatype to update its own lvid
+				// (see operator() below)
 				operands.eachLVID(*this);
 			}
 
-			void operator () (uint32_t& lvid) const
+			inline void operator () (uint32_t& lvid) const
 			{
 				if (lvid > greaterThan)
 					lvid += inc;
 			}
-			void operator () (uint32_t& lvid1, uint32_t& lvid2) const
+			inline void operator () (uint32_t& lvid1, uint32_t& lvid2) const
 			{
 				if (lvid1 > greaterThan)
 					lvid1 += inc;
 				if (lvid2 > greaterThan)
 					lvid2 += inc;
 			}
-			void operator () (uint32_t& lvid1, uint32_t& lvid2, uint32_t& lvid3) const
+			inline void operator () (uint32_t& lvid1, uint32_t& lvid2, uint32_t& lvid3) const
 			{
 				if (lvid1 > greaterThan)
 					lvid1 += inc;
@@ -168,8 +172,8 @@ namespace IR
 					lvid3 += inc;
 			}
 
-			uint32_t inc;
 			uint32_t greaterThan;
+			uint32_t inc;
 			uint32_t depth = 0;
 			Instruction** cursor = nullptr;
 			Sequence& sequence;
@@ -179,13 +183,10 @@ namespace IR
 
 	void Sequence::increaseAllLVID(uint32_t inc, uint32_t greaterThan, uint32_t offset)
 	{
-		if (inc > 0)
-		{
-			WalkerIncreaseLVID walker{*this};
-			walker.inc = inc;
-			walker.greaterThan = greaterThan;
-			each(walker, offset);
-		}
+		assert(inc > 0 and "this method should not be called if nothing to do");
+
+		WalkerIncreaseLVID walker{*this, inc, greaterThan};
+		each(walker, offset);
 	}
 
 
