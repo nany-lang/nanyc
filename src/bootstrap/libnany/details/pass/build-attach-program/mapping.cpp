@@ -472,7 +472,7 @@ namespace Mapping
 		{
 			// creating all related classdefs
 			// (take max with 1 to prevent against invalid opcode)
-			if (localvarCount == 0)
+			if (unlikely(localvarCount == 0))
 				return printError(operands, "invalid local variable count for a func blueprint");
 
 			// like parameters, the return type should not 'ref' by default
