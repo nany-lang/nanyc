@@ -431,6 +431,9 @@ namespace Nany
 			// \warning offset of the operands of the blueprint, not the opcode value
 			uint32_t offset = 0;
 
+			//! For capturing variables, it may be required to increase the IR stack size
+			uint32_t stackSizeExtra = 0;
+
 			//! Flag to determine whether the sequence is owned by the atom or not
 			bool owned = false;
 		}

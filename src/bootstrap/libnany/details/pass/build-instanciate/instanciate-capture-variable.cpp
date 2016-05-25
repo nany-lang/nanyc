@@ -77,7 +77,7 @@ namespace Instanciate
 		auto& table = cdeftable.originalTable();
 
 		// Base offset for the new lvid (new captured variables in the class)
-		uint32_t startLvid = atom.localVariablesCount;
+		uint32_t startLvid = atom.localVariablesCount + 1; // 1-based
 		auto offset = atom.opcodes.offset;
 
 		#ifndef NDEBUG
@@ -95,13 +95,14 @@ namespace Instanciate
 		++offset;
 		auto& stacksize = sequence.at<IR::ISA::Op::stacksize>(offset);
 		assert(stacksize.opcode == static_cast<uint32_t>(IR::ISA::Op::stacksize));
-		assert(stacksize.add == startLvid);
+		assert(stacksize.add + 1 == startLvid);
 		if (unlikely(stacksize.opcode != static_cast<uint32_t>(IR::ISA::Op::stacksize)))
 			return (void)(ICE() << "capturing variable: stacksize opcode expected");
 
 		// new stack size
 		stacksize.add += count;
 		atom.localVariablesCount += count;
+
 		table.bulkAppend(atom.atomid, startLvid, count);
 
 
@@ -137,14 +138,8 @@ namespace Instanciate
 		// adding parameters to all constructors
 		atom.eachChild([&](Atom& child) -> bool
 		{
-			if (not child.isOperator())
-				return true;
-
-			if (child.name == "^default-new" or child.name == "^new")
+			if (child.isOperator() and (child.name == "^default-new" or child.name == "^new"))
 			{
-				// keep the original number of parameters
-				uint32_t initialParamCount = child.parameters.size();
-
 				for (uint32_t i = 0; i != count; ++i)
 				{
 					auto& var = capturedVars[i];
@@ -158,8 +153,8 @@ namespace Instanciate
 					}
 				}
 
-				// insert parameters lvid
-				child.opcodes.sequence->increaseAllLVID(count, initialParamCount);
+				// need extra size for the next instanciation
+				child.opcodes.stackSizeExtra = count;
 			}
 			return true;
 		});

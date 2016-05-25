@@ -203,7 +203,7 @@ namespace Nany
 	void ClassdefTable::bulkAppend(uint32_t atomid, uint32_t offset, uint32_t count)
 	{
 		assert(atomid > 0);
-		for (uint32_t i = offset; i < count; ++i)
+		for (uint32_t i = offset; i != offset + count; ++i)
 		{
 			// the new classid, made from the atom id
 			CLID clid{atomid, i};

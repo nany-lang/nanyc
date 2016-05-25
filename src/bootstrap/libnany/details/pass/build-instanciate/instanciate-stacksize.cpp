@@ -16,11 +16,14 @@ namespace Instanciate
 	{
 		if (frame)
 		{
+			// the new stack size
+			uint32_t stacksize = operands.add + frame->atom.opcodes.stackSizeExtra;
+
 			if (cdeftable.substituteAtomID() == frame->atomid)
-				frame->resizeRegisterCount(operands.add, cdeftable);
+				frame->resizeRegisterCount(stacksize, cdeftable);
 
 			if (canGenerateCode())
-				frame->offsetOpcodeStacksize = out.emitStackSizeIncrease(operands.add);
+				frame->offsetOpcodeStacksize = out.emitStackSizeIncrease(stacksize);
 		}
 	}
 
