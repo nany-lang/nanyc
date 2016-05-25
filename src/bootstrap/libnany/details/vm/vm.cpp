@@ -851,7 +851,7 @@ namespace VM
 
 			uint64_t invoke(const IR::Sequence& callee)
 			{
-				const uint32_t framesize = callee.at<IR::ISA::Op::stacksize>(0).add + 1; // 1-based
+				const uint32_t framesize = callee.at<IR::ISA::Op::stacksize>(0).add;
 				#ifndef NDEBUG
 				assert(framesize < 1024 * 1024);
 				registerCount = framesize;
