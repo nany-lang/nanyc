@@ -689,6 +689,13 @@ namespace IR
 		return lvid;
 	}
 
+	inline void Sequence::emitMemrealloc(uint32_t lvid, uint32_t oldsize, uint32_t newsize)
+	{
+		auto& operands   = emit<ISA::Op::memrealloc>();
+		operands.lvid    = lvid;
+		operands.oldsize = oldsize;
+		operands.newsize = newsize;
+	}
 
 	inline void Sequence::emitMemFree(uint32_t lvid, uint32_t regsize)
 	{
@@ -696,7 +703,6 @@ namespace IR
 		operands.lvid    = lvid;
 		operands.regsize = regsize;
 	}
-
 
 	inline void Sequence::emitMemFill(uint32_t lvid, uint32_t regsize, uint32_t pattern)
 	{

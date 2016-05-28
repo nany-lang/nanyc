@@ -78,7 +78,7 @@ set(ny_core_files
 	"${nsl_root}/std.env/env.ny"
 
 	# std.memory
-	#"${nsl_root}/std.memory/allocator.ny"
+	"${nsl_root}/std.memory/allocator.ny"
 	)
 
 file(MAKE_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/details/nsl/generated")

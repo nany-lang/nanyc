@@ -150,15 +150,40 @@ namespace Instanciate
 
 	bool SequenceBuilder::instanciateIntrinsicMemalloc(uint32_t lvid)
 	{
-		cdeftable.substitute(lvid).mutateToBuiltin(nyt_u64);
+		cdeftable.substitute(lvid).mutateToBuiltin(nyt_pointer);
 
 		uint32_t objlvid = pushedparams.func.indexed[0].lvid;
 		auto& cdef = cdeftable.classdefFollowClassMember(CLID{frame->atomid, objlvid});
-		if (not cdef.isBuiltingUnsigned())
+		if (not cdef.isBuiltinU64())
 			return complainIntrinsicParameter("memory.allocate", 0, cdef, "'__u64'");
 
 		if (canGenerateCode())
 			out.emitMemalloc(lvid, objlvid);
+		return true;
+	}
+
+
+	bool SequenceBuilder::instanciateIntrinsicMemrealloc(uint32_t lvid)
+	{
+		cdeftable.substitute(lvid).mutateToVoid();
+
+		uint32_t ptrlvid = pushedparams.func.indexed[0].lvid;
+		auto& cdefptr = cdeftable.classdefFollowClassMember(CLID{frame->atomid, ptrlvid});
+		if (not cdefptr.isRawPointer())
+			return complainIntrinsicParameter("memory.realloc", 0, cdefptr, "'__pointer'");
+
+		uint32_t oldsizelvid = pushedparams.func.indexed[1].lvid;
+		auto& cdefOldsize = cdeftable.classdefFollowClassMember(CLID{frame->atomid, oldsizelvid});
+		if (not cdefOldsize.isBuiltinU64())
+			return complainIntrinsicParameter("memory.realloc", 0, cdefOldsize, "'__u64'");
+
+		uint32_t newsizelvid = pushedparams.func.indexed[2].lvid;
+		auto& cdefNewsize = cdeftable.classdefFollowClassMember(CLID{frame->atomid, newsizelvid});
+		if (not cdefNewsize.isBuiltinU64())
+			return complainIntrinsicParameter("memory.realloc", 0, cdefNewsize, "'__u64'");
+
+		if (canGenerateCode())
+			out.emitMemrealloc(ptrlvid, oldsizelvid, newsizelvid);
 		return true;
 	}
 
@@ -688,6 +713,7 @@ namespace Instanciate
 		{"^fieldset",       { &SequenceBuilder::instanciateIntrinsicFieldset,  2 }},
 		{"addressof",       { &SequenceBuilder::instanciateIntrinsicAddressof, 1 }},
 		{"memory.allocate", { &SequenceBuilder::instanciateIntrinsicMemalloc,  1 }},
+		{"memory.realloc",  { &SequenceBuilder::instanciateIntrinsicMemrealloc,  3 }},
 		{"memory.dispose",  { &SequenceBuilder::instanciateIntrinsicMemFree,   2 }},
 		{"memory.fill",     { &SequenceBuilder::instanciateIntrinsicMemfill,   3 }},
 		{"ref",             { &SequenceBuilder::instanciateIntrinsicRef,       1 }},

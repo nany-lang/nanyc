@@ -52,7 +52,10 @@ namespace Nany
 		bool isBuiltin() const;
 		//! Get if the classdef is a builtin type ('void' included)
 		bool isBuiltinOrVoid() const;
-
+		//! Get if the classdef is a builtin pointer
+		bool isRawPointer() const;
+		//! Get if the classdef is a builtin u64
+		bool isBuiltinU64() const;
 		//! Get if the classdef is a builtin unsigned int (u32, u64...)
 		bool isBuiltingUnsigned() const;
 

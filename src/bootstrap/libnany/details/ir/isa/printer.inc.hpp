@@ -511,6 +511,13 @@ namespace // anonymous
 			line() << "memory.fill %" << operands.lvid << " size %" << operands.regsize;
 		}
 
+		void print(const Operand<Op::memrealloc>& operands)
+		{
+			line() << "memory.realloc %" << operands.lvid
+				<< " oldsize %" << operands.oldsize
+				<< " newsize %" << operands.newsize;
+		}
+
 
 		void print(const Operand<Op::ref>& operands)
 		{

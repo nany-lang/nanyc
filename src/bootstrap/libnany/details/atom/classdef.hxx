@@ -17,6 +17,15 @@ namespace Nany
 		return kind != nyt_any;
 	}
 
+	inline bool Classdef::isRawPointer() const
+	{
+		return kind == nyt_pointer and (atom == nullptr);
+	}
+
+	inline bool Classdef::isBuiltinU64() const
+	{
+		return kind == nyt_u64;
+	}
 
 	inline bool Classdef::isBuiltingUnsigned() const
 	{
