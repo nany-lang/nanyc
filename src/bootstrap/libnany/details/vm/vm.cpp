@@ -798,18 +798,21 @@ namespace VM
 				assert(operands.regsize < registerCount);
 
 				uint64_t* object = reinterpret_cast<uint64_t*>(registers[operands.lvid].u64);
-				VM_CHECK_POINTER(object, operands);
-				size_t size = static_cast<size_t>(registers[operands.regsize].u64);
-				size += sizeof(uint64_t); // reference counter
+				if (object)
+				{
+					VM_CHECK_POINTER(object, operands);
+					size_t size = static_cast<size_t>(registers[operands.regsize].u64);
+					size += sizeof(uint64_t); // reference counter
 
-				if (YUNI_UNLIKELY(not memchecker.checkObjectSize(object, static_cast<size_t>(size))))
-					return emitPointerSizeMismatch(object, size);
+					if (YUNI_UNLIKELY(not memchecker.checkObjectSize(object, static_cast<size_t>(size))))
+						return emitPointerSizeMismatch(object, size);
 
-				if (debugmode)
-					memset(object, patternFree, size);
+					if (debugmode)
+						memset(object, patternFree, size);
 
-				deallocate(object, size);
-				memchecker.forget(object);
+					deallocate(object, size);
+					memchecker.forget(object);
+				}
 			}
 
 			void visit(const IR::ISA::Operand<IR::ISA::Op::memfill>& operands)
