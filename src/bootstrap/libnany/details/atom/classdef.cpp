@@ -84,12 +84,6 @@ namespace Nany
 	}
 
 
-	bool Classdef::isPointerToFunc() const
-	{
-		return isLinkedToAtom() and (atom->type == Atom::Type::funcdef);
-	}
-
-
 	bool Classdef::isClass(const AnyString& name) const
 	{
 		return isClass() and (atom->name == name);

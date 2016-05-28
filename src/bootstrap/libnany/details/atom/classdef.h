@@ -66,10 +66,6 @@ namespace Nany
 		bool isClass() const;
 		//! Get if the type is a given class
 		bool isClass(const AnyString& name) const;
-		//! Get if the type is a function
-		bool isPointerToFunc() const;
-		//! Get if the type is a pointer to member
-		bool isPointerToMember() const;
 
 		//! Get if is a variable
 		bool isVariable() const;
