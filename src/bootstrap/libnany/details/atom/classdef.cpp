@@ -52,7 +52,7 @@ namespace Nany
 		const Atom* selfAtom = table.findClassdefAtom(*this);
 		if (selfAtom)
 		{
-			if (kind == nyt_pointer)
+			if (kind == nyt_ptr)
 				out << "ptr -> ";
 			selfAtom->retrieveCaption(out, table);
 		}

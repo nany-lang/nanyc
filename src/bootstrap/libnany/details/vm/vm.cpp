@@ -325,7 +325,7 @@ namespace VM
 						case nyt_i32:
 							dcArgInt(dyncall, static_cast<DCint>(r.i64));
 							break;
-						case nyt_pointer:
+						case nyt_ptr:
 							dcArgPointer(dyncall, reinterpret_cast<DCpointer>(r.u64));
 							break;
 						case nyt_u16:
@@ -371,7 +371,7 @@ namespace VM
 					case nyt_i32:
 						registers[opr.lvid].i64 = static_cast<int64_t>(dcCallInt(dyncall, intrinsic.callback));
 						break;
-					case nyt_pointer:
+					case nyt_ptr:
 						registers[opr.lvid].u64 = reinterpret_cast<uint64_t>(dcCallPointer(dyncall, intrinsic.callback));
 						break;
 					case nyt_u16:

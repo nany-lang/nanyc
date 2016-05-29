@@ -150,7 +150,7 @@ namespace Instanciate
 
 	bool SequenceBuilder::instanciateIntrinsicMemalloc(uint32_t lvid)
 	{
-		cdeftable.substitute(lvid).mutateToBuiltin(nyt_pointer);
+		cdeftable.substitute(lvid).mutateToBuiltin(nyt_ptr);
 
 		uint32_t objlvid = pushedparams.func.indexed[0].lvid;
 		auto& cdef = cdeftable.classdefFollowClassMember(CLID{frame->atomid, objlvid});
@@ -194,7 +194,7 @@ namespace Instanciate
 
 		uint32_t objlvid = pushedparams.func.indexed[0].lvid;
 		auto& cdef = cdeftable.classdefFollowClassMember(CLID{frame->atomid, objlvid});
-		if (cdef.kind != nyt_pointer)
+		if (cdef.kind != nyt_ptr)
 			return complainIntrinsicParameter("memory.dispose", 0, cdef, "'__u64'");
 
 		uint32_t size = pushedparams.func.indexed[1].lvid;
@@ -214,7 +214,7 @@ namespace Instanciate
 
 		uint32_t objlvid = pushedparams.func.indexed[0].lvid;
 		auto& cdef = cdeftable.classdefFollowClassMember(CLID{frame->atomid, objlvid});
-		if (cdef.kind != nyt_pointer)
+		if (cdef.kind != nyt_ptr)
 			return complainIntrinsicParameter("memory.memset", 0, cdef, "'__pointer'");
 
 		uint32_t size = pushedparams.func.indexed[1].lvid;
@@ -260,7 +260,7 @@ namespace Instanciate
 			}
 		}
 
-		if (unlikely(builtinlhs != nyt_bool and builtinlhs != nyt_pointer))
+		if (unlikely(builtinlhs != nyt_bool and builtinlhs != nyt_ptr))
 			return complainIntrinsicParameter("not", 0, cdeflhs);
 
 		// --- result of the operator
@@ -375,12 +375,12 @@ namespace Instanciate
 	{
 		/*void*/ {nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,},
 		/*any*/  {nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,},
-		/*ptr*/  {nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,},
+		/*ptr*/  {nyt_void,nyt_void,nyt_ptr, nyt_void,nyt_ptr, nyt_ptr, nyt_ptr, nyt_ptr, nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,},
 		/*bool*/ {nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,},
-		/*u8 */  {nyt_void,nyt_void,nyt_void,nyt_void,nyt_u8,  nyt_u16, nyt_u32, nyt_u64, nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,},
-		/*u16*/  {nyt_void,nyt_void,nyt_void,nyt_void,nyt_u16, nyt_u16, nyt_u32, nyt_u64, nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,},
-		/*u32*/  {nyt_void,nyt_void,nyt_void,nyt_void,nyt_u32, nyt_u32, nyt_u32, nyt_u64, nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,},
-		/*u64*/  {nyt_void,nyt_void,nyt_void,nyt_void,nyt_u64, nyt_u64, nyt_u64, nyt_u64, nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,},
+		/*u8 */  {nyt_void,nyt_void,nyt_ptr, nyt_void,nyt_u8,  nyt_u16, nyt_u32, nyt_u64, nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,},
+		/*u16*/  {nyt_void,nyt_void,nyt_ptr, nyt_void,nyt_u16, nyt_u16, nyt_u32, nyt_u64, nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,},
+		/*u32*/  {nyt_void,nyt_void,nyt_ptr, nyt_void,nyt_u32, nyt_u32, nyt_u32, nyt_u64, nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,},
+		/*u64*/  {nyt_void,nyt_void,nyt_ptr, nyt_void,nyt_u64, nyt_u64, nyt_u64, nyt_u64, nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,},
 		/*i8 */  {nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_i8,  nyt_i16, nyt_i32, nyt_i64, nyt_void,nyt_void,},
 		/*i16*/  {nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_i16, nyt_i16, nyt_i32, nyt_i64, nyt_void,nyt_void,},
 		/*i32*/  {nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_void,nyt_i32, nyt_i32, nyt_i32, nyt_i64, nyt_void,nyt_void,},
@@ -484,7 +484,7 @@ namespace Instanciate
 			}
 			case nyt_void:
 			case nyt_any:
-			case nyt_pointer:
+			case nyt_ptr:
 			case nyt_count:
 			{
 				return complainIntrinsicParameter(name, 0, cdeflhs);

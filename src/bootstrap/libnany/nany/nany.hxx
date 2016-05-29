@@ -29,19 +29,19 @@ inline size_t nany_type_sizeof(nytype_t type)
 {
 	switch (type)
 	{
-		case nyt_u32:     return sizeof(uint32_t);
-		case nyt_u64:     return sizeof(uint64_t);
+		case nyt_u32:  return sizeof(uint32_t);
+		case nyt_u64:  return sizeof(uint64_t);
 
-		case nyt_pointer: return sizeof(size_t);
-		case nyt_bool:    return sizeof(uint8_t);
-		case nyt_u8:      return sizeof(uint8_t);
-		case nyt_u16:     return sizeof(uint16_t);
-		case nyt_i8:      return sizeof(int8_t);
-		case nyt_i16:     return sizeof(int16_t);
-		case nyt_i32:     return sizeof(int32_t);
-		case nyt_i64:     return sizeof(int64_t);
-		case nyt_f32:     return sizeof(float);
-		case nyt_f64:     return sizeof(double);
+		case nyt_ptr:  return sizeof(size_t);
+		case nyt_bool: return sizeof(uint8_t);
+		case nyt_u8:   return sizeof(uint8_t);
+		case nyt_u16:  return sizeof(uint16_t);
+		case nyt_i8:   return sizeof(int8_t);
+		case nyt_i16:  return sizeof(int16_t);
+		case nyt_i32:  return sizeof(int32_t);
+		case nyt_i64:  return sizeof(int64_t);
+		case nyt_f32:  return sizeof(float);
+		case nyt_f64:  return sizeof(double);
 		case nyt_void:
 		case nyt_any:
 		case nyt_count: break;

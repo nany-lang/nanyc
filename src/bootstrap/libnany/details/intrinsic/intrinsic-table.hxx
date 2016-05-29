@@ -56,12 +56,12 @@ namespace Nany
 
 	template<class P> struct CTypeToNanyType<P*> final
 	{
-		static constexpr nytype_t type = nyt_pointer;
+		static constexpr nytype_t type = nyt_ptr;
 	};
 
 	template<class P> struct CTypeToNanyType<const P*> final
 	{
-		static constexpr nytype_t type = nyt_pointer;
+		static constexpr nytype_t type = nyt_ptr;
 	};
 
 	template<> struct CTypeToNanyType<Yuni::None> final

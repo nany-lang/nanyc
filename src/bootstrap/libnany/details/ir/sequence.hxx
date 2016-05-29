@@ -649,7 +649,7 @@ namespace IR
 
 	inline uint32_t Sequence::emitStackallocText(uint32_t lvid, const AnyString& text)
 	{
-		emitStackalloc(lvid, nyt_pointer);
+		emitStackalloc(lvid, nyt_ptr);
 		emitStoreText(lvid, text);
 		return lvid;
 	}

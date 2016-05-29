@@ -94,7 +94,7 @@ typedef enum /* nytype_t */
 	/*! Custom user type */
 	nyt_any,
 	/*! Raw pointer (arch dependent) */
-	nyt_pointer,
+	nyt_ptr,
 	/*! Boolean (nytrue/nyfalse) */
 	nyt_bool,
 	/*! Unsigned 8  bits integer */

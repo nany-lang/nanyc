@@ -144,7 +144,7 @@ namespace Instanciate
 						frame->partiallyResolved.erase(cdef.clid); // just in case
 
 						auto& opc = cdeftable.substitute(operands.lvid);
-						opc.mutateToBuiltin(nyt_pointer);
+						opc.mutateToBuiltin(nyt_ptr);
 						opc.qualifiers.ref = false;
 						out.emitStore_u64(operands.lvid, 0);
 						frame->lvids[operands.lvid].synthetic = false;

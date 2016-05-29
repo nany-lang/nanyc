@@ -43,6 +43,8 @@ namespace Nany
 	}
 
 
+
+
 	namespace // anonymous
 	{
 		static inline bool findCoreObject(Atom::Ptr& out, nytype_t kind, const AnyString& name, Logs::Report& report, Atom& root)
@@ -101,6 +103,8 @@ namespace Nany
 
 			success &= findCoreObject(core.object[nyt_f32], nyt_f32, "f32", report, root);
 			success &= findCoreObject(core.object[nyt_f64], nyt_f64, "f64", report, root);
+
+			success &= findCoreObject(core.object[nyt_ptr], nyt_ptr, "pointer", report, root);
 
 			if (unlikely(not success))
 				core.object[nyt_bool] = nullptr;

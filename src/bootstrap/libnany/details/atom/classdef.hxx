@@ -19,7 +19,7 @@ namespace Nany
 
 	inline bool Classdef::isRawPointer() const
 	{
-		return kind == nyt_pointer and (atom == nullptr);
+		return kind == nyt_ptr and (atom == nullptr);
 	}
 
 	inline bool Classdef::isBuiltinU64() const
@@ -103,7 +103,7 @@ namespace Nany
 
 	inline void Classdef::mutateToPtr2Func(Atom* newAtom)
 	{
-		kind = nyt_pointer;
+		kind = nyt_ptr;
 		atom = newAtom;
 	}
 

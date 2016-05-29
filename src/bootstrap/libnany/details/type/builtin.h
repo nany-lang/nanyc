@@ -35,8 +35,8 @@ namespace Builtin
 
 
 
-	NY_DECLARE_BUILTIN(bool,     nyt_bool,    1);
-	NY_DECLARE_BUILTIN(void*,    nyt_pointer, sizeof(void*));
+	NY_DECLARE_BUILTIN(bool,     nyt_bool, 1);
+	NY_DECLARE_BUILTIN(void*,    nyt_ptr,  sizeof(void*));
 
 	NY_DECLARE_BUILTIN(uint64_t, nyt_u64,  8);
 	NY_DECLARE_BUILTIN(uint32_t, nyt_u32,  4);
@@ -48,8 +48,8 @@ namespace Builtin
 	NY_DECLARE_BUILTIN(int16_t,  nyt_i16,  2);
 	NY_DECLARE_BUILTIN(int8_t,   nyt_i8,   1);
 
-	NY_DECLARE_BUILTIN(double,   nyt_f64, sizeof(double));
-	NY_DECLARE_BUILTIN(float,    nyt_f32, sizeof(float));
+	NY_DECLARE_BUILTIN(double,   nyt_f64,  sizeof(double));
+	NY_DECLARE_BUILTIN(float,    nyt_f32,  sizeof(float));
 
 
 	#undef NY_DECLARE_BUILTIN
