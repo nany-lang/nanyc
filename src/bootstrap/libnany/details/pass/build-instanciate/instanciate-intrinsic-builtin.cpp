@@ -254,10 +254,13 @@ namespace Instanciate
 				uint32_t newlvid = createLocalVariables();
 				out.emitFieldget(newlvid, lhs, 0);
 				lhs = newlvid;
+
+				if (builtinlhs != nyt_bool) // allow only bool for complex types
+					builtinlhs = nyt_any;
 			}
 		}
 
-		if (unlikely(builtinlhs != nyt_bool))
+		if (unlikely(builtinlhs != nyt_bool and builtinlhs != nyt_pointer))
 			return complainIntrinsicParameter("not", 0, cdeflhs);
 
 		// --- result of the operator
@@ -303,7 +306,7 @@ namespace Instanciate
 		else
 		{
 			// no convertion to perform, direct call
-			cdeftable.substitute(lvid).mutateToBuiltin(nyt_bool);
+			cdeftable.substitute(lvid).mutateToBuiltin(builtinlhs);
 			if (canGenerateCode())
 				out.emitNOT(lvid, lhs);
 		}
