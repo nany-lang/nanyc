@@ -77,14 +77,19 @@ namespace Producer
 				case AST::rgIn:         success &= visitASTExprIn(child, localvar); break;
 				case AST::rgFunction:   success &= visitASTExprClosure(child, localvar); break;
 
+				case AST::rgAttributes: success &= visitASTAttributes(child); break;
+
 				// special for internal AST manipulation
 				case AST::rgRegister:   success &= visitASTExprRegister(child, localvar); break;
 
 				// scope may appear in expr (when expr are actually statements)
-				case AST::rgScope:  if (allowScope) {
-					success &= visitASTExprScope(child);
-					break;
-				} // fallthru ok - if not then unexpected
+				case AST::rgScope: {
+					if (allowScope) {
+						success &= visitASTExprScope(child);
+						break;
+					}
+				}
+				// [[fallthru]]
 				default:
 					success = ICEUnexpectedNode(child, "[expr/continuation]");
 			}

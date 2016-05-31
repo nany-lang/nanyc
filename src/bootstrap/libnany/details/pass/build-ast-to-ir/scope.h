@@ -2,7 +2,7 @@
 #include <yuni/yuni.h>
 #include "details/pass/build-ast-to-ir/context.h"
 #include "details/ir/fwd.h"
-
+#include <yuni/core/flags.h>
 
 
 
@@ -12,6 +12,39 @@ namespace IR
 {
 namespace Producer
 {
+
+	/*!
+	** \brief List of all attributes
+	**\
+	** The attributes used by the code must be reset to avoid error reporting
+	*/
+	struct Attributes final
+	{
+		enum class Flag {
+			//! Call builtin instead of func implementation
+			builtinAlias,
+			//! Do not suggest this function for error reporting
+			doNotSuggest,
+			//! Use shortcircuit evaluation for the snd parameter
+			shortcircuit,
+			//! Allow pushing a synthetic object (most likely a type)
+			pushSynthetic,
+
+			// when adding a new flag here, do not forget to add err reporting
+			// in Scope::complainUnknownAttributes()
+		};
+
+		//! Ctor
+		Attributes(const AST::Node& node): node(node) {}
+
+		//! Attributes presence
+		Yuni::Flags<Flag> flags;
+		//! builtinalias: or | and | ...
+		const AST::Node* builtinAlias = nullptr;
+		//! The original attribute AST node
+		const AST::Node& node;
+	};
+
 
 	/*!
 	** \brief Scope for IR generation (requires a context or another scope)
@@ -30,6 +63,7 @@ namespace Producer
 			uint32_t offsetPragma = 0;
 			uint32_t offsetStackalloc = 0;
 		};
+
 
 	public:
 		//! \name Constructor & Destructor
@@ -54,6 +88,8 @@ namespace Producer
 		bool visitASTType(const AST::Node&, LVID& localvar);
 		bool visitASTTypedef(const AST::Node&);
 		bool visitASTFor(const AST::Node&);
+
+		bool visitASTAttributes(const AST::Node&);
 
 		bool visitASTVar(const AST::Node&);
 		bool visitASTVarValueInitialization(LVID&, const AST::Node&, const AST::Node&, const AnyString&);
@@ -144,6 +180,11 @@ namespace Producer
 
 		//! Get the name from a 'symbol-name' node (empty if error)
 		AnyString getSymbolNameFromASTNode(const AST::Node& node);
+
+		//! Get the attributes
+		Attributes* attributes();
+		//! Move attributes
+		void moveAttributes(Scope&);
 		//@}
 
 
@@ -163,6 +204,8 @@ namespace Producer
 
 		void setErrorFrom(Logs::Report& report, const AST::Node& node) const;
 		void setErrorFrom(const AST::Node& node) const;
+
+		void complainUnknownAttributes();
 		//@}
 
 
@@ -200,6 +243,10 @@ namespace Producer
 
 		//! BroadcastNextVarID
 		bool broadcastNextVarID = true;
+
+		//! Attributes
+		std::unique_ptr<Attributes> pAttributes;
+
 		//! Nakama
 		friend class Context;
 

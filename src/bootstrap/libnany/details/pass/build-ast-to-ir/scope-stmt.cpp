@@ -36,14 +36,42 @@ namespace Producer
 				//             function-kind
 				//             function-body
 				//             [...]
-				if (node.children.size() == 1)
+				auto size = node.children.size();
+				AST::Node* child = nullptr;
+				AST::Node* attrs = nullptr;
+				switch (size)
 				{
-					auto& child = *(node.children[0]);
-					switch (child.rule)
+					case 1:
 					{
-						case AST::rgIf:       return visitASTExprIfStmt(child);
-						case AST::rgFunction: return visitASTFunc(child);
-						case AST::rgSwitch:   return visitASTExprSwitch(child);
+						child = AST::Node::Ptr::WeakPointer(node.children[0]);
+						break;
+					}
+					case 2:
+					{
+						attrs = AST::Node::Ptr::WeakPointer(node.children[0]);
+						if (attrs->rule == AST::rgAttributes)
+						{
+							child = AST::Node::Ptr::WeakPointer(node.children[1]);
+							if (child->rule == AST::rgExprValue and child->children.size() == 1)
+							{
+								child = AST::Node::Ptr::WeakPointer(child->children[0]);
+							}
+							else
+								child = nullptr;
+						}
+						break;
+					}
+				}
+				if (child)
+				{
+					switch (child->rule)
+					{
+						case AST::rgIf:
+							return (not attrs? true : visitASTAttributes(*attrs)) and visitASTExprIfStmt(*child);
+						case AST::rgFunction:
+							return (not attrs? true : visitASTAttributes(*attrs)) and visitASTFunc(*child);
+						case AST::rgSwitch:
+							return (not attrs? true : visitASTAttributes(*attrs)) and visitASTExprSwitch(*child);
 						default: {}
 					}
 				}

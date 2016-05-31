@@ -145,6 +145,7 @@ namespace Producer
 
 		// new scope
 		IR::Producer::Scope scope{*this};
+		scope.moveAttributes(*this);
 		// reset internal counter for generating local classdef in the current scope
 		scope.resetLocalCounters();
 		scope.kind = Scope::Kind::kclass;

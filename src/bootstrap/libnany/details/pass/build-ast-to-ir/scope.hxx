@@ -34,6 +34,11 @@ namespace Producer
 			assert(parentScope != nullptr); // broadcast new values to the parent
 			parentScope->pNextVarID = pNextVarID;
 		}
+		if (unlikely(pAttributes.get() != nullptr))
+		{
+			if (unlikely(not pAttributes->flags.empty()))
+				complainUnknownAttributes();
+		}
 	}
 
 
@@ -220,6 +225,16 @@ namespace Producer
 	}
 
 
+	inline Attributes* Scope::attributes()
+	{
+		return pAttributes.get();
+	}
+
+	inline void Scope::moveAttributes(Scope& scope)
+	{
+		pAttributes = nullptr;
+		std::swap(pAttributes, scope.pAttributes);
+	}
 
 
 

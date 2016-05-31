@@ -683,8 +683,6 @@ var-decl: hidden
 	(wp var-assign)?
 
 var: notext, important
-	wp
-	(attributes wp)?
 	(visibility sp)?
 	var-qualifier
 	(var-decl (wp var-property)?) | error-semicolon
@@ -721,7 +719,6 @@ each: important, notext
 // --- TYPEDEF ---
 
 typedef: notext, important
-	(attributes wp)?
 	(visibility sp)? tk-typedef identifier (wp class-template-params)?
 	(wp tk-colon wp type)?
 	(wp tk-semicolon)?
@@ -780,7 +777,6 @@ class-body: notext
 	tk-brace-close
 
 class: notext important
-	(attributes wp)?
 	(visibility wp)?
 	tk-class
 		(wp symbol-name)?
@@ -844,7 +840,6 @@ function-kind: notext
 	function-kind-function | function-kind-operator | function-kind-view
 
 function: notext, important
-	(attributes wp)?
 	(visibility wp)? (func-qualifier wp)?
 	function-kind wp
 	(
@@ -867,7 +862,7 @@ expr-with-semicolon: hidden
 
 // all sub expr, ordered by priority ASC
 expr: notext
-	expr-no-node
+	(attributes wp)? expr-no-node
 
 expr-group: notext
 	expr-no-node

@@ -54,7 +54,7 @@ namespace Producer
 			bool inspectParameters(const AST::Node*, const AST::Node*);
 			bool inspectReturnType(const AST::Node&);
 			bool inspectSingleParameter(uint pindex, const AST::Node&, uint32_t paramoffset);
-			bool inspectAttributes(const AST::Node&);
+			bool inspectAttributes(Attributes&);
 
 		private:
 			//! Flag to determine whether the 'self' parameter is implicit
@@ -455,70 +455,34 @@ namespace Producer
 		}
 
 
-		bool FuncInspector::inspectAttributes(const AST::Node& node)
+		bool FuncInspector::inspectAttributes(Attributes& attrs)
 		{
-			assert(node.rule == AST::rgAttributes);
 			auto& out = scope.sequence();
 
-			for (auto& childptr: node.children)
+			if (attrs.flags(Attributes::Flag::shortcircuit))
 			{
-				auto& child = *childptr;
-				if (YUNI_UNLIKELY(child.rule != AST::rgAttributesParameter))
-					return scope.ICEUnexpectedNode(child, "invalid node, not attribute parameter");
-				if (YUNI_UNLIKELY(child.children.size() != 2))
-					return scope.ICEUnexpectedNode(child, "invalid attribute parameter node");
-				if (YUNI_UNLIKELY(AST::ruleIsError(child.children[1]->rule)))
-					return false;
-				if (YUNI_UNLIKELY(child.children[0]->rule != AST::rgEntity))
-					return scope.ICEUnexpectedNode(child, "invalid attribute parameter name");
-
-				ShortString64 attrname;
-				if (not AST::retrieveEntityString(attrname, *(child.children[0])))
-					return scope.ICEUnexpectedNode(child, "invalid entity");
-
-				if (attrname == "shortcircuit")
-				{
-					ShortString64 value;
-					if (YUNI_UNLIKELY(child.children[1]->rule == AST::rgEntity))
-						AST::retrieveEntityString(value, *(child.children[1]));
-					if (value.empty() or (value != "__true" and value != "__false"))
-					{
-						scope.error(*child.children[1]) << "invalid shortcircuit value, expected '__false' or '__true'";
-						return false;
-					}
-					out.emitPragmaShortcircuit((value == "__true") ? 1 : 0);
-					continue;
-				}
-
-				if (attrname == "builtinalias")
-				{
-					ShortString64 value;
-					if (YUNI_UNLIKELY(child.children[1]->rule == AST::rgEntity))
-						AST::retrieveEntityString(value, *(child.children[1]));
-
-					out.emitPragmaBuiltinAlias(value);
-					continue;
-				}
-
-				if (attrname == "suggest")
-				{
-					ShortString64 value;
-					if (YUNI_UNLIKELY(child.children[1]->rule == AST::rgEntity))
-						AST::retrieveEntityString(value, *(child.children[1]));
-					bool onoff = true;
-					if (value.empty() or not value.to(onoff))
-					{
-						scope.error(*child.children[1]) << "invalid attribute 'suggest' value, expected 'false' or 'true'";
-						return false;
-					}
-					if (not onoff)
-						out.emitPragmaSuggest(false);
-					continue;
-				}
-
-				scope.error(child) << "unknown attribute '" << attrname << '\'';
-				return false;
+				out.emitPragmaShortcircuit(1);
+				attrs.flags -= Attributes::Flag::shortcircuit;
 			}
+
+			if (attrs.flags(Attributes::Flag::builtinAlias))
+			{
+				assert(attrs.builtinAlias != nullptr);
+				ShortString64 value;
+				if (not AST::retrieveEntityString(value, *attrs.builtinAlias))
+					return scope.error(*attrs.builtinAlias) << "invalid builtinalias attribute";
+
+				out.emitPragmaBuiltinAlias(value);
+				attrs.flags -= Attributes::Flag::builtinAlias;
+			}
+
+			if (attrs.flags(Attributes::Flag::doNotSuggest))
+			{
+				out.emitPragmaSuggest(0);
+				attrs.flags -= Attributes::Flag::doNotSuggest;
+				assert(not attrs.flags(Attributes::Flag::doNotSuggest));
+			}
+
 			return true;
 		}
 
@@ -536,6 +500,11 @@ namespace Producer
 			// the node related to the return type
 			const AST::Node* nodeReturnType = nullptr;
 
+
+			// function attributes, if any
+			if (scope.attributes())
+				success &= inspectAttributes(*scope.attributes());
+
 			for (auto& childptr: node.children)
 			{
 				auto& child = *childptr;
@@ -546,7 +515,6 @@ namespace Producer
 					case AST::rgVisibility:     { success &= inspectVisibility(child); break; }
 					case AST::rgFuncReturnType: { if (not child.children.empty()) nodeReturnType = &child; break; }
 					case AST::rgFuncBody:       { body = &child; break; }
-					case AST::rgAttributes:     { success = inspectAttributes(child); break; }
 					case AST::rgClassTemplateParams: { nodeGenTParams = &child; break; }
 					default:
 						success &= scope.ICEUnexpectedNode(child, "[func]");
@@ -600,6 +568,7 @@ namespace Producer
 
 		// new scope
 		IR::Producer::Scope scope{*this};
+		scope.moveAttributes(*this);
 		// reset internal counter for generating local classdef in the current scope
 		scope.resetLocalCounters();
 		scope.kind = Scope::Kind::kfunc;

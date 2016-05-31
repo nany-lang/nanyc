@@ -122,6 +122,25 @@ namespace Producer
 	}
 
 
+	void Scope::complainUnknownAttributes()
+	{
+		assert(pAttributes.get());
+		auto& attrs = *pAttributes;
+		auto& node  = attrs.node;
+
+		if (attrs.flags(Attributes::Flag::pushSynthetic))
+			error(node) << "invalid use of expr attribute '__synthetic'";
+
+		if (attrs.flags(Attributes::Flag::shortcircuit))
+			error(node) << "invalid use of func attribute 'shortcircuit'";
+
+		if (attrs.flags(Attributes::Flag::doNotSuggest))
+			error(node) << "invalid use of func attribute 'suggest'";
+
+		if (attrs.flags(Attributes::Flag::builtinAlias))
+			error(node) << "invalid use of func attribute 'builtinalias'";
+	}
+
 
 
 
