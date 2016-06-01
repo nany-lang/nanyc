@@ -1,6 +1,5 @@
 #include "mapping.h"
 #include "details/atom/classdef-table-view.h"
-#include "details/ir/isa/pragma.h"
 #include "details/ir/sequence.h"
 
 using namespace Yuni;

@@ -2,7 +2,6 @@
 #include "../fwd.h"
 #include <yuni/core/string.h>
 #include "details/ir/isa/opcodes.h"
-#include "details/ir/isa/pragma.h"
 #include "details/ir/isa/data.h"
 #include "details/ir/instruction.h"
 #include "details/utils/stringrefs.h"

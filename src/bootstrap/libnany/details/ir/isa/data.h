@@ -17,6 +17,81 @@ namespace IR
 namespace ISA
 {
 
+
+	enum class Pragma: uint32_t
+	{
+		//! Unknown pragma / invalid
+		unknown = 0,
+		//! Code generation flag
+		codegen,
+
+
+		// --- pragma for compilation only
+
+		//! Size of the blueprint, in opcodes
+		blueprintsize,
+
+		//! Visibility modifier
+		visibility,
+		//! body start,
+		bodystart,
+
+		//! shortcircuit attribute
+		shortcircuit,
+		//! shortcircuit sequence offset of 'nop' instructions
+		shortcircuitOpNopOffset,
+		//! Shortcircuit mutate '__bool' to 'bool'
+		shortcircuitMutateToBool,
+
+		//! Builtin alias
+		builtinalias,
+
+		//! Suggestion (for error reporting)
+		suggest,
+
+		//! Set / unset an object as synthetic
+		synthetic,
+
+		//! The maximum number of elements, for integrity check
+		max,
+
+	}; // enum Pragma
+
+
+
+	/*!
+	** \internal the total number of items must currently be < 2^4 (see data struct)
+	** \see struct Operand<ISA::Op::blueprint>
+	*/
+	enum class Blueprint: uint32_t
+	{
+		//! Function definition
+		funcdef,
+		//! Variable member definition
+		vardef,
+		//! Class definition
+		classdef,
+		//! Typedef
+		typealias,
+		//! Parameter definition (for a function)
+		param,
+		//! Template parameter
+		gentypeparam,
+		//! Parameter definition, with auto assignment
+		paramself,
+		//! Namespace definition (one part of it)
+		namespacedef,
+		//! Unit (source file)
+		unit,
+
+	}; // enum Blueprint
+
+
+
+
+
+
+
 	template<Nany::IR::ISA::Op O> struct Operand final {};
 
 

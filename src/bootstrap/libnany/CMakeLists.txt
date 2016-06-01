@@ -324,7 +324,6 @@ addsrc(
 	FILES
 	"details/ir/ir.h"
 	"details/ir/isa/opcodes.h"
-	"details/ir/isa/pragma.h"
 	"details/ir/isa/opcodes.cpp"
 	"details/ir/isa/data.h"
 	"details/ir/isa/data.cpp"
