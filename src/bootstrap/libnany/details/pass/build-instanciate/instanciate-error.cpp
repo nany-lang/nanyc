@@ -391,7 +391,7 @@ namespace Instanciate
 		if (responsible.atomid != original.atomid)
 		{
 			auto hint = (err.hint() << "when trying to resolve '");
-			responsible.retrieveCaption(err.data().message, cdeftable);
+			responsible.retrieveCaption(hint.data().message, cdeftable);
 			hint << '\'';
 		}
 	}
@@ -406,7 +406,7 @@ namespace Instanciate
 		err << "' not resolved yet";
 
 		auto hint = (err.hint() << "when trying to resolve '");
-		responsible.retrieveCaption(err.data().message, cdeftable);
+		responsible.retrieveCaption(hint.data().message, cdeftable);
 		hint << '\'';
 	}
 
