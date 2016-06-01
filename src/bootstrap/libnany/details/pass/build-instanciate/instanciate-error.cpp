@@ -228,7 +228,7 @@ namespace Instanciate
 
 	bool SequenceBuilder::complainUnknownIntrinsic(const AnyString& name)
 	{
-		error() << "unknown intrinsic '" << name << '\'';
+		error() << "unknown intrinsic '!!" << name << '\'';
 		return false;
 	}
 
