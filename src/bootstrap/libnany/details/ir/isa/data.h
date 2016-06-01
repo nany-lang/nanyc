@@ -679,7 +679,7 @@ namespace ISA
 		constexpr static const char* opname() { return "label"; }
 		uint32_t opcode;
 		uint32_t label;
-		template<class T> void eachLVID(T&) {}
+		template<class T> void eachLVID(T& c) { c(label); }
 	};
 
 
@@ -787,8 +787,24 @@ namespace ISA
 		}
 		value;
 
-		template<class T> void eachLVID(T&) {
+		template<class T> void eachLVID(T& c) {
 			static_assert(sizeof(pragma) == sizeof(uint32_t), "alignment required");
+			switch (pragma)
+			{
+				case Pragma::synthetic:                { c(value.synthetic.lvid); break; }
+				case Pragma::shortcircuitOpNopOffset:  { c(value.shortcircuitMetadata.label); break; }
+				case Pragma::shortcircuitMutateToBool: { c(value.shortcircuitMutate.lvid); break; }
+				case Pragma::unknown:
+				case Pragma::codegen:
+				case Pragma::blueprintsize:
+				case Pragma::visibility:
+				case Pragma::bodystart:
+				case Pragma::shortcircuit:
+				case Pragma::builtinalias:
+				case Pragma::suggest:
+				case Pragma::max:
+					break;
+			}
 		}
 	};
 
