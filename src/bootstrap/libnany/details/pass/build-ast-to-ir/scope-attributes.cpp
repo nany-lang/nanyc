@@ -32,9 +32,9 @@ namespace Producer
 		auto& attrs = *pAttributes;
 
 		// attribute name
-		ShortString64 attrname;
+		ShortString32 attrname;
 		// temporary buffer for value interpretation
-		ShortString64 value;
+		ShortString32 value;
 
 		for (auto& childptr: node.children)
 		{

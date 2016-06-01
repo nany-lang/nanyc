@@ -42,6 +42,9 @@ namespace ISA //!< Instruction Set Architecture
 		//! Suggestion (for error reporting)
 		suggest,
 
+		//! Set / unset an object as synthetic
+		synthetic,
+
 		//! The maximum number of elements, for integrity check
 		max,
 

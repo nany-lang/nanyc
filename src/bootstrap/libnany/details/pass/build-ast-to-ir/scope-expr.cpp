@@ -98,6 +98,23 @@ namespace Producer
 	}
 
 
+	void Scope::emitExprAttributes(uint32_t& localvar)
+	{
+		assert(!!pAttributes);
+		auto& attrs = *pAttributes;
+
+		// allow to push a synthetic object (type)
+		if (unlikely(attrs.flags(Attributes::Flag::pushSynthetic)))
+		{
+			// do not report errors
+			attrs.flags -= Attributes::Flag::pushSynthetic;
+			if (debugmode)
+				sequence().emitComment(String("#[__synthetic: %") << localvar << ']');
+			sequence().emitPragmaSynthetic(localvar, false);
+		}
+	}
+
+
 	bool Scope::visitASTExpr(const AST::Node& orignode, LVID& localvar, bool allowScope)
 	{
 		assert(not orignode.children.empty());
@@ -105,22 +122,60 @@ namespace Producer
 		// reset the value of the localvar, result of the expr
 		localvar = 0;
 
-		auto& node = (orignode.rule == AST::rgExpr
-			and orignode.children.size() == 1 and orignode.children[0]->rule == AST::rgExprValue)
-			? *(orignode.children[0])
-			: orignode;
+		// expr
+		// |   expr-value
+		const AST::Node* nodeptr = &orignode;
+		const AST::Node* attrnode = nullptr;
+		if (orignode.rule == AST::rgExpr)
+		{
+			switch (orignode.children.size())
+			{
+				case 1:
+				{
+					// do not take into consideration this node
+					// (it will generate useless scopes)
+					auto& firstchild = *(orignode.children[0]);
+					if (firstchild.rule == AST::rgExprValue)
+						nodeptr = &firstchild;
+					break;
+				}
+				case 2:
+				{
+					auto& firstchild = *(orignode.children[0]);
+					if (firstchild.rule == AST::rgAttributes)
+					{
+						auto& sndchild = *(orignode.children[1]);
+						if (sndchild.rule == AST::rgExprValue)
+						{
+							nodeptr = &sndchild;
+							attrnode = &firstchild; // do not forget to visit this node
+						}
+					}
+					break;
+				}
+			}
+		}
 
-		assert(node.rule == AST::rgExpr or node.rule == AST::rgExprValue or node.rule == AST::rgExprGroup or node.rule == AST::rgTypeDecl);
+		auto& node = *nodeptr;
+		assert(node.rule == AST::rgExpr or node.rule == AST::rgExprValue
+			or node.rule == AST::rgExprGroup or node.rule == AST::rgTypeDecl);
 		assert(not node.children.empty());
 
 		// always creating a new scope for a expr
 		IR::Producer::Scope scope{*this};
 		scope.emitDebugpos(node);
+
+		if (unlikely(attrnode))
+			scope.visitASTAttributes(*attrnode);
+
 		bool r = scope.visitASTExprContinuation(node, localvar, allowScope);
 		if (r and localvar != 0 and localvar != (uint32_t) -1)
 		{
 			scope.emitTmplParametersIfAny();
 			scope.sequence().emitEnsureTypeResolved(localvar);
+
+			if (unlikely(!!scope.pAttributes))
+				scope.emitExprAttributes(localvar);
 		}
 		return r;
 	}

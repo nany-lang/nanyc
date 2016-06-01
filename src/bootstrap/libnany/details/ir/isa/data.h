@@ -705,6 +705,7 @@ namespace ISA
 			uint32_t blueprintsize;
 			uint32_t shortcircuit;
 			uint32_t suggest;
+			struct { uint32_t lvid; uint32_t onoff; } synthetic;
 			struct { uint32_t namesid; } builtinalias;
 			struct { uint32_t label; } shortcircuitMetadata;
 			struct { uint32_t lvid; uint32_t source; } shortcircuitMutate;

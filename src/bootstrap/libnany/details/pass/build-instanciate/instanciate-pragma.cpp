@@ -186,6 +186,14 @@ namespace Instanciate
 				break;
 			}
 
+			case IR::ISA::Pragma::synthetic:
+			{
+				uint32_t lvid = operands.value.synthetic.lvid;
+				bool onoff = (operands.value.synthetic.onoff != 0);
+				frame->lvids[lvid].synthetic = onoff;
+				break;
+			}
+
 			case IR::ISA::Pragma::suggest:
 			case IR::ISA::Pragma::builtinalias:
 			case IR::ISA::Pragma::shortcircuit:

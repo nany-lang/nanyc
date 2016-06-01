@@ -336,6 +336,8 @@ namespace Instanciate
 		bool complainMissingOperator(Atom&, const AnyString& name) const;
 
 		bool complainCannotCall(Atom& atom, FuncOverloadMatch& overloadMatch);
+
+		void complainPushedSynthetic(const CLID&, uint32_t paramindex, const AnyString& paramname = nullptr);
 		//@}
 
 

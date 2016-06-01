@@ -228,6 +228,7 @@ namespace Producer
 		void emitTmplParametersIfAny();
 
 		void prepareClosureNodeExpr(AST::Node::Ptr& out);
+		void emitExprAttributes(uint32_t& localvar);
 
 
 	private:

@@ -523,6 +523,25 @@ namespace Instanciate
 	}
 
 
+	void SequenceBuilder::complainPushedSynthetic(const CLID& clid, uint32_t paramindex, const AnyString& paramname)
+	{
+		auto err = error();
+		err << "cannot push synthetic object '";
+
+		if (debugmode)
+			err << clid << ' ';
+
+		auto& cdef = cdeftable.classdef(clid);
+		cdef.print(err.message.message, cdeftable, false);
+
+		if (paramname.empty())
+			err << "' for parameter " << paramindex;
+		else
+			err << "' for parameter '" << paramname << '\'';
+	}
+
+
+
 
 
 } // namespace Instanciate

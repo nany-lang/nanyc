@@ -386,12 +386,21 @@ namespace IR
 	}
 
 
+	inline void Sequence::emitPragmaSynthetic(uint32_t lvid, bool onoff)
+	{
+		auto& opc  = emit<ISA::Op::pragma>();
+		opc.pragma = static_cast<uint32_t>(IR::ISA::Pragma::synthetic);
+		opc.value.synthetic.lvid  = lvid;
+		opc.value.synthetic.onoff = static_cast<uint32_t>(onoff);
+	}
+
 	inline void Sequence::emitPragmaSuggest(bool onoff)
 	{
 		auto& opc  = emit<ISA::Op::pragma>();
 		opc.pragma = static_cast<uint32_t>(IR::ISA::Pragma::suggest);
 		opc.value.suggest = static_cast<uint32_t>(onoff);
 	}
+
 
 	inline void Sequence::emitPragmaBuiltinAlias(const AnyString& name)
 	{
@@ -407,6 +416,7 @@ namespace IR
 		opc.pragma = static_cast<uint32_t>(IR::ISA::Pragma::shortcircuit);
 		opc.value.shortcircuit = static_cast<uint32_t>(evalvalue);
 	}
+
 
 	inline void Sequence::emitPragmaShortcircuitMetadata(uint32_t label)
 	{
@@ -434,7 +444,8 @@ namespace IR
 
 	inline void Sequence::emitPragmaFuncBody()
 	{
-		emit<ISA::Op::pragma>().pragma = static_cast<uint32_t>(IR::ISA::Pragma::bodystart);
+		emit<ISA::Op::pragma>().pragma =
+			static_cast<uint32_t>(IR::ISA::Pragma::bodystart);
 	}
 
 

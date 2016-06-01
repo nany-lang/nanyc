@@ -23,8 +23,8 @@ namespace Instanciate
 
 			if (verified and unlikely(frame->lvids[operands.lvid].synthetic))
 			{
-				error() << "cannot push synthetic object for parameter "
-					<< pushedparams.func.indexed.size();
+				auto pindex = static_cast<uint32_t>(pushedparams.func.indexed.size());
+				complainPushedSynthetic(CLID{frame->atomid, operands.lvid}, pindex);
 			}
 		}
 		else
@@ -33,7 +33,9 @@ namespace Instanciate
 			pushedparams.func.named.emplace_back(name, operands.lvid, currentLine, currentOffset);
 
 			if (verified and unlikely(frame->lvids[operands.lvid].synthetic))
-				error() << "cannot push synthetic object for parameter '" << name << "'";
+			{
+				complainPushedSynthetic(CLID{frame->atomid, operands.lvid}, 0, name);
+			}
 		}
 	}
 

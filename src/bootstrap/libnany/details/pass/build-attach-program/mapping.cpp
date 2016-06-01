@@ -437,6 +437,7 @@ namespace Mapping
 				break;
 			}
 
+			case IR::ISA::Pragma::synthetic:
 			case IR::ISA::Pragma::blueprintsize:
 			case IR::ISA::Pragma::visibility:
 			case IR::ISA::Pragma::bodystart:

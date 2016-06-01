@@ -741,6 +741,12 @@ namespace // anonymous
 						out << (operands.value.suggest != 0 ? "true" : "false");
 						break;
 					}
+					case Pragma::synthetic:
+					{
+						line() << "pragma __synthetic %" << operands.value.synthetic.lvid << " = ";
+						out << (operands.value.synthetic.onoff != 0 ? "true" : "false");
+						break;
+					}
 					case Pragma::unknown:
 					case Pragma::max:
 						line() << "<invalid pragma identifier>";
