@@ -203,6 +203,7 @@ namespace Producer
 
 	inline bool Scope::visitASTExprSubDot(const AST::Node& node, LVID& localvar)
 	{
+		emitTmplParametersIfAny();
 		sequence().emitEnsureTypeResolved(localvar);
 		return visitASTExprContinuation(node, localvar);
 	}

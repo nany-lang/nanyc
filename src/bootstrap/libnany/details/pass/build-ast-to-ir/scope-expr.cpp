@@ -52,11 +52,9 @@ namespace Producer
 				case AST::rgExprValue:
 				case AST::rgExprGroup:  success &= visitASTExpr(child, localvar); break;
 				case AST::rgCall:       success &= visitASTExprCall(&child, localvar, &node); break;
-				case AST::rgExprSubDot: success &= visitASTExprSubDot(child, localvar); break;
 				case AST::rgNumber:     success &= visitASTExprNumber(child, localvar); break;
 				case AST::rgNew:        success &= visitASTExprNew(child, localvar); break;
-
-				// typing - same as std expr
+				case AST::rgExprSubDot:
 				case AST::rgTypeSubDot: success &= visitASTExprSubDot(child, localvar); break;
 
 				// strings

@@ -168,6 +168,7 @@ namespace Producer
 					break;
 				}
 				case AST::rgExprSubDot:
+				case AST::rgTypeSubDot:
 				{
 					bool e = visitASTExprSubDot(child, localvar);
 					if (unlikely(not e))
@@ -187,6 +188,7 @@ namespace Producer
 		}
 		return true;
 	}
+
 
 
 
