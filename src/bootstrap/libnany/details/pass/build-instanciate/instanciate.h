@@ -93,7 +93,7 @@ namespace Instanciate
 		bool instanciateIntrinsicMemfill(uint32_t lvid);
 		bool instanciateIntrinsicAssert(uint32_t lvid);
 
-
+		bool instanciateIntrinsicReinterpret(uint32_t lvid);
 		bool instanciateIntrinsicNOT(uint32_t);
 
 		bool instanciateIntrinsicAND(uint32_t);

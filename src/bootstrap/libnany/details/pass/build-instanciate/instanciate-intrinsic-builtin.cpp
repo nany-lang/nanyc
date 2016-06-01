@@ -369,6 +369,36 @@ namespace Instanciate
 	}
 
 
+	bool SequenceBuilder::instanciateIntrinsicReinterpret(uint32_t lvid)
+	{
+		assert(pushedparams.func.indexed.size() == 2);
+
+		uint32_t lhs    = pushedparams.func.indexed[0].lvid;
+		uint32_t tolvid = pushedparams.func.indexed[1].lvid;
+
+		auto& cdef = cdeftable.classdefFollowClassMember(CLID{frame->atomid, tolvid});
+
+		// copy the type, without any check
+		auto& spare = cdeftable.substitute(lvid);
+		spare.import(cdef);
+		spare.qualifiers = cdef.qualifiers;
+
+		out.emitStore(lvid, lhs);
+
+		auto& lvidinfo = frame->lvids[lvid];
+		lvidinfo.synthetic = false;
+
+		if (canBeAcquired(cdef) and canGenerateCode()) // re-acquire the object
+		{
+			out.emitRef(lvid);
+			lvidinfo.autorelease = true;
+			lvidinfo.scope = frame->scope;
+		}
+		return true;
+	}
+
+
+
 
 
 	constexpr static const nytype_t promotion[nyt_count][nyt_count] =
@@ -707,12 +737,11 @@ namespace Instanciate
 
 
 
-
-
 	typedef bool (SequenceBuilder::* BuiltinIntrinsic)(uint32_t);
 
 	static const std::unordered_map<AnyString, std::pair<BuiltinIntrinsic, uint32_t>> builtinDispatch =
 	{
+		//
 		{"^fieldset",       { &SequenceBuilder::instanciateIntrinsicFieldset,  2 }},
 		{"addressof",       { &SequenceBuilder::instanciateIntrinsicAddressof, 1 }},
 		{"memory.allocate", { &SequenceBuilder::instanciateIntrinsicMemalloc,  1 }},
@@ -757,6 +786,7 @@ namespace Instanciate
 		{"igte",            { &SequenceBuilder::instanciateIntrinsicIGTE,      2 }},
 		//
 		{"assert",          { &SequenceBuilder::instanciateIntrinsicAssert,    1 }},
+		{"__reinterpret",   { &SequenceBuilder::instanciateIntrinsicReinterpret, 2 }},
 	};
 
 	bool SequenceBuilder::instanciateBuiltinIntrinsic(const AnyString& name, uint32_t lvid, bool canComplain)
