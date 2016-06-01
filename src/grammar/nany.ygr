@@ -175,6 +175,11 @@ tk-bracket-open: notext
 tk-bracket-close: notext
 	']'
 
+tk-attr-open: notext
+	'#['
+tk-attr-close: notext
+	']'
+
 tk-parenthese-open: notext
 	'('
 
@@ -516,10 +521,10 @@ attributes-parameter: notext
 	entity (wp tk-colon wp (entity | expr) | error)?
 
 attributes: notext
-	tk-bracket-open tk-bracket-open
+	tk-attr-open
 	(
 		(wp attributes-parameter (wp tk-comma wp attributes-parameter | error-bracket)*)?
-		wp tk-bracket-close tk-bracket-close
+		wp tk-attr-close
 	)
 	| (error-bracket ']'*)
 

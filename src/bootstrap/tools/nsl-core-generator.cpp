@@ -41,9 +41,9 @@ static void craftClassFloat(Clob& o, uint32_t bits, const AnyString& license, co
 	o << "\toperator new(self cref pod: f32);\n";
 	if (bits > 32)
 		o << "\toperator new(self cref pod: f64);\n";
-	o << "\t[[suggest: false]] operator new(self pod: __f32);\n";
+	o << "\t#[suggest: false] operator new(self pod: __f32);\n";
 	if (bits > 32)
-		o << "\t[[suggest: false]] operator new(self pod: __f64);\n";
+		o << "\t#[suggest: false] operator new(self pod: __f64);\n";
 	o << '\n';
 	o << '\n';
 	o << "\toperator ++self: ref " << suffix << '\n';
@@ -90,7 +90,7 @@ static void craftClassFloat(Clob& o, uint32_t bits, const AnyString& license, co
 			o << "\t\treturn self;\n";
 			o << "\t}\n\n";
 
-			o << "\t[[suggest: false]] operator " << op << " (x: __" << targetsign << b << "): ref " << suffix << '\n';
+			o << "\t#[suggest: false] operator " << op << " (x: __" << targetsign << b << "): ref " << suffix << '\n';
 			o << "\t{\n";
 			o << "\t\tpod = !!" << intrinsic << "(pod, x);\n";
 			o << "\t\treturn self;\n";
@@ -132,10 +132,10 @@ static void craftClassFloat(Clob& o, uint32_t bits, const AnyString& license, co
 
 	auto genGlobalCompareOperator = [&](AnyString op, AnyString builtin, char sign, uint32_t b, AnyString prefixA, AnyString prefixB)
 	{
-		o << "[[builtinalias: " << builtin;
+		o << "#[builtinalias: " << builtin;
 		if (prefixA.first() == '_' or prefixB.first() == '_')
 			o << ", suggest: false";
-		o << "]] public operator ";
+		o << "] public operator ";
 		o << op << " (a: " << prefixA << suffix << ", b: " << prefixB << sign << b << "): ";
 		o << ((prefixA.first() == '_' and prefixB.first() == '_') ? "__" : "ref ");
 		o << "bool;\n";
@@ -154,10 +154,10 @@ static void craftClassFloat(Clob& o, uint32_t bits, const AnyString& license, co
 	auto genGlobalOperator = [&](AnyString op, AnyString builtin, char sign, uint32_t b, AnyString prefixA, AnyString prefixB)
 	{
 		bool atLeastOneBuiltin = (prefixA.first() != '_' or prefixB.first() != '_');
-		o << "[[builtinalias: " << builtin;
+		o << "#[builtinalias: " << builtin;
 		if (prefixA.first() == '_' or prefixB.first() == '_')
 			o << ", suggest: false";
-		o << "]] public operator ";
+		o << "] public operator ";
 		o << op << " (a: " << prefixA << suffix << ", b: " << prefixB << sign << b << "): ";
 		o << ((atLeastOneBuiltin) ? "ref " : "__");
 		o << suffix << ";\n";
@@ -246,7 +246,7 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 	craftOperator([&](uint32_t b, char targetsign)
 	{
 		for ( ; b >= 8; b /= 2)
-			o << "\t[[suggest: false]] operator new (self pod: __" << targetsign << b << ");\n";
+			o << "\t#[suggest: false] operator new (self pod: __" << targetsign << b << ");\n";
 	});
 
 	o << '\n';
@@ -293,7 +293,7 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 				o << "\t\treturn self;\n";
 				o << "\t}\n\n";
 
-				o << "\t[[suggest: false]] operator " << op << " (x: __" << targetsign << b << "): ref " << suffix << '\n';
+				o << "\t#[suggest: false] operator " << op << " (x: __" << targetsign << b << "): ref " << suffix << '\n';
 				o << "\t{\n";
 				o << "\t\tpod = !!" << pr << intrinsic << "(pod, x);\n";
 				o << "\t\treturn self;\n";
@@ -326,10 +326,10 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 	bool canBeSigned = true;
 	auto genGlobalCompareOperator = [&](AnyString op, AnyString builtin, char sign, uint32_t b, AnyString prefixA, AnyString prefixB)
 	{
-		o << "[[builtinalias: " << (canBeSigned and issigned ? "i" : "") << builtin;
+		o << "#[builtinalias: " << (canBeSigned and issigned ? "i" : "") << builtin;
 		if (prefixA.first() == '_' or prefixB.first() == '_')
 			o << ", suggest: false";
-		o << "]] public operator ";
+		o << "] public operator ";
 		o << op << " (a: " << prefixA << suffix << ", b: " << prefixB << sign << b << "): ";
 		o << ((prefixA.first() == '_' and prefixB.first() == '_') ? "__" : "ref ");
 		o << "bool;\n";
@@ -356,10 +356,10 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 	auto genGlobalOperator = [&](AnyString op, AnyString builtin, char sign, uint32_t b, AnyString prefixA, AnyString prefixB)
 	{
 		bool atLeastOneBuiltin = (prefixA.first() != '_' or prefixB.first() != '_');
-		o << "[[builtinalias: " << builtin;
+		o << "#[builtinalias: " << builtin;
 		if (prefixA.first() == '_' or prefixB.first() == '_')
 			o << ", suggest: false";
-		o << "]] public operator ";
+		o << "] public operator ";
 		o << op << " (a: " << prefixA << suffix << ", b: " << prefixB << sign << b << "): ";
 		o << ((atLeastOneBuiltin) ? "ref " : "__");
 		o << suffix << ";\n";
