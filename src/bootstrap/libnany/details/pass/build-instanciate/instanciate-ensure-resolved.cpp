@@ -63,6 +63,11 @@ namespace Instanciate
 			default:
 				break;
 		}
+
+		// no generic type parameters should remain at this point
+		if (unlikely(not pushedparams.gentypes.empty()))
+			ICE() << "invalid pushed generic type parameters";
+
 		return true;
 	}
 

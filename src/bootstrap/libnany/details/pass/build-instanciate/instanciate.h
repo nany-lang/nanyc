@@ -370,6 +370,7 @@ namespace Instanciate
 		{
 			struct Catalog final
 			{
+				bool empty() const {return indexed.empty() and named.empty();}
 				std::vector<IndexedParameter> indexed;
 				std::vector<NamedParameter> named;
 			};

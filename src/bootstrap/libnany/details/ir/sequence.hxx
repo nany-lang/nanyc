@@ -389,7 +389,7 @@ namespace IR
 	inline void Sequence::emitPragmaSynthetic(uint32_t lvid, bool onoff)
 	{
 		auto& opc  = emit<ISA::Op::pragma>();
-		opc.pragma = static_cast<uint32_t>(IR::ISA::Pragma::synthetic);
+		opc.pragma = IR::ISA::Pragma::synthetic;
 		opc.value.synthetic.lvid  = lvid;
 		opc.value.synthetic.onoff = static_cast<uint32_t>(onoff);
 	}
@@ -397,7 +397,7 @@ namespace IR
 	inline void Sequence::emitPragmaSuggest(bool onoff)
 	{
 		auto& opc  = emit<ISA::Op::pragma>();
-		opc.pragma = static_cast<uint32_t>(IR::ISA::Pragma::suggest);
+		opc.pragma = IR::ISA::Pragma::suggest;
 		opc.value.suggest = static_cast<uint32_t>(onoff);
 	}
 
@@ -405,7 +405,7 @@ namespace IR
 	inline void Sequence::emitPragmaBuiltinAlias(const AnyString& name)
 	{
 		auto& opc  = emit<ISA::Op::pragma>();
-		opc.pragma = static_cast<uint32_t>(IR::ISA::Pragma::builtinalias);
+		opc.pragma = IR::ISA::Pragma::builtinalias;
 		opc.value.builtinalias.namesid = stringrefs.ref(name);
 	}
 
@@ -413,7 +413,7 @@ namespace IR
 	inline void Sequence::emitPragmaShortcircuit(bool evalvalue)
 	{
 		auto& opc  = emit<ISA::Op::pragma>();
-		opc.pragma = static_cast<uint32_t>(IR::ISA::Pragma::shortcircuit);
+		opc.pragma = IR::ISA::Pragma::shortcircuit;
 		opc.value.shortcircuit = static_cast<uint32_t>(evalvalue);
 	}
 
@@ -421,7 +421,7 @@ namespace IR
 	inline void Sequence::emitPragmaShortcircuitMetadata(uint32_t label)
 	{
 		auto& opc  = emit<ISA::Op::pragma>();
-		opc.pragma = static_cast<uint32_t>(IR::ISA::Pragma::shortcircuitOpNopOffset);
+		opc.pragma = IR::ISA::Pragma::shortcircuitOpNopOffset;
 		opc.value.shortcircuitMetadata.label = label;
 	}
 
@@ -429,7 +429,7 @@ namespace IR
 	inline void Sequence::emitPragmaShortcircuitMutateToBool(uint32_t lvid, uint32_t source)
 	{
 		auto& opc  = emit<ISA::Op::pragma>();
-		opc.pragma = static_cast<uint32_t>(IR::ISA::Pragma::shortcircuitMutateToBool);
+		opc.pragma = IR::ISA::Pragma::shortcircuitMutateToBool;
 		opc.value.shortcircuitMutate.lvid = lvid;
 		opc.value.shortcircuitMutate.source = source;
 	}
@@ -444,22 +444,21 @@ namespace IR
 
 	inline void Sequence::emitPragmaFuncBody()
 	{
-		emit<ISA::Op::pragma>().pragma =
-			static_cast<uint32_t>(IR::ISA::Pragma::bodystart);
+		emit<ISA::Op::pragma>().pragma = IR::ISA::Pragma::bodystart;
 	}
 
 
 	inline void Sequence::emitPragmaAllowCodeGeneration(bool enabled)
 	{
-		auto& operands = emit<ISA::Op::pragma>();
-		operands.pragma = (uint32_t) ISA::Pragma::codegen;
+		auto& operands  = emit<ISA::Op::pragma>();
+		operands.pragma = ISA::Pragma::codegen;
 		operands.value.codegen = static_cast<uint32_t>(enabled);
 	}
 
 	inline void Sequence::emitVisibility(nyvisibility_t visibility)
 	{
-		auto& operands = emit<ISA::Op::pragma>();
-		operands.pragma = (uint32_t) ISA::Pragma::visibility;
+		auto& operands  = emit<ISA::Op::pragma>();
+		operands.pragma = ISA::Pragma::visibility;
 		operands.value.visibility = static_cast<uint32_t>(visibility);
 	}
 
@@ -480,7 +479,7 @@ namespace IR
 	{
 		uint32_t offset = pSize;
 		auto& operands = emit<ISA::Op::pragma>();
-		operands.pragma = (uint32_t) ISA::Pragma::blueprintsize;
+		operands.pragma = ISA::Pragma::blueprintsize;
 		operands.value.blueprintsize = 0;
 		return offset;
 	}

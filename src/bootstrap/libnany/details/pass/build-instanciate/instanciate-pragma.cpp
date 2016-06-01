@@ -93,8 +93,7 @@ namespace Instanciate
 
 	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::pragma>& operands)
 	{
-		if (unlikely(not (operands.pragma < static_cast<uint32_t>(IR::ISA::Pragma::max))))
-			return (void)(ICE() << "invalid pragma");
+		assert(static_cast<uint32_t>(operands.pragma) < static_cast<uint32_t>(IR::ISA::Pragma::max));
 
 		auto pragma = static_cast<IR::ISA::Pragma>(operands.pragma);
 		switch (pragma)

@@ -770,7 +770,7 @@ namespace ISA
 	{
 		constexpr static const char* opname() { return "pragma"; }
 		uint32_t opcode;
-		uint32_t pragma;
+		Pragma pragma;
 
 		union
 		{
@@ -787,7 +787,9 @@ namespace ISA
 		}
 		value;
 
-		template<class T> void eachLVID(T&) {}
+		template<class T> void eachLVID(T&) {
+			static_assert(sizeof(pragma) == sizeof(uint32_t), "alignment required");
+		}
 	};
 
 

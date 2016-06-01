@@ -680,7 +680,7 @@ namespace // anonymous
 
 		void print(const Operand<Op::pragma>& operands)
 		{
-			if (operands.pragma < static_cast<uint32_t>(Pragma::max))
+			if (static_cast<uint32_t>(operands.pragma) < static_cast<uint32_t>(Pragma::max))
 			{
 				switch ((Pragma) operands.pragma)
 				{
