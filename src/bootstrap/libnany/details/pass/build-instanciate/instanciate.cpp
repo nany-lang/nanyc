@@ -392,6 +392,9 @@ namespace Nany
 		bool instanciated = Pass::Instanciate::instanciateAtom(info);
 		report.appendEntry(newReport);
 
+		if (Config::Traces::atomTable)
+			cdeftable.atoms.root.print(report, cdeftable);
+
 		if (instanciated)
 		{
 			atomid = entrypointAtom->atomid;
