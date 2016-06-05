@@ -92,6 +92,29 @@ namespace Producer
 				}
 
 				// [[fallthru]]
+				case 'p':
+				{
+					if (attrname == "per")
+					{
+						if (unlikely(!nodevalue))
+							return (error(child) << "value expected for attribute '" << attrname << '\'');
+
+						AST::retrieveEntityString(value, *nodevalue);
+						if (value == "thread")
+						{
+							warning(child) << "ignored attribute 'per: thread'";
+						}
+						else if (value == "process")
+						{
+							warning(child) << "ignored attribute 'per: process'";
+						}
+						else
+							return (error(child) << "invalid 'per' value");
+						break;
+					}
+				}
+
+				// [[fallthru]]
 				case 's':
 				{
 					if (attrname == "shortcircuit")
