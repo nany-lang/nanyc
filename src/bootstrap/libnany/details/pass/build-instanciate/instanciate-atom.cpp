@@ -140,7 +140,7 @@ namespace Instanciate
 			auto& sequence  = *atom.opcodes.sequence;
 			auto& cdeftable = info.cdeftable.originalTable();
 			// the mutex is useless here since the code instanciation is mono-threaded
-			// but it's required by the mapping (which must be thread-safe in the first passes)
+			// but it's required by the mapping (which must be thread-safe in the first passes - see attach)
 			// TODO remove this mutex
 			Mutex mutex;
 

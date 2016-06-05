@@ -4,7 +4,9 @@
 #include <yuni/datetime/timestamp.h>
 #include "details/ir/sequence.h"
 #include "details/nsl/import-stdcore.h"
+#include "details/atom/classdef-table-view.h"
 #include "libnany-config.h"
+#include "libnany-traces.h"
 
 using namespace Yuni;
 
@@ -105,6 +107,9 @@ namespace Nany
 			//
 			success &= successNameLookup
 				and cdeftable.atoms.fetchAndIndexCoreObjects(report);
+
+			if (Config::Traces::preAtomTable)
+				cdeftable.atoms.root.print(report, ClassdefTableView{cdeftable});
 
 			//
 			// -- instanciate
