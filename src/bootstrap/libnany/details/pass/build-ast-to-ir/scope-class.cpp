@@ -141,7 +141,7 @@ namespace Producer
 
 		uint32_t lvid = 0;
 		if (localvar) // create the lvid before the new scope
-			lvid = *localvar = nextvar();
+			*localvar = (lvid = nextvar());
 
 		// new scope
 		IR::Producer::Scope scope{*this};

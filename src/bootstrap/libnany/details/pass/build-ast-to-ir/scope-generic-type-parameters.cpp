@@ -30,7 +30,8 @@ namespace Producer
 				case AST::rgIdentifier:
 				{
 					const AnyString& name = child.text;
-					if (not checkForValidIdentifierName(report(), child, name))
+					bool ok = checkForValidIdentifierName(report(), child, name);
+					if (unlikely(not ok))
 						return false;
 					sequence().emitBlueprintGenericTypeParam(nextvar(), name);
 					break;
@@ -61,9 +62,8 @@ namespace Producer
 		if (unlikely(node.children.empty()))
 			return true;
 
-		auto& out = sequence();
 		if (debugmode)
-			out.emitComment("generic type parameters");
+			sequence().emitComment("generic type parameters");
 
 		bool success = true;
 
