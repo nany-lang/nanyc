@@ -81,6 +81,17 @@ namespace Producer
 				}
 
 				// [[fallthru]]
+				case 'n':
+				{
+					if (attrname == "nodiscard")
+					{
+						if (unlikely(nodevalue))
+							return (error(child) << "no value expected for attribute '" << attrname << '\'');
+						break;
+					}
+				}
+
+				// [[fallthru]]
 				case 's':
 				{
 					if (attrname == "shortcircuit")
