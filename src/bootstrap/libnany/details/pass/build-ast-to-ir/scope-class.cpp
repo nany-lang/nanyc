@@ -150,6 +150,9 @@ namespace Producer
 		scope.resetLocalCounters();
 		scope.kind = Scope::Kind::kclass;
 		scope.broadcastNextVarID = false;
+		// a log of code relies on the fact that %{atomid:1} is the type of the return value
+		// starting from +2 to avoid to always check for the type of the atom everywhere in the code
+		scope.nextvar();
 
 
 		auto& out = sequence();

@@ -194,14 +194,14 @@ namespace Mapping
 				if (unlikely(not checkForLVID(operands, paramLVID)))
 					return;
 
-				bool isTemplate = (kind == IR::ISA::Blueprint::gentypeparam);
-				if (unlikely(not isTemplate and not frame.atom.isFunction()))
+				bool isGenTypeParam = (kind == IR::ISA::Blueprint::gentypeparam);
+				if (unlikely(not isGenTypeParam and not frame.atom.isFunction()))
 					return printError(operands, "parameter for non-function");
 
-				CLID clid {frame.atom.atomid, paramLVID};
+				CLID clid{frame.atom.atomid, paramLVID};
 				AnyString name = currentSequence.stringrefs[operands.name];
 
-				auto& parameters = (not isTemplate)
+				auto& parameters = (not isGenTypeParam)
 					? frame.atom.parameters : frame.atom.tmplparams;
 				parameters.append(clid, name);
 
@@ -212,10 +212,13 @@ namespace Mapping
 				MutexLocker locker{mutex};
 				// information about the parameter itself
 				auto& cdef = cdeftable.classdef(clid);
-				cdef.instance = not isTemplate;
+				cdef.instance = not isGenTypeParam;
 				cdef.qualifiers.ref = false; // should not be 'ref' by default, contrary to all other classdefs
 
-				if (isTemplate)
+				// making sure the classdef is 'any'
+				assert(cdef.atom == nullptr and cdef.isAny());
+
+				if (isGenTypeParam)
 				{
 					// if a generic type parameter, generating an implicit typedef
 					Atom& atom = atomStack->currentAtomNotUnit();
@@ -334,6 +337,7 @@ namespace Mapping
 					cdeftable.registerAtom(newAliasAtom);
 				}
 
+				assert(newAliasAtom != nullptr);
 				newAliasAtom->opcodes.sequence = &currentSequence;
 				newAliasAtom->opcodes.offset  = currentSequence.offsetOf(operands);
 
