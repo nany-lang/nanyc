@@ -113,6 +113,18 @@ namespace Producer
 				}
 
 				// [[fallthru]]
+				case 't':
+				{
+					if (attrname == "threadproc")
+					{
+						attrs.flags += Attributes::Flag::threadproc;
+						if (unlikely(nodevalue))
+							return (error(child) << "the attribute '" << attrname << "' does not accept values");
+						break;
+					}
+				}
+
+				// [[fallthru]]
 				case '_':
 				{
 					if (attrname == "__nanyc_builtinalias")

@@ -139,6 +139,9 @@ namespace Producer
 
 		if (attrs.flags(Attributes::Flag::builtinAlias))
 			error(node) << "invalid use of func attribute 'builtinalias'";
+
+		if (attrs.flags(Attributes::Flag::threadproc))
+			error(node) << "invalid use of func attribute 'thread'";
 	}
 
 

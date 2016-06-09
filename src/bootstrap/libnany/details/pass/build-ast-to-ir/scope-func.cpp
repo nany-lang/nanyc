@@ -483,6 +483,12 @@ namespace Producer
 				assert(not attrs.flags(Attributes::Flag::doNotSuggest));
 			}
 
+			if (attrs.flags(Attributes::Flag::threadproc))
+			{
+				// currently silently ignored
+				attrs.flags -= Attributes::Flag::threadproc;
+			}
+
 			return true;
 		}
 

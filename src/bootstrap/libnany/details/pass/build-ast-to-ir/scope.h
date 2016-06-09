@@ -29,6 +29,8 @@ namespace Producer
 			shortcircuit,
 			//! Allow pushing a synthetic object (most likely a type)
 			pushSynthetic,
+			//! Notify that a function might be called by another thread
+			threadproc,
 
 			// when adding a new flag here, do not forget to add err reporting
 			// in Scope::complainUnknownAttributes()
