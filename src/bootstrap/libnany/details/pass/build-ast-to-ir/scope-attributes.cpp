@@ -103,24 +103,6 @@ namespace Producer
 				// [[fallthru]]
 				case 's':
 				{
-					if (attrname == "shortcircuit")
-					{
-						if (unlikely(!nodevalue))
-							return (error(child) << "value expected for attribute '" << attrname << '\'');
-
-						AST::retrieveEntityString(value, *nodevalue);
-						bool isTrue = (value == "__true");
-						if (not isTrue and (value.empty() or value != "__false"))
-						{
-							error(*child.children[1]) << "invalid shortcircuit value, expected '__false' or '__true', got '"
-								<< value << "'";
-							return false;
-						}
-
-						if (isTrue)
-							attrs.flags += Attributes::Flag::shortcircuit;
-						break;
-					}
 					if (attrname == "nosuggest")
 					{
 						attrs.flags += Attributes::Flag::doNotSuggest;
@@ -140,6 +122,25 @@ namespace Producer
 
 						attrs.builtinAlias = nodevalue;
 						attrs.flags += Attributes::Flag::builtinAlias;
+						break;
+					}
+
+					if (attrname == "__nanyc_shortcircuit")
+					{
+						if (unlikely(!nodevalue))
+							return (error(child) << "value expected for attribute '" << attrname << '\'');
+
+						AST::retrieveEntityString(value, *nodevalue);
+						bool isTrue = (value == "__true");
+						if (not isTrue and (value.empty() or value != "__false"))
+						{
+							error(*child.children[1]) << "invalid shortcircuit value, expected '__false' or '__true', got '"
+								<< value << "'";
+							return false;
+						}
+
+						if (isTrue)
+							attrs.flags += Attributes::Flag::shortcircuit;
 						break;
 					}
 
