@@ -46,6 +46,9 @@ namespace Instanciate
 					if (unlikely(nullptr == newAtomRef))
 						return false;
 
+					// remove generic type parameters if any
+					pushedparams.gentypes.clear();
+
 					// The target atom may have changed for generic classes
 					if (atom.atomid != newAtomRef->atomid)
 					{
@@ -66,7 +69,7 @@ namespace Instanciate
 
 		// no generic type parameters should remain at this point
 		if (unlikely(not pushedparams.gentypes.empty()))
-			ICE() << "invalid pushed generic type parameters";
+			ICE() << "invalid pushed generic type parameters, ensureResolve '" << atom.caption() << '\'';
 
 		return true;
 	}

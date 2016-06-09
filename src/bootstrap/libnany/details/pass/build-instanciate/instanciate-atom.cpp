@@ -407,6 +407,9 @@ namespace Instanciate
 		for (auto& param: pushedparams.gentypes.indexed)
 			overloadMatch.input.tmplparams.indexed.emplace_back(frame->atomid, param.lvid);
 
+		if (not pushedparams.gentypes.named.empty())
+			error() << "named generic type parameters not implemented yet";
+
 		// disable any hint or error report for now, to avoid spurious messages
 		// if there is no error.
 		overloadMatch.canGenerateReport = false;
