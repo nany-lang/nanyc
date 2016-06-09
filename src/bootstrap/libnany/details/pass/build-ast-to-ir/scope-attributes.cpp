@@ -135,17 +135,11 @@ namespace Producer
 							attrs.flags += Attributes::Flag::shortcircuit;
 						break;
 					}
-					if (attrname == "suggest")
+					if (attrname == "nosuggest")
 					{
-						if (unlikely(!nodevalue))
-							return (error(child) << "value expected for attribute '" << attrname << '\'');
-
-						AST::retrieveEntityString(value, *nodevalue);
-						bool onoff = true;
-						if (value.empty() or not value.to(onoff))
-							return (error(child) << "invalid attribute 'suggest' value, expected 'false' or 'true'");
-
 						attrs.flags += Attributes::Flag::doNotSuggest;
+						if (unlikely(nodevalue))
+							return (error(child) << "the attribute '" << attrname << "' does not accept values");
 						break;
 					}
 				}

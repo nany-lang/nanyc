@@ -135,7 +135,7 @@ namespace Producer
 			error(node) << "invalid use of func attribute 'shortcircuit'";
 
 		if (attrs.flags(Attributes::Flag::doNotSuggest))
-			error(node) << "invalid use of func attribute 'suggest'";
+			error(node) << "invalid use of func attribute 'nosuggest'";
 
 		if (attrs.flags(Attributes::Flag::builtinAlias))
 			error(node) << "invalid use of func attribute 'builtinalias'";
