@@ -67,20 +67,6 @@ namespace Producer
 
 			switch (attrname[0])
 			{
-				case 'b':
-				{
-					if (attrname == "builtinalias")
-					{
-						if (unlikely(!nodevalue))
-							return (error(child) << "value expected for attribute '" << attrname << '\'');
-
-						attrs.builtinAlias = nodevalue;
-						attrs.flags += Attributes::Flag::builtinAlias;
-						break;
-					}
-				}
-
-				// [[fallthru]]
 				case 'n':
 				{
 					if (attrname == "nodiscard")
@@ -147,6 +133,16 @@ namespace Producer
 				// [[fallthru]]
 				case '_':
 				{
+					if (attrname == "__nanyc_builtinalias")
+					{
+						if (unlikely(!nodevalue))
+							return (error(child) << "value expected for attribute '" << attrname << '\'');
+
+						attrs.builtinAlias = nodevalue;
+						attrs.flags += Attributes::Flag::builtinAlias;
+						break;
+					}
+
 					if (attrname == "__nanyc_synthetic")
 					{
 						attrs.flags += Attributes::Flag::pushSynthetic;

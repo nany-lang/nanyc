@@ -132,7 +132,7 @@ static void craftClassFloat(Clob& o, uint32_t bits, const AnyString& license, co
 
 	auto genGlobalCompareOperator = [&](AnyString op, AnyString builtin, char sign, uint32_t b, AnyString prefixA, AnyString prefixB)
 	{
-		o << "#[builtinalias: " << builtin;
+		o << "#[__nanyc_builtinalias: " << builtin;
 		if (prefixA.first() == '_' or prefixB.first() == '_')
 			o << ", nosuggest";
 		o << "] public operator ";
@@ -154,7 +154,7 @@ static void craftClassFloat(Clob& o, uint32_t bits, const AnyString& license, co
 	auto genGlobalOperator = [&](AnyString op, AnyString builtin, char sign, uint32_t b, AnyString prefixA, AnyString prefixB)
 	{
 		bool atLeastOneBuiltin = (prefixA.first() != '_' or prefixB.first() != '_');
-		o << "#[builtinalias: " << builtin;
+		o << "#[__nanyc_builtinalias: " << builtin;
 		if (prefixA.first() == '_' or prefixB.first() == '_')
 			o << ", nosuggest";
 		o << "] public operator ";
@@ -326,7 +326,7 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 	bool canBeSigned = true;
 	auto genGlobalCompareOperator = [&](AnyString op, AnyString builtin, char sign, uint32_t b, AnyString prefixA, AnyString prefixB)
 	{
-		o << "#[builtinalias: " << (canBeSigned and issigned ? "i" : "") << builtin;
+		o << "#[__nanyc_builtinalias: " << (canBeSigned and issigned ? "i" : "") << builtin;
 		if (prefixA.first() == '_' or prefixB.first() == '_')
 			o << ", nosuggest";
 		o << "] public operator ";
@@ -356,7 +356,7 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 	auto genGlobalOperator = [&](AnyString op, AnyString builtin, char sign, uint32_t b, AnyString prefixA, AnyString prefixB)
 	{
 		bool atLeastOneBuiltin = (prefixA.first() != '_' or prefixB.first() != '_');
-		o << "#[builtinalias: " << builtin;
+		o << "#[__nanyc_builtinalias: " << builtin;
 		if (prefixA.first() == '_' or prefixB.first() == '_')
 			o << ", nosuggest";
 		o << "] public operator ";
