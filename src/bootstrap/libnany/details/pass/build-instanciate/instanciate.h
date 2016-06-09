@@ -207,7 +207,7 @@ namespace Instanciate
 		void captureVariables(Atom& atom);
 
 
-		Atom& resolveTypeAlias(Atom& atom, bool& success);
+		Atom& resolveTypeAlias(Atom& atom, bool& success, const Classdef*&);
 
 		bool pragmaBlueprint(const IR::ISA::Operand<IR::ISA::Op::pragma>& operands);
 		void pragmaBodyStart();

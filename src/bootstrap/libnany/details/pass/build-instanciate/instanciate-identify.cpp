@@ -1,4 +1,5 @@
 #include "instanciate.h"
+#include <iostream>
 
 using namespace Yuni;
 
@@ -13,45 +14,58 @@ namespace Instanciate
 {
 
 
-	Atom& SequenceBuilder::resolveTypeAlias(Atom& original, bool& success)
+	Atom& SequenceBuilder::resolveTypeAlias(Atom& original, bool& success, const Classdef*& resultcdef)
 	{
 		assert(original.isTypeAlias());
 
 		// trying a direct resolution
-		auto& hopCdef = cdeftable.classdef(original.returnType.clid);
-		auto* alias = cdeftable.findClassdefAtom(hopCdef);
-		if (alias)
+		auto cdef = std::cref(cdeftable.classdef(original.returnType.clid));
+
+		std::unordered_set<uint32_t> encountered; // to avoid circular references
+		Atom* alias = nullptr;
+		do
 		{
-			std::unordered_set<uint32_t> encountered; // to avoid circular references
-			do
+			if (cdef.get().isBuiltin()) // gotcha !
 			{
-				if ((alias->parent == original.parent) and alias->atomid > original.atomid)
-				{
-					// same parent but declared after (the atomid is likely to be greater
-					// than the first one since registered after)
-					complainTypedefDeclaredAfter(original, *alias);
-					break;
-				}
-
-				if (not alias->isTypeAlias())
-					return *alias;
-
-				// checking for circular aliases
-				if (not encountered.insert(alias->atomid).second)
-				{
-					// circular reference
-					complainTypealiasCircularRef(original, *alias);
-					break;
-				}
-
-				auto& cdef = cdeftable.classdef(alias->returnType.clid);
-				alias = cdeftable.findClassdefAtom(cdef);
+				resultcdef = &(cdef.get());
+				std::cout << "piko ? " << (void*) resultcdef << "\n";
+				return original;
 			}
-			while (alias != nullptr);
+
+			// current atom to check
+			alias = cdeftable.findClassdefAtom(cdef.get());
+			if (unlikely(!alias))
+				break;
+
+			if ((alias->parent == original.parent) and alias->atomid > original.atomid)
+			{
+				// same parent but declared after (the atomid is likely to be greater
+				// than the first one since registered after)
+				complainTypedefDeclaredAfter(original, *alias);
+				break;
+			}
+
+			if (not alias->isTypeAlias()) // gotcha !
+			{
+				resultcdef = &(cdef.get());
+				return *alias;
+			}
+
+			// checking for circular aliases
+			if (not encountered.insert(alias->atomid).second)
+			{
+				// circular reference
+				complainTypealiasCircularRef(original, *alias);
+				break;
+			}
+
+			cdef = std::cref(cdeftable.classdef(alias->returnType.clid));
 		}
+		while (alias != nullptr);
 
 		complainTypedefUnresolved(original);
 		success = false;
+		resultcdef = nullptr;
 		return original;
 	}
 
@@ -297,15 +311,32 @@ namespace Instanciate
 			{
 				auto& resultAtom = multipleResults[0].get();
 				bool aliasSuccess = true;
+				const Classdef* cdefTypedef = nullptr;
 				auto& atom = (not resultAtom.isTypeAlias())
 					? resultAtom
-					: resolveTypeAlias(resultAtom, aliasSuccess);
+					: resolveTypeAlias(resultAtom, aliasSuccess, cdefTypedef);
 
 				if (unlikely(not aliasSuccess or atom.flags(Atom::Flags::error)))
 					return false;
 
+				if (unlikely(cdefTypedef and cdefTypedef->isBuiltin()))
+				{
+					auto& spare = cdeftable.substitute(cdef.clid.lvid());
+					spare.import(*cdefTypedef);
+
+					if (isLocalVariable)
+					{
+						// disable optimisation to avoid unwanted behavior
+						auto& lvidinfo = frame->lvids[operands.lvid];
+						lvidinfo.synthetic = false;
+						lvidinfo.origin.memalloc = false;
+						lvidinfo.origin.returnedValue = false;
+					}
+					return true;
+				}
+
 				// if the resolution is simple (aka only one solution), it is possible that the
-				// solution is a member variable. In this case, the atom will be the member itself
+				// solution is a member variable (`self.myvar`). In this case, the atom will be the member itself
 				// and not its real type
 				if (atom.isMemberVariable())
 				{
@@ -343,8 +374,9 @@ namespace Instanciate
 							}
 							else
 							{
-								return (ICE() << "identify: invalid 'self' object for '" << name << "' from '"
-									<< frame->atom.caption() << '\'');
+								ICE() << "identify: invalid 'self' object for '" << name << "' from '"
+									<< frame->atom.caption() << '\'';
+								return false;
 							}
 						}
 					}

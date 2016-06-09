@@ -26,9 +26,9 @@ namespace Instanciate
 					return;
 			}
 
-			auto e = (error() << "invalid type: got '");
+			auto e = (error() << "class expected, got '");
 			cdef.print(e.data().message, cdeftable, false);
-			e << "', expected class";
+			e << "' instead";
 
 			if (debugmode)
 				e << CLID{frame->atomid, operands.lvid};
