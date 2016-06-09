@@ -160,6 +160,16 @@ namespace Producer
 							return (error(child) << "the attribute '__synthetic' does not accept values");
 						break;
 					}
+
+					// [FALLBACK]
+					// ignore vendor specific attributes (starting by '__')
+					if (attrname.size() > 2 and attrname[1] == '_')
+					{
+						// emit a warning for the unsupported specific nany attributes
+						if (unlikely(attrname.startsWith("__nanyc_")))
+							warning(child) << "unknown nanyc attribute '" << attrname << "'";
+						break;
+					}
 				}
 
 				// [[fallthru]]
