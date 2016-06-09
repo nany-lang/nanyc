@@ -153,11 +153,11 @@ namespace Producer
 				// [[fallthru]]
 				case '_':
 				{
-					if (attrname == "__synthetic")
+					if (attrname == "__nanyc_synthetic")
 					{
 						attrs.flags += Attributes::Flag::pushSynthetic;
 						if (unlikely(nodevalue))
-							return (error(child) << "the attribute '__synthetic' does not accept values");
+							return (error(child) << "the attribute '" << attrname << "' does not accept values");
 						break;
 					}
 

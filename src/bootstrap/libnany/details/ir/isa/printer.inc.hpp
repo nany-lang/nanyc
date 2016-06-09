@@ -743,7 +743,7 @@ namespace // anonymous
 					}
 					case Pragma::synthetic:
 					{
-						line() << "pragma __synthetic %" << operands.value.synthetic.lvid << " = ";
+						line() << "pragma synthetic %" << operands.value.synthetic.lvid << " = ";
 						out << (operands.value.synthetic.onoff != 0 ? "true" : "false");
 						break;
 					}

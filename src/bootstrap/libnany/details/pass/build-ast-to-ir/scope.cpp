@@ -128,8 +128,8 @@ namespace Producer
 		auto& attrs = *pAttributes;
 		auto& node  = attrs.node;
 
-		if (attrs.flags(Attributes::Flag::pushSynthetic))
-			error(node) << "invalid use of expr attribute '__synthetic'";
+		if (unlikely(attrs.flags(Attributes::Flag::pushSynthetic)))
+			error(node) << "invalid use of expr attribute '__nanyc_synthetic'";
 
 		if (attrs.flags(Attributes::Flag::shortcircuit))
 			error(node) << "invalid use of func attribute 'shortcircuit'";
