@@ -1,5 +1,4 @@
 #include "instanciate.h"
-#include <iostream>
 
 using namespace Yuni;
 
@@ -28,7 +27,6 @@ namespace Instanciate
 			if (cdef.get().isBuiltin()) // gotcha !
 			{
 				resultcdef = &(cdef.get());
-				std::cout << "piko ? " << (void*) resultcdef << "\n";
 				return original;
 			}
 

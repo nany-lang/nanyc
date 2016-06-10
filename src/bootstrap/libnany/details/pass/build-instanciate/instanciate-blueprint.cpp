@@ -1,5 +1,4 @@
 #include "instanciate.h"
-#include <iostream>
 
 using namespace Yuni;
 
