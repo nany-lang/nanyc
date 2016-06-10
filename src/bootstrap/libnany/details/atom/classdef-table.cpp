@@ -290,20 +290,22 @@ namespace Nany
 
 		// standard name lookup
 		{
-			Atom& atom = *(this->classdef(CLID::AtomMapID(classdef.clid.atomid())).atom);
-			bool success = atom.performNameLookupFromParent(funcdef.overloads.getList(), funcdef.name);
-			if (success)
+			Atom* atom = (this->classdef(CLID::AtomMapID(classdef.clid.atomid())).atom);
+			if (atom)
 			{
-				if (funcdef.overloads.size() == 1)
+				if (atom->performNameLookupFromParent(funcdef.overloads.getList(), funcdef.name))
 				{
-					// a single result has been found, fully-resolved
-					auto& resolvedAtom = funcdef.overloads.getList()[0].get();
-					funcdef.overloads.clear();
-					classdef.mutateToAtom(&resolvedAtom);
-					funcdef.clid = CLID::AtomMapID(resolvedAtom.atomid);
-					funcdef.atom = &resolvedAtom;
+					if (funcdef.overloads.size() == 1)
+					{
+						// a single result has been found, fully-resolved
+						auto& resolvedAtom = funcdef.overloads.getList()[0].get();
+						funcdef.overloads.clear();
+						classdef.mutateToAtom(&resolvedAtom);
+						funcdef.clid = CLID::AtomMapID(resolvedAtom.atomid);
+						funcdef.atom = &resolvedAtom;
+					}
+					return true;
 				}
-				return true;
 			}
 		}
 		return false;
