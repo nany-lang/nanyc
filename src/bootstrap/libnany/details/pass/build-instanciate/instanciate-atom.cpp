@@ -410,10 +410,6 @@ namespace Instanciate
 		if (not pushedparams.gentypes.named.empty())
 			error() << "named generic type parameters not implemented yet";
 
-		// disable any hint or error report for now, to avoid spurious messages
-		// if there is no error.
-		overloadMatch.canGenerateReport = false;
-
 		TypeCheck::Match match = overloadMatch.validate(atom);
 		if (unlikely(TypeCheck::Match::none == match))
 		{
@@ -424,9 +420,8 @@ namespace Instanciate
 			auto err = (error() << "invalid parameters, failed to instanciate '" << atom.keyword() << ' ');
 			atom.retrieveFullname(err.data().message);
 			err << '\'';
-			overloadMatch.canGenerateReport = true;
 			overloadMatch.report = std::ref(err);
-			overloadMatch.validate(atom);
+			overloadMatch.validateWithErrReport(atom);
 			return nullptr;
 		}
 
@@ -495,10 +490,6 @@ namespace Instanciate
 		if (retlvid != 0) // return value
 			overloadMatch.input.rettype.push_back(CLID{frameAtom.atomid, retlvid});
 
-		// disable any hint or error report for now, to avoid spurious messages
-		// if there is no error.
-		overloadMatch.canGenerateReport = false;
-
 		TypeCheck::Match match = overloadMatch.validate(funcAtom);
 		if (unlikely(TypeCheck::Match::none == match))
 		{
@@ -506,9 +497,8 @@ namespace Instanciate
 			auto err = (error() << "cannot call '" << funcAtom.keyword() << ' ');
 			funcAtom.retrieveFullname(err.data().message);
 			err << '\'';
-			overloadMatch.canGenerateReport = true;
 			overloadMatch.report = std::ref(err);
-			overloadMatch.validate(funcAtom);
+			overloadMatch.validateWithErrReport(funcAtom);
 			if (retlvid != 0)
 				frame->invalidate(retlvid);
 			return false;

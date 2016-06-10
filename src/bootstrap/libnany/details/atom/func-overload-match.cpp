@@ -4,6 +4,7 @@
 #include "details/atom/classdef-table-view.h"
 #include "details/reporting/report.h"
 #include "libnany-config.h"
+#include <iostream>
 
 using namespace Yuni;
 
@@ -122,7 +123,7 @@ namespace Nany
 	}
 
 
-	template<bool isTmpl>
+	template<bool withErrorReporting, bool isTmpl>
 	inline TypeCheck::Match FuncOverloadMatch::pushParameter(Atom& atom, uint32_t index, const CLID& clid)
 	{
 		// force reset
@@ -137,18 +138,21 @@ namespace Nany
 			: table.classdef(atom.tmplparams.vardef(index).clid);
 
 		// checking the parameter type
-		resultinfo.strategy = TypeCheck::isSimilarTo(table, nullptr, cdef, paramdef, pAllowImplicit);
+		resultinfo.strategy = (not cdef.isAny())
+			? TypeCheck::isSimilarTo(table, nullptr, cdef, paramdef, pAllowImplicit)
+			: TypeCheck::Match::none;
 
 		if (resultinfo.strategy == TypeCheck::Match::none)
 		{
-			if (unlikely(canGenerateReport))
+			if (withErrorReporting)
 				complainParamTypeMismatch(isTmpl, cdef, atom, index, paramdef);
 		}
 		return resultinfo.strategy;
 	}
 
 
-	TypeCheck::Match FuncOverloadMatch::validate(Atom& atom, bool allowImplicit)
+	template<bool withErrorReporting>
+	inline TypeCheck::Match FuncOverloadMatch::validateAtom(Atom& atom, bool allowImplicit)
 	{
 		assert(atom.isFunction() or atom.isClass());
 
@@ -158,9 +162,9 @@ namespace Nany
 		result.funcToCall = &atom;
 
 		// trivial check, too many parameters for this overload
-		if (atom.parameters.size() < (uint32_t) input.params.indexed.size())
+		if (unlikely(atom.parameters.size() < (uint32_t) input.params.indexed.size()))
 		{
-			if (unlikely(canGenerateReport))
+			if (withErrorReporting)
 			{
 				// do not take into consideration the 'self' parameter for error reporting
 				uint32_t selfidx = static_cast<uint32_t>(atom.isClassMember() and atom.isFunction());
@@ -171,9 +175,9 @@ namespace Nany
 			return TypeCheck::Match::none;
 		}
 		// trivial check, too many template parameters for this overload
-		if (atom.tmplparams.size() < (uint32_t) input.tmplparams.indexed.size())
+		if (unlikely(atom.tmplparams.size() < (uint32_t) input.tmplparams.indexed.size()))
 		{
-			if (unlikely(canGenerateReport))
+			if (withErrorReporting)
 			{
 				report.get().hint() << "too many generic type parameters. Got "
 					<< input.tmplparams.indexed.size()
@@ -194,7 +198,7 @@ namespace Nany
 			// trying to resolve indexed template parameters
 			for (uint32_t i = 0; i != (uint32_t) input.tmplparams.indexed.size(); ++i)
 			{
-				switch (pushParameter<true>(atom, i, input.tmplparams.indexed[i]))
+				switch (pushParameter<withErrorReporting, true>(atom, i, input.tmplparams.indexed[i]))
 				{
 					case TypeCheck::Match::equal:       perfectMatch = false; break;
 					case TypeCheck::Match::strictEqual: break;
@@ -202,9 +206,9 @@ namespace Nany
 				}
 			}
 
-			if (not input.tmplparams.named.empty())
+			if (unlikely(not input.tmplparams.named.empty()))
 			{
-				if (unlikely(canGenerateReport))
+				if (withErrorReporting)
 					report.get().error() << "named generic type parameters not implemented yet";
 				return TypeCheck::Match::none;
 			}
@@ -213,7 +217,7 @@ namespace Nany
 			// trying to resolve indexed parameters (if they match)
 			for (uint32_t i = 0; i != (uint32_t) input.params.indexed.size(); ++i)
 			{
-				switch (pushParameter<false>(atom, i, input.params.indexed[i]))
+				switch (pushParameter<withErrorReporting, false>(atom, i, input.params.indexed[i]))
 				{
 					case TypeCheck::Match::equal:       perfectMatch = false; break;
 					case TypeCheck::Match::strictEqual: break;
@@ -229,16 +233,16 @@ namespace Nany
 				{
 					uint32_t index = atom.parameters.findByName(pair.first, offset);
 					// the named parameter is not present after indexed parameters
-					if (index == static_cast<uint32_t>(-1))
+					if (unlikely(index == static_cast<uint32_t>(-1)))
 					{
 						//report.trace() << "named parameter '" << pair.first
 						//	<< "' not found after started from index " << offset << " in " << (CLID{atom.atomid,0});
-						if (unlikely(canGenerateReport))
+						if (withErrorReporting)
 							report.get().hint() << "named parameter '" << pair.first << "' not found after indexed parameters";
 						return TypeCheck::Match::none;
 					}
 
-					switch (pushParameter<false>(atom, index, pair.second))
+					switch (pushParameter<withErrorReporting, false>(atom, index, pair.second))
 					{
 						case TypeCheck::Match::equal:       perfectMatch = false; break;
 						case TypeCheck::Match::strictEqual: break;
@@ -252,7 +256,7 @@ namespace Nany
 			{
 				if (not result.tmplparams[i].cdef or result.tmplparams[i].cdef->clid.isVoid()) // undefined - TODO: default values
 				{
-					if (unlikely(canGenerateReport))
+					if (withErrorReporting)
 					{
 						auto ix = i;
 						if (not atom.isClassMember())
@@ -271,7 +275,7 @@ namespace Nany
 			{
 				if (not result.params[i].cdef or result.params[i].cdef->clid.isVoid()) // undefined - TODO: default values
 				{
-					if (unlikely(canGenerateReport))
+					if (withErrorReporting)
 					{
 						auto ix = i;
 						if (not atom.isClassMember())
@@ -297,7 +301,7 @@ namespace Nany
 					auto& atomRettype = table.classdef(atom.returnType.clid);
 					if (TypeCheck::Match::none == TypeCheck::isSimilarTo(table, nullptr, wantedRettype, atomRettype, pAllowImplicit))
 					{
-						if (unlikely(canGenerateReport))
+						if (withErrorReporting)
 						{
 							auto err = report.get().hint() << "returned type does not match, got '";
 							if (debugmode)
@@ -328,7 +332,7 @@ namespace Nany
 					if (atomRettype.kind == nyt_any and !table.findClassdefAtom(atomRettype))
 						break;
 
-					if (unlikely(canGenerateReport))
+					if (withErrorReporting)
 					{
 						auto err = report.get().hint() << "returned type does not match, got '";
 						if (debugmode)
@@ -349,6 +353,18 @@ namespace Nany
 		return perfectMatch ? TypeCheck::Match::strictEqual : TypeCheck::Match::equal;
 	}
 
+
+
+
+	TypeCheck::Match FuncOverloadMatch::validate(Atom& atom, bool allowImplicit)
+	{
+		return validateAtom<false>(atom, allowImplicit);
+	}
+
+	TypeCheck::Match FuncOverloadMatch::validateWithErrReport(Atom& atom, bool allowImplicit)
+	{
+		return validateAtom<true>(atom, allowImplicit);
+	}
 
 
 

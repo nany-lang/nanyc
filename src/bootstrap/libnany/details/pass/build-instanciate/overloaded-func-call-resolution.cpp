@@ -48,8 +48,6 @@ namespace Instanciate
 		// flag for determine whether a perfect match has really been found (and not invalidated a posteriori)
 		uint32_t perfectMatchCount = 0;
 
-		overloadMatch.canGenerateReport = false;
-
 		// trying to find all suitable solutions
 		for (uint32_t r = 0; r != solutionCount; ++r)
 		{
@@ -94,12 +92,11 @@ namespace Instanciate
 			if (false)
 			{
 				// let's do another loop for generating a report (currently done by the caller)
-				overloadMatch.canGenerateReport = true;
 				auto err = (report.error() << "cannot call ");
 				overloadMatch.report = std::ref(err);
 
 				for (uint32_t r = 0; r != solutionCount; ++r)
-					overloadMatch.validate(solutions[r].get());
+					overloadMatch.validateWithErrReport(solutions[r].get());
 			}
 			return false;
 		}

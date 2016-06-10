@@ -49,6 +49,12 @@ namespace Nany
 		TypeCheck::Match validate(Atom& atom, bool allowImplicit = true);
 
 		/*!
+		** \brief Try to determine if the given func can be called given the input param types
+		** and generate an error report if any error is encountered
+		*/
+		TypeCheck::Match validateWithErrReport(Atom& atom, bool allowImplicit = true);
+
+		/*!
 		** \brief Export input parameters
 		*/
 		void printInputParameters(YString& out) const;
@@ -85,14 +91,15 @@ namespace Nany
 		}
 		result;
 
-		//! Flag to enable/disable error reporting
-		bool canGenerateReport = true;
 		//! Reporting
 		mutable std::reference_wrapper<Logs::Report> report;
 
 
 	private:
-		template<bool IsTmpl>
+		template<bool withErrorReporting>
+		TypeCheck::Match validateAtom(Atom& atom, bool allowImplicit);
+
+		template<bool withErrorReporting, bool IsTmpl>
 		inline TypeCheck::Match pushParameter(Atom& atom, uint32_t index, const CLID& clid);
 		void complainParamTypeMismatch(bool isGenType, const Classdef&, const Atom&, uint32_t, const Classdef&);
 

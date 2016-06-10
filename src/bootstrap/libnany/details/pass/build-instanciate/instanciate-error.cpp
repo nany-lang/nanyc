@@ -426,9 +426,8 @@ namespace Instanciate
 		err << '\'';
 
 		// no match, re-launching the process with error-enabled logging for user-reporting
-		overloadMatch.canGenerateReport = true;
 		overloadMatch.report = std::ref(err);
-		overloadMatch.validate(atom);
+		overloadMatch.validateWithErrReport(atom);
 		return false;
 	}
 

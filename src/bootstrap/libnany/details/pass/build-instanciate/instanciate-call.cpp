@@ -204,9 +204,8 @@ namespace Instanciate
 			if (unlikely(not atom->isFunction()))
 				return complainOperand(IR::Instruction::fromOpcode(operands), "a functor is required for func call");
 
-			// any error can be directly reported (since no overload is present)
-			overloadMatch.canGenerateReport = false;
 			// try to validate the func call
+			// (no error reporting, since no overload is present)
 			if (unlikely(TypeCheck::Match::none == overloadMatch.validate(*atom)))
 				return complainCannotCall(*atom, overloadMatch);
 
