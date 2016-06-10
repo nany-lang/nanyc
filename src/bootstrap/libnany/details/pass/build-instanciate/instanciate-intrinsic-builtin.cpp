@@ -507,6 +507,7 @@ namespace Instanciate
 			case nyt_u16:
 			case nyt_u32:
 			case nyt_u64:
+			case nyt_ptr:
 			{
 				if (not AcceptInt)
 					return complainBuiltinIntrinsicDoesNotAccept(name, "integer literals");
@@ -521,7 +522,6 @@ namespace Instanciate
 			}
 			case nyt_void:
 			case nyt_any:
-			case nyt_ptr:
 			case nyt_count:
 			{
 				return complainIntrinsicParameter(name, 0, cdeflhs);
