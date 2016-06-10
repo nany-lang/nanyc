@@ -140,18 +140,19 @@ namespace Instanciate
 		static bool createNewAtom(InstanciateData& info, Atom& atom, Logs::Report& report)
 		{
 			auto& sequence  = *atom.opcodes.sequence;
-			auto& cdeftable = info.cdeftable.originalTable();
+			auto& originaltable = info.cdeftable.originalTable();
 			// the mutex is useless here since the code instanciation is mono-threaded
 			// but it's required by the mapping (which must be thread-safe in the first passes - see attach)
 			// TODO remove this mutex
 			Mutex mutex;
 
-			Pass::Mapping::SequenceMapping mapper{cdeftable, mutex, report, sequence};
+			Pass::Mapping::SequenceMapping mapper{originaltable, mutex, report, sequence};
 			mapper.evaluateWholeSequence = false;
 			mapper.prefixNameForFirstAtomCreated = "^";
 
-			auto& parentAtom = *atom.parent;
-			mapper.map(parentAtom, atom.opcodes.offset);
+
+			// run the type mapping
+			mapper.map(*atom.parent, atom.opcodes.offset);
 
 			if (unlikely(!mapper.firstAtomCreated))
 				return (report.error() << "failed to remap atom '" << atom.caption() << "'");
@@ -164,8 +165,14 @@ namespace Instanciate
 			// any new attempt to check them
 			auto& newAtom = info.atom.get();
 			newAtom.tmplparamsForPrinting.swap(newAtom.tmplparams);
-			// marking the new atom as instnaciated, like a standard class
+
+			// marking the new atom as instanciated, like a standard class
 			newAtom.classinfo.isInstanciated = true;
+			// to keep the types for the new atoms
+			info.shouldMergeLayer = true;
+
+			// re-update type entries
+			originaltable.performNameLookup();
 			return true;
 		}
 
