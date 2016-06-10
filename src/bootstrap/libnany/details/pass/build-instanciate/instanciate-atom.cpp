@@ -113,6 +113,7 @@ namespace Instanciate
 					param.atom = const_cast<Atom*>(info.cdeftable.findClassdefAtom(cdef));
 					param.kind = cdef.kind;
 					param.qualifiers = cdef.qualifiers;
+					assert(param.kind != nyt_any or param.atom != nullptr);
 				}
 			}
 
@@ -130,6 +131,7 @@ namespace Instanciate
 					param.atom = const_cast<Atom*>(info.cdeftable.findClassdefAtom(cdef));
 					param.kind = cdef.kind;
 					param.qualifiers = cdef.qualifiers;
+					assert(param.kind != nyt_any or param.atom != nullptr);
 				}
 			}
 		}
@@ -425,17 +427,18 @@ namespace Instanciate
 			return nullptr;
 		}
 
+		// moving all input parameters
 		decltype(FuncOverloadMatch::result.params) params;
 		decltype(FuncOverloadMatch::result.params) tmplparams;
 		params.swap(overloadMatch.result.params);
 		tmplparams.swap(overloadMatch.result.tmplparams);
 
-		Logs::Message::Ptr newReport;
 
 		// determine captured variables before instanciating the class
 		if (!!atom.candidatesForCapture)
 			captureVariables(atom);
 
+		Logs::Message::Ptr newReport;
 
 		Pass::Instanciate::InstanciateData info{newReport, atom, cdeftable, build, params, tmplparams};
 		info.parentAtom = &(frame->atom);
@@ -581,6 +584,7 @@ namespace Instanciate
 		{
 			auto& param = signature.parameters[i];
 			cdeftable.addSubstitute(param.kind, param.atom, param.qualifiers);
+			assert(param.kind != nyt_any or param.atom != nullptr);
 		}
 		// adding reserved variables for cloning parameters (after normal parameters)
 		for (uint32_t i = 0; i != count; ++i)
@@ -595,6 +599,7 @@ namespace Instanciate
 		{
 			auto& param = signature.tmplparams[i];
 			cdeftable.addSubstitute(param.kind, param.atom, param.qualifiers);
+			assert(param.kind != nyt_any or param.atom != nullptr);
 		}
 	}
 
@@ -694,6 +699,8 @@ namespace Instanciate
 			info.parent->error() << "parameters/return types must be fully defined to allow recursive func calls";
 		return false;
 	}
+
+
 
 
 	bool instanciateAtom(InstanciateData& info)

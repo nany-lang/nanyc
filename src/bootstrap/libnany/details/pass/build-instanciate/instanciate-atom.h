@@ -22,12 +22,12 @@ namespace Instanciate
 		InstanciateData(Logs::Message::Ptr& report, Atom& atom, ClassdefTableView& cdeftable, Build& build,
 			decltype(FuncOverloadMatch::result.params)& params,
 			decltype(FuncOverloadMatch::result.params)& tmplparams)
-			: report(report)
+			: cdeftable(cdeftable)
 			, atom(atom)
-			, cdeftable(cdeftable)
 			, build(build)
 			, params(params)
 			, tmplparams(tmplparams)
+			, report(report)
 		{
 			returnType.mutateToAny();
 
@@ -35,15 +35,15 @@ namespace Instanciate
 				report = new Logs::Message{Logs::Level::none};
 		}
 
-		Logs::Message::Ptr& report;
+		//! The original view to the classdef table
+		ClassdefTableView& cdeftable;
+
 		//! The atom to instanciate
 		std::reference_wrapper<Atom> atom;
 		//! The parent atom, if any
 		Atom* parentAtom = nullptr;
 		//! Instance
 		uint32_t instanceid = (uint32_t) -1;
-		//! The original view to the classdef table
-		ClassdefTableView& cdeftable;
 		//! Context
 		Build& build;
 
@@ -64,8 +64,18 @@ namespace Instanciate
 
 		//! Parent
 		SequenceBuilder* parent = nullptr;
-	};
 
+		//! Error reporting
+		Logs::Message::Ptr& report;
+
+	}; // class InstanciateData
+
+
+
+
+	/*!
+	** \brief Instanciate atom
+	*/
 	bool instanciateAtom(InstanciateData& info);
 
 
