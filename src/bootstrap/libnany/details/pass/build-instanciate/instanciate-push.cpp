@@ -42,6 +42,8 @@ namespace Instanciate
 
 	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::tpush>& operands)
 	{
+		frame->verify(operands.lvid);
+
 		if (0 == operands.name)
 		{
 			pushedparams.gentypes.indexed.emplace_back(operands.lvid, currentLine, currentOffset);
