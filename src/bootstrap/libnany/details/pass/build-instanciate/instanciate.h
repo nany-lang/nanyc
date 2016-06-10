@@ -85,7 +85,7 @@ namespace Instanciate
 		bool instanciateIntrinsicFieldset(uint32_t lvid);
 		bool instanciateIntrinsicRef(uint32_t lvid);
 		bool instanciateIntrinsicUnref(uint32_t lvid);
-		bool instanciateIntrinsicAddressof(uint32_t lvid);
+		bool instanciateIntrinsicPointer(uint32_t lvid);
 		bool instanciateIntrinsicSizeof(uint32_t lvid);
 		bool instanciateIntrinsicMemalloc(uint32_t lvid);
 		bool instanciateIntrinsicMemrealloc(uint32_t lvid);

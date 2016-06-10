@@ -96,17 +96,24 @@ namespace Instanciate
 	}
 
 
-	bool SequenceBuilder::instanciateIntrinsicAddressof(uint32_t lvid)
+	bool SequenceBuilder::instanciateIntrinsicPointer(uint32_t lvid)
 	{
-		cdeftable.substitute(lvid).mutateToBuiltin(nyt_u64);
+		cdeftable.substitute(lvid).mutateToBuiltin(nyt_ptr);
 
 		if (canGenerateCode())
 		{
 			uint32_t objlvid = pushedparams.func.indexed[0].lvid;
 			if (canBeAcquired(objlvid))
+			{
+				// retrieving the pointer address of the object in input
+				// the objlvid representing the object is already the address
 				out.emitStore(lvid, objlvid);
+			}
 			else
+			{
+				// can not be acquired, not an object - NULL
 				out.emitStore_u64(lvid, 0);
+			}
 		}
 		return true;
 	}
@@ -743,9 +750,9 @@ namespace Instanciate
 	{
 		//
 		{"^fieldset",       { &SequenceBuilder::instanciateIntrinsicFieldset,  2 }},
-		{"addressof",       { &SequenceBuilder::instanciateIntrinsicAddressof, 1 }},
+		{"pointer",         { &SequenceBuilder::instanciateIntrinsicPointer,   1 }},
 		{"memory.allocate", { &SequenceBuilder::instanciateIntrinsicMemalloc,  1 }},
-		{"memory.realloc",  { &SequenceBuilder::instanciateIntrinsicMemrealloc,  3 }},
+		{"memory.realloc",  { &SequenceBuilder::instanciateIntrinsicMemrealloc,3 }},
 		{"memory.dispose",  { &SequenceBuilder::instanciateIntrinsicMemFree,   2 }},
 		{"memory.fill",     { &SequenceBuilder::instanciateIntrinsicMemfill,   3 }},
 		{"ref",             { &SequenceBuilder::instanciateIntrinsicRef,       1 }},
