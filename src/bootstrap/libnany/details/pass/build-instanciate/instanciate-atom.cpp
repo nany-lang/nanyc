@@ -164,6 +164,8 @@ namespace Instanciate
 			// any new attempt to check them
 			auto& newAtom = info.atom.get();
 			newAtom.tmplparamsForPrinting.swap(newAtom.tmplparams);
+			// marking the new atom as instnaciated, like a standard class
+			newAtom.classinfo.isInstanciated = true;
 			return true;
 		}
 
@@ -187,6 +189,9 @@ namespace Instanciate
 			{
 				if (not createNewAtom(info, previousAtom, report))
 					return nullptr;
+
+				// the atom has changed
+				assert(&info.atom.get() != &previousAtom);
 			}
 
 			if (Config::Traces::sourceOpcodeSequence)
@@ -568,8 +573,8 @@ namespace Instanciate
 		//  * +1: the CLID{X, 1} is reserved for the return type
 
 		// unused pseudo/invalid register
-		CLID clid{atomid, 0};
 		cdeftable.addSubstitute(nyt_void, nullptr, Qualifiers()); // unused, 1-based
+		CLID clid{atomid, 0};
 
 		// redefine return type {atomid,1}
 		clid.reclass(1);
