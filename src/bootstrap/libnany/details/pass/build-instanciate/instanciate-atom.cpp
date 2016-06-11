@@ -191,6 +191,9 @@ namespace Instanciate
 				return nullptr;
 			}
 
+			// for template classes
+			Atom* remapAtom = nullptr;
+
 			// creaa new atom branch for the new instanciation if the atom is a generic class
 			bool instTemplateClass = (previousAtom.isClass() and previousAtom.hasGenericParameters());
 			if (instTemplateClass)
@@ -199,6 +202,7 @@ namespace Instanciate
 				if (unlikely(not creatok))
 					return nullptr;
 
+				remapAtom = &info.atom.get();
 				// the atom has changed
 				assert(&info.atom.get() != &previousAtom);
 			}
@@ -207,7 +211,7 @@ namespace Instanciate
 				printSourceOpcodeSequence(report, info.cdeftable, info.atom.get(), "[post-IR] ");
 
 
-			// the current atom
+			// the current atom, probably different from `previousAtom`
 			auto& atom = info.atom.get();
 			// the new IR sequence for the instanciated function
 			auto* outIR = new IR::Sequence;
@@ -215,8 +219,9 @@ namespace Instanciate
 			auto& inputIR = *(atom.opcodes.sequence);
 
 			// registering the new instanciation first
-			// (required for recursive functions)
-			info.instanceid = atom.createInstanceID(signature, outIR, nullptr);
+			// (required for recursive functions & classes)
+			// `previousAtom` is probably `atom` itself, but different for template classes
+			info.instanceid = previousAtom.createInstanceID(signature, outIR, remapAtom);
 
 			// new layer for the cdeftable
 			ClassdefTableView newView{info.cdeftable, atom.atomid, signature.parameters.size()};
@@ -290,7 +295,9 @@ namespace Instanciate
 
 				if (likely(success))
 				{
-					atom.updateInstance(info.instanceid, symbolName, info.returnType);
+					// registering the new instance to the atom
+					// `previousAtom` is probably `atom` itself, but different for template classes
+					previousAtom.updateInstance(info.instanceid, symbolName, info.returnType);
 					return outIR;
 				}
 			}
@@ -733,7 +740,7 @@ namespace Instanciate
 				}
 
 				// instance already present
-				if (unlikely(remapAtom != nullptr)) // the target atom may have changed
+				if (unlikely(remapAtom != nullptr)) // the target atom may have changed (template class)
 					info.atom = std::ref(*remapAtom);
 				return true;
 			}
