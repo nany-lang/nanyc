@@ -80,6 +80,13 @@ namespace Instanciate
 	}
 
 
+	bool SequenceBuilder::complain(const AnyString& msg) const
+	{
+		error() << msg;
+		return false;
+	}
+
+
 	bool SequenceBuilder::complainRedeclared(const AnyString& name, uint32_t previousDeclaration)
 	{
 		success = false;
@@ -537,6 +544,19 @@ namespace Instanciate
 			err << "' for parameter " << paramindex;
 		else
 			err << "' for parameter '" << paramname << '\'';
+	}
+
+
+	void SequenceBuilder::complainInvalidParametersAfterSignatureMatching(Atom& atom, FuncOverloadMatch& overloadMatch)
+	{
+		// fail - try again to produce error message, hint, and any suggestion
+		auto err = (error());
+		err << "invalid parameters, failed to instanciate '" << atom.keyword() << ' ';
+		atom.retrieveFullname(err.data().message);
+		err << '\'';
+
+		overloadMatch.report = std::ref(err);
+		overloadMatch.validateWithErrReport(atom);
 	}
 
 

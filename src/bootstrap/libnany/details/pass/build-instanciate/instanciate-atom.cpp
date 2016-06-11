@@ -192,9 +192,11 @@ namespace Instanciate
 			}
 
 			// creaa new atom branch for the new instanciation if the atom is a generic class
-			if (previousAtom.isClass() and previousAtom.hasGenericParameters())
+			bool instTemplateClass = (previousAtom.isClass() and previousAtom.hasGenericParameters());
+			if (instTemplateClass)
 			{
-				if (not createNewAtom(info, previousAtom, report))
+				bool creatok = createNewAtom(info, previousAtom, report);
+				if (unlikely(not creatok))
 					return nullptr;
 
 				// the atom has changed
@@ -216,85 +218,82 @@ namespace Instanciate
 			// (required for recursive functions)
 			info.instanceid = atom.createInstanceID(signature, outIR, nullptr);
 
-			try
+			// new layer for the cdeftable
+			ClassdefTableView newView{info.cdeftable, atom.atomid, signature.parameters.size()};
+
+			// instanciate the sequence attached to the atom
+			auto builder = std::make_unique<SequenceBuilder>
+				(report.subgroup(), newView, info.build, *outIR, inputIR, info.parent);
+
+			builder->pushParametersFromSignature(atom.atomid, signature);
+			//if (info.parentAtom)
+			builder->layerDepthLimit = 2; // allow the first blueprint to be instanciated
+
+			// Read the input IR sequence, resolve all types, and generate
+			// a new IR sequence ready for execution ! (with or without optimization passes)
+			// (everything happens here)
+			bool success = builder->readAndInstanciate(atom.opcodes.offset);
+
+
+			// post-processing regarding 'stackalloc' opcodes
+			// those opcodes may not have the good declared type (most likely
+			// something like 'any')
+			// (always update even if sometimes not necessary, easier for debugging)
+			reinitStackAllocTypes(*outIR, newView, atom.atomid);
+
+			// keep all deduced types
+			if (likely(success) and info.shouldMergeLayer)
+				newView.mergeSubstitutes();
+
+			// Generating the full human readable name of the symbol with the
+			// apropriate types & qualifiers for all parameters
+			// (example: "func A.foo(b: cref __i32): ref __i32")
+			// note: the content of the string will be moved to avoid memory allocation
+			String symbolName;
+			if (success or Config::Traces::generatedOpcodeSequence)
 			{
-				// new layer for the cdeftable
-				ClassdefTableView newView{info.cdeftable, atom.atomid, signature.parameters.size()};
+				symbolName << newView.keyword(info.atom) << ' '; // ex: func
+				atom.retrieveCaption(symbolName, newView);  // ex: A.foo(...)...
+			}
+			if (Config::Traces::generatedOpcodeSequence)
+				printGeneratedIRSequence(report, symbolName, *outIR, newView);
 
-				// instanciate the sequence attached to the atom
-				auto builder = std::make_unique<SequenceBuilder>
-					(report.subgroup(), newView, info.build, *outIR, inputIR, info.parent);
-
-				builder->pushParametersFromSignature(atom.atomid, signature);
-				if (info.parentAtom)
-					builder->layerDepthLimit = 2; // allow the first one
-
-				// Read the input IR sequence, resolve all types, and generate
-				// a new IR sequence ready for execution ! (with or without optimization passes)
-				// (everything happens here)
-				bool success = builder->readAndInstanciate(atom.opcodes.offset);
-
-
-				// post-processing regarding 'stackalloc' opcodes
-				// those opcodes may not have the good declared type (most likely
-				// something like 'any')
-				// (always update even if sometimes not necessary, easier for debugging)
-				reinitStackAllocTypes(*outIR, newView, atom.atomid);
-
-				// keep all deduced types
-				if (likely(success) and info.shouldMergeLayer)
-					newView.mergeSubstitutes();
-
-				// Generating the full human readable name of the symbol with the
-				// apropriate types & qualifiers for all parameters
-				// (example: "func A.foo(b: cref __i32): ref __i32")
-				String symbolName;
-				if (success or Config::Traces::generatedOpcodeSequence)
+			if (success)
+			{
+				if (atom.isFunction())
 				{
-					symbolName << newView.keyword(info.atom) << ' '; // ex: func
-					atom.retrieveCaption(symbolName, newView);  // ex: A.foo(...)...
-				}
-				if (Config::Traces::generatedOpcodeSequence)
-					printGeneratedIRSequence(report, symbolName, *outIR, newView);
-
-				if (success)
-				{
-					if (atom.isFunction())
+					// if the IR code belongs to a function, get the return type
+					// and put it into the signature (for later reuse) and into
+					// the 'info' structure for immediate use
+					auto& cdefReturn = newView.classdef(CLID{atom.atomid, 1});
+					if (not cdefReturn.isBuiltinOrVoid())
 					{
-						// if the IR code belongs to a function, get the return type
-						// and put it into the signature (for later reuse) and into
-						// the 'info' structure for immediate use
-						auto& cdefReturn = newView.classdef(CLID{atom.atomid, 1});
-						if (not cdefReturn.isBuiltinOrVoid())
+						auto* atom = newView.findClassdefAtom(cdefReturn);
+						if (atom)
 						{
-							auto* atom = newView.findClassdefAtom(cdefReturn);
-							if (atom)
-							{
-								info.returnType.mutateToAtom(atom);
-							}
-							else
-							{
-								report.ICE() << "invalid atom pointer in func return type for '" << symbolName << '\'';
-								success = false;
-							}
+							info.returnType.mutateToAtom(atom);
 						}
 						else
-							info.returnType.kind = cdefReturn.kind;
+						{
+							report.ICE() << "invalid atom pointer in func return type for '" << symbolName << '\'';
+							success = false;
+						}
 					}
 					else
-					{
-						// not a function, so no return value (unlikely to be used anyway)
-						info.returnType.mutateToVoid();
-					}
+						info.returnType.kind = cdefReturn.kind;
+				}
+				else
+				{
+					// not a function, so no return value (unlikely to be used anyway)
+					info.returnType.mutateToVoid();
+				}
 
-					if (likely(success))
-					{
-						atom.updateInstance(info.instanceid, symbolName, info.returnType);
-						return outIR;
-					}
+				if (likely(success))
+				{
+					atom.updateInstance(info.instanceid, symbolName, info.returnType);
+					return outIR;
 				}
 			}
-			catch (...) {}
 
 			// failed to instanciate the input IR sequence. This can be expected, if trying
 			// to not instanciate the appropriate function (if several overloads are present
@@ -376,7 +375,8 @@ namespace Instanciate
 			{
 				assert(userDefinedDtor != nullptr);
 				uint32_t instanceid = static_cast<uint32_t>(-1);
-				if (not instanciateAtomFunc(instanceid, (*userDefinedDtor), /*void*/0, /*self*/lvid))
+				bool instok = instanciateAtomFunc(instanceid, (*userDefinedDtor), /*void*/0, /*self*/lvid);
+				if (unlikely(not instok))
 					return false;
 				break;
 			}
@@ -412,8 +412,12 @@ namespace Instanciate
 	{
 		assert(atom.isClass());
 
+		// mark the atom being instanciated as 'instanciated'. For classes with gen. type parameters
+		// a new atom will be created and only this one will be marked
 		if (atom.tmplparams.empty())
+		{
 			atom.classinfo.isInstanciated = true;
+		}
 
 
 		overloadMatch.clear(); // reset
@@ -421,21 +425,16 @@ namespace Instanciate
 		for (auto& param: pushedparams.gentypes.indexed)
 			overloadMatch.input.tmplparams.indexed.emplace_back(frame->atomid, param.lvid);
 
-		if (not pushedparams.gentypes.named.empty())
-			error() << "named generic type parameters not implemented yet";
+		if (unlikely(not pushedparams.gentypes.named.empty()))
+			complain("named generic type parameters not implemented yet");
 
 		TypeCheck::Match match = overloadMatch.validate(atom);
 		if (unlikely(TypeCheck::Match::none == match))
 		{
 			if (Config::Traces::sourceOpcodeSequence)
 				printSourceOpcodeSequence(report, cdeftable, atom, "[FAIL-IR] ");
-
 			// fail - try again to produce error message, hint, and any suggestion
-			auto err = (error() << "invalid parameters, failed to instanciate '" << atom.keyword() << ' ');
-			atom.retrieveFullname(err.data().message);
-			err << '\'';
-			overloadMatch.report = std::ref(err);
-			overloadMatch.validateWithErrReport(atom);
+			complainInvalidParametersAfterSignatureMatching(atom, overloadMatch);
 			return nullptr;
 		}
 
@@ -509,14 +508,9 @@ namespace Instanciate
 		if (unlikely(TypeCheck::Match::none == match))
 		{
 			// fail - try again to produce error message, hint, and any suggestion
-			auto err = (error() << "cannot call '" << funcAtom.keyword() << ' ');
-			funcAtom.retrieveFullname(err.data().message);
-			err << '\'';
-			overloadMatch.report = std::ref(err);
-			overloadMatch.validateWithErrReport(funcAtom);
 			if (retlvid != 0)
 				frame->invalidate(retlvid);
-			return false;
+			return complainCannotCall(funcAtom, overloadMatch);
 		}
 
 		decltype(FuncOverloadMatch::result.params) params;
@@ -643,7 +637,7 @@ namespace Instanciate
 			return (ICE() << "failed to find parent sequence builder");
 
 		if (not atom.tmplparams.empty())
-			return (error() << "recursive functions with generic type parameters is not supported yet");
+			return complain("recursive functions with generic type parameters is not supported yet");
 
 		// !! NOTE !!
 		// the func is not fully instanciated, so the real return type is not set yet
@@ -732,7 +726,7 @@ namespace Instanciate
 		{
 			case Tribool::Value::yes:
 			{
-				if (atom.flags(Atom::Flags::instanciating)) // recursive func detected
+				if (unlikely(atom.flags(Atom::Flags::instanciating))) // recursive func detected
 				{
 					if (unlikely(not instanciateRecursiveAtom(info)))
 						return false;

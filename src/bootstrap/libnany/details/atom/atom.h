@@ -295,8 +295,9 @@ namespace Nany
 		/*!
 		** \brief Update atom instance
 		** \param symbol The complete symbol name (ex: "func A.foo(b: ref __i32): ref __i32")
+		** \note The content of 'symbol' will be moved to avoid memory allocation
 		*/
-		void updateInstance(uint32_t id, const AnyString& symbol, const Classdef& rettype);
+		void updateInstance(uint32_t id, Yuni::String& symbol, const Classdef& rettype);
 
 		//! Mark as invalid a given signature
 		uint32_t invalidateInstance(const Signature& signature, uint32_t id);

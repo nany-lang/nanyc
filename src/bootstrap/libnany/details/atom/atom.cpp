@@ -401,15 +401,6 @@ namespace Nany
 	}
 
 
-	void Atom::updateInstance(uint32_t id, const AnyString& symbol, const Classdef& rettype)
-	{
-		auto& md = pInstancesMD[id];
-		md.rettype.import(rettype);
-		md.rettype.qualifiers = rettype.qualifiers;
-		md.symbol = symbol;
-	}
-
-
 	Tribool::Value Atom::findInstance(const Signature& signature, uint32_t& iid, Classdef& rettype, Atom*& remapAtom) const
 	{
 		auto it = pInstancesIDs.find(signature);

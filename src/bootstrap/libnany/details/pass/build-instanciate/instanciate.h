@@ -272,6 +272,7 @@ namespace Instanciate
 
 		bool checkForIntrinsicParamCount(const AnyString& name, uint32_t count);
 
+		bool complain(const AnyString& msg) const;
 
 		bool complainUnknownIdentifier(const Atom* self, const Atom& atom, const AnyString& name);
 
@@ -338,6 +339,9 @@ namespace Instanciate
 		bool complainCannotCall(Atom& atom, FuncOverloadMatch& overloadMatch);
 
 		void complainPushedSynthetic(const CLID&, uint32_t paramindex, const AnyString& paramname = nullptr);
+
+		void complainInvalidParametersAfterSignatureMatching(Atom&, FuncOverloadMatch& overloadMatch);
+		void complainCannotCall(const Atom&, FuncOverloadMatch& overloadMatch);
 		//@}
 
 

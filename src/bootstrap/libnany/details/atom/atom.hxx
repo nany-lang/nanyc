@@ -259,6 +259,15 @@ namespace Nany
 	}
 
 
+	inline void Atom::updateInstance(uint32_t id, Yuni::String& symbol, const Classdef& rettype)
+	{
+		auto& md = pInstancesMD[id];
+		md.rettype.import(rettype);
+		md.rettype.qualifiers = rettype.qualifiers;
+		md.symbol.swap(symbol);
+	}
+
+
 	inline uint64_t Atom::runtimeSizeof() const
 	{
 		return classinfo.nextFieldIndex * sizeof(uint64_t);
