@@ -309,7 +309,7 @@ namespace Nany
 		//! Get the full name of the atom (without any parameters)
 		YString fullname() const;
 		//! Append the full name of the atom (without any parameters)
-		void retrieveFullname(YString& out) const;
+		void retrieveFullname(YString& out, const ClassdefTableView* table = nullptr) const;
 
 
 		//! Get the full name of the atom along with its parameters
@@ -459,7 +459,7 @@ namespace Nany
 		//! Default constructor, with a parent
 		explicit Atom(Atom& rootparent, const AnyString& name, Type type);
 		void doPrint(Logs::Report&, const ClassdefTableView& table, uint depth) const;
-		template<class T> void doAppendCaption(YString& out, const T* table) const;
+		void doAppendCaption(YString& out, const ClassdefTableView* table) const;
 
 	private:
 		//! All children

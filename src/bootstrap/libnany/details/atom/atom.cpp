@@ -13,6 +13,53 @@ using namespace Yuni;
 namespace Nany
 {
 
+	namespace // anonymous
+	{
+
+		template<class OutT, class ListT, class TableT>
+		static void atomParametersPrinter(OutT& out, ListT& list, const TableT* table, bool avoidSelf, AnyString sepBefore, AnyString sepAfter)
+		{
+			bool first = true;
+			out << sepBefore;
+			list.each([&](uint32_t i, const AnyString& paramname, const Vardef& vardef)
+			{
+				// avoid the first virtual parameter
+				if (avoidSelf and i == 0 and paramname == "self")
+					return;
+
+				if (not first)
+					out << ", ";
+				first = false;
+				out << paramname;
+
+				if (table)
+				{
+					if (table) // and table->hasClassdef(vardef.clid))
+					{
+						auto& retcdef = table->classdef(vardef.clid);
+						if (not retcdef.isVoid())
+						{
+							out << ": ";
+							retcdef.print(out, *table, false);
+						}
+					}
+				}
+				else
+				{
+					if (not vardef.clid.isVoid())
+						out << ": any";
+				}
+			});
+			out << sepAfter;
+		}
+
+	} // anonymous namespace
+
+
+
+
+
+
 	Atom::Atom(const AnyString& name, Atom::Type type)
 		: type(type)
 		, name(name)
@@ -64,13 +111,13 @@ namespace Nany
 	}
 
 
-	void Atom::retrieveFullname(Yuni::String& out) const
+	void Atom::retrieveFullname(Yuni::String& out, const ClassdefTableView* table) const
 	{
 		if (parent)
 		{
 			if (parent->parent)
 			{
-				parent->retrieveFullname(out);
+				parent->retrieveFullname(out, table);
 				out += '.';
 			}
 
@@ -104,10 +151,11 @@ namespace Nany
 							out.append(name.c_str() + 6, name.size() - 6);
 						}
 						else
-						{
 							out.append(name.c_str() + 1, name.size() - 1);
-						}
 					}
+
+					if (not tmplparamsForPrinting.empty())
+						atomParametersPrinter(out, tmplparamsForPrinting, table, false, "<:", ":>");
 					break;
 				}
 
@@ -117,6 +165,9 @@ namespace Nany
 						out += name;
 					else
 						out.append(name.c_str() + 1, name.size() - 1);
+
+					if (not tmplparamsForPrinting.empty())
+						atomParametersPrinter(out, tmplparamsForPrinting, table, false, "<:", ":>");
 					break;
 				}
 
@@ -141,10 +192,11 @@ namespace Nany
 	}
 
 
-	template<class T>
-	void Atom::doAppendCaption(YString& out, const T* table) const
+	void Atom::doAppendCaption(YString& out, const ClassdefTableView* table) const
 	{
-		retrieveFullname(out);
+		// append the name of its ancestor, with the table to resolve their specialization
+		// (for template clsses for example)
+		retrieveFullname(out, table); // parents
 
 		switch (type)
 		{
@@ -161,48 +213,10 @@ namespace Nany
 			case Type::classdef:
 			case Type::typealias:
 			{
-				auto paramprinter = [&](auto& list, bool avoidSelf, AnyString sepBefore, AnyString sepAfter)
-				{
-					if (list.empty())
-						return;
-
-					bool first = true;
-					out << sepBefore;
-					list.each([&](uint32_t i, const AnyString& paramname, const Vardef& vardef)
-					{
-						// avoid the first virtual parameter
-						if (avoidSelf and i == 0 and paramname == "self")
-							return;
-
-						if (not first)
-							out << ", ";
-						first = false;
-						out << paramname;
-
-						if (table)
-						{
-							if (table) // and table->hasClassdef(vardef.clid))
-							{
-								auto& retcdef = table->classdef(vardef.clid);
-								if (not retcdef.isVoid())
-								{
-									out << ": ";
-									retcdef.print(out, *table, false);
-								}
-							}
-						}
-						else
-						{
-							if (not vardef.clid.isVoid())
-								out << ": any";
-						}
-					});
-					out << sepAfter;
-				};
-
-				paramprinter(tmplparams, false, "<:", ":>");
-				// paramprinter(tmplparamsForPrinting, false, "<:", ":>");
-				paramprinter(parameters, true, "(", ")");
+				if (not tmplparams.empty())
+					atomParametersPrinter(out, tmplparams, table, false, "<:", ":>");
+				if (not parameters.empty())
+					atomParametersPrinter(out, parameters, table, true, "(", ")");
 
 				if (table)
 				{
@@ -249,7 +263,7 @@ namespace Nany
 	YString Atom::caption() const
 	{
 		String out;
-		doAppendCaption<ClassdefTableView>(out, nullptr);
+		doAppendCaption(out, nullptr);
 		return out;
 	}
 
