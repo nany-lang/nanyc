@@ -77,9 +77,9 @@ namespace Producer
 					if (debugmode)
 						out.emitComment("case");
 					if (unlikely(valuelvid == 0))
-						return (ICE(child) << "switch: unexpected lvid value");
+						return (ice(child) << "switch: unexpected lvid value");
 					if (unlikely(child.children.size() != 2))
-						return ICEUnexpectedNode(child, "[ir/switch/case]");
+						return unexpectedNode(child, "[ir/switch/case]");
 
 					if (success)
 					{
@@ -111,7 +111,7 @@ namespace Producer
 					// do not break
 				}
 				default:
-					return ICEUnexpectedNode(child, "[ir/switch]");
+					return unexpectedNode(child, "[ir/switch]");
 			}
 		}
 

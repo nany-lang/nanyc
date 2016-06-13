@@ -1,6 +1,6 @@
 #include "check-for-valid-identifier-name.h"
 #include "details/ast/ast.h"
-#include "details/reporting/report.h"
+#include "details/errors/errors.h"
 #include "details/fwd.h"
 #include "libnany-config.h"
 #include <yuni/io/file.h>
@@ -96,17 +96,17 @@ namespace Nany
 	}
 
 
-	bool checkForValidIdentifierName(Logs::Report& report, const AST::Node& node, const AnyString& name,
+	bool checkForValidIdentifierName(const AST::Node& node, const AnyString& name,
 		bool isOperator, bool isType)
 	{
 		// checking the name size
 		uint32_t size = name.size();
 		if (unlikely(0 == size))
-			return (report.error() << "invalid empty name");
+			return (error(node) << "invalid empty name");
 
 		if (unlikely(size > Config::maxSymbolNameLength))
 		{
-			auto err = report.error() << "identifier name too long";
+			auto err = error(node) << "identifier name too long";
 			auto& location = err.message.origins.location;
 			location.pos.offsetEnd = location.pos.offset + name.size();
 			return false;
@@ -121,7 +121,7 @@ namespace Nany
 			// names with '_' as prefix are for internal uses only
 			if (unlikely(name.first() == '_'))
 			{
-				auto err = report.error();
+				auto err = error(node);
 				err << "invalid identifier name '" << name << "': underscore as a prefix is not allowed";
 				err.message.origins.location.pos.offsetEnd = err.message.origins.location.pos.offset + name.size();
 				return false;
@@ -135,7 +135,7 @@ namespace Nany
 				{
 					if (not i->isAscii())
 					{
-						auto wrn = report.warning()
+						auto wrn = warning(node)
 							<< "invalid identifier name: the name contains non-ascii characters";
 						auto& location = wrn.message.origins.location;
 						location.pos.offsetEnd = location.pos.offset + name.size();
@@ -147,7 +147,7 @@ namespace Nany
 			// checking if the id name is not from one of reserved keywords
 			if (unlikely(not isType and reservedKeywords.count(name) != 0))
 			{
-				auto err = report.error() << "'" << name << "' is a reserved keyword";
+				auto err = error(node) << "'" << name << "' is a reserved keyword";
 				auto& location = err.message.origins.location;
 				location.pos.offsetEnd = location.pos.offset + name.size();
 				return false;
@@ -158,14 +158,13 @@ namespace Nany
 			// checking if the operator name is one from the list
 			if (unlikely(operatorKeywords.count(name) == 0)) // not found
 			{
-				auto err = (report.error()
+				auto err = (error(node)
 					<< "invalid identifier name: '" << name << "' is not a valid operator");
 				auto& location = err.message.origins.location;
 				location.pos.offsetEnd = location.pos.offset + name.size();
 				return false;
 			}
 		}
-
 
 		return true;
 	}

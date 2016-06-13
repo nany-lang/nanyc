@@ -61,7 +61,7 @@ namespace Producer
 				emitDebugpos(thenc);
 
 				if (unlikely(thenc.children.size() != 1))
-					return (ICE(thenc) << "invalid if-then branch");
+					return (ice(thenc) << "invalid if-then branch");
 				auto& thenNode = *(thenc.children[0]);
 
 				success &= visitASTStmt(thenNode);
@@ -98,7 +98,7 @@ namespace Producer
 				emitDebugpos(elsec);
 
 				if (unlikely(elsec.children.size() != 1))
-					return (ICE(elsec) << "invalid if-then branch");
+					return (ice(elsec) << "invalid if-then branch");
 				auto& elseNode = *(elsec.children[0]);
 
 				success &= visitASTStmt(elseNode);
@@ -162,7 +162,7 @@ namespace Producer
 				emitDebugpos(thenc);
 
 				if (unlikely(thenc.children.size() != 1))
-					return (ICE(thenc) << "invalid if-then branch");
+					return (ice(thenc) << "invalid if-then branch");
 				auto& thenNode = *(thenc.children[0]);
 
 				uint32_t thenlvid;
@@ -189,7 +189,7 @@ namespace Producer
 				emitDebugpos(elsec);
 
 				if (unlikely(elsec.children.size() != 1))
-					return (ICE(elsec) << "invalid if-then branch");
+					return (ice(elsec) << "invalid if-then branch");
 				auto& elseNode = *(elsec.children[0]);
 
 				uint32_t elselvid;
@@ -241,7 +241,7 @@ namespace Producer
 			}
 			default:
 			{
-				ICE(node) << "if: invalid ast node";
+				ice(node) << "if: invalid ast node";
 				return false;
 			}
 		}
@@ -276,7 +276,7 @@ namespace Producer
 
 			default:
 			{
-				ICE(node) << "if: invalid ast node";
+				ice(node) << "if: invalid ast node";
 				return false;
 			}
 		}

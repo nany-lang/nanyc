@@ -5,6 +5,7 @@
 #include "details/ir/sequence.h"
 #include "details/reporting/report.h"
 #include "details/grammar/nany.h"
+#include "details/errors/errors.h"
 #include "nany/nany.h"
 #include <map>
 #include <array>
@@ -35,7 +36,7 @@ namespace Producer
 		//! \name Constructor & Destructor
 		//@{
 		//! Default constructor
-		explicit Context(nybuild_cf_t&, Sequence&, Logs::Report);
+		explicit Context(nybuild_cf_t&, AnyString filename, Sequence&, Logs::Report);
 		//@}
 
 
@@ -81,8 +82,6 @@ namespace Producer
 		//! Has debug info ?
 		bool debuginfo = true;
 
-		//! Debug source filename
-		Yuni::String dbgSourceFilename;
 		//! Map contet offset (0-based - bytes) -> lines (1-based, from source input)
 		std::map<uint, uint> offsetToLine;
 
@@ -151,10 +150,19 @@ namespace Producer
 
 	private:
 		friend class Scope;
+		static Logs::Report emitReportEntry(void*, Logs::Level level);
+		static void retriveReportMetadata(void*, Logs::Level, const AST::Node*, Yuni::String&, uint32_t&, uint32_t&);
 
 	private:
 		uint32_t pPreviousDbgOffset = 0;
 		uint32_t pPreviousDbgLine = 0;
+		//! Debug source filename
+		AnyString dbgSourceFilename;
+
+		//! Error reporting
+		Logs::Handler localErrorHandler;
+		Logs::MetadataHandler localMetadataHandler;
+		AnyString pFilename;
 
 	}; // class Producer
 

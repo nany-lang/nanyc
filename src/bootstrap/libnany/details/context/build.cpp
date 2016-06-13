@@ -5,6 +5,7 @@
 #include "details/ir/sequence.h"
 #include "details/nsl/import-stdcore.h"
 #include "details/atom/classdef-table-view.h"
+#include "details/errors/errors.h"
 #include "libnany-config.h"
 #include "libnany-traces.h"
 
@@ -75,6 +76,13 @@ namespace Nany
 	{
 		// preparing report
 		Nany::Logs::Report report{*messages.get()};
+
+		Logs::Handler newHandler{&report, +[](void* ptr, Logs::Level level) -> Logs::Report
+		{
+			return (*((Nany::Logs::Report*) ptr)).fromErrLevel(level);
+		}};
+
+
 		buildtime = DateTime::NowMilliSeconds();
 
 		if (unlikely(sources.empty()))
@@ -106,10 +114,10 @@ namespace Nany
 			// -- Core Objects (bool, u32, u64, f32, ...)
 			//
 			success &= successNameLookup
-				and cdeftable.atoms.fetchAndIndexCoreObjects(report);
+				and cdeftable.atoms.fetchAndIndexCoreObjects();
 
 			if (Config::Traces::preAtomTable)
-				cdeftable.atoms.root.print(report, ClassdefTableView{cdeftable});
+				cdeftable.atoms.root.print(ClassdefTableView{cdeftable});
 
 			//
 			// -- instanciate

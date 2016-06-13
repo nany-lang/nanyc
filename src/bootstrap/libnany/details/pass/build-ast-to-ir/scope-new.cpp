@@ -37,7 +37,7 @@ namespace Producer
 				case AST::rgTypeDecl:
 				{
 					if (unlikely(rettype != 0))
-						return ICEUnexpectedNode(child, "[ir/new/several calls]");
+						return unexpectedNode(child, "[ir/new/several calls]");
 
 					success &= visitASTExprTypeDecl(child, rettype);
 					if (success)
@@ -62,7 +62,7 @@ namespace Producer
 				}
 
 				default:
-					return ICEUnexpectedNode(child, "[ir/new]");
+					return unexpectedNode(child, "[ir/new]");
 			}
 		}
 

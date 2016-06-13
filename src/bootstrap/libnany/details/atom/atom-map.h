@@ -78,7 +78,7 @@ namespace Nany
 		/*!
 		** \brief Try to retrieve the corresponding classes for core objects (bool, i32...)
 		*/
-		bool fetchAndIndexCoreObjects(Logs::Report& report);
+		bool fetchAndIndexCoreObjects();
 
 
 	public:

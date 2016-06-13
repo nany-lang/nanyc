@@ -30,9 +30,7 @@ namespace Producer
 			{
 				case AST::rgExpr:
 				{
-					setErrorFrom(assignChild);
 					bool success = visitASTExpr(assignChild, localvar);
-
 					if (unlikely(not success))
 					{
 						error(varnodeDecl) << "could not declare '" << varname << "': error in initialization";
@@ -45,7 +43,7 @@ namespace Producer
 					break; // operator =
 				}
 				default:
-					return ICEUnexpectedNode(assignChild, "[var]");
+					return unexpectedNode(assignChild, "[var]");
 			}
 		}
 		return true;
@@ -144,8 +142,7 @@ namespace Producer
 				{
 					varnodeDecl = &child;
 					varname = child.text;
-					setErrorFrom(child);
-					if (unlikely(not checkForValidIdentifierName(context.report, child, varname, false)))
+					if (unlikely(not checkForValidIdentifierName(child, varname, false)))
 						return false;
 					break;
 				}
@@ -201,13 +198,13 @@ namespace Producer
 				}
 
 				default:
-					return ICEUnexpectedNode(child, "[var]");
+					return unexpectedNode(child, "[var]");
 			}
 		}
 
 		if (unlikely(varnodeDecl == nullptr))
 		{
-			report().ICE() << "invalid null pointer for the var-decl node";
+			ice() << "invalid null pointer for the var-decl node";
 			return false;
 		}
 
@@ -322,7 +319,7 @@ namespace Producer
 				}
 				default:
 				{
-					ICE(*varnodeDecl) << "var declaration: invalid scope type";
+					ice(*varnodeDecl) << "var declaration: invalid scope type";
 					return false;
 				}
 			}

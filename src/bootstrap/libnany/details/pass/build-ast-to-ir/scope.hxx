@@ -34,17 +34,8 @@ namespace Producer
 			assert(parentScope != nullptr); // broadcast new values to the parent
 			parentScope->pNextVarID = pNextVarID;
 		}
-		if (unlikely(pAttributes.get() != nullptr))
-		{
-			if (unlikely(not pAttributes->flags.empty()))
-				complainUnknownAttributes();
-		}
-	}
-
-
-	inline Logs::Report& Scope::report()
-	{
-		return context.report;
+		if (unlikely(!!pAttributes))
+			checkForUnknownAttributes();
 	}
 
 
@@ -68,13 +59,13 @@ namespace Producer
 
 	inline void Scope::comment(const AnyString& text)
 	{
-		sequence().emitComment(text);
+		context.sequence.emitComment(text);
 	}
 
 
 	inline void Scope::comment()
 	{
-		sequence().emitComment();
+		context.sequence.emitComment();
 	}
 
 
@@ -83,7 +74,7 @@ namespace Producer
 		if (context.debuginfo and
 			(not Config::removeRedundantDbgOffset or offset != context.pPreviousDbgOffset or line != context.pPreviousDbgLine))
 		{
-			sequence().emitDebugpos(line, offset);
+			context.sequence.emitDebugpos(line, offset);
 			context.pPreviousDbgOffset = offset;
 			context.pPreviousDbgLine = line;
 		}
@@ -92,7 +83,7 @@ namespace Producer
 
 	inline void Scope::addDebugCurrentFilename(const AnyString& filename)
 	{
-		sequence().emitDebugfile(filename);
+		context.sequence.emitDebugfile(filename);
 	}
 
 
@@ -126,28 +117,28 @@ namespace Producer
 	inline LVID Scope::createLocalBuiltinVoid(const AST::Node& node)
 	{
 		emitDebugpos(node);
-		return sequence().emitStackalloc(nextvar(), nyt_void);
+		return context.sequence.emitStackalloc(nextvar(), nyt_void);
 	}
 
 
 	inline LVID Scope::createLocalBuiltinAny(const AST::Node& node)
 	{
 		emitDebugpos(node);
-		return sequence().emitStackalloc(nextvar(), nyt_any);
+		return context.sequence.emitStackalloc(nextvar(), nyt_any);
 	}
 
 
 	inline LVID Scope::createLocalBuiltinFloat64(const AST::Node& node, nytype_t type, double value)
 	{
 		emitDebugpos(node);
-		return sequence().emitStackalloc_f64(nextvar(), type, value);
+		return context.sequence.emitStackalloc_f64(nextvar(), type, value);
 	}
 
 
 	inline LVID Scope::createLocalBuiltinInt64(const AST::Node& node, nytype_t type, yuint64 value)
 	{
 		emitDebugpos(node);
-		return sequence().emitStackalloc_u64(nextvar(), type, value);
+		return context.sequence.emitStackalloc_u64(nextvar(), type, value);
 	}
 
 
@@ -179,21 +170,6 @@ namespace Producer
 	}
 
 
-	inline void Scope::setErrorFrom(Logs::Report& report, const AST::Node& node) const
-	{
-		uint line, offset;
-		fetchLineAndOffsetFromNode(node, line, offset);
-		report.message.origins.location.pos.line = line;
-		report.message.origins.location.pos.offset = offset;
-	}
-
-
-	inline void Scope::setErrorFrom(const AST::Node& node) const
-	{
-		setErrorFrom(context.report, node);
-	}
-
-
 	inline void Scope::emitDebugpos(const AST::Node* node)
 	{
 		if (node)
@@ -204,25 +180,15 @@ namespace Producer
 	inline bool Scope::visitASTExprSubDot(const AST::Node& node, LVID& localvar)
 	{
 		emitTmplParametersIfAny();
-		sequence().emitEnsureTypeResolved(localvar);
+		context.sequence.emitEnsureTypeResolved(localvar);
 		return visitASTExprContinuation(node, localvar);
 	}
 
 
 	inline void Scope::emitTmplParametersIfAny()
 	{
-		if (not lastPushedTmplParams.empty())
-		{
-			auto& outIR = sequence();
-			for (auto& pair: lastPushedTmplParams)
-			{
-				if (pair.second.empty())
-					outIR.emitTPush(pair.first);
-				else
-					outIR.emitTPush(pair.first, pair.second);
-			}
-			lastPushedTmplParams.clear();
-		}
+		if (!!lastPushedTmplParams)
+			doEmitTmplParameters();
 	}
 
 
@@ -236,6 +202,7 @@ namespace Producer
 		pAttributes = nullptr;
 		std::swap(pAttributes, scope.pAttributes);
 	}
+
 
 
 

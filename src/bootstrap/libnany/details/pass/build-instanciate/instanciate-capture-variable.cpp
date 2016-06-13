@@ -97,7 +97,7 @@ namespace Instanciate
 		assert(stacksize.opcode == static_cast<uint32_t>(IR::ISA::Op::stacksize));
 		assert(stacksize.add + 1 == startLvid);
 		if (unlikely(stacksize.opcode != static_cast<uint32_t>(IR::ISA::Op::stacksize)))
-			return (void)(ICE() << "capturing variable: stacksize opcode expected");
+			return (void)(ice() << "capturing variable: stacksize opcode expected");
 
 		// new stack size
 		stacksize.add += count;
@@ -120,7 +120,7 @@ namespace Instanciate
 			// the same type than the original one
 			auto* varSrcAtom = table.findClassdefAtom(src);
 			if (unlikely(varSrcAtom == nullptr))
-				ICE() << "invalid atom for captured variable '" << var.name << "'";
+				ice() << "invalid atom for captured variable '" << var.name << "'";
 			cdef.mutateToAtom(varSrcAtom);
 			cdef.qualifiers.ref = true;
 
@@ -175,7 +175,7 @@ namespace Instanciate
 			AnyString varname{child.name, /*offset*/ (uint32_t)::strlen("^trap^")};
 			if (unlikely(varname.empty()))
 			{
-				ICE() << "invalid empty captured variable name";
+				ice() << "invalid empty captured variable name";
 				return true;
 			}
 

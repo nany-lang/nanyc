@@ -50,7 +50,7 @@ namespace Producer
 					break;
 				}
 				default:
-					return ICEUnexpectedNode(child, "[closure]");
+					return unexpectedNode(child, "[closure]");
 			}
 		}
 
@@ -76,6 +76,7 @@ namespace Producer
 
 		return visitASTExpr(expr, localvar);
 	}
+
 
 
 

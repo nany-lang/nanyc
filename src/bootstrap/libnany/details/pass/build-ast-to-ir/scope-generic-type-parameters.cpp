@@ -30,7 +30,7 @@ namespace Producer
 				case AST::rgIdentifier:
 				{
 					const AnyString& name = child.text;
-					bool ok = checkForValidIdentifierName(report(), child, name);
+					bool ok = checkForValidIdentifierName(child, name);
 					if (unlikely(not ok))
 						return false;
 					sequence().emitBlueprintGenericTypeParam(nextvar(), name);
@@ -49,7 +49,7 @@ namespace Producer
 					return false;
 				}
 				default:
-					return ICEUnexpectedNode(child, "[gen-type-param]");
+					return unexpectedNode(child, "[gen-type-param]");
 			}
 		}
 		return true;
@@ -78,7 +78,7 @@ namespace Producer
 					break;
 				}
 				default:
-					return ICEUnexpectedNode(child, "[gen-type-params]");
+					return unexpectedNode(child, "[gen-type-params]");
 			}
 		}
 		return success;
@@ -112,12 +112,12 @@ namespace Producer
 					break;
 				}
 				default:
-					return ICEUnexpectedNode(child, "[expr-template-param/call]");
+					return unexpectedNode(child, "[expr-template-param/call]");
 			}
 		}
 
 		if (unlikely(type == nullptr))
-			return (ICE(node) << "invalid node type");
+			return (ice(node) << "invalid node type");
 
 		uint32_t localvar = 0;
 		if (not visitASTType(*type, localvar))
@@ -126,7 +126,7 @@ namespace Producer
 		if (unlikely(localvar == (uint32_t) -1))
 			return (error(*type) << "'any' is not accepted as parameter");
 
-		lastPushedTmplParams.emplace_back(localvar, name);
+		lastPushedTmplParams->emplace_back(localvar, name);
 		return true;
 	}
 
@@ -143,8 +143,8 @@ namespace Producer
 			{
 				case AST::rgCallTemplateParameters:
 				{
-					lastPushedTmplParams.clear();
-					lastPushedTmplParams.reserve(child.children.size());
+					lastPushedTmplParams = std::make_unique<std::vector<std::pair<uint32_t,AnyString>>>();
+					lastPushedTmplParams->reserve(child.children.size());
 
 					bool success = true;
 					for (auto& ptr: child.children)
@@ -159,7 +159,7 @@ namespace Producer
 								break;
 							}
 							default:
-								return ICEUnexpectedNode(param, "[expr-template-param]");
+								return unexpectedNode(param, "[expr-template-param]");
 						}
 					}
 
@@ -183,7 +183,7 @@ namespace Producer
 					break;
 				}
 				default:
-					return ICEUnexpectedNode(child, "[expr-template]");
+					return unexpectedNode(child, "[expr-template]");
 			}
 		}
 		return true;

@@ -257,7 +257,7 @@ namespace Producer
 
 							default:
 							{
-								ICE(*subnodeptr) << "[expr-number]";
+								ice(*subnodeptr) << "[expr-number]";
 								return false;
 							}
 						}
@@ -319,7 +319,7 @@ namespace Producer
 							}
 							default:
 							{
-								ICE(subnode) << "[expr-number]";
+								ice(subnode) << "[expr-number]";
 								return false;
 							}
 						}
@@ -330,7 +330,7 @@ namespace Producer
 
 				default:
 				{
-					ICE(*childptr) << "[expr-number]";
+					ice(*childptr) << "[expr-number]";
 					return false;
 				}
 			}

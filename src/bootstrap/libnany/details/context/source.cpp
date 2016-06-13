@@ -6,7 +6,7 @@
 #include "build-info.h"
 #include "target.h"
 #include "libnany-config.h"
-#include "details/reporting/report.h"
+#include "details/errors/errors.h"
 #include <memory>
 #include "details/context/build.h"
 
@@ -84,8 +84,6 @@ namespace Nany
 				if (modified <= 0)
 					modified = build.buildtime;
 
-				// create a new report entry
-				auto report = Logs::Report{*build.messages}.subgroup();
 
 				// reporting
 				if (pFilename.first() != '{')
@@ -96,7 +94,7 @@ namespace Nany
 					constexpr const char* arrow = nullptr;
 					#endif
 
-					auto entry = (report.info() << "building " << pFilename);
+					auto entry = (info() << "building " << pFilename);
 					entry.message.prefix = arrow;
 				}
 
@@ -115,6 +113,9 @@ namespace Nany
 							f(build.project.self(), build.self(), pFilename.c_str(), pFilename.size());
 					}
 				}
+
+				// create a new report entry
+				auto report = Logs::Report{*build.messages}.subgroup();
 
 				// reset build-info
 				report.data().origins.location.filename = pFilename;
@@ -135,7 +136,7 @@ namespace Nany
 					if (success)
 					{
 						auto& sequence = pBuildInfo->parsing.sequence;
-						success &= build.attach(sequence, report);
+						success &= build.attach(sequence);
 					}
 				}
 
@@ -145,13 +146,12 @@ namespace Nany
 		}
 		catch (std::bad_alloc&)
 		{
-			build.printStderr("ICE: not enough memory");
+			build.printStderr("ice: not enough memory");
 			success = false;
 		}
 		catch (...)
 		{
-			auto report = Logs::Report{*build.messages};
-			report.ICE() << "uncaught exception when building '" << pFilename << "'";
+			ice() << "uncaught exception when building '" << pFilename << "'";
 			success = false;
 		}
 

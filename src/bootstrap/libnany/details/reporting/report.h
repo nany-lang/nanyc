@@ -29,7 +29,7 @@ namespace Logs
 		//! \name Messages
 		//@{
 		//! Create ICE
-		Report ICE();
+		Report ice();
 		//! Create a new error message
 		Report error();
 		//! Create a new warning message
@@ -48,6 +48,8 @@ namespace Logs
 		Report verbose();
 		//! Create a new trace message
 		Report trace();
+
+		Report fromErrLevel(Level);
 
 		//! Create a dummy message, for sub-grouping
 		Report subgroup();

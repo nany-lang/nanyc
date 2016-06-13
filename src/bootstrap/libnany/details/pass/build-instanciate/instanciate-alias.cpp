@@ -19,7 +19,7 @@ namespace Instanciate
 
 		if (unlikely(name.empty()))
 		{
-			ICE() << "got empty variable name";
+			ice() << "got empty variable name";
 			frame->invalidate(lvid);
 			return;
 		}

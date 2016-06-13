@@ -3,6 +3,7 @@
 #include "details/atom/classdef-table.h"
 #include "details/atom/classdef-table-view.h"
 #include "details/reporting/report.h"
+#include "details/errors/errors.h"
 
 using namespace Yuni;
 
@@ -270,9 +271,9 @@ namespace Nany
 
 
 
-	inline void Atom::doPrint(Logs::Report& report, const ClassdefTableView& table, uint depth) const
+	inline void Atom::doPrint(const ClassdefTableView& table, uint depth) const
 	{
-		auto entry = report.trace();
+		auto entry = trace();
 		for (uint i = depth; i--; )
 			entry.message.prefix << "    ";
 
@@ -291,16 +292,16 @@ namespace Nany
 
 		++depth;
 		for (auto& child: pChildren)
-			child.second->doPrint(report, table, depth);
+			child.second->doPrint(table, depth);
 
 		if (Type::classdef == type)
-			report.trace(); // for beauty
+			trace(); // for beauty
 	}
 
 
-	void Atom::print(Logs::Report& report, const ClassdefTableView& table) const
+	void Atom::print(const ClassdefTableView& table) const
 	{
-		doPrint(report, table, 0);
+		doPrint(table, 0);
 	}
 
 

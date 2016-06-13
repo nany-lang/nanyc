@@ -89,7 +89,7 @@ namespace Producer
 				}
 				// [[fallthru]]
 				default:
-					success = ICEUnexpectedNode(child, "[expr/continuation]");
+					success = unexpectedNode(child, "[expr/continuation]");
 			}
 		}
 		return success;

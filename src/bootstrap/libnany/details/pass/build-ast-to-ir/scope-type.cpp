@@ -76,7 +76,7 @@ namespace Producer
 				case AST::rgTypeDecl:
 				{
 					if (unlikely(localvar != 0))
-						return ICEUnexpectedNode(child, "[ir/new/several calls]");
+						return unexpectedNode(child, "[ir/new/several calls]");
 
 					bool status = visitASTExprTypeDecl(child, localvar);
 					success &= status;
@@ -96,7 +96,7 @@ namespace Producer
 							case AST::rgConst: isConst = true; break;
 							case AST::rgCref:  isRef   = true; isConst = true; break;
 							default:
-								success = ICEUnexpectedNode(child, "[ir/type-qualifier]");
+								success = unexpectedNode(child, "[ir/type-qualifier]");
 						}
 					}
 					break;
@@ -108,7 +108,7 @@ namespace Producer
 				}
 
 				default:
-					success = ICEUnexpectedNode(child, "[ir/type]");
+					success = unexpectedNode(child, "[ir/type]");
 			}
 		}
 

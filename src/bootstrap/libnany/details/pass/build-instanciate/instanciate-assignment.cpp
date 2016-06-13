@@ -19,7 +19,7 @@ namespace Instanciate
 		// lhs and rhs can not be null, but they can be identical, to force a clone
 		// when required for example
 		if (unlikely(lhs == 0 or rhs == 0 or lhs == rhs))
-			return (ICE() << "invalid lvid for variable assignment");
+			return (ice() << "invalid lvid for variable assignment");
 
 		if (unlikely(not frame.verify(lhs) or not frame.verify(rhs)))
 			return false;
@@ -85,7 +85,7 @@ namespace Instanciate
 			{
 				auto* rhsAtom = cdeftable.findClassdefAtom(cdefrhs);
 				if (unlikely(nullptr == rhsAtom))
-					return (ICE() << "invalid atom for left-side assignment");
+					return (ice() << "invalid atom for left-side assignment");
 				cdeftable.substitute(lhs).mutateToAtom(rhsAtom);
 			}
 			else
@@ -138,9 +138,9 @@ namespace Instanciate
 
 		if (isMemberVariable and unlikely(origin.self == 0))
 		{
-			auto ice = (ICE() << "invalid member assignment with invalid 'self'");
+			auto ce = (ice() << "invalid member assignment with invalid 'self'");
 			if (debugmode)
-				ice << " (as %" << cdeflhs.clid << " = %" << cdefrhs.clid << ')';
+				ce << " (as %" << cdeflhs.clid << " = %" << cdefrhs.clid << ')';
 			return false;
 		}
 
@@ -207,7 +207,7 @@ namespace Instanciate
 			{
 				auto* rhsAtom = cdeftable.findClassdefAtom(cdefrhs);
 				if (unlikely(nullptr == rhsAtom))
-					return (ICE() << "invalid atom for left-side assignment");
+					return (ice() << "invalid atom for left-side assignment");
 
 				// 'clone' operator
 				if (0 == rhsAtom->classinfo.clone.atomid)
@@ -272,13 +272,13 @@ namespace Instanciate
 		assert(frame != nullptr);
 
 		if (unlikely(pushedparams.func.indexed.size() != 1))
-			return (ICE() << "assignment: invalid number of pushed parameters");
+			return (ice() << "assignment: invalid number of pushed parameters");
 
 		if (unlikely(not pushedparams.func.named.empty()))
-			return (ICE() << "assignment: named parameters are not accepted");
+			return (ice() << "assignment: named parameters are not accepted");
 
 		if (unlikely(not pushedparams.gentypes.indexed.empty() or not pushedparams.gentypes.named.empty()))
-			return (ICE() << "assignment: invalid template parameters");
+			return (ice() << "assignment: invalid template parameters");
 
 		// -- LHS
 		// note: double indirection, since assignment is like method call

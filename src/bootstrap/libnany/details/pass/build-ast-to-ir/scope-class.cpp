@@ -60,7 +60,7 @@ namespace Producer
 		{
 			classname = scope.getSymbolNameFromASTNode(node);
 			return not classname.empty()
-				and checkForValidIdentifierName(scope.report(), node, classname, false, true);
+				and checkForValidIdentifierName(node, classname, false, true);
 		}
 
 
@@ -94,7 +94,7 @@ namespace Producer
 						break;
 					}
 					default:
-						success &= scope.ICEUnexpectedNode(child, "[class]");
+						success &= unexpectedNode(child, "[class]");
 				}
 			}
 

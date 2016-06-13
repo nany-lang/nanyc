@@ -128,6 +128,8 @@ namespace Nany
 	{
 		// force reset
 		auto& cdef = table.classdef(clid);
+		if (cdef.isLinkedToAtom())
+			std::cout << "    " << cdef.atom->caption() << '\n';
 		auto& resultinfo = (not isTmpl) ? result.params[index] : result.tmplparams[index];
 		resultinfo.clid = clid;
 		resultinfo.cdef = &cdef;
@@ -155,6 +157,7 @@ namespace Nany
 	inline TypeCheck::Match FuncOverloadMatch::validateAtom(Atom& atom, bool allowImplicit)
 	{
 		assert(atom.isFunction() or atom.isClass());
+		std::cout << "--- " << atom.fullname() << '\n';
 
 		// some reset
 		result.params.clear();

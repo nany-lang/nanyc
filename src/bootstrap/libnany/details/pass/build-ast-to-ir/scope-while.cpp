@@ -24,7 +24,7 @@ namespace Producer
 		uint32_t childcount = static_cast<uint32_t>(node.children.size());
 		if (unlikely(childcount != 2))
 		{
-			ICE(node) << "while: invalid number of children";
+			ice(node) << "while: invalid number of children";
 			return false;
 		}
 
@@ -91,7 +91,7 @@ namespace Producer
 		uint32_t childcount = static_cast<uint32_t>(node.children.size());
 		if (unlikely(childcount != 2))
 		{
-			ICE(node) << "do-while: invalid number of children";
+			ice(node) << "do-while: invalid number of children";
 			return false;
 		}
 

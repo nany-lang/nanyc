@@ -33,7 +33,7 @@ namespace Producer
 			threadproc,
 
 			// when adding a new flag here, do not forget to add err reporting
-			// in Scope::complainUnknownAttributes()
+			// in Scope::checkForUnknownAttributes()
 		};
 
 		//! Ctor
@@ -54,7 +54,7 @@ namespace Producer
 	class Scope final
 	{
 	public:
-		enum class Kind
+		enum class Kind: uint32_t
 		{
 			undefined,
 			kfunc,
@@ -164,7 +164,6 @@ namespace Producer
 		void addDebugCurrentFilename();
 		void addDebugCurrentFilename(const AnyString& filename);
 		void addDebugCurrentPosition(uint line, uint offset);
-		void fetchLineAndOffsetFromNode(const AST::Node& node, yuint32& line, yuint32& offset) const;
 
 		bool generateIfStmt(const AST::Node& expr, const AST::Node& thenc, const AST::Node* elsec = nullptr, uint32_t* customjmpthenOffset = nullptr);
 		bool generateIfExpr(uint32_t& ifret, const AST::Node& expr, const AST::Node& thenc, const AST::Node& elsec);
@@ -192,22 +191,7 @@ namespace Producer
 
 		//! \name Error management
 		//@{
-		//! Get the reporting
-		Logs::Report& report();
-		//! Generate an error "ICE: unexecpected node..."
-		// \return Always false
-		bool ICEUnexpectedNode(const AST::Node& node, const AnyString& location) const;
-		//! Generate an error "ICE: <msg>"
-		// \return Always false
-		Logs::Report ICE(const AST::Node& node) const;
-
-		Logs::Report error(const AST::Node& node);
-		Logs::Report warning(const AST::Node& node);
-
-		void setErrorFrom(Logs::Report& report, const AST::Node& node) const;
-		void setErrorFrom(const AST::Node& node) const;
-
-		void complainUnknownAttributes();
+		void checkForUnknownAttributes() const;
 		//@}
 
 
@@ -227,7 +211,10 @@ namespace Producer
 		bool generateInitFuncForClassVar(const AnyString& varname, LVID, const AST::Node& varAssign);
 		bool generateTypeofForClassVar(LVID&, const AST::Node& varAssign);
 		template<bool BuiltinT, class DefT> bool generateNumberCode(uint32_t& localvar, const DefT& numdef, const AST::Node&);
+
+		//! Emit generic type parameters push
 		void emitTmplParametersIfAny();
+		void doEmitTmplParameters();
 
 		void prepareClosureNodeExpr(AST::Node::Ptr& out);
 		void emitExprAttributes(uint32_t& localvar);
@@ -239,16 +226,15 @@ namespace Producer
 		//! Kind
 		Kind kind = Kind::undefined;
 
+		//! For template parameters
+		std::unique_ptr<std::vector<std::pair<uint32_t, AnyString>>> lastPushedTmplParams;
+		//! Expression attributes
+		std::unique_ptr<Attributes> pAttributes;
+
 		//! Parent scope (if any)
 		Scope* parentScope = nullptr;
-		//! For template parameters
-		std::vector<std::pair<uint32_t, AnyString>> lastPushedTmplParams;
-
 		//! BroadcastNextVarID
 		bool broadcastNextVarID = true;
-
-		//! Attributes
-		std::unique_ptr<Attributes> pAttributes;
 
 		//! Nakama
 		friend class Context;

@@ -4,7 +4,7 @@
 #include <vector>
 #include <utility>
 #include "details/atom/atom.h"
-#include "details/reporting/report.h"
+#include "details/errors/errors.h"
 #include "details/ir/isa/opcodes.h"
 #include "details/ir/instruction.h"
 
@@ -59,7 +59,7 @@ namespace Mapping
 	class SequenceMapping final
 	{
 	public:
-		SequenceMapping(ClassdefTable& cdeftable, Yuni::Mutex& mutex, Logs::Report& report, IR::Sequence& sequence);
+		SequenceMapping(ClassdefTable& cdeftable, Yuni::Mutex& mutex, IR::Sequence& sequence);
 
 		bool map(Atom& parentAtom, uint32_t offset = 0);
 
@@ -82,8 +82,6 @@ namespace Mapping
 		bool success = false;
 		//! Current sequence
 		IR::Sequence& currentSequence;
-		//! Step
-		Logs::Report report;
 
 		const char* currentFilename = nullptr;
 		uint32_t currentLine = 0;
@@ -131,11 +129,15 @@ namespace Mapping
 		void printError(const IR::Instruction& operands, AnyString msg = nullptr);
 		template<IR::ISA::Op O> bool checkForLVID(const IR::ISA::Operand<O>& operands, LVID lvid);
 		void attachFuncCall(const IR::ISA::Operand<IR::ISA::Op::call>&);
-		Logs::Report error();
 		void resetClassdefOriginFromCurrentPosition(Classdef& cdef);
 
 		void pushNewFrame(Atom& atom);
 		void deleteAllFrames();
+		static void retriveReportMetadata(void* self, Logs::Level, const AST::Node*, Yuni::String&, uint32_t&, uint32_t&);
+
+	private:
+		//! Error reporting
+		Logs::MetadataHandler localMetadataHandler;
 
 	}; // class SequenceMapping
 

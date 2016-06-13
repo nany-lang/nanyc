@@ -189,7 +189,7 @@ namespace Instanciate
 						Atom* atom = nullptr;
 						if (1 != frame->atom.findVarAtom(atom, varname))
 						{
-							ICE() << "unknown variable member '" << varname << "'";
+							ice() << "unknown variable member '" << varname << "'";
 							break;
 						}
 						atom->returnType.clid.reclass(frame->atomid, operands.lvid);

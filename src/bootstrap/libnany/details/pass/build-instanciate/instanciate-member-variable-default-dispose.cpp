@@ -81,10 +81,10 @@ namespace Instanciate
 				auto* typeAtom = cdeftable.findClassdefAtom(cdef);
 				if (unlikely(nullptr == typeAtom))
 				{
-					auto ice = (ICE() << "invalid atom from " << cdef.clid);
-					ice << " for disposing member variable '";
-					subatom.retrieveFullname(ice.data().message);
-					ice << "'";
+					auto ce = (ice() << "invalid atom from " << cdef.clid);
+					ce << " for disposing member variable '";
+					subatom.retrieveFullname(ce.data().message);
+					ce << "'";
 					continue;
 				}
 

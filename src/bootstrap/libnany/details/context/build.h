@@ -56,7 +56,7 @@ namespace Nany
 		/*!
 		** Attach an IR sequence
 		*/
-		bool attach(IR::Sequence& sequence, Logs::Report& report, bool owned = false);
+		bool attach(IR::Sequence& sequence, bool owned = false);
 
 		/*!
 		** \brief Try to instanciate an entry point

@@ -95,7 +95,7 @@ namespace Producer
 
 			case AST::rgClassVisibility: /*currently ignored */ return true;
 
-			default: return ICEUnexpectedNode(node, "[ir/stmt]");
+			default: return unexpectedNode(node, "[ir/stmt]");
 		}
 	}
 

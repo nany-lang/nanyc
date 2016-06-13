@@ -96,7 +96,7 @@ namespace Instanciate
 				}
 				case nyt_void:
 				{
-					ICE() << "unexpected pseudo type 'void' for " << cdef.clid;
+					ice() << "unexpected pseudo type 'void' for " << cdef.clid;
 					break;
 				}
 				default:

@@ -217,7 +217,7 @@ namespace Instanciate
 		if (not atom->builtinalias.empty())
 		{
 			if (unlikely(not tmplparams.empty()))
-				return (ICE() << "invalid template parameters for builtinalias");
+				return (ice() << "invalid template parameters for builtinalias");
 			if (unlikely(pushedparams.func.indexed.size() != params.size()))
 				return (error() << "builtin alias not allowed for methods");
 			// update each lvid, since they may have been changed (via implicit ctors)
@@ -272,7 +272,7 @@ namespace Instanciate
 
 		uint32_t offset = frame->lvids[lvid].offsetDeclOut;
 		if (unlikely(not (offset > 0 and offset < out.opcodeCount())))
-			return (ICE() << "invalid opcode offset for generating shortcircuit");
+			return (ice() << "invalid opcode offset for generating shortcircuit");
 
 		// checking if the referenced offset is really a stackalloc
 		assert(out.at(offset).opcodes[0] == static_cast<uint32_t>(IR::ISA::Op::stackalloc));

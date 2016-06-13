@@ -47,7 +47,7 @@ namespace Producer
 						return false;
 
 					if (unlikely(viewlvid == 0 or viewlvid == (uint32_t) -1))
-						return ICE(child) << "invalid container lvid";
+						return ice(child) << "invalid container lvid";
 					break;
 				}
 				case AST::rgForDo:
@@ -56,7 +56,7 @@ namespace Producer
 					break;
 				}
 				default:
-					return ICEUnexpectedNode(child, "[for]");
+					return unexpectedNode(child, "[for]");
 			}
 		}
 

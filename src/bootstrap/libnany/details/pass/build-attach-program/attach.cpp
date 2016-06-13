@@ -15,7 +15,7 @@ namespace Nany
 {
 
 
-	bool Build::attach(IR::Sequence& sequence, Logs::Report& report, bool owned)
+	bool Build::attach(IR::Sequence& sequence, bool owned)
 	{
 		// keep the sequence somewhere
 		{
@@ -23,7 +23,7 @@ namespace Nany
 			pAttachedSequences.push_back(AttachedSequenceRef{&sequence, owned});
 		}
 
-		Pass::Mapping::SequenceMapping mapper{cdeftable, mutex, report, sequence};
+		Pass::Mapping::SequenceMapping mapper{cdeftable, mutex, sequence};
 		return mapper.map(cdeftable.atoms.root);
 	}
 

@@ -47,7 +47,7 @@ namespace Producer
 				}
 
 				default:
-					return ICEUnexpectedNode(child, "[ir/return]");
+					return unexpectedNode(child, "[ir/return]");
 			}
 		}
 

@@ -31,7 +31,7 @@ namespace Instanciate
 		auto* atom = cdeftable.findClassdefAtom(cdef);
 		if (unlikely(nullptr == atom))
 		{
-			ICE() << "invalid atom for 'unref' opcode";
+			ice() << "invalid atom for 'unref' opcode";
 			return frame->invalidate(lvid);
 		}
 

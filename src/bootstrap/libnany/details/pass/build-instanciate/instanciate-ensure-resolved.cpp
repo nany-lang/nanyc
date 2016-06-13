@@ -32,7 +32,10 @@ namespace Instanciate
 
 		auto* atomptr = cdeftable.findClassdefAtom(cdef);
 		if (unlikely(atomptr == nullptr))
-			return (ICE() << "invalid pseudo type 'any' for %" << operands.lvid << " (in " << clid << ')');
+		{
+			ice() << "invalid pseudo type 'any' for %" << operands.lvid << " (in " << clid << ')';
+			return false;
+		}
 		auto& atom = *atomptr;
 
 		switch (atom.type)
@@ -69,7 +72,7 @@ namespace Instanciate
 
 		// no generic type parameters should remain at this point
 		if (unlikely(not pushedparams.gentypes.empty()))
-			ICE() << "invalid pushed generic type parameters, ensureResolve '" << atom.caption() << '\'';
+			ice() << "invalid pushed generic type parameters, ensureResolve '" << atom.caption() << '\'';
 
 		return true;
 	}

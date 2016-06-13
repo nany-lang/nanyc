@@ -438,6 +438,8 @@ addsrc(
 	"details/reporting/report.cpp"
 	"details/reporting/report.h"
 	"details/reporting/report.hxx"
+	"details/errors/errors.h"
+	"details/errors/errors.cpp"
 	"details/reporting/levels.h")
 
 

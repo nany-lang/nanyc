@@ -110,7 +110,7 @@ namespace Producer
 					{
 						auto& expr = *ptr;
 						if (unlikely(expr.rule != AST::rgExpr))
-							return ICEUnexpectedNode(expr, "[string-interpolation]");
+							return unexpectedNode(expr, "[string-interpolation]");
 
 						// creating a scope for temporary expression (string interpolation)
 						IR::OpcodeScopeLocker opscope{out};
@@ -159,7 +159,7 @@ namespace Producer
 
 				default:
 				{
-					return ICEUnexpectedNode(*childptr, "[expr-string]");
+					return unexpectedNode(*childptr, "[expr-string]");
 				}
 			}
 		}

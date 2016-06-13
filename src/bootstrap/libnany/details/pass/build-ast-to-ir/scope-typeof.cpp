@@ -36,16 +36,16 @@ namespace Producer
 				}
 				auto& parameter = *(child.children[0]);
 				if (parameter.rule != AST::rgCallParameter or parameter.children.size() != 1)
-					return ICEUnexpectedNode(parameter, "ir/typeof/param");
+					return unexpectedNode(parameter, "ir/typeof/param");
 
 				expr = AST::Node::Ptr::WeakPointer(parameter.children[0]);
 			}
 			else
-				return ICEUnexpectedNode(child, "[ir/typeof]");
+				return unexpectedNode(child, "[ir/typeof]");
 		}
 
 		if (unlikely(nullptr == expr))
-			return (ICE(node) << "invalid typeof expression");
+			return (ice(node) << "invalid typeof expression");
 
 		IR::Producer::Scope scope{*this};
 		OpcodeCodegenDisabler codegen{sequence()};

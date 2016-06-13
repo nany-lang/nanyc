@@ -29,7 +29,7 @@ namespace Producer
 				case AST::rgIdentifier:
 				{
 					typedefname = child.text;
-					bool ok = checkForValidIdentifierName(report(), child, typedefname, false, true);
+					bool ok = checkForValidIdentifierName(child, typedefname, false, true);
 					if (unlikely(not ok))
 						return false;
 					break;
@@ -41,12 +41,12 @@ namespace Producer
 				}
 
 				default:
-					return ICEUnexpectedNode(child, "[ir/typedef]");
+					return unexpectedNode(child, "[ir/typedef]");
 			}
 		}
 
 		if (unlikely(nullptr == typeexpr))
-			return (ICE(node) << "invalid typedef definition");
+			return (ice(node) << "invalid typedef definition");
 
 		IR::Producer::Scope scope{*this};
 		uint32_t localvar;

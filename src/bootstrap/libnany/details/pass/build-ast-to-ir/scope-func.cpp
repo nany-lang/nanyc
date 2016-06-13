@@ -83,7 +83,7 @@ namespace Producer
 			{
 				// visibility per attribute is not allowed inside a class
 				// (the visibility if set by region)
-				scope.error(node) << "visibility oer attribute is not allowed inside a class";
+				error(node) << "visibility oer attribute is not allowed inside a class";
 				success = false;
 			}
 			else
@@ -97,7 +97,7 @@ namespace Producer
 					if (unlikely(visibility != nyv_public and visibility != nyv_internal))
 					{
 						visibility = nyv_internal;
-						scope.error(node) << "invalid visibility '" << node.text << "'";
+						error(node) << "invalid visibility '" << node.text << "'";
 						success = false;
 					}
 
@@ -107,7 +107,7 @@ namespace Producer
 				else
 				{
 					// should really never happen...
-					scope.error(node) << "invalid visibility '" << node.text << "'";
+					error(node) << "invalid visibility '" << node.text << "'";
 					success = false;
 				}
 			}
@@ -119,7 +119,7 @@ namespace Producer
 		inline bool FuncInspector::inspectKind(const AST::Node& node)
 		{
 			if (unlikely(node.children.size() != 1))
-				return scope.ICEUnexpectedNode(node, "[funckind/child]");
+				return unexpectedNode(node, "[funckind/child]");
 
 			auto& kindchild = *(node.children[0]);
 			switch (kindchild.rule)
@@ -130,11 +130,11 @@ namespace Producer
 				case AST::rgFunctionKindFunction:
 				{
 					if (unlikely(kindchild.children.size() != 1))
-						return scope.ICEUnexpectedNode(kindchild, "[funckindfunc/child]");
+						return unexpectedNode(kindchild, "[funckindfunc/child]");
 
 					auto& symbolname = *(kindchild.children[0]);
 					AnyString name = scope.getSymbolNameFromASTNode(symbolname);
-					if (not checkForValidIdentifierName(scope.report(), symbolname, name, false))
+					if (not checkForValidIdentifierName(symbolname, name, false))
 						return false;
 					funcname = name;
 					break;
@@ -143,13 +143,13 @@ namespace Producer
 				case AST::rgFunctionKindOperator:
 				{
 					if (unlikely(kindchild.children.size() != 1))
-						return scope.ICEUnexpectedNode(kindchild, "[funckindfunc/child]");
+						return unexpectedNode(kindchild, "[funckindfunc/child]");
 
 					auto& opname = *(kindchild.children[0]);
 					if (unlikely(opname.rule != AST::rgFunctionKindOpname or not opname.children.empty()))
-						return scope.ICEUnexpectedNode(opname, "[funckindfunc/child]");
+						return unexpectedNode(opname, "[funckindfunc/child]");
 
-					if (not checkForValidIdentifierName(scope.report(), opname, opname.text, true))
+					if (not checkForValidIdentifierName(opname, opname.text, true))
 						return false;
 
 					funcname.clear();
@@ -170,7 +170,7 @@ namespace Producer
 					{
 						auto& symbolname = *(kindchild.children[0]);
 						AnyString name = scope.getSymbolNameFromASTNode(symbolname);
-						if (not checkForValidIdentifierName(scope.report(), symbolname, name, false))
+						if (not checkForValidIdentifierName(symbolname, name, false))
 							return false;
 
 						funcname.clear();
@@ -180,7 +180,7 @@ namespace Producer
 				}
 
 				default:
-					return scope.ICEUnexpectedNode(kindchild, "[funckind]");
+					return unexpectedNode(kindchild, "[funckind]");
 			}
 			return true;
 		}
@@ -220,7 +220,7 @@ namespace Producer
 
 					case AST::rgIdentifier: // name of the parameter
 					{
-						if (checkForValidIdentifierName(scope.report(), child, child.text, false))
+						if (checkForValidIdentifierName(child, child.text, false))
 						{
 							paramname = child.text;
 						}
@@ -247,7 +247,7 @@ namespace Producer
 									break;
 								}
 								default:
-									success &= scope.ICEUnexpectedNode(childtype, "[func/param-type]");
+									success &= unexpectedNode(childtype, "[func/param-type]");
 							}
 						}
 
@@ -270,7 +270,7 @@ namespace Producer
 						else
 						{
 							success = false;
-							scope.error(child)
+							error(child)
 								<< "automatic variable assignment is only allowed in the operator 'new'";
 						}
 						break;
@@ -278,20 +278,20 @@ namespace Producer
 
 					case AST::rgFuncParamVariadic:
 					{
-						scope.error(child) << "variadic parameters not implemented";
+						error(child) << "variadic parameters not implemented";
 						success = false;
 						break;
 					}
 
 					default:
-						success = scope.ICEUnexpectedNode(child, "[param]");
+						success = unexpectedNode(child, "[param]");
 				}
 			}
 
 			if (unlikely(paramname.empty()))
 			{
 				// generating a pseudo identifier name {should never happen}
-				scope.ICE(node) << "anonymous variable not allowed";
+				ice(node) << "anonymous variable not allowed";
 				success   = false;
 				paramname = scope.acquireString(String() << "_p_" << (void*)(&node));
 			}
@@ -350,7 +350,7 @@ namespace Producer
 			if (unlikely(paramCount > Config::maxFuncDeclParameterCount - 1)) // too many parameters ?
 			{
 				assert(node != nullptr);
-				scope.error(*node) << "hard limit: too many parameters. Got "
+				error(*node) << "hard limit: too many parameters. Got "
 					<< paramCount << ", expected: " << (Config::maxFuncDeclParameterCount - 1);
 				success = false;
 				paramCount = Config::maxFuncDeclParameterCount - 1;
@@ -430,7 +430,7 @@ namespace Producer
 						break;
 					}
 					default:
-						return scope.ICEUnexpectedNode(child, "[func/ret-type]");
+						return unexpectedNode(child, "[func/ret-type]");
 				}
 			}
 
@@ -470,7 +470,7 @@ namespace Producer
 				assert(attrs.builtinAlias != nullptr);
 				ShortString64 value;
 				if (not AST::retrieveEntityString(value, *attrs.builtinAlias))
-					return scope.error(*attrs.builtinAlias) << "invalid builtinalias attribute";
+					return error(*attrs.builtinAlias) << "invalid builtinalias attribute";
 
 				out.emitPragmaBuiltinAlias(value);
 				attrs.flags -= Attributes::Flag::builtinAlias;
@@ -523,7 +523,7 @@ namespace Producer
 					case AST::rgFuncBody:       { body = &child; break; }
 					case AST::rgClassTemplateParams: { nodeGenTParams = &child; break; }
 					default:
-						success &= scope.ICEUnexpectedNode(child, "[func]");
+						success &= unexpectedNode(child, "[func]");
 				}
 			}
 

@@ -24,6 +24,18 @@ namespace Logs
 	};
 
 
+	inline bool isError(Level level)
+	{
+		switch (level)
+		{
+			default:
+				break;
+			case Level::error:
+			case Level::ICE:
+				return true;
+		}
+		return false;
+	}
 
 
 

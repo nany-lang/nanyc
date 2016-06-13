@@ -1,5 +1,6 @@
 #include <yuni/yuni.h>
 #include "type-check.h"
+#include <iostream>
 
 using namespace Yuni;
 
@@ -21,6 +22,9 @@ namespace TypeCheck
 
 			if (atom.type != to.type) // can not be similar to a different type
 				return Match::none;
+
+			if (to.isTypeAlias())
+				std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
 
 
 			switch (atom.type)

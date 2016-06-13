@@ -45,7 +45,7 @@ namespace Producer
 							}
 							default:
 							{
-								success = ICEUnexpectedNode(entity, "[intrinsic/entity]");
+								success = unexpectedNode(entity, "[intrinsic/entity]");
 								break;
 							}
 						}
@@ -66,7 +66,7 @@ namespace Producer
 				}
 
 				default:
-					success = ICEUnexpectedNode(child, "[intrinsic]");
+					success = unexpectedNode(child, "[intrinsic]");
 			}
 		}
 

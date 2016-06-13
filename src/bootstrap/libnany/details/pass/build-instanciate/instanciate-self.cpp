@@ -39,7 +39,7 @@ namespace Instanciate
 				cdef.mutateToAtom(&atom);
 			}
 			else
-				ICE() << "invalid 'self' opcode";
+				ice() << "invalid 'self' opcode";
 		}
 	}
 

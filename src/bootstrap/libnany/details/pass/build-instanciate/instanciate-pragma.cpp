@@ -129,7 +129,7 @@ namespace Instanciate
 
 					if (unlikely(count < 3))
 					{
-						ICE() << "invalid blueprint size when instanciating atom";
+						ice() << "invalid blueprint size when instanciating atom";
 						break;
 					}
 

@@ -27,10 +27,9 @@ namespace Nany
 			auto& out = buildinfo.parsing.sequence;
 
 			// helper for generating IR code
-			IR::Producer::Context producer{buildinfo.cf, out, report};
+			IR::Producer::Context producer{buildinfo.cf, pFilename, out, report};
 			// generate namespace-related opcodes
 			producer.useNamespace(buildinfo.parsing.nmspc.first);
-			producer.dbgSourceFilename = pFilename;
 			// map code offset (in bytes) with line numbers (from source input)
 			producer.generateLineIndexes(pContent);
 

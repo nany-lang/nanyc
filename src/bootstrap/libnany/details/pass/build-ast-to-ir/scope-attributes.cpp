@@ -42,7 +42,7 @@ namespace Producer
 
 			// checking for node type
 			if (unlikely(child.rule != AST::rgAttributesParameter))
-				return ICEUnexpectedNode(child, "invalid node, not attribute parameter");
+				return unexpectedNode(child, "invalid node, not attribute parameter");
 
 			AST::Node* nodevalue;
 			switch (child.children.size())
@@ -50,11 +50,11 @@ namespace Producer
 				case 1: nodevalue = nullptr; break;
 				case 2: nodevalue = AST::Node::Ptr::WeakPointer(child.children[1]); break;
 				default:
-					return ICEUnexpectedNode(child, "invalid attribute parameter node");
+					return unexpectedNode(child, "invalid attribute parameter node");
 			}
 			AST::Node& nodekey = *child.children[0];
 			if (unlikely(nodekey.rule != AST::rgEntity))
-				return ICEUnexpectedNode(child, "invalid attribute parameter name type");
+				return unexpectedNode(child, "invalid attribute parameter name type");
 			if (nodevalue)
 			{
 				if (unlikely(nodevalue->rule != AST::rgEntity))
@@ -63,7 +63,7 @@ namespace Producer
 			attrname.clear();
 			value.clear();
 			if (not AST::retrieveEntityString(attrname, nodekey))
-				return ICEUnexpectedNode(child, "invalid entity");
+				return unexpectedNode(child, "invalid entity");
 
 			switch (attrname[0])
 			{

@@ -20,25 +20,25 @@ namespace Instanciate
 		uint32_t lvidsid = pushedparams.func.indexed[1].lvid;
 		uint32_t sid = frame->lvids[lvidsid].text_sid;
 		if (unlikely(sid == (uint32_t) -1))
-			return (ICE() << "invalid string-id for field name (got lvid " << lvidsid << ')');
+			return (ice() << "invalid string-id for field name (got lvid " << lvidsid << ')');
 
 		AnyString varname = out.stringrefs[sid];
 		if (unlikely(varname.empty()))
-			return (ICE() << "invalid empty field name");
+			return (ice() << "invalid empty field name");
 
 		Atom* parent = frame->atom.isClass() ? &frame->atom : frame->atom.parent;
 		if (unlikely(!parent))
-			return (ICE() << "invalid parent atom for __nanyc_fieldset");
+			return (ice() << "invalid parent atom for __nanyc_fieldset");
 
 		Atom* varatom = nullptr;
 		parent->eachChild(varname, [&](Atom& child) -> bool {
 			if (unlikely(varatom))
-				return (ICE() << "duplicate variable member '" << varname << "'");
+				return (ice() << "duplicate variable member '" << varname << "'");
 			varatom = &child;
 			return true;
 		});
 		if (unlikely(!varatom))
-			return (ICE() << "invalid variable member atom for __nanyc_fieldset");
+			return (ice() << "invalid variable member atom for __nanyc_fieldset");
 
 		uint32_t objlvid = pushedparams.func.indexed[0].lvid;
 		auto& cdefvar = cdeftable.classdefFollowClassMember(varatom->returnType.clid);
@@ -132,7 +132,7 @@ namespace Instanciate
 		{
 			atom = cdeftable.findClassdefAtom(cdef);
 			if (unlikely(nullptr == atom))
-				return (ICE() << "invalid atom for sizeof operator");
+				return (ice() << "invalid atom for sizeof operator");
 		}
 
 		if (canGenerateCode())

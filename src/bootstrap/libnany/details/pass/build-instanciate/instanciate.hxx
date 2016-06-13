@@ -33,7 +33,7 @@ namespace Instanciate
 		bool success = not cdef.isBuiltinOrVoid();
 		#ifndef NDEBUG
 		if (unlikely(success and unlikely(cdeftable.findClassdefAtom(cdef) == nullptr)))
-			return (ICE() << "canBeAcquired: invalid atom " << cdef.clid);
+			return (ice() << "canBeAcquired: invalid atom " << cdef.clid);
 		assert(not (success and unlikely(cdeftable.findClassdefAtom(cdef) == nullptr)));
 		#endif
 		return success;

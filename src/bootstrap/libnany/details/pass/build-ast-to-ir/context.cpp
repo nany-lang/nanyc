@@ -15,6 +15,63 @@ namespace Producer
 {
 
 
+	Context::Context(nybuild_cf_t& cf, AnyString filename, Sequence& sequence, Logs::Report report)
+		: cf(cf)
+		, sequence(sequence)
+		, report(report)
+		, dbgSourceFilename(filename)
+		, localErrorHandler(this, &emitReportEntry)
+		, localMetadataHandler(this, &retriveReportMetadata)
+	{}
+
+
+	Logs::Report Context::emitReportEntry(void* self, Logs::Level level)
+	{
+		auto& ctx = *(reinterpret_cast<Context*>(self));
+
+		switch (level)
+		{
+			default:
+				break;
+			case Logs::Level::warning:
+			{
+				if (ctx.cf.warnings_into_errors != nyfalse)
+					level = Logs::Level::error;
+				break;
+			}
+		}
+		return ctx.report.fromErrLevel(level);
+	}
+
+
+	void Context::retriveReportMetadata(void* self, Logs::Level, const AST::Node* node, String& filename, uint32_t& line, uint32_t& offset)
+	{
+		auto& ctx = *(reinterpret_cast<Context*>(self));
+		filename = ctx.dbgSourceFilename;
+
+		if (node and node->offset > 0)
+		{
+			auto it = ctx.offsetToLine.lower_bound(node->offset);
+			if (it != ctx.offsetToLine.end())
+			{
+				if (it->first == node->offset or (--it != ctx.offsetToLine.end()))
+				{
+					line = it->second;
+					offset = node->offset - it->first;
+					return;
+				}
+			}
+			line = 1;
+			offset = 1;
+		}
+		else
+		{
+			line = 0;
+			offset = 0;
+		}
+	}
+
+
 	void Context::useNamespace(const AnyString& nmspc)
 	{
 		if (not nmspc.empty())

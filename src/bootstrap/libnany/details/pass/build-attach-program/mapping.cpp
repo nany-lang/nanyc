@@ -14,15 +14,26 @@ namespace Mapping
 {
 
 
-	SequenceMapping::SequenceMapping(ClassdefTable& cdeftable, Mutex& mutex, Logs::Report& report, IR::Sequence& sequence)
+	SequenceMapping::SequenceMapping(ClassdefTable& cdeftable, Mutex& mutex, IR::Sequence& sequence)
 		: cdeftable(cdeftable)
 		, mutex(mutex)
 		, currentSequence(sequence)
-		, report(report)
+		, localMetadataHandler(this, &retriveReportMetadata)
+
 	{
 		// reduce memory allocations
 		lastPushedNamedParameters.reserve(8); // arbitrary
 		lastPushedIndexedParameters.reserve(8);
+	}
+
+
+	void SequenceMapping::retriveReportMetadata(void* self, Logs::Level level, const AST::Node*, String& filename, uint32_t& line, uint32_t& offset)
+	{
+		auto& sb    = *(reinterpret_cast<SequenceMapping*>(self));
+		sb.success &= Logs::isError(level);
+		filename    = sb.currentFilename;
+		line        = sb.currentLine;
+		offset      = sb.currentOffset;
 	}
 
 
@@ -33,21 +44,10 @@ namespace Mapping
 	}
 
 
-	Logs::Report SequenceMapping::error()
-	{
-		success = false;
-		auto err = report.error();
-		err.message.origins.location.filename   = currentFilename;
-		err.message.origins.location.pos.line   = currentLine;
-		err.message.origins.location.pos.offset = currentOffset;
-		return err;
-	}
-
-
 	void SequenceMapping::printError(const IR::Instruction& operands, AnyString msg)
 	{
 		// example: ICE: unknown opcode 'resolveAttribute': from 'ref %4 = resolve %3."()"'
-		auto trace = report.ICE();
+		auto trace = ice();
 		if (not msg.empty())
 			trace << msg << ':';
 		else

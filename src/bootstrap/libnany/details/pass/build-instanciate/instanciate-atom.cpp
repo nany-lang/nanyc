@@ -66,13 +66,11 @@ namespace Instanciate
 		}
 
 
-		template<class R>
-		static inline void printGeneratedIRSequence(R& report, const String& symbolName,
+		static inline void printGeneratedIRSequence(const String& symbolName,
 			const IR::Sequence& out, const ClassdefTableView& newView, uint32_t offset = 0)
 		{
-			report.info();
-			auto trace = report.subgroup();
-			auto entry = trace.trace();
+			info();
+			auto entry = trace();
 			entry.message.prefix << symbolName;
 
 			String text;
@@ -80,20 +78,20 @@ namespace Instanciate
 			text.replace("\n", "\n    ");
 			text.trimRight();
 
-			trace.trace() << "{\n    " << text << "\n}";
-			trace.info(); // for beauty
-			trace.info(); // for beauty
-			trace.info(); // for beauty
+			entry.trace() << "{\n    " << text << "\n}";
+			entry.info(); // for beauty
+			entry.info(); // for beauty
+			entry.info(); // for beauty
 		}
 
-		static inline void printSourceOpcodeSequence(Logs::Report& report, const ClassdefTableView& cdeftable, const Atom& atom, const char* txt)
+		static inline void printSourceOpcodeSequence(const ClassdefTableView& cdeftable, const Atom& atom, const char* txt)
 		{
 			String text;
 			text << txt << cdeftable.keyword(atom) << ' '; // ex: func
 			atom.retrieveCaption(text, cdeftable);  // ex: A.foo(...)...
 			auto& seqprint = *(atom.opcodes.sequence);
 			uint32_t offset = atom.opcodes.offset;
-			printGeneratedIRSequence(report, text, seqprint, cdeftable, offset);
+			printGeneratedIRSequence(text, seqprint, cdeftable, offset);
 		}
 
 
@@ -137,7 +135,7 @@ namespace Instanciate
 		}
 
 
-		static bool createNewAtom(InstanciateData& info, Atom& atom, Logs::Report& report)
+		static bool createNewAtom(InstanciateData& info, Atom& atom)
 		{
 			auto& sequence  = *atom.opcodes.sequence;
 			auto& originaltable = info.cdeftable.originalTable();
@@ -146,7 +144,7 @@ namespace Instanciate
 			// TODO remove this mutex
 			Mutex mutex;
 
-			Pass::Mapping::SequenceMapping mapper{originaltable, mutex, report, sequence};
+			Pass::Mapping::SequenceMapping mapper{originaltable, mutex, sequence};
 			mapper.evaluateWholeSequence = false;
 			mapper.prefixNameForFirstAtomCreated = "^";
 
@@ -155,7 +153,7 @@ namespace Instanciate
 			mapper.map(*atom.parent, atom.opcodes.offset);
 
 			if (unlikely(!mapper.firstAtomCreated))
-				return (report.error() << "failed to remap atom '" << atom.caption() << "'");
+				return (error() << "failed to remap atom '" << atom.caption() << "'");
 
 			assert(info.atom.get().atomid != mapper.firstAtomCreated->atomid);
 			assert(&info.atom.get() != mapper.firstAtomCreated);
@@ -181,13 +179,11 @@ namespace Instanciate
 		{
 			// No IR sequence attached for the given signature,
 			// let's instanciate the function or the class !
-			assert(!!info.report);
-			Logs::Report report{*info.report};
 
 			auto& previousAtom = info.atom.get();
 			if (unlikely(!previousAtom.opcodes.sequence or !previousAtom.parent))
 			{
-				report.ICE() << "invalid atom";
+				ice() << "invalid atom";
 				return nullptr;
 			}
 
@@ -198,7 +194,7 @@ namespace Instanciate
 			bool instTemplateClass = (previousAtom.isClass() and previousAtom.hasGenericParameters());
 			if (instTemplateClass)
 			{
-				bool creatok = createNewAtom(info, previousAtom, report);
+				bool creatok = createNewAtom(info, previousAtom);
 				if (unlikely(not creatok))
 					return nullptr;
 
@@ -207,8 +203,6 @@ namespace Instanciate
 				assert(&info.atom.get() != &previousAtom);
 			}
 
-			if (Config::Traces::sourceOpcodeSequence)
-				printSourceOpcodeSequence(report, info.cdeftable, info.atom.get(), "[post-IR] ");
 
 
 			// the current atom, probably different from `previousAtom`
@@ -225,10 +219,15 @@ namespace Instanciate
 
 			// new layer for the cdeftable
 			ClassdefTableView newView{info.cdeftable, atom.atomid, signature.parameters.size()};
+			// log
+			Logs::Report report{*info.report};
 
 			// instanciate the sequence attached to the atom
 			auto builder = std::make_unique<SequenceBuilder>
 				(report.subgroup(), newView, info.build, *outIR, inputIR, info.parent);
+
+			if (Config::Traces::sourceOpcodeSequence)
+				printSourceOpcodeSequence(info.cdeftable, info.atom.get(), "[post-IR] ");
 
 			builder->pushParametersFromSignature(atom.atomid, signature);
 			//if (info.parentAtom)
@@ -261,7 +260,7 @@ namespace Instanciate
 				atom.retrieveCaption(symbolName, newView);  // ex: A.foo(...)...
 			}
 			if (Config::Traces::generatedOpcodeSequence)
-				printGeneratedIRSequence(report, symbolName, *outIR, newView);
+				printGeneratedIRSequence(symbolName, *outIR, newView);
 
 			if (success)
 			{
@@ -280,7 +279,7 @@ namespace Instanciate
 						}
 						else
 						{
-							report.ICE() << "invalid atom pointer in func return type for '" << symbolName << '\'';
+							ice() << "invalid atom pointer in func return type for '" << symbolName << '\'';
 							success = false;
 						}
 					}
@@ -368,7 +367,7 @@ namespace Instanciate
 		// a common scenario is that the code tries to destroy something (via unref)
 		// which is not be a real class
 		if (unlikely(not atom.isClass()))
-			return (ICE() << "trying to call the destructor of a non-class atom");
+			return (ice() << "trying to call the destructor of a non-class atom");
 
 		if (unlikely(atom.flags(Atom::Flags::error)))
 			return false;
@@ -433,13 +432,13 @@ namespace Instanciate
 			overloadMatch.input.tmplparams.indexed.emplace_back(frame->atomid, param.lvid);
 
 		if (unlikely(not pushedparams.gentypes.named.empty()))
-			complain("named generic type parameters not implemented yet");
+			error("named generic type parameters not implemented yet");
 
 		TypeCheck::Match match = overloadMatch.validate(atom);
 		if (unlikely(TypeCheck::Match::none == match))
 		{
 			if (Config::Traces::sourceOpcodeSequence)
-				printSourceOpcodeSequence(report, cdeftable, atom, "[FAIL-IR] ");
+				printSourceOpcodeSequence(cdeftable, atom, "[FAIL-IR] ");
 			// fail - try again to produce error message, hint, and any suggestion
 			complainInvalidParametersAfterSignatureMatching(atom, overloadMatch);
 			return nullptr;
@@ -551,7 +550,7 @@ namespace Instanciate
 
 		if (unlikely(info.instanceid == static_cast<uint32_t>(-1)))
 		{
-			ICE(info.returnType, "return: invalid instance id");
+			iceClassdef(info.returnType, "return: invalid instance id");
 			return false;
 		}
 
@@ -564,7 +563,7 @@ namespace Instanciate
 			spare.instance = true; // force some values just in case
 			if (unlikely(not spare.isBuiltinOrVoid() and spare.atom == nullptr))
 			{
-				ICE() << "return: invalid atom for return type";
+				ice() << "return: invalid atom for return type";
 				return false;
 			}
 		}
@@ -641,10 +640,10 @@ namespace Instanciate
 			}
 		}
 		if (unlikely(!parentBuilder))
-			return (ICE() << "failed to find parent sequence builder");
+			return (ice() << "failed to find parent sequence builder");
 
 		if (not atom.tmplparams.empty())
-			return complain("recursive functions with generic type parameters is not supported yet");
+			return error("recursive functions with generic type parameters is not supported yet");
 
 		// !! NOTE !!
 		// the func is not fully instanciated, so the real return type is not set yet
@@ -699,18 +698,21 @@ namespace Instanciate
 		atom.flags += Atom::Flags::recursive;
 		if (unlikely(not atom.isFunction()))
 		{
-			if (info.parent)
-				info.parent->ICE() << "cannot mark non function '" << atom.caption() << "' as recursive";
+			ice() << "cannot mark non function '" << atom.caption() << "' as recursive";
 			return false;
 		}
 
-		if (info.parent and info.parent->getReturnTypeForRecursiveFunc(atom, info.returnType))
-			return true;
 
-		info.returnType.mutateToAny();
-		if (info.parent)
-			info.parent->error() << "parameters/return types must be fully defined to allow recursive func calls";
-		return false;
+		bool success = (info.parent
+			and info.parent->getReturnTypeForRecursiveFunc(atom, info.returnType));
+
+		if (unlikely(not success))
+		{
+			info.returnType.mutateToAny();
+			error() << "parameters/return types must be fully defined to allow recursive func calls";
+			return false;
+		}
+		return true;
 	}
 
 

@@ -6,6 +6,7 @@
 #include "details/ir/isa/data.h"
 #include "details/atom/func-overload-match.h"
 #include "details/ir/sequence.h"
+#include "details/errors/errors.h"
 #include "stack-frame.h"
 #include <vector>
 
@@ -77,8 +78,6 @@ namespace Instanciate
 		void disableCodeGeneration();
 		bool canGenerateCode() const;
 
-		void printClassdefTable(Logs::Report trace, const AtomStackFrame& frame) const;
-
 		void instanciateInstrinsicCall();
 		bool instanciateUserDefinedIntrinsic(const IR::ISA::Operand<IR::ISA::Op::intrinsic>& operands);
 		bool instanciateBuiltinIntrinsic(const AnyString& name, uint32_t lvid, bool canComplain = true);
@@ -137,16 +136,8 @@ namespace Instanciate
 
 		//! \name Error reporting
 		//@{
-		//! Emit a new error entry
-		Logs::Report error() const;
-		//! Emit a new warning entry (or error)
-		Logs::Report warning() const;
-		//! Emit a new ICE log entry
-		Logs::Report ICE() const;
-		//! Emit a new ICE log entry
-		Logs::Report trace() const;
 		//! Emit a new ICE log entry (ICE on classdef)
-		YString ICE(const Classdef&, const AnyString& msg) const;
+		YString iceClassdef(const Classdef&, const AnyString& msg) const;
 		//@}
 
 
@@ -263,6 +254,7 @@ namespace Instanciate
 		//! \name Debugging
 		//@{
 		void printClassdefTable();
+		void printClassdefTable(const AtomStackFrame& currentframe);
 		//@}
 
 
@@ -271,8 +263,6 @@ namespace Instanciate
 
 
 		bool checkForIntrinsicParamCount(const AnyString& name, uint32_t count);
-
-		bool complain(const AnyString& msg) const;
 
 		bool complainUnknownIdentifier(const Atom* self, const Atom& atom, const AnyString& name);
 
@@ -348,6 +338,8 @@ namespace Instanciate
 	private:
 		bool doInstanciateAtomFunc(Logs::Message::Ptr& subreport, InstanciateData& info, uint32_t retlvid);
 		void pushNewFrame(Atom& atom);
+		static Logs::Report emitReportEntry(void* self, Logs::Level);
+		static void retriveReportMetadata(void* self, Logs::Level, const AST::Node*, Yuni::String&, uint32_t&, uint32_t&);
 
 	private:
 		// Current stack frame (current func / class...)
@@ -392,7 +384,6 @@ namespace Instanciate
 		// Helper for resolving func overloads (reused by each opcode 'call')
 		FuncOverloadMatch overloadMatch;
 
-		mutable Logs::Report report;
 
 		const char* currentFilename = nullptr;
 		uint32_t currentLine = 1;
@@ -422,6 +413,12 @@ namespace Instanciate
 
 		//! Previous sequence builder
 		SequenceBuilder* parent = nullptr;
+
+		//! Error reporting
+		Logs::Handler localErrorHandler;
+		Logs::MetadataHandler localMetadataHandler;
+		//! Current report
+		mutable Logs::Report report;
 
 	public:
 		//! Flag to determine weather sub atoms can be instanciated in the same time

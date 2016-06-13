@@ -31,8 +31,10 @@ namespace Instanciate
 		, out(out)
 		, currentSequence(sequence)
 		, overloadMatch(report, cdeftable)
-		, report(report)
 		, parent(parent)
+		, localErrorHandler(this, &emitReportEntry)
+		, localMetadataHandler(this, &retriveReportMetadata)
+		, report(report)
 	{
 		// reduce memory (re)allocations
 		multipleResults.reserve(8); // arbitrary value
@@ -59,11 +61,46 @@ namespace Instanciate
 	}
 
 
-	void SequenceBuilder::printClassdefTable()
+	Logs::Report SequenceBuilder::emitReportEntry(void* self, Logs::Level level)
 	{
-		for (auto* f = frame; f != nullptr; f = f->previous)
-			printClassdefTable(report.subgroup(), *f);
+		auto& sb = *(reinterpret_cast<SequenceBuilder*>(self));
+
+		switch (level)
+		{
+			default:
+				break;
+			case Logs::Level::warning:
+			{
+				if (nyfalse != sb.build.cf.warnings_into_errors)
+				{
+					level = Logs::Level::error;
+					sb.success = false;
+				}
+				break;
+			}
+			case Logs::Level::error:
+			case Logs::Level::ICE:
+			{
+				sb.success = false;
+				break;
+			}
+		}
+
+		auto entry = sb.report.fromErrLevel(level);
+		if (debugmode)
+			entry << "{opc+" << sb.currentSequence.offsetOf(**sb.cursor) << "} ";
+		return entry;
 	}
+
+	void SequenceBuilder::retriveReportMetadata(void* self, Logs::Level, const AST::Node*, String& filename, uint32_t& line, uint32_t& offset)
+	{
+		auto& sb = *(reinterpret_cast<SequenceBuilder*>(self));
+		filename = sb.currentFilename;
+		line     = sb.currentLine;
+		offset   = sb.currentOffset;
+	}
+
+
 
 
 	void SequenceBuilder::releaseScopedVariables(int scope, bool forget)
@@ -159,18 +196,20 @@ namespace Instanciate
 	}
 
 
-	void SequenceBuilder::printClassdefTable(Logs::Report trace, const AtomStackFrame& frame) const
+	void SequenceBuilder::printClassdefTable(const AtomStackFrame& currentframe)
 	{
-		auto entry = trace.trace();
-
-		entry.message.prefix << cdeftable.keyword(frame.atom) << ' ';
-		frame.atom.retrieveCaption(entry.message.prefix, cdeftable);
-		entry << " - type matrix, after instanciation - atom " << frame.atom.atomid;
-
-		for (uint i = 0; i != frame.localVariablesCount(); ++i)
+		// new entry
 		{
-			auto clid = CLID{frame.atomid, i};
-			auto entry = trace.trace();
+			auto entry = trace();
+			entry.message.prefix << cdeftable.keyword(currentframe.atom) << ' ';
+			currentframe.atom.retrieveCaption(entry.message.prefix, cdeftable);
+			entry << " - type matrix, after instanciation - atom " << currentframe.atom.atomid;
+		}
+
+		for (uint32_t i = 0; i != currentframe.localVariablesCount(); ++i)
+		{
+			auto clid = CLID{currentframe.atomid, i};
+			auto entry = trace();
 
 			if (cdeftable.hasClassdef(clid) or cdeftable.hasSubstitute(clid))
 			{
@@ -180,17 +219,22 @@ namespace Instanciate
 				if (cdeftable.hasSubstitute(clid))
 					entry << " (local replacement)";
 
-				if (frame.lvids[i].isConstexpr)
+				if (currentframe.lvids[i].isConstexpr)
 					entry << " (constexpr)";
 
-				if (frame.lvids[i].errorReported)
+				if (currentframe.lvids[i].errorReported)
 					entry << " [ERROR]";
 			}
 			else
-			{
 				entry << "    " << clid << ": !!INVALID CLID";
-			}
 		}
+	}
+
+
+	void SequenceBuilder::printClassdefTable()
+	{
+		for (auto* f = frame; f != nullptr; f = f->previous)
+			printClassdefTable(*f);
 	}
 
 
@@ -211,7 +255,7 @@ namespace Instanciate
 			}
 			default:
 			{
-				ICE() << "invalid inherit value " << operands.inherit;
+				ice() << "invalid inherit value " << operands.inherit;
 			}
 		}
 	}
@@ -276,7 +320,7 @@ namespace Instanciate
 				break;
 			}
 			default:
-				ICE() << "unknown qualifier constant " << operands.qualifier;
+				ice() << "unknown qualifier constant " << operands.qualifier;
 		}
 	}
 
@@ -369,13 +413,13 @@ namespace Nany
 
 		if (unlikely(nullptr == entrypointAtom))
 		{
-			report.ICE() << "failed to instanciate '" << entrypoint << "()': function not found";
+			report.ice() << "failed to instanciate '" << entrypoint << "()': function not found";
 			return false;
 		}
 
 		if (unlikely(entrypointAtom->type != Atom::Type::funcdef))
 		{
-			report.ICE() << "failed to instanciate '" << entrypoint << "': the atom is not a function";
+			report.ice() << "failed to instanciate '" << entrypoint << "': the atom is not a function";
 			return false;
 		}
 
@@ -393,7 +437,7 @@ namespace Nany
 		report.appendEntry(newReport);
 
 		if (Config::Traces::atomTable)
-			cdeftable.atoms.root.print(report, cdeftable);
+			cdeftable.atoms.root.print(cdeftable);
 
 		if (instanciated)
 		{

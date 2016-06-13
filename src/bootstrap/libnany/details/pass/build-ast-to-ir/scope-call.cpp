@@ -105,7 +105,7 @@ namespace Producer
 									return false;
 
 								if (unlikely(isNamed and name.empty()))
-									return (ICE(paramchild) << "got an empty name for a named parameter");
+									return (ice(paramchild) << "got an empty name for a named parameter");
 								break;
 							}
 							case AST::rgIdentifier:
@@ -120,7 +120,7 @@ namespace Producer
 								// no break here - to go to unexecped node
 							}
 							default:
-								return ICEUnexpectedNode(paramchild, "[ir/expr/call-parameter]");
+								return unexpectedNode(paramchild, "[ir/expr/call-parameter]");
 						}
 					}
 
@@ -130,7 +130,7 @@ namespace Producer
 
 				//case AST::rgCallNamedParameter:
 				default:
-					return ICEUnexpectedNode(child, "[ir/expr/call]");
+					return unexpectedNode(child, "[ir/expr/call]");
 			}
 		} // each child
 
@@ -140,7 +140,7 @@ namespace Producer
 			shortcircuit->offsetPragma = out.opcodeCount();
 			out.emitPragmaShortcircuitMetadata(0 /*label*/);
 			if (unlikely(paramCount != 2))
-				ICE(node) << "invalid number of parameters for shortcircuit";
+				ice(node) << "invalid number of parameters for shortcircuit";
 		}
 
 		// push all parameters, indexed and named
@@ -220,10 +220,10 @@ namespace Producer
 
 				bool success = visitASTExprCallParameters(*node, &scupdt);
 
-				if (unlikely(not lastPushedTmplParams.empty()))
+				if (unlikely(!!lastPushedTmplParams))
 				{
-					lastPushedTmplParams.clear();
-					ICE(*node) << "unsupported generic type parameters for shortcircuit functions";
+					lastPushedTmplParams = nullptr;
+					ice(*node) << "unsupported generic type parameters for shortcircuit functions";
 					success = false;
 				}
 

@@ -99,7 +99,7 @@ namespace Instanciate
 				// since self was marked as an 'assignment', we're trying to resolve here '^()'
 				if (unlikely(name != "^()"))
 				{
-					ICE() << "invalid resolve name for assignment (got '" << name << "')";
+					ice() << "invalid resolve name for assignment (got '" << name << "')";
 					return false;
 				}
 
@@ -238,7 +238,7 @@ namespace Instanciate
 							return true;
 						}
 
-						ICE() << "invalid atom for local scope variable. clid: " << CLID{frame->atomid, lvidVar}
+						ice() << "invalid atom for local scope variable. clid: " << CLID{frame->atomid, lvidVar}
 						<< ", " << (uint32_t) varcdef.kind;
 						return false;
 					}
@@ -269,7 +269,7 @@ namespace Instanciate
 			// self.<something to identify>
 			if (unlikely(frame->lvids[operands.lvid].markedAsAny))
 			{
-				ICE() << "can not perform member lookup on 'any'";
+				ice() << "can not perform member lookup on 'any'";
 				return false;
 			}
 
@@ -345,7 +345,7 @@ namespace Instanciate
 					auto& cdefvar = cdeftable.classdef(atom.returnType.clid);
 					auto* atomvar = (not cdefvar.isBuiltin()) ? cdeftable.findClassdefAtom(cdefvar) : nullptr;
 					if (unlikely(!atomvar and not cdefvar.isBuiltin()))
-						return (ICE() << "invalid variable member type for " << atom.fullname());
+						return (ice() << "invalid variable member type for " << atom.fullname());
 
 					auto& spare = cdeftable.substitute(operands.lvid);
 					spare.import(cdefvar);
@@ -372,7 +372,7 @@ namespace Instanciate
 							}
 							else
 							{
-								ICE() << "identify: invalid 'self' object for '" << name << "' from '"
+								ice() << "identify: invalid 'self' object for '" << name << "' from '"
 									<< frame->atom.caption() << '\'';
 								return false;
 							}

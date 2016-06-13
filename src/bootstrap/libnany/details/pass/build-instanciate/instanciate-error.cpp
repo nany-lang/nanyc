@@ -14,76 +14,12 @@ namespace Instanciate
 {
 
 
-	Logs::Report SequenceBuilder::trace() const
-	{
-		auto tr = report.trace();
-		tr.message.origins.location.filename   = currentFilename;
-		tr.message.origins.location.pos.line   = currentLine;
-		tr.message.origins.location.pos.offset = currentOffset;
-		return tr;
-	}
-
-	Logs::Report SequenceBuilder::error() const
+	YString SequenceBuilder::iceClassdef(const Classdef& cdef, const AnyString& msg) const
 	{
 		success = false;
-		auto err = report.error();
-		err.message.origins.location.filename   = currentFilename;
-		err.message.origins.location.pos.line   = currentLine;
-		err.message.origins.location.pos.offset = currentOffset;
-
-		if (debugmode)
-			err << "{opc+" << currentSequence.offsetOf(**cursor) << "} ";
-		return err;
-	}
-
-	Logs::Report SequenceBuilder::warning() const
-	{
-		if (nyfalse == build.cf.warnings_into_errors)
-		{
-			auto wrn = report.warning();
-			wrn.message.origins.location.filename   = currentFilename;
-			wrn.message.origins.location.pos.line   = currentLine;
-			wrn.message.origins.location.pos.offset = currentOffset;
-
-			if (debugmode)
-				wrn << "{opc+" << currentSequence.offsetOf(**cursor) << "} ";
-			return wrn;
-		}
-		return error();
-	}
-
-
-	Logs::Report SequenceBuilder::ICE() const
-	{
-		success = false;
-		auto ice = report.ICE();
-		ice.message.origins.location.filename   = currentFilename;
-		ice.message.origins.location.pos.line   = currentLine;
-		ice.message.origins.location.pos.offset = currentOffset;
-
-		if (debugmode)
-			ice << "{opc+" << currentSequence.offsetOf(**cursor) << "} ";
-
-		// assert on the variable 'success' to not make the compiler
-		// complain on the attribute ‘noreturn’
-		//assert(success and "ICE raise");
-		return ice;
-	}
-
-
-	YString SequenceBuilder::ICE(const Classdef& cdef, const AnyString& msg) const
-	{
-		success = false;
-		auto ice = (ICE() << msg << ": " << cdef.clid << ' ');
-		cdef.print(ice, cdeftable);
-		return ice.data().message;
-	}
-
-
-	bool SequenceBuilder::complain(const AnyString& msg) const
-	{
-		error() << msg;
-		return false;
+		auto ce = (ice() << msg << ": " << cdef.clid << ' ');
+		cdef.print(ce, cdeftable);
+		return ce.data().message;
 	}
 
 
@@ -301,8 +237,8 @@ namespace Instanciate
 	bool SequenceBuilder::complainOperand(const IR::Instruction& operands, AnyString msg)
 	{
 		success = false;
-		auto message = ICE();
-		// example: ICE: unexpected opcode 'resolveAttribute': from 'ref %4 = resolve %3."()"'
+		auto message = ice();
+		// example: ice: unexpected opcode 'resolveAttribute': from 'ref %4 = resolve %3."()"'
 		if (not msg.empty())
 			message << msg;
 		else
@@ -356,18 +292,18 @@ namespace Instanciate
 	{
 		assert(frame != nullptr);
 		auto& cdef = cdeftable.classdef(CLID{frame->atomid, lvid});
-		auto ice = (ICE() << "invalid 'self' reference for variable assignment (self.= <expr>) ");
-		cdef.print(ice.data().message, cdeftable, false);
+		auto ce = (ice() << "invalid 'self' reference for variable assignment (self.= <expr>) ");
+		cdef.print(ce.data().message, cdeftable, false);
 		return false;
 	}
 
 
 	bool SequenceBuilder::complainMissingOperator(Atom& atom, const AnyString& name) const
 	{
-		auto ice = (ICE() << "missing operator '" << name << "' for '");
-		ice << atom.keyword() << ' ';
-		atom.retrieveFullname(ice.data().message);
-		ice << '\'';
+		auto ce = (ice() << "missing operator '" << name << "' for '");
+		ce << atom.keyword() << ' ';
+		atom.retrieveFullname(ce.data().message);
+		ce << '\'';
 		return false;
 	}
 
@@ -458,9 +394,7 @@ namespace Instanciate
 			}
 		}
 		else
-		{
-			ICE() << "mismatch return";
-		}
+			ice() << "mismatch return";
 	}
 
 

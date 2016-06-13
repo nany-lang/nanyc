@@ -25,7 +25,10 @@ namespace Instanciate
 			{
 				auto* atom = cdeftable.findClassdefAtom(cdef);
 				if (unlikely(nullptr == atom))
-					return (void)(ICE() << "invalid atom for sizeof operator");
+				{
+					ice() << "invalid atom for sizeof operator";
+					return;
+				}
 
 				out.emitSizeof(operands.lvid, atom->atomid);
 			}

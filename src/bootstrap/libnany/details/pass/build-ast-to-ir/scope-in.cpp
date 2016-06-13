@@ -32,9 +32,9 @@ namespace Producer
 						return error(child) << "only one cursor name is allowed in views";
 					auto& identifier = child.firstChild();
 					if (unlikely(identifier.rule != AST::rgIdentifier))
-						return ICE(identifier) << "identifier expected";
+						return ice(identifier) << "identifier expected";
 
-					if (unlikely(not checkForValidIdentifierName(context.report, child, identifier.text, false)))
+					if (unlikely(not checkForValidIdentifierName(child, identifier.text, false)))
 						return false;
 
 					elementname = identifier.text;
@@ -44,7 +44,7 @@ namespace Producer
 				case AST::rgInContainer:
 				{
 					if (unlikely(child.children.size() != 1))
-						return ICE(child) << "invalid expression";
+						return ice(child) << "invalid expression";
 
 					container = &child.firstChild();
 					break;
@@ -53,21 +53,21 @@ namespace Producer
 				case AST::rgInPredicate:
 				{
 					if (unlikely(child.children.size() != 1))
-						return ICE(child) << "invalid predicate expr";
+						return ice(child) << "invalid predicate expr";
 					auto& expr = child.firstChild();
 					if (unlikely(expr.rule != AST::rgExpr))
-						return ICE(expr) << "invalid node type for predicate";
+						return ice(expr) << "invalid node type for predicate";
 
 					predicate = &expr;
 					break;
 				}
 				default:
-					return ICEUnexpectedNode(child, "[expr/in]");
+					return unexpectedNode(child, "[expr/in]");
 			}
 		}
 
 		if (unlikely(!container))
-			return ICE(node) << "invalid view container expr";
+			return ice(node) << "invalid view container expr";
 
 		if (!context.reuse.inset.node)
 			context.prepareReuseForIn();

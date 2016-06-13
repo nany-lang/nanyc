@@ -23,7 +23,7 @@ namespace Instanciate
 		// note: do not keep a reference on 'out.at...', since the internal buffer might be reized
 		auto& funcAtom = frame->atom;
 		if (unlikely(funcAtom.parent == nullptr))
-			return (void)(ICE() << "invalid parent atom for variable initialization in ctor");
+			return (void)(ice() << "invalid parent atom for variable initialization in ctor");
 
 		auto& parentAtom = *(funcAtom.parent);
 		if (parentAtom.empty())
@@ -52,7 +52,7 @@ namespace Instanciate
 						return false;
 					});
 					if (unlikely(!varatom))
-						return (void)(ICE() << "invalid atom for automatic initialization of captured variable '" << name << '\'');
+						return (void)(ice() << "invalid atom for automatic initialization of captured variable '" << name << '\'');
 
 					out.emitFieldset(lvid, /*self*/ 2, varatom->varinfo.effectiveFieldIndex);
 
@@ -122,7 +122,7 @@ namespace Instanciate
 				// extracting varname from ^default-var-%42-varname
 				auto endOffset = subatom.name.find_last_of('-');
 				if (unlikely(not (endOffset < subatom.name.size())))
-					return (void)(ICE() << "invalid string offset");
+					return (void)(ice() << "invalid string offset");
 				AnyString varname{subatom.name, endOffset + 1};
 
 				uint32_t instanceid = (uint32_t) -1;
@@ -165,7 +165,10 @@ namespace Instanciate
 							return false;
 						});
 						if (unlikely(!varatom))
-							return (void)(ICE() << "invalid atom for automatic initialization of variable '" << varname << "'");
+						{
+							ice() << "invalid atom for automatic initialization of variable '" << varname << "'";
+							return;
+						}
 
 						out.emitFieldset(lvid, /*self*/ 2, varatom->varinfo.effectiveFieldIndex);
 

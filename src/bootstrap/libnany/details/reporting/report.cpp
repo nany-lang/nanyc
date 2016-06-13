@@ -10,8 +10,20 @@ namespace Nany
 namespace Logs
 {
 
+	Report Report::fromErrLevel(Level level)
+	{
+		switch (level)
+		{
+			case Level::error:
+			case Level::ICE:
+				message.hasErrors = true;
+			default: break;
+		}
+		return Report{message.createEntry(level)};
+	}
 
-	Report Report::ICE()
+
+	Report Report::ice()
 	{
 		message.hasErrors = true;
 		return Report{message.createEntry(Level::ICE)} << "ICE: ";
