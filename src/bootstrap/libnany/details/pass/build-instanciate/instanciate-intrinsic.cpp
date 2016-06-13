@@ -38,7 +38,7 @@ namespace Instanciate
 					if (retry == nytrue)
 						intrinsic = intrinsics.find(name);
 				}
-				if (intrinsic == nullptr)
+				if (unlikely(intrinsic == nullptr))
 					return complainUnknownIntrinsic(name);
 			}
 

@@ -81,48 +81,6 @@ namespace Instanciate
 		void instanciateInstrinsicCall();
 		bool instanciateUserDefinedIntrinsic(const IR::ISA::Operand<IR::ISA::Op::intrinsic>& operands);
 		bool instanciateBuiltinIntrinsic(const AnyString& name, uint32_t lvid, bool canComplain = true);
-		bool instanciateIntrinsicFieldset(uint32_t lvid);
-		bool instanciateIntrinsicRef(uint32_t lvid);
-		bool instanciateIntrinsicUnref(uint32_t lvid);
-		bool instanciateIntrinsicPointer(uint32_t lvid);
-		bool instanciateIntrinsicSizeof(uint32_t lvid);
-		bool instanciateIntrinsicMemalloc(uint32_t lvid);
-		bool instanciateIntrinsicMemrealloc(uint32_t lvid);
-		bool instanciateIntrinsicMemFree(uint32_t lvid);
-		bool instanciateIntrinsicMemfill(uint32_t lvid);
-		bool instanciateIntrinsicAssert(uint32_t lvid);
-
-		bool instanciateIntrinsicReinterpret(uint32_t lvid);
-		bool instanciateIntrinsicNOT(uint32_t);
-
-		bool instanciateIntrinsicAND(uint32_t);
-		bool instanciateIntrinsicOR(uint32_t);
-		bool instanciateIntrinsicXOR(uint32_t);
-		bool instanciateIntrinsicMOD(uint32_t);
-		bool instanciateIntrinsicADD(uint32_t);
-		bool instanciateIntrinsicSUB(uint32_t);
-		bool instanciateIntrinsicIDIV(uint32_t);
-		bool instanciateIntrinsicIMUL(uint32_t);
-		bool instanciateIntrinsicDIV(uint32_t);
-		bool instanciateIntrinsicMUL(uint32_t);
-		bool instanciateIntrinsicFADD(uint32_t);
-		bool instanciateIntrinsicFSUB(uint32_t);
-		bool instanciateIntrinsicFDIV(uint32_t);
-		bool instanciateIntrinsicFMUL(uint32_t);
-		bool instanciateIntrinsicEQ(uint32_t);
-		bool instanciateIntrinsicNEQ(uint32_t);
-		bool instanciateIntrinsicFLT(uint32_t);
-		bool instanciateIntrinsicFLTE(uint32_t);
-		bool instanciateIntrinsicFGT(uint32_t);
-		bool instanciateIntrinsicFGTE(uint32_t);
-		bool instanciateIntrinsicLT(uint32_t);
-		bool instanciateIntrinsicLTE(uint32_t);
-		bool instanciateIntrinsicILT(uint32_t);
-		bool instanciateIntrinsicILTE(uint32_t);
-		bool instanciateIntrinsicGT(uint32_t);
-		bool instanciateIntrinsicGTE(uint32_t);
-		bool instanciateIntrinsicIGT(uint32_t);
-		bool instanciateIntrinsicIGTE(uint32_t);
 
 
 		/*!
@@ -141,7 +99,6 @@ namespace Instanciate
 		//@}
 
 
-	private:
 		//! \name Visitors for all supported opcodes
 		//@{
 		void visit(const IR::ISA::Operand<IR::ISA::Op::scope>&);
@@ -260,8 +217,6 @@ namespace Instanciate
 
 		//! \name Errors
 		//@{
-
-
 		bool checkForIntrinsicParamCount(const AnyString& name, uint32_t count);
 
 		bool complainUnknownIdentifier(const Atom* self, const Atom& atom, const AnyString& name);
@@ -335,13 +290,11 @@ namespace Instanciate
 		//@}
 
 
-	private:
 		bool doInstanciateAtomFunc(Logs::Message::Ptr& subreport, InstanciateData& info, uint32_t retlvid);
 		void pushNewFrame(Atom& atom);
 		static Logs::Report emitReportEntry(void* self, Logs::Level);
 		static void retriveReportMetadata(void* self, Logs::Level, const AST::Node*, Yuni::String&, uint32_t&, uint32_t&);
 
-	private:
 		// Current stack frame (current func / class...)
 		AtomStackFrame* frame = nullptr;
 
@@ -420,7 +373,6 @@ namespace Instanciate
 		//! Current report
 		mutable Logs::Report report;
 
-	public:
 		//! Flag to determine weather sub atoms can be instanciated in the same time
 		uint32_t layerDepthLimit = (uint32_t) -1;
 		//! cursor

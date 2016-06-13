@@ -227,7 +227,10 @@ namespace Instanciate
 				pushedparams.func.indexed[i].lvid = params[i].clid.lvid();
 			}
 			shortcircuit.compareTo = atom->parameters.shortcircuitValue;
-			return instanciateBuiltinIntrinsic(atom->builtinalias, lvid);
+			bool builtinok = instanciateBuiltinIntrinsic(atom->builtinalias, lvid);
+			if (unlikely(not builtinok))
+				frame->lvids[lvid].errorReported = true;
+			return builtinok;
 		}
 
 		// instanciate the called func
