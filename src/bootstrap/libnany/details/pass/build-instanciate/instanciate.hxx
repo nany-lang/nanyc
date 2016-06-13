@@ -60,11 +60,6 @@ namespace Instanciate
 		return (codeGenerationLock == 0);
 	}
 
-	inline void SequenceBuilder::disableCodeGeneration()
-	{
-		++codeGenerationLock;
-	}
-
 
 	inline bool SequenceBuilder::checkForIntrinsicParamCount(const AnyString& name, uint32_t count)
 	{

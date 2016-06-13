@@ -73,32 +73,6 @@ namespace Instanciate
 		//@}
 
 
-		bool readAndInstanciate(uint32_t offset);
-
-		void disableCodeGeneration();
-		bool canGenerateCode() const;
-
-		void instanciateInstrinsicCall();
-		bool instanciateUserDefinedIntrinsic(const IR::ISA::Operand<IR::ISA::Op::intrinsic>& operands);
-		bool instanciateBuiltinIntrinsic(const AnyString& name, uint32_t lvid, bool canComplain = true);
-
-
-		/*!
-		** \brief Determine if an atom is fully typed and retrieve its return type into the signature
-		**
-		** Used for recursive functions
-		** \return True if fully typed, false if can not be used as a recursive function
-		*/
-		bool getReturnTypeForRecursiveFunc(const Atom& atom, Classdef&) const;
-
-
-		//! \name Error reporting
-		//@{
-		//! Emit a new ICE log entry (ICE on classdef)
-		YString iceClassdef(const Classdef&, const AnyString& msg) const;
-		//@}
-
-
 		//! \name Visitors for all supported opcodes
 		//@{
 		void visit(const IR::ISA::Operand<IR::ISA::Op::scope>&);
@@ -132,19 +106,89 @@ namespace Instanciate
 		void visit(const IR::ISA::Operand<IR::ISA::Op::inherit>&);
 		void visit(const IR::ISA::Operand<IR::ISA::Op::nop>&);
 		void visit(const IR::ISA::Operand<IR::ISA::Op::label>&);
-
 		void visit(const IR::ISA::Operand<IR::ISA::Op::jmp>&);
 		void visit(const IR::ISA::Operand<IR::ISA::Op::jz>&);
 		void visit(const IR::ISA::Operand<IR::ISA::Op::jnz>&);
 		void visit(const IR::ISA::Operand<IR::ISA::Op::comment>&);
-
 		//! visitor - fallback
 		template<IR::ISA::Op O> void visit(const IR::ISA::Operand<O>&);
+
+		//! Walk through all opcodes generated from the AST
+		bool readAndInstanciate(uint32_t offset);
 		//@}
 
-		template<nytype_t R, bool AcceptBool, bool AcceptInt, bool AcceptFloat,
-			void (IR::Sequence::* M)(uint32_t, uint32_t, uint32_t)>
-		bool emitBuiltinOperator(uint32_t lvid, const char* const name);
+
+		//! \name Type checking
+		//@{
+		/*!
+		** \brief Try to resolve a type alias
+		**
+		** \param atom A type alias atom
+		** \param success[out] Result of the operation
+		** \param cdefout[out] The resolved classdef
+		*/
+		Atom& resolveTypeAlias(Atom& atom, bool& success, const Classdef*& cdefout);
+
+		//! Get if a value from a register can be acquired (ref counting)
+		bool canBeAcquired(LVID lvid) const;
+		//! Get if a type definition can be acquired (ref. counting)
+		bool canBeAcquired(const CLID& clid) const;
+		//! Get if a type definition can be acquired (ref. counting)
+		bool canBeAcquired(const Classdef& cdef) const;
+
+		/*!
+		** \brief Determine if an atom is fully typed and retrieve its return type into the signature
+		**
+		** Used for recursive functions
+		** \return True if fully typed, false if can not be used as a recursive function
+		*/
+		bool getReturnTypeForRecursiveFunc(const Atom& atom, Classdef&) const;
+		//@}
+
+
+		//! \name Helpers for propgram memory management
+		//@{
+		//! Emit 'ref' opcode if 'type' can be acquired (e.g. is not a builtin type)
+		template<class T> void tryToAcquireObject(LVID lvid, const T& type);
+		//! Emit 'ref' opcode if 'lvid' can be acquired (e.g. is not a builtin type)
+		void tryToAcquireObject(LVID lvid);
+		//! Emit 'ref' opcode whether 'lvid' can be acquired or not (no check)
+		void acquireObject(LVID lvid);
+		//! Emit 'unref' opcode if 'lvid' can be acquired
+		void tryUnrefObject(uint32_t lvid);
+
+		//! Create 'count' new local variables and return the first lvid
+		uint32_t createLocalVariables(uint32_t count = 1);
+
+		/*!
+		** \brief Emit 'unref' opcodes to release all variables available from a given scope depth
+		**
+		** \param scope Scope's Depth
+		** \param forget Flag to avoid (or not) to release those variables again
+		*/
+		void releaseScopedVariables(int scope, bool forget = false);
+		//@}
+
+
+		//! \name Misc Code generation
+		//@{
+		//! Get if opcodes can be emitted (not within a type definition for example)
+		bool canGenerateCode() const;
+
+		//! Generate the function to initialize the class variables to their default values
+		void generateMemberVarDefaultInitialization();
+		//! Generate the destructor of the current class
+		void generateMemberVarDefaultDispose();
+		//! Generate the clone function of the current class
+		void generateMemberVarDefaultClone();
+
+		//! Generate short circuit jumps
+		bool generateShortCircuitInstrs(uint32_t retlvid);
+
+		bool instanciateAssignment(const IR::ISA::Operand<IR::ISA::Op::call>& operands);
+
+		bool instanciateAssignment(AtomStackFrame& frame, LVID lhs, LVID rhs, bool canDisposeLHS = true,
+			bool checktype = true, bool forceDeepcopy = false);
 
 		//! perform type resolution and fetch data (local variable, func...)
 		bool identify(const IR::ISA::Operand<IR::ISA::Op::identify>& operands, const AnyString& name, bool firstChance = true);
@@ -153,9 +197,6 @@ namespace Instanciate
 
 		//! Try to capture variables from a list of potentiel candidates created by the mapping
 		void captureVariables(Atom& atom);
-
-
-		Atom& resolveTypeAlias(Atom& atom, bool& success, const Classdef*&);
 
 		bool pragmaBlueprint(const IR::ISA::Operand<IR::ISA::Op::pragma>& operands);
 		void pragmaBodyStart();
@@ -170,53 +211,22 @@ namespace Instanciate
 		bool emitFuncCall(const IR::ISA::Operand<IR::ISA::Op::call>& operands);
 		bool pushCapturedVarsAsParameters(const Atom& atomclass);
 
-		bool instanciateAssignment(const IR::ISA::Operand<IR::ISA::Op::call>& operands);
-		bool instanciateAssignment(AtomStackFrame& frame, LVID lhs, LVID rhs, bool canDisposeLHS = true,
-			bool checktype = true, bool forceDeepcopy = false);
-
 		//! Declare a named variable (and checks for multiple declarations)
 		void declareNamedVariable(const AnyString& name, LVID lvid, bool autorelease = true);
 
-
-		void releaseScopedVariables(int scope, bool forget = false);
-
 		void adjustSettingsNewFuncdefOperator(const AnyString& name);
-		void generateMemberVarDefaultInitialization();
-		void generateMemberVarDefaultDispose();
-		void generateMemberVarDefaultClone();
 
-		bool generateShortCircuitInstrs(uint32_t retlvid);
-
-		//! \name Help for memory management
-		//@{
-		//! Get if a value from a register can be acquired (ref counting)
-		bool canBeAcquired(LVID lvid) const;
-		//! Get if a type definition can be acquired (ref. counting)
-		bool canBeAcquired(const CLID& clid) const;
-		//! Get if a type definition can be acquired (ref. counting)
-		bool canBeAcquired(const Classdef& cdef) const;
-
-		template<class T> void tryToAcquireObject(LVID lvid, const T& type);
-		void tryToAcquireObject(LVID lvid);
-		void acquireObject(LVID lvid); // without checking
-
-		void tryUnrefObject(uint32_t lvid);
-
-		//! Create 'count' new local variables and return the first lvid
-		uint32_t createLocalVariables(uint32_t count = 1);
-
-		//@}
-
-
-		//! \name Debugging
-		//@{
-		void printClassdefTable();
-		void printClassdefTable(const AtomStackFrame& currentframe);
+		void instanciateInstrinsicCall();
+		bool instanciateUserDefinedIntrinsic(const IR::ISA::Operand<IR::ISA::Op::intrinsic>& operands);
+		bool instanciateBuiltinIntrinsic(const AnyString& name, uint32_t lvid, bool canComplain = true);
 		//@}
 
 
 		//! \name Errors
 		//@{
+		//! Emit a new ICE log entry (ICE on classdef)
+		YString iceClassdef(const Classdef&, const AnyString& msg) const;
+
 		bool checkForIntrinsicParamCount(const AnyString& name, uint32_t count);
 
 		bool complainUnknownIdentifier(const Atom* self, const Atom& atom, const AnyString& name);
@@ -253,15 +263,12 @@ namespace Instanciate
 		bool complainIntrinsicParameterCount(const AnyString& name, uint32_t count);
 
 		bool complainIntrinsicParameter(const AnyString& name, uint32_t pindex, const Classdef& got,
-			const AnyString& expected = "");
+			const AnyString& expected = nullptr);
 
 		void complainTypealiasCircularRef(const Atom& original, const Atom& responsible);
 		void complainTypedefDeclaredAfter(const Atom& original, const Atom& responsible);
 		void complainTypedefUnresolved(const Atom& original);
 
-		/*!
-		**
-		*/
 		bool complainMultipleDefinitions(const Atom&, const AnyString& funcOrOpName);
 
 		//! Emit a new error message with additional information on the given operand
@@ -290,6 +297,16 @@ namespace Instanciate
 		//@}
 
 
+		//! \name Debugging
+		//@{
+		//! Print all classdefs
+		void printClassdefTable();
+		//! Print the classdefs of a given frame
+		void printClassdefTable(const AtomStackFrame& currentframe);
+		//@}
+
+
+	public:
 		bool doInstanciateAtomFunc(Logs::Message::Ptr& subreport, InstanciateData& info, uint32_t retlvid);
 		void pushNewFrame(Atom& atom);
 		static Logs::Report emitReportEntry(void* self, Logs::Level);
