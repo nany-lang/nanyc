@@ -3,7 +3,7 @@
 #include "details/fwd.h"
 #include "details/atom/classdef.h"
 #include "details/atom/classdef-table.h"
-#include "details/type/type-check.h"
+#include "type-check.h"
 #include <functional>
 #include <vector>
 
@@ -13,6 +13,12 @@
 
 namespace Nany
 {
+namespace Pass
+{
+namespace Instanciate
+{
+
+	class SequenceBuilder;
 
 
 	class FuncOverloadMatch final
@@ -33,9 +39,7 @@ namespace Nany
 		//! \name Constructor & Destructor
 		//@{
 		//! Default constructor
-		FuncOverloadMatch(Logs::Report report, const ClassdefTableView& table);
-		//! Destructor
-		~FuncOverloadMatch() = default;
+		FuncOverloadMatch(SequenceBuilder*);
 		//@}
 
 		/*!
@@ -91,9 +95,7 @@ namespace Nany
 		}
 		result;
 
-		//! Reporting
-		mutable std::reference_wrapper<Logs::Report> report;
-
+		Logs::Report* report = nullptr;
 
 	private:
 		template<bool withErrorReporting>
@@ -104,13 +106,14 @@ namespace Nany
 		void complainParamTypeMismatch(bool isGenType, const Classdef&, const Atom&, uint32_t, const Classdef&);
 
 	private:
-		const ClassdefTableView& table;
 		bool pAllowImplicit = false;
+		SequenceBuilder* seq;
 
 	}; // class FuncOverloadMatch
 
 
 
 
-
+} // namespace Instanciate
+} // namespace Pass
 } // namespace Nany

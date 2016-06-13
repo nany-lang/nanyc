@@ -66,7 +66,7 @@ namespace Instanciate
 
 		if (checktype)
 		{
-			auto similarity = TypeCheck::isSimilarTo(cdeftable, nullptr, cdeflhs, cdefrhs, false);
+			auto similarity = TypeCheck::isSimilarTo(*this, cdeflhs, cdefrhs, false);
 			if (unlikely(TypeCheck::Match::strictEqual != similarity))
 				return complainInvalidType(nullptr, cdefrhs, cdeflhs);
 		}

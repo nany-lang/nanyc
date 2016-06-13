@@ -369,7 +369,7 @@ namespace Instanciate
 		err << '\'';
 
 		// no match, re-launching the process with error-enabled logging for user-reporting
-		overloadMatch.report = std::ref(err);
+		overloadMatch.report = &err;
 		overloadMatch.validateWithErrReport(atom);
 		return false;
 	}
@@ -489,7 +489,7 @@ namespace Instanciate
 		atom.retrieveFullname(err.data().message);
 		err << '\'';
 
-		overloadMatch.report = std::ref(err);
+		overloadMatch.report = &err;
 		overloadMatch.validateWithErrReport(atom);
 	}
 

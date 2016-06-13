@@ -2,11 +2,11 @@
 #include <yuni/yuni.h>
 #include "details/context/build.h"
 #include "details/reporting/report.h"
-#include "details/atom/func-overload-match.h"
 #include "details/ir/sequence.h"
 #include "details/atom/atom.h"
 #include "details/atom/signature.h"
 #include "details/atom/classdef-table.h"
+#include "func-overload-match.h"
 #include "nany/nany.h"
 #include <memory>
 #include <vector>

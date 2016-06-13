@@ -4,10 +4,10 @@
 #include "details/context/build.h"
 #include "details/atom/classdef-table-view.h"
 #include "details/ir/isa/data.h"
-#include "details/atom/func-overload-match.h"
 #include "details/ir/sequence.h"
 #include "details/errors/errors.h"
 #include "stack-frame.h"
+#include "func-overload-match.h"
 #include <vector>
 
 

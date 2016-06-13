@@ -93,10 +93,12 @@ namespace Instanciate
 			{
 				// let's do another loop for generating a report (currently done by the caller)
 				auto err = (report.error() << "cannot call ");
-				overloadMatch.report = std::ref(err);
 
 				for (uint32_t r = 0; r != solutionCount; ++r)
+				{
+					overloadMatch.report = &err;
 					overloadMatch.validateWithErrReport(solutions[r].get());
+				}
 			}
 			return false;
 		}

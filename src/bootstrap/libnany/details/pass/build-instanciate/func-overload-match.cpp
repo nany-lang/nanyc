@@ -3,8 +3,9 @@
 #include "details/atom/vardef.h"
 #include "details/atom/classdef-table-view.h"
 #include "details/reporting/report.h"
+#include "details/errors/errors.h"
+#include "instanciate.h"
 #include "libnany-config.h"
-#include <iostream>
 
 using namespace Yuni;
 
@@ -13,11 +14,14 @@ using namespace Yuni;
 
 namespace Nany
 {
+namespace Pass
+{
+namespace Instanciate
+{
 
 
-	FuncOverloadMatch::FuncOverloadMatch(Logs::Report report, const ClassdefTableView& table)
-		: report(std::ref(report))
-		, table(table)
+	FuncOverloadMatch::FuncOverloadMatch(SequenceBuilder* seq)
+		: seq(seq)
 	{
 		input.rettype.reserve(1); // currently, only 1 return value is allowed
 		input.params.indexed.reserve(Config::maxPushedParameters);
@@ -42,6 +46,7 @@ namespace Nany
 
 	void FuncOverloadMatch::printInputParameters(String& out) const
 	{
+		auto& table = seq->cdeftable;
 		auto paramprinter = [&](const auto& paramlist)
 		{
 			if (not paramlist.indexed.empty())
@@ -87,38 +92,40 @@ namespace Nany
 
 	void FuncOverloadMatch::complainParamTypeMismatch(bool isGenType, const Classdef& cdef, const Atom& atom, uint32_t i, const Classdef& paramdef)
 	{
-
-		auto hint = report.get().hint();
+		assert(report);
+		auto& table = seq->cdeftable;
+		auto h = report->hint();
 		switch (i)
 		{
-			case 0:  hint << "1st"; break;
-			case 1:  hint << "2nd"; break;
-			case 2:  hint << "3rd"; break;
-			default: hint << (i + 1) << "th";
+			case 0:  h << "1st"; break;
+			case 1:  h << "2nd"; break;
+			case 2:  h << "3rd"; break;
+			default: h << (i + 1) << "th";
 		}
-		if (isGenType)
-			hint << " generic";
-		hint << " parameter, got '";
-		cdef.print(hint.message.message, table, false);
-		if (debugmode)
-			hint << ' ' << cdef.clid;
 
-		hint << "', expected '";
-		paramdef.print(hint.message.message, table, false);
+		if (isGenType)
+			h << " generic";
+		h << " parameter, got '";
+		cdef.print(h.message.message, table, false);
 		if (debugmode)
-			hint << ' ' << paramdef.clid;
-		hint << '\'';
+			h << ' ' << cdef.clid;
+
+		h << "', expected '";
+		paramdef.print(h.message.message, table, false);
+		if (debugmode)
+			h << ' ' << paramdef.clid;
+		h << '\'';
 
 		if (debugmode)
 		{
-			hint.hint() << "failed to push"
+			h.hint() << "failed to push"
 				<< (isGenType ? " generic value " : " value ")
 				<< cdef.clid << " to " << (CLID{atom.atomid,0})
 				<< ":'" << atom.name << "' parameter index " << (i + 1);
 
 			String inputs;
 			printInputParameters(inputs);
-			hint.hint() << ">> <call> " << inputs;
+			h.hint() << ">> <call> " << inputs;
 		}
 	}
 
@@ -127,9 +134,8 @@ namespace Nany
 	inline TypeCheck::Match FuncOverloadMatch::pushParameter(Atom& atom, uint32_t index, const CLID& clid)
 	{
 		// force reset
-		auto& cdef = table.classdef(clid);
-		if (cdef.isLinkedToAtom())
-			std::cout << "    " << cdef.atom->caption() << '\n';
+		auto& table = seq->cdeftable;
+		auto& cdef  = table.classdef(clid);
 		auto& resultinfo = (not isTmpl) ? result.params[index] : result.tmplparams[index];
 		resultinfo.clid = clid;
 		resultinfo.cdef = &cdef;
@@ -141,7 +147,7 @@ namespace Nany
 
 		// checking the parameter type
 		resultinfo.strategy = (not cdef.isAny())
-			? TypeCheck::isSimilarTo(table, nullptr, cdef, paramdef, pAllowImplicit)
+			? TypeCheck::isSimilarTo(*seq, cdef, paramdef, pAllowImplicit)
 			: TypeCheck::Match::none;
 
 		if (resultinfo.strategy == TypeCheck::Match::none)
@@ -157,21 +163,23 @@ namespace Nany
 	inline TypeCheck::Match FuncOverloadMatch::validateAtom(Atom& atom, bool allowImplicit)
 	{
 		assert(atom.isFunction() or atom.isClass());
-		std::cout << "--- " << atom.fullname() << '\n';
 
 		// some reset
 		result.params.clear();
 		result.tmplparams.clear();
 		result.funcToCall = &atom;
 
+		auto& table = seq->cdeftable;
+
 		// trivial check, too many parameters for this overload
 		if (unlikely(atom.parameters.size() < (uint32_t) input.params.indexed.size()))
 		{
 			if (withErrorReporting)
 			{
+				assert(report);
 				// do not take into consideration the 'self' parameter for error reporting
 				uint32_t selfidx = static_cast<uint32_t>(atom.isClassMember() and atom.isFunction());
-				report.get().hint() << "too many parameters. Got "
+				report->hint() << "too many parameters. Got "
 					<< (input.params.indexed.size() - selfidx)
 					<< ", expected: " << (atom.parameters.size() - selfidx);
 			}
@@ -182,7 +190,8 @@ namespace Nany
 		{
 			if (withErrorReporting)
 			{
-				report.get().hint() << "too many generic type parameters. Got "
+				assert(report);
+				report->hint() << "too many generic type parameters. Got "
 					<< input.tmplparams.indexed.size()
 					<< ", expected: " << atom.tmplparams.size();
 			}
@@ -212,7 +221,7 @@ namespace Nany
 			if (unlikely(not input.tmplparams.named.empty()))
 			{
 				if (withErrorReporting)
-					report.get().error() << "named generic type parameters not implemented yet";
+					report->error() << "named generic type parameters not implemented yet";
 				return TypeCheck::Match::none;
 			}
 
@@ -241,7 +250,7 @@ namespace Nany
 						//report.trace() << "named parameter '" << pair.first
 						//	<< "' not found after started from index " << offset << " in " << (CLID{atom.atomid,0});
 						if (withErrorReporting)
-							report.get().hint() << "named parameter '" << pair.first << "' not found after indexed parameters";
+							report->hint() << "named parameter '" << pair.first << "' not found after indexed parameters";
 						return TypeCheck::Match::none;
 					}
 
@@ -264,10 +273,10 @@ namespace Nany
 						auto ix = i;
 						if (not atom.isClassMember())
 							++ix;
-						auto hint = (report.get().hint());
-						hint << atom.caption(table);
-						hint << ": no type provided for the generic type parameter '";
-						hint << atom.tmplparams.name((uint32_t) i) << '\'';
+						auto h = (report->hint());
+						h << atom.caption(table);
+						h << ": no type provided for the generic type parameter '";
+						h << atom.tmplparams.name((uint32_t) i) << '\'';
 					}
 					return TypeCheck::Match::none;
 				}
@@ -283,9 +292,9 @@ namespace Nany
 						auto ix = i;
 						if (not atom.isClassMember())
 							++ix;
-						auto hint = (report.get().hint());
-						hint << atom.caption(table) << ": no value provided for the parameter '";
-						hint << atom.parameters.name((uint32_t) i) << '\'';
+						auto h = (report->hint());
+						h << atom.caption(table) << ": no value provided for the parameter '";
+						h << atom.parameters.name((uint32_t) i) << '\'';
 					}
 					return TypeCheck::Match::none;
 				}
@@ -302,11 +311,11 @@ namespace Nany
 				if (wantedRettype.isBuiltinOrVoid() or wantedRettype.hasConstraints())
 				{
 					auto& atomRettype = table.classdef(atom.returnType.clid);
-					if (TypeCheck::Match::none == TypeCheck::isSimilarTo(table, nullptr, wantedRettype, atomRettype, pAllowImplicit))
+					if (TypeCheck::Match::none == TypeCheck::isSimilarTo(*seq, wantedRettype, atomRettype, pAllowImplicit))
 					{
 						if (withErrorReporting)
 						{
-							auto err = report.get().hint() << "returned type does not match, got '";
+							auto err = (report->hint() << "returned type does not match, got '");
 							if (debugmode)
 								err << atomRettype.clid;
 							atomRettype.print(err.message.message, table, false);
@@ -337,7 +346,7 @@ namespace Nany
 
 					if (withErrorReporting)
 					{
-						auto err = report.get().hint() << "returned type does not match, got '";
+						auto err = (report->hint() << "returned type does not match, got '");
 						if (debugmode)
 							err << atomRettype.clid;
 						atomRettype.print(err.message.message, table, false);
@@ -366,9 +375,14 @@ namespace Nany
 
 	TypeCheck::Match FuncOverloadMatch::validateWithErrReport(Atom& atom, bool allowImplicit)
 	{
-		return validateAtom<true>(atom, allowImplicit);
+		assert(report != nullptr);
+		auto match = validateAtom<true>(atom, allowImplicit);
+		report = nullptr;
+		return match;
 	}
 
 
 
+} // namespace Instanciate
+} // namespace Pass
 } // namespace Nany

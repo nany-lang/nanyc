@@ -1,6 +1,6 @@
 #include <yuni/yuni.h>
 #include "type-check.h"
-#include <iostream>
+#include "instanciate.h"
 
 using namespace Yuni;
 
@@ -9,13 +9,17 @@ using namespace Yuni;
 
 namespace Nany
 {
+namespace Pass
+{
+namespace Instanciate
+{
 namespace TypeCheck
 {
 
 	namespace // anonymous
 	{
 
-		static Match isAtomSimilarTo(const ClassdefTable& table, const CTarget* target, const Atom& atom, const Atom& to)
+		static Match isAtomSimilarTo(SequenceBuilder& seq, const Atom& atom, const Atom& to)
 		{
 			if (&atom == &to) // identity
 				return Match::strictEqual;
@@ -23,8 +27,8 @@ namespace TypeCheck
 			if (atom.type != to.type) // can not be similar to a different type
 				return Match::none;
 
-			if (to.isTypeAlias())
-				std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
+			//if (to.isTypeAlias())
+			//	std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
 
 
 			switch (atom.type)
@@ -42,8 +46,8 @@ namespace TypeCheck
 						if (atomParam.first != toParam.first)
 							return Match::none;
 
-						auto& cdefAtom = table.classdef(atomParam.second.clid);
-						auto& cdefTo   = table.classdef(toParam.second.clid);
+						auto& cdefAtom = seq.cdeftable.classdef(atomParam.second.clid);
+						auto& cdefTo   = seq.cdeftable.classdef(toParam.second.clid);
 
 						if (cdefAtom.atom != cdefTo.atom)
 							return Match::none;
@@ -58,9 +62,9 @@ namespace TypeCheck
 
 					if (hasReturnType)
 					{
-						auto& cdefAtom = table.classdef(atom.returnType.clid);
-						auto& cdefTo   = table.classdef(to.returnType.clid);
-						if (Match::none == isSimilarTo(table, target, cdefAtom, cdefTo, false))
+						auto& cdefAtom = seq.cdeftable.classdef(atom.returnType.clid);
+						auto& cdefTo   = seq.cdeftable.classdef(to.returnType.clid);
+						if (Match::none == isSimilarTo(seq, cdefAtom, cdefTo, false))
 							return Match::none;
 					}
 					return Match::equal;
@@ -75,7 +79,7 @@ namespace TypeCheck
 						// try to find a similar atom
 						to.eachChild(child.name, [&](const Atom& toChild) -> bool
 						{
-							if (Match::none != isAtomSimilarTo(table, target, child, toChild))
+							if (Match::none != isAtomSimilarTo(seq, child, toChild))
 							{
 								found = true;
 								return false;
@@ -110,8 +114,7 @@ namespace TypeCheck
 
 
 
-	Match isSimilarTo(const ClassdefTable& table, const CTarget* target, const Classdef& from, const Classdef& to,
-		bool allowImplicit)
+	Match isSimilarTo(SequenceBuilder& seq, const Classdef& from, const Classdef& to, bool allowImplicit)
 	{
 		// identity
 		// (note: comparing only the address of 'from' and 'to' is not good enough
@@ -132,14 +135,14 @@ namespace TypeCheck
 			return (from.kind == to.kind) ? Match::strictEqual : Match::none;
 
 
-		const Atom* toAtom = table.findClassdefAtom(to);
+		const Atom* toAtom = seq.cdeftable.findClassdefAtom(to);
 		if (unlikely(toAtom == nullptr)) // type not resolved
 			return Match::none;
 
 		auto similarity = Match::none;
 		if (from.hasAtom())
 		{
-			similarity = isAtomSimilarTo(table, target, *from.atom, *toAtom);
+			similarity = isAtomSimilarTo(seq, *from.atom, *toAtom);
 			if (similarity == Match::none)
 				return Match::none;
 		}
@@ -147,7 +150,7 @@ namespace TypeCheck
 		// follow-ups
 		for (auto& clid: from.followup.extends)
 		{
-			auto extendSimilarity = isSimilarTo(table, target, table.classdef(clid), to, allowImplicit);
+			auto extendSimilarity = isSimilarTo(seq, seq.cdeftable.classdef(clid), to, allowImplicit);
 			if (Match::none == extendSimilarity)
 				return Match::none;
 
@@ -163,4 +166,6 @@ namespace TypeCheck
 
 
 } // namespace TypeCheck
+} // namespace Instanciate
+} // namespace Pass
 } // namespace Nany

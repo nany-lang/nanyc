@@ -1,5 +1,5 @@
 #include "instanciate.h"
-#include "details/type/type-check.h"
+#include "type-check.h"
 
 using namespace Yuni;
 
@@ -58,7 +58,7 @@ namespace Instanciate
 
 			if (not implicitBuiltin)
 			{
-				auto similarity = TypeCheck::isSimilarTo(seq.cdeftable, nullptr, cdef, cdefvar);
+				auto similarity = TypeCheck::isSimilarTo(seq, cdef, cdefvar);
 				if (unlikely(TypeCheck::Match::none == similarity))
 					return seq.complainInvalidType("fieldset: ", cdef, cdefvar);
 			}

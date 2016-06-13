@@ -48,6 +48,11 @@ namespace Nany
 	Logs::Report info();
 
 	/*!
+	** \brief Generate a new hint report
+	*/
+	Logs::Report hint();
+
+	/*!
 	** \brief Generate a new ICE report
 	*/
 	Logs::Report ice();

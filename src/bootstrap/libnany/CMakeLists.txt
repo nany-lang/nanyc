@@ -237,6 +237,12 @@ addsrc(
 	"details/pass/build-instanciate/instanciate-atom.h"
 	"details/pass/build-instanciate/instanciate.h"
 	"details/pass/build-instanciate/instanciate.hxx"
+
+	"details/pass/build-instanciate/type-check.cpp"
+	"details/pass/build-instanciate/type-check.h"
+	"details/pass/build-instanciate/func-overload-match.cpp"
+	"details/pass/build-instanciate/func-overload-match.h"
+
 	"details/pass/build-instanciate/stack-frame.h"
 	"details/pass/build-instanciate/stack-frame.hxx"
 	"details/pass/build-instanciate/instanciate-capture-variable.cpp"
@@ -360,9 +366,7 @@ addsrc(
 	NAME nysrc_details_type_system
 	GROUP "details/type"
 	FILES
-	"details/type/builtin.h"
-	"details/type/type-check.cpp"
-	"details/type/type-check.h")
+	"details/type/builtin.h")
 
 
 addsrc(
@@ -392,9 +396,7 @@ addsrc(
 	"details/atom/atom-map.cpp"
 	"details/atom/signature.h"
 	"details/atom/signature.cpp"
-	"details/atom/signature.hxx"
-	"details/atom/func-overload-match.cpp"
-	"details/atom/func-overload-match.h")
+	"details/atom/signature.hxx")
 
 
 addsrc(

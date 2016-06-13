@@ -202,6 +202,16 @@ namespace Nany
 		return entry;
 	}
 
+
+	Logs::Report hint()
+	{
+		auto& state = Logs::localHandler;
+		auto entry = state.callback(state.userdefined, Logs::Level::hint);
+		retrieveMetadata(entry);
+		return entry;
+	}
+
+
 	Logs::Report trace()
 	{
 		auto& state = Logs::localHandler;

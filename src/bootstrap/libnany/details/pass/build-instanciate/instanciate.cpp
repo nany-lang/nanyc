@@ -1,11 +1,11 @@
 #include "details/context/build.h"
 #include "instanciate.h"
 #include "details/reporting/report.h"
-#include "details/atom/func-overload-match.h"
 #include "details/reporting/message.h"
 #include "details/utils/origin.h"
 #include "libnany-traces.h"
 #include "instanciate-atom.h"
+#include "func-overload-match.h"
 #include <memory>
 
 using namespace Yuni;
@@ -30,7 +30,7 @@ namespace Instanciate
 		, intrinsics(build.intrinsics)
 		, out(out)
 		, currentSequence(sequence)
-		, overloadMatch(report, cdeftable)
+		, overloadMatch(this)
 		, parent(parent)
 		, localErrorHandler(this, &emitReportEntry)
 		, localMetadataHandler(this, &retriveReportMetadata)
@@ -424,8 +424,8 @@ namespace Nany
 		}
 
 		// parameters for the signature
-		decltype(FuncOverloadMatch::result.params) params;
-		decltype(FuncOverloadMatch::result.params) tmplparams;
+		decltype(Pass::Instanciate::FuncOverloadMatch::result.params) params;
+		decltype(Pass::Instanciate::FuncOverloadMatch::result.params) tmplparams;
 		Logs::Message::Ptr newReport;
 
 		ClassdefTableView cdeftblView{cdeftable};

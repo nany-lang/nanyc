@@ -53,7 +53,7 @@ namespace Instanciate
 			retIsVoid = false;
 
 			// determining if the expression returned matched the return type of the current func
-			similarity = TypeCheck::isSimilarTo(cdeftable, nullptr, *usercdef, *expectedcdef);
+			similarity = TypeCheck::isSimilarTo(*this, *usercdef, *expectedcdef);
 			switch (similarity)
 			{
 				case TypeCheck::Match::strictEqual:
@@ -80,7 +80,7 @@ namespace Instanciate
 				if (not marker.clid.isVoid())
 				{
 					auto& cdefPreviousReturn = cdeftable.classdef(marker.clid);
-					auto prevsim = TypeCheck::isSimilarTo(cdeftable, nullptr, *usercdef, cdefPreviousReturn);
+					auto prevsim = TypeCheck::isSimilarTo(*this, *usercdef, cdefPreviousReturn);
 					switch (prevsim)
 					{
 						case TypeCheck::Match::strictEqual:
