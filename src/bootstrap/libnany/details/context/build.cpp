@@ -24,7 +24,6 @@ namespace Nany
 	}
 
 
-
 	void Build::destroy()
 	{
 		if (cf.on_destroy)
@@ -72,15 +71,17 @@ namespace Nany
 	}
 
 
+	static Logs::Report buildGenerateReport(void* ptr, Logs::Level level)
+	{
+		return (*((Nany::Logs::Report*) ptr)).fromErrLevel(level);
+	}
+
+
 	bool Build::compile()
 	{
 		// preparing report
 		Nany::Logs::Report report{*messages.get()};
-
-		Logs::Handler newHandler{&report, +[](void* ptr, Logs::Level level) -> Logs::Report
-		{
-			return (*((Nany::Logs::Report*) ptr)).fromErrLevel(level);
-		}};
+		Logs::Handler newHandler{&report, &buildGenerateReport};
 
 
 		buildtime = DateTime::NowMilliSeconds();
