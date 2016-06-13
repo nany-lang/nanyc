@@ -50,6 +50,15 @@ $ msbuild nany-boostrap.sln
 to the `appveyor.yml` file at the root directory of the repository.
 
 
+
+### Release mode
+
+To compile in release mode, just add `-DCMAKE_BUILD_TYPE=release` to cmake
+command line options.
+
+
+
+
 Generating packages for Debian/Redhat
 -------------------------------------
 
