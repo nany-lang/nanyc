@@ -956,6 +956,14 @@ namespace IR
 	}
 
 
+	inline bool Sequence::isCursorValid(const Instruction& instr) const
+	{
+		return (pSize > 0 and pCapacity > 0)
+			and (&instr >= pBody)
+			and (&instr <  pBody + pSize);
+	}
+
+
 	template<ISA::Op O>
 	inline uint32_t Sequence::offsetOf(const ISA::Operand<O>& instr) const
 	{

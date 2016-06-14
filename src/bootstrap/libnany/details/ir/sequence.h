@@ -56,6 +56,9 @@ namespace IR
 		//! Get the offset of an instruction within the sequence
 		uint32_t offsetOf(const Instruction& instr) const;
 
+		//! Get if a cursor is valid
+		bool isCursorValid(const Instruction& instr) const;
+
 		//! Get the upper limit
 		void invalidateCursor(const Instruction*& cusror) const;
 		//! Get the upper limit

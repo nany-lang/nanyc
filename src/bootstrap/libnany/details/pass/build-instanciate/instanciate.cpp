@@ -88,7 +88,10 @@ namespace Instanciate
 
 		auto entry = sb.report.fromErrLevel(level);
 		if (debugmode)
-			entry << "{opc+" << sb.currentSequence.offsetOf(**sb.cursor) << "} ";
+		{
+			if (sb.currentSequence.isCursorValid(**sb.cursor))
+				entry << "{opc+" << sb.currentSequence.offsetOf(**sb.cursor) << "} ";
+		}
 		return entry;
 	}
 
