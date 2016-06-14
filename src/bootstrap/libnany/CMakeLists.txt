@@ -72,6 +72,9 @@ set(ny_core_files
 	# std.os
 	"${nsl_root}/std.os/process.ny"
 
+	# std.memory
+	"${nsl_root}/std.memory/allocator.ny"
+
 	# std.io
 	"${nsl_root}/std.io/native/native.ny"
 	"${nsl_root}/std.io/native/file.ny"
