@@ -51,11 +51,11 @@ extern "C" nybuild_t* nany_build_prepare(nyproject_t* ptr, const nybuild_cf_t* c
 				nybuild_cf_t ncf;
 				nany_build_cf_init(&ncf, ptr);
 
-				auto& allocator = const_cast<nyallocator_t&>(cf->allocator);
+				auto& allocator = const_cast<nyallocator_t&>(ncf.allocator);
 				void* inplace = allocator.allocate(&allocator, sizeof(Nany::Build));
 				if (!inplace)
 					return nullptr;
-				build = new (inplace) Nany::Build(project, *cf, async);
+				build = new (inplace) Nany::Build(project, ncf, async);
 			}
 		}
 		catch (...)
