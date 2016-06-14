@@ -579,3 +579,23 @@ install(TARGETS libnany
 install(FILES ${nysrc_public_headers} 
 	DESTINATION "include/libnany/${nany_version}/nany"
 	COMPONENT "libnany-dev")
+
+
+if (YUNI_COMPILER_IS_CLANG)
+	function(add_clang_static_analysis target)
+	    get_target_property(SRCs ${target} SOURCES)
+	    add_library(${target}_analyze OBJECT EXCLUDE_FROM_ALL ${SRCs})
+		set_target_properties(${target}_analyze PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD true)
+		set_target_properties(${target}_analyze PROPERTIES COMPILE_FLAGS "--analyze")
+
+		target_include_directories(${target}_analyze PRIVATE "${libnany_config_folder}")
+		target_include_directories(${target}_analyze PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../ext/dyncall/")
+		target_include_directories(${target}_analyze PUBLIC  "${CMAKE_CURRENT_LIST_DIR}")
+
+		add_dependencies(${target}_analyze nany-grammar-cpp)
+		add_dependencies(${target}_analyze nyt-nanyfile-to-cstring)
+	endfunction()
+
+	add_clang_static_analysis(libnany)
+endif()
+
