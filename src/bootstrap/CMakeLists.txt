@@ -67,15 +67,13 @@ endif()
 # -- dyncall - (Generic Dynamic FFI package / http://www.dyncall.org/)
 #
 add_subdirectory("ext/dyncall")
-#include(ExternalProject)
-#externalproject_add(ext_dyncall
-#	SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/ext/dyncall/"
-#	PREFIX "${CMAKE_CURRENT_LIST_DIR}/ext/dyncall"
-#	INSTALL_COMMAND ""
-#	CMAKE_ARGS
-#	"-DCMAKE_BUILD_TYPE=Release")
-#add_library(dyncall UNKNOWN IMPORTED)
-#add_dependencies(dyncall ext_dyncall)
+
+#
+# -- Google RE2 (fast, safe, thread-friendly alternative to backtracking regular expression engines)
+#
+add_subdirectory("ext/re2")
+set_target_properties(re2 PROPERTIES EXCLUDE_FROM_ALL true)
+
 
 
 

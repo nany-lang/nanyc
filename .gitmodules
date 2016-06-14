@@ -14,3 +14,7 @@
 	path = src/bootstrap/ext/dyncall
 	url = https://github.com/nany-lang/ext-dyncall
 	branch = master
+[submodule "src/bootstrap/ext/re2"]
+	path = src/bootstrap/ext/re2
+	url = https://github.com/nany-lang/ext-google-re2.git
+	branch = 2016-06-01
