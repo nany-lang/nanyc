@@ -13,7 +13,7 @@ namespace Instanciate
 {
 
 
-	Atom& SequenceBuilder::resolveTypeAlias(Atom& original, bool& success, const Classdef*& resultcdef)
+	Atom& SequenceBuilder::resolveTypeAlias(Atom& original, const Classdef*& resultcdef)
 	{
 		assert(original.isTypeAlias());
 
@@ -62,7 +62,6 @@ namespace Instanciate
 		while (alias != nullptr);
 
 		complainTypedefUnresolved(original);
-		success = false;
 		resultcdef = nullptr;
 		return original;
 	}
@@ -308,13 +307,12 @@ namespace Instanciate
 			case 1: // unique match count
 			{
 				auto& resultAtom = multipleResults[0].get();
-				bool aliasSuccess = true;
 				const Classdef* cdefTypedef = nullptr;
 				auto& atom = (not resultAtom.isTypeAlias())
 					? resultAtom
-					: resolveTypeAlias(resultAtom, aliasSuccess, cdefTypedef);
+					: resolveTypeAlias(resultAtom, cdefTypedef);
 
-				if (unlikely(not aliasSuccess or atom.flags(Atom::Flags::error)))
+				if (unlikely((!cdefTypedef and resultAtom.isTypeAlias()) or atom.flags(Atom::Flags::error)))
 					return false;
 
 				if (unlikely(cdefTypedef and cdefTypedef->isBuiltin()))

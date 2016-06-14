@@ -124,10 +124,9 @@ namespace Instanciate
 		** \brief Try to resolve a type alias
 		**
 		** \param atom A type alias atom
-		** \param success[out] Result of the operation
-		** \param cdefout[out] The resolved classdef
+		** \param[out] cdefout The resolved classdef. null if failed
 		*/
-		Atom& resolveTypeAlias(Atom& atom, bool& success, const Classdef*& cdefout);
+		Atom& resolveTypeAlias(Atom& atom, const Classdef*& cdefout);
 
 		//! Get if a value from a register can be acquired (ref counting)
 		bool canBeAcquired(LVID lvid) const;

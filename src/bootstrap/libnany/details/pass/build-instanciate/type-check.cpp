@@ -19,7 +19,7 @@ namespace TypeCheck
 	namespace // anonymous
 	{
 
-		static Match isAtomSimilarTo(SequenceBuilder& seq, const Atom& atom, const Atom& to)
+		static Match isAtomSimilarTo(SequenceBuilder& seq, Atom& atom, Atom& to)
 		{
 			if (&atom == &to) // identity
 				return Match::strictEqual;
@@ -27,8 +27,16 @@ namespace TypeCheck
 			if (atom.type != to.type) // can not be similar to a different type
 				return Match::none;
 
-			//if (to.isTypeAlias())
-			//	std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
+			if (to.isTypeAlias())
+			{
+				const Classdef* newCdef = nullptr;
+				auto& newTo = seq.resolveTypeAlias(to, newCdef);
+
+				// it can't be a builtin since we have an atom
+				if (unlikely(!newCdef or newCdef->isBuiltinOrVoid()))
+					return Match::none;
+				return isAtomSimilarTo(seq, atom, newTo);
+			}
 
 
 			switch (atom.type)
@@ -73,11 +81,11 @@ namespace TypeCheck
 				case Atom::Type::classdef:
 				{
 					bool found = true;
-					atom.eachChild([&](const Atom& child) -> bool
+					atom.eachChild([&](Atom& child) -> bool
 					{
 						found = false;
 						// try to find a similar atom
-						to.eachChild(child.name, [&](const Atom& toChild) -> bool
+						to.eachChild(child.name, [&](Atom& toChild) -> bool
 						{
 							if (Match::none != isAtomSimilarTo(seq, child, toChild))
 							{
@@ -135,29 +143,43 @@ namespace TypeCheck
 			return (from.kind == to.kind) ? Match::strictEqual : Match::none;
 
 
-		const Atom* toAtom = seq.cdeftable.findClassdefAtom(to);
+		Atom* toAtom = seq.cdeftable.findClassdefAtom(to);
 		if (unlikely(toAtom == nullptr)) // type not resolved
 			return Match::none;
 
+
 		auto similarity = Match::none;
-		if (from.hasAtom())
+
+		if (not toAtom->isTypeAlias())
 		{
-			similarity = isAtomSimilarTo(seq, *from.atom, *toAtom);
-			if (similarity == Match::none)
-				return Match::none;
-		}
+			do
+			{
+				if (from.hasAtom())
+				{
+					similarity = isAtomSimilarTo(seq, *from.atom, *toAtom);
+					if (similarity == Match::none)
+						break;
+				}
 
-		// follow-ups
-		for (auto& clid: from.followup.extends)
+				// follow-ups
+				for (auto& clid: from.followup.extends)
+				{
+					auto extendSimilarity = isSimilarTo(seq, seq.cdeftable.classdef(clid), to, allowImplicit);
+					if (Match::none == extendSimilarity)
+						return Match::none;
+
+					if (similarity == Match::none)
+						similarity = extendSimilarity;
+				}
+			} while (false);
+		}
+		else
 		{
-			auto extendSimilarity = isSimilarTo(seq, seq.cdeftable.classdef(clid), to, allowImplicit);
-			if (Match::none == extendSimilarity)
-				return Match::none;
-
-			if (similarity == Match::none)
-				similarity = extendSimilarity;
+			const Classdef* newCdef = nullptr;
+			/*auto& newTo =*/ seq.resolveTypeAlias(*toAtom, newCdef);
+			if (newCdef)
+				similarity = isSimilarTo(seq, from, (*newCdef), allowImplicit);
 		}
-
 		return similarity;
 	}
 

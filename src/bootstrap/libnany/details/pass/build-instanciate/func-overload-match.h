@@ -40,6 +40,8 @@ namespace Instanciate
 		//@{
 		//! Default constructor
 		FuncOverloadMatch(SequenceBuilder*);
+		// No copy constructor
+		FuncOverloadMatch(const FuncOverloadMatch&) = delete;
 		//@}
 
 		/*!

@@ -31,7 +31,7 @@ namespace TypeCheck
 	** \brief Try to tell if 2 types are similar
 	**
 	** \param A The first type
-	** \param B The other type
+	** \param[in,out] B The other type
 	** \return 'none' if not equal, othe
 	** \note B: Only a well-known classdef, with no interface and no follow-ups (and a valid atom)
 	*/
