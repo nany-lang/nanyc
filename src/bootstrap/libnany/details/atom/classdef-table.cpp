@@ -437,7 +437,7 @@ namespace Nany
 			if (not isAlias) // do not handle aliases
 			{
 				bool success = nameLookupForClassdef(cdef);
-				if (Config::Traces::allTypeDefinitions and not success)
+				if (not success and Config::Traces::allTypeDefinitions)
 					remainings.push_back(cdef);
 			}
 		}
