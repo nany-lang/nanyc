@@ -45,50 +45,17 @@ endmacro()
 #
 get_filename_component(nsl_stdcore_root "${CMAKE_CURRENT_LIST_DIR}/../../nsl/std.core/" REALPATH)
 get_filename_component(nsl_root "${CMAKE_CURRENT_LIST_DIR}/../../nsl/" REALPATH)
-file(GLOB_RECURSE ny_core_files "${nsl_stdcore_root}/*.ny")
+set(nsl_root "${nsl_root}" CACHE INTERNEL "NSL Root path")
 
-set(ny_core_files
-	# std.core
-	"${nsl_root}/std.core/bool.ny"
-	"${nsl_root}/std.core/string.ny"
-	"${nsl_root}/std.core/f64.ny"
-	"${nsl_root}/std.core/f32.ny"
-	"${nsl_root}/std.core/i64.ny"
-	"${nsl_root}/std.core/u64.ny"
-	"${nsl_root}/std.core/i32.ny"
-	"${nsl_root}/std.core/u32.ny"
-	"${nsl_root}/std.core/i16.ny"
-	"${nsl_root}/std.core/u16.ny"
-	"${nsl_root}/std.core/u8.ny"
-	"${nsl_root}/std.core/i8.ny"
-	"${nsl_root}/std.core/utils.ny"
-	"${nsl_root}/std.core/pointer.ny"
-	# C types
-	"${nsl_root}/std.c/ctypes.ny"
+include("${nsl_root}/nsl.cmake")
 
-	# std.math
-	"${nsl_root}/std.math/math.ny"
-
-	# std.os
-	"${nsl_root}/std.os/process.ny"
-
-	# std.memory
-	"${nsl_root}/std.memory/allocator.ny"
-
-	# std.io
-	"${nsl_root}/std.io/native/native.ny"
-	"${nsl_root}/std.io/native/file.ny"
-	# std.env
-	"${nsl_root}/std.env/env.ny"
-
-	# std.memory
-	#"${nsl_root}/std.memory/allocator.ny"
-	)
+list(LENGTH nsl_files nsl_files_count)
+nmessage("standard library: added ${nsl_files_count} files")
 
 file(MAKE_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/details/nsl/generated")
 set(__nany_stdcore)
 set(nysrc_nsl_stdcore)
-foreach (filename ${ny_core_files})
+foreach (filename ${nsl_files})
 	string(REPLACE "/std." "/std" __funcname "${filename}")
 	string(REPLACE "${nsl_root}/" "nany_nsl_" __funcname "${__funcname}")
 	string(REPLACE ".ny" "" __funcname "${__funcname}")
