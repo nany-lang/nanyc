@@ -6,9 +6,48 @@
 */
 #ifndef __LIBNANY_NANY_C_H__
 #define __LIBNANY_NANY_C_H__
-#include "../nany/types.h"
-#include "../nany/memalloc.h"
-#include "../nany/console.h"
+#include <string.h>
+#include <stdint.h>
+
+#if defined(_WIN32) || defined(__CYGWIN__)
+#  ifdef __GNUC__
+#    define LIBNANY_VISIBILITY_EXPORT   __attribute__ ((dllexport))
+#    define LIBNANY_VISIBILITY_IMPORT   __attribute__ ((dllimport))
+#  else
+#    define LIBNANY_VISIBILITY_EXPORT   __declspec(dllexport) /* note: actually gcc seems to also supports this syntax */
+#    define LIBNANY_VISIBILITY_IMPORT   __declspec(dllimport) /* note: actually gcc seems to also supports this syntax */
+#  endif
+#else
+#  define LIBNANY_VISIBILITY_EXPORT     __attribute__((visibility("default")))
+#  define LIBNANY_VISIBILITY_IMPORT     __attribute__((visibility("default")))
+#endif
+
+#if defined(_DLL) && !defined(LIBNANY_DLL_EXPORT)
+#  define LIBNANY_DLL_EXPORT
+#endif
+
+
+#if defined(__clang__) || defined(__GNUC__)
+#  define LIBNANY_ATTR_ALLOCSIZE(A)    __attribute__((alloc_size(A)))
+#  define LIBNANY_ATTR_ALLOCSIZE2(A,B) __attribute__((alloc_size(A, B)))
+#else
+#  define LIBNANY_ATTR_ALLOCSIZE(A)
+#  define LIBNANY_ATTR_ALLOCSIZE2(A, B)
+#endif
+
+/*!
+** \macro NY_EXPORT
+** \brief Export / import a libnany symbol (function)
+*/
+#if defined(LIBNANY_DLL_EXPORT)
+#	define NY_EXPORT LIBNANY_VISIBILITY_EXPORT
+#else
+#	define NY_EXPORT LIBNANY_VISIBILITY_IMPORT
+#endif
+
+
+
+
 
 
 
@@ -17,27 +56,295 @@
 extern "C" {
 #endif
 
+/*! Boolean type */
+typedef enum nybool_t {nyfalse, nytrue} nybool_t;
+
+
+
 
 /*! \name Information about libnany */
 /*@{*/
-/*! Export information about nany for bug reporting (must be released by free())*/
-NY_EXPORT char* nany_get_info_for_bugreport();
+/*!
+** \brief Print information about nany for bug reporting
+*/
+NY_EXPORT void nany_print_info_for_bugreport();
 
-/*! Get the version of nany (string, ex: 3.2.1-beta+2e738ae) */
+/*!
+** \brief Export information about nany for bug reporting
+**
+** \param[out] length Length of the returned c-string (can be null)
+** \return A C-String, which must be released by `free (3)`. NULL if an error occured
+*/
+NY_EXPORT char* nany_get_info_for_bugreport(uint32_t* length);
+
+/*!
+** \brief Get the nany's website
+*/
+NY_EXPORT const char* nany_website_url();
+
+/*!
+** \brief Get the version of nany
+**
+** \param[out] major Major version (eX: 2.4.1 -> 2) (can be null)
+** \param[out] major Minor version (eX: 2.4.1 -> 4) (can be null)
+** \param[out] major Patch (eX: 2.4.1 -> 1) (can be null)
+** \return The full version within a single integer (ex: 2.4.1 -> 204001)
+*/
+NY_EXPORT uint32_t nany_get_version(uint32_t* major, uint32_t* minor, uint32_t* patch);
+
+/*! Get the full version of nany (string, ex: 2.4.1-beta+2e738ae) */
 NY_EXPORT const char* nany_version();
-/*! Get the version metadata (ex: 2e738ae, can be null or empty) */
-
+/*! Get the version metadata (ex: '2e738ae', can be null or empty) */
 NY_EXPORT const char* nany_version_metadata();
-
-/*! Get the pre-release version (ex: beta, can be null or empty) */
+/*! Get the pre-release version (ex: 'beta', can be null or empty) */
 NY_EXPORT const char* nany_version_prerelease();
 
-/*! Get the version of nany */
-NY_EXPORT int nany_get_version(int* major, int* minor, int* patch);
-
-/*! Get the nany's website */
-NY_EXPORT const char* nany_website_url();
+/*!
+** \brief Check if the version is compatible with the library
+**
+** This function can be used to avoid unwanted behaviors when
+** a program is able to use several versions of libnany
+** \code
+** if (nyfalse == nany_check_compatible_version(0, 2))
+**     fprintf(stderr, "incompatible version\n");
+** \endcode
+*/
+NY_EXPORT nybool_t nany_check_compatible_version(uint32_t major, uint32_t minor);
 /*@}*/
+
+
+
+
+
+
+
+
+/*!
+** \brief Nany builtin types
+*/
+typedef enum /* nytype_t */
+{
+	/*! No type */
+	nyt_void = 0,
+	/*! Custom user type */
+	nyt_any,
+	/*! Raw pointer (arch dependent) */
+	nyt_ptr,
+	/*! Boolean (nytrue/nyfalse) */
+	nyt_bool,
+	/*! Unsigned 8  bits integer */
+	nyt_u8,
+	/*! Unsigned 16 bits integer */
+	nyt_u16,
+	/*! Unsigned 32 bits integer */
+	nyt_u32,
+	/*! Unsigned 64 bits integer */
+	nyt_u64,
+	/*! Signed 8  bits integer */
+	nyt_i8,
+	/*! Signed 16 bits integer */
+	nyt_i16,
+	/*! Signed 32 bits integer */
+	nyt_i32,
+	/*! Signed 64 bits integer */
+	nyt_i64,
+	/*! Floating-point number 32 bits */
+	nyt_f32,
+	/*! Floating-point number 64 bits */
+	nyt_f64,
+
+} nytype_t;
+
+enum {
+	/*! The total number of intrinsic types */
+	nyt_count = nyt_f64 + 1,
+};
+
+
+
+
+
+/*!
+** \brief Identifiers' visibility
+**
+** \internal All values are strictly ordered
+*/
+typedef enum /* nyvisibility_t */
+{
+	/*! no valid visibility */
+	nyv_undefined,
+	/*! default: public or internal, according the context */
+	nyv_default,
+	/*! private: accessible only by the class */
+	nyv_private,
+	/*! protected: accessible only by the class and all derived classes */
+	nyv_protected,
+	/*! internal: accessible only from the correspondig target */
+	nyv_internal,
+	/*! public: accessible by everyone */
+	nyv_public,
+	/*! published: same as public, but accessible from an IDE */
+	nyv_published,
+
+} nyvisibility_t;
+
+enum {
+	/*! The total number of visibility types */
+	nyv_count = nyv_published + 1,
+};
+
+
+
+
+/*! Intrnsic attributes */
+typedef uint32_t nybind_flag_t;
+
+/*! Flags for intrinsic attributes */
+enum {
+	/*! Default settings */
+	nybind_default = 0
+};
+
+
+
+
+/*! Opaque Thread Object */
+typedef struct nythread_t nythread_t;
+
+
+/*! Opaque Project Object */
+typedef struct nyproject_t nyproject_t;
+/*! Opaque Target Object */
+typedef struct nytarget_t nytarget_t;
+/*! Opaque structure to a source */
+typedef struct nysource_t nysource_t;
+
+/*! Build */
+typedef struct nybuild_t nybuild_t;
+
+/*! VM Program */
+typedef struct nyprogram_t nyprogram_t;
+/*! VM Thread Context */
+typedef struct nythread_t nytctx_t;
+
+
+
+/*! \name Memory allocator */
+/*@{*/
+typedef struct nyallocator_t
+{
+	/*! Allocates some memory */
+	void* (*allocate)(struct nyallocator_t*, size_t);
+	/*! Re-allocate */
+	void* (*reallocate)(struct nyallocator_t*, void* ptr, size_t oldsize, size_t newsize);
+	/*! free */
+	void (*deallocate)(struct nyallocator_t*, void* ptr, size_t);
+
+	/*! Special values that may not be used directly but are here for performance reasons */
+	volatile size_t reserved_mem0;
+	/*! Memory usage limit (in bytes) */
+	size_t limit_mem_size;
+
+	/*! event: not enough memory */
+	void (*on_not_enough_memory)(struct nyallocator_t*, nybool_t limit_reached);
+}
+nyallocator_t;
+
+
+/*!
+** \nbrief Switch to the standard C memory allocator
+*/
+NY_EXPORT void nany_memalloc_set_default(nyallocator_t*);
+/*!
+** \nbrief Switch to the std C memory allocator with bounds checking
+*/
+NY_EXPORT void nany_memalloc_set_with_limit(nyallocator_t*, size_t limit);
+/*!
+** \nbrief Copy allocator
+*/
+void nany_memalloc_copy(nyallocator_t* out, const nyallocator_t* const src);
+/*@}*/
+
+
+
+
+
+
+
+/*! \name Console */
+/*@{*/
+typedef enum nyconsole_output_t
+{
+	/*! Print to the cout */
+	nycout = 1,
+	/*! Print to the cerr */
+	nycerr = 2,
+}
+nyconsole_output_t;
+
+
+/*! Color constants */
+typedef enum nycolor_t
+{
+	/*! None / reset */
+	nyc_none = 0,
+	/*! Black */
+	nyc_black,
+	/*! Red */
+	nyc_red,
+	/*! Green */
+	nyc_green,
+	/*! Yellow */
+	nyc_yellow,
+	/*! Dark Blue */
+	nyc_blue,
+	/*! Purple */
+	nyc_purple,
+	/*! Gray */
+	nyc_gray,
+	/*! White */
+	nyc_white,
+	/*! Light blue */
+	nyc_lightblue
+}
+nycolor_t;
+
+enum {
+	/*! The total number of colors */
+	nyc_count = nyc_lightblue + 1
+};
+
+
+typedef struct nyconsole_t
+{
+	/*! Write some data to STDOUT */
+	void (*write_stdout)(void*, const char* text, size_t length);
+	/*! Write some data to STDERR */
+	void (*write_stderr)(void*, const char* text, size_t length);
+	/*! Flush output */
+	void (*flush)(void*, nyconsole_output_t);
+	/*! Set the text color */
+	void (*set_color)(void*, nyconsole_output_t, nycolor_t);
+
+	/*! Internal opaque pointer*/
+	void* internal;
+	/*! Flush STDERR */
+	void (*release)(void**);
+}
+nyconsole_t;
+
+/*! Initialize a project configuration */
+NY_EXPORT void nany_console_cf_set_stdcout(nyconsole_t*);
+
+/*!
+** \nbrief Copy Cf
+*/
+void nany_console_cf_copy(nyconsole_t* out, const nyconsole_t* const src);
+/*@}*/
+
+
+
+
 
 
 
@@ -311,7 +618,7 @@ NY_EXPORT void nany_program_cf_init(nyprogram_cf_t* cf, const nybuild_cf_t*);
 **
 ** \warning Writing to the same FD by multiple threads is not thread-safe on all platforms
 */
-inline nybool_t nany_print_ast_from_file(const char* filename, int fd, nybool_t unixcolors);
+nybool_t nany_print_ast_from_file(const char* filename, int fd, nybool_t unixcolors);
 
 /*!
 ** \brief Print the AST of a nany source file
@@ -326,7 +633,7 @@ NY_EXPORT nybool_t nany_print_ast_from_file_n(const char* filename, size_t lengt
 ** \warning Writing to the same FD by multiple threads is not thread-safe on all platforms
 ** \param content Arbitrary utf-8 content (c-string)
 */
-inline nybool_t nany_print_ast_from_memory(const char* content, int fd, nybool_t unixcolors);
+NY_EXPORT nybool_t nany_print_ast_from_memory(const char* content, int fd, nybool_t unixcolors);
 /*!
 ** \brief Print the AST of some nany code in memory
 **
@@ -341,7 +648,7 @@ NY_EXPORT  nybool_t nany_print_ast_from_memory_n(const char* content, size_t len
 ** \param filename An arbitrary filename (utf-8 c-string)
 ** \return nytrue if the file has been successfully parsed, false otherwise
 */
-inline nybool_t nany_try_parse_file(const char* const filename);
+NY_EXPORT nybool_t nany_try_parse_file(const char* const filename);
 /*!
 ** \brief Check if a filename is a valid nany source code
 **
@@ -361,7 +668,7 @@ NY_EXPORT nybool_t nany_try_parse_file_n(const char* filename, size_t length);
 **
 ** An empty value will represent a "default" visibility (nyv_undefined)
 */
-inline nyvisibility_t  nany_cstring_to_visibility(const char* const text);
+NY_EXPORT nyvisibility_t  nany_cstring_to_visibility(const char* const text);
 /*!
 ** \brief Convert a C-String representing a visibility level (with given length)
 **
@@ -381,7 +688,7 @@ NY_EXPORT const char* nany_visibility_to_cstring(nyvisibility_t);
 ** \param text An arbitrary text (ex: "__uint64")
 ** \return The corresponding type (ex: nyt_uint64)
 */
-inline nytype_t  nany_cstring_to_type(const char* const text);
+NY_EXPORT nytype_t nany_cstring_to_type(const char* const text);
 
 /*!
 ** \brief Convert a string into the builtin type (with length provided)
@@ -389,7 +696,7 @@ inline nytype_t  nany_cstring_to_type(const char* const text);
 ** \param text An arbitrary text (ex: "__uint64")
 ** \return The corresponding type (ex: nyt_uint64)
 */
-NY_EXPORT nytype_t  nany_cstring_to_type_n(const char* const text, size_t length);
+NY_EXPORT nytype_t nany_cstring_to_type_n(const char* const text, size_t length);
 
 /*!
 ** \brief Convert a type into a c-string
@@ -397,14 +704,10 @@ NY_EXPORT nytype_t  nany_cstring_to_type_n(const char* const text, size_t length
 NY_EXPORT const char* nany_type_to_cstring(nytype_t);
 
 /*!
-** \brief Get the size in bytes of a Nany type
+** \brief Get the size in bytes of a Nany builtin type
 */
-NY_EXPORT size_t  nany_type_sizeof(nytype_t);
+NY_EXPORT uint32_t nany_type_sizeof(nytype_t);
 /*@}*/
-
-
-
-
 
 
 
@@ -412,7 +715,5 @@ NY_EXPORT size_t  nany_type_sizeof(nytype_t);
 #ifdef __cplusplus
 }
 #endif
-
-#include "nany.hxx" // inline functions
 
 #endif /* __LIBNANY_NANY_C_H__ */

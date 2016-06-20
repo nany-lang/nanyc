@@ -5,18 +5,18 @@
 #include "libnany-config.h"
 #include "common-debuginfo.hxx"
 #include <string.h>
+#include <iostream>
 
 using namespace Yuni;
 
 
 
-
-extern "C" char* nany_get_info_for_bugreport()
+namespace // anonymous
 {
-	try
+
+	template<class T>
+	static inline void buildBugReport(T& string)
 	{
-		String string;
-		string.reserve(512);
 		string << "> nanyc {c++/bootstrap} v" << nany_version();
 		if (debugmode)
 			string << " {debug}";
@@ -73,20 +73,36 @@ extern "C" char* nany_get_info_for_bugreport()
 		string << "> ";
 		nany_details_export_memory_usage(string);
 		string << '\n';
-
-		char* result = (char*)::malloc(sizeof(char) * (string.sizeInBytes() + 1));
-		memcpy(result, string.data(), string.sizeInBytes());
-		result[string.sizeInBytes()] = '\0';
-		return result;
 	}
-	catch (std::bad_alloc&)
+
+
+} // anonymous namespace
+
+
+
+
+extern "C" void nany_print_info_for_bugreport()
+{
+	buildBugReport(std::cout);
+}
+
+
+extern "C" char* nany_get_info_for_bugreport(uint32_t* length)
+{
+	String string;
+	string.reserve(512);
+	buildBugReport(string);
+
+	char* result = (char*)::malloc(sizeof(char) * (string.sizeInBytes() + 1));
+	if (!result)
 	{
+		if (length)
+			*length = 0u;
 		return nullptr;
 	}
-	catch (...)
-	{
-		char* txt = (char*)::malloc(16);
-		strncpy(txt, "<error>", 16);
-		return txt;
-	}
+	memcpy(result, string.data(), string.sizeInBytes());
+	result[string.sizeInBytes()] = '\0';
+	if (length)
+		*length = string.size();
+	return result;
 }

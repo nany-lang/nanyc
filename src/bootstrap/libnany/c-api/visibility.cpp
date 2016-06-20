@@ -45,7 +45,7 @@ extern "C" nyvisibility_t  nany_cstring_to_visibility_n(const char* const text, 
 
 extern "C" const char* nany_visibility_to_cstring(nyvisibility_t visibility)
 {
-	static constexpr const char* const values[(uint32_t) nyv_max] =
+	static constexpr const char* const values[(uint32_t) nyv_count] =
 	{
 		"undefined",
 		"default",
@@ -56,5 +56,13 @@ extern "C" const char* nany_visibility_to_cstring(nyvisibility_t visibility)
 		"published"
 	};
 	uint32_t index = (uint32_t) visibility;
-	return (index < (uint32_t) nyv_max) ? values[index] : values[index];
+	return (index < (uint32_t) nyv_count) ? values[index] : values[index];
 }
+
+
+extern "C" nyvisibility_t nany_cstring_to_visibility(const char* const text)
+{
+	size_t length = (text ? strlen(text) : 0u);
+	return nany_cstring_to_visibility_n(text, length);
+}
+

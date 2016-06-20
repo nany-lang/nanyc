@@ -1,5 +1,5 @@
 #include <yuni/yuni.h>
-#include "nany/memalloc.h"
+#include "nany/nany.h"
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
@@ -173,4 +173,11 @@ void nany_memalloc_set_with_limit(nyallocator_t* allocator, size_t limit)
 		allocator->reserved_mem0  = 0;
 		allocator->on_not_enough_memory = NULL;
 	}
+}
+
+
+void nany_memalloc_copy(nyallocator_t* out, const nyallocator_t* const src)
+{
+	if (out)
+		memcpy(out, src, sizeof(nyallocator_t));
 }

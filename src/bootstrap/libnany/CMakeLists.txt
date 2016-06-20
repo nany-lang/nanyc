@@ -438,10 +438,6 @@ addsrc(
 	NAME  nysrc_public_headers
 	GROUP "public-headers"
 	FILES
-	"nany/types.h"
-	"nany/console.h"
-	"nany/memalloc.h"
-	"nany/nany.hxx"
 	"nany/nany.h")
 
 

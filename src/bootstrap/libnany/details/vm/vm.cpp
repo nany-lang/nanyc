@@ -351,7 +351,6 @@ namespace VM
 							break;
 						case nyt_void:
 						case nyt_any:
-						case nyt_count:
 							emitInvalidIntrinsicParamType();
 					}
 				}
@@ -399,7 +398,6 @@ namespace VM
 						dcCallVoid(dyncall, intrinsic.callback);
 						break;
 					case nyt_any:
-					case nyt_count:
 						emitInvalidReturnType();
 				}
 			}

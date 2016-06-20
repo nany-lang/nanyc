@@ -25,42 +25,77 @@ static const std::unordered_map<AnyString, nytype_t> translationStringToDef
 	{ "__f64",     nyt_f64  },
 };
 
-
 extern "C" nytype_t nany_cstring_to_type_n(const char* const text, size_t length)
 {
-	try
+	if (length > 3 and length < 16 and text)
 	{
-		if (length > 3 and length < 16 and text and text[0] == '_' and text[1] == '_')
-		{
-			auto it = translationStringToDef.find(AnyString{text, static_cast<uint32_t>(length)});
-			return (it != translationStringToDef.cend()) ? it->second : nyt_void;
-		}
+		auto it = translationStringToDef.find(AnyString{text, static_cast<uint32_t>(length)});
+		return (it != translationStringToDef.cend()) ? it->second : nyt_void;
 	}
-	catch (...) {}
+	return nyt_void;
+}
+
+extern "C" nytype_t nany_cstring_to_type(const char* const text)
+{
+	size_t length = (text ? strlen(text) : 0u);
+	if (length > 3 and length < 16)
+	{
+		auto it = translationStringToDef.find(AnyString{text, static_cast<uint32_t>(length)});
+		return (it != translationStringToDef.cend()) ? it->second : nyt_void;
+	}
 	return nyt_void;
 }
 
 
+
+
+static constexpr const char* const type2cstring[nyt_count] =
+{
+	"void",
+	"any",
+	"__pointer",
+	"__bool",
+	"__u8",
+	"__u16",
+	"__u32",
+	"__u64",
+	"__i8",
+	"__i16",
+	"__i32",
+	"__i64",
+	"__f32",
+	"__f64"
+};
 extern "C" const char* nany_type_to_cstring(nytype_t type)
 {
-	switch (type)
-	{
-		case nyt_bool:  return "__bool";
-		case nyt_ptr:   return "__pointer";
-		case nyt_u64:   return "__u64";
-		case nyt_u32:   return "__u32";
-		case nyt_u16:   return "__u16";
-		case nyt_u8:    return "__u8";
-		case nyt_i64:   return "__i64";
-		case nyt_i32:   return "__i32";
-		case nyt_i16:   return "__i16";
-		case nyt_i8:    return "__i8";
-		case nyt_f32:   return "__f32";
-		case nyt_f64:   return "__f64";
-		case nyt_void:  return "void";
-		case nyt_any:   return "any";
-		case nyt_count: return "??";
-	}
-	assert(false and "unknown nany type");
-	return "<unknown>";
+	return (static_cast<uint32_t>(type) < nyt_count)
+		? type2cstring[static_cast<uint32_t>(type)]
+		: "<unknown>";
+}
+
+
+static constexpr const uint32_t type2size[] =
+{
+	0,
+	0,
+	(uint32_t) sizeof(void*),
+	(uint32_t) sizeof(uint8_t),
+
+	(uint32_t) sizeof(uint8_t),
+	(uint32_t) sizeof(uint16_t),
+	(uint32_t) sizeof(uint32_t),
+	(uint32_t) sizeof(uint64_t),
+	(uint32_t) sizeof(int8_t),
+	(uint32_t) sizeof(int16_t),
+	(uint32_t) sizeof(int32_t),
+	(uint32_t) sizeof(int64_t),
+
+	(uint32_t) sizeof(float),
+	(uint32_t) sizeof(double),
+};
+extern "C" uint32_t nany_type_sizeof(nytype_t type)
+{
+	return (static_cast<uint32_t>(type) < nyt_count)
+		? type2size[static_cast<uint32_t>(type)]
+		: 0;
 }

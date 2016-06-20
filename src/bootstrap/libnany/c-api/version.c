@@ -33,7 +33,7 @@ const char* nany_version_prerelease()
 }
 
 
-int nany_get_version(int* major, int* minor, int* patch)
+uint32_t nany_get_version(uint32_t* major, uint32_t* minor, uint32_t* patch)
 {
 	if (major)
 		*major = LIBNANY_VERSION_MAJOR;
@@ -42,5 +42,14 @@ int nany_get_version(int* major, int* minor, int* patch)
 	if (patch)
 		*patch = LIBNANY_VERSION_PATCH;
 
-	return LIBNANY_VERSION_MAJOR * 100000 + LIBNANY_VERSION_MINOR * 1000 + LIBNANY_VERSION_PATCH;
+	return LIBNANY_VERSION_MAJOR * 100000u + LIBNANY_VERSION_MINOR * 1000u + LIBNANY_VERSION_PATCH;
+}
+
+
+nybool_t nany_check_compatible_version(uint32_t major, uint32_t minor)
+{
+	/* currently, no real incompatibilities except for version comparison */
+	return ((LIBNANY_VERSION_MAJOR >= major)
+		|| (LIBNANY_VERSION_MAJOR == major && minor <= LIBNANY_VERSION_MINOR)
+		) ? nytrue : nyfalse;
 }

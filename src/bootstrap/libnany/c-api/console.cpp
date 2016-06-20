@@ -1,9 +1,11 @@
 #include <yuni/yuni.h>
 #include <yuni/core/system/console/console.h>
-#include "nany/console.h"
+#include "nany/nany.h"
 #include <iostream>
 
 using namespace Yuni;
+
+
 
 
 union internal_t
@@ -47,47 +49,41 @@ static void nany_console_flush(void*, nyconsole_output_t out)
 }
 
 
+constexpr static const System::Console::Color color2yunicolor[nyc_count] =
+{
+	System::Console::none, // none
+	System::Console::black,
+	System::Console::red,
+	System::Console::green,
+	System::Console::yellow,
+	System::Console::blue,
+	System::Console::purple,
+	System::Console::gray,
+	System::Console::white,
+	System::Console::lightblue,
+};
+
 static void nany_console_set_color(void* internal, nyconsole_output_t out, nycolor_t color)
 {
 	assert(internal != nullptr);
 	assert((uint32_t) out == nycout or (uint32_t) out == nycerr);
 
-	try
+	internal_t flags;
+	flags.pointer = internal;
+
+	if (flags.colors[out] != 0)
 	{
-		internal_t flags;
-		flags.pointer = internal;
+		// which output
+		auto& o = (out == nycout) ? std::cout : std::cerr;
 
-		if (flags.colors[out] != 0)
-		{
-			// which output
-			auto& o = (out == nycout) ? std::cout : std::cerr;
-
-			if (color == nyc_none)
-			{
-				System::Console::ResetTextColor(o);
-			}
-			else
-			{
-				constexpr static const System::Console::Color mapping[] =
-				{
-					System::Console::none, // none
-
-					System::Console::black,
-					System::Console::red,
-					System::Console::green,
-					System::Console::yellow,
-					System::Console::blue,
-					System::Console::purple,
-					System::Console::gray,
-					System::Console::white,
-					System::Console::lightblue,
-				};
-				System::Console::SetTextColor(o, mapping[color]);
-			}
-		}
+		if (color == nyc_none)
+			System::Console::ResetTextColor(o);
+		else
+			System::Console::SetTextColor(o, color2yunicolor[color]);
 	}
-	catch (...) {}
 }
+
+
 
 
 extern "C" void nany_console_cf_set_stdcout(nyconsole_t* cf)
@@ -109,4 +105,11 @@ extern "C" void nany_console_cf_set_stdcout(nyconsole_t* cf)
 		cf->internal = internal.pointer;
 		cf->release  = nullptr;
 	}
+}
+
+
+void nany_console_cf_copy(nyconsole_t* out, const nyconsole_t* const src)
+{
+	if (out)
+		memcpy(out, src, sizeof(nyconsole_t));
 }

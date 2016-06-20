@@ -85,3 +85,17 @@ extern "C" nybool_t nany_print_ast_from_memory_n(const char* content, size_t len
 	catch (...) {}
 	return nyfalse;
 }
+
+
+extern "C" nybool_t nany_print_ast_from_file(const char* filename, int fd, nybool_t unixcolors)
+{
+	size_t length = (filename ? strlen(filename) : 0u);
+	return nany_print_ast_from_file_n(filename, length, fd, unixcolors);
+}
+
+
+extern "C" nybool_t nany_print_ast_from_memory(const char* content, int fd, nybool_t unixcolors)
+{
+	size_t length = (content ? strlen(content) : 0u);
+	return nany_print_ast_from_memory_n(content, length, fd, unixcolors);
+}

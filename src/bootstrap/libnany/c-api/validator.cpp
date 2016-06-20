@@ -54,3 +54,13 @@ extern "C" nybool_t nany_try_parse_file_n(const char* const filename, size_t len
 	}
 	return success ? nytrue : nyfalse;
 }
+
+
+extern "C" nybool_t nany_try_parse_file(const char* const filename)
+{
+	size_t length = (filename ? strlen(filename) : 0u);
+	return nany_try_parse_file_n(filename, length);
+}
+
+
+

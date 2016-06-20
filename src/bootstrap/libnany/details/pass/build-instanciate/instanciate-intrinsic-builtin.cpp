@@ -525,7 +525,6 @@ namespace Instanciate
 				}
 				case nyt_void:
 				case nyt_any:
-				case nyt_count:
 				{
 					return seq.complainIntrinsicParameter(name, 0, cdeflhs);
 				}
