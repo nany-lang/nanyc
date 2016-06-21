@@ -86,14 +86,8 @@ namespace // anonymous
 
 	static int printBugReportInfo()
 	{
-		auto* text = nany_get_info_for_bugreport();
-		if (text)
-		{
-			std::cout << text;
-			::free(text);
-			return EXIT_SUCCESS;
-		}
-		return EXIT_FAILURE;
+		nany_print_info_for_bugreport();
+		return EXIT_SUCCESS;
 	}
 
 	static int printVersion()
@@ -149,9 +143,6 @@ namespace // anonymous
 		nybuild_cf_t cf;
 		nany_build_cf_init(&cf, project.get());
 		auto build = std::unique_ptr<nybuild_t>{nany_build_prepare(project.get(), &cf)};
-		if (unlikely(!build))
-			return nullptr;
-
 		auto bStatus = nany_build(build.get());
 		if (bStatus != nyfalse)
 		{
