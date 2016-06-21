@@ -125,7 +125,7 @@ namespace Instanciate
 					assert(frame != nullptr);
 					assert(frame->offsetOpcodeBlueprint != (uint32_t) -1);
 					auto startOffset = frame->offsetOpcodeBlueprint;
-					auto count = operands.value.blueprintsize;
+					uint32_t count = operands.value.blueprintsize;
 
 					if (unlikely(count < 3))
 					{

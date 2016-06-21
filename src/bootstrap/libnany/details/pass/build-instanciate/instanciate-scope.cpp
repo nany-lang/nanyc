@@ -53,13 +53,13 @@ namespace Instanciate
 						out.emitEnd();
 				}
 				else
-					*cursor += currentSequence.opcodeCount(); // end of the code
+					currentSequence.invalidateCursor(*cursor); // end-of-code
 			}
 		}
 		else
 		{
 			assert(false and "should not happen");
-			*cursor += currentSequence.opcodeCount();
+			currentSequence.invalidateCursor(*cursor);
 		}
 	}
 
