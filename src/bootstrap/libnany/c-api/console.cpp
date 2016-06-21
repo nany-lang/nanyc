@@ -108,7 +108,7 @@ extern "C" void nany_console_cf_set_stdcout(nyconsole_t* cf)
 }
 
 
-void nany_console_cf_copy(nyconsole_t* out, const nyconsole_t* const src)
+extern "C" void nany_console_cf_copy(nyconsole_t* out, const nyconsole_t* const src)
 {
 	if (out)
 		memcpy(out, src, sizeof(nyconsole_t));

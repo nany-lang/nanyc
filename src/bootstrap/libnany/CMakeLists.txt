@@ -427,6 +427,7 @@ addsrc(
 	"c-api/bugreport.cpp"
 	"c-api/validator.cpp"
 	"c-api/type.cpp"
+	"c-api/run.cpp"
 	"c-api/print-ast.cpp"
 	"c-api/visibility.cpp"
 	"c-api/memalloc.c"

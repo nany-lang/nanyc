@@ -60,9 +60,9 @@ extern "C" nyprogram_t* nany_program_prepare(nybuild_t* build, const nyprogram_c
 }
 
 
-extern "C" int nany_main(nyprogram_t* ptr, int argc, const char** argv)
+extern "C" int nany_program_main(nyprogram_t* ptr, uint32_t argc, const char** argv)
 {
-	if (ptr and argc > 0 and argv != nullptr)
+	if (ptr and argc != 0 and argv != nullptr)
 	{
 		auto& program = Nany::ref(ptr);
 		return program.execute(argc, argv);

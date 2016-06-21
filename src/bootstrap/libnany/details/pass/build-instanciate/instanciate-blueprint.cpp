@@ -1,4 +1,5 @@
 #include "instanciate.h"
+#include <iostream>
 
 using namespace Yuni;
 
@@ -69,8 +70,11 @@ namespace Instanciate
 				generateClassVarsAutoInit = false;
 				generateClassVarsAutoRelease = false;
 
-				assert(layerDepthLimit > 0);
-				--layerDepthLimit;
+
+//				assert(layerDepthLimit > 0);
+				bool bug = (layerDepthLimit == 0);
+				if (not bug)
+					--layerDepthLimit;
 
 				uint32_t atomid = operands.atomid;
 
@@ -125,6 +129,8 @@ namespace Instanciate
 					// ignoring completely this blueprint, so the cursor will be
 					// moved to its final corresponding opcode 'end'
 					currentSequence.moveCursorFromBlueprintToEnd(*cursor);
+					if (bug)
+						*cursor = &currentSequence.at(currentSequence.offsetOf(**cursor) + 1);
 
 					bool instok = instanciateAtomClass(*atom); // instanciating the class
 					if (unlikely(not instok))

@@ -247,6 +247,9 @@ typedef struct nyallocator_t
 
 	/*! event: not enough memory */
 	void (*on_not_enough_memory)(struct nyallocator_t*, nybool_t limit_reached);
+
+	/*! Flush STDERR */
+	void (*release)(const struct nyallocator_t*);
 }
 nyallocator_t;
 
@@ -329,7 +332,7 @@ typedef struct nyconsole_t
 	/*! Internal opaque pointer*/
 	void* internal;
 	/*! Flush STDERR */
-	void (*release)(void**);
+	void (*release)(const struct nyconsole_t*);
 }
 nyconsole_t;
 
@@ -424,7 +427,6 @@ typedef struct nybuild_cf_t
 {
 	/*! Memory allocator */
 	nyallocator_t allocator;
-
 	/*! Console output */
 	nyconsole_t console;
 
@@ -449,7 +451,7 @@ typedef struct nybuild_cf_t
 	/*! A build has terminated */
 	void (*on_end)(const nyproject_t*, nybuild_t*, nybool_t success);
 
-	void (*on_error_file_eacces)(const nyproject_t*, nybuild_t*, const char*, uint32_t);
+	void (*on_error_file_eacces)(const nyproject_t*, nybuild_t*, const char* filename, uint32_t length);
 }
 nybuild_cf_t;
 
@@ -585,7 +587,7 @@ NY_EXPORT nyprogram_t* nany_program_prepare(nybuild_t* build, const nyprogram_cf
 **    to the program/script. Arguments must use the UTF8 encoding
 ** \return Exit status code
 */
-NY_EXPORT int nany_main(nyprogram_t* program, int argc, const char** argv);
+NY_EXPORT int nany_program_main(nyprogram_t* program, uint32_t argc, const char** argv);
 
 
 
@@ -707,6 +709,86 @@ NY_EXPORT const char* nany_type_to_cstring(nytype_t);
 ** \brief Get the size in bytes of a Nany builtin type
 */
 NY_EXPORT uint32_t nany_type_sizeof(nytype_t);
+/*@}*/
+
+
+
+
+
+
+/*! \name Convenient wrappers */
+/*@{*/
+typedef struct nyrun_cf_t
+{
+	/*! Memory allocator */
+	nyallocator_t allocator;
+	/*! Console */
+	nyconsole_t console;
+
+	/*! Default prject settings */
+	nyproject_cf_t project;
+	/*! Default build settings */
+	nybuild_cf_t build;
+	/*! Default program settings */
+	nyprogram_cf_t program;
+
+	/*! A non-zero value for verbose mode */
+	int verbose;
+}
+nyrun_cf_t;
+
+/*! Initialize a template object */
+NY_EXPORT void nany_run_cf_init(nyrun_cf_t*);
+
+/*! Release resources held by a template object */
+NY_EXPORT void nany_run_cf_release(const nyrun_cf_t*);
+/*!
+** \brief Compile & run a nany program
+**
+** \param cf A template for settings (can be null)
+** \param source A nany program (can be null)
+** \param argc The number of additional input arguments (ignored if <= 0)
+** \param argv Input arguments (ignored if null)
+** \return Exit status code
+*/
+NY_EXPORT int nany_run(const nyrun_cf_t* cf, const char* source, uint32_t argc, const char** argv);
+
+/*!
+** \brief Compile & run a nany program
+**
+** \param cf A template for settings (can be null)
+** \param source A nany program (can be null)
+** \param length Length in bytes of the nany program
+** \param argc The number of additional input arguments (ignored if <= 0)
+** \param argv Input arguments (ignored if null)
+** \return Exit status code
+*/
+NY_EXPORT int nany_run_n(const nyrun_cf_t* cf, const char* source, size_t length, uint32_t argc, const char** argv);
+
+
+/*!
+** \brief Compile & run a nany script file
+**
+** \param cf A template for settings (can be null)
+** \param file a filename (can be null)
+** \param length Length in bytes of the filename
+** \param argc The number of additional input arguments (ignored if <= 0)
+** \param argv Input arguments (ignored if null)
+** \return Exit status code
+*/
+NY_EXPORT int nany_run_file(const nyrun_cf_t* cf, const char* file, uint32_t argc, const char** argv);
+
+/*!
+** \brief Compile & run a nany script file
+**
+** \param cf A template for settings (can be null)
+** \param file a filename (can be null)
+** \param length Length in bytes of the filename
+** \param argc The number of additional input arguments (ignored if <= 0)
+** \param argv Input arguments (ignored if null)
+** \return Exit status code
+*/
+NY_EXPORT int nany_run_file_n(const nyrun_cf_t* cf, const char* file, size_t length, uint32_t argc, const char** argv);
 /*@}*/
 
 

@@ -35,7 +35,7 @@ namespace VM
 		/*!
 		** \brief Execute the main entry point
 		*/
-		int execute(int argc, const char** argv);
+		int execute(uint32_t argc, const char** argv);
 
 		/*!
 		** \brief Print a message on the console

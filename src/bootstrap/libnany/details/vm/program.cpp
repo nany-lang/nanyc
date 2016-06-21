@@ -41,7 +41,7 @@ namespace VM
 
 
 
-	int Program::execute(int argc, const char** argv)
+	int Program::execute(uint32_t argc, const char** argv)
 	{
 		if (cf.on_execute)
 		{
@@ -50,6 +50,7 @@ namespace VM
 		}
 
 		// TODO Take input arguments into consideration
+		// (requires std.Array<:T:>)
 		(void) argc;
 		(void) argv;
 

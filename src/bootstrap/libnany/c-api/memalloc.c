@@ -62,6 +62,7 @@ void nany_memalloc_set_default(nyallocator_t* allocator)
 		allocator->limit_mem_size = (size_t) -1; // just to have a value set
 		allocator->reserved_mem0  = 0;
 		allocator->on_not_enough_memory = NULL;
+		allocator->release = NULL;
 	}
 }
 
@@ -172,6 +173,7 @@ void nany_memalloc_set_with_limit(nyallocator_t* allocator, size_t limit)
 		allocator->limit_mem_size = limit;
 		allocator->reserved_mem0  = 0;
 		allocator->on_not_enough_memory = NULL;
+		allocator->release = NULL;
 	}
 }
 
