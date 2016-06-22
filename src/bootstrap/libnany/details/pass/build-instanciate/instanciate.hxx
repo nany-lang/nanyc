@@ -32,9 +32,12 @@ namespace Instanciate
 	{
 		bool success = not cdef.isBuiltinOrVoid();
 		#ifndef NDEBUG
-		if (unlikely(success and unlikely(cdeftable.findClassdefAtom(cdef) == nullptr)))
-			return (ice() << "canBeAcquired: invalid atom " << cdef.clid);
-		assert(not (success and unlikely(cdeftable.findClassdefAtom(cdef) == nullptr)));
+		if (unlikely(success and cdeftable.findClassdefAtom(cdef) == nullptr))
+		{
+			// do not generate any error if already reported
+			if (frame->atomid != cdef.clid.atomid() or frame->verify(cdef.clid.lvid()))
+				return (ice() << "canBeAcquired: invalid atom " << cdef.clid);
+		}
 		#endif
 		return success;
 	}
@@ -42,8 +45,7 @@ namespace Instanciate
 
 	inline bool SequenceBuilder::canBeAcquired(const CLID& clid) const
 	{
-		auto& cdef = cdeftable.classdef(clid);
-		return canBeAcquired(cdef);
+		return canBeAcquired(cdeftable.classdef(clid));
 	}
 
 
@@ -64,8 +66,7 @@ namespace Instanciate
 	inline bool SequenceBuilder::checkForIntrinsicParamCount(const AnyString& name, uint32_t count)
 	{
 		return (pushedparams.func.indexed.size() == count)
-			? true
-			: complainIntrinsicParameterCount(name, count);
+			or complainIntrinsicParameterCount(name, count);
 	}
 
 
