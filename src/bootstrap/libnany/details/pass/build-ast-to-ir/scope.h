@@ -101,6 +101,7 @@ namespace Producer
 		bool visitASTExprReturn(const AST::Node&);
 		bool visitASTExprContinuation(const AST::Node&, LVID& localvar, bool allowScope = false);
 		bool visitASTExprIdentifier(const AST::Node&, LVID& localvar);
+		bool visitASTExprIdOperator(const AST::Node& node, LVID& localvar);
 		bool visitASTExprRegister(const AST::Node&, LVID& localvar);
 		bool visitASTExprCall(const AST::Node*, LVID& localvar, const AST::Node* parent = nullptr); // func call
 		bool visitASTExprCallParameters(const AST::Node&, ShortcircuitUpdate* shortcircuit = nullptr); // parameters of a func call

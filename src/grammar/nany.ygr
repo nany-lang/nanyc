@@ -979,7 +979,7 @@ type-continuation: notext hidden
 //	ex-value
 
 expr-sub-dot: notext
-	tk-dot (wp identifier  expr-continuation?) | error-semicolon
+	tk-dot (wp (function-kind-operator | identifier)  expr-continuation?) | error-semicolon
 
 expr-sub-array: notext
 	interval | array   expr-continuation?

@@ -29,6 +29,23 @@ namespace Producer
 	}
 
 
+	bool Scope::visitASTExprIdOperator(const AST::Node& node, LVID& localvar)
+	{
+		if (unlikely((node.children.size() != 1) or (node.children[0]->rule != AST::rgFunctionKindOpname)))
+			return unexpectedNode(node, "[expr/operator]");
+
+		// value fetching
+		emitDebugpos(node);
+		uint32_t rid = sequence().emitStackalloc(nextvar(), nyt_any);
+		ShortString64 idname;
+		idname << '^' << node.children[0]->text;
+		sequence().emitIdentify(rid, acquireString(idname), localvar);
+		localvar = rid;
+		return true;
+	}
+
+
+
 	inline bool Scope::visitASTExprRegister(const AST::Node& node, LVID& localvar)
 	{
 		assert(not node.text.empty());
@@ -76,6 +93,8 @@ namespace Producer
 				case AST::rgFunction:   success &= visitASTExprClosure(child, localvar); break;
 
 				case AST::rgAttributes: success &= visitASTAttributes(child); break;
+
+				case AST::rgFunctionKindOperator: success &= visitASTExprIdOperator(child, localvar); break;
 
 				// special for internal AST manipulation
 				case AST::rgRegister:   success &= visitASTExprRegister(child, localvar); break;
