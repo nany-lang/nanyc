@@ -18,15 +18,15 @@ namespace Instanciate
 		if (not frame->verify(lvid))
 			return;
 
-		auto& cdef  = cdeftable.classdefFollowClassMember(CLID{frame->atomid, lvid});
-		if (not canBeAcquired(cdef)) // do nothing if builtin
-			return;
-
 		if (unlikely(frame->lvids[lvid].synthetic))
 		{
 			error() << "cannot unref a synthetic object";
 			return;
 		}
+
+		auto& cdef  = cdeftable.classdefFollowClassMember(CLID{frame->atomid, lvid});
+		if (not canBeAcquired(cdef)) // do nothing if builtin
+			return;
 
 		auto* atom = cdeftable.findClassdefAtom(cdef);
 		if (unlikely(nullptr == atom))
