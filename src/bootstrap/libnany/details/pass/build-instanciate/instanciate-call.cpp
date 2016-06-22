@@ -229,7 +229,7 @@ namespace Instanciate
 			shortcircuit.compareTo = atom->parameters.shortcircuitValue;
 			bool builtinok = instanciateBuiltinIntrinsic(atom->builtinalias, lvid);
 			if (unlikely(not builtinok))
-				frame->lvids[lvid].errorReported = true;
+				frame->invalidate(lvid);
 			return builtinok;
 		}
 

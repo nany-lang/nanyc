@@ -25,8 +25,7 @@ namespace Instanciate
 			auto err = (error() << "cannot instanciate object of type '");
 			cdef.print(err.data().message, cdeftable, false);
 			err << "'";
-			frame->invalidate(operands.lvid);
-			return;
+			return frame->invalidate(operands.lvid);
 		}
 
 		// propagate the object type

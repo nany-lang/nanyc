@@ -17,11 +17,13 @@ namespace Instanciate
 	{
 		assert(frame != nullptr);
 
+		if (unlikely(not frame->verify(lvid)))
+			return;
+
 		if (unlikely(name.empty()))
 		{
 			ice() << "got empty variable name";
-			frame->invalidate(lvid);
-			return;
+			return frame->invalidate(lvid);
 		}
 
 		auto& lr = frame->lvids[lvid];
