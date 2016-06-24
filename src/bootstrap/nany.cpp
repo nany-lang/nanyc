@@ -53,7 +53,7 @@ static int unknownOption(const char* argv0, const AnyString& name)
 static void on_error_file_eacces(const nyproject_t*, nybuild_t*, const char* file, uint32_t length)
 {
 	std::cerr << "error: failed to access to '";
-	std::cout << AnyString{file, length} << "'\n";
+	std::cerr << AnyString{file, length} << "'\n";
 }
 
 
