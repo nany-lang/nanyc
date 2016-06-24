@@ -23,6 +23,7 @@ namespace Producer
 
 		if (debugmode)
 			out.emitComment("*** if-stmt");
+		emitDebugpos(expr);
 
 		bool hasElseClause = (elseptr != nullptr);
 		bool success = true;
@@ -122,6 +123,7 @@ namespace Producer
 
 		if (debugmode)
 			out.emitComment("*** if-expr");
+		emitDebugpos(expr);
 
 		// result of the expression
 		ifret = out.emitStackalloc(nextvar(), nyt_any);

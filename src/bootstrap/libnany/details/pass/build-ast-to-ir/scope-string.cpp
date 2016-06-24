@@ -30,6 +30,8 @@ namespace Producer
 	{
 		assert(node.rule == AST::rgString);
 
+		emitDebugpos(node);
+
 		// transform string literals into implicit `new string()`
 		//
 		// several patterns can arise for declaring a string:

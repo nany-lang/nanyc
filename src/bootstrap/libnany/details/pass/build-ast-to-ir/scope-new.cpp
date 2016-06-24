@@ -72,25 +72,26 @@ namespace Producer
 
 		// debug info
 		emitDebugpos((call ? *call : node));
+		auto& out = sequence();
 
-		sequence().emitTypeIsObject(rettype);
+		out.emitTypeIsObject(rettype);
 
 		// trick: a register will be allocated even if unused for now
 		// it will be later (when instanciating the func) to put the sizeof
 		// of the object to allocate
-		sequence().emitStackalloc(nextvar(), nyt_u64);
+		out.emitStackalloc(nextvar(), nyt_u64);
 		// the object allocation itself
-		uint32_t pointer = sequence().emitStackalloc(nextvar(), nyt_any);
-		sequence().emitAllocate(pointer, rettype);
+		uint32_t pointer = out.emitStackalloc(nextvar(), nyt_any);
+		out.emitAllocate(pointer, rettype);
 		localvar = pointer;
 
-		auto& operands    = sequence().emit<ISA::Op::follow>();
+		auto& operands    = out.emit<ISA::Op::follow>();
 		operands.follower = pointer;
 		operands.lvid     = rettype;
 		operands.symlink  = 0;
 
-		uint32_t lvidcall = sequence().emitStackalloc(nextvar(), nyt_any);
-		sequence().emitIdentify(lvidcall, "^new", pointer);
+		uint32_t lvidcall = out.emitStackalloc(nextvar(), nyt_any);
+		out.emitIdentify(lvidcall, "^new", pointer);
 
 		return visitASTExprCall(call, lvidcall);
 	}

@@ -27,6 +27,7 @@ namespace Producer
 
 		auto& out = sequence();
 		OpcodeScopeLocker opscopeSwitch{out};
+		emitDebugpos(node);
 
 		// the variable id of the initial condition
 		uint32_t valuelvid = 0;
@@ -101,6 +102,7 @@ namespace Producer
 					if (child.children.size() == 1)
 					{
 						auto& condition = *(child.children[0]);
+						emitDebugpos(condition);
 						success &= visitASTExpr(condition, valuelvid, false);
 
 						// updating lhs for operator ==
@@ -115,6 +117,7 @@ namespace Producer
 			}
 		}
 
+		emitDebugpos(node);
 		uint32_t labelEnd = out.emitLabel(nextvar());
 
 		// update all labels for jumping to the end

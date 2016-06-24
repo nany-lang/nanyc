@@ -111,6 +111,7 @@ namespace Producer
 			if (!reuse.operatorDefault.node)
 				scope.context.prepareReuseForClasses();
 
+			scope.emitDebugpos(node);
 			reuse.operatorDefault.funcname->text = "^default-new";
 			success &= scope.visitASTFunc(*reuse.operatorDefault.node);
 

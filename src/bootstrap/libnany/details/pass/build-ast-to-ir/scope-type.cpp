@@ -112,17 +112,20 @@ namespace Producer
 			}
 		}
 
+		emitDebugpos(node);
+		auto& out = sequence();
+
 		// create a value even if nothing to always have an attached value
 		if (localvar == 0 and not reallyVoid /*any*/)
-			localvar = sequence().emitStackalloc(nextvar(), nyt_any);
+			localvar = out.emitStackalloc(nextvar(), nyt_any);
 
 		if (0 != localvar)
 		{
 			if (localvar == (uint32_t) -1)
-				localvar = sequence().emitStackalloc(reserveLocalVariable(), nyt_any);
+				localvar = out.emitStackalloc(reserveLocalVariable(), nyt_any);
 
-			sequence().emitQualifierRef(localvar, isRef);
-			sequence().emitQualifierConst(localvar, isConst);
+			out.emitQualifierRef(localvar, isRef);
+			out.emitQualifierConst(localvar, isConst);
 		}
 		return success;
 	}

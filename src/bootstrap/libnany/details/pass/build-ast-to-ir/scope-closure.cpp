@@ -60,6 +60,7 @@ namespace Producer
 		if (!context.reuse.closure.node)
 			context.prepareReuseForClosures();
 
+		emitDebugpos(node);
 		auto& expr = *context.reuse.closure.node;
 		auto& targetBody = *context.reuse.closure.funcbody;
 		targetBody.children = body->children;

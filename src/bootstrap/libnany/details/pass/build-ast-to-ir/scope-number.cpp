@@ -45,24 +45,25 @@ namespace Producer
 
 		static bool convertASTNumberToDouble(double& value, uint64 part1, const AnyString& part2, char sign)
 		{
-			if (part1 == 0 and part2.empty()) // obvious reason
+			if (part1 == 0 and part2.empty()) // obvious zero value
 			{
 				value = 0.;
-				return true;
 			}
-
-			ShortString128 tmp;
-			if (sign == '-') // append the sign of the number
-				tmp += '-';
-
-			tmp << part1;
-			if (not part2.empty())
-				tmp << '.' << part2;
-
-			if (unlikely(not tmp.to<double>(value)))
+			else
 			{
-				value = 0.;
-				return false;
+				ShortString128 tmp;
+				if (sign == '-') // append the sign of the number
+					tmp += '-';
+
+				tmp << part1;
+				if (not part2.empty())
+					tmp << '.' << part2;
+
+				if (unlikely(not tmp.to<double>(value)))
+				{
+					value = 0.;
+					return false;
+				}
 			}
 			return true;
 		}
@@ -178,7 +179,6 @@ namespace Producer
 				cn.adapt((numdef.bits == 32) ? "f32" : "f64", 3);
 			hardcodedlvid = createLocalBuiltinFloat64(node, type, value);
 		}
-
 
 		if (BuiltinT)
 		{

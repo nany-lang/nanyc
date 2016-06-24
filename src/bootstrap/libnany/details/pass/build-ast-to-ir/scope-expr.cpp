@@ -180,7 +180,6 @@ namespace Producer
 
 		// always creating a new scope for a expr
 		IR::Producer::Scope scope{*this};
-		scope.emitDebugpos(node);
 
 		if (unlikely(attrnode))
 			scope.visitASTAttributes(*attrnode);
@@ -189,6 +188,7 @@ namespace Producer
 		if (r and localvar != 0 and localvar != (uint32_t) -1)
 		{
 			scope.emitTmplParametersIfAny();
+			scope.emitDebugpos(node);
 			scope.sequence().emitEnsureTypeResolved(localvar);
 
 			if (unlikely(!!scope.pAttributes))

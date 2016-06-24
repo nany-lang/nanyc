@@ -102,6 +102,7 @@ namespace Producer
 					}
 
 					// set the visibility
+					scope.emitDebugpos(node);
 					scope.sequence().emitVisibility(visibility);
 				}
 				else
@@ -207,6 +208,7 @@ namespace Producer
 			// constant parameter
 			bool constant = false;
 
+			scope.emitDebugpos(node);
 
 			for (auto& childptr: node.children)
 			{
@@ -344,7 +346,7 @@ namespace Producer
 				return true;
 			}
 
-
+			scope.emitDebugpos(node);
 			bool success = true;
 
 			if (unlikely(paramCount > Config::maxFuncDeclParameterCount - 1)) // too many parameters ?
@@ -436,6 +438,7 @@ namespace Producer
 
 			if (not lvidIsAny(rettype))
 			{
+				scope.emitDebugpos(node);
 				if (rettype == 0)
 				{
 					rettype = scope.createLocalBuiltinVoid(node);

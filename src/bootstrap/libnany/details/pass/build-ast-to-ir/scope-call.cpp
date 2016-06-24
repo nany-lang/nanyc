@@ -161,7 +161,7 @@ namespace Producer
 	{
 		assert(!node or node->rule == AST::rgCall);
 
-		emitDebugpos(node);
+		emitDebugpos(node ? node : parent);
 
 		auto& out = sequence();
 		// ask to resolve the call to operator ()

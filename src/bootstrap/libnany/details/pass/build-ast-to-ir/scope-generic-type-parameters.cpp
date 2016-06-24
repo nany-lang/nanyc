@@ -33,6 +33,7 @@ namespace Producer
 					bool ok = checkForValidIdentifierName(child, name);
 					if (unlikely(not ok))
 						return false;
+					emitDebugpos(child);
 					sequence().emitBlueprintGenericTypeParam(nextvar(), name);
 					break;
 				}

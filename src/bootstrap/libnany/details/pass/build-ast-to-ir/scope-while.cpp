@@ -36,10 +36,10 @@ namespace Producer
 
 		// new scope for the 'while' statement
 		OpcodeScopeLocker opscopeWhile{out};
+		emitDebugpos(node);
 
 		// the label at the very begining, to loop back
 		uint32_t labelWhile = out.emitLabel(nextvar());
-		emitDebugpos(node);
 
 		if (debugmode)
 			out.emitComment("while-condition");
@@ -71,6 +71,7 @@ namespace Producer
 			success &= visitASTStmt(*(node.children[1]));
 		}
 
+		emitDebugpos(node);
 		// loop back to the condition evaluation
 		out.emitJmp(labelWhile);
 
@@ -128,10 +129,12 @@ namespace Producer
 			OpcodeScopeLocker opscopeCond{out};
 			auto& condition = *(node.children[1]);
 			uint32_t exprEval = 0;
+			emitDebugpos(condition);
 			success &= visitASTExpr(condition, exprEval, false);
 			out.emitAssign(condlvid, exprEval, false);
 		}
 
+		emitDebugpos(node);
 		// jump to the begining if true (non zero)
 		out.emitJnz(condlvid, 0, labelWhile);
 		return success;

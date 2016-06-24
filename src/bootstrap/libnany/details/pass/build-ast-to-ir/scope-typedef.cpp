@@ -53,6 +53,7 @@ namespace Producer
 		if (not scope.visitASTType(*typeexpr, localvar))
 			return false;
 
+		scope.emitDebugpos(node);
 		scope.sequence().emitBlueprintTypealias(typedefname, localvar);
 		return true;
 	}

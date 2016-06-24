@@ -48,6 +48,7 @@ namespace Producer
 			return (ice(node) << "invalid typeof expression");
 
 		IR::Producer::Scope scope{*this};
+		emitDebugpos(node);
 		OpcodeCodegenDisabler codegen{sequence()};
 		sequence().emitComment("typeof expression");
 		return scope.visitASTExpr(*expr, localvar);
