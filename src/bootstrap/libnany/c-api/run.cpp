@@ -78,7 +78,7 @@ namespace // anonymous
 
 			if (runcf)
 			{
-				verbose = (runcf->verbose != 0);
+				verbose = (runcf->verbose != nyfalse);
 				memcpy(&(cf),           &(runcf->build),     sizeof(nybuild_cf_t));
 				memcpy(&(cf.allocator), &(runcf->allocator), sizeof(nyallocator_t));
 				memcpy(&(cf.console),   &(runcf->console),   sizeof(nyconsole_t));

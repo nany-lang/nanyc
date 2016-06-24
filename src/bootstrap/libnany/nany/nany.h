@@ -733,7 +733,7 @@ typedef struct nyrun_cf_t
 	nyprogram_cf_t program;
 
 	/*! A non-zero value for verbose mode */
-	int verbose;
+	nybool_t verbose;
 }
 nyrun_cf_t;
 

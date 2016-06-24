@@ -90,7 +90,7 @@ int main(int argc, const char** argv)
 							return printBugReportInfo();
 						if (arg == "--verbose")
 						{
-							runcf.verbose = 1; // non-zero value
+							runcf.verbose = nytrue;
 							continue;
 						}
 						return unknownOption(argv0, arg);
