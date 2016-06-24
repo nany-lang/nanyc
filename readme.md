@@ -7,38 +7,44 @@
 
 
 
-Nany Compiler
-=============
+# Nany Compiler
 
-Nany is a high-productivity language, meant to be either compiled to native
-code or bytecode, or to be run as script.
+Nany aims to be a high-productivity language, meant to be either compiled
+to native code or bytecode, or to be run as script.
 
 <a href="https://gitter.im/nany-lang/nany" target="_blank">![Github Issues](https://img.shields.io/gitter/room/nany-lang/nany.svg)</a>
 
 
-Overview of the Nany Programming Language
------------------------------------------
+
+
+## Overview of the Nany Programming Language
 
 [Few examples to give you a taste of Nany](examples/)
 
 
 
-How to build Nany
------------------
+## How to build Nany
 
 [Building Nany on your platform](src/readme.md)
 
 
 
-Contributing
-------------
+## Contributing
 
-**Note**: this project uses [Zenhub](https://www.zenhub.io/) for ticket management and upvoting
+**Note**: this project uses [Zenhub](https://www.zenhub.io/) for tickets
+management and upvoting
 
 
 
-Resources
----------
+
+## License
+
+The Nany compiler and the NSL are under the [MPL-2.0 license](http://nany.io/en/license/)
+(Mozilla Public License 2).
+
+
+
+## Resources
 
  * Syntax hightlighting: [Vim](//github.com/nany-lang/nany-syntax-vim),
    [Emacs](//github.com/nany-lang/nany-syntax-emacs),
