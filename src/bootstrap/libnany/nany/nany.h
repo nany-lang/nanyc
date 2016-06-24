@@ -57,7 +57,7 @@ extern "C" {
 #endif
 
 /*! Boolean type */
-typedef enum nybool_t {nyfalse, nytrue} nybool_t;
+typedef enum nybool_t {nyfalse = 0, nytrue} nybool_t;
 
 
 
