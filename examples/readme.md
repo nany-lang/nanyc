@@ -1,19 +1,19 @@
-Overview of the Nany Programming Language
-=========================================
+# Overview of the Nany Programming Language
 
 Here are some of the features of the Nany Language.
 
-*note*: the current implementation of the Nany compiler may not implement all the
-features required for compiling the following examples.
+*note*: the current status of the Nany compiler may not be able to compile
+all the following examples. Some feature may still be missing but we're
+working on it !
 
 
 
-## Traditional Hello world
+## The traditional Hello world
 
 ```nany
-public func main
+func main
 {
-    console << “Hello world\n”;
+	console << "Hello world!\n";
 }
 ```
 
@@ -24,11 +24,12 @@ public func main
 ```nany
 //! Fibonacci (recursive way)
 func fibonacci(n: u32): u32
-    -> if n < 2u then n else fibonacci(n - 1u) + fibonacci(n - 2u);
+	-> if n < 2u then n else fibonacci(n - 1u) + fibonacci(n - 2u);
 
-public func main
+
+func main
 {
-    console << fibonacci(10u) << ‘\n’;
+	console << fibonacci(10u) << "\n";
 }
 ```
 
@@ -37,18 +38,18 @@ public func main
 ## Variables & References
 
 ```nany
-public func main: i32
+func main: i32
 {
-    var x = “hello world”;
-    var y = z; // make a copy of x
-    ref z = x; // x and z are actually the same variable
+	var x = "hello world";
+	var y = z; // make a copy of x
+	ref z = x; // x and z are actually the same variable
 
-    // some standard types, even if not needed
-    var languageName: string = “nany.io”;
-    var version: f64 = 1.0;
-    var introduced: i32 = 2015;
-    var isAwesome: bool = true;
-    return 0;
+	// some standard types, even if types can be omitted
+	var languageName: string = "nany.io";
+	var version: f32 = 1.0;
+	var introduced: i32 = 2015;
+	var isAwesome: bool = true;
+	return 0;
 }
 ```
 
@@ -57,18 +58,14 @@ public func main: i32
 ## Working with I/O, reading a file
 
 ```nany
-public func main(args)
+func main(args)
 {
-    for filename in args do
-    {
-        // read the whole content of the file
-        var content = std.io.file.read(filename) on fail(e) do
-        {
-            console.error << “failed to open ‘” << e.filename << “: ” << e.reason << ‘\n’;
-            continue;
-        };
-        console << filename << “:\n” << content << ‘\n’;
-    }
+	for filename in args do
+	{
+		// read the whole content of the file
+		var content = std.io.read(filename);
+		console << filename << ":\n" << content << "\n";
+	}
 }
 ```
 
@@ -79,12 +76,15 @@ public func main(args)
 ## Working with I/O, reading a file line by line
 
 ```nany
-public func main
+func main
 {
-    // print to the console the content of the file line-by-line
-    console << (each in std.io.file.lines("tmp:///some-file.txt")) << ‘\n’
-    on fail(e) do
-        console.error << “failed to read ‘” << e.filename << “: ” << e.reason << ‘\n’;
+	// for each line, print it to the standard output
+	console << (each in std.io.file("/tmp/myfile.txt")) << "\n";
+
+	// the same than above, but with line numbers
+	var lineNumber = 0;
+	for line in std.io.file("/tmp/myfile.txt") do
+		console << (++lineNumber) << ": " << line << "\n";
 }
 ```
 - [ ] feature not fully implemented yet
@@ -94,23 +94,23 @@ public func main
 ## Scripting, interacting with environment variables
 
 ```nany
-public func main
+func main
 {
-    // hard-coded env variables can directly be manipulated via the special
-    // object ‘$’, like in shell
-    // retrieve the value of the env variable “HOME”
-    console << “HOME = ” << $HOME << “\n”;
-    // set the value of the env variable “MY_ENV_VAR”
-    $MY_ENV_VAR = “some text”;
+	// hard-coded env variables can directly be manipulated via the special
+	// object ‘$’, like in shell
+	// retrieve the value of the env variable “HOME”
+	console << "HOME = " << $HOME << "\n";
+	// set the value of the env variable “MY_ENV_VAR”
+	$MY_ENV_VAR = "some text";
 
-    // the object $ behaves like a dictionary (string -> string)
-    $[“ANOTHER_ENV_VAR”] = “some text”;
-    console << “HTTP_PROXY available: ” << $.contains(“HTTP_PROXY”) << “\n”;
+	// the object $ behaves like a dictionary (string -> string)
+	$["ANOTHER_ENV_VAR"] = "some text";
+	console << "HTTP_PROXY available: " << std.env.exists("HTTP_PROXY") << “\n”;
 
-    // printing all env variables
-    console << “--\nenv variables:\n”;
-    for v in std.env.variables do
-        console << v.name << “ = ” << v.value << ‘\n’;
+	// printing all env variables
+	console << "--\nenv variables:\n";
+	for v in std.env.variables do
+		console << v.name << " = " << v.value << "\n";
 }
 ```
 - [ ] feature not fully implemented yet
@@ -127,34 +127,34 @@ public func main
 // with the default value), the each construct can be used in combination with += to
 // obtain a really concise and elegant syntax for a complicated task.
 
-func howManyAudioFilesAtUrl(url)
+func howManyAudioFilesAtUrl(url): u64
 {
 	switch std.io.type(url) do
-    {
-        case ntFolder:
-        {
-            // the given url is a folder
-            // retrieving a virtual list of all files in this folder, matching our criteria
-            var allfiles = (inode in std.io.directory(url).entries) | inode.type == ntFile
-                and inode.name == :regex{ .*\.{mp3,wav,ogg,wma} };
+	{
+		case ntFolder:
+		{
+			// the given url is a folder
+			// retrieving a virtual list of all files in this folder, matching our criteria
+			var files = (inode in std.io.folder(url) :recursive) | inode.type == ntFile
+				and inode.name == :regex{ .*\.{mp3,wav,ogg,wma} };
 
-            // retrieving how many files this folder has
-            return allfiles.size;
-        }
-    }
+			// retrieving how many files this folder has
+			return files.size;
+		}
+	}
 	else
 		return 0;
 }
 
 
-public func main(args)
+func main(args)
 {
-    // The magic happens here !
-    // Using the value for variable howManyFiles triggers a synchronization,
-    // i.e. the statement will not run until all jobs are finished and the final value computed
-    var howManyFiles += & howManyAudioFilesAtUrl((each in args));
+	// The magic happens here !
+	// Using the value for variable howManyFiles triggers a synchronization,
+	// i.e. the statement will not run until all jobs are finished and the final value computed
+	var howManyFiles += & howManyAudioFilesAtUrl((each in args));
 
-    console << "total number of files : " << howManyFiles << “\n”;
+	console << "total number of files : " << howManyFiles << "\n";
 }
 ```
 - [ ] feature not fully implemented yet
@@ -166,18 +166,18 @@ public func main(args)
 ```nany
 func load(memory)
 {
-    console << “loading content from memory content: \(memory) \n”;
+	console << "loading content from memory content: \(memory) \n";
 }
 
 func load(file)
 {
-    console << “loading content from url: \(url) \n”;
+	console << "loading content from file: \(url) \n";
 }
 
-public func main
+func main
 {
-    load(memory: “hello world”);
-    load(file: :url{http://nany.io/index.html});
+	load(memory: “hello world”);
+	load(file: "/tmp/myfile.txt");
 }
 ```
 
@@ -186,11 +186,13 @@ public func main
 ## String interpolation
 
 ```nany
-public func main
+func main
 {
 	var x = 10;
 	var y = 42;
-	console << "x + y = \(x) + \(y) = \(x + y)\n"; // x = y = 10 + 42 = 52
+
+	// x = y = 10 + 42 = 52
+	console << "x + y = \(x) + \(y) = \(x + y)\n";
 }
 ```
 
@@ -199,14 +201,14 @@ public func main
 ## Properties
 
 ```nany
-public func main
+func main
 {
 	var radius = 42.6;
-	var diameter -> get: radius * 2, set: radius = value / 2;
+	var diameter -> { get: radius * 2, set: radius = value / 2 };
 
-	var circumference ->
+	var circumference -> {
 		get: 2 * std.math.pi * radius,
-		set: diameter = value / std.math.pi;
+		set: diameter = value / std.math.pi };
 
 	console << "circle: radius = \(radius), circumference: \(circumference)\n";
 

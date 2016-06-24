@@ -1,16 +1,15 @@
 func load(memory)
 {
-	console << “loading content from memory content: \(memory) \n”;
+	console << "loading content from memory content: \(memory) \n";
 }
 
 func load(file)
 {
-	console << “loading content from url: \(url) \n”;
+	console << "loading content from file: \(url) \n";
 }
 
-
-public func main
+func main
 {
 	load(memory: “hello world”);
-	load(file: :url{http://nany.io/index.html});
+	load(file: "/tmp/myfile.txt");
 }

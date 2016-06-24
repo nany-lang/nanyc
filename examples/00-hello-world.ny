@@ -1,4 +1,4 @@
-public func main
+func main
 {
-	console << “Hello world\n”;
+	console << "Hello world!\n";
 }
