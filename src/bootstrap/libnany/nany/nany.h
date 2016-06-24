@@ -94,9 +94,9 @@ NY_EXPORT uint32_t nany_get_version(uint32_t* major, uint32_t* minor, uint32_t* 
 
 /*! Get the full version of nany (string, ex: 2.4.1-beta+2e738ae) */
 NY_EXPORT const char* nany_version();
-/*! Get the version metadata (ex: '2e738ae', can be null or empty) */
+/*! Get the version metadata (ex: '2e738ae', null if empty) */
 NY_EXPORT const char* nany_version_metadata();
-/*! Get the pre-release version (ex: 'beta', can be null or empty) */
+/*! Get the pre-release version (ex: 'beta', null if empty) */
 NY_EXPORT const char* nany_version_prerelease();
 
 /*!

@@ -1,5 +1,6 @@
 #include "nany/nany.h"
 #include "libnany-version.h"
+#include <assert.h>
 
 // NOTE
 //
@@ -8,28 +9,31 @@
 
 
 
+static inline const char* strOrNull(const char* const text)
+{
+	return (text && *text != '\0') ? text : NULL;
+}
 
 const char* nany_website_url()
 {
+	_Static_assert(LIBNANY_WEBSITE != NULL, "invalid null url");
 	return LIBNANY_WEBSITE;
 }
 
-
 const char* nany_version()
 {
+	_Static_assert(LIBNANY_VERSION_STR != NULL, "invalid null version");
 	return LIBNANY_VERSION_STR;
 }
 
-
 const char* nany_version_metadata()
 {
-	return LIBNANY_VERSION_METADATA;
+	return strOrNull(LIBNANY_VERSION_METADATA);
 }
-
 
 const char* nany_version_prerelease()
 {
-	return LIBNANY_VERSION_PRERELEASE;
+	return strOrNull(LIBNANY_VERSION_PRERELEASE);
 }
 
 
