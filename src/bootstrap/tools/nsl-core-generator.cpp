@@ -199,7 +199,7 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 	auto craft = [&](const AnyString& op, const AnyString& builtin, auto callback)
 	{
 		char sign = issigned ? 'i' : 'u';
-		for (uint32_t b = bits; b >= 8; b /= 2)
+		for (uint32_t b = 64 /*bits*/; b >= 8; b /= 2)
 		{
 			callback(op, builtin, sign, b, "cref ", "cref ");
 			callback(op, builtin, sign, b, "cref ", "__");
@@ -207,17 +207,6 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 			callback(op, builtin, sign, b, "__", "__");
 		}
 
-		/*if (issigned)
-		{
-			sign = 'u';
-			for (uint32_t b = bits / 2; b >= 8; b /= 2)
-			{
-				callback(op, builtin, sign, b, "cref ", "cref ");
-				callback(op, builtin, sign, b, "cref ", "__");
-				callback(op, builtin, sign, b, "__", "cref ");
-				callback(op, builtin, sign, b, "__", "__");
-			}
-		}*/
 		o << '\n';
 	};
 
@@ -361,8 +350,9 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 			o << ", nosuggest";
 		o << "] public operator ";
 		o << op << " (a: " << prefixA << suffix << ", b: " << prefixB << sign << b << "): ";
-		o << ((atLeastOneBuiltin) ? "ref " : "__");
-		o << suffix << ";\n";
+		o << "any;\n";
+		//o << ((atLeastOneBuiltin) ? "ref " : "__");
+		//o << suffix << ";\n";
 
 		if (not atLeastOneBuiltin)
 			o << '\n';
