@@ -61,7 +61,6 @@ typedef enum nybool_t {nyfalse = 0, nytrue} nybool_t;
 
 
 
-
 /*! \name Information about libnany */
 /*@{*/
 /*!
@@ -229,6 +228,10 @@ typedef struct nythread_t nytctx_t;
 
 
 
+
+
+
+
 /*! \name Memory allocator */
 /*@{*/
 typedef struct nyallocator_t
@@ -269,6 +272,38 @@ void nany_memalloc_copy(nyallocator_t* out, const nyallocator_t* const src);
 /*@}*/
 
 
+
+/*! \name URL */
+/*@{*/
+typedef struct nyurl_t
+{
+	/*! The full url (can be null, not zero-terminated) */
+	const char* url;
+	/*! Length (in bytes) of the url */
+	uint32_t url_len;
+
+	/*! Scheme (can be null, not zero-terminated) */
+	const char* scheme;
+	uint32_t scheme_len;
+	/*! hostname (can be null, not zero-terminated) */
+	const char* server;
+	uint32_t server_len;
+
+	/*! Port (0 when not set, with sport_len == 0) */
+	uint32_t port;
+
+	/*! The fragment (can be null, not zero-terminated) */
+	const char* path;
+	uint32_t path_len;
+	/*! The fragment (can be null, not zero-terminated) */
+	const char* query;
+	uint32_t query_len;
+	/*! The fragment (can be null, not zero-terminated) */
+	const char* fragment;
+	uint32_t fragment_len;
+}
+nyurl_t;
+/*@}*/
 
 
 
@@ -496,6 +531,143 @@ NY_EXPORT void nany_build_cf_init(nybuild_cf_t* cf, const nyproject_t* project);
 
 
 
+/*! \name IO */
+/*@{*/
+/*! Opaque pointer to a file */
+typedef struct nyfile_t nyfile_t;
+
+
+typedef enum nyio_type_t
+{
+	nyiot_failed = 0,
+	nyiot_file,
+	nyiot_folder,
+}
+nyio_type_t;
+
+
+typedef enum nyio_err_t
+{
+	/*! Success */
+	nyioe_ok = 0,
+	/*! Generic unknown error */
+	nyioe_failed,
+	/*! Operation not supported by the adapter */
+	nyioe_unsupported,
+	/*! Failed to allocate memory */
+	nyioe_memory,
+	/*! Not enough permissions */
+	nyioe_access,
+	/*! Already exists */
+	nyioe_exists,
+}
+nyio_err_t;
+
+
+typedef enum nyio_automout_flag_t
+{
+	/*! Automount all */
+	nyioaf_all   = (uint32_t) -1,
+	/*! No automount */
+	nyioaf_none  = 0,
+
+	/*! Automount /root, to acces to the local filesystem */
+	nyioaf_root  = (1 << 0),
+	/*! Automount /tmp, temporary folder from the process point of view */
+	nyioaf_tmp   = (1 << 1),
+	/*! Automount /home, (/home/Desktop, /home/Documents...) */
+	nyioaf_home  = (1 << 2),
+	/*! Automount */
+	nyioaf_users = (1 << 3),
+}
+nyio_automout_flag_t;
+
+
+
+/*! Callback for iterating through a folder */
+typedef nybool_t (*nyio_iterator_t)(void*, nytctx_t*, void* userdata,
+	const char* vpath, uint32_t len, nyio_type_t, uint64_t filesize);
+
+/*! Callback for iterating through the list of opened files */
+typedef nybool_t (*nyio_opened_files_it_t)(const char* vpath, uint32_t len,
+	const char* localpath, uint32_t lplen);
+
+
+/*! IO Adapter */
+typedef struct nyio_adapter_t nyio_adapter_t;
+
+struct nyio_adapter_t
+{
+	/*! Internal opaque pointer */
+	void* internal;
+	/*! Attached thread context */
+	nytctx_t* threadctx;
+
+	/*! Stat a node */
+	nyio_type_t (*stat)(nyio_adapter_t*, const char* path, uint32_t len);
+	/*! Stat a node */
+	nyio_type_t (*statex)(nyio_adapter_t*, const char* path, uint32_t len, uint64_t* size, int64_t* modified);
+
+
+	/*! Read content from a file */
+	size_t (*file_read)(nyfile_t*, void* buffer, size_t bufsize);
+	/*! Write content to an opened file */
+	size_t (*file_write)(nyfile_t*, const void* buffer, size_t bufsize);
+	/*! Open a local file for the current thread */
+	nyio_err_t (*file_open)(nyio_adapter_t*, nyfile_t**, const char* path, uint32_t len);
+	/*! Close a file */
+	void (*file_close)(nyfile_t*);
+	/*! Seek from the begining of the file */
+	nyio_err_t (*file_seek)(nyfile_t*, int64_t offset);
+	/*! Seek from the end of the file */
+	nyio_err_t (*file_seek_from_end)(nyfile_t*, int64_t offset);
+	/*! Flush a file */
+	void (*file_flush)(nyfile_t*);
+
+	/*! Retrieve the content of a file */
+	nyio_err_t (*file_get_contents)(nyio_adapter_t*, const char** content, size_t* size, const char* path, uint32_t len);
+	/*! Set the content of a file */
+	nyio_err_t (*file_set_contents)(nyio_adapter_t*, const char* path, uint32_t len, const char* content, size_t ctlen);
+
+	/*! Create a new folder */
+	nyio_err_t (*folder_create)(nyio_adapter_t*, const char* path, uint32_t len);
+	/*! Iterate through folder */
+	nyio_err_t (*folder_iterate)(nyio_adapter_t*, const char* path, uint32_t len, nyio_iterator_t);
+	/*! Iterate recursively through folder */
+	nyio_err_t (*folder_iterate_recursive)(nyio_adapter_t*, const char* path, uint32_t len, nyio_iterator_t);
+
+	/*! Get the file size or the folder size (in bytes) */
+	uint64_t (*size)(nyio_adapter_t*, const char* path, uint32_t len);
+	/*! Remove a file or a folder recursively */
+	nyio_err_t (*remove)(nyio_adapter_t*, const char* path, uint32_t len);
+	/*! Empty a file or remove the contents of a folder */
+	nyio_err_t (*remove_contents)(nyio_adapter_t*, const char* path, uint32_t len);
+	/*! Trash a file or a folder */
+	nyio_err_t (*trash)(nyio_adapter_t*, const char* path, uint32_t len);
+	/*! Rename a file or a folder */
+	nyio_err_t (*rename)(nyio_adapter_t*, const char* path, uint32_t len, const char* newvpath, size_t nplen);
+
+	/*! Clone the adapter, most likely for a new thread */
+	void (*clone)(nyio_adapter_t* parent, nyio_adapter_t** dst, nytctx_t* threadctx);
+	/*! Release the adapter */
+	void (*release)(nyio_adapter_t*);
+};
+
+
+typedef struct nyio_cf_t
+{
+	/*! event: an url has been mounted */
+	nyio_err_t (*on_mount_query)(nyprogram_t*, nytctx_t*, const nyurl_t* url, const char* path, uint32_t len);
+	/*! event: create an adapter from an url */
+	nyio_err_t (*on_adapter_create)(nyprogram_t*, nytctx_t*, nyio_adapter_t**, const nyurl_t* url, nyio_adapter_t* parent);
+
+	/*! Flag to automatically mount some standard paths */
+	/*! \see nyio_automout_flag_t */
+	uint32_t automount_flags;
+}
+nyio_cf_t;
+/*@}*/
+
 
 
 /*! \name Program */
@@ -552,6 +724,9 @@ typedef struct nyprogram_cf_t
 	** \note This callback won't be called if `on_execute` failed
 	*/
 	void (*on_terminate)(const nyprogram_t*, nybool_t error, int exitcode);
+
+	/*! IO configuration */
+	nyio_cf_t io;
 }
 nyprogram_cf_t;
 
