@@ -96,7 +96,7 @@ namespace Instanciate
 		if (unlikely(name.empty())) // should never happen
 			return (error() << "invalid empty identifier name");
 
-		if (self and self->flags(Atom::Flags::error)) // error already reported
+		if (unlikely(self and self->flags(Atom::Flags::error))) // error already reported
 			return false;
 
 		auto err = error();
@@ -129,6 +129,14 @@ namespace Instanciate
 			else
 				err << '\'' << varname << "' is not declared in this scope";
 		}
+
+		// from
+		auto h = (err.hint() << "from '" << atom.caption() << '\'');
+		h.origins().location.filename = atom.origin.filename;
+		h.origins().location.pos.line = atom.origin.line;
+		h.origins().location.pos.offset = atom.origin.offset;
+		if (debugmode)
+			h << " {atomid: " << atom.atomid << '}';
 
 
 		// trying local variables first

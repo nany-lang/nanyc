@@ -437,16 +437,6 @@ namespace Instanciate
 							return true;
 					}
 
-					// UNKNOWN identifier
-					if (debugmode)
-					{
-						auto err = (error() << "debug: failed identify '" << name);
-						err << "' from atom: " << frame->atomid << " aka '" << frame->atom.caption();
-						err << "', self: %" << operands.self;
-						err << ", lvid: %" << operands.lvid;
-						if (unlikely(not firstChance))
-							err << " (SECOND TRY - ICE!)";
-					}
 					return complainUnknownIdentifier(selfAtom, frame->atom, name);
 				}
 				break;
