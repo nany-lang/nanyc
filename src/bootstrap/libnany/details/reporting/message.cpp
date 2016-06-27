@@ -1,4 +1,5 @@
 #include "message.h"
+#include "details/atom/atom.h"
 #include <yuni/core/system/console/console.h>
 
 using namespace Yuni;
@@ -258,6 +259,15 @@ namespace Logs
 				printMessage<false>(out, *this, 0, tmp);
 		}
 	}
+
+
+	void Message::Origin::Location::resetFromAtom(const Atom& atom)
+	{
+		filename = atom.origin.filename;
+		pos.line = atom.origin.line;
+		pos.offset = atom.origin.offset;
+	}
+
 
 
 

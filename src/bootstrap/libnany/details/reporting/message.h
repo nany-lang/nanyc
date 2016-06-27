@@ -3,7 +3,7 @@
 #include <yuni/core/smartptr/intrusive.h>
 #include <yuni/core/string.h>
 #include <yuni/core/noncopyable.h>
-#include "fwd.h"
+#include "details/fwd.h"
 #include "levels.h"
 #include "nany/nany.h"
 #include <iosfwd>
@@ -65,8 +65,11 @@ namespace Logs
 		struct Origin final
 		{
 			//! Current filename (if any)
-			struct
+			struct Location final
 			{
+				//! Reset the location from a given atom
+				void resetFromAtom(const Nany::Atom&);
+
 				//! Current target
 				YString target;
 				//! Current filename

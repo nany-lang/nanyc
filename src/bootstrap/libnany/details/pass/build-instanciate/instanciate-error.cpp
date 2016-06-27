@@ -111,9 +111,7 @@ namespace Instanciate
 			{
 				auto& atom = solutions[i].get();
 				auto hint = err.hint();
-				hint.message.origins.location.filename   = atom.origin.filename;
-				hint.message.origins.location.pos.line   = atom.origin.line;
-				hint.message.origins.location.pos.offset = atom.origin.offset;
+				hint.message.origins.location.resetFromAtom(atom);
 
 				hint << '\'';
 				hint << cdeftable.keyword(atom) << ' ';
@@ -164,9 +162,7 @@ namespace Instanciate
 				{
 					auto& atom = solutions[i].get();
 					auto hint = err.hint();
-					hint.message.origins.location.filename   = atom.origin.filename;
-					hint.message.origins.location.pos.line   = atom.origin.line;
-					hint.message.origins.location.pos.offset = atom.origin.offset;
+					hint.message.origins.location.resetFromAtom(atom);
 
 					hint << '\'';
 					hint << cdeftable.keyword(atom) << ' ';
@@ -189,9 +185,7 @@ namespace Instanciate
 				if (atom.flags(Atom::Flags::suggestInReport))
 				{
 					auto hint  = (err.hint() << "see ");
-					hint.message.origins.location.filename   = atom.origin.filename;
-					hint.message.origins.location.pos.line   = atom.origin.line;
-					hint.message.origins.location.pos.offset = atom.origin.offset;
+					hint.message.origins.location.resetFromAtom(atom);
 
 					hint << '\'';
 					hint << cdeftable.keyword(atom) << ' ';

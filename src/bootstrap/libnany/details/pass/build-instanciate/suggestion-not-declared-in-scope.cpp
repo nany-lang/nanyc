@@ -132,9 +132,7 @@ namespace Instanciate
 
 		// from
 		auto h = (err.hint() << "from '" << atom.caption() << '\'');
-		h.origins().location.filename = atom.origin.filename;
-		h.origins().location.pos.line = atom.origin.line;
-		h.origins().location.pos.offset = atom.origin.offset;
+		h.origins().location.resetFromAtom(atom);
 		if (debugmode)
 			h << " {atomid: " << atom.atomid << '}';
 
@@ -216,10 +214,7 @@ namespace Instanciate
 					{
 						auto suggest = (err.suggest() << cdeftable.keyword(candidate) << ' ');
 						candidate.retrieveCaption(suggest.data().message, cdeftable);
-
-						suggest.origins().location.pos.line   = candidate.origin.line;
-						suggest.origins().location.pos.offset = candidate.origin.offset;
-						suggest.origins().location.filename   = candidate.origin.filename;
+						suggest.origins().location.resetFromAtom(candidate);
 					}
 				}
 			}
