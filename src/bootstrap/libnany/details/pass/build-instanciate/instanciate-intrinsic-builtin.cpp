@@ -175,7 +175,7 @@ namespace Instanciate
 
 		static bool intrinsicMemrealloc(SequenceBuilder& seq, uint32_t lvid)
 		{
-			seq.cdeftable.substitute(lvid).mutateToVoid();
+			seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_ptr);
 
 			uint32_t ptrlvid = seq.pushedparams.func.indexed[0].lvid;
 			auto& cdefptr = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, ptrlvid});
@@ -193,7 +193,10 @@ namespace Instanciate
 				return seq.complainIntrinsicParameter("memory.realloc", 0, cdefNewsize, "'__u64'");
 
 			if (seq.canGenerateCode())
-				seq.out.emitMemrealloc(ptrlvid, oldsizelvid, newsizelvid);
+			{
+				seq.out.emitStore(lvid, ptrlvid);
+				seq.out.emitMemrealloc(lvid, oldsizelvid, newsizelvid);
+			}
 			return true;
 		}
 
