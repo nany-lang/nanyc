@@ -451,11 +451,11 @@ namespace Instanciate
 					if (debugmode)
 						seq.out.emitComment("reading inner 'pod' variable");
 
-					atomBuiltinCast = atom;
 					builtinlhs = atom->builtinMapping;
 					uint32_t newlvid = seq.createLocalVariables();
 					seq.out.emitFieldget(newlvid, lhs, 0);
 					lhs = newlvid;
+					atomBuiltinCast = atom;
 				}
 			}
 
@@ -472,11 +472,11 @@ namespace Instanciate
 					if (debugmode)
 						seq.out.emitComment("reading inner 'pod' variable");
 
-					atomBuiltinCast = atom;
 					builtinrhs = atom->builtinMapping;
 					uint32_t newlvid = seq.createLocalVariables();
 					seq.out.emitFieldget(newlvid, rhs, 0);
 					rhs = newlvid;
+					atomBuiltinCast = atom;
 				}
 			}
 
@@ -490,7 +490,8 @@ namespace Instanciate
 					seq.complainIntrinsicParameter(name, 0, cdeflhs);
 					return seq.complainIntrinsicParameter(name, 1, cdefrhs);
 				}
-				if (atomBuiltinCast != nullptr)
+
+				if (atomBuiltinCast != nullptr and builtinlhs != nyt_ptr)
 					atomBuiltinCast = Atom::Ptr::WeakPointer(seq.cdeftable.atoms().core.object[builtinlhs]);
 			}
 
@@ -534,7 +535,7 @@ namespace Instanciate
 
 			nytype_t rettype = (R == nyt_any) ? builtinlhs : R;
 
-			if (atomBuiltinCast != nullptr and seq.shortcircuit.label == 0) // the result is a real instance
+			if (rettype != nyt_ptr and atomBuiltinCast != nullptr and seq.shortcircuit.label == 0) // the result is a real instance
 			{
 				// implicit convertion from builtin (__i32...) to object (i32...)
 				if (R != nyt_any) // force the result type
