@@ -67,6 +67,10 @@ namespace Builtin
 		reinterpret_cast<String*>(string)->append(static_cast<typename IntCast<T>::value>(value));
 	}
 
+	static void yn_string_append_ptr(nyvm_t*, void* string, void* ptr)
+	{
+		reinterpret_cast<String*>(string)->append(ptr);
+	}
 
 
 
@@ -95,6 +99,7 @@ namespace Nany
 		intrinsics.add("yuni.string.append.i16",  Builtin::yn_string_append<int16_t>);
 		intrinsics.add("yuni.string.append.i32",  Builtin::yn_string_append<int32_t>);
 		intrinsics.add("yuni.string.append.i64",  Builtin::yn_string_append<int64_t>);
+		intrinsics.add("yuni.string.append.ptr",  Builtin::yn_string_append_ptr);
 
 		intrinsics.add("yuni.string.cout", Builtin::yn_string_cout);
 	}
