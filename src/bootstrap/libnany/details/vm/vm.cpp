@@ -7,6 +7,7 @@
 #include "details/ir/isa/data.h"
 #include <iostream>
 #include <csetjmp>
+#include <limits>
 
 
 using namespace Yuni;
@@ -773,7 +774,22 @@ namespace VM
 				assert(operands.lvid < registerCount);
 				assert(operands.regsize < registerCount);
 
-				size_t size = static_cast<size_t>(registers[operands.regsize].u64);
+				size_t size;
+				if (sizeof(size_t) < sizeof(uint64_t))
+				{
+					// size_t is less than a u64 (32bits platform probably)
+					// so it is possible to ask more than the system can provide
+					auto request = registers[operands.regsize].u64;
+					if (std::numeric_limits<size_t>::max() <= request)
+						return emitBadAlloc();
+					size = static_cast<size_t>(request);
+				}
+				else
+				{
+					// 64bits platform
+					size = static_cast<size_t>(registers[operands.regsize].u64);
+				}
+
 				size += sizeof(uint64_t); // reference counter
 
 				uint64_t* pointer = allocateraw<uint64_t>(size);
