@@ -227,7 +227,8 @@ namespace Instanciate
 				pushedparams.func.indexed[i].lvid = params[i].clid.lvid();
 			}
 			shortcircuit.compareTo = atom->parameters.shortcircuitValue;
-			bool builtinok = instanciateBuiltinIntrinsic(atom->builtinalias, lvid);
+			bool builtinok =
+				(Tribool::Value::yes == instanciateBuiltinIntrinsic(atom->builtinalias, lvid));
 			if (unlikely(not builtinok))
 				frame->invalidate(lvid);
 			return builtinok;

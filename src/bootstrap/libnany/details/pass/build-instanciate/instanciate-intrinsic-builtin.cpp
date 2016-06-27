@@ -803,43 +803,56 @@ namespace Instanciate
 
 
 
-	bool SequenceBuilder::instanciateBuiltinIntrinsic(const AnyString& name, uint32_t lvid, bool canProduceError)
+	Yuni::Tribool::Value
+	SequenceBuilder::instanciateBuiltinIntrinsic(const AnyString& name, uint32_t lvid, bool canProduceError)
 	{
 		assert(not name.empty());
 		assert(frame != nullptr);
 
-		// named parameters are not accepted
-		if (unlikely(not pushedparams.func.named.empty()))
-			return complainIntrinsicWithNamedParameters(name);
+		if (canProduceError)
+		{
+			// named parameters are not accepted
+			if (unlikely(not pushedparams.func.named.empty()))
+			{
+				complainIntrinsicWithNamedParameters(name);
+				return Tribool::Value::no;
+			}
 
-		// generic type parameters are not accepted
-		if (unlikely(not pushedparams.gentypes.indexed.empty() or not pushedparams.gentypes.named.empty()))
-			return complainIntrinsicWithGenTypeParameters(name);
+			// generic type parameters are not accepted
+			if (unlikely(not pushedparams.gentypes.indexed.empty() or not pushedparams.gentypes.named.empty()))
+			{
+				complainIntrinsicWithGenTypeParameters(name);
+				return Tribool::Value::no;
+			}
+
+			// checking if one parameter was already flag as 'error'
+			for (uint32_t i = 0u; i != pushedparams.func.indexed.size(); ++i)
+			{
+				if (unlikely(not frame->verify(pushedparams.func.indexed[i].lvid)))
+					return Tribool::Value::no;
+			}
+		}
 
 		auto it = builtinDispatch.find(name);
 		if (unlikely(it == builtinDispatch.end()))
 		{
+			warning() << "not found !";
 			if (canProduceError)
 				complainUnknownIntrinsic(name);
-			return false;
+			return Tribool::Value::indeterminate;
 		}
 
 		// checking for parameters
 		uint32_t count = it->second.first;
 		if (unlikely(not checkForIntrinsicParamCount(name, count)))
-			return false;
+			return Tribool::Value::no;
 
-		// checking if one parameter was already flag as 'error'
-		for (uint32_t i = 0u; i != count; ++i)
-		{
-			if (unlikely(not frame->verify(pushedparams.func.indexed[i].lvid)))
-				return false;
-		}
 
 		frame->lvids[lvid].synthetic = false;
 
 		// intrinsic builtin found !
-		return ((it->second.second))(*this, lvid);
+		return ((it->second.second))(*this, lvid)
+			? Tribool::Value::yes : Tribool::Value::no;
 	}
 
 

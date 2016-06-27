@@ -22,14 +22,36 @@ namespace Instanciate
 			if (unlikely(name.empty()))
 				return (error() << "invalid empty intrinsic name");
 
+			// named parameters are not accepted
+			if (unlikely(not pushedparams.func.named.empty()))
+				return complainIntrinsicWithNamedParameters(name);
+
+			// generic type parameters are not accepted
+			if (unlikely(not pushedparams.gentypes.indexed.empty() or not pushedparams.gentypes.named.empty()))
+				return complainIntrinsicWithGenTypeParameters(name);
+
+			// checking if one parameter was already flag as 'error'
+			for (uint32_t i = 0u; i != pushedparams.func.indexed.size(); ++i)
+			{
+				if (unlikely(not frame->verify(pushedparams.func.indexed[i].lvid)))
+					return false;
+			}
+
 			// trying user-defined intrinsic
 			auto* intrinsic = intrinsics.find(name);
 
-			// if not found, it can be a compiler intrinsic
+			// if not found, this could be a compiler intrinsic
 			if (intrinsic == nullptr)
 			{
-				if (instanciateBuiltinIntrinsic(name, operands.lvid, false))
-					return true;
+				switch (instanciateBuiltinIntrinsic(name, operands.lvid, false))
+				{
+					case Tribool::Value::indeterminate:
+						break; // not found
+					case Tribool::Value::yes:
+						return true;
+					case Tribool::Value::no:
+						return false; // an error has occured
+				}
 
 				// intrinsic not found, trying discover mode
 				if (build.cf.on_binding_discovery)
@@ -42,13 +64,6 @@ namespace Instanciate
 					return complainUnknownIntrinsic(name);
 			}
 
-			// named parameters are not accepted
-			if (unlikely(not pushedparams.func.named.empty()))
-				return complainIntrinsicWithNamedParameters(name);
-
-			// generic type parameters are not accepted
-			if (unlikely(not pushedparams.gentypes.indexed.empty() or not pushedparams.gentypes.named.empty()))
-				return complainIntrinsicWithGenTypeParameters(name);
 
 			if (unlikely(not checkForIntrinsicParamCount(name, intrinsic->paramcount)))
 				return false;
@@ -86,7 +101,7 @@ namespace Instanciate
 		})();
 
 		if (not success)
-			frame->lvids[operands.lvid].errorReported = true;
+			frame->invalidate(operands.lvid);
 		return success;
 	}
 
