@@ -15,7 +15,7 @@ using namespace Yuni;
 
 
 //! Print opcodes executed by the vm
-#define NANY_VM_PRINT_OPCODES 1
+#define NANY_VM_PRINT_OPCODES 0
 
 
 
@@ -27,7 +27,8 @@ using namespace Yuni;
 
 
 #if NANY_VM_PRINT_OPCODES != 0
-#define VM_PRINT_OPCODE(O)  do { std::cout << "== nany:vm ==  " \
+#define VM_PRINT_OPCODE(O)  do { std::cout << "== nany:vm +" \
+	<< sequence.get().offsetOf(opr) << "  == "  \
 	<< Nany::IR::ISA::print(sequence.get(), opr, &map) << '\n';} while (0)
 #else
 #define VM_PRINT_OPCODE(O)
@@ -1006,6 +1007,15 @@ namespace VM
 			inline void call(uint32_t retlvid, uint32_t atomfunc, uint32_t instanceid)
 			{
 				assert(retlvid == 0 or retlvid < registerCount);
+
+				#if NANY_VM_PRINT_OPCODES != 0
+				std::cout << "== nany:vm >>  registers before call\n";
+				for (uint32_t r = 0; r != registerCount; ++r)
+					std::cout << "== nany:vm >>     reg %" << r << " = " << registers[r].u64 << "\n";
+				std::cout << "== nany:vm >>  entering func atom:" << atomfunc
+					<< ", instance: " << instanceid << '\n';
+				#endif
+
 				// save the current stack frame
 				auto* storestackptr = registers;
 				auto storesequence = sequence;
@@ -1032,6 +1042,10 @@ namespace VM
 				#endif
 				stacktrace.pop();
 				memchecker.atomid(memcheckPreviousAtomid);
+
+				#if NANY_VM_PRINT_OPCODES != 0
+				std::cout << "== nany:vm <<  returned from func call\n";
+				#endif
 			}
 
 		}; // struct Executor
