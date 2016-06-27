@@ -208,6 +208,15 @@ namespace VM
 			}
 
 
+			/*!
+			** \brief Adjust an input size for extra metadata held by an object
+			*/
+			static constexpr inline size_t extraObjectSize()
+			{
+				return sizeof(uint64_t); // object ref counter
+			}
+
+
 			template<class T> inline T* allocateraw(size_t size)
 			{
 				return (T*) allocator.allocate(&allocator, size);
@@ -243,7 +252,7 @@ namespace VM
 
 				// its size
 				uint64_t classsizeof = classobject->runtimeSizeof();
-				classsizeof += sizeof(uint64_t); // internal ref counting
+				classsizeof += extraObjectSize();
 
 				if (instanceid != (uint32_t) -1)
 				{
@@ -790,7 +799,7 @@ namespace VM
 					size = static_cast<size_t>(registers[operands.regsize].u64);
 				}
 
-				size += sizeof(uint64_t); // reference counter
+				size += extraObjectSize();
 
 				uint64_t* pointer = allocateraw<uint64_t>(size);
 				if (YUNI_UNLIKELY(!pointer))
@@ -816,8 +825,8 @@ namespace VM
 
 				size_t oldsize = static_cast<size_t>(registers[operands.oldsize].u64);
 				size_t newsize = static_cast<size_t>(registers[operands.newsize].u64);
-				oldsize += sizeof(uint64_t); // reference counter
-				newsize += sizeof(uint64_t); // reference counter
+				oldsize += extraObjectSize();
+				newsize += extraObjectSize();
 
 				if (object)
 				{
@@ -858,7 +867,7 @@ namespace VM
 				{
 					VM_CHECK_POINTER(object, operands);
 					size_t size = static_cast<size_t>(registers[operands.regsize].u64);
-					size += sizeof(uint64_t); // reference counter
+					size += extraObjectSize();
 
 					if (YUNI_UNLIKELY(not memchecker.checkObjectSize(object, static_cast<size_t>(size))))
 						return emitPointerSizeMismatch(object, size);
@@ -881,7 +890,7 @@ namespace VM
 				uint64_t* object = reinterpret_cast<uint64_t*>(registers[operands.lvid].u64);
 				VM_CHECK_POINTER(object, operands);
 				size_t size = static_cast<size_t>(registers[operands.regsize].u64);
-				size += sizeof(uint64_t); // reference counter
+				size += extraObjectSize();
 				uint8_t pattern = static_cast<uint8_t>(registers[operands.pattern].u64);
 
 				if (YUNI_UNLIKELY(not memchecker.checkObjectSize(object, static_cast<size_t>(size))))
