@@ -524,9 +524,11 @@ namespace Nany
 			keyword = "operator";
 			varname = AnyString{name.c_str() + 1, name.size() - 1};
 		}
-
-		keyword.clear();
-		varname.clear();
+		else
+		{
+			keyword.clear();
+			varname.clear();
+		}
 	}
 
 	AnyString Atom::keyword() const
