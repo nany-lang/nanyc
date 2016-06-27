@@ -13,6 +13,59 @@ namespace Pass
 namespace Instanciate
 {
 
+	Logs::Report SequenceBuilder::emitReportEntry(void* self, Logs::Level level)
+	{
+		auto& sb = *(reinterpret_cast<SequenceBuilder*>(self));
+
+		switch (level)
+		{
+			default:
+				break;
+			case Logs::Level::warning:
+			{
+				if (nyfalse != sb.build.cf.warnings_into_errors)
+				{
+					level = Logs::Level::error;
+					sb.success = false;
+				}
+				break;
+			}
+			case Logs::Level::error:
+			case Logs::Level::ICE:
+			{
+				sb.success = false;
+				break;
+			}
+		}
+
+		auto entry = sb.report.fromErrLevel(level);
+		if (debugmode)
+		{
+			if (sb.currentSequence.isCursorValid(**sb.cursor))
+			{
+				if (level == Logs::Level::error or level == Logs::Level::ICE)
+				{
+					uint32_t offset = sb.currentSequence.offsetOf(**sb.cursor);
+					auto h = entry.hint();
+					h << "dump opcodes at +" << offset << "\n";
+					auto* map = &(sb.cdeftable.originalTable().atoms);
+					IR::ISA::printExtract(h.message.message, sb.currentSequence, offset, map);
+				}
+			}
+		}
+		return entry;
+	}
+
+	void SequenceBuilder::retriveReportMetadata(void* self, Logs::Level, const AST::Node*, String& filename, uint32_t& line, uint32_t& offset)
+	{
+		auto& sb = *(reinterpret_cast<SequenceBuilder*>(self));
+		filename = sb.currentFilename;
+		line     = sb.currentLine;
+		offset   = sb.currentOffset;
+	}
+
+
+
 
 	YString SequenceBuilder::iceClassdef(const Classdef& cdef, const AnyString& msg) const
 	{

@@ -26,6 +26,24 @@ namespace ISA
 	}
 
 
+	void printExtract(YString& out, const Sequence& sequence, uint32_t offset, const AtomMap* atommap)
+	{
+		uint32_t context = 6;
+		uint32_t start = (offset >= context) ? (offset - context) : 0;
+		uint32_t end   = offset + 2;
+
+		Printer<String> printer{out, sequence};
+		printer.atommap = atommap;
+		for (uint32_t i = start; i <= end and i < sequence.opcodeCount(); ++i)
+		{
+			if (i == offset)
+				out << "   > | ";
+			else
+				out << "     | ";
+			printer.visit(sequence.at(i));
+		}
+		out.trimRight();
+	}
 
 
 } // namespace ISA

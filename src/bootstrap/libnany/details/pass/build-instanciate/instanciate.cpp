@@ -61,49 +61,6 @@ namespace Instanciate
 	}
 
 
-	Logs::Report SequenceBuilder::emitReportEntry(void* self, Logs::Level level)
-	{
-		auto& sb = *(reinterpret_cast<SequenceBuilder*>(self));
-
-		switch (level)
-		{
-			default:
-				break;
-			case Logs::Level::warning:
-			{
-				if (nyfalse != sb.build.cf.warnings_into_errors)
-				{
-					level = Logs::Level::error;
-					sb.success = false;
-				}
-				break;
-			}
-			case Logs::Level::error:
-			case Logs::Level::ICE:
-			{
-				sb.success = false;
-				break;
-			}
-		}
-
-		auto entry = sb.report.fromErrLevel(level);
-		if (debugmode)
-		{
-			if (sb.currentSequence.isCursorValid(**sb.cursor))
-				entry << "{opc+" << sb.currentSequence.offsetOf(**sb.cursor) << "} ";
-		}
-		return entry;
-	}
-
-	void SequenceBuilder::retriveReportMetadata(void* self, Logs::Level, const AST::Node*, String& filename, uint32_t& line, uint32_t& offset)
-	{
-		auto& sb = *(reinterpret_cast<SequenceBuilder*>(self));
-		filename = sb.currentFilename;
-		line     = sb.currentLine;
-		offset   = sb.currentOffset;
-	}
-
-
 
 
 	void SequenceBuilder::releaseScopedVariables(int scope, bool forget)

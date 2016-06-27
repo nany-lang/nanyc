@@ -970,6 +970,7 @@ namespace ISA
 		return print(sequence, reinterpret_cast<const Nany::IR::Instruction&>(operands), map);
 	}
 
+	void printExtract(YString& out, const Sequence&, uint32_t offset, const AtomMap* = nullptr);
 
 
 } // namespace ISA
