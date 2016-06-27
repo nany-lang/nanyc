@@ -813,25 +813,36 @@ namespace VM
 				assert(operands.newsize < registerCount);
 
 				uint64_t* object = reinterpret_cast<uint64_t*>(registers[operands.lvid].u64);
+
+				size_t oldsize = static_cast<size_t>(registers[operands.oldsize].u64);
+				size_t newsize = static_cast<size_t>(registers[operands.newsize].u64);
+				oldsize += sizeof(uint64_t); // reference counter
+				newsize += sizeof(uint64_t); // reference counter
+
 				if (object)
 				{
+					// checking the input pointer
 					VM_CHECK_POINTER(object, operands);
-					size_t oldsize = static_cast<size_t>(registers[operands.oldsize].u64);
-					size_t newsize = static_cast<size_t>(registers[operands.newsize].u64);
-					oldsize += sizeof(uint64_t); // reference counter
-					newsize += sizeof(uint64_t); // reference counter
-
 					if (YUNI_UNLIKELY(not memchecker.checkObjectSize(object, static_cast<size_t>(oldsize))))
 						return emitPointerSizeMismatch(object, oldsize);
 
 					memchecker.forget(object);
+				}
 
-					auto* newptr = (uint64_t*)allocator.reallocate(&allocator, object, oldsize, newsize);
-					registers[operands.lvid].u64 = reinterpret_cast<uint64_t>(newptr);
-					if (newptr)
-						memchecker.hold(newptr, newsize, operands.lvid);
-					else
-						deallocate(object, oldsize);
+				auto* newptr = (uint64_t*) allocator.reallocate(&allocator, object, oldsize, newsize);
+				registers[operands.lvid].u64 = reinterpret_cast<uint64_t>(newptr);
+
+				if (newptr)
+				{
+					// the nointer has been successfully reallocated - keeping a reference
+					memchecker.hold(newptr, newsize, operands.lvid);
+				}
+				else
+				{
+					// `realloc` may not release the input pointer if the
+					// allocation failed
+					deallocate(object, oldsize);
+					emitBadAlloc();
 				}
 			}
 
