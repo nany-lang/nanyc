@@ -554,8 +554,22 @@ new-init: notext
 new-shared: notext
 	tk-shared
 
+new-named-parameter: notext
+	identifier wp tk-colon wp (expr wp) | error-parenthese-or-bracket
+
+new-parameters: notext
+	new-named-parameter
+	(
+		wp tk-comma wp
+		new-named-parameter | error-parenthese-or-bracket
+	)*
+
 new: notext important
-	tk-new new-shared? (type-decl (wp call)? (wp new-init)?) | error-semicolon
+	tk-new
+	new-shared?
+	// new parameters
+	(tk-parenthese-open ((wp new-parameters)? wp tk-parenthese-close) | (error-parenthese wp tk-parenthese-close?))?
+	(wp type-decl (wp call)? (wp new-init)?) | error-semicolon
 
 
 

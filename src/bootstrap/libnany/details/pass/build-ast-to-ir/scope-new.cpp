@@ -27,6 +27,7 @@ namespace Producer
 		// create a new variable for the result
 		LVID rettype = 0;
 		const AST::Node* call = nullptr;
+		const AST::Node* inplace = nullptr;
 
 		for (auto& childptr: node.children)
 		{
@@ -68,6 +69,32 @@ namespace Producer
 					break;
 				}
 
+				case AST::rgNewParameters:
+				{
+					for (auto& paramptr: child.children)
+					{
+						auto& param = *paramptr;
+						if (unlikely(param.rule != AST::rgNewNamedParameter or param.children.size() != 2))
+							return unexpectedNode(param, "[ir/new/params]");
+
+						auto& pname = *(param.children[0]);
+						auto& pexpr = *(param.children[1]);
+						if (unlikely(pname.rule != AST::rgIdentifier or pexpr.rule != AST::rgExpr))
+							return unexpectedNode(pname, "[ir/new/param/id]");
+
+						if (pname.text == "inplace")
+						{
+							inplace = &pexpr;
+						}
+						else
+						{
+							error(pname) << "unknown 'new' parameter '" << pname.text << "'";
+							success = false;
+						}
+					}
+					break;
+				}
+
 				default:
 					return unexpectedNode(child, "[ir/new]");
 			}
@@ -83,23 +110,44 @@ namespace Producer
 
 		out.emitTypeIsObject(rettype);
 
-		// trick: a register will be allocated even if unused for now
-		// it will be later (when instanciating the func) to put the sizeof
-		// of the object to allocate
-		out.emitStackalloc(nextvar(), nyt_u64);
-		// the object allocation itself
-		uint32_t pointer = out.emitStackalloc(nextvar(), nyt_any);
-		out.emitAllocate(pointer, rettype);
-		localvar = pointer;
 
+		// OBJECT ALLOCATION
+		uint32_t pointer = 0;
+		if (inplace == nullptr)
+		{
+			// SIZEOF
+			// trick: a register will be allocated even if unused for now
+			// it will be later (when instanciating the func) to put the sizeof
+			// of the object to allocate
+			out.emitStackalloc(nextvar(), nyt_u64);
+
+			pointer = out.emitStackalloc(nextvar(), nyt_any);
+			out.emitAllocate(pointer, rettype);
+		}
+		else
+		{
+			uint32_t inplaceExpr = 0;
+			if (not visitASTExpr(*inplace, inplaceExpr))
+				return false;
+			// intermediate pointer to force type __pointer
+			uint32_t tmpptr = out.emitStackalloc(nextvar(), nyt_ptr);
+			out.emitAssign(tmpptr, inplaceExpr, false);
+			// promoting the given __pointer to T
+			pointer = out.emitStackalloc(nextvar(), nyt_any);
+			out.emitStore(pointer, tmpptr);
+		}
+
+		// type propagation
 		auto& operands    = out.emit<ISA::Op::follow>();
 		operands.follower = pointer;
 		operands.lvid     = rettype;
 		operands.symlink  = 0;
 
+		localvar = pointer;
+
+		// CONSTRUCTOR CALL
 		uint32_t lvidcall = out.emitStackalloc(nextvar(), nyt_any);
 		out.emitIdentify(lvidcall, "^new", pointer);
-
 		return visitASTExprCall(call, lvidcall);
 	}
 
