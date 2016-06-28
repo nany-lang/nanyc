@@ -7,6 +7,21 @@
 #include "nany/nany.h"
 
 
+#define NANY_MEMCHECKER_PRINT 0
+
+#if NANY_MEMCHECKER_PRINT != 0
+
+#  include <iostream>
+#  define NANY_MEMCHECK_HOLD(PTR) \
+		do { std::cout << "== nany:vm:memcheck == hold " << (PTR) << '\n'; } while (0)
+#  define NANY_MEMCHECK_FORGET(PTR) \
+		do { std::cout << "== nany:vm:memcheck == forget " << (PTR) << '\n'; } while (0)
+
+#else
+#  define NANY_MEMCHECK_HOLD(PTR)
+#  define NANY_MEMCHECK_FORGET(PTR)
+#endif
+
 
 
 namespace Nany
@@ -49,6 +64,7 @@ namespace VM
 
 		void hold(const uint64_t* const pointer, size_t size, uint32_t lvid)
 		{
+			NANY_MEMCHECK_HOLD(pointer);
 			ownedPointers.insert(
 				std::make_pair(pointer, AllocInfo{size, CLID{currentAtomid, lvid}}));
 		}
@@ -56,6 +72,7 @@ namespace VM
 
 		void forget(const uint64_t* pointer)
 		{
+			NANY_MEMCHECK_FORGET(pointer);
 			ownedPointers.erase(pointer);
 		}
 
