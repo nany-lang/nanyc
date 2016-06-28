@@ -25,6 +25,11 @@ namespace Instanciate
 					generateClassVarsAutoInit = true; // same as '^new'
 					break;
 				}
+				if (name == "^dispose")
+				{
+					generateClassVarsAutoRelease = true;
+					break;
+				}
 				break;
 			}
 
@@ -40,11 +45,6 @@ namespace Instanciate
 
 			case 'o':
 			{
-				if (name == "^obj-dispose")
-				{
-					generateClassVarsAutoRelease = true;
-					break;
-				}
 				if (name == "^obj-clone")
 				{
 					generateClassVarsAutoClone = true;

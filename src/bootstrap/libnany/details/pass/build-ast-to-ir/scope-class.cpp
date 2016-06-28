@@ -112,12 +112,16 @@ namespace Producer
 				scope.context.prepareReuseForClasses();
 
 			scope.emitDebugpos(node);
+
+			// default constructor
 			reuse.operatorDefault.funcname->text = "^default-new";
 			success &= scope.visitASTFunc(*reuse.operatorDefault.node);
 
-			reuse.operatorDefault.funcname->text = "^obj-dispose";
+			// destructor
+			reuse.operatorDefault.funcname->text = "^dispose";
 			success &= scope.visitASTFunc(*reuse.operatorDefault.node);
 
+			// copy constructor
 			reuse.operatorClone.funcname->text = "^obj-clone";
 			success &= scope.visitASTFunc(*(reuse.operatorClone.node));
 			return success;

@@ -373,7 +373,7 @@ namespace Instanciate
 
 		// first, try to find the user-defined dtor function (if any)
 		Atom* userDefinedDtor = nullptr;
-		switch (atom.findFuncAtom(userDefinedDtor, "^dispose"))
+		switch (atom.findFuncAtom(userDefinedDtor, "^#user-dispose"))
 		{
 			case 0: break;
 			case 1:
@@ -389,7 +389,7 @@ namespace Instanciate
 		}
 
 		Atom* dtor = nullptr;
-		switch (atom.findFuncAtom(dtor, "^obj-dispose"))
+		switch (atom.findFuncAtom(dtor, "^dispose"))
 		{
 			case 1:
 			{
@@ -405,9 +405,9 @@ namespace Instanciate
 			}
 			case 0:
 			{
-				return complainMissingOperator(atom, "obj-dispose");
+				return complainMissingOperator(atom, "dispose");
 			}
-			default: return complainMultipleDefinitions(atom, "operator 'obj-dispose'");
+			default: return complainMultipleDefinitions(atom, "operator 'dispose'");
 		}
 		return false;
 	}

@@ -153,8 +153,11 @@ namespace Producer
 					if (not checkForValidIdentifierName(opname, opname.text, true))
 						return false;
 
-					funcname.clear();
-					funcname << '^' << opname.text;
+					funcname = '^';
+					if (opname.text != "dispose")
+						funcname << opname.text;
+					else
+						funcname << "#user-dispose";
 
 					isNewOperator = (opname.text == "new");
 					break;
