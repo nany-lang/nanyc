@@ -190,6 +190,9 @@ tk-parenthese-close: notext
 tk-new: notext
 	'new' sp
 
+tk-shared: notext
+	'shared' sp
+
 tk-dot: notext
 	'.' [^.]^
 tk-dot-dot: notext
@@ -548,8 +551,11 @@ array: notext
 new-init: notext
 	object
 
+new-shared: notext
+	tk-shared
+
 new: notext important
-	tk-new (type-decl (wp call)? (wp new-init)?) | error-semicolon
+	tk-new new-shared? (type-decl (wp call)? (wp new-init)?) | error-semicolon
 
 
 

@@ -61,6 +61,13 @@ namespace Producer
 					break;
 				}
 
+				case AST::rgNewShared:
+				{
+					error(child) << "'new shared': Distributed objects are not implemented yet";
+					success = false;
+					break;
+				}
+
 				default:
 					return unexpectedNode(child, "[ir/new]");
 			}
