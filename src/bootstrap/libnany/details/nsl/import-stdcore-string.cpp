@@ -47,6 +47,11 @@ namespace Builtin
 		reinterpret_cast<String*>(string)->clear();
 	}
 
+	static bool yn_string_is_equal(nyvm_t*, void* string, void* rhs)
+	{
+		auto& other = *(reinterpret_cast<String*>(rhs));
+		return reinterpret_cast<String*>(string)->equals(other);
+	}
 
 
 	static void yn_string_cout(nyvm_t* tctx, void* string)
@@ -100,6 +105,7 @@ namespace Nany
 		intrinsics.add("yuni.string.append.i32",  Builtin::yn_string_append<int32_t>);
 		intrinsics.add("yuni.string.append.i64",  Builtin::yn_string_append<int64_t>);
 		intrinsics.add("yuni.string.append.ptr",  Builtin::yn_string_append_ptr);
+		intrinsics.add("yuni.string.equals",      Builtin::yn_string_is_equal);
 
 		intrinsics.add("yuni.string.cout", Builtin::yn_string_cout);
 	}
