@@ -722,6 +722,13 @@ namespace IR
 		operands.pattern = pattern;
 	}
 
+	inline void Sequence::emitMemCopy(uint32_t lvid, uint32_t srclvid, uint32_t regsize)
+	{
+		auto& operands   = emit<ISA::Op::memcopy>();
+		operands.lvid    = lvid;
+		operands.srclvid = srclvid;
+		operands.regsize = regsize;
+	}
 
 	inline void Sequence::emitSizeof(uint32_t lvid, uint32_t type)
 	{

@@ -798,6 +798,7 @@ namespace Mapping
 			case IR::ISA::Op::storeText:
 			case IR::ISA::Op::storeConstant:
 			case IR::ISA::Op::memalloc:
+			case IR::ISA::Op::memcopy:
 			case IR::ISA::Op::typeisobject:
 			case IR::ISA::Op::ref:
 			case IR::ISA::Op::unref:

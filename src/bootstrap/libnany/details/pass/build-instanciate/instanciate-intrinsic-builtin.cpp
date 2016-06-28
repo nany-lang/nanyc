@@ -236,12 +236,36 @@ namespace Instanciate
 				return seq.complainIntrinsicParameter("memory.memset", 1, cdef, "'__u64'");
 
 			uint32_t patternlvid = seq.pushedparams.func.indexed[2].lvid;
-			auto& cdefpattern = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, size});
+			auto& cdefpattern = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, patternlvid});
 			if (unlikely(not cdefpattern.isBuiltingUnsigned()))
 				return seq.complainIntrinsicParameter("memory.memset", 2, cdef, "'__u32'");
 
 			if (seq.canGenerateCode())
 				seq.out.emitMemFill(objlvid, size, patternlvid);
+			return true;
+		}
+
+		static bool intrinsicMemCopy(SequenceBuilder& seq, uint32_t lvid)
+		{
+			seq.cdeftable.substitute(lvid).mutateToVoid();
+
+			uint32_t objlvid = seq.pushedparams.func.indexed[0].lvid;
+			auto& cdef = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, objlvid});
+			if (unlikely(not cdef.isRawPointer()))
+				return seq.complainIntrinsicParameter("memory.copy", 0, cdef, "'__pointer'");
+
+			uint32_t src = seq.pushedparams.func.indexed[1].lvid;
+			auto& cdefsrc = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, src});
+			if (unlikely(not cdefsrc.isRawPointer()))
+				return seq.complainIntrinsicParameter("memory.copy", 1, cdef, "'__pointer'");
+
+			uint32_t size = seq.pushedparams.func.indexed[2].lvid;
+			auto& cdefsize = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, size});
+			if (unlikely(not cdefsize.isBuiltinU64()))
+				return seq.complainIntrinsicParameter("memory.copy", 2, cdef, "'__u64'");
+
+			if (seq.canGenerateCode())
+				seq.out.emitMemCopy(objlvid, src, size);
 			return true;
 		}
 
@@ -761,6 +785,7 @@ namespace Instanciate
 			{"memory.realloc",  { 3,  &intrinsicMemrealloc,  }},
 			{"memory.dispose",  { 2,  &intrinsicMemFree,     }},
 			{"memory.fill",     { 3,  &intrinsicMemfill,     }},
+			{"memory.copy",     { 3,  &intrinsicMemCopy,     }},
 			{"ref",             { 1,  &intrinsicRef,         }},
 			{"unref",           { 1,  &intrinsicUnref,       }},
 			{"sizeof",          { 1,  &intrinsicSizeof,      }},

@@ -173,7 +173,7 @@ namespace VM
 			[[noreturn]] void emitUnexpectedOpcode(const AnyString& name)
 			{
 				ShortString64 msg;
-				msg << "error: unexpected opcode '" << name << '\'';
+				msg << "error: vm: unexpected opcode '" << name << '\'';
 				threadContext.cerrException(msg);
 				abortMission();
 			}
@@ -955,6 +955,22 @@ namespace VM
 					return emitPointerSizeMismatch(object, size);
 
 				memset(object, pattern, size);
+			}
+
+			void visit(const IR::ISA::Operand<IR::ISA::Op::memcopy>& opr)
+			{
+				VM_PRINT_OPCODE(opr);
+				ASSERT_LVID(opr.lvid);
+				ASSERT_LVID(opr.srclvid);
+				ASSERT_LVID(opr.regsize);
+
+				uint64_t* object = reinterpret_cast<uint64_t*>(registers[opr.lvid].u64);
+				VM_CHECK_POINTER(object, opr);
+				uint64_t* src = reinterpret_cast<uint64_t*>(registers[opr.srclvid].u64);
+				VM_CHECK_POINTER(src, opr);
+
+				size_t size = static_cast<size_t>(registers[opr.regsize].u64);
+				memcpy(object, src, size);
 			}
 
 

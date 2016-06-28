@@ -134,6 +134,8 @@ namespace ISA //!< Instruction Set Architecture
 		memrealloc,
 		//! Fill a memory with a pattern
 		memfill,
+		//! Memcopy
+		memcopy,
 
 		//! label
 		label,
@@ -262,6 +264,7 @@ namespace ISA //!< Instruction Set Architecture
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::memfree) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::memrealloc) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::memfill) \
+				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::memcopy) \
 				\
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::label) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::opassert) \
