@@ -26,6 +26,10 @@ namespace Nany
 	{
 		return kind == nyt_u64;
 	}
+	inline bool Classdef::isBuiltinU32() const
+	{
+		return kind == nyt_u32;
+	}
 
 	inline bool Classdef::isBuiltingUnsigned() const
 	{

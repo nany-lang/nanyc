@@ -168,6 +168,11 @@ namespace IR
 		//! Emit a memrealloc
 		void emitMemrealloc(uint32_t lvid, uint32_t oldsize,uint32_t newsize);
 
+		void emitLoadU64(uint32_t lvid, uint32_t addr);
+		void emitLoadU32(uint32_t lvid, uint32_t addr);
+		void emitStoreU64(uint32_t lvid, uint32_t addr);
+		void emitStoreU32(uint32_t lvid, uint32_t addr);
+
 		//! Enter a namespace def
 		void emitNamespace(const AnyString& name);
 

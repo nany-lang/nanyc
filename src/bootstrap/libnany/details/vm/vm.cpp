@@ -801,7 +801,7 @@ namespace VM
 
 				uint64_t* object = reinterpret_cast<uint64_t*>(registers[opr.lvid].u64);
 				VM_CHECK_POINTER(object, opr);
-				++(object[0]);
+				++(object[0]); // +ref
 			}
 
 			inline void visit(const IR::ISA::Operand<IR::ISA::Op::unref>& opr)
@@ -811,7 +811,7 @@ namespace VM
 
 				uint64_t* object = reinterpret_cast<uint64_t*>(registers[opr.lvid].u64);
 				VM_CHECK_POINTER(object, opr);
-				if (0 == --(object[0]))
+				if (0 == --(object[0])) // -unref
 					destroy(object, opr.atomid, opr.instanceid);
 			}
 
@@ -969,6 +969,36 @@ namespace VM
 
 				size_t size = static_cast<size_t>(registers[opr.regsize].u64);
 				memcpy(object, src, size);
+			}
+
+			void visit(const IR::ISA::Operand<IR::ISA::Op::load_u64>& opr)
+			{
+				VM_PRINT_OPCODE(opr);
+				ASSERT_LVID(opr.lvid);
+				ASSERT_LVID(opr.ptrlvid);
+				registers[opr.lvid].u64 = *(reinterpret_cast<uint64_t*>(registers[opr.ptrlvid].u64));
+			}
+			void visit(const IR::ISA::Operand<IR::ISA::Op::load_u32>& opr)
+			{
+				VM_PRINT_OPCODE(opr);
+				ASSERT_LVID(opr.lvid);
+				ASSERT_LVID(opr.ptrlvid);
+				registers[opr.lvid].u64 = *(reinterpret_cast<uint32_t*>(registers[opr.ptrlvid].u64));
+			}
+
+			void visit(const IR::ISA::Operand<IR::ISA::Op::store_u64>& opr)
+			{
+				VM_PRINT_OPCODE(opr);
+				ASSERT_LVID(opr.lvid);
+				ASSERT_LVID(opr.ptrlvid);
+				*(reinterpret_cast<uint64_t*>(registers[opr.ptrlvid].u64)) = registers[opr.lvid].u64;
+			}
+			void visit(const IR::ISA::Operand<IR::ISA::Op::store_u32>& opr)
+			{
+				VM_PRINT_OPCODE(opr);
+				ASSERT_LVID(opr.lvid);
+				ASSERT_LVID(opr.ptrlvid);
+				*(reinterpret_cast<uint32_t*>(registers[opr.ptrlvid].u64)) = static_cast<uint32_t>(registers[opr.lvid].u64);
 			}
 
 

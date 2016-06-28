@@ -761,6 +761,40 @@ namespace ISA
 	};
 
 
+	template<> struct Operand<Nany::IR::ISA::Op::load_u64> final
+	{
+		constexpr static const char* opname() { return "load_u64"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		uint32_t ptrlvid;
+		template<class T> void eachLVID(T& c) { c(lvid, ptrlvid); }
+	};
+	template<> struct Operand<Nany::IR::ISA::Op::load_u32> final
+	{
+		constexpr static const char* opname() { return "load_u32"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		uint32_t ptrlvid;
+		template<class T> void eachLVID(T& c) { c(lvid, ptrlvid); }
+	};
+
+	template<> struct Operand<Nany::IR::ISA::Op::store_u64> final
+	{
+		constexpr static const char* opname() { return "store_u64"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		uint32_t ptrlvid;
+		template<class T> void eachLVID(T& c) { c(lvid, ptrlvid); }
+	};
+	template<> struct Operand<Nany::IR::ISA::Op::store_u32> final
+	{
+		constexpr static const char* opname() { return "store_u32"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		uint32_t ptrlvid;
+		template<class T> void eachLVID(T& c) { c(lvid, ptrlvid); }
+	};
+
 	template<> struct Operand<Nany::IR::ISA::Op::memrealloc> final
 	{
 		constexpr static const char* opname() { return "memrealloc"; }

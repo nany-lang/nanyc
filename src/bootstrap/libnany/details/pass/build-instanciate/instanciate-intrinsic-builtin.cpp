@@ -270,6 +270,116 @@ namespace Instanciate
 		}
 
 
+		static bool intrinsicMemGetU64(SequenceBuilder& seq, uint32_t lvid)
+		{
+			seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_u64);
+
+			uint32_t ptrlvid = seq.pushedparams.func.indexed[0].lvid;
+			auto& cdef = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, ptrlvid});
+			if (unlikely(not cdef.isRawPointer()))
+				return seq.complainIntrinsicParameter("loadu64", 0, cdef, "'__pointer'");
+
+			if (seq.canGenerateCode())
+				seq.out.emitLoadU64(lvid, ptrlvid);
+			return true;
+		}
+
+		static bool intrinsicMemGetU32(SequenceBuilder& seq, uint32_t lvid)
+		{
+			seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_u32);
+
+			uint32_t ptrlvid = seq.pushedparams.func.indexed[0].lvid;
+			auto& cdef = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, ptrlvid});
+			if (unlikely(not cdef.isRawPointer()))
+				return seq.complainIntrinsicParameter("loadu32", 0, cdef, "'__pointer'");
+
+			if (seq.canGenerateCode())
+				seq.out.emitLoadU32(lvid, ptrlvid);
+			return true;
+		}
+
+		static bool intrinsicMemGetPTR(SequenceBuilder& seq, uint32_t lvid)
+		{
+			seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_ptr);
+
+			uint32_t ptrlvid = seq.pushedparams.func.indexed[0].lvid;
+			auto& cdef = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, ptrlvid});
+			if (unlikely(not cdef.isRawPointer()))
+				return seq.complainIntrinsicParameter("loadptr", 0, cdef, "'__pointer'");
+
+			if (seq.canGenerateCode())
+			{
+				if (sizeof(uint64_t) == sizeof(void*))
+					seq.out.emitLoadU64(lvid, ptrlvid);
+				else
+					seq.out.emitLoadU32(lvid, ptrlvid);
+			}
+			return true;
+		}
+
+		static bool intrinsicMemSetU64(SequenceBuilder& seq, uint32_t lvid)
+		{
+			seq.cdeftable.substitute(lvid).mutateToVoid();
+
+			uint32_t ptrlvid = seq.pushedparams.func.indexed[0].lvid;
+			auto& cdef = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, ptrlvid});
+			if (unlikely(not cdef.isRawPointer()))
+				return seq.complainIntrinsicParameter("storeu64", 0, cdef, "'__pointer'");
+
+			uint32_t value = seq.pushedparams.func.indexed[1].lvid;
+			auto& cdefvalue = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, ptrlvid});
+			if (unlikely(not cdefvalue.isBuiltinU64()))
+				return seq.complainIntrinsicParameter("storeu64", 1, cdefvalue, "'__u64'");
+
+			if (seq.canGenerateCode())
+				seq.out.emitStoreU64(value, ptrlvid);
+			return true;
+		}
+
+		static bool intrinsicMemSetU32(SequenceBuilder& seq, uint32_t lvid)
+		{
+			seq.cdeftable.substitute(lvid).mutateToVoid();
+
+			uint32_t ptrlvid = seq.pushedparams.func.indexed[0].lvid;
+			auto& cdef = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, ptrlvid});
+			if (unlikely(not cdef.isRawPointer()))
+				return seq.complainIntrinsicParameter("storeu32", 0, cdef, "'__pointer'");
+
+			uint32_t value = seq.pushedparams.func.indexed[1].lvid;
+			auto& cdefvalue = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, ptrlvid});
+			if (unlikely(not cdefvalue.isBuiltinU32()))
+				return seq.complainIntrinsicParameter("storeu32", 1, cdefvalue, "'__u32'");
+
+			if (seq.canGenerateCode())
+				seq.out.emitStoreU32(value, ptrlvid);
+			return true;
+		}
+
+		static bool intrinsicMemSetPTR(SequenceBuilder& seq, uint32_t lvid)
+		{
+			seq.cdeftable.substitute(lvid).mutateToVoid();
+
+			uint32_t ptrlvid = seq.pushedparams.func.indexed[0].lvid;
+			auto& cdef = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, ptrlvid});
+			if (unlikely(not cdef.isRawPointer()))
+				return seq.complainIntrinsicParameter("storeptr", 0, cdef, "'__pointer'");
+
+			uint32_t value = seq.pushedparams.func.indexed[1].lvid;
+			auto& cdefvalue = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, ptrlvid});
+			if (unlikely(not cdefvalue.isRawPointer()))
+				return seq.complainIntrinsicParameter("storeptr", 1, cdefvalue, "'__pointer'");
+
+			if (seq.canGenerateCode())
+			{
+				if (sizeof(uint64_t) == sizeof(void*))
+					seq.out.emitStoreU64(value, ptrlvid);
+				else
+					seq.out.emitStoreU32(value, ptrlvid);
+			}
+			return true;
+		}
+
+
 		static bool intrinsicNOT(SequenceBuilder& seq, uint32_t lvid)
 		{
 			assert(seq.pushedparams.func.indexed.size() == 1);
@@ -780,15 +890,23 @@ namespace Instanciate
 		{
 			//
 			{"^fieldset",       { 2,  &intrinsicFieldset,    }},
-			{"pointer",         { 1,  &intrinsicPointer,     }},
+			//
 			{"memory.allocate", { 1,  &intrinsicMemalloc,    }},
 			{"memory.realloc",  { 3,  &intrinsicMemrealloc,  }},
 			{"memory.dispose",  { 2,  &intrinsicMemFree,     }},
 			{"memory.fill",     { 3,  &intrinsicMemfill,     }},
 			{"memory.copy",     { 3,  &intrinsicMemCopy,     }},
+			{"load.ptr",        { 1,  &intrinsicMemGetPTR,   }},
+			{"load.u64",        { 1,  &intrinsicMemGetU64,   }},
+			{"load.u32",        { 1,  &intrinsicMemGetU32,   }},
+			{"store.ptr",       { 2,  &intrinsicMemSetPTR,   }},
+			{"store.u64",       { 2,  &intrinsicMemSetU64,   }},
+			{"store.u32",       { 2,  &intrinsicMemSetU32,   }},
+			//
 			{"ref",             { 1,  &intrinsicRef,         }},
 			{"unref",           { 1,  &intrinsicUnref,       }},
 			{"sizeof",          { 1,  &intrinsicSizeof,      }},
+			{"pointer",         { 1,  &intrinsicPointer,     }},
 			//
 			{"and",             { 2,  &intrinsicAND,         }},
 			{"or",              { 2,  &intrinsicOR,          }},

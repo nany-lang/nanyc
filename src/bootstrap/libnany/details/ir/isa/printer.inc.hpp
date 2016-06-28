@@ -518,6 +518,24 @@ namespace // anonymous
 			out << ", size %" << operands.regsize << '}';
 		}
 
+		void print(const Operand<Op::load_u64>& operands)
+		{
+			line() << '%' << operands.lvid << " = load __u64 %" << operands.ptrlvid;
+		}
+		void print(const Operand<Op::load_u32>& operands)
+		{
+			line() << '%' << operands.lvid << " = load __u32 %" << operands.ptrlvid;
+		}
+
+		void print(const Operand<Op::store_u64>& operands)
+		{
+			line() << "store __u64 %" << operands.ptrlvid << " = %" << operands.lvid;
+		}
+		void print(const Operand<Op::store_u32>& operands)
+		{
+			line() << "store __u32 %" << operands.ptrlvid << " = %" << operands.lvid;
+		}
+
 		void print(const Operand<Op::memrealloc>& operands)
 		{
 			line() << "memory.realloc %" << operands.lvid

@@ -730,6 +730,33 @@ namespace IR
 		operands.regsize = regsize;
 	}
 
+
+	inline void Sequence::emitLoadU64(uint32_t lvid, uint32_t addr)
+	{
+		auto& opr   = emit<ISA::Op::load_u64>();
+		opr.lvid    = lvid;
+		opr.ptrlvid = addr;
+	}
+	inline void Sequence::emitLoadU32(uint32_t lvid, uint32_t addr)
+	{
+		auto& opr   = emit<ISA::Op::load_u32>();
+		opr.lvid    = lvid;
+		opr.ptrlvid = addr;
+	}
+
+	inline void Sequence::emitStoreU64(uint32_t lvid, uint32_t addr)
+	{
+		auto& opr   = emit<ISA::Op::store_u64>();
+		opr.lvid    = lvid;
+		opr.ptrlvid = addr;
+	}
+	inline void Sequence::emitStoreU32(uint32_t lvid, uint32_t addr)
+	{
+		auto& opr   = emit<ISA::Op::store_u32>();
+		opr.lvid    = lvid;
+		opr.ptrlvid = addr;
+	}
+
 	inline void Sequence::emitSizeof(uint32_t lvid, uint32_t type)
 	{
 		auto& operands = emit<ISA::Op::classdefsizeof>();
