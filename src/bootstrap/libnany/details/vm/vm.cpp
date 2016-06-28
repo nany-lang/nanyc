@@ -965,9 +965,7 @@ namespace VM
 				ASSERT_LVID(opr.regsize);
 
 				uint64_t* object = reinterpret_cast<uint64_t*>(registers[opr.lvid].u64);
-				VM_CHECK_POINTER(object, opr);
 				uint64_t* src = reinterpret_cast<uint64_t*>(registers[opr.srclvid].u64);
-				VM_CHECK_POINTER(src, opr);
 
 				size_t size = static_cast<size_t>(registers[opr.regsize].u64);
 				memcpy(object, src, size);
