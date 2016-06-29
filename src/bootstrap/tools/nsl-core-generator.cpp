@@ -38,9 +38,17 @@ static void craftClassFloat(Clob& o, uint32_t bits, const AnyString& license, co
 	o << "public class " << suffix << '\n';
 	o << "{\n";
 	o << "\toperator new;\n";
-	o << "\toperator new(self cref pod: f32);\n";
+	o << "\toperator new(cref x: f32)\n";
+	o << "\t{\n";
+	o << "\t\tpod = x.pod;\n";
+	o << "\t}\n";
 	if (bits > 32)
-		o << "\toperator new(self cref pod: f64);\n";
+	{
+		o << "\toperator new(cref x: f64)\n";
+		o << "\t{\n";
+		o << "\t\tpod = x.pod;\n";
+		o << "\t}\n";
+	}
 	o << "\t#[nosuggest] operator new(self pod: __f32);\n";
 	if (bits > 32)
 		o << "\t#[nosuggest] operator new(self pod: __f64);\n";
@@ -226,11 +234,17 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 	o << "/// \\ingroup std.core\n";
 	o << "public class " << suffix << '\n';
 	o << "{\n";
+	o << "\t//! Default constructor\n";
 	o << "\toperator new;\n\n";
 	craftOperator([&](uint32_t b, char targetsign)
 	{
 		for ( ; b >= 8; b /= 2)
-			o << "\toperator new (self cref pod: " << targetsign << b << ");\n";
+		{
+			o << "\toperator new (cref x: " << targetsign << b << ")\n";
+			o << "\t{\n";
+			o << "\t\tpod = x.pod;\n";
+			o << "\t}\n";
+		}
 	});
 	craftOperator([&](uint32_t b, char targetsign)
 	{
