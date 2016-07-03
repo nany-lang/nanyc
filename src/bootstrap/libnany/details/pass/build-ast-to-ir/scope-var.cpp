@@ -119,6 +119,118 @@ namespace Producer
 
 
 
+	inline bool Scope::emitVarInClass(const AnyString& varname, const AST::Node& node, const AST::Node* varType,
+		const AST::Node* varAssign, bool ref, bool constant)
+	{
+		auto& out = sequence();
+		if (debugmode)
+		{
+			out.emitComment();
+			out.emitComment(String{"class var "} << varname);
+		}
+		// the new member variable
+		auto mbvar = nextvar();
+		out.emitStackalloc(mbvar, nyt_any);
+
+		// the type of the expression
+		LVID lvid = 0;
+
+		if (varType != nullptr)
+		{
+			if (not visitASTType(*varType, lvid))
+				return false;
+		}
+		else
+		{
+			// type definition, via typeof(varAssign)
+			if (not generateTypeofForClassVar(lvid, *varAssign))
+				return false;
+		}
+		if (unlikely(0 == lvid))
+			return false;
+
+		// follow
+		{
+			auto& operands    = out.emit<ISA::Op::follow>();
+			operands.follower = mbvar;
+			operands.lvid     = lvid;
+			operands.symlink  = 0;
+		}
+		// preserve var / ref / const
+		out.emitQualifierRef(mbvar, ref);
+		if (constant)
+			out.emitQualifierConst(mbvar, true);
+
+		// variable definition
+		emitDebugpos(node);
+		out.emitBlueprintVardef(mbvar, varname);
+
+		// generating an INIT func for the variable
+		return generateInitFuncForClassVar(varname, mbvar, *varAssign);
+
+	}
+
+
+	inline bool Scope::emitVarInFunc(const AnyString& varname, const AST::Node& node, const AST::Node* varType,
+		const AST::Node* varAssign, bool ref, bool constant)
+	{
+		auto& out = sequence();
+		// create the variable itself
+		uint32_t varlvid  = out.emitStackalloc(nextvar(), nyt_any);
+
+		if (varType != nullptr)
+		{
+			uint32_t lvidtype;
+			if (not visitASTType(*varType, lvidtype) or lvidtype == 0)
+				return false;
+
+			// follow
+			auto& operands    = out.emit<ISA::Op::follow>();
+			operands.follower = varlvid;
+			operands.lvid	  = lvidtype;
+			operands.symlink  = 0;
+		}
+
+		// preserve var / ref / const
+		out.emitQualifierRef(varlvid, ref);
+		if (constant)
+			out.emitQualifierConst(varlvid, true);
+
+		// default value
+		{
+			LVID rhs = 0;
+			IR::OpcodeScopeLocker opscope{out};
+			if (not visitASTVarValueInitialization(rhs, *varAssign, node, varname))
+				return false;
+
+			assert(rhs != 0);
+			if (not ref)
+			{
+				out.emitAssign(varlvid, rhs, false);
+			}
+			else
+			{
+				out.emitStore(varlvid, rhs); // re-acquire to keep the value alive
+				out.emitRef(varlvid);
+			}
+		}
+
+		// important: the alias must be declared *after* the right value
+		// (otherwise it may be used by the code)
+		emitDebugpos(node); // reset the debug position
+		out.emitNameAlias(varlvid, varname);
+		return true;
+	}
+
+
+	inline bool Scope::emitPropertyInClass(const AnyString& varname, const AST::Node& node, const AST::Node* varType,
+		const AST::Node* varAssign, bool ref, bool constant)
+	{
+		return (error(node) << "not implemented yet");
+	}
+
+
+
 	bool Scope::visitASTVar(const AST::Node& node)
 	{
 		assert(node.rule == AST::rgVar);
@@ -193,8 +305,7 @@ namespace Producer
 
 				case AST::rgFuncParamVariadic:
 				{
-					error(child) << "variadic parameter not allowed in variable definition";
-					return false;
+					return (error(child) << "variadic parameter not allowed in variable definition");
 				}
 
 				default:
@@ -203,135 +314,38 @@ namespace Producer
 		}
 
 		if (unlikely(varnodeDecl == nullptr))
-		{
-			ice() << "invalid null pointer for the var-decl node";
-			return false;
-		}
+			return (ice() << "invalid null pointer for the var-decl node");
 
 		if (unlikely(varAssign == nullptr)) // the variable currently must have a default value
-		{
-			error(*varnodeDecl) << "value initialization is missing for '" << varname << "'";
-			return false;
-		}
+			return (error(*varnodeDecl) << "value initialization is missing for '" << varname << '\'');
 
-		auto& out = sequence();
 
 		if (not isProperty)
 		{
 			switch (kind)
 			{
-				case Kind::kclass:
-				{
-					if (debugmode)
-					{
-						out.emitComment();
-						out.emitComment(String{"class var "} << varname);
-					}
-					// the new member variable
-					auto mbvar = nextvar();
-					out.emitStackalloc(mbvar, nyt_any);
-
-					// the type of the expression
-					LVID lvid = 0;
-
-					if (varType != nullptr)
-					{
-						if (not visitASTType(*varType, lvid))
-							return false;
-					}
-					else
-					{
-						// type definition, via typeof(varAssign)
-						if (not generateTypeofForClassVar(lvid, *varAssign))
-							return false;
-					}
-					if (unlikely(0 == lvid))
-						return false;
-
-					// follow
-					{
-						auto& operands    = out.emit<ISA::Op::follow>();
-						operands.follower = mbvar;
-						operands.lvid     = lvid;
-						operands.symlink  = 0;
-					}
-					// preserve var / ref / const
-					out.emitQualifierRef(mbvar, ref);
-					if (constant)
-						out.emitQualifierConst(mbvar, true);
-
-					// variable definition
-					emitDebugpos(*varnodeDecl);
-					out.emitBlueprintVardef(mbvar, varname);
-
-					// generating an INIT func for the variable
-					if (not generateInitFuncForClassVar(varname, mbvar, *varAssign))
-						return false;
-					break;
-				}
-
 				case Kind::kfunc:
-				{
-					// create the variable itself
-					uint32_t varlvid  = out.emitStackalloc(nextvar(), nyt_any);
-
-					if (varType != nullptr)
-					{
-						uint32_t lvidtype;
-						if (not visitASTType(*varType, lvidtype) or lvidtype == 0)
-							return false;
-
-						// follow
-						auto& operands    = out.emit<ISA::Op::follow>();
-						operands.follower = varlvid;
-						operands.lvid	  = lvidtype;
-						operands.symlink  = 0;
-					}
-
-					// preserve var / ref / const
-					out.emitQualifierRef(varlvid, ref);
-					if (constant)
-						out.emitQualifierConst(varlvid, true);
-
-					{
-						LVID rhs = 0;
-						IR::OpcodeScopeLocker opscope{out};
-						if (not visitASTVarValueInitialization(rhs, *varAssign, *varnodeDecl, varname))
-							return false;
-
-						assert(rhs != 0);
-						if (not ref)
-						{
-							out.emitAssign(varlvid, rhs, false);
-						}
-						else
-						{
-							out.emitStore(varlvid, rhs); // re-acquire to keep the value alive
-							out.emitRef(varlvid);
-						}
-					}
-
-					// important: the alias must be declared *after* the right value
-					// (otherwise it may be used by the code)
-					emitDebugpos(*varnodeDecl); // reset the debug position
-					out.emitNameAlias(varlvid, varname);
-					break;
-				}
+					return emitVarInFunc(varname, *varnodeDecl, varType, varAssign, ref, constant);
+				case Kind::kclass:
+					return emitVarInClass(varname, *varnodeDecl, varType, varAssign, ref, constant);
 				default:
-				{
-					ice(*varnodeDecl) << "var declaration: invalid scope type";
-					return false;
-				}
+					return (ice(*varnodeDecl) << "var declaration: unsupported scope type");
 			}
 		}
 		else
 		{
-			// the declaration is a property
-			error(*varnodeDecl) << "properties not implemented";
-			return false;
+			switch (kind)
+			{
+				case Kind::kclass:
+					return emitPropertyInClass(varname, *varnodeDecl, varType, varAssign, ref, constant);
+				case Kind::kfunc:
+					return (error(*varnodeDecl) << "properties in functions not implemented");
+				default:
+					return (ice(*varnodeDecl) << "property declaration: unsupported scope type");
+			}
 		}
 
-		return true;
+		return false;
 	}
 
 

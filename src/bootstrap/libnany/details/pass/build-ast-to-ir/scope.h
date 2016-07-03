@@ -94,6 +94,8 @@ namespace Producer
 		bool visitASTAttributes(const AST::Node&);
 
 		bool visitASTVar(const AST::Node&);
+		bool visitASTVarInClass();
+
 		bool visitASTVarValueInitialization(LVID&, const AST::Node&, const AST::Node&, const AnyString&);
 
 		bool visitASTExpr(const AST::Node&, LVID& localvar, bool allowScope = false);
@@ -219,6 +221,13 @@ namespace Producer
 
 		void prepareClosureNodeExpr(AST::Node::Ptr& out);
 		void emitExprAttributes(uint32_t& localvar);
+
+		bool emitVarInClass(const AnyString& varname, const AST::Node& node, const AST::Node* varType,
+			const AST::Node* varAssign, bool ref, bool constant);
+		bool emitVarInFunc(const AnyString& varname, const AST::Node& node, const AST::Node* varType,
+			const AST::Node* varAssign, bool ref, bool constant);
+		bool emitPropertyInClass(const AnyString& varname, const AST::Node& node, const AST::Node* varType,
+			const AST::Node* varAssign, bool ref, bool constant);
 
 
 	private:
