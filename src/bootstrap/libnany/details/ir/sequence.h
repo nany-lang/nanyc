@@ -274,7 +274,7 @@ namespace IR
 		void emitPragmaShortcircuit(bool evalvalue);
 		//! Emit pragma shortcircuit opcode 'nop' offset
 		void emitPragmaShortcircuitMetadata(uint32_t label);
-		//! Emit pragma shortcircuit opcode 
+		//! Emit pragma shortcircuit opcode
 		void emitPragmaShortcircuitMutateToBool(uint32_t lvid, uint32_t  source);
 
 		//! Emit pragma builtinalias
@@ -349,13 +349,6 @@ namespace IR
 		//@}
 
 
-		//! \name Atom relationship
-		//@{
-		//! Get if the sequence is attached to an atom
-		bool hasAtomParent() const;
-		//@}
-
-
 		//! \name Debug
 		//@{
 		//! Print the sequence to a string
@@ -379,8 +372,6 @@ namespace IR
 		uint32_t pCapacity = 0u;
 		//! pBody of the sequence
 		Instruction* pBody = nullptr;
-		//! Attaced Atom, if any
-		Atom* pAtom = nullptr;
 
 	}; // class Sequence
 

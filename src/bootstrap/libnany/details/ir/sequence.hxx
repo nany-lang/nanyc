@@ -1003,12 +1003,6 @@ namespace IR
 	}
 
 
-	inline bool Sequence::hasAtomParent() const
-	{
-		return (nullptr != pAtom);
-	}
-
-
 	inline void Sequence::invalidateCursor(const Instruction*& cursor) const
 	{
 		cursor = pBody + pSize;
