@@ -26,10 +26,10 @@ namespace IR
 	}
 
 
-	inline void Sequence::reserve(uint32_t instrCount)
+	inline void Sequence::reserve(uint32_t count)
 	{
-		if (pCapacity < instrCount)
-			grow(instrCount);
+		if (pCapacity < count)
+			grow(count);
 	}
 
 
@@ -87,7 +87,7 @@ namespace IR
 
 	template<ISA::Op O> inline ISA::Operand<O>& Sequence::emit()
 	{
-		if (unlikely(not ((pSize + 1) < pCapacity)))
+		if (unlikely(not (pSize + 1 < pCapacity)))
 			grow(pSize + 1);
 
 		static_assert(sizeof(Instruction) >= sizeof(ISA::Operand<O>), "pSize mismatch");
@@ -826,8 +826,7 @@ namespace IR
 
 	inline void Sequence::emitEnsureTypeResolved(uint32_t lvid)
 	{
-		auto& operands = emit<ISA::Op::ensureresolved>();
-		operands.lvid  = lvid;
+		emit<ISA::Op::ensureresolved>().lvid = lvid;
 	}
 
 
@@ -918,7 +917,6 @@ namespace IR
 		emit<ISA::Op::scope>();
 	}
 
-
 	inline void Sequence::emitEnd()
 	{
 		emit<ISA::Op::end>();
@@ -969,8 +967,7 @@ namespace IR
 
 	inline void Sequence::emitDebugfile(const AnyString& filename)
 	{
-		auto& operands    = emit<ISA::Op::debugfile>();
-		operands.filename = stringrefs.ref(filename);
+		emit<ISA::Op::debugfile>().filename = stringrefs.ref(filename);
 	}
 
 

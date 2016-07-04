@@ -12,6 +12,7 @@ namespace Nany
 namespace IR
 {
 
+
 	void Sequence::moveCursorFromBlueprintToEnd(const Instruction*& cursor) const
 	{
 		assert((*cursor).opcodes[0] == static_cast<uint32_t>(IR::ISA::Op::blueprint));
@@ -97,6 +98,8 @@ namespace IR
 	}
 
 
+
+
 	namespace // anonymous
 	{
 
@@ -120,15 +123,11 @@ namespace IR
 				{
 					case IR::ISA::Blueprint::funcdef:
 					case IR::ISA::Blueprint::classdef:
-					{
 						sequence.moveCursorFromBlueprintToEnd(*cursor);
 						break;
-					}
 					default:
-					{
 						operands.eachLVID(*this);
 						break;
-					}
 				}
 			}
 

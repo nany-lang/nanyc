@@ -7,7 +7,6 @@ using namespace Yuni;
 
 
 
-
 namespace Nany
 {
 namespace IR
@@ -15,12 +14,14 @@ namespace IR
 namespace Producer
 {
 
-	inline bool Scope::visitASTExprIdentifier(const AST::Node& node, LVID& localvar)
+
+	bool Scope::visitASTExprIdentifier(const AST::Node& node, LVID& localvar)
 	{
 		// value fetching
 		emitDebugpos(node);
-		uint32_t rid = sequence().emitStackalloc(nextvar(), nyt_any);
-		sequence().emitIdentify(rid, node.text, localvar);
+		auto& out = sequence();
+		uint32_t rid = out.emitStackalloc(nextvar(), nyt_any);
+		out.emitIdentify(rid, node.text, localvar);
 		localvar = rid;
 
 		if (not node.children.empty())
@@ -36,17 +37,17 @@ namespace Producer
 
 		// value fetching
 		emitDebugpos(node);
-		uint32_t rid = sequence().emitStackalloc(nextvar(), nyt_any);
+		auto& out = sequence();
+		uint32_t rid = out.emitStackalloc(nextvar(), nyt_any);
 		ShortString64 idname;
 		idname << '^' << node.children[0]->text;
-		sequence().emitIdentify(rid, idname, localvar);
+		out.emitIdentify(rid, idname, localvar);
 		localvar = rid;
 		return true;
 	}
 
 
-
-	inline bool Scope::visitASTExprRegister(const AST::Node& node, LVID& localvar)
+	bool Scope::visitASTExprRegister(const AST::Node& node, LVID& localvar)
 	{
 		assert(not node.text.empty());
 		localvar = node.text.to<uint32_t>();
