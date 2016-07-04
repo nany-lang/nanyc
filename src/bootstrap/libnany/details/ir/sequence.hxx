@@ -1017,7 +1017,7 @@ namespace IR
 		auto& operands = emit<ISA::Op::qualifiers>();
 		operands.lvid  = lvid;
 		operands.flag  = static_cast<uint32_t>(flag);
-		operands.qualifier = 1; // ref
+		operands.qualifier = static_cast<uint32_t>(IR::ISA::TypeQualifier::ref);
 	}
 
 	inline void Sequence::emitQualifierConst(uint32_t lvid, bool flag)
@@ -1025,7 +1025,7 @@ namespace IR
 		auto& operands = emit<ISA::Op::qualifiers>();
 		operands.lvid  = lvid;
 		operands.flag  = static_cast<uint32_t>(flag);
-		operands.qualifier = 2; // const
+		operands.qualifier = static_cast<uint32_t>(IR::ISA::TypeQualifier::constant);
 	}
 
 	inline void Sequence::emitDebugfile(const AnyString& filename)

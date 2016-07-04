@@ -264,24 +264,26 @@ namespace Instanciate
 
 	inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::qualifiers>& operands)
 	{
-		bool  onoff = (operands.flag != 0);
-		auto& spare = cdeftable.substitute(operands.lvid);
-
-		switch (operands.qualifier)
+		if (operands.qualifier < IR::ISA::TypeQualifierCount)
 		{
-			case 1: // ref
+			bool  onoff = (operands.flag != 0);
+			auto& spare = cdeftable.substitute(operands.lvid);
+
+			switch (static_cast<IR::ISA::TypeQualifier>(operands.qualifier))
 			{
-				spare.qualifiers.ref = onoff;
-				break;
+				case IR::ISA::TypeQualifier::ref:
+				{
+					spare.qualifiers.ref = onoff;
+					return;
+				}
+				case IR::ISA::TypeQualifier::constant:
+				{
+					spare.qualifiers.constant = onoff;
+					return;
+				}
 			}
-			case 2: // const
-			{
-				spare.qualifiers.constant = onoff;
-				break;
-			}
-			default:
-				ice() << "unknown qualifier constant " << operands.qualifier;
 		}
+		ice() << "unknown qualifier constant " << operands.qualifier;
 	}
 
 

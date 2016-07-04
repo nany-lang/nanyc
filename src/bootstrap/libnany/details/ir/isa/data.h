@@ -87,6 +87,14 @@ namespace ISA
 	}; // enum Blueprint
 
 
+	enum class TypeQualifier: uint32_t
+	{
+		//! Ref qualifier
+		ref,
+		//! 'const' qualifier
+		constant,
+	};
+	static const constexpr uint32_t TypeQualifierCount = 1 + static_cast<uint32_t>(TypeQualifier::constant);
 
 
 
