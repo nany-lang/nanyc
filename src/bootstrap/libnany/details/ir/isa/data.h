@@ -45,17 +45,12 @@ namespace ISA
 
 		//! Builtin alias
 		builtinalias,
-
 		//! Suggestion (for error reporting)
 		suggest,
-
 		//! Set / unset an object as synthetic
 		synthetic,
-
-		//! The maximum number of elements, for integrity check
-		max,
-
-	}; // enum Pragma
+	};
+	static const constexpr uint32_t PragmaCount = 1 + (uint32_t) Pragma::synthetic;
 
 
 
@@ -94,7 +89,7 @@ namespace ISA
 		//! 'const' qualifier
 		constant,
 	};
-	static const constexpr uint32_t TypeQualifierCount = 1 + static_cast<uint32_t>(TypeQualifier::constant);
+	static const constexpr uint32_t TypeQualifierCount = 1 + (uint32_t) TypeQualifier::constant;
 
 
 
@@ -839,7 +834,8 @@ namespace ISA
 		}
 		value;
 
-		template<class T> void eachLVID(T& c) {
+		template<class T> void eachLVID(T& c)
+		{
 			static_assert(sizeof(pragma) == sizeof(uint32_t), "alignment required");
 			switch (pragma)
 			{
@@ -854,7 +850,6 @@ namespace ISA
 				case Pragma::shortcircuit:
 				case Pragma::builtinalias:
 				case Pragma::suggest:
-				case Pragma::max:
 					break;
 			}
 		}

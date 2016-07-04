@@ -93,7 +93,7 @@ namespace Instanciate
 
 	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::pragma>& operands)
 	{
-		assert(static_cast<uint32_t>(operands.pragma) < static_cast<uint32_t>(IR::ISA::Pragma::max));
+		assert(static_cast<uint32_t>(operands.pragma) < IR::ISA::PragmaCount);
 
 		auto pragma = static_cast<IR::ISA::Pragma>(operands.pragma);
 		switch (pragma)
@@ -197,7 +197,6 @@ namespace Instanciate
 			case IR::ISA::Pragma::builtinalias:
 			case IR::ISA::Pragma::shortcircuit:
 			case IR::ISA::Pragma::unknown:
-			case IR::ISA::Pragma::max:
 				break;
 		}
 	}

@@ -409,7 +409,7 @@ namespace Mapping
 		if (unlikely(nullptr == atomStack))
 			return printError(operands, "invalid stack for blueprint pragma");
 
-		assert(static_cast<uint32_t>(operands.pragma) < static_cast<uint32_t>(IR::ISA::Pragma::max));
+		assert(static_cast<uint32_t>(operands.pragma) < IR::ISA::PragmaCount);
 
 		switch ((IR::ISA::Pragma) operands.pragma)
 		{
@@ -446,7 +446,6 @@ namespace Mapping
 			case IR::ISA::Pragma::shortcircuitOpNopOffset:
 			case IR::ISA::Pragma::shortcircuitMutateToBool:
 			case IR::ISA::Pragma::unknown:
-			case IR::ISA::Pragma::max:
 				break;
 		}
 	}

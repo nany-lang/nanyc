@@ -538,9 +538,7 @@ namespace Nany
 			// preserve qualifiers
 			auto it = pClassdefs.find(CLID{layer.atomid, lvid});
 			if (it != pClassdefs.end())
-			{
 				newcdef.qualifiers = (*(it->second)).qualifiers;
-			}
 
 			// set clid
 			newcdef.clid.reclass(layer.atomid, lvid);

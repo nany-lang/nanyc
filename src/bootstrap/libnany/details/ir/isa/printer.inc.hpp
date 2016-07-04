@@ -705,7 +705,7 @@ namespace // anonymous
 
 		void print(const Operand<Op::pragma>& operands)
 		{
-			if (static_cast<uint32_t>(operands.pragma) < static_cast<uint32_t>(Pragma::max))
+			if (static_cast<uint32_t>(operands.pragma) < IR::ISA::PragmaCount)
 			{
 				switch ((Pragma) operands.pragma)
 				{
@@ -773,9 +773,10 @@ namespace // anonymous
 						break;
 					}
 					case Pragma::unknown:
-					case Pragma::max:
+					{
 						line() << "<invalid pragma identifier>";
 						break;
+					}
 				}
 			}
 			else
