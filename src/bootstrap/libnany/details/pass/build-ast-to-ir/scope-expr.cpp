@@ -39,7 +39,7 @@ namespace Producer
 		uint32_t rid = sequence().emitStackalloc(nextvar(), nyt_any);
 		ShortString64 idname;
 		idname << '^' << node.children[0]->text;
-		sequence().emitIdentify(rid, acquireString(idname), localvar);
+		sequence().emitIdentify(rid, idname, localvar);
 		localvar = rid;
 		return true;
 	}
