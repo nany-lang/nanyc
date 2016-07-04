@@ -1,7 +1,7 @@
 #include "sequence.h"
-#include <cstdlib>
 #include "details/ir/isa/printer.inc.hpp"
 #include "details/atom/atom.h"
+#include <cstdlib>
 
 using namespace Yuni;
 
@@ -55,18 +55,22 @@ namespace IR
 	{
 		pSize = 0;
 		stringrefs.clear();
+		free(pBody);
+		pCapacity = 0;
+		pBody = nullptr;
 	}
 
 
-	void Sequence::grow(uint32_t instrCount)
+	void Sequence::grow(uint32_t count)
 	{
 		auto newcapa = pCapacity;
-		do { newcapa += 1000; } while (newcapa < instrCount);
-		pCapacity = newcapa;
+		do { newcapa += 1000; } while (newcapa < count);
 
-		pBody = (Instruction*)::std::realloc(pBody, sizeof(Instruction) * newcapa);
-		if (unlikely(nullptr == pBody))
+		auto* newbody = (Instruction*) realloc(pBody, sizeof(Instruction) * newcapa);
+		if (unlikely(nullptr == newbody))
 			throw std::bad_alloc();
+		pBody = newbody;
+		pCapacity = newcapa;
 	}
 
 
@@ -75,14 +79,16 @@ namespace IR
 		if (pSize == 0)
 		{
 			pCapacity = 0;
-			std::free(pBody);
+			free(pBody);
 			pBody = nullptr;
 		}
 		else
 		{
-			pBody = (Instruction*) std::realloc(pBody, sizeof(Instruction) * pSize);
-			if (unlikely(nullptr == pBody))
+			auto* newbody = (Instruction*) realloc(pBody, sizeof(Instruction) * pSize);
+			if (unlikely(nullptr == newbody))
 				throw std::bad_alloc();
+			pBody = newbody;
+			pCapacity = pSize;
 		}
 	}
 

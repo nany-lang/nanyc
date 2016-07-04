@@ -78,7 +78,7 @@ namespace IR
 	template<ISA::Op O> inline ISA::Operand<O>& Sequence::emitraw()
 	{
 		static_assert(sizeof(Instruction) >= sizeof(ISA::Operand<O>), "pSize mismatch");
-		assert(pSize + 1 < pCapacity);
+		assert(pSize + 1 <= pCapacity);
 		auto& result = at<O>(pSize++);
 		result.opcode = static_cast<uint32_t>(O);
 		return result;
@@ -87,11 +87,11 @@ namespace IR
 
 	template<ISA::Op O> inline ISA::Operand<O>& Sequence::emit()
 	{
-		if (unlikely(not (pSize + 1 < pCapacity)))
+		if (unlikely(pCapacity < pSize + 1))
 			grow(pSize + 1);
 
 		static_assert(sizeof(Instruction) >= sizeof(ISA::Operand<O>), "pSize mismatch");
-		assert(pSize + 1 < pCapacity);
+		assert(pSize + 1 <= pCapacity);
 		auto& result = at<O>(pSize++);
 		result.opcode = static_cast<uint32_t>(O);
 		return result;
