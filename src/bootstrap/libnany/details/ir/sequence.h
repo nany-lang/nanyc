@@ -35,6 +35,28 @@ namespace IR
 		//@}
 
 
+		//! \name Cursor manipulation
+		//@{
+		//! Get if a cursor is valid
+		bool isCursorValid(const Instruction& instr) const;
+
+		//! Get the upper limit
+		void invalidateCursor(const Instruction*& cusror) const;
+		//! Get the upper limit
+		void invalidateCursor(Instruction*& cusror) const;
+
+		//! Go to the next label
+		bool jumpToLabelForward(const Instruction*& cursor, uint32_t label) const;
+		//! Go to a previous label
+		bool jumpToLabelBackward(const Instruction*& cursor, uint32_t label) const;
+
+		//! Move the cursor at the end of the blueprint
+		void moveCursorFromBlueprintToEnd(Instruction*& cursor) const;
+		//! Move the cursor at the end of the blueprint
+		void moveCursorFromBlueprintToEnd(const Instruction*& cursor) const;
+		//@}
+
+
 		//! \name Opcodes
 		//@{
 		//! Fetch an instruction at a given offset
@@ -55,25 +77,6 @@ namespace IR
 		template<ISA::Op O> uint32_t offsetOf(const ISA::Operand<O>& instr) const;
 		//! Get the offset of an instruction within the sequence
 		uint32_t offsetOf(const Instruction& instr) const;
-
-		//! Get if a cursor is valid
-		bool isCursorValid(const Instruction& instr) const;
-
-		//! Get the upper limit
-		void invalidateCursor(const Instruction*& cusror) const;
-		//! Get the upper limit
-		void invalidateCursor(Instruction*& cusror) const;
-
-		//! Go to the next label
-		bool jumpToLabelForward(const Instruction*& cursor, uint32_t label) const;
-		//! Go to a previous label
-		bool jumpToLabelBackward(const Instruction*& cursor, uint32_t label) const;
-
-		//! Move the cursor at the end of the blueprint
-		void moveCursorFromBlueprintToEnd(Instruction*& cursor) const;
-		//! Move the cursor at the end of the blueprint
-		void moveCursorFromBlueprintToEnd(const Instruction*& cursor) const;
-
 
 		//! Emit a NOP instruction
 		void emitNop();
@@ -258,7 +261,7 @@ namespace IR
 		uint32_t emitBlueprintGenericTypeParam(LVID);
 
 		//! Emit a blueprint vardef opcode
-		void emitBlueprintVardef(LVID, const AnyString&);
+		void emitBlueprintVardef(LVID, const AnyString& name);
 
 		//! Emit a stack size increase opcode and give the offset of the instruction in the sequence
 		uint32_t emitStackSizeIncrease();
@@ -314,13 +317,20 @@ namespace IR
 		void emitJz(uint32_t lvid, uint32_t result, uint32_t label);
 		//! Emit jump if not zero
 		void emitJnz(uint32_t lvid, uint32_t result, uint32_t label);
+		//@}
 
 
+		//! \name Iteration
+		//@{
 		//! Visit each instruction
 		template<class T> void each(T& visitor, uint32_t offset = 0);
 		//! Visit each instruction (const)
 		template<class T> void each(T& visitor, uint32_t offset = 0) const;
+		//@}
 
+
+		//! \name Opcode utils
+		//@{
 		/*!
 		** \brief Iterate through all opcodes and increment all lvid
 		**
