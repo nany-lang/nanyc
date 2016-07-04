@@ -646,9 +646,13 @@ namespace ISA
 		constexpr static const char* opname() { return "qualifiers"; }
 		uint32_t opcode;
 		uint32_t lvid;
-		uint32_t qualifier; // 1: ref, 2: const
+		TypeQualifier qualifier;
 		uint32_t flag;
-		template<class T> void eachLVID(T& c) { c(lvid); }
+
+		template<class T> void eachLVID(T& c) {
+			static_assert(sizeof(qualifier) == sizeof(uint32_t), "alignment required");
+			c(lvid);
+		}
 	};
 
 

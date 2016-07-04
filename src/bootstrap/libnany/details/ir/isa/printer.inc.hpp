@@ -233,8 +233,8 @@ namespace // anonymous
 			out << (operands.flag ? '+' : '-');
 			switch (operands.qualifier)
 			{
-				case 1: out << "ref"; break;
-				case 2: out << "const"; break;
+				case IR::ISA::TypeQualifier::ref:      out << "ref"; break;
+				case IR::ISA::TypeQualifier::constant: out << "const"; break;
 			}
 		}
 

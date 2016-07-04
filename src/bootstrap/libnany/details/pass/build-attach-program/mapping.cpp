@@ -755,30 +755,27 @@ namespace Mapping
 
 	inline void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::qualifiers>& operands)
 	{
-		if (operands.qualifier < IR::ISA::TypeQualifierCount)
+		assert(static_cast<uint32_t>(operands.qualifier) < IR::ISA::TypeQualifierCount);
+		CLID clid {atomStack->atom.atomid, operands.lvid};
+		bool onoff = (operands.flag != 0);
+
+		MutexLocker locker{mutex};
+		if (debugmode and not cdeftable.hasClassdef(clid))
+			return printError(operands, "invalid clid");
+
+		switch (operands.qualifier)
 		{
-			CLID clid {atomStack->atom.atomid, operands.lvid};
-			bool onoff = (operands.flag != 0);
-
-			MutexLocker locker{mutex};
-			if (debugmode and not cdeftable.hasClassdef(clid))
-				return printError(operands, "invalid clid");
-
-			switch (static_cast<IR::ISA::TypeQualifier>(operands.qualifier))
+			case IR::ISA::TypeQualifier::ref:
 			{
-				case IR::ISA::TypeQualifier::ref:
-				{
-					cdeftable.classdef(clid).qualifiers.ref = onoff;
-					return;
-				}
-				case IR::ISA::TypeQualifier::constant:
-				{
-					cdeftable.classdef(clid).qualifiers.constant = onoff;
-					return;
-				}
+				cdeftable.classdef(clid).qualifiers.ref = onoff;
+				break;
+			}
+			case IR::ISA::TypeQualifier::constant:
+			{
+				cdeftable.classdef(clid).qualifiers.constant = onoff;
+				break;
 			}
 		}
-		printError(operands, "invalid qualifier value");
 	}
 
 
