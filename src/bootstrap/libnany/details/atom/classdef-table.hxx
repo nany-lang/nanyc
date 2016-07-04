@@ -18,7 +18,9 @@ namespace Nany
 
 	inline bool ClassdefTable::hasClassdef(const CLID& clid) const
 	{
-		return (0 != pClassdefs.count(clid));
+		return (clid.atomid() == layer.atomid)
+			? (clid.lvid() < layer.count)
+			: (0 != pClassdefs.count(clid));
 	}
 
 

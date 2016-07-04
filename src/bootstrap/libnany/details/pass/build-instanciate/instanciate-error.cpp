@@ -41,7 +41,7 @@ namespace Instanciate
 		auto entry = sb.report.fromErrLevel(level);
 		if (debugmode)
 		{
-			if (sb.currentSequence.isCursorValid(**sb.cursor))
+			if (sb.cursor and sb.currentSequence.isCursorValid(**sb.cursor))
 			{
 				if (level == Logs::Level::error or level == Logs::Level::ICE)
 				{
