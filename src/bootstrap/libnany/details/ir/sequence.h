@@ -344,8 +344,6 @@ namespace IR
 
 		//! Clear the sequence
 		void clear();
-		//! Shrink the memory used by the pBody
-		void shrink();
 		//! Reserve enough memory for N instructions
 		void reserve(uint32_t count);
 		//@}

@@ -63,33 +63,15 @@ namespace IR
 
 	void Sequence::grow(uint32_t count)
 	{
+		assert(count > 0);
 		auto newcapa = pCapacity;
-		do { newcapa += 1000; } while (newcapa < count);
+		do { newcapa += 1000u; } while (newcapa < count);
 
 		auto* newbody = (Instruction*) realloc(pBody, sizeof(Instruction) * newcapa);
 		if (unlikely(nullptr == newbody))
 			throw std::bad_alloc();
 		pBody = newbody;
 		pCapacity = newcapa;
-	}
-
-
-	void Sequence::shrink()
-	{
-		if (pSize == 0)
-		{
-			pCapacity = 0;
-			free(pBody);
-			pBody = nullptr;
-		}
-		else
-		{
-			auto* newbody = (Instruction*) realloc(pBody, sizeof(Instruction) * pSize);
-			if (unlikely(nullptr == newbody))
-				throw std::bad_alloc();
-			pBody = newbody;
-			pCapacity = pSize;
-		}
 	}
 
 
