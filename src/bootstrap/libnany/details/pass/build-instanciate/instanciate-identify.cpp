@@ -67,6 +67,121 @@ namespace Instanciate
 	}
 
 
+	inline bool SequenceBuilder::emitIdentifyForSingleResult(bool isLocalVar, const Classdef& cdef,
+		const IR::ISA::Operand<IR::ISA::Op::identify>& operands, const AnyString& name)
+	{
+		auto& resultAtom = multipleResults[0].get();
+		const Classdef* cdefTypedef = nullptr;
+		auto& atom = (not resultAtom.isTypeAlias())
+			? resultAtom
+			: resolveTypeAlias(resultAtom, cdefTypedef);
+
+
+		if (unlikely((!cdefTypedef and resultAtom.isTypeAlias()) or atom.flags(Atom::Flags::error)))
+			return false;
+
+		if (unlikely(cdefTypedef and cdefTypedef->isBuiltin()))
+		{
+			auto& spare = cdeftable.substitute(cdef.clid.lvid());
+			spare.import(*cdefTypedef);
+
+			if (isLocalVar)
+			{
+				// disable optimisation to avoid unwanted behavior
+				auto& lvidinfo = frame->lvids[operands.lvid];
+				lvidinfo.synthetic = false;
+				lvidinfo.origin.memalloc = false;
+				lvidinfo.origin.returnedValue = false;
+			}
+			return true;
+		}
+
+		// if the resolution is simple (aka only one solution), it is possible that the
+		// solution is a member variable (`self.myvar`). In this case, the atom will be the member itself
+		// and not its real type
+		if (atom.isMemberVariable())
+		{
+			assert(not isLocalVar and "a member variable cannot be a local variable");
+			assert(not atom.returnType.clid.isVoid());
+
+			// member variable - the real type is held by 'returnType'
+			auto& cdefvar = cdeftable.classdef(atom.returnType.clid);
+			auto* atomvar = (not cdefvar.isBuiltin()) ? cdeftable.findClassdefAtom(cdefvar) : nullptr;
+			if (unlikely(!atomvar and not cdefvar.isBuiltin()))
+				return (ice() << "invalid variable member type for " << atom.fullname());
+
+			auto& spare = cdeftable.substitute(operands.lvid);
+			spare.import(cdefvar);
+			if (atomvar)
+				spare.mutateToAtom(atomvar);
+
+			uint32_t self = operands.self;
+			if (self == 0) // implicit 'self' ?
+			{
+				if (frame->atom.isClassMember())
+				{
+					// 'self' is given by the first parameter
+					self = 2; // 1: return type, 2: first parameter
+				}
+				else
+				{
+					// no 'self' available since it just does not exist, which can be expected
+					// for type resolution (the type resolution is done directly from the atom class,
+					// where the initialization is done via a proxy function)
+					// It's ok for type resolution since we already know we're dealing with a variable member)
+					if (frame->atom.isClass() and (not canGenerateCode()))
+					{
+						// 'self' can stay null
+					}
+					else
+					{
+						ice() << "identify: invalid 'self' object for '" << name << "' from '"
+							<< frame->atom.caption() << '\'';
+						return false;
+					}
+				}
+			}
+
+			auto& lvidinfo = frame->lvids[operands.lvid];
+			lvidinfo.synthetic = false;
+
+			auto& origin  = lvidinfo.origin.varMember;
+			assert(atom.atomid != 0);
+			origin.self   = self;
+			origin.atomid = atom.atomid;
+			origin.field  = atom.varinfo.effectiveFieldIndex;
+
+			if (canGenerateCode())
+			{
+				// read the address
+				assert(self != 0 and "'self can be null only for type resolution'");
+				out.emitFieldget(operands.lvid, self, atom.varinfo.effectiveFieldIndex);
+				tryToAcquireObject(operands.lvid, cdefvar);
+			}
+		}
+		else
+		{
+			// override the typeinfo
+			auto& spare = cdeftable.substitute(cdef.clid.lvid());
+			spare.import(cdef);
+			spare.mutateToAtom(&atom);
+
+			if (isLocalVar)
+			{
+				// disable optimisation to avoid unwanted behavior
+				auto& lvidinfo = frame->lvids[operands.lvid];
+				lvidinfo.synthetic = false;
+				lvidinfo.origin.memalloc = false;
+				lvidinfo.origin.returnedValue = false;
+
+				if (canGenerateCode())
+					acquireObject(operands.lvid);
+			}
+		}
+		return true;
+	}
+
+
 
 
 	bool SequenceBuilder::identify(const IR::ISA::Operand<IR::ISA::Op::identify>& operands,
@@ -128,7 +243,7 @@ namespace Instanciate
 		// Self, if any
 		Atom* selfAtom = nullptr;
 		// local variable ?
-		bool isLocalVariable = false;
+		bool isLocalVar = false;
 
 		if (0 == operands.self)
 		{
@@ -242,7 +357,7 @@ namespace Instanciate
 						return false;
 					}
 					multipleResults.emplace_back(std::ref(*varAtom));
-					isLocalVariable = true;
+					isLocalVar = true;
 				}
 				else
 				{
@@ -267,10 +382,7 @@ namespace Instanciate
 			assert(frame->verify(operands.self));
 			// self.<something to identify>
 			if (unlikely(frame->lvids[operands.lvid].markedAsAny))
-			{
-				ice() << "can not perform member lookup on 'any'";
-				return false;
-			}
+				return (ice() << "can not perform member lookup on 'any'");
 
 			auto& self = cdeftable.classdef(CLID{frame->atomid, operands.self});
 			if (unlikely(self.isBuiltinOrVoid()))
@@ -306,116 +418,8 @@ namespace Instanciate
 		{
 			case 1: // unique match count
 			{
-				auto& resultAtom = multipleResults[0].get();
-				const Classdef* cdefTypedef = nullptr;
-				auto& atom = (not resultAtom.isTypeAlias())
-					? resultAtom
-					: resolveTypeAlias(resultAtom, cdefTypedef);
-
-				if (unlikely((!cdefTypedef and resultAtom.isTypeAlias()) or atom.flags(Atom::Flags::error)))
-					return false;
-
-				if (unlikely(cdefTypedef and cdefTypedef->isBuiltin()))
-				{
-					auto& spare = cdeftable.substitute(cdef.clid.lvid());
-					spare.import(*cdefTypedef);
-
-					if (isLocalVariable)
-					{
-						// disable optimisation to avoid unwanted behavior
-						auto& lvidinfo = frame->lvids[operands.lvid];
-						lvidinfo.synthetic = false;
-						lvidinfo.origin.memalloc = false;
-						lvidinfo.origin.returnedValue = false;
-					}
-					return true;
-				}
-
-				// if the resolution is simple (aka only one solution), it is possible that the
-				// solution is a member variable (`self.myvar`). In this case, the atom will be the member itself
-				// and not its real type
-				if (atom.isMemberVariable())
-				{
-					assert(not isLocalVariable and "a member variable cannot be a local variable");
-					assert(not atom.returnType.clid.isVoid());
-
-					// member variable - the real type is held by 'returnType'
-					auto& cdefvar = cdeftable.classdef(atom.returnType.clid);
-					auto* atomvar = (not cdefvar.isBuiltin()) ? cdeftable.findClassdefAtom(cdefvar) : nullptr;
-					if (unlikely(!atomvar and not cdefvar.isBuiltin()))
-						return (ice() << "invalid variable member type for " << atom.fullname());
-
-					auto& spare = cdeftable.substitute(operands.lvid);
-					spare.import(cdefvar);
-					if (atomvar)
-						spare.mutateToAtom(atomvar);
-
-					uint32_t self = operands.self;
-					if (self == 0) // implicit 'self' ?
-					{
-						if (frame->atom.isClassMember())
-						{
-							// 'self' is given by the first parameter
-							self = 2; // 1: return type, 2: first parameter
-						}
-						else
-						{
-							// no 'self' available since it just does not exist, which can be expected
-							// for type resolution (the type resolution is done directly from the atom class,
-							// where the initialization is done via a proxy function)
-							// It's ok for type resolution since we already know we're dealing with a variable member)
-							if (frame->atom.isClass() and (not canGenerateCode()))
-							{
-								// 'self' can stay null
-							}
-							else
-							{
-								ice() << "identify: invalid 'self' object for '" << name << "' from '"
-									<< frame->atom.caption() << '\'';
-								return false;
-							}
-						}
-					}
-
-					auto& lvidinfo = frame->lvids[operands.lvid];
-					lvidinfo.synthetic = false;
-
-					auto& origin  = lvidinfo.origin.varMember;
-					assert(atom.atomid != 0);
-					origin.self   = self;
-					origin.atomid = atom.atomid;
-					origin.field  = atom.varinfo.effectiveFieldIndex;
-
-					if (canGenerateCode())
-					{
-						// read the address
-						assert(self != 0 and "'self can be null only for type resolution'");
-						out.emitFieldget(operands.lvid, self, atom.varinfo.effectiveFieldIndex);
-						tryToAcquireObject(operands.lvid, cdefvar);
-					}
-				}
-				else
-				{
-					// override the typeinfo
-					auto& spare = cdeftable.substitute(cdef.clid.lvid());
-					spare.import(cdef);
-					spare.mutateToAtom(&atom);
-
-					if (isLocalVariable)
-					{
-						// disable optimisation to avoid unwanted behavior
-						auto& lvidinfo = frame->lvids[operands.lvid];
-						lvidinfo.synthetic = false;
-						lvidinfo.origin.memalloc = false;
-						lvidinfo.origin.returnedValue = false;
-
-						if (canGenerateCode())
-							acquireObject(operands.lvid);
-					}
-				}
-				return true;
+				return emitIdentifyForSingleResult(isLocalVar, cdef, operands, name);
 			}
-
 			default: // multiple solutions
 			{
 				// multiple solutions are possible (probably for a func call)
@@ -424,19 +428,14 @@ namespace Instanciate
 				frame->partiallyResolved[cdef.clid].swap(multipleResults);
 				return true;
 			}
-
 			case 0: // no identifier found from 'atom map'
 			{
 				// nothing has been found
 				// trying capturing variable from anonymous classes
 				if (firstChance)
 				{
-					if (frame->atom.canCaptureVariabes())
-					{
-						if (identifyCapturedVar(operands, name))
-							return true;
-					}
-
+					if (frame->atom.canCaptureVariabes() and identifyCapturedVar(operands, name))
+						return true;
 					return complainUnknownIdentifier(selfAtom, frame->atom, name);
 				}
 				break;
