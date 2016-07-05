@@ -119,7 +119,7 @@ namespace Producer
 
 
 
-	inline bool Scope::emitVarInClass(const AnyString& varname, const AST::Node& node, const AST::Node* varType,
+	bool Scope::emitVarInClass(const AnyString& varname, const AST::Node& node, const AST::Node* varType,
 		const AST::Node* varAssign, bool ref, bool constant)
 	{
 		auto& out = sequence();
@@ -171,7 +171,7 @@ namespace Producer
 	}
 
 
-	inline bool Scope::emitVarInFunc(const AnyString& varname, const AST::Node& node, const AST::Node* varType,
+	bool Scope::emitVarInFunc(const AnyString& varname, const AST::Node& node, const AST::Node* varType,
 		const AST::Node* varAssign, bool ref, bool constant)
 	{
 		auto& out = sequence();
@@ -223,10 +223,117 @@ namespace Producer
 	}
 
 
-	inline bool Scope::emitPropertyInClass(const AnyString& varname, const AST::Node& node, const AST::Node* varType,
-		const AST::Node* varAssign, bool ref, bool constant)
+	bool Scope::emitPropertyInClass(const AnyString& varname, const AST::Node& node, const AST::Node* /*varType*/,
+		AST::Node& varAssign, bool ref)
 	{
-		return (error(node) << "not implemented yet");
+		AST::Node* nodeGet = nullptr;
+		AST::Node* nodeSet = nullptr;
+
+		for (auto& optr: varAssign.children)
+		{
+			auto& object = *optr;
+			switch (object.rule)
+			{
+				case AST::rgObject:
+				{
+					for (auto& ptr: object.children)
+					{
+						auto& child = *ptr;
+						switch (child.rule)
+						{
+							case AST::rgObjectEntry:
+							{
+								bool validAST = ((child.children.size() == 2)
+									and child.children[0]->rule == AST::rgIdentifier
+									and child.children[1]->rule == AST::rgExpr);
+								if (unlikely(not validAST))
+									return (error(child) << "invalid AST node [property]");
+
+								AnyString name = child.children[0]->text;
+								if (name == "get")
+								{
+									if (unlikely(nodeGet))
+										return (error(child) << "property: multiple definition of 'get'");
+									nodeGet = AST::Node::Ptr::WeakPointer(child.children[1]);
+									break;
+								}
+								if (name == "set")
+								{
+									if (unlikely(nodeSet))
+										return (error(child) << "property: multiple definition of 'set'");
+									nodeSet = AST::Node::Ptr::WeakPointer(child.children[1]);
+									break;
+								}
+
+								return (error(child) << "unsupported property component '" << name << '\'');
+							}
+							default:
+								return unexpectedNode(child, "[property]");
+						}
+					}
+					break;
+				}
+				default:
+					return unexpectedNode(object, "[property/object]");
+			}
+		}
+
+		if (unlikely(!nodeGet and !nodeSet))
+			return (error(node) << "empty property definition");
+
+		bool success = true;
+		ShortString128 propname;
+
+		if (nodeGet)
+		{
+			if (!context.reuse.properties.get.node)
+				context.prepareReuseForPropertiesGET();
+
+			propname << "^prop^.^" << varname;
+			context.reuse.properties.get.propname->text = propname;
+
+			auto& type = *(context.reuse.properties.get.type);
+			type.children.clear();
+			if (ref)
+				type.children.push_back(context.reuse.properties.get.typeIsRefAny);
+			else
+				type.children.push_back(context.reuse.properties.get.typeIsAny);
+
+			auto& returnValue = *(context.reuse.properties.get.returnValue);
+			returnValue.children.clear();
+			returnValue.children.emplace_back(nodeGet);
+
+			auto& funcnode = *(context.reuse.properties.get.node);
+			success &= visitASTFunc(funcnode);
+
+			// to avoid crap printed in the debugger
+			context.reuse.properties.get.propname->text.clear();
+			type.children.clear();
+			returnValue.children.clear();
+		}
+
+		if (nodeSet)
+		{
+			if (!context.reuse.properties.set.node)
+				context.prepareReuseForPropertiesSET();
+
+			propname << "^prop^=^" << varname;
+			context.reuse.properties.set.propname->text = propname;
+
+			auto& body = *(context.reuse.properties.set.body);
+			body.children.clear();
+			body.children.emplace_back(nodeSet);
+
+			auto& funcnode = *(context.reuse.properties.set.node);
+			success &= visitASTFunc(funcnode);
+
+			// to avoid crap printed in the debugger
+			context.reuse.properties.set.propname->text.clear();
+			body.children.clear();
+		}
+
+		//return (error(node) << "not implemented yet");
+		return success;
 	}
 
 
@@ -334,17 +441,21 @@ namespace Producer
 		}
 		else
 		{
+			if (unlikely(constant))
+				return (error(node) << "'const' keyword for properties is not supported yet");
+			if (unlikely(varType))
+				return (error(node) << "'type' for properties is not supported yet");
+
 			switch (kind)
 			{
 				case Kind::kclass:
-					return emitPropertyInClass(varname, *varnodeDecl, varType, varAssign, ref, constant);
+					return emitPropertyInClass(varname, *varnodeDecl, varType, *varAssign, ref);
 				case Kind::kfunc:
 					return (error(*varnodeDecl) << "properties in functions not implemented");
 				default:
 					return (ice(*varnodeDecl) << "property declaration: unsupported scope type");
 			}
 		}
-
 		return false;
 	}
 

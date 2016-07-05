@@ -69,6 +69,10 @@ namespace Producer
 		void prepareReuseForIn();
 		//! re-use objects for for..do
 		void prepareReuseForLoops();
+		//! re-use objects for properties
+		void prepareReuseForPropertiesGET();
+		//! re-use objects for properties
+		void prepareReuseForPropertiesSET();
 		//@}
 
 
@@ -145,6 +149,30 @@ namespace Producer
 				AST::Node* scope;
 			}
 			loops;
+
+			struct {
+				struct {
+					AST::Node::Ptr node;
+					AST::Node* propname = nullptr;
+					AST::Node* returnValue = nullptr;
+
+					//! node type
+					AST::Node* type = nullptr;
+					//! node to use as a child when any
+					AST::Node::Ptr typeIsAny;
+					//! node to use as a child when ref
+					AST::Node::Ptr typeIsRefAny;
+				}
+				get;
+
+				struct {
+					AST::Node::Ptr node;
+					AST::Node* propname = nullptr;
+					AST::Node* body = nullptr;
+				}
+				set;
+			}
+			properties;
 		}
 		reuse;
 

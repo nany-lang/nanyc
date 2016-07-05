@@ -447,6 +447,84 @@ namespace Producer
 	}
 
 
+	void Context::prepareReuseForPropertiesGET()
+	{
+		// function (+3)
+		//     function-kind
+		//     |   function-kind-function (+2)
+		//     |       symbol-name
+		//     |           identifier: ^prop^get^myprop
+		//     func-return-type (+2)
+		//     |   type
+		//     |       type-qualifier
+		//     |           ref
+		//     |       type-decl
+		//     |           identifier: any
+		//     func-body
+		//         scope (+4)
+		//             expr
+		//             |   expr-value
+		//             |       return (+2)
+		//             |           expr
+		//             |               ...
+
+		AST::Node::Ptr root = new AST::Node(AST::rgFunction);
+		reuse.properties.get.node = root;
+
+		// function name
+		auto& symbolname = root->append
+			(AST::rgFunctionKind, AST::rgFunctionKindFunction, AST::rgSymbolName);
+		reuse.properties.get.propname = &symbolname.append(AST::rgIdentifier);
+
+		// Return types
+		reuse.properties.get.type = &root->append(AST::rgFuncReturnType, AST::rgType);
+		reuse.properties.get.type->children.reserve(1);
+
+		reuse.properties.get.typeIsRefAny = new AST::Node{AST::rgTypeQualifier};
+		reuse.properties.get.typeIsRefAny->append(AST::rgRef);
+
+		reuse.properties.get.typeIsAny = new AST::Node{AST::rgTypeDecl};
+		auto& any = reuse.properties.get.typeIsAny->append(AST::rgIdentifier);
+		any.text = "any";
+
+		// body
+		auto& retnode = root->append(AST::rgFuncBody, AST::rgScope, AST::rgReturn);
+		reuse.properties.get.returnValue = &retnode;
+	}
+
+
+	void Context::prepareReuseForPropertiesSET()
+	{
+		// function (+3)
+		//     function-kind
+		//     |   function-kind-function (+2)
+		//     |       symbol-name
+		//     |           identifier: piko
+		//     func-params (+3)
+		//     |   func-param (+2)
+		//     |   |   cref
+		//     |   |   identifier: value
+		//     func-body
+		//         scope
+
+		AST::Node::Ptr root = new AST::Node{AST::rgFunction};
+		reuse.properties.set.node = root;
+
+		auto& symbol = root->append(AST::rgFunctionKind, AST::rgFunctionKindFunction, AST::rgSymbolName);
+		auto& identifier = symbol.append(AST::rgIdentifier);
+		reuse.properties.set.propname = &identifier;
+
+		// parameter "value"
+		auto& param = root->append(AST::rgFuncParams, AST::rgFuncParam);
+		param.append(AST::rgCref);
+		auto& paramname = param.append(AST::rgIdentifier);
+		paramname.text = "value";
+
+		// body
+		auto& body = root->append(AST::rgFuncBody, AST::rgScope);
+		reuse.properties.set.body = &body;
+	}
+
 
 
 
