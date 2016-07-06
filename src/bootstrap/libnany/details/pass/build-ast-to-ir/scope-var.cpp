@@ -273,6 +273,14 @@ namespace Producer
 					}
 					break;
 				}
+				case AST::rgExpr:
+				{
+					// read-only property
+					if (unlikely(nodeGet))
+						return (error(object) << "property: multiple definition of 'get'");
+					nodeGet = &object;
+					break;
+				}
 				default:
 					return unexpectedNode(object, "[property/object]");
 			}
