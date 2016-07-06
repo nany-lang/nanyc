@@ -293,7 +293,7 @@ namespace Nany
 			Atom* atom = (this->classdef(CLID::AtomMapID(classdef.clid.atomid())).atom);
 			if (atom)
 			{
-				if (atom->performNameLookupFromParent(funcdef.overloads.getList(), funcdef.name))
+				if (atom->nameLookupFromParent(funcdef.overloads.getList(), funcdef.name))
 				{
 					if (funcdef.overloads.size() == 1)
 					{
@@ -350,7 +350,7 @@ namespace Nany
 					{
 						cdef.interface.eachUnresolved([&](Funcdef& funcdef)
 						{
-							bool found = parentAtom->performNameLookupOnChildren(funcdef.overloads.getList(), funcdef.name);
+							bool found = parentAtom->nameLookupOnChildren(funcdef.overloads.getList(), funcdef.name);
 							if (found)
 							{
 								if (funcdef.overloads.size() == 1)

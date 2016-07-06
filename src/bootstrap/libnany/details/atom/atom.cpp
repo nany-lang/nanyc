@@ -383,7 +383,7 @@ namespace Nany
 	}
 
 
-	bool Atom::performNameLookupOnChildren(std::vector<std::reference_wrapper<Atom>>& list, const AnyString& name, bool* singleHop)
+	bool Atom::nameLookupOnChildren(std::vector<std::reference_wrapper<Atom>>& list, const AnyString& name, bool* singleHop)
 	{
 		assert(not name.empty());
 
@@ -415,7 +415,7 @@ namespace Nany
 	}
 
 
-	bool Atom::performNameLookupFromParent(std::vector<std::reference_wrapper<Atom>>& list, const AnyString& name)
+	bool Atom::nameLookupFromParent(std::vector<std::reference_wrapper<Atom>>& list, const AnyString& name)
 	{
 		assert(not name.empty());
 
@@ -440,22 +440,22 @@ namespace Nany
 			bool askToParentFirst = not scope.isClass();;
 			if (askToParentFirst)
 			{
-				if (scope.parent->performNameLookupFromParent(list, name))
+				if (scope.parent->nameLookupFromParent(list, name))
 					return true;
 			}
 
 			// try to resolve locally
-			bool found = scope.performNameLookupOnChildren(list, name);
+			bool found = scope.nameLookupOnChildren(list, name);
 
 			if (not found and (not askToParentFirst)) // try again
-				found = scope.parent->performNameLookupFromParent(list, name);
+				found = scope.parent->nameLookupFromParent(list, name);
 
 			return found;
 		}
 		else
 		{
 			// try to resolve locally
-			return scope.performNameLookupOnChildren(list, name);
+			return scope.nameLookupOnChildren(list, name);
 		}
 
 		return false;

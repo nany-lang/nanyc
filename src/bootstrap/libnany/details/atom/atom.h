@@ -232,7 +232,7 @@ namespace Nany
 		** \param[out] list A non-empty list if several overloads have been found
 		** \return True if at least one overload has been found
 		*/
-		bool performNameLookupFromParent(std::vector<std::reference_wrapper<Atom>>& list, const AnyString& name);
+		bool nameLookupFromParent(std::vector<std::reference_wrapper<Atom>>& list, const AnyString& name);
 
 		/*!
 		** \brief Perform a name lookup from the local scope only
@@ -244,7 +244,7 @@ namespace Nany
 		** \param[out] list A non-empty list if several overloads have been found
 		** \return True if at least one overload has been found
 		*/
-		bool performNameLookupOnChildren(std::vector<std::reference_wrapper<Atom>>& list, const AnyString& name,
+		bool nameLookupOnChildren(std::vector<std::reference_wrapper<Atom>>& list, const AnyString& name,
 			bool* singleHop = nullptr);
 
 		/*!

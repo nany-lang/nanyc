@@ -373,10 +373,10 @@ namespace Instanciate
 			}
 			else
 			{
-				if (not frame->atom.performNameLookupOnChildren(multipleResults, name))
+				if (not frame->atom.nameLookupOnChildren(multipleResults, name))
 				{
 					if (frame->atom.parent)
-						frame->atom.parent->performNameLookupFromParent(multipleResults, name);
+						frame->atom.parent->nameLookupFromParent(multipleResults, name);
 				}
 			}
 		}
@@ -401,7 +401,7 @@ namespace Instanciate
 				assert(frame->partiallyResolved.count(self.clid) == 0
 					   or frame->partiallyResolved[self.clid].empty());
 
-				selfAtom->performNameLookupOnChildren(multipleResults, name, &singleHop);
+				selfAtom->nameLookupOnChildren(multipleResults, name, &singleHop);
 			}
 			else
 			{
@@ -411,7 +411,7 @@ namespace Instanciate
 					auto& selfSolutions = it->second;
 					multipleResults.reserve(selfSolutions.size());
 					for (auto& atomE: selfSolutions)
-						atomE.get().performNameLookupOnChildren(multipleResults, name, &singleHop);
+						atomE.get().nameLookupOnChildren(multipleResults, name, &singleHop);
 				}
 			}
 		}
