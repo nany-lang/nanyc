@@ -98,6 +98,12 @@ namespace Nany
 			functor,
 			//! Captured variable
 			capturedVar,
+			//! Property get
+			propget,
+			//! Property set
+			propset,
+			//! property set, custom operator, for future uses
+			propsetCustom,
 		};
 
 		struct Parameters final
@@ -188,6 +194,14 @@ namespace Nany
 		bool isFunctor() const;
 		//! Get if the atom is a captured variable
 		bool isCapturedVariable() const;
+		//! Get if the atom is a property (get or set)
+		bool isProperty() const;
+		//! Get if the atom is a property getter
+		bool isPropertyGet() const;
+		//! Get if the atom is a property setter
+		bool isPropertySet() const;
+		//! Get if the atom is a property setter (custom operator)
+		bool isPropertySetCustom() const;
 
 		//! Get if the atom is publicly accessible
 		bool isPublicOrPublished() const;

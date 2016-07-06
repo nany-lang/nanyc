@@ -108,6 +108,14 @@ namespace Nany
 						}
 						else
 							category += Category::funcoperator;
+
+						if (category(Category::funcoperator))
+						{
+							if (newname.startsWith("^propget^"))
+								category += Category::propget;
+							else if (newname.startsWith("^propset^"))
+								category += Category::propset;
+						}
 					}
 					break;
 				}
@@ -199,28 +207,31 @@ namespace Nany
 					{
 						if (isMemberVarDefaultInit())
 						{
-							AnyString sub{pName.c_str() + 14, pName.size() - 14};
+							AnyString sub{pName, 14};
 							auto ix = sub.find('-');
 
 							if (ix < sub.size())
 							{
 								++ix;
-								AnyString varname{sub.c_str() + ix, sub.size() - ix};
-								out << varname;
+								out << AnyString{sub, ix};
 							}
 							else
 								out << "<invalid-field>";
 						}
+						else if (isProperty())
+						{
+							if (isPropertyGet() or isPropertySet()) // ^propget^ / ^propset^
+								out << AnyString{pName, 9};
+							else
+								out << "<unmanaged prop>";
+						}
 						else if (isView())
 						{
 							out += ':'; // ^view^
-							out.append(pName.c_str() + 6, pName.size() - 6);
+							out.append(AnyString{pName, 6});
 						}
 						else
-						{
-							// operator like
-							out.append(pName.c_str() + 1, pName.size() - 1);
-						}
+							out.append(AnyString{pName, 1}); // operator like, removing ^
 					}
 
 					if (not tmplparamsForPrinting.empty())
@@ -273,6 +284,9 @@ namespace Nany
 
 				if (isSpecial()) // for beauty
 					out << ' ';
+
+				if (isProperty()) // just the name for properties
+					break;
 			}
 			// [[fallthu]]
 			case Type::classdef:
@@ -571,25 +585,34 @@ namespace Nany
 			{
 				keyword.clear();
 				varname = name;
-				return;
 			}
-			if (name.startsWith("^default-var-%"))
+			else if (name.startsWith("^default-var-%"))
 			{
 				keyword = "<default-init>";
 				auto endOffset = name.find_last_of('-');
 				varname = (endOffset < name.size())
 					? AnyString{name, endOffset + 1} : AnyString{"<invalid-field>"};
-				return;
 			}
-			if (name.startsWith("^view^"))
+			else if (name.startsWith("^view^"))
 			{
 				keyword = "view";
-				varname = AnyString{name.c_str() + 6, name.size() - 6};
-				return;
+				varname = AnyString{name, 6};
 			}
-
-			keyword = "operator";
-			varname = AnyString{name.c_str() + 1, name.size() - 1};
+			else if (name.startsWith("^propget^"))
+			{
+				keyword = "property:get";
+				varname = AnyString{name, 9};
+			}
+			else if (name.startsWith("^propset^"))
+			{
+				keyword = "property:set";
+				varname = AnyString{name, 9};
+			}
+			else
+			{
+				keyword = "operator";
+				varname = AnyString{name.c_str() + 1, name.size() - 1};
+			}
 		}
 		else
 		{
@@ -608,6 +631,10 @@ namespace Nany
 					return "func";
 				if (isView())
 					return "view";
+				if (isPropertyGet())
+					return "property:get";
+				if (isPropertySet())
+					return "property:set";
 				if (isMemberVarDefaultInit())
 					return "<default-init>";
 				return "operator";

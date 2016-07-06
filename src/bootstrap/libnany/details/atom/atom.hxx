@@ -111,12 +111,30 @@ namespace Nany
 		return (type != Type::classdef) and category(Category::classParent);
 	}
 
+	inline bool Atom::isPropertyGet() const
+	{
+		return category(Category::propget);
+	}
+
+	inline bool Atom::isPropertySet() const
+	{
+		return category(Category::propset);
+	}
+
+	inline bool Atom::isPropertySetCustom() const
+	{
+		return category(Category::propsetCustom);
+	}
+
+	inline bool Atom::isProperty() const
+	{
+		return isPropertyGet() or isPropertySet() or isPropertySetCustom();
+	}
 
 	inline bool Atom::isPublicOrPublished() const
 	{
 		return (visibility == nyv_public) or (visibility == nyv_published);
 	}
-
 
 	inline bool Atom::hasReturnType() const
 	{

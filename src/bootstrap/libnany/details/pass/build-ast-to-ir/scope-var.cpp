@@ -289,7 +289,7 @@ namespace Producer
 			if (!context.reuse.properties.get.node)
 				context.prepareReuseForPropertiesGET();
 
-			propname << "^prop^.^" << varname;
+			propname << "^propget^" << varname;
 			context.reuse.properties.get.propname->text = propname;
 
 			auto& type = *(context.reuse.properties.get.type);
@@ -317,7 +317,7 @@ namespace Producer
 			if (!context.reuse.properties.set.node)
 				context.prepareReuseForPropertiesSET();
 
-			propname << "^prop^=^" << varname;
+			propname.clear() << "^propset^" << varname;
 			context.reuse.properties.set.propname->text = propname;
 
 			auto& body = *(context.reuse.properties.set.body);
