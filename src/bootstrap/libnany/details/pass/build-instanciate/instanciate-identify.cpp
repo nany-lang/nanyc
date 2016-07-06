@@ -1,4 +1,5 @@
 #include "instanciate.h"
+#include "instanciate-atom.h"
 
 using namespace Yuni;
 
@@ -182,6 +183,36 @@ namespace Instanciate
 	}
 
 
+	bool SequenceBuilder::emitIdentifyForProperty(const IR::ISA::Operand<IR::ISA::Op::identify>& operands, Atom& propatom)
+	{
+		// report for instanciation
+		Logs::Message::Ptr subreport;
+		// all pushed parameters
+		decltype(FuncOverloadMatch::result.params) params;
+		// all pushed template parameters
+		decltype(FuncOverloadMatch::result.params) tmplparams;
+		// return value
+		uint32_t lvid = operands.lvid;
+
+
+		InstanciateData info{subreport, propatom, cdeftable, build, params, tmplparams};
+		if (not doInstanciateAtomFunc(subreport, info, lvid))
+			return false;
+
+		if (canGenerateCode())
+		{
+			if (operands.self != 0)
+				out.emitPush(operands.self);
+			out.emitCall(lvid, propatom.atomid, info.instanceid);
+
+			// the function is responsible for acquiring the returned object
+			// however we must release it
+			if (canBeAcquired(lvid))
+				frame->lvids[lvid].autorelease = true;
+			return true;
+		}
+		return false;
+	}
 
 
 	bool SequenceBuilder::identify(const IR::ISA::Operand<IR::ISA::Op::identify>& operands,
@@ -360,7 +391,6 @@ namespace Instanciate
 					}
 					multipleResults.emplace_back(std::ref(*varAtom));
 					isLocalVar = true;
-					// isProperty = varAtom;
 				}
 				else
 				{
@@ -376,7 +406,10 @@ namespace Instanciate
 				if (not frame->atom.nameLookupOnChildren(multipleResults, name))
 				{
 					if (frame->atom.parent)
-						frame->atom.parent->nameLookupFromParent(multipleResults, name);
+					{
+						if (not frame->atom.parent->nameLookupFromParent(multipleResults, name))
+							isProperty = frame->atom.propertyLookupOnChildren(multipleResults, "^propget^", name);
+					}
 				}
 			}
 		}
@@ -401,7 +434,8 @@ namespace Instanciate
 				assert(frame->partiallyResolved.count(self.clid) == 0
 					   or frame->partiallyResolved[self.clid].empty());
 
-				selfAtom->nameLookupOnChildren(multipleResults, name, &singleHop);
+				if (not selfAtom->nameLookupOnChildren(multipleResults, name, &singleHop))
+					isProperty = selfAtom->propertyLookupOnChildren(multipleResults, "^propget^", name);
 			}
 			else
 			{
@@ -417,31 +451,55 @@ namespace Instanciate
 		}
 
 
-		switch (multipleResults.size())
+		if (not isProperty)
 		{
-			case 1: // unique match count
+			switch (multipleResults.size())
 			{
-				return emitIdentifyForSingleResult(isLocalVar, cdef, operands, name);
-			}
-			default: // multiple solutions
-			{
-				// multiple solutions are possible (probably for a func call)
-				// keeping the solutions for later resolution by the real func call
-				// (with parameters to find the most appropriate one)
-				frame->partiallyResolved[cdef.clid].swap(multipleResults);
-				return true;
-			}
-			case 0: // no identifier found from 'atom map'
-			{
-				// nothing has been found
-				// trying capturing variable from anonymous classes
-				if (firstChance)
+				case 1: // unique match count
 				{
-					if (frame->atom.canCaptureVariabes() and identifyCapturedVar(operands, name))
-						return true;
-					return complainUnknownIdentifier(selfAtom, frame->atom, name);
+					return emitIdentifyForSingleResult(isLocalVar, cdef, operands, name);
 				}
-				break;
+				default: // multiple solutions
+				{
+					// multiple solutions are possible (probably for a func call)
+					// keeping the solutions for later resolution by the real func call
+					// (with parameters to find the most appropriate one)
+					frame->partiallyResolved[cdef.clid].swap(multipleResults);
+					return true;
+				}
+				case 0: // no identifier found from 'atom map'
+				{
+					// nothing has been found
+					// trying capturing variable from anonymous classes
+					if (firstChance)
+					{
+						if (frame->atom.canCaptureVariabes() and identifyCapturedVar(operands, name))
+							return true;
+						return complainUnknownIdentifier(selfAtom, frame->atom, name);
+					}
+					break;
+				}
+			}
+		}
+		else
+		{
+			switch (multipleResults.size())
+			{
+				case 1: // unique match count
+				{
+					return emitIdentifyForProperty(operands, multipleResults[0].get());
+				}
+				default: // multiple solutions
+				{
+					// multiple solutions are not acceptable for properties
+					error() << "ambigous property call for '" << name << '\'';
+					break;
+				}
+				case 0: // no identifier found from 'atom map'
+				{
+					error() << "no property found for '" << name << '\'';
+					break;
+				}
 			}
 		}
 		return false;

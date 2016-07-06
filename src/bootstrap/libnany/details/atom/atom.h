@@ -225,11 +225,8 @@ namespace Nany
 		/*!
 		** \brief Perform a name lookup from the local scope to the top root atom
 		**
-		** This method is meant to be called several times with the same input (The input
-		** parameters are guarantee to not be modified if nothing is found The input
-		** vector is never cleared)
-		**
-		** \param[out] list A non-empty list if several overloads have been found
+		** \param[in,out] list List where all matches will be added
+		** \param name The identifier name to find
 		** \return True if at least one overload has been found
 		*/
 		bool nameLookupFromParent(std::vector<std::reference_wrapper<Atom>>& list, const AnyString& name);
@@ -237,15 +234,22 @@ namespace Nany
 		/*!
 		** \brief Perform a name lookup from the local scope only
 		**
-		** This method is meant to be called several times with the same input (The input
-		** parameters are guarantee to not be modified if nothing is found The input
-		** vector is never cleared)
-		**
-		** \param[out] list A non-empty list if several overloads have been found
+		** \param[in,out] list List where all matches will be added
+		** \param name The identifier name to find
 		** \return True if at least one overload has been found
 		*/
 		bool nameLookupOnChildren(std::vector<std::reference_wrapper<Atom>>& list, const AnyString& name,
 			bool* singleHop = nullptr);
+
+		/*!
+		** \brief Perform a name lookup on properties from the local scope only
+		**
+		** \param[in,out] list List where all matches will be added
+		** \param name The identifier name to find
+		** \return True if at least one overload has been found
+		*/
+		bool propertyLookupOnChildren(std::vector<std::reference_wrapper<Atom>>& list,
+			const AnyString& prefix, const AnyString& name);
 
 		/*!
 		** \brief Get if this atom has a child member

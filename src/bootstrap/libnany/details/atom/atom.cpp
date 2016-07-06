@@ -462,6 +462,27 @@ namespace Nany
 	}
 
 
+	bool Atom::propertyLookupOnChildren(std::vector<std::reference_wrapper<Atom>>& list,
+		const AnyString& prefix, const AnyString& name)
+	{
+		assert(not name.empty());
+
+		// the current scope
+		Atom& scope = (nullptr == scopeForNameResolution) ? *this : *scopeForNameResolution;
+		ShortString128 propname{prefix};
+		propname << name;
+
+		bool success = false;
+		scope.eachChild(propname, [&](Atom& child) -> bool
+		{
+			list.push_back(std::ref(child));
+			success = true;
+			return true; // let's continue
+		});
+		return success;
+	}
+
+
 	uint32_t Atom::invalidateInstance(const Signature& signature, uint32_t id)
 	{
 		instances[id].reset(nullptr);

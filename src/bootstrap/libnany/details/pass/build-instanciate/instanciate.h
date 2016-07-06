@@ -194,6 +194,8 @@ namespace Instanciate
 		bool identifyCapturedVar(const IR::ISA::Operand<IR::ISA::Op::identify>& operands, const AnyString& name);
 		bool emitIdentifyForSingleResult(bool isLocalVar, const Classdef& cdef,
 			const IR::ISA::Operand<IR::ISA::Op::identify>& operands, const AnyString& name);
+		bool emitIdentifyForProperty(const IR::ISA::Operand<IR::ISA::Op::identify>& operands, Atom& propatom);
+
 		bool ensureResolve(const IR::ISA::Operand<IR::ISA::Op::ensureresolved>& operands);
 
 		//! Try to capture variables from a list of potentiel candidates created by the mapping

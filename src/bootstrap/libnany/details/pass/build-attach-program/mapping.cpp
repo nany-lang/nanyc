@@ -307,6 +307,7 @@ namespace Mapping
 					cdeftable.registerAtom(newClassAtom);
 				}
 
+				assert(newClassAtom != nullptr);
 				newClassAtom->opcodes.sequence = &currentSequence;
 				newClassAtom->opcodes.offset   = currentSequence.offsetOf(operands);
 
