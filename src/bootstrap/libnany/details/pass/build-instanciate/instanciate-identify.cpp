@@ -244,6 +244,8 @@ namespace Instanciate
 		Atom* selfAtom = nullptr;
 		// local variable ?
 		bool isLocalVar = false;
+		// property call ?
+		bool isProperty = false;
 
 		if (0 == operands.self)
 		{
@@ -353,11 +355,12 @@ namespace Instanciate
 						}
 
 						ice() << "invalid atom for local scope variable. clid: " << CLID{frame->atomid, lvidVar}
-						<< ", " << (uint32_t) varcdef.kind;
+							<< ", " << (uint32_t) varcdef.kind;
 						return false;
 					}
 					multipleResults.emplace_back(std::ref(*varAtom));
 					isLocalVar = true;
+					// isProperty = varAtom;
 				}
 				else
 				{

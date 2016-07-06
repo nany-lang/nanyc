@@ -181,10 +181,10 @@ namespace Instanciate
 				// not an operator, can be anything
 				parentAtom->eachChild([&](const Atom& child) -> bool
 				{
-					if (&child != &atom and (not child.isOperator()))
+					if (&child != &atom and (not child.isSpecial()))
 					{
 						uint32_t note;
-						if (stringsAreCloseEnough(note, name, child.name))
+						if (stringsAreCloseEnough(note, name, child.name()))
 							dict[note].emplace_back(std::cref(child));
 					}
 					return true;
@@ -195,7 +195,7 @@ namespace Instanciate
 				// invalid operator, suggesting only operator with exactly the same name
 				parentAtom->eachChild([&](const Atom& child) -> bool
 				{
-					if (&child != &atom and child.name == name)
+					if (&child != &atom and child.name() == name)
 					{
 						// arbitrary mark based on the number of parameters
 						// for pseudo ordering

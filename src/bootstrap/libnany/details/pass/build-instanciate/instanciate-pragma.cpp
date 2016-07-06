@@ -64,7 +64,7 @@ namespace Instanciate
 			});
 
 			// generating some code on the fly
-			if (atom.isOperator() and canGenerateCode())
+			if (atom.isSpecial() and canGenerateCode())
 			{
 				// variables initialization (for a ctor)
 				if (generateClassVarsAutoInit)

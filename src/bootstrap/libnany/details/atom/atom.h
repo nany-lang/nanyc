@@ -59,7 +59,7 @@ namespace Nany
 			unit,
 		};
 
-		enum class Flags
+		enum class Flags: uint32_t
 		{
 			//! Allow this atom in error reporting
 			suggestInReport,
@@ -74,6 +74,30 @@ namespace Nany
 
 			//! Atom currently being instanciated
 			instanciating,
+		};
+
+		enum class Category: uint32_t
+		{
+			//! Not a normal func/class
+			special,
+			//! Operator
+			funcoperator,
+			//! Is the atom a view
+			view,
+			//! When the atom has a class as parent
+			classParent,
+			//! When the atom is a constructor
+			ctor,
+			//! When the atom is copy constructor
+			clone,
+			//! When the atom is the destructor
+			dtor,
+			//! Default variable initialization
+			defvarInit,
+			//! Functor object
+			functor,
+			//! Captured variable
+			capturedVar,
 		};
 
 		struct Parameters final
@@ -127,6 +151,8 @@ namespace Nany
 
 		//! \name Queries
 		//@{
+		//! Atom name
+		AnyString name() const;
 		//! Get the clid for this atom
 		CLID clid() const;
 
@@ -138,6 +164,10 @@ namespace Nany
 		bool isFunction() const;
 		//! Get if the atom is an operator
 		bool isOperator() const;
+		//! Get if the atom is a special atom (operator, view...)
+		bool isSpecial() const;
+		//! Get if the atom is a view
+		bool isView() const;
 		//! Get if the atom is a member variable
 		bool isMemberVariable() const;
 		//! Get if the atom is a class member (function or variable)
@@ -150,6 +180,14 @@ namespace Nany
 		bool isUnit() const;
 		//! Get if the atom is a constructor
 		bool isCtor() const;
+		//! Get if the atom is a destructor
+		bool isDtor() const;
+		//! Get if the atom is a clone constructor
+		bool isCloneCtor() const;
+		//! Get if the atom is a functor (operator ())
+		bool isFunctor() const;
+		//! Get if the atom is a captured variable
+		bool isCapturedVariable() const;
 
 		//! Get if the atom is publicly accessible
 		bool isPublicOrPublished() const;
@@ -348,6 +386,8 @@ namespace Nany
 		yuint32 atomid = 0u;
 		//! Atom flags
 		Yuni::Flags<Flags> flags = {Flags::suggestInReport};
+		//! Atom Category
+		Yuni::Flags<Category> category;
 
 		//! Various information for vardef only (class member)
 		struct
@@ -446,8 +486,6 @@ namespace Nany
 		//! Builtin type (!= nyt_void if this atom represents a builtin)
 		nytype_t builtinMapping = nyt_void;
 
-		//! Name of the current atom
-		AnyString name;
 
 		//! List of potential candidates for being captured
 		std::unique_ptr<std::unordered_set<AnyString>> candidatesForCapture;
@@ -460,6 +498,7 @@ namespace Nany
 		explicit Atom(Atom& rootparent, const AnyString& name, Type type);
 		void doPrint(const ClassdefTableView& table, uint depth) const;
 		void doAppendCaption(YString& out, const ClassdefTableView* table) const;
+		void name(const AnyString& newname);
 
 	private:
 		//! All children
@@ -478,6 +517,9 @@ namespace Nany
 		};
 		//! Symbol names for instances in `pInstances`
 		std::vector<InstanceMetadata> pInstancesMD;
+
+		//! Name of the current atom
+		AnyString pName;
 
 		// nakama !
 		friend class AtomMap;

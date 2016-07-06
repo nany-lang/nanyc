@@ -6,6 +6,12 @@
 namespace Nany
 {
 
+	inline AnyString Atom::name() const
+	{
+		return pName;
+	}
+
+
 	inline bool Atom::canCaptureVariabes() const
 	{
 		return flags.get(Flags::captureVariables)
@@ -37,8 +43,17 @@ namespace Nany
 
 	inline bool Atom::isCtor() const
 	{
-		return isOperator() and parent and (parent->type == Type::classdef)
-			and (name == "^new" or name == "^default-new");
+		return category(Category::ctor);
+	}
+
+	inline bool Atom::isDtor() const
+	{
+		return category(Category::dtor);
+	}
+
+	inline bool Atom::isCloneCtor() const
+	{
+		return category(Category::clone);
 	}
 
 	inline bool Atom::isUnit() const
@@ -58,24 +73,42 @@ namespace Nany
 
 	inline bool Atom::isOperator() const
 	{
-		return type == Type::funcdef and name[0] == '^';
+		return category(Category::funcoperator);
+	}
+
+	inline bool Atom::isSpecial() const
+	{
+		return category(Category::special);
+	}
+
+	inline bool Atom::isView() const
+	{
+		return category(Category::view);
+	}
+
+	inline bool Atom::isFunctor() const
+	{
+		return category(Category::functor);
+	}
+
+	inline bool Atom::isCapturedVariable() const
+	{
+		return category(Category::capturedVar);
 	}
 
 	inline bool Atom::isMemberVarDefaultInit() const
 	{
-		return type == Type::funcdef and name[0] == '^'
-			and name.startsWith("^default-var-%");
+		return category(Category::defvarInit);
 	}
-
 
 	inline bool Atom::isMemberVariable() const
 	{
-		return type == Type::vardef and parent and (parent->type == Type::classdef);
+		return (type == Type::vardef) and category(Category::classParent);
 	}
 
 	inline bool Atom::isClassMember() const
 	{
-		return (type != Type::classdef) and parent and (parent->type == Type::classdef);
+		return (type != Type::classdef) and category(Category::classParent);
 	}
 
 
@@ -122,7 +155,7 @@ namespace Nany
 	{
 		switch (type)
 		{
-			case Type::funcdef: return (name == "^()");
+			case Type::funcdef: return category(Category::functor);
 			default:            return (pChildren.count(name) != 0);
 		}
 		return false;
@@ -284,7 +317,6 @@ namespace Nany
 	{
 		return pChildren.empty();
 	}
-
 
 
 

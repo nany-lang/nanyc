@@ -138,7 +138,7 @@ namespace Instanciate
 		// adding parameters to all constructors
 		atom.eachChild([&](Atom& child) -> bool
 		{
-			if (child.isOperator() and (child.name == "^default-new" or child.name == "^new"))
+			if (child.isCtor())
 			{
 				for (uint32_t i = 0; i != count; ++i)
 				{
@@ -169,10 +169,10 @@ namespace Instanciate
 		{
 			if (not child.isMemberVariable())
 				return true;
-			if (not child.name.startsWith("^trap^"))
+			if (not child.isCapturedVariable())
 				return true;
 
-			AnyString varname{child.name, /*offset*/ (uint32_t)::strlen("^trap^")};
+			AnyString varname{child.name(), /*offset*/ (uint32_t)::strlen("^trap^")};
 			if (unlikely(varname.empty()))
 			{
 				ice() << "invalid empty captured variable name";
@@ -190,7 +190,7 @@ namespace Instanciate
 				return true;
 
 			CLID clid{frame->atomid, varlvid};
-			overloadMatch.input.params.named.emplace_back(std::make_pair(child.name, clid));
+			overloadMatch.input.params.named.emplace_back(std::make_pair(child.name(), clid));
 			return true;
 		});
 		return true;
@@ -203,7 +203,7 @@ namespace Instanciate
 	{
 		AnyString captureName;
 		{
-			ShortString256 newname;
+			ShortString128 newname;
 			newname << "^trap^" << name;
 			captureName = currentSequence.stringrefs.refstr(newname);
 		}

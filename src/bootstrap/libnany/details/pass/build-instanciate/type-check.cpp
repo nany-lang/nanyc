@@ -85,7 +85,7 @@ namespace TypeCheck
 					{
 						found = false;
 						// try to find a similar atom
-						to.eachChild(child.name, [&](Atom& toChild) -> bool
+						to.eachChild(child.name(), [&](Atom& toChild) -> bool
 						{
 							if (Match::none != isAtomSimilarTo(seq, child, toChild))
 							{

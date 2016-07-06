@@ -35,7 +35,7 @@ namespace Instanciate
 			}
 			else
 			{
-				if (subatom.isOperator() and subatom.name == "^#user-dispose")
+				if (subatom.isDtor())
 					userDefinedDispose = &subatom;
 			}
 			return true; // next

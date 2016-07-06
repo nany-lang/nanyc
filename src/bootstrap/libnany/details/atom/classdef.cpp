@@ -86,7 +86,7 @@ namespace Nany
 
 	bool Classdef::isClass(const AnyString& name) const
 	{
-		return isClass() and (atom->name == name);
+		return isClass() and (atom->name() == name);
 	}
 
 

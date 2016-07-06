@@ -59,20 +59,86 @@ namespace Nany
 
 
 
+	inline void Atom::name(const AnyString& newname)
+	{
+		pName = newname;
+		category.clear();
+
+		if (parent and parent->type == Type::classdef)
+			category += Category::classParent;
+
+		if (not newname.empty())
+		{
+			switch (type)
+			{
+				case Type::funcdef:
+				{
+					if (newname[0] == '^')
+					{
+						category += Category::special;
+
+						if (category(Category::classParent))
+						{
+							if (newname == "^new" or newname == "^default-new")
+							{
+								category += Category::ctor;
+							}
+							else if (newname == "^clone")
+							{
+								category += Category::clone;
+							}
+							else if (newname == "^#user-dispose")
+							{
+								category += Category::dtor;
+							}
+							else if (newname.startsWith("^view^"))
+							{
+								category += Category::view;
+							}
+							else if (newname.startsWith("^default-var-%"))
+							{
+								category += Category::defvarInit;
+							}
+							else
+							{
+								category += Category::funcoperator;
+								if (newname == "^()")
+									category += Category::functor;
+							}
+						}
+						else
+							category += Category::funcoperator;
+					}
+					break;
+				}
+
+				case Type::vardef:
+				{
+					if (newname.startsWith("^trap^"))
+						category += Category::capturedVar;
+					break;
+				}
+
+				default:
+					break;
+			}
+		}
+	}
 
 
-	Atom::Atom(const AnyString& name, Atom::Type type)
+	Atom::Atom(const AnyString& atomName, Atom::Type type)
 		: type(type)
-		, name(name)
-	{}
+	{
+		this->name(atomName);
+	}
 
 
-	Atom::Atom(Atom& rootparent, const AnyString& name, Atom::Type type)
+	Atom::Atom(Atom& rootparent, const AnyString& atomName, Atom::Type type)
 		: type(type)
 		, parent(&rootparent)
-		, name(name)
 	{
-		rootparent.pChildren.insert(std::pair<AnyString, Atom::Ptr>(name, this));
+		this->name(atomName);
+		rootparent.pChildren.insert(std::pair<AnyString, Atom::Ptr>(atomName, this));
 	}
 
 
@@ -91,7 +157,6 @@ namespace Nany
 
 		if (this == &atom) // same...
 			return true;
-
 		// belonging to a class ?
 		if (parent and parent == atom.parent and isClassMember())
 			return true;
@@ -126,15 +191,15 @@ namespace Nany
 			{
 				case Type::funcdef:
 				{
-					if (name.first() != '^')
+					if (not isSpecial())
 					{
-						out += name;
+						out += pName;
 					}
 					else
 					{
-						if (name.startsWith("^default-var-%"))
+						if (isMemberVarDefaultInit())
 						{
-							AnyString sub{name.c_str() + 14, name.size() - 14};
+							AnyString sub{pName.c_str() + 14, pName.size() - 14};
 							auto ix = sub.find('-');
 
 							if (ix < sub.size())
@@ -146,13 +211,16 @@ namespace Nany
 							else
 								out << "<invalid-field>";
 						}
-						else if (name.startsWith("^view^"))
+						else if (isView())
 						{
-							out += ':';
-							out.append(name.c_str() + 6, name.size() - 6);
+							out += ':'; // ^view^
+							out.append(pName.c_str() + 6, pName.size() - 6);
 						}
 						else
-							out.append(name.c_str() + 1, name.size() - 1);
+						{
+							// operator like
+							out.append(pName.c_str() + 1, pName.size() - 1);
+						}
 					}
 
 					if (not tmplparamsForPrinting.empty())
@@ -162,10 +230,7 @@ namespace Nany
 
 				case Type::classdef:
 				{
-					if (name.first() != '^')
-						out += name;
-					else
-						out.append(name.c_str() + 1, name.size() - 1);
+					out += pName;
 
 					if (not tmplparamsForPrinting.empty())
 						atomParametersPrinter(out, tmplparamsForPrinting, table, false, "<:", ":>");
@@ -177,7 +242,7 @@ namespace Nany
 				case Type::vardef:
 				case Type::unit:
 				{
-					out += name;
+					out += pName;
 					break;
 				}
 			}
@@ -203,14 +268,13 @@ namespace Nany
 		{
 			case Type::funcdef:
 			{
-				if (name.startsWith("^default-var-%")) // keep it simple
+				if (isMemberVarDefaultInit())
 					break;
 
-				if (name.first() == '^')
-					out << ' '; // for beauty
-
-				// break fallthru
+				if (isSpecial()) // for beauty
+					out << ' ';
 			}
+			// [[fallthu]]
 			case Type::classdef:
 			case Type::typealias:
 			{
@@ -311,8 +375,10 @@ namespace Nany
 
 		// the current scope
 		Atom& scope = (nullptr == scopeForNameResolution) ? *this : *scopeForNameResolution;
+		// shorthand for func call ?
+		bool isFuncCall = (name == "^()");
 
-		if (scope.isFunction() and name == "^()") // shorthand for function calls
+		if (isFuncCall and scope.isFunction()) // shorthand for function calls
 		{
 			list.push_back(std::ref(scope));
 			return true;
@@ -326,7 +392,7 @@ namespace Nany
 			return true; // let's continue
 		});
 
-		if (success and name == "^()") // operator () resolved by a real atom
+		if (success and isFuncCall) // operator () resolved by a real atom
 		{
 			if (singleHop)
 				*singleHop = true;
@@ -496,6 +562,7 @@ namespace Nany
 	}
 
 
+	/*static*/
 	void Atom::extractNames(AnyString& keyword, AnyString& varname, const AnyString& name)
 	{
 		if (not name.empty())
@@ -537,15 +604,17 @@ namespace Nany
 		{
 			case Type::funcdef:
 			{
-				return (name[0] != '^')
-					? "func"
-					: ((not name.startsWith("^default-var-%"))
-						? (not name.startsWith("^view^") ? "operator" : "view")
-						: "<default-init>");
+				if (not isSpecial())
+					return "func";
+				if (isView())
+					return "view";
+				if (isMemberVarDefaultInit())
+					return "<default-init>";
+				return "operator";
 			}
 			case Type::classdef:     return "class";
-			case Type::namespacedef: return "namespace";
 			case Type::vardef:       return "var";
+			case Type::namespacedef: return "namespace";
 			case Type::typealias:    return "typedef";
 			case Type::unit:         return "unit";
 		}
@@ -561,7 +630,7 @@ namespace Nany
 
 		eachChild([&](Atom& child) -> bool
 		{
-			if (child.isClass() and child.name == name)
+			if (child.isClass() and child.pName == name)
 			{
 				if (likely(atomA == nullptr))
 				{
@@ -593,7 +662,7 @@ namespace Nany
 
 		eachChild([&](Atom& child) -> bool
 		{
-			if (child.isFunction() and child.name == name)
+			if (child.isFunction() and child.pName == name)
 			{
 				if (likely(atomA == nullptr))
 				{
@@ -624,7 +693,7 @@ namespace Nany
 
 		eachChild([&](Atom& child) -> bool
 		{
-			if (child.isMemberVariable() and child.name == name)
+			if (child.isMemberVariable() and child.pName == name)
 			{
 				if (likely(atomA == nullptr))
 				{
@@ -654,7 +723,7 @@ namespace Nany
 
 		eachChild([&](Atom& child) -> bool
 		{
-			if (child.isNamespace() and child.name == name)
+			if (child.isNamespace() and child.pName == name)
 			{
 				atomA = &child;
 				return false;
@@ -677,7 +746,7 @@ namespace Nany
 			it = pChildren.erase(it);
 		}
 
-		child->name = to;
+		child->name(to);
 		pChildren.insert(std::pair<AnyString, Atom::Ptr>(to, child));
 	}
 

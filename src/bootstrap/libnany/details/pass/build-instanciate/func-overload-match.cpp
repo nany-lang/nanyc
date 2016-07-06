@@ -121,7 +121,7 @@ namespace Instanciate
 			h.hint() << "failed to push"
 				<< (isGenType ? " generic value " : " value ")
 				<< cdef.clid << " to " << (CLID{atom.atomid,0})
-				<< ":'" << atom.name << "' parameter index " << (i + 1);
+				<< ":'" << atom.name() << "' parameter index " << (i + 1);
 
 			String inputs;
 			printInputParameters(inputs);

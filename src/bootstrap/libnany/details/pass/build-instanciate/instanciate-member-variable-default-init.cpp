@@ -95,7 +95,7 @@ namespace Instanciate
 			{
 				auto& subatom = subatomref.get();
 				if (debugmode)
-					out.emitComment(String() << "initialization for " << subatom.name << " via default-init");
+					out.emitComment(String() << "initialization for " << subatom.name() << " via default-init");
 
 				uint32_t instanceid = static_cast<uint32_t>(-1);
 				bool localSuccess = instanciateAtomFunc(instanceid, subatom, /*ret*/ 0, /*self*/ 2);
@@ -118,12 +118,13 @@ namespace Instanciate
 			for (auto& subatomref: atomvars)
 			{
 				auto& subatom = subatomref.get();
+				AnyString subatomname = subatom.name();
 
 				// extracting varname from ^default-var-%42-varname
-				auto endOffset = subatom.name.find_last_of('-');
-				if (unlikely(not (endOffset < subatom.name.size())))
+				auto endOffset = subatomname.find_last_of('-');
+				if (unlikely(not (endOffset < subatomname.size())))
 					return (void)(ice() << "invalid string offset");
-				AnyString varname{subatom.name, endOffset + 1};
+				AnyString varname{subatomname, endOffset + 1};
 
 				uint32_t instanceid = (uint32_t) -1;
 				bool localSuccess = instanciateAtomFunc(instanceid, subatom, /*ret*/0, /*self*/2);
@@ -132,7 +133,7 @@ namespace Instanciate
 				if (selfIT == selfparamlistEnd)
 				{
 					if (debugmode)
-						out.emitComment(String() << "initialization for " << subatom.name << " via default-init");
+						out.emitComment(String() << "initialization for " << subatomname << " via default-init");
 
 					if (localSuccess)
 					{
@@ -143,7 +144,7 @@ namespace Instanciate
 				else
 				{
 					if (debugmode)
-						out.emitComment(String() << "initialization for " << subatom.name << " via self-parameter");
+						out.emitComment(String() << "initialization for " << subatomname << " via self-parameter");
 
 					if (localSuccess)
 					{

@@ -41,7 +41,7 @@ namespace Instanciate
 			}
 			else
 			{
-				if (subatom.isOperator() and subatom.name == "^clone")
+				if (subatom.isCloneCtor())
 					userDefinedClone = &subatom;
 			}
 			return true; // next
@@ -59,7 +59,7 @@ namespace Instanciate
 			auto& subatom = subatomref.get();
 			auto& cdef    = cdeftable.classdef(subatom.returnType.clid); // type of the var member
 			if (debugmode)
-				out.emitComment(String{"\nCLONE for '"} << subatom.name << '\'');
+				out.emitComment(String{"\nCLONE for '"} << subatom.name() << '\'');
 
 			switch (cdef.kind)
 			{
