@@ -20,7 +20,9 @@ namespace Instanciate
 
 		if (unlikely(frame->lvids[lvid].synthetic))
 		{
-			error() << "cannot unref a synthetic object";
+			auto err = (error() << "cannot unref a synthetic object");
+			if (debugmode)
+				err << " {" << frame->atomid << ',' << lvid << '}';
 			return;
 		}
 
