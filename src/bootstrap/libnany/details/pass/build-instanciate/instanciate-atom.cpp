@@ -9,7 +9,7 @@
 
 using namespace Yuni;
 
-
+#include <iostream>
 
 
 
@@ -33,6 +33,14 @@ namespace Instanciate
 
 			void visit(IR::ISA::Operand<IR::ISA::Op::stackalloc>& opc)
 			{
+				if (debugmode)
+				{
+					if (not table.hasClassdef(CLID{atomid, opc.lvid}))
+					{
+						ice() << "failed to get classdef " << CLID{atomid, opc.lvid};
+						return;
+					}
+				}
 				auto& cdef = table.classdef(CLID{atomid, opc.lvid});
 				if (not cdef.isBuiltinOrVoid())
 				{
@@ -226,7 +234,7 @@ namespace Instanciate
 				(report.subgroup(), newView, info.build, *outIR, inputIR, info.parent);
 
 			if (Config::Traces::sourceOpcodeSequence)
-				printSourceOpcodeSequence(info.cdeftable, info.atom.get(), "[post-IR] ");
+				printSourceOpcodeSequence(info.cdeftable, info.atom.get(), "[ir-from-ast] ");
 
 			builder->pushParametersFromSignature(atom.atomid, signature);
 			//if (info.parentAtom)
@@ -554,17 +562,29 @@ namespace Instanciate
 		}
 
 		// import the return type of the instanciated sequence
-		auto& spare = cdeftable.substitute(retlvid);
-		spare.kind  = info.returnType.kind;
-		spare.atom  = info.returnType.atom;
-		if (not info.returnType.isVoid())
+		if (retlvid != 0)
 		{
-			spare.instance = true; // force some values just in case
-			if (unlikely(not spare.isBuiltinOrVoid() and spare.atom == nullptr))
+			auto& spare = cdeftable.substitute(retlvid);
+			if (not info.returnType.isVoid())
 			{
-				ice() << "return: invalid atom for return type";
-				return false;
+				spare.kind  = info.returnType.kind;
+				spare.atom  = info.returnType.atom;
+
+				spare.instance = true; // force some values just in case
+				if (unlikely(not spare.isBuiltinOrVoid() and spare.atom == nullptr))
+					return (ice() << "return: invalid atom for return type");
+
+				// release automatically the returned value, acquired by the function
+				if (canBeAcquired(info.returnType))
+				{
+					frame->lvids[retlvid].autorelease = true;
+					frame->lvids[retlvid].synthetic = false;
+				}
 			}
+			else
+				spare.mutateToVoid();
+
+			frame->lvids[retlvid].origin.returnedValue = true;
 		}
 		return true;
 	}

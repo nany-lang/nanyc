@@ -48,6 +48,9 @@ namespace Instanciate
 		// (used for resolving 'self')
 		bool singleHopForReferer = false;
 
+		//! Self lvid to use if call to a property setter (0 otherwise)
+		uint32_t propsetCallSelf = 0u;
+
 		//! The scope depth when the variable has been declared
 		int scope = -1; // -1: no scope, : 0 first scope
 		//! declaration offset (stackalloc) in the out IR sequence

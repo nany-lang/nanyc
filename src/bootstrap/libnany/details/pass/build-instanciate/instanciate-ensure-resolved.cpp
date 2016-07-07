@@ -63,8 +63,16 @@ namespace Instanciate
 			}
 			case Atom::Type::funcdef:
 			{
-				error() << "pointer-to-function are not implemented yet";
-				return false;
+				if (atom.isProperty())
+				{
+					// for setter, everything will be entirely resolved at the next
+					// assignment (or operators like +=)
+				}
+				else
+				{
+					error() << "pointer-to-function are not implemented yet";
+					return false;
+				}
 			}
 			default:
 				break;

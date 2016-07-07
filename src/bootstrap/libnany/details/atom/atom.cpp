@@ -37,11 +37,14 @@ namespace Nany
 				{
 					if (table) // and table->hasClassdef(vardef.clid))
 					{
-						auto& retcdef = table->classdef(vardef.clid);
-						if (not retcdef.isVoid())
+						if (table->hasClassdef(vardef.clid))
 						{
-							out << ": ";
-							retcdef.print(out, *table, false);
+							auto& retcdef = table->classdef(vardef.clid);
+							if (not retcdef.isVoid())
+							{
+								out << ": ";
+								retcdef.print(out, *table, false);
+							}
 						}
 					}
 				}

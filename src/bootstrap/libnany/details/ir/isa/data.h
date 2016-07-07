@@ -88,8 +88,10 @@ namespace ISA
 		ref,
 		//! 'const' qualifier
 		constant,
+		//! 'propset' compiler qualifier, setter if a resolved as property
+		propset,
 	};
-	static const constexpr uint32_t TypeQualifierCount = 1 + (uint32_t) TypeQualifier::constant;
+	static const constexpr uint32_t TypeQualifierCount = 1 + (uint32_t) TypeQualifier::propset;
 
 
 

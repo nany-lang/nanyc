@@ -235,6 +235,7 @@ namespace // anonymous
 			{
 				case IR::ISA::TypeQualifier::ref:      out << "ref"; break;
 				case IR::ISA::TypeQualifier::constant: out << "const"; break;
+				case IR::ISA::TypeQualifier::propset:  out << "propset"; break;
 			}
 		}
 

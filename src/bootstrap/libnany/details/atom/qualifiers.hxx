@@ -16,11 +16,15 @@ namespace Nany
 
 		if (rhs.ref)
 			ref = true;
+
+		if (rhs.propset)
+			propset = true;
 	}
 
 
 	inline bool Qualifiers::operator == (const Qualifiers& rhs) const
 	{
+		// ignoring propset, since only a metadata for property instanciation
 		return (constant == rhs.constant) and (ref == rhs.ref) and (nullable == rhs.nullable);
 	}
 
@@ -35,6 +39,7 @@ namespace Nany
 		constant.clear();
 		ref.clear();
 		nullable.clear();
+		propset = false;
 	}
 
 

@@ -266,20 +266,13 @@ namespace Instanciate
 	{
 		assert(static_cast<uint32_t>(operands.qualifier) < IR::ISA::TypeQualifierCount);
 		bool  onoff = (operands.flag != 0);
-		auto& spare = cdeftable.substitute(operands.lvid);
+		auto& qualifiers = cdeftable.substitute(operands.lvid).qualifiers;
 
 		switch (operands.qualifier)
 		{
-			case IR::ISA::TypeQualifier::ref:
-			{
-				spare.qualifiers.ref = onoff;
-				break;
-			}
-			case IR::ISA::TypeQualifier::constant:
-			{
-				spare.qualifiers.constant = onoff;
-				break;
-			}
+			case IR::ISA::TypeQualifier::ref:      qualifiers.ref = onoff; break;
+			case IR::ISA::TypeQualifier::constant: qualifiers.constant = onoff; break;
+			case IR::ISA::TypeQualifier::propset:  qualifiers.propset = onoff; break;
 		}
 	}
 

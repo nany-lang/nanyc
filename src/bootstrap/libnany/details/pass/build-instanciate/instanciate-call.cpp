@@ -55,14 +55,6 @@ namespace Instanciate
 		}
 
 
-		static inline bool atomIsCtor(const Atom* atom)
-		{
-			if (atom and atom->isCtor())
-				return true;
-			return false;
-		}
-
-
 	} // anonymous namespace
 
 
@@ -128,7 +120,7 @@ namespace Instanciate
 				// get the captured variables and push them as named parameters
 				if (selfAtom->flags(Atom::Flags::pushCapturedVariables))
 				{
-					if (atomIsCtor(atom))
+					if (atom and atom->isCtor())
 						pushCapturedVarsAsParameters(*selfAtom);
 				}
 			}
@@ -237,8 +229,7 @@ namespace Instanciate
 		// instanciate the called func
 		Logs::Message::Ptr subreport;
 		InstanciateData info{subreport, *atom, cdeftable, build, params, tmplparams};
-		bool instok = doInstanciateAtomFunc(subreport, info, lvid);
-		if (unlikely(not instok))
+		if (not doInstanciateAtomFunc(subreport, info, lvid))
 			return false;
 
 		// opcodes
@@ -248,11 +239,6 @@ namespace Instanciate
 				out.emitPush(element.clid.lvid());
 
 			out.emitCall(lvid, atom->atomid, info.instanceid);
-
-			// the function is responsible for acquiring the returned object
-			// however we must release it
-			if (canBeAcquired(lvid))
-				frame->lvids[lvid].autorelease = true;
 		}
 		return true;
 	}
@@ -329,29 +315,110 @@ namespace Instanciate
 	}
 
 
+	bool SequenceBuilder::emitPropsetCall(const IR::ISA::Operand<IR::ISA::Op::call>& operands)
+	{
+		if (unlikely(pushedparams.func.indexed.size() != 1))
+			return (ice() << "calling a property setter with more than one value");
+		if (unlikely(not pushedparams.func.named.empty()))
+			return (ice() << "calling property setter with named parameters");
+		if (unlikely(not pushedparams.gentypes.empty()))
+			return (ice() << "calling a property setter with generic types parameters");
+
+		// the current context atom
+		uint32_t atomid = frame->atomid;
+		// result of the func call
+		uint32_t lvid = operands.lvid;
+		// report for instanciation
+		Logs::Message::Ptr subreport;
+		// all pushed parameters
+		decltype(FuncOverloadMatch::result.params) params;
+		// all pushed template parameters
+		decltype(FuncOverloadMatch::result.params) tmplparams;
+
+		// self, if any
+		uint32_t self = frame->lvids[operands.ptr2func].propsetCallSelf;
+		if (self == (uint32_t) -1) // unwanted value just for indicating propset call
+			self = 0;
+
+		auto& cdeffunc = cdeftable.classdef(CLID{atomid, operands.ptr2func});
+		auto* atom = cdeftable.findClassdefAtom(cdeffunc);
+		if (unlikely(!atom))
+			return (ice() << "invalid atom for property setter");
+		if (unlikely(not atom->isPropertySet()))
+			return (ice() << "atom is not a property setter");
+
+		// the new value for the property
+		auto propvalue = pushedparams.func.indexed[0];
+
+		// preparing the overload matcher
+		overloadMatch.clear();
+		overloadMatch.input.rettype.push_back(CLID{atomid, lvid});
+		if (self != 0)
+			overloadMatch.input.params.indexed.emplace_back(CLID{atomid, self});
+		overloadMatch.input.params.indexed.emplace_back(CLID{atomid, propvalue.lvid});
+
+		// try to validate the func call
+		if (unlikely(TypeCheck::Match::none == overloadMatch.validate(*atom)))
+			return complainCannotCall(*atom, overloadMatch);
+
+		// get new parameters
+		params.swap(overloadMatch.result.params);
+		tmplparams.swap(overloadMatch.result.tmplparams);
+
+
+		InstanciateData info{subreport, *atom, cdeftable, build, params, tmplparams};
+		if (not doInstanciateAtomFunc(subreport, info, lvid))
+			return false;
+
+		if (canGenerateCode())
+		{
+			for (auto& param: params)
+				out.emitPush(param.clid.lvid());
+
+			out.emitCall(lvid, atom->atomid, info.instanceid);
+		}
+		return true;
+	}
+
+
 	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::call>& operands)
 	{
+		// A 'call' can represent several language features.
 		// after AST transformation, assignments are method calls
 		// ('a = b' have been transformed into 'a.=(b)'). However this is not
 		// a real func call and it is intercepted to be handled differently
+		//
+		// It can also be a call to a property setter, which is also a func
+		// but the input parameters can be slighty different
 
-		// the result is not a synthetic object
+		// the result is no longer a synthetic object
 		frame->lvids[operands.lvid].synthetic = false;
+		// resul of the operation
+		bool callSuccess;
 
-		bool checkpoint = ((not frame->lvids[operands.ptr2func].pointerAssignment)
-			? emitFuncCall(operands)
-			: instanciateAssignment(operands));
-
-		if (shortcircuit.label != 0)
+		if (0 == frame->lvids[operands.ptr2func].propsetCallSelf)
 		{
-			if (checkpoint and canGenerateCode())
-				checkpoint = generateShortCircuitInstrs(operands.lvid);
+			// normal function call, or assignment
+			callSuccess = ((not frame->lvids[operands.ptr2func].pointerAssignment)
+				? emitFuncCall(operands)
+				: instanciateAssignment(operands));
+
+			if (shortcircuit.label != 0)
+			{
+				if (callSuccess and canGenerateCode())
+					callSuccess = generateShortCircuitInstrs(operands.lvid);
+			}
+		}
+		else
+		{
+			// property setter
+			callSuccess = emitPropsetCall(operands);
 		}
 
-		// always remove pushed parameters, whatever the result
+		// always remove pushed parameters, whatever the result is
 		pushedparams.clear();
 
-		if (unlikely(not checkpoint))
+		if (unlikely(not callSuccess))
 		{
 			success = false;
 			frame->invalidate(operands.lvid);

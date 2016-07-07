@@ -764,18 +764,12 @@ namespace Mapping
 		if (debugmode and not cdeftable.hasClassdef(clid))
 			return printError(operands, "invalid clid");
 
+		auto& qualifiers = cdeftable.classdef(clid).qualifiers;
 		switch (operands.qualifier)
 		{
-			case IR::ISA::TypeQualifier::ref:
-			{
-				cdeftable.classdef(clid).qualifiers.ref = onoff;
-				break;
-			}
-			case IR::ISA::TypeQualifier::constant:
-			{
-				cdeftable.classdef(clid).qualifiers.constant = onoff;
-				break;
-			}
+			case IR::ISA::TypeQualifier::ref:      qualifiers.ref = onoff; break;
+			case IR::ISA::TypeQualifier::constant: qualifiers.constant = onoff; break;
+			case IR::ISA::TypeQualifier::propset:  qualifiers.propset = onoff; break;
 		}
 	}
 

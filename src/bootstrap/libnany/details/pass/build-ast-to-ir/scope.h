@@ -226,7 +226,7 @@ namespace Producer
 			const AST::Node* varAssign, bool ref, bool constant);
 		bool emitVarInFunc(const AnyString& varname, const AST::Node& node, const AST::Node* varType,
 			const AST::Node* varAssign, bool ref, bool constant);
-		bool emitPropertyInClass(const AnyString& varname, const AST::Node& node, const AST::Node* varType,
+		bool emitProperty(const AnyString& varname, const AST::Node& node, const AST::Node* varType,
 			AST::Node& varAssign, bool ref);
 
 

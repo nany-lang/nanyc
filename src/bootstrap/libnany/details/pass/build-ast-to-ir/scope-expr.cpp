@@ -22,8 +22,16 @@ namespace Producer
 		auto& out = sequence();
 		uint32_t rid = out.emitStackalloc(nextvar(), nyt_any);
 		out.emitIdentify(rid, node.text, localvar);
-		localvar = rid;
 
+		if (/*self*/ localvar != 0 and not node.children.empty())
+		{
+			// if %localvar (self for the current identifier) is resolved later
+			// as a property, then it would be a setter, and not a getter
+			if (node.text == "=")
+				out.emitQualifierPropset(localvar);
+		}
+
+		localvar = rid;
 		if (not node.children.empty())
 			return visitASTExprContinuation(node, localvar);
 		return true;

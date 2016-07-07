@@ -194,7 +194,8 @@ namespace Instanciate
 		bool identifyCapturedVar(const IR::ISA::Operand<IR::ISA::Op::identify>& operands, const AnyString& name);
 		bool emitIdentifyForSingleResult(bool isLocalVar, const Classdef& cdef,
 			const IR::ISA::Operand<IR::ISA::Op::identify>& operands, const AnyString& name);
-		bool emitIdentifyForProperty(const IR::ISA::Operand<IR::ISA::Op::identify>& operands, Atom& propatom);
+		bool emitIdentifyForProperty(const IR::ISA::Operand<IR::ISA::Op::identify>& operands,
+			const Classdef& cdef, Atom& propatom);
 
 		bool ensureResolve(const IR::ISA::Operand<IR::ISA::Op::ensureresolved>& operands);
 
@@ -212,6 +213,7 @@ namespace Instanciate
 
 
 		bool emitFuncCall(const IR::ISA::Operand<IR::ISA::Op::call>& operands);
+		bool emitPropsetCall(const IR::ISA::Operand<IR::ISA::Op::call>& operands);
 		bool pushCapturedVarsAsParameters(const Atom& atomclass);
 
 		//! Declare a named variable (and checks for multiple declarations)

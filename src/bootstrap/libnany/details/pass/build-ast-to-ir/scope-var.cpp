@@ -223,7 +223,7 @@ namespace Producer
 	}
 
 
-	bool Scope::emitPropertyInClass(const AnyString& varname, const AST::Node& node, const AST::Node* /*varType*/,
+	bool Scope::emitProperty(const AnyString& varname, const AST::Node& node, const AST::Node* /*varType*/,
 		AST::Node& varAssign, bool ref)
 	{
 		AST::Node* nodeGet = nullptr;
@@ -340,7 +340,6 @@ namespace Producer
 			body.children.clear();
 		}
 
-		//return (error(node) << "not implemented yet");
 		return success;
 	}
 
@@ -457,11 +456,10 @@ namespace Producer
 			switch (kind)
 			{
 				case Kind::kclass:
-					return emitPropertyInClass(varname, *varnodeDecl, varType, *varAssign, ref);
+				case Kind::undefined:
+					return emitProperty(varname, *varnodeDecl, varType, *varAssign, ref);
 				case Kind::kfunc:
 					return (error(*varnodeDecl) << "properties in functions not implemented");
-				default:
-					return (ice(*varnodeDecl) << "property declaration: unsupported scope type");
 			}
 		}
 		return false;

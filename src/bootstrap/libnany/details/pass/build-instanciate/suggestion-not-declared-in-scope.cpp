@@ -121,10 +121,27 @@ namespace Instanciate
 		{
 			if (self)
 			{
-				err << '\'' << varname << "' is not declared in '";
-				err << cdeftable.keyword(*self) << ' ';
-				self->retrieveCaption(err.data().message, cdeftable);
-				err << '\'';
+				if (self->hasMember(ShortString128("^propget^") << name)) // RO properties
+				{
+					err << "the property '";
+					err << cdeftable.keyword(*self) << ' ';
+					self->retrieveCaption(err.data().message, cdeftable);
+					err << '.' << name << "' is read-only";
+				}
+				else if (self->hasMember(ShortString128("^propset^") << name)) // WO properties
+				{
+					err << "the property '";
+					err << cdeftable.keyword(*self) << ' ';
+					self->retrieveCaption(err.data().message, cdeftable);
+					err << '.' << name << "' is write-only";
+				}
+				else
+				{
+					err << '\'' << varname << "' is not declared in '";
+					err << cdeftable.keyword(*self) << ' ';
+					self->retrieveCaption(err.data().message, cdeftable);
+					err << '\'';
+				}
 			}
 			else
 				err << '\'' << varname << "' is not declared in this scope";

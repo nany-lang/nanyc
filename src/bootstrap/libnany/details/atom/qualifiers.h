@@ -20,6 +20,8 @@ namespace Nany
 			static constexpr bool nullable = false;
 			//! reference by default ?
 			static constexpr bool ref = true;
+			//! Not a setter by default if a property
+			static constexpr bool propset = false;
 		};
 
 
@@ -30,6 +32,8 @@ namespace Nany
 		Yuni::Tribool ref = Default::ref;
 		//! Nullable, can be null ?
 		Yuni::Tribool nullable = Default::nullable;
+		//! If a property, would it be a setter ?
+		bool propset = Default::propset;
 
 		/*!
 		** \brief Merge with another qualifiers
