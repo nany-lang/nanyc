@@ -188,11 +188,11 @@ namespace Nany
 	}
 
 
-	void Atom::retrieveFullname(Yuni::String& out, const ClassdefTableView* table) const
+	void Atom::retrieveFullname(Yuni::String& out, const ClassdefTableView* table, bool parentName) const
 	{
 		if (parent)
 		{
-			if (parent->parent)
+			if (parentName and parent->parent)
 			{
 				parent->retrieveFullname(out, table);
 				out += '.';
@@ -272,11 +272,11 @@ namespace Nany
 	}
 
 
-	void Atom::doAppendCaption(YString& out, const ClassdefTableView* table) const
+	void Atom::doAppendCaption(YString& out, const ClassdefTableView* table, bool fullname) const
 	{
 		// append the name of its ancestor, with the table to resolve their specialization
 		// (for template clsses for example)
-		retrieveFullname(out, table); // parents
+		retrieveFullname(out, table, fullname); // parents
 
 		switch (type)
 		{
@@ -361,7 +361,8 @@ namespace Nany
 		if (parent != nullptr)
 		{
 			entry.message.prefix << table.keyword(*this) << ' ';
-			retrieveCaption(entry.data().message, table);
+			bool parentNames = isNamespace() or isUnit();
+			doAppendCaption(entry.data().message, &table, parentNames);
 			entry << " [id:" << atomid;
 			if (isMemberVariable())
 				entry << ", field: " << varinfo.effectiveFieldIndex;

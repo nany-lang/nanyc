@@ -9,7 +9,6 @@
 
 using namespace Yuni;
 
-#include <iostream>
 
 
 
@@ -71,7 +70,6 @@ namespace Instanciate
 			PostProcessStackAllocWalker walker{table, atomid};
 			out.each(walker);
 		}
-
 
 		static inline void printGeneratedIRSequence(const String& symbolName,
 			const IR::Sequence& out, const ClassdefTableView& newView, uint32_t offset = 0)
