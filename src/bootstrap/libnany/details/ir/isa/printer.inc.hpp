@@ -235,7 +235,6 @@ namespace // anonymous
 			{
 				case IR::ISA::TypeQualifier::ref:      out << "ref"; break;
 				case IR::ISA::TypeQualifier::constant: out << "const"; break;
-				case IR::ISA::TypeQualifier::propset:  out << "propset"; break;
 			}
 		}
 
@@ -424,6 +423,14 @@ namespace // anonymous
 		void print(const Operand<Op::identify>& operands)
 		{
 			line() << '%' << operands.lvid << " = identify ";
+			if (operands.self != 0)
+				out << '%' << operands.self << " . ";
+			printString(operands.text);
+		}
+
+		void print(const Operand<Op::identifyset>& operands)
+		{
+			line() << '%' << operands.lvid << " = identify:set ";
 			if (operands.self != 0)
 				out << '%' << operands.self << " . ";
 			printString(operands.text);

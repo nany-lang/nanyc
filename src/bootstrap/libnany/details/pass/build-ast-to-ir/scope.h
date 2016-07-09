@@ -236,6 +236,10 @@ namespace Producer
 		//! Kind
 		Kind kind = Kind::undefined;
 
+		//! Opcode offset of the last identify opcode
+		// (to allow to promote identify:get to identify:set)
+		uint32_t lastIdentifyOpcOffset = 0u;
+
 		//! For template parameters
 		std::unique_ptr<std::vector<std::pair<uint32_t, AnyString>>> lastPushedTmplParams;
 		//! Expression attributes

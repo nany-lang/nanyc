@@ -22,6 +22,9 @@ namespace Producer
 			? *(orignode.children[0])
 			: orignode;
 
+		// invalidate the last identify opcode offset to avoid any invalid use
+		lastIdentifyOpcOffset = 0;
+
 		emitDebugpos(node);
 		switch (node.rule)
 		{

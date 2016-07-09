@@ -156,6 +156,9 @@ namespace ISA //!< Instruction Set Architecture
 
 		//! try to identity an identifier (partially or completely from its referer)
 		identify,
+		//! try to identity an id setter if ambigous
+		// (this opcode is strictly identical to 'identify')
+		identifyset,
 		//! try to identify completely the type of sub expression
 		// (if not already done by 'identity')
 		ensureresolved,
@@ -288,6 +291,7 @@ namespace ISA //!< Instruction Set Architecture
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::fieldget) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::fieldset) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::identify) \
+				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::identifyset) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::ensureresolved) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::assign) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::self) \

@@ -652,6 +652,11 @@ namespace Mapping
 		}
 	}
 
+	inline void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::identifyset>& operands)
+	{
+		auto& newopc = IR::Instruction::fromOpcode(operands).to<IR::ISA::Op::identify>();
+		visit(newopc);
+	}
 
 	inline void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::tpush>& operands)
 	{
@@ -769,7 +774,6 @@ namespace Mapping
 		{
 			case IR::ISA::TypeQualifier::ref:      qualifiers.ref = onoff; break;
 			case IR::ISA::TypeQualifier::constant: qualifiers.constant = onoff; break;
-			case IR::ISA::TypeQualifier::propset:  qualifiers.propset = onoff; break;
 		}
 	}
 
@@ -829,6 +833,7 @@ namespace Mapping
 		currentSequence.each(*this, offset);
 
 		atomStack.reset(nullptr); // cleanup after use
+
 		return success;
 	}
 

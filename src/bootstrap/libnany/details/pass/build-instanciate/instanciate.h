@@ -87,6 +87,7 @@ namespace Instanciate
 		void visit(const IR::ISA::Operand<IR::ISA::Op::classdefsizeof>&);
 		void visit(const IR::ISA::Operand<IR::ISA::Op::follow>&);
 		void visit(const IR::ISA::Operand<IR::ISA::Op::identify>&);
+		void visit(const IR::ISA::Operand<IR::ISA::Op::identifyset>&);
 		void visit(const IR::ISA::Operand<IR::ISA::Op::ensureresolved>&);
 		void visit(const IR::ISA::Operand<IR::ISA::Op::debugfile>&);
 		void visit(const IR::ISA::Operand<IR::ISA::Op::debugpos>&);

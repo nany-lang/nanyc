@@ -1028,14 +1028,6 @@ namespace IR
 		operands.qualifier = IR::ISA::TypeQualifier::constant;
 	}
 
-	inline void Sequence::emitQualifierPropset(uint32_t lvid)
-	{
-		auto& operands = emit<ISA::Op::qualifiers>();
-		operands.lvid  = lvid;
-		operands.flag  = 1u;
-		operands.qualifier = IR::ISA::TypeQualifier::propset;
-	}
-
 	inline void Sequence::emitDebugfile(const AnyString& filename)
 	{
 		emit<ISA::Op::debugfile>().filename = stringrefs.ref(filename);

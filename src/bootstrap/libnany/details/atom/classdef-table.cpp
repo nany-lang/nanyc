@@ -6,6 +6,7 @@
 #include <cassert>
 
 using namespace Yuni;
+#include <iostream>
 
 
 

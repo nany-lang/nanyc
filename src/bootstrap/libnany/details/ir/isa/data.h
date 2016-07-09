@@ -88,10 +88,8 @@ namespace ISA
 		ref,
 		//! 'const' qualifier
 		constant,
-		//! 'propset' compiler qualifier, setter if a resolved as property
-		propset,
 	};
-	static const constexpr uint32_t TypeQualifierCount = 1 + (uint32_t) TypeQualifier::propset;
+	static const constexpr uint32_t TypeQualifierCount = 1 + (uint32_t) TypeQualifier::constant;
 
 
 
@@ -899,6 +897,15 @@ namespace ISA
 	template<> struct Operand<Nany::IR::ISA::Op::identify> final
 	{
 		constexpr static const char* opname() { return "identify"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		uint32_t self;
+		uint32_t text;
+		template<class T> void eachLVID(T& c) { c(lvid, self); }
+	};
+	template<> struct Operand<Nany::IR::ISA::Op::identifyset> final // MUST be identical to 'identify'
+	{
+		constexpr static const char* opname() { return "identifyset"; }
 		uint32_t opcode;
 		uint32_t lvid;
 		uint32_t self;

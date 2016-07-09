@@ -113,6 +113,7 @@ namespace Mapping
 		void visit(IR::ISA::Operand<IR::ISA::Op::stackalloc>&);
 		void visit(IR::ISA::Operand<IR::ISA::Op::self>&);
 		void visit(IR::ISA::Operand<IR::ISA::Op::identify>&);
+		void visit(IR::ISA::Operand<IR::ISA::Op::identifyset>&);
 		void visit(IR::ISA::Operand<IR::ISA::Op::push>&);
 		void visit(IR::ISA::Operand<IR::ISA::Op::tpush>&);
 		void visit(IR::ISA::Operand<IR::ISA::Op::call>&);

@@ -49,6 +49,16 @@ namespace Nany
 		static constexpr nytype_t type = nyt_u64;
 	};
 
+	template<> struct CTypeToNanyType<float> final
+	{
+		static constexpr nytype_t type = nyt_f32;
+	};
+
+	template<> struct CTypeToNanyType<double> final
+	{
+		static constexpr nytype_t type = nyt_f64;
+	};
+
 	template<> struct CTypeToNanyType<bool> final
 	{
 		static constexpr nytype_t type = nyt_bool;

@@ -17,11 +17,15 @@ namespace Instanciate
 	namespace // anonymous
 	{
 
-		static bool tryFindProperties(std::vector<std::reference_wrapper<Atom>>& multipleResults,
-			Atom& atom,
-			const Classdef& cdef, const AnyString& name)
+		static bool tryFindProperties(const IR::ISA::Operand<IR::ISA::Op::identify>& operands,
+			std::vector<std::reference_wrapper<Atom>>& multipleResults,
+			Atom& atom, const AnyString& name)
 		{
-			if (not cdef.qualifiers.propset)
+			// 'identifyset' is strictly identical to 'identify', but it indicates
+			// that we should resolve a setter and not a getter
+			bool setter = (operands.opcode == static_cast<uint32_t>(IR::ISA::Op::identifyset));
+
+			if (not setter)
 			{
 				return atom.propertyLookupOnChildren(multipleResults, "^propget^", name);
 			}
@@ -475,7 +479,7 @@ namespace Instanciate
 					{
 						auto& parent = *(frame->atom.parent);
 						if (not parent.nameLookupFromParent(multipleResults, name))
-							isProperty = tryFindProperties(multipleResults, parent, cdef, name);
+							isProperty = tryFindProperties(operands, multipleResults, parent, name);
 					}
 				}
 			}
@@ -503,7 +507,7 @@ namespace Instanciate
 
 				if (not selfAtom->nameLookupOnChildren(multipleResults, name, &singleHop))
 				{
-					isProperty = tryFindProperties(multipleResults, *selfAtom, cdef, name);
+					isProperty = tryFindProperties(operands, multipleResults, *selfAtom, name);
 					// 'self' for propset can be really used if it is a class
 					// and not a namespace
 					if (selfAtom->isClass())
@@ -562,10 +566,14 @@ namespace Instanciate
 				{
 					auto& propatom = multipleResults[0].get();
 
+					// 'identifyset' is strictly identical to 'identify', but it indicates
+					// that we should resolve a setter and not a getter
+					bool setter = (operands.opcode == static_cast<uint32_t>(IR::ISA::Op::identifyset));
+
 					// Generate code only for getter
 					// setter will be called later, when enough information will be provided
 					// (the 'value' parameter is not available yet)
-					if (not cdef.qualifiers.propset)
+					if (not setter)
 					{
 						if (Config::Traces::properties)
 						{
@@ -623,6 +631,11 @@ namespace Instanciate
 	}
 
 
+	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::identifyset>& operands)
+	{
+		auto& newopc = IR::Instruction::fromOpcode(operands).to<IR::ISA::Op::identify>();
+		visit(newopc);
+	}
 
 
 

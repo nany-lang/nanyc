@@ -104,6 +104,8 @@ namespace Nany
 		intrinsics.add("yuni.string.append.i16",  Builtin::yn_string_append<int16_t>);
 		intrinsics.add("yuni.string.append.i32",  Builtin::yn_string_append<int32_t>);
 		intrinsics.add("yuni.string.append.i64",  Builtin::yn_string_append<int64_t>);
+		intrinsics.add("yuni.string.append.f32",  Builtin::yn_string_append<float>);
+		intrinsics.add("yuni.string.append.f64",  Builtin::yn_string_append<double>);
 		intrinsics.add("yuni.string.append.ptr",  Builtin::yn_string_append_ptr);
 		intrinsics.add("yuni.string.equals",      Builtin::yn_string_is_equal);
 

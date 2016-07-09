@@ -20,21 +20,43 @@ namespace Producer
 		// value fetching
 		emitDebugpos(node);
 		auto& out = sequence();
+
+		// allocate a local variable to receive information about the current identifier
 		uint32_t rid = out.emitStackalloc(nextvar(), nyt_any);
+		uint32_t offset = out.opcodeCount();
 		out.emitIdentify(rid, node.text, localvar);
 
-		if (/*self*/ localvar != 0 and not node.children.empty())
-		{
-			// if %localvar (self for the current identifier) is resolved later
-			// as a property, then it would be a setter, and not a getter
-			if (node.text == "=")
-				out.emitQualifierPropset(localvar);
-		}
-
+		// the result of the current expression is now the new allocated local variable
 		localvar = rid;
-		if (not node.children.empty())
+
+		// any sub node ?
+		bool hasChildren   = not node.children.empty();
+
+		// promotion to identify:set
+		// since it is an assignment (=, +=, ...), only if the current node has children and
+		// if another identifier was previously given
+		bool shouldPromote = (hasChildren and /*self*/ localvar != 0 and lastIdentifyOpcOffset != 0)
+			and (node.text == "=");
+
+		if (not shouldPromote)
+		{
+			// remember the last opcode offset
+			lastIdentifyOpcOffset = offset;
+			// children
+			return (not hasChildren) or visitASTExprContinuation(node, localvar);
+		}
+		else
+		{
+			auto& operands = out.at<IR::ISA::Op::identify>(lastIdentifyOpcOffset);
+			assert(operands.opcode == static_cast<uint32_t>(IR::ISA::Op::identify));
+			if (operands.opcode == static_cast<uint32_t>(IR::ISA::Op::identify))
+			{
+				operands.opcode = static_cast<uint32_t>(IR::ISA::Op::identifyset);
+				lastIdentifyOpcOffset = 0;
+			}
+			assert(not node.children.empty());
 			return visitASTExprContinuation(node, localvar);
-		return true;
+		}
 	}
 
 
@@ -202,6 +224,14 @@ namespace Producer
 
 			if (unlikely(!!scope.pAttributes))
 				scope.emitExprAttributes(localvar);
+		}
+
+		// transmit the last identify opcode offset to allow to report propset
+		switch (orignode.rule)
+		{
+			case AST::rgExprValue:
+			case AST::rgExprGroup: lastIdentifyOpcOffset = scope.lastIdentifyOpcOffset;
+			default: break;
 		}
 		return r;
 	}

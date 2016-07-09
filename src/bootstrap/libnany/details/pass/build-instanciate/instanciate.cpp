@@ -278,7 +278,6 @@ namespace Instanciate
 		{
 			case IR::ISA::TypeQualifier::ref:      qualifiers.ref = onoff; break;
 			case IR::ISA::TypeQualifier::constant: qualifiers.constant = onoff; break;
-			case IR::ISA::TypeQualifier::propset:  qualifiers.propset = onoff; break;
 		}
 	}
 

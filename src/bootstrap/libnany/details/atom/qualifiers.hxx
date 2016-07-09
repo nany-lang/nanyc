@@ -16,9 +16,6 @@ namespace Nany
 
 		if (rhs.ref)
 			ref = true;
-
-		if (rhs.propset)
-			propset = true;
 	}
 
 
@@ -39,7 +36,6 @@ namespace Nany
 		constant.clear();
 		ref.clear();
 		nullable.clear();
-		propset = false;
 	}
 
 
