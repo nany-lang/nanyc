@@ -352,7 +352,7 @@ namespace Nany
 
 
 
-	inline void Atom::doPrint(const ClassdefTableView& table, uint depth) const
+	inline void Atom::doPrintTree(const ClassdefTableView& table, uint depth) const
 	{
 		auto entry = trace();
 		for (uint i = depth; i--; )
@@ -371,19 +371,18 @@ namespace Nany
 		else
 			entry << "{global namespace}";
 
-
 		++depth;
 		for (auto& child: pChildren)
-			child.second->doPrint(table, depth);
+			child.second->doPrintTree(table, depth);
 
 		if (Type::classdef == type)
 			trace(); // for beauty
 	}
 
 
-	void Atom::print(const ClassdefTableView& table) const
+	void Atom::printTree(const ClassdefTableView& table) const
 	{
-		doPrint(table, 0);
+		doPrintTree(table, 0);
 	}
 
 

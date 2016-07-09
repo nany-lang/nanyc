@@ -380,7 +380,7 @@ namespace Nany
 
 
 		//! Print the subtree
-		void print(const ClassdefTableView&) const;
+		void printTree(const ClassdefTableView&) const;
 
 		//! Print all instanciated sequences for the atom
 		void printInstances(Yuni::Clob& out, const AtomMap&) const;
@@ -515,7 +515,7 @@ namespace Nany
 		explicit Atom(const AnyString& name, Type type);
 		//! Default constructor, with a parent
 		explicit Atom(Atom& rootparent, const AnyString& name, Type type);
-		void doPrint(const ClassdefTableView& table, uint depth) const;
+		void doPrintTree(const ClassdefTableView& table, uint depth) const;
 		void doAppendCaption(YString& out, const ClassdefTableView* table, bool fullname = true) const;
 		void name(const AnyString& newname);
 

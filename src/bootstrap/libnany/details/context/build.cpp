@@ -118,7 +118,7 @@ namespace Nany
 				and cdeftable.atoms.fetchAndIndexCoreObjects();
 
 			if (Config::Traces::preAtomTable)
-				cdeftable.atoms.root.print(ClassdefTableView{cdeftable});
+				cdeftable.atoms.root.printTree(ClassdefTableView{cdeftable});
 
 			//
 			// -- instanciate

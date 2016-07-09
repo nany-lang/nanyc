@@ -389,7 +389,7 @@ namespace Nany
 		report.appendEntry(newReport);
 
 		if (Config::Traces::atomTable)
-			cdeftable.atoms.root.print(cdeftable);
+			cdeftable.atoms.root.printTree(cdeftable);
 
 		if (instanciated)
 		{
