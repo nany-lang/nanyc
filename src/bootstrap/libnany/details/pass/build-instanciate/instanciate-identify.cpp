@@ -574,6 +574,7 @@ namespace Instanciate
 						// -1 'self' does not exist for this property (global property)
 						uint32_t propsetself = (operands.self != 0) ? operands.self : (uint32_t) -1;
 						frame->lvids[lvid].propsetCallSelf = propsetself;
+						frame->lvids[lvid].synthetic = true; // making sure it won't be used
 
 						auto& spare = cdeftable.substitute(lvid);
 						spare.mutateToAtom(&propatom);
