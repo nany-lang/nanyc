@@ -203,20 +203,22 @@ func main
 ```nany
 func main
 {
-	var radius = 42.6;
-	var diameter -> { get: radius * 2, set: radius = value / 2 };
+	var circle = new class {
+		var radius = 2.0;
+		var diameter -> { get: radius * 2.0, set: radius = value / 2.0 };
 
-	var circumference -> {
-		get: 2 * std.math.pi * radius,
-		set: diameter = value / std.math.pi };
+		var circumference -> {
+			get: 2.0 * std.math.pi * radius,
+			set: diameter = value / std.math.pi };
+	};
 
-	console << "circle: radius = \(radius), circumference: \(circumference)\n";
+	print("radius = \(circle.radius), circumference: \(circle.circumference)\n\n");
 
-	circumference = 21;
-	console << "new radius: \(radius)\n";
+	circle.circumference = 42.0;
+	print("new circumference: \(circle.circumference)\n");
+	print("new radius = \(circle.radius)\n");
 }
 ```
-- [ ] feature not fully implemented yet
 
 
 
