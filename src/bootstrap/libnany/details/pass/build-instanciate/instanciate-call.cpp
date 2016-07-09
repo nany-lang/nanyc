@@ -335,17 +335,26 @@ namespace Instanciate
 		// all pushed template parameters
 		decltype(FuncOverloadMatch::result.params) tmplparams;
 
-		// self, if any
-		uint32_t self = frame->lvids[operands.ptr2func].propsetCallSelf;
-		if (self == (uint32_t) -1) // unwanted value just for indicating propset call
-			self = 0;
-
 		auto& cdeffunc = cdeftable.classdef(CLID{atomid, operands.ptr2func});
 		auto* atom = cdeftable.findClassdefAtom(cdeffunc);
 		if (unlikely(!atom))
 			return (ice() << "invalid atom for property setter");
 		if (unlikely(not atom->isPropertySet()))
 			return (ice() << "atom is not a property setter");
+
+		// self, if any
+		uint32_t self = frame->lvids[operands.ptr2func].propsetCallSelf;
+		if (self == (uint32_t) -1) // unwanted value just for indicating propset call
+		{
+			// no self parameter, actually here, no self provided by the code
+			self = 0;
+			// an implicit 'self' may be required
+			if (frame->atom.parent and atom->parent and frame->atom.parent->isClass())
+			{
+				if (atom->parent->atomid == frame->atom.parent->atomid)
+					self = 2; // 'self' parameter of the current function
+			}
+		}
 
 		// the new value for the property
 		auto propvalue = pushedparams.func.indexed[0];
