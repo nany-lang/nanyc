@@ -209,7 +209,7 @@ namespace Instanciate
 
 
 	bool SequenceBuilder::emitIdentifyForProperty(const IR::ISA::Operand<IR::ISA::Op::identify>& operands,
-		const Classdef& cdef, Atom& propatom)
+		Atom& propatom, uint32_t self)
 	{
 		// report for instanciation
 		Logs::Message::Ptr subreport;
@@ -225,8 +225,8 @@ namespace Instanciate
 		// preparing the overload matcher
 		overloadMatch.clear();
 		overloadMatch.input.rettype.push_back(CLID{atomid, lvid});
-		if (operands.self)
-			overloadMatch.input.params.indexed.emplace_back(CLID{atomid, operands.self});
+		if (self != (uint32_t) -1 and self != 0)
+			overloadMatch.input.params.indexed.emplace_back(CLID{atomid, self});
 
 		// try to validate the func call
 		// (no error reporting, since no overload is present)
@@ -251,6 +251,8 @@ namespace Instanciate
 		}
 		return true;
 	}
+
+
 
 
 	bool SequenceBuilder::identify(const IR::ISA::Operand<IR::ISA::Op::identify>& operands,
@@ -336,6 +338,11 @@ namespace Instanciate
 		bool isLocalVar = false;
 		// property call ?
 		bool isProperty = false;
+		// self for propseot
+		// getter will be directly resolved here but setter later
+		// (-1 since this special value will be user to determine if it is a propset)
+		uint32_t propself = (uint32_t) -1;
+
 
 		if (0 == operands.self)
 		{
@@ -495,7 +502,13 @@ namespace Instanciate
 					   or frame->partiallyResolved[self.clid].empty());
 
 				if (not selfAtom->nameLookupOnChildren(multipleResults, name, &singleHop))
+				{
 					isProperty = tryFindProperties(multipleResults, *selfAtom, cdef, name);
+					// 'self' for propset can be really used if it is a class
+					// and not a namespace
+					if (selfAtom->isClass())
+						propself = operands.self;
+				}
 			}
 			else
 			{
@@ -559,7 +572,7 @@ namespace Instanciate
 							trace() << "property: resolved '" << name << "' from '"
 								<< frame->atom.caption() << "' as getter " << cdef.clid;
 						}
-						return emitIdentifyForProperty(operands, cdef, propatom);
+						return emitIdentifyForProperty(operands, propatom, propself);
 					}
 					else
 					{
@@ -572,8 +585,7 @@ namespace Instanciate
 						// this lvid is a call to a property setter
 						// must adjust the code accordingly
 						// -1 'self' does not exist for this property (global property)
-						uint32_t propsetself = (operands.self != 0) ? operands.self : (uint32_t) -1;
-						frame->lvids[lvid].propsetCallSelf = propsetself;
+						frame->lvids[lvid].propsetCallSelf = propself;
 						frame->lvids[lvid].synthetic = true; // making sure it won't be used
 
 						auto& spare = cdeftable.substitute(lvid);

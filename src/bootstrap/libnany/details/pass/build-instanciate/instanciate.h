@@ -195,7 +195,7 @@ namespace Instanciate
 		bool emitIdentifyForSingleResult(bool isLocalVar, const Classdef& cdef,
 			const IR::ISA::Operand<IR::ISA::Op::identify>& operands, const AnyString& name);
 		bool emitIdentifyForProperty(const IR::ISA::Operand<IR::ISA::Op::identify>& operands,
-			const Classdef& cdef, Atom& propatom);
+			Atom& propatom, uint32_t self);
 
 		bool ensureResolve(const IR::ISA::Operand<IR::ISA::Op::ensureresolved>& operands);
 
