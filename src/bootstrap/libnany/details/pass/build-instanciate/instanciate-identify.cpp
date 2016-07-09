@@ -1,5 +1,6 @@
 #include "instanciate.h"
 #include "instanciate-atom.h"
+#include "libnany-traces.h"
 
 using namespace Yuni;
 
@@ -553,10 +554,21 @@ namespace Instanciate
 					// (the 'value' parameter is not available yet)
 					if (not cdef.qualifiers.propset)
 					{
+						if (Config::Traces::properties)
+						{
+							trace() << "property: resolved '" << name << "' from '"
+								<< frame->atom.caption() << "' as getter " << cdef.clid;
+						}
 						return emitIdentifyForProperty(operands, cdef, propatom);
 					}
 					else
 					{
+						if (Config::Traces::properties)
+						{
+							trace() << "property: resolved '" << name << "' from '"
+								<< frame->atom.caption() << "' as setter " << cdef.clid;
+						}
+
 						// this lvid is a call to a property setter
 						// must adjust the code accordingly
 						// -1 'self' does not exist for this property (global property)
