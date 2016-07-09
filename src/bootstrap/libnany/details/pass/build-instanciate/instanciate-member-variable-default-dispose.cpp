@@ -66,52 +66,48 @@ namespace Instanciate
 			auto& subatom = subatomref.get();
 			auto& cdef    = cdeftable.classdef(subatom.returnType.clid);
 
-			if (not cdef.isBuiltinOrVoid())
+			// nothing to do for pod types
+			if (cdef.isBuiltinOrVoid())
+				continue;
+
+			if (debugmode and not commentAdded)
 			{
-				if (debugmode and not commentAdded)
-				{
-					out.emitComment("releasing non-pod variable members");
-					commentAdded = true;
-				}
+				out.emitComment("releasing variable members");
+				commentAdded = true;
+			}
 
-				// temporary variable to force increment enven if an error has occured
-				// (to avoid for looking for spurious bugs while debugging)
-				uint32_t reglvid = lvid++;
-				// type propagation
-				cdeftable.substitute(reglvid).import(cdef);
+			// current lvig, previously allocated to release variable members
+			uint32_t reglvid = lvid++;
 
-				// out.emitComment(String() << "dispose for " << subatom.name);
-				// read the pointer
-				out.emitFieldget(reglvid, /*self*/ 2, subatom.varinfo.effectiveFieldIndex);
+			// type propagation
+			cdeftable.substitute(reglvid).import(cdef);
+			// out.emitComment(String() << "dispose for " << subatom.name);
+			// read the pointer
+			out.emitFieldget(reglvid, /*self*/ 2, subatom.varinfo.effectiveFieldIndex);
 
-				auto& origin  = frame->lvids[reglvid].origin.varMember;
-				origin.self   = 2;
-				origin.atomid = subatom.atomid;
-				origin.field  = subatom.varinfo.effectiveFieldIndex;
+			auto& origin  = frame->lvids[reglvid].origin.varMember;
+			origin.self   = 2;
+			origin.atomid = subatom.atomid;
+			origin.field  = subatom.varinfo.effectiveFieldIndex;
 
-				auto* typeAtom = cdeftable.findClassdefAtom(cdef);
-				if (unlikely(nullptr == typeAtom))
-				{
-					auto ce = (ice() << "invalid atom from " << cdef.clid);
-					ce << " for disposing member variable '";
-					subatom.retrieveFullname(ce.data().message);
-					ce << "'";
+			auto* typeAtom = cdeftable.findClassdefAtom(cdef);
+			if (unlikely(nullptr == typeAtom))
+			{
+				auto ce = (ice() << "invalid atom from " << cdef.clid);
+				ce << " for disposing member variable '";
+				subatom.retrieveFullname(ce.data().message);
+				ce << "'";
+				continue;
+			}
+
+			if (0 == typeAtom->classinfo.dtor.atomid)
+			{
+				if (not instanciateAtomClassDestructor(*typeAtom, reglvid))
 					continue;
-				}
-
-				if (0 == typeAtom->classinfo.dtor.atomid)
-				{
-					if (not instanciateAtomClassDestructor(*typeAtom, reglvid))
-						continue;
-				}
-
-				auto& classinfo = typeAtom->classinfo;
-				out.emitUnref(reglvid, classinfo.dtor.atomid, classinfo.dtor.instanceid);
 			}
-			else
-			{
-				// out.emitComment(String() << "builtin dispose for " << subatom.name);
-			}
+
+			auto& classinfo = typeAtom->classinfo;
+			out.emitUnref(reglvid, classinfo.dtor.atomid, classinfo.dtor.instanceid);
 		}
 	}
 

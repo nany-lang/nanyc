@@ -136,7 +136,10 @@ namespace Instanciate
 		{
 			for (uint32_t i = 0; i != count; ++i)
 			{
-				auto& lvidinfo = frame->lvids[startOffset + i];
+				uint32_t lvid = startOffset + i;
+				cdeftable.substitute(lvid).mutateToAny();
+
+				auto& lvidinfo = frame->lvids[lvid];
 				lvidinfo.scope = scope;
 				lvidinfo.synthetic = false;
 				lvidinfo.offsetDeclOut = out.opcodeCount();
@@ -147,7 +150,10 @@ namespace Instanciate
 		{
 			for (uint32_t i = 0; i != count; ++i)
 			{
-				auto& lvidinfo = frame->lvids[startOffset + i];
+				uint32_t lvid = startOffset + i;
+				cdeftable.substitute(lvid).mutateToAny();
+
+				auto& lvidinfo = frame->lvids[lvid];
 				lvidinfo.scope = scope;
 				lvidinfo.synthetic = false;
 			}
