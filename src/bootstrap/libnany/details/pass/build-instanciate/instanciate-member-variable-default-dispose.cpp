@@ -50,10 +50,15 @@ namespace Instanciate
 		// call to user-defined operator dispose
 		if (userDefinedDispose)
 		{
+			if (debugmode)
+				out.emitComment("calling user destructor");
 			out.emitPush(2); // self
 			out.emitCall(lvid, userDefinedDispose->atomid, 0);
+			cdeftable.substitute(lvid).mutateToVoid();
 			++lvid;
 		}
+
+		bool commentAdded = false;
 
 		// ... then release all variables !
 		for (auto& subatomref: atomvars)
@@ -63,6 +68,12 @@ namespace Instanciate
 
 			if (not cdef.isBuiltinOrVoid())
 			{
+				if (debugmode and not commentAdded)
+				{
+					out.emitComment("releasing non-pod variable members");
+					commentAdded = true;
+				}
+
 				// temporary variable to force increment enven if an error has occured
 				// (to avoid for looking for spurious bugs while debugging)
 				uint32_t reglvid = lvid++;
