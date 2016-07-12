@@ -3,7 +3,7 @@
 #include "details/ast/tree-index.h"
 #include <yuni/datetime/timestamp.h>
 #include "details/ir/sequence.h"
-#include "details/nsl/import-stdcore.h"
+#include "details/vm/runtime/std.core.h"
 #include "details/atom/classdef-table-view.h"
 #include "details/errors/errors.h"
 #include "libnany-config.h"

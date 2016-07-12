@@ -22,6 +22,7 @@ namespace VM
 
 	inline ThreadContext::ThreadContext(Program& program, const AnyString& name)
 		: program(program)
+		, cwd("/")
 		, cf(program.cf)
 		, name(name)
 	{}
@@ -29,6 +30,7 @@ namespace VM
 
 	inline ThreadContext::ThreadContext(ThreadContext& rhs)
 		: program(rhs.program)
+		, cwd(rhs.cwd)
 		, cf(rhs.cf)
 	{}
 

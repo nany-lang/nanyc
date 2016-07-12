@@ -52,27 +52,28 @@ include("${nsl_root}/nsl.cmake")
 list(LENGTH nsl_files nsl_files_count)
 nmessage("standard library: added ${nsl_files_count} files")
 
-file(MAKE_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/details/nsl/generated")
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/details/vm/runtime/nsl2c")
 set(__nany_stdcore)
 set(nysrc_nsl_stdcore)
 foreach (filename ${nsl_files})
 	string(REPLACE "/std." "/std" __funcname "${filename}")
-	string(REPLACE "${nsl_root}/" "nany_nsl_" __funcname "${__funcname}")
+	string(REPLACE "${nsl_root}/" "nsl_" __funcname "${__funcname}")
 	string(REPLACE ".ny" "" __funcname "${__funcname}")
 	string(REPLACE "/" "_" __funcname "${__funcname}")
 	string(REPLACE "\\" "_" __funcname "${__funcname}")
 
-	set(target_filename "generated/${__funcname}.c")
+	set(target_filename "nsl2c/${__funcname}.c")
 	string(REPLACE "_" "-" target_filename "${target_filename}")
 	list(APPEND __nany_stdcore "${__funcname}")
-	list(APPEND nysrc_nsl_stdcore "${CMAKE_CURRENT_LIST_DIR}/details/nsl/${target_filename}")
+	list(APPEND nysrc_nsl_stdcore "${CMAKE_CURRENT_LIST_DIR}/details/vm/runtime/${target_filename}")
 
+	set(__ref_nsl_file_${__funcname}  "${filename}")
 	add_custom_command(
-		OUTPUT  "${CMAKE_CURRENT_LIST_DIR}/details/nsl/${target_filename}"
+		OUTPUT  "${CMAKE_CURRENT_LIST_DIR}/details/vm/runtime/${target_filename}"
 		COMMAND "$<TARGET_FILE:nyt-nanyfile-to-cstring>"
 			"${__funcname}"
 			"${filename}"
-			"${CMAKE_CURRENT_LIST_DIR}/details/nsl/${target_filename}"
+			"${CMAKE_CURRENT_LIST_DIR}/details/vm/runtime/${target_filename}"
 		DEPENDS
 			nyt-nanyfile-to-cstring
 			"${filename}"
@@ -105,7 +106,7 @@ foreach (__funcname ${__nany_stdcore})
 	string(REPLACE "stdcore" "std.core" __sourceid "${__sourceid}")
 	string(REPLACE "nsl:" "{nsl} " __sourceid "${__sourceid}")
 	if (NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Release" AND NOT "${CMAKE_BUILD_TYPE}" STREQUAL "release")
-		set(__sourceid "${__sourceid} > ${nsl_stdcore_root}/${__funcname}.ny")
+		set(__sourceid "{nsl} ${__ref_nsl_file_${__funcname}}")
 		string(REPLACE "nany_nsl_stdcore_" "" __sourceid "${__sourceid}")
 	endif()
 	set(__nsl_stdcore_cpp "${__nsl_stdcore_cpp}\t\t\tproject.targets.nsl->addSource(\"${__sourceid}\", content);\n")
@@ -114,8 +115,8 @@ endforeach()
 
 set(__nsl_stdcore_cpp "${__nsl_stdcore_cpp}\t}\n")
 set(__nsl_stdcore_cpp "${__nsl_stdcore_cpp}\n\n} // namespace Nany\n")
-file(WRITE "${CMAKE_CURRENT_LIST_DIR}/details/nsl/generated/all.cpp" "${__nsl_stdcore_cpp}")
-list(APPEND nysrc_nsl_stdcore "${CMAKE_CURRENT_LIST_DIR}/details/nsl/generated/all.cpp")
+file(WRITE "${CMAKE_CURRENT_LIST_DIR}/details/vm/runtime/nsl2c/all.cpp" "${__nsl_stdcore_cpp}")
+list(APPEND nysrc_nsl_stdcore "${CMAKE_CURRENT_LIST_DIR}/details/vm/runtime/nsl2c/all.cpp")
 
 
 
@@ -442,6 +443,17 @@ addsrc(
 	"nany/nany.h")
 
 
+addsrc(
+	NAME  nysrc_details_vm_runtime
+	GROUP "details/vm/runtime"
+	FILES
+	"details/vm/runtime/std.core.h"
+	"details/vm/runtime/std.core.string.cpp"
+	"details/vm/runtime/std.os.process.cpp"
+	"details/vm/runtime/std.io.native.cpp"
+	"details/vm/runtime/std.env.cpp")
+
+
 
 set(mode_libnany "SHARED")
 if ("${NANY_STATIC}")
@@ -470,7 +482,9 @@ add_library(libnany ${mode_libnany}
 	${nysrc_details_pass_build_attach}
 	${nysrc_details_pass_build_instanciate}
 
+	${nysrc_nsl_stdcore}
 	${nysrc_details_vm}
+	${nysrc_details_vm_runtime}
 
 	${nysrc_details_utils}
 	${nysrc_details_ast}
@@ -483,18 +497,10 @@ add_library(libnany ${mode_libnany}
 	${nysrc_details_reporting}
 
 	# Semantic Analysis
-	details/sema/metadata.cpp
-	details/sema/metadata.h
+	"details/sema/metadata.cpp"
+	"details/sema/metadata.h"
 	# implementation - misc
-	details/fwd.h
-
-	# NSL - std.core
-	details/nsl/import-stdcore.h
-	details/nsl/import-stdcore-string.cpp
-	details/nsl/import-stdos-process.cpp
-	details/nsl/import-stdio-native.cpp
-	details/nsl/import-stdenv.cpp
-	${nysrc_nsl_stdcore}
+	"details/fwd.h"
 
 	# misc
 	"${libnany_config_folder}/libnany-config.h"

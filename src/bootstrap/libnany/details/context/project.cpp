@@ -1,5 +1,5 @@
 #include "project.h"
-#include "details/nsl/import-stdcore.h"
+#include "details/vm/runtime/std.core.h"
 #include "libnany-config.h"
 
 using namespace Yuni;

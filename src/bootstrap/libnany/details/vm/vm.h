@@ -46,9 +46,10 @@ namespace VM
 	public:
 		//! Attached program
 		Program& program;
+		//! Current working directory
+		Yuni::String cwd;
 
 		nyprogram_cf_t& cf;
-
 		//! Thread name
 		Yuni::ShortString32 name;
 
