@@ -333,7 +333,7 @@ char-extended:
 string-interpolation: notext
 	tk-string-var-open wp (expr wp)?  tk-string-var-close
 
-char: hidden
+char-value: hidden
 	| [^\\"\n]
 	| ('\\' char-extended)
 
@@ -344,8 +344,8 @@ string: notext
 	tk-double-quote
 	((string-interpolation | ('\\' char-extended) | string-literal)* tk-double-quote) | error-eol
 
-char-value:
-	['] char [']
+char:
+	['] char-value [']
 
 
 
@@ -967,7 +967,7 @@ ex-value: hidden
 	// all expr which can be continued
 	( (
 		| (tk-parenthese-open wp expr-group wp tk-parenthese-close)
-		| char-value
+		| char
 		| typeof
 		| identifier
 		| number-def
