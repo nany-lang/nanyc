@@ -429,7 +429,7 @@ namespace Nany
 		{
 			pDuplicationSuccess = false;
 
-			auto msg = report.error() << "parse error: ";
+			auto msg = (report.error() << "parse error: ");
 			msg << '"';
 
 			if (node.text.size() > 43)

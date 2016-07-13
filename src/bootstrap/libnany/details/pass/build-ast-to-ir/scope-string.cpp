@@ -149,7 +149,7 @@ namespace Producer
 		auto flush = [&]() {
 			emitDebugpos(*firstLiteralNode);
 			uint32_t sid = out.emitStackallocText(nextvar(), context.reuse.string.text);
-			uint32_t lid = out.emitStackalloc_u64(nextvar(), nyt_u64, context.reuse.string.text.size());
+			uint32_t lid = out.emitStackalloc_u64(nextvar(), nyt_u32, context.reuse.string.text.size());
 			uint32_t ret = out.emitStackalloc(nextvar(), nyt_void);
 			out.emitPush(sid); // text: __text
 			out.emitPush(lid); // size: __u64

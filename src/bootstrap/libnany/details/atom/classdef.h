@@ -58,6 +58,8 @@ namespace Nany
 		bool isBuiltinU64() const;
 		//! Get if the classdef is a builtin u32
 		bool isBuiltinU32() const;
+		//! Get if the classdef is a builtin u32
+		bool isBuiltinU8() const;
 		//! Get if the classdef is a builtin unsigned int (u32, u64...)
 		bool isBuiltingUnsigned() const;
 
