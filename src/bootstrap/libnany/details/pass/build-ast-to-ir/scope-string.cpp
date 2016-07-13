@@ -16,10 +16,97 @@ namespace IR
 namespace Producer
 {
 
+	namespace // anonymous
+	{
+
+		static inline bool convertCharExtended(char& out, char c)
+		{
+			switch (c)
+			{
+				case 'r':  out = '\r'; break;
+				case 'n':  out = '\n'; break;
+				case 't':  out = '\t'; break;
+				case 'v':  out = '\v'; break;
+				case '\\': out = '\\'; break;
+				case '"':  out = '"'; break;
+				case 'a':  out = '\a'; break;
+				case 'b':  out = '\b'; break;
+				case 'f':  out = '\f'; break;
+				case '0':  out = '\0'; break;
+				case 'c':  /* produce no further output */ break;
+				default: return false;
+			}
+			return true;
+		}
+
+	} // anonymous namespace
+
+
+
+	bool Scope::visitASTExprChar(const AST::Node& node, uint32_t& localvar)
+	{
+		char c /*= '\0'*/;
+
+		switch (node.children.size())
+		{
+			case 0:
+			{
+				// simple char
+				if (unlikely(node.text.size() != 3)) // 'X'
+					return (ice(node) << "invalid char node");
+				c = node.text[1];
+				break;
+			}
+			case 1:
+			{
+				auto& extended = *(node.children[0]);
+				switch (extended.rule)
+				{
+					case AST::rgCharExtended:
+					{
+						if (extended.text.size() == 1)
+						{
+							char extC;
+							if (not convertCharExtended(extC, extended.text[0]))
+								return (error(extended) << "invalid escaped character '\\" << extended.text << '\'');
+							c = extC;
+						}
+						else
+						{
+							error(extended) << "invalid escaped character '\\" << extended.text << '\'';
+							return false;
+						}
+						break;
+					}
+					default:
+						return unexpectedNode(node, "[char/extended]");
+				}
+				break;
+			}
+			default:
+				return unexpectedNode(node, "[char]");
+		}
+
+		if (!context.reuse.ascii.node)
+			context.prepareReuseForAsciis();
+
+		uint32_t hardcodedlvid = createLocalBuiltinInt64(node, nyt_u8, static_cast<uint8_t>(c));
+		ShortString16 lvidstr;
+		lvidstr = hardcodedlvid;
+		context.reuse.ascii.lvidnode->text = lvidstr;
+
+		bool success = visitASTExprNew(*(context.reuse.ascii.node), localvar);
+
+		// avoid crap in the debugger
+		context.reuse.ascii.lvidnode->text.clear();
+		return success;
+	}
+
+
 	bool Scope::visitASTExprStringLiteral(const AST::Node& node, LVID& localvar)
 	{
 		// when called, this rule represents an internal cstring
-		// thus, this function is not called by an user-defined string
+		// thus, this function can not be called by an user-defined string
 		emitDebugpos(node);
 		localvar = sequence().emitStackallocText(nextvar(), node.text);
 		return true;
@@ -42,18 +129,8 @@ namespace Producer
 
 		// create a string object
 		if (!context.reuse.string.createObject)
-		{
-			// new (+2)
-			//     type-decl
-			//     |   identifier: string
-			auto& cache = context.reuse.string;
-			cache.createObject = new AST::Node{AST::rgNew};
-			AST::Node::Ptr typeDecl = new AST::Node{AST::rgTypeDecl};
-			cache.createObject->children.push_back(typeDecl);
-			AST::Node::Ptr classname = new AST::Node{AST::rgIdentifier};
-			typeDecl->children.push_back(classname);
-			classname->text = "string";
-		}
+			context.prepareReuseForStrings();
+
 		bool success = visitASTExprNew(*(context.reuse.string.createObject), localvar);
 		if (unlikely(not success))
 			return false;
@@ -136,20 +213,10 @@ namespace Producer
 
 					if (child.text.size() == 1)
 					{
-						switch (child.text[0])
-						{
-							case 'r':  context.reuse.string.text += '\r'; break;
-							case 'n':  context.reuse.string.text += '\n'; break;
-							case 't':  context.reuse.string.text += '\t'; break;
-							case 'v':  context.reuse.string.text += '\v'; break;
-							case '\\': context.reuse.string.text += '\\'; break;
-							case '"':  context.reuse.string.text += '"'; break;
-							case 'a':  context.reuse.string.text += '\a'; break;
-							case 'b':  context.reuse.string.text += '\b'; break;
-							case 'f':  context.reuse.string.text += '\f'; break;
-							case 'c':  /* produce no further output */ break;
-							default: error(child) << "invalid escaped character '\\" << child.text << '\''; return false;
-						}
+						char c;
+						if (not convertCharExtended(c, child.text[0]))
+							return (error(child) << "invalid escaped character '\\" << child.text << '\'');
+						context.reuse.string.text += c;
 					}
 					else
 					{

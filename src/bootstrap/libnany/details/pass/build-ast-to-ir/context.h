@@ -57,6 +57,10 @@ namespace Producer
 
 		//! \name Reuse nodes
 		//@{
+		//! re-use objects for string declaration
+		void prepareReuseForStrings();
+		//! re-use objects for ascii
+		void prepareReuseForAsciis();
 		//! re-use objects for classes (ctor)
 		void prepareReuseForClasses();
 		//! re-use objects for literals
@@ -92,8 +96,8 @@ namespace Producer
 		struct {
 			struct {
 				AST::Node::Ptr node;
-				AST::Node::Ptr classname;
-				AST::Node::Ptr lvidnode;
+				AST::Node* classname = nullptr;
+				AST::Node* lvidnode = nullptr;
 			}
 			literal;
 
@@ -102,6 +106,12 @@ namespace Producer
 				YString text;
 			}
 			string;
+
+			struct {
+				AST::Node::Ptr node;
+				AST::Node* lvidnode = nullptr;
+			}
+			ascii;
 
 			struct {
 				AST::Node::Ptr node;

@@ -197,12 +197,10 @@ namespace Producer
 			context.reuse.literal.lvidnode->text = lvidstr;
 
 			bool success = visitASTExprNew(*(context.reuse.literal.node), localvar);
-			//if (debugmode)
-			//{
-			//	// to not print invalid data in the debugger
-			//	context.reuse.literal.classname->text.clear();
-			//	context.reuse.literal.lvidnode->text.clear();
-			//}
+
+			// avoid crap in the debugger
+			context.reuse.literal.classname->text.clear();
+			context.reuse.literal.lvidnode->text.clear();
 			return success;
 		}
 	}

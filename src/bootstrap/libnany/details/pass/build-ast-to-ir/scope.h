@@ -112,6 +112,7 @@ namespace Producer
 		bool visitASTExprNumber(const AST::Node&, LVID& localvar);
 		bool visitASTExprString(const AST::Node&, LVID& localvar);
 		bool visitASTExprStringLiteral(const AST::Node&, LVID& localvar);
+		bool visitASTExprChar(const AST::Node&, LVID& localvar);
 		bool visitASTExprNew(const AST::Node&, LVID& localvar);
 		bool visitASTExprTypeDecl(const AST::Node&, LVID& localvar);
 		bool visitASTExprTypeof(const AST::Node&, LVID& localvar);

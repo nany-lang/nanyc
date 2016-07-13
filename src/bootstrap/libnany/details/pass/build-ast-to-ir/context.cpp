@@ -97,6 +97,21 @@ namespace Producer
 	}
 
 
+	void Context::prepareReuseForStrings()
+	{
+		// new (+2)
+		//     type-decl
+		//     |   identifier: string
+		auto& cache = reuse.string;
+		cache.createObject = new AST::Node{AST::rgNew};
+		AST::Node::Ptr typeDecl = new AST::Node{AST::rgTypeDecl};
+		cache.createObject->children.push_back(typeDecl);
+		AST::Node::Ptr classname = new AST::Node{AST::rgIdentifier};
+		typeDecl->children.push_back(classname);
+		classname->text = "string";
+	}
+
+
 	void Context::prepareReuseForLiterals()
 	{
 		// new (+2)
@@ -108,21 +123,41 @@ namespace Producer
 		//				 register: <lvid>
 
 		auto& cache = reuse.literal;
-
 		cache.node = new AST::Node{AST::rgNew};
-		AST::Node::Ptr typeDecl = new AST::Node{AST::rgTypeDecl};
-		cache.node->children.push_back(typeDecl);
-		cache.classname = new AST::Node{AST::rgIdentifier};
-		typeDecl->children.push_back(cache.classname);
 
-		AST::Node::Ptr call = new AST::Node{AST::rgCall};
-		cache.node->children.push_back(call);
-		AST::Node::Ptr callParam = new AST::Node{AST::rgCallParameter};
-		call->children.push_back(callParam);
-		AST::Node::Ptr expr = new AST::Node{AST::rgExpr};
-		callParam->children.push_back(expr);
-		cache.lvidnode = new AST::Node{AST::rgRegister};
-		expr->children.push_back(cache.lvidnode);
+		auto& identifier = cache.node->append(AST::rgTypeDecl, AST::rgIdentifier);
+		cache.classname = &identifier;
+
+		auto& expr = cache.node->append(AST::rgCall, AST::rgCallParameter, AST::rgExpr);
+		auto& reg  = expr.append(AST::rgRegister);
+		cache.lvidnode = &reg;
+	}
+
+
+	void Context::prepareReuseForAsciis()
+	{
+		// new (+2)
+		//	 type-decl
+		//	 |   identifier: std
+		//   |   type-sub-dot
+		//   |       identifier Ascii
+		//	 call (+3)
+		//		 call-parameter
+		//			 expr
+		//				 register: <lvid>
+
+		auto& cache = reuse.ascii;
+		cache.node = new AST::Node{AST::rgNew};
+
+		auto& typedecl = cache.node->append(AST::rgTypeDecl);
+		auto& identifier = typedecl.append(AST::rgIdentifier);
+		identifier.text = "std";
+		auto& classname = typedecl.append(AST::rgTypeSubDot, AST::rgIdentifier);
+		classname.text = "Ascii";
+
+		auto& expr = cache.node->append(AST::rgCall, AST::rgCallParameter, AST::rgExpr);
+		auto& reg  = expr.append(AST::rgRegister);
+		cache.lvidnode = &reg;
 	}
 
 

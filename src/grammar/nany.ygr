@@ -334,7 +334,7 @@ string-interpolation: notext
 	tk-string-var-open wp (expr wp)?  tk-string-var-close
 
 char-value: hidden
-	| [^\\"\n]
+	| [^\\\n\t]
 	| ('\\' char-extended)
 
 string-literal:
