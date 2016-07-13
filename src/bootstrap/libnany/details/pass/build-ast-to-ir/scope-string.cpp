@@ -90,7 +90,7 @@ namespace Producer
 		if (!context.reuse.ascii.node)
 			context.prepareReuseForAsciis();
 
-		uint32_t hardcodedlvid = createLocalBuiltinInt64(node, nyt_u8, static_cast<uint8_t>(c));
+		uint32_t hardcodedlvid = createLocalBuiltinInt(node, nyt_u8, static_cast<uint8_t>(c));
 		ShortString16 lvidstr;
 		lvidstr = hardcodedlvid;
 		context.reuse.ascii.lvidnode->text = lvidstr;

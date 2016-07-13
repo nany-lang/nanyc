@@ -165,7 +165,7 @@ namespace Producer
 				}
 			}
 
-			hardcodedlvid = createLocalBuiltinInt64(node, type, numdef.part1);
+			hardcodedlvid = createLocalBuiltinInt(node, type, numdef.part1);
 		}
 		else
 		{
@@ -177,7 +177,7 @@ namespace Producer
 			type = (numdef.bits == 32) ? nyt_f32 : nyt_f64;
 			if (not BuiltinT)
 				cn.adapt((numdef.bits == 32) ? "f32" : "f64", 3);
-			hardcodedlvid = createLocalBuiltinFloat64(node, type, value);
+			hardcodedlvid = createLocalBuiltinFloat(node, type, value);
 		}
 
 		if (BuiltinT)

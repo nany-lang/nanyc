@@ -135,9 +135,9 @@ namespace Producer
 		//! \name Typeinfo / variables
 		//@{
 		//! Create a new local builtin float
-		LVID createLocalBuiltinFloat64(const AST::Node&, nytype_t type, double value);
+		LVID createLocalBuiltinFloat(const AST::Node&, nytype_t, double value);
 		//! Create a new local builtin integer
-		LVID createLocalBuiltinInt64(const AST::Node&, nytype_t type, yuint64 value);
+		LVID createLocalBuiltinInt(const AST::Node&, nytype_t, yuint64 value);
 		//! Create a new local builtin 'void'
 		LVID createLocalBuiltinVoid(const AST::Node&);
 		//! Create a new local variable 'any'

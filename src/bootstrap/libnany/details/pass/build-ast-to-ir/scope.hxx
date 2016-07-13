@@ -128,14 +128,14 @@ namespace Producer
 	}
 
 
-	inline LVID Scope::createLocalBuiltinFloat64(const AST::Node& node, nytype_t type, double value)
+	inline LVID Scope::createLocalBuiltinFloat(const AST::Node& node, nytype_t type, double value)
 	{
 		emitDebugpos(node);
 		return context.sequence.emitStackalloc_f64(nextvar(), type, value);
 	}
 
 
-	inline LVID Scope::createLocalBuiltinInt64(const AST::Node& node, nytype_t type, yuint64 value)
+	inline LVID Scope::createLocalBuiltinInt(const AST::Node& node, nytype_t type, yuint64 value)
 	{
 		emitDebugpos(node);
 		return context.sequence.emitStackalloc_u64(nextvar(), type, value);
