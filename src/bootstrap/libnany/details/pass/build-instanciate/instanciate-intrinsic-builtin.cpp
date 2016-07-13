@@ -269,7 +269,6 @@ namespace Instanciate
 			return true;
 		}
 
-
 		static bool intrinsicMemGetU64(SequenceBuilder& seq, uint32_t lvid)
 		{
 			seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_u64);
@@ -277,7 +276,7 @@ namespace Instanciate
 			uint32_t ptrlvid = seq.pushedparams.func.indexed[0].lvid;
 			auto& cdef = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, ptrlvid});
 			if (unlikely(not cdef.isRawPointer()))
-				return seq.complainIntrinsicParameter("loadu64", 0, cdef, "'__pointer'");
+				return seq.complainIntrinsicParameter("load.u64", 0, cdef, "'__pointer'");
 
 			if (seq.canGenerateCode())
 				seq.out.emitLoadU64(lvid, ptrlvid);
@@ -291,7 +290,7 @@ namespace Instanciate
 			uint32_t ptrlvid = seq.pushedparams.func.indexed[0].lvid;
 			auto& cdef = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, ptrlvid});
 			if (unlikely(not cdef.isRawPointer()))
-				return seq.complainIntrinsicParameter("loadu32", 0, cdef, "'__pointer'");
+				return seq.complainIntrinsicParameter("load.u32", 0, cdef, "'__pointer'");
 
 			if (seq.canGenerateCode())
 				seq.out.emitLoadU32(lvid, ptrlvid);
@@ -305,7 +304,7 @@ namespace Instanciate
 			uint32_t ptrlvid = seq.pushedparams.func.indexed[0].lvid;
 			auto& cdef = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, ptrlvid});
 			if (unlikely(not cdef.isRawPointer()))
-				return seq.complainIntrinsicParameter("loadu8", 0, cdef, "'__pointer'");
+				return seq.complainIntrinsicParameter("load.u8", 0, cdef, "'__pointer'");
 
 			if (seq.canGenerateCode())
 				seq.out.emitLoadU8(lvid, ptrlvid);
@@ -319,7 +318,7 @@ namespace Instanciate
 			uint32_t ptrlvid = seq.pushedparams.func.indexed[0].lvid;
 			auto& cdef = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, ptrlvid});
 			if (unlikely(not cdef.isRawPointer()))
-				return seq.complainIntrinsicParameter("loadptr", 0, cdef, "'__pointer'");
+				return seq.complainIntrinsicParameter("load.ptr", 0, cdef, "'__pointer'");
 
 			if (seq.canGenerateCode())
 			{
@@ -338,12 +337,12 @@ namespace Instanciate
 			uint32_t ptrlvid = seq.pushedparams.func.indexed[0].lvid;
 			auto& cdef = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, ptrlvid});
 			if (unlikely(not cdef.isRawPointer()))
-				return seq.complainIntrinsicParameter("storeu64", 0, cdef, "'__pointer'");
+				return seq.complainIntrinsicParameter("store.u64", 0, cdef, "'__pointer'");
 
 			uint32_t value = seq.pushedparams.func.indexed[1].lvid;
-			auto& cdefvalue = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, ptrlvid});
+			auto& cdefvalue = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, value});
 			if (unlikely(not cdefvalue.isBuiltinU64()))
-				return seq.complainIntrinsicParameter("storeu64", 1, cdefvalue, "'__u64'");
+				return seq.complainIntrinsicParameter("store.u64", 1, cdefvalue, "'__u64'");
 
 			if (seq.canGenerateCode())
 				seq.out.emitStoreU64(value, ptrlvid);
@@ -357,12 +356,12 @@ namespace Instanciate
 			uint32_t ptrlvid = seq.pushedparams.func.indexed[0].lvid;
 			auto& cdef = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, ptrlvid});
 			if (unlikely(not cdef.isRawPointer()))
-				return seq.complainIntrinsicParameter("storeu32", 0, cdef, "'__pointer'");
+				return seq.complainIntrinsicParameter("store.u32", 0, cdef, "'__pointer'");
 
 			uint32_t value = seq.pushedparams.func.indexed[1].lvid;
-			auto& cdefvalue = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, ptrlvid});
+			auto& cdefvalue = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, value});
 			if (unlikely(not cdefvalue.isBuiltinU32()))
-				return seq.complainIntrinsicParameter("storeu32", 1, cdefvalue, "'__u32'");
+				return seq.complainIntrinsicParameter("store.u32", 1, cdefvalue, "'__u32'");
 
 			if (seq.canGenerateCode())
 				seq.out.emitStoreU32(value, ptrlvid);
@@ -376,12 +375,12 @@ namespace Instanciate
 			uint32_t ptrlvid = seq.pushedparams.func.indexed[0].lvid;
 			auto& cdef = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, ptrlvid});
 			if (unlikely(not cdef.isRawPointer()))
-				return seq.complainIntrinsicParameter("storeu32", 0, cdef, "'__pointer'");
+				return seq.complainIntrinsicParameter("store.u8", 0, cdef, "'__pointer'");
 
 			uint32_t value = seq.pushedparams.func.indexed[1].lvid;
-			auto& cdefvalue = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, ptrlvid});
-			if (unlikely(not cdefvalue.isBuiltinU32()))
-				return seq.complainIntrinsicParameter("storeu8", 1, cdefvalue, "'__u8'");
+			auto& cdefvalue = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, value});
+			if (unlikely(not cdefvalue.isBuiltinU8()))
+				return seq.complainIntrinsicParameter("store.u8", 1, cdefvalue, "'__u8'");
 
 			if (seq.canGenerateCode())
 				seq.out.emitStoreU8(value, ptrlvid);
@@ -399,7 +398,7 @@ namespace Instanciate
 				return seq.complainIntrinsicParameter("storeptr", 0, cdef, "'__pointer'");
 
 			uint32_t value = seq.pushedparams.func.indexed[1].lvid;
-			auto& cdefvalue = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, ptrlvid});
+			auto& cdefvalue = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, value});
 			if (unlikely(not cdefvalue.isRawPointer()))
 				return seq.complainIntrinsicParameter("storeptr", 1, cdefvalue, "'__pointer'");
 
