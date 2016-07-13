@@ -784,6 +784,14 @@ namespace ISA
 		uint32_t ptrlvid;
 		template<class T> void eachLVID(T& c) { c(lvid, ptrlvid); }
 	};
+	template<> struct Operand<Nany::IR::ISA::Op::load_u8> final
+	{
+		constexpr static const char* opname() { return "load_u8"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		uint32_t ptrlvid;
+		template<class T> void eachLVID(T& c) { c(lvid, ptrlvid); }
+	};
 
 	template<> struct Operand<Nany::IR::ISA::Op::store_u64> final
 	{
@@ -796,6 +804,14 @@ namespace ISA
 	template<> struct Operand<Nany::IR::ISA::Op::store_u32> final
 	{
 		constexpr static const char* opname() { return "store_u32"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		uint32_t ptrlvid;
+		template<class T> void eachLVID(T& c) { c(lvid, ptrlvid); }
+	};
+	template<> struct Operand<Nany::IR::ISA::Op::store_u8> final
+	{
+		constexpr static const char* opname() { return "store_u8"; }
 		uint32_t opcode;
 		uint32_t lvid;
 		uint32_t ptrlvid;

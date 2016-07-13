@@ -829,6 +829,12 @@ namespace IR
 		opr.lvid    = lvid;
 		opr.ptrlvid = addr;
 	}
+	inline void Sequence::emitLoadU8(uint32_t lvid, uint32_t addr)
+	{
+		auto& opr   = emit<ISA::Op::load_u8>();
+		opr.lvid    = lvid;
+		opr.ptrlvid = addr;
+	}
 
 	inline void Sequence::emitStoreU64(uint32_t lvid, uint32_t addr)
 	{
@@ -839,6 +845,12 @@ namespace IR
 	inline void Sequence::emitStoreU32(uint32_t lvid, uint32_t addr)
 	{
 		auto& opr   = emit<ISA::Op::store_u32>();
+		opr.lvid    = lvid;
+		opr.ptrlvid = addr;
+	}
+	inline void Sequence::emitStoreU8(uint32_t lvid, uint32_t addr)
+	{
+		auto& opr   = emit<ISA::Op::store_u8>();
 		opr.lvid    = lvid;
 		opr.ptrlvid = addr;
 	}

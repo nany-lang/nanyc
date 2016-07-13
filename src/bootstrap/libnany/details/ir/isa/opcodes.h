@@ -136,14 +136,18 @@ namespace ISA //!< Instruction Set Architecture
 		memfill,
 		//! Memcopy
 		memcopy,
-		//! Read a 64bits from memory
+		//! Read 64bits from memory
 		load_u64,
-		//! Read a 32bits from emmory
+		//! Read 32bits from emmory
 		load_u32,
-		//! Write a 64bits in memory
+		//! Read 8bits from emmory
+		load_u8,
+		//! Write 64bits into memory
 		store_u64,
-		//! Write a 32bits in memory
+		//! Write 32bits into memory
 		store_u32,
+		//! Write 8bits into memory
+		store_u8,
 
 		//! label
 		label,
@@ -278,8 +282,10 @@ namespace ISA //!< Instruction Set Architecture
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::memcopy) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::load_u64) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::load_u32) \
+				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::load_u8) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::store_u64) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::store_u32) \
+				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::store_u8) \
 				\
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::label) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::opassert) \

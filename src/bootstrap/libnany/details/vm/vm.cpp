@@ -985,6 +985,13 @@ namespace VM
 				ASSERT_LVID(opr.ptrlvid);
 				registers[opr.lvid].u64 = *(reinterpret_cast<uint32_t*>(registers[opr.ptrlvid].u64));
 			}
+			void visit(const IR::ISA::Operand<IR::ISA::Op::load_u8>& opr)
+			{
+				VM_PRINT_OPCODE(opr);
+				ASSERT_LVID(opr.lvid);
+				ASSERT_LVID(opr.ptrlvid);
+				registers[opr.lvid].u64 = *(reinterpret_cast<uint8_t*>(registers[opr.ptrlvid].u64));
+			}
 
 			void visit(const IR::ISA::Operand<IR::ISA::Op::store_u64>& opr)
 			{
@@ -999,6 +1006,13 @@ namespace VM
 				ASSERT_LVID(opr.lvid);
 				ASSERT_LVID(opr.ptrlvid);
 				*(reinterpret_cast<uint32_t*>(registers[opr.ptrlvid].u64)) = static_cast<uint32_t>(registers[opr.lvid].u64);
+			}
+			void visit(const IR::ISA::Operand<IR::ISA::Op::store_u8>& opr)
+			{
+				VM_PRINT_OPCODE(opr);
+				ASSERT_LVID(opr.lvid);
+				ASSERT_LVID(opr.ptrlvid);
+				*(reinterpret_cast<uint8_t*>(registers[opr.ptrlvid].u64)) = static_cast<uint8_t>(registers[opr.lvid].u64);
 			}
 
 

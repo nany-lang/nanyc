@@ -535,14 +535,26 @@ namespace // anonymous
 			line() << '%' << operands.lvid << " = load __u32 %" << operands.ptrlvid;
 		}
 
+		void print(const Operand<Op::load_u8>& operands)
+		{
+			line() << '%' << operands.lvid << " = load __u8 %" << operands.ptrlvid;
+		}
+
 		void print(const Operand<Op::store_u64>& operands)
 		{
 			line() << "store __u64 %" << operands.ptrlvid << " = %" << operands.lvid;
 		}
+
 		void print(const Operand<Op::store_u32>& operands)
 		{
 			line() << "store __u32 %" << operands.ptrlvid << " = %" << operands.lvid;
 		}
+
+		void print(const Operand<Op::store_u8>& operands)
+		{
+			line() << "store __u8 %" << operands.ptrlvid << " = %" << operands.lvid;
+		}
+
 
 		void print(const Operand<Op::memrealloc>& operands)
 		{

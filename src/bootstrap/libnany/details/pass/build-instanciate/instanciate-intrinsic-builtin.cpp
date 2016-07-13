@@ -298,6 +298,20 @@ namespace Instanciate
 			return true;
 		}
 
+		static bool intrinsicMemGetU8(SequenceBuilder& seq, uint32_t lvid)
+		{
+			seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_u8);
+
+			uint32_t ptrlvid = seq.pushedparams.func.indexed[0].lvid;
+			auto& cdef = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, ptrlvid});
+			if (unlikely(not cdef.isRawPointer()))
+				return seq.complainIntrinsicParameter("loadu8", 0, cdef, "'__pointer'");
+
+			if (seq.canGenerateCode())
+				seq.out.emitLoadU8(lvid, ptrlvid);
+			return true;
+		}
+
 		static bool intrinsicMemGetPTR(SequenceBuilder& seq, uint32_t lvid)
 		{
 			seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_ptr);
@@ -354,6 +368,26 @@ namespace Instanciate
 				seq.out.emitStoreU32(value, ptrlvid);
 			return true;
 		}
+
+		static bool intrinsicMemSetU8(SequenceBuilder& seq, uint32_t lvid)
+		{
+			seq.cdeftable.substitute(lvid).mutateToVoid();
+
+			uint32_t ptrlvid = seq.pushedparams.func.indexed[0].lvid;
+			auto& cdef = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, ptrlvid});
+			if (unlikely(not cdef.isRawPointer()))
+				return seq.complainIntrinsicParameter("storeu32", 0, cdef, "'__pointer'");
+
+			uint32_t value = seq.pushedparams.func.indexed[1].lvid;
+			auto& cdefvalue = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, ptrlvid});
+			if (unlikely(not cdefvalue.isBuiltinU32()))
+				return seq.complainIntrinsicParameter("storeu8", 1, cdefvalue, "'__u8'");
+
+			if (seq.canGenerateCode())
+				seq.out.emitStoreU8(value, ptrlvid);
+			return true;
+		}
+
 
 		static bool intrinsicMemSetPTR(SequenceBuilder& seq, uint32_t lvid)
 		{
@@ -899,9 +933,11 @@ namespace Instanciate
 			{"load.ptr",        { 1,  &intrinsicMemGetPTR,   }},
 			{"load.u64",        { 1,  &intrinsicMemGetU64,   }},
 			{"load.u32",        { 1,  &intrinsicMemGetU32,   }},
+			{"load.u8",         { 1,  &intrinsicMemGetU8,    }},
 			{"store.ptr",       { 2,  &intrinsicMemSetPTR,   }},
 			{"store.u64",       { 2,  &intrinsicMemSetU64,   }},
 			{"store.u32",       { 2,  &intrinsicMemSetU32,   }},
+			{"store.u8",        { 2,  &intrinsicMemSetU8,    }},
 			//
 			{"ref",             { 1,  &intrinsicRef,         }},
 			{"unref",           { 1,  &intrinsicUnref,       }},
