@@ -971,6 +971,20 @@ namespace VM
 				memcpy(object, src, size);
 			}
 
+			void visit(const IR::ISA::Operand<IR::ISA::Op::memmove>& opr)
+			{
+				VM_PRINT_OPCODE(opr);
+				ASSERT_LVID(opr.lvid);
+				ASSERT_LVID(opr.srclvid);
+				ASSERT_LVID(opr.regsize);
+
+				uint64_t* object = reinterpret_cast<uint64_t*>(registers[opr.lvid].u64);
+				uint64_t* src = reinterpret_cast<uint64_t*>(registers[opr.srclvid].u64);
+
+				size_t size = static_cast<size_t>(registers[opr.regsize].u64);
+				memmove(object, src, size);
+			}
+
 			void visit(const IR::ISA::Operand<IR::ISA::Op::load_u64>& opr)
 			{
 				VM_PRINT_OPCODE(opr);

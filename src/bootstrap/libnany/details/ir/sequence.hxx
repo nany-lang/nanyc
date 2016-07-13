@@ -817,6 +817,15 @@ namespace IR
 		operands.regsize = regsize;
 	}
 
+	inline void Sequence::emitMemMove(uint32_t lvid, uint32_t srclvid, uint32_t regsize)
+	{
+		auto& operands   = emit<ISA::Op::memmove>();
+		operands.lvid    = lvid;
+		operands.srclvid = srclvid;
+		operands.regsize = regsize;
+	}
+
+
 	inline void Sequence::emitLoadU64(uint32_t lvid, uint32_t addr)
 	{
 		auto& opr   = emit<ISA::Op::load_u64>();

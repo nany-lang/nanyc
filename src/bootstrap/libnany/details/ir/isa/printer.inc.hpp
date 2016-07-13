@@ -526,6 +526,13 @@ namespace // anonymous
 			out << ", size %" << operands.regsize << '}';
 		}
 
+		void print(const Operand<Op::memmove>& operands)
+		{
+			line() << "memory.move %" << operands.lvid << " from {%";
+			out << operands.srclvid;
+			out << ", size %" << operands.regsize << '}';
+		}
+
 		void print(const Operand<Op::load_u64>& operands)
 		{
 			line() << '%' << operands.lvid << " = load __u64 %" << operands.ptrlvid;
