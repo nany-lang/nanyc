@@ -277,6 +277,15 @@ namespace Instanciate
 		err.message.origins.location.filename   = currentFilename;
 		err.message.origins.location.pos.line   = element.line;
 		err.message.origins.location.pos.offset = element.offset;
+
+		uint32_t index = 0;
+		for (auto& p : pushedparams.func.indexed)
+		{
+			auto& cdef = cdeftable.classdef(CLID{frame->atomid, p.lvid});
+			auto h = (err.hint() << "received pushed parameter " << (++index) << " as '");
+			cdef.print(h, cdeftable);
+			h << '\'';
+		}
 		return false;
 	}
 
