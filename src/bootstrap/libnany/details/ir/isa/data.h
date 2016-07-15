@@ -724,9 +724,6 @@ namespace ISA
 
 
 
-
-
-
 	template<> struct Operand<Nany::IR::ISA::Op::memalloc> final
 	{
 		constexpr static const char* opname() { return "memalloc"; }
@@ -736,7 +733,6 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, regsize); }
 	};
 
-
 	template<> struct Operand<Nany::IR::ISA::Op::memfree> final
 	{
 		constexpr static const char* opname() { return "memfree"; }
@@ -745,7 +741,6 @@ namespace ISA
 		uint32_t regsize;
 		template<class T> void eachLVID(T& c) { c(lvid, regsize); }
 	};
-
 
 	template<> struct Operand<Nany::IR::ISA::Op::memfill> final
 	{
@@ -776,6 +771,17 @@ namespace ISA
 		uint32_t regsize;
 		template<class T> void eachLVID(T& c) { c(lvid, srclvid, regsize); }
 	};
+
+	template<> struct Operand<Nany::IR::ISA::Op::memcmp> final
+	{
+		constexpr static const char* opname() { return "memcmp"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		uint32_t srclvid;
+		uint32_t regsize; // and result as well
+		template<class T> void eachLVID(T& c) { c(lvid, srclvid, regsize); }
+	};
+
 
 
 	template<> struct Operand<Nany::IR::ISA::Op::load_u64> final

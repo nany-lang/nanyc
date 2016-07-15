@@ -170,6 +170,8 @@ namespace IR
 		void emitMemCopy(uint32_t lvid, uint32_t srclvid, uint32_t regsize);
 		//! Emit a memmove
 		void emitMemMove(uint32_t lvid, uint32_t srclvid, uint32_t regsize);
+		//! Emit a memcmp
+		void emitMemCmp(uint32_t lvid, uint32_t srclvid, uint32_t regsize);
 		//! Emit a memrealloc
 		void emitMemrealloc(uint32_t lvid, uint32_t oldsize,uint32_t newsize);
 

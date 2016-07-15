@@ -985,6 +985,21 @@ namespace VM
 				memmove(object, src, size);
 			}
 
+			void visit(const IR::ISA::Operand<IR::ISA::Op::memcmp>& opr)
+			{
+				VM_PRINT_OPCODE(opr);
+				ASSERT_LVID(opr.lvid);
+				ASSERT_LVID(opr.srclvid);
+				ASSERT_LVID(opr.regsize);
+
+				uint64_t* object = reinterpret_cast<uint64_t*>(registers[opr.lvid].u64);
+				uint64_t* src = reinterpret_cast<uint64_t*>(registers[opr.srclvid].u64);
+
+				size_t size = static_cast<size_t>(registers[opr.regsize].u64);
+				int cmp = memcmp(object, src, size);
+				registers[opr.regsize].u64 = (cmp == 0) ? 0 : ((cmp < 0) ? 2 : 1);
+			}
+
 			void visit(const IR::ISA::Operand<IR::ISA::Op::load_u64>& opr)
 			{
 				VM_PRINT_OPCODE(opr);

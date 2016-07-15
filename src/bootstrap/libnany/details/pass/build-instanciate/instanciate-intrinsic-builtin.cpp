@@ -293,6 +293,34 @@ namespace Instanciate
 			return true;
 		}
 
+		static bool intrinsicMemCmp(SequenceBuilder& seq, uint32_t lvid)
+		{
+			seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_u64);
+
+			uint32_t objlvid = seq.pushedparams.func.indexed[0].lvid;
+			auto& cdef = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, objlvid});
+			if (unlikely(not cdef.isRawPointer()))
+				return seq.complainIntrinsicParameter("memory.cmp", 0, cdef, "'__pointer'");
+
+			uint32_t src = seq.pushedparams.func.indexed[1].lvid;
+			auto& cdefsrc = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, src});
+			if (unlikely(not cdefsrc.isRawPointer()))
+				return seq.complainIntrinsicParameter("memory.cmp", 1, cdef, "'__pointer'");
+
+			uint32_t size = seq.pushedparams.func.indexed[2].lvid;
+			auto& cdefsize = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, size});
+			if (unlikely(not cdefsize.isBuiltinU64()))
+				return seq.complainIntrinsicParameter("memory.cmp", 2, cdef, "'__u64'");
+
+			if (seq.canGenerateCode())
+			{
+				seq.out.emitStore(lvid, size);
+				seq.out.emitMemCmp(objlvid, src, lvid);
+			}
+			return true;
+		}
+
+
 		static bool intrinsicMemGetU64(SequenceBuilder& seq, uint32_t lvid)
 		{
 			seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_u64);
@@ -954,6 +982,7 @@ namespace Instanciate
 			{"memory.fill",     { 3,  &intrinsicMemfill,     }},
 			{"memory.copy",     { 3,  &intrinsicMemCopy,     }},
 			{"memory.move",     { 3,  &intrinsicMemMove,     }},
+			{"memory.cmp",      { 3,  &intrinsicMemCmp,      }},
 			{"load.ptr",        { 1,  &intrinsicMemGetPTR,   }},
 			{"load.u64",        { 1,  &intrinsicMemGetU64,   }},
 			{"load.u32",        { 1,  &intrinsicMemGetU32,   }},
