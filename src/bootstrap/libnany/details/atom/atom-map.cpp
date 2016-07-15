@@ -19,9 +19,9 @@ namespace Nany
 	}
 
 
-	Atom* AtomMap::createNewAtom(Atom::Type type, Atom& root, const AnyString& name)
+	Atom* AtomMap::createNewAtom(Atom::Type type, Atom& parent, const AnyString& name)
 	{
-		auto* newnode   = new Atom(root, stringrefs.refstr(name), type);
+		auto* newnode   = new Atom(parent, stringrefs.refstr(name), type);
 		newnode->atomid = ++pAtomGrpID;
 		pByIndex.emplace_back(newnode);
 		return newnode;

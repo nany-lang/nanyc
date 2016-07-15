@@ -26,32 +26,32 @@ namespace Nany
 		/*!
 		** \brief Create a new atom related to a part of a namespace
 		*/
-		Atom* createNamespace(Atom& root, const AnyString& name);
+		Atom* createNamespace(Atom& parent, const AnyString& name);
 
 		/*!
 		** \brief Create a new atom related to a function
 		*/
-		Atom* createFuncdef(Atom& root, const AnyString& name);
+		Atom* createFuncdef(Atom& parent, const AnyString& name);
 
 		/*!
 		** \brief Create a new atom related to a class
 		*/
-		Atom* createClassdef(Atom& root, const AnyString& name);
+		Atom* createClassdef(Atom& parent, const AnyString& name);
 
 		/*!
 		** \brief Create a new atom related to a variable
 		*/
-		Atom* createVardef(Atom& root, const AnyString& name);
+		Atom* createVardef(Atom& parent, const AnyString& name);
 
 		/*!
 		** \brief Create a new atom related to a type alias
 		*/
-		Atom* createTypealias(Atom& root, const AnyString& name);
+		Atom* createTypealias(Atom& parent, const AnyString& name);
 
 		/*!
 		** \brief Create a new atom related to an unit (source file)
 		*/
-		Atom* createUnit(Atom& root, const AnyString& name);
+		Atom* createUnit(Atom& parent, const AnyString& name);
 
 
 		/*
