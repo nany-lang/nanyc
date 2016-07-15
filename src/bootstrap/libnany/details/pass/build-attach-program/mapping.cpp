@@ -242,9 +242,16 @@ namespace Mapping
 				lastPushedNamedParameters.clear();
 				lastPushedIndexedParameters.clear();
 
+				bool isGlobalOperator = (atom.type == Atom::Type::namespacedef)
+					and funcname[0] == '^' and (not funcname.startsWith("^view^"));
+
+				auto& parentAtom = (not isGlobalOperator)
+					? atom
+					: cdeftable.atoms.root;
+
 				MutexLocker locker{mutex};
 				// create a new atom in the global type table
-				auto* newatom = cdeftable.atoms.createFuncdef(atom, funcname);
+				auto* newatom = cdeftable.atoms.createFuncdef(parentAtom, funcname);
 				assert(newatom != nullptr);
 				newatom->opcodes.sequence  = &currentSequence;
 				newatom->opcodes.offset   = currentSequence.offsetOf(operands);
@@ -255,6 +262,9 @@ namespace Mapping
 
 				// return type
 				newatom->returnType.clid.reclass(newatom->atomid, 1);
+				// scope resolution
+				if (parentAtom.atomid != atom.atomid)
+					newatom->scopeForNameResolution = &atom;
 
 				// requires additional information
 				needAtomDbgFileReport = true;
@@ -262,10 +272,13 @@ namespace Mapping
 				pushNewFrame(*newatom);
 
 				// capture unknown variables ?
-				if (newatom->isClassMember() and newatom->parent->flags(Atom::Flags::captureVariables))
+				if (not isGlobalOperator)
 				{
-					atomStack->capture.enabled(newatom->parent);
-					newatom->flags += Atom::Flags::captureVariables;
+					if (newatom->isClassMember() and newatom->parent->flags(Atom::Flags::captureVariables))
+					{
+						atomStack->capture.enabled(newatom->parent);
+						newatom->flags += Atom::Flags::captureVariables;
+					}
 				}
 
 				if (!firstAtomCreated)
