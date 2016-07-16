@@ -75,7 +75,13 @@ namespace Producer
 		else
 			context.reuse.closure.rettype->children.clear();
 
-		return visitASTExpr(expr, localvar);
+		bool success = visitASTExpr(expr, localvar);
+
+		// avoid crap in the debugger
+		context.reuse.closure.params->children.clear();
+		context.reuse.closure.rettype->children.clear();
+		targetBody.children.clear();
+		return success;
 	}
 
 
