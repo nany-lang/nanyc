@@ -20,6 +20,7 @@ namespace Producer
 		// lvid representing the input container
 		AST::Node* container = nullptr;
 		AST::Node* predicate = nullptr;
+		AnyString requestedViewName = "default";
 
 		for (auto& childptr: node.children)
 		{
@@ -50,6 +51,25 @@ namespace Producer
 					break;
 				}
 
+				case AST::rgInViewName:
+				{
+					for (auto& ptr: child.children)
+					{
+						auto& vnnode = *ptr;
+						switch (vnnode.rule)
+						{
+							case AST::rgIdentifier:
+							{
+								requestedViewName = vnnode.text;
+								break;
+							}
+							default:
+								return unexpectedNode(child, "[expr/in/view-name]");
+						}
+					}
+					break;
+				}
+
 				case AST::rgInPredicate:
 				{
 					if (unlikely(child.children.size() != 1))
@@ -72,9 +92,12 @@ namespace Producer
 		if (!context.reuse.inset.node)
 			context.prepareReuseForIn();
 
+		ShortString128 viewname;
+		viewname << "^view^" << requestedViewName;
+
 		context.reuse.inset.container->children.clear();
 		context.reuse.inset.container->children.push_back(container);
-		context.reuse.inset.viewname->text = "^view^default";
+		context.reuse.inset.viewname->text = viewname;
 
 		if (elementname.empty())
 			elementname << "%vr" << nextvar();
@@ -86,7 +109,12 @@ namespace Producer
 		context.reuse.inset.predicate->children.push_back(predicate);
 
 		emitDebugpos(node);
-		return visitASTExpr(*context.reuse.inset.node, localvar);
+		bool success = visitASTExpr(*context.reuse.inset.node, localvar);
+
+		// avoid crap in the debugger
+		context.reuse.inset.elementname->text.clear();
+		context.reuse.inset.viewname->text.clear();
+		return success;
 	}
 
 

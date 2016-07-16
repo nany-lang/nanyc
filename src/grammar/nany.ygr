@@ -726,11 +726,14 @@ in-container: notext
 	| (tk-parenthese-open wp expr-group wp tk-parenthese-close)
 	| expr-value // to reduce the priority of 'each i in ...'
 
+in-view-name: notext
+	':' wp identifier (wp call)?
+
 in-predicate: notext
 	tk-pipe wp expr
 
 in: important, notext
-	(tk-in | (in-vars wp tk-in)) in-container (wp in-predicate)?
+	(tk-in | (in-vars wp tk-in)) in-container (wp in-view-name)? (wp in-predicate)?
 
 each: important, notext
 	tk-each in
