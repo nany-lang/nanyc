@@ -134,7 +134,9 @@ namespace Producer
 			operatorClone;
 
 			struct {
-				AST::Node::Ptr node;
+				AST::Node::Ptr node; // expr
+				AST::Node* func = nullptr;
+				AST::Node* classdef = nullptr;
 				AST::Node* funcbody = nullptr;
 				AST::Node* params = nullptr;
 				AST::Node* rettype = nullptr;

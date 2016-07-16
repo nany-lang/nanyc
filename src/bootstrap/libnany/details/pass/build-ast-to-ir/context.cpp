@@ -248,6 +248,9 @@ namespace Producer
 
 		auto& func = bodyValue.append(AST::rgFunction);
 
+		reuse.closure.classdef = &nclass;
+		reuse.closure.func = &func;
+
 		auto& funcname =
 			func.append(AST::rgFunctionKind, AST::rgFunctionKindOperator, AST::rgFunctionKindOpname);
 		funcname.text = "()";

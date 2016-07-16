@@ -75,6 +75,12 @@ namespace Producer
 		else
 			context.reuse.closure.rettype->children.clear();
 
+		// for debugging
+		context.reuse.closure.classdef->offset = node.offset;
+		context.reuse.closure.classdef->offsetEnd = node.offsetEnd;
+		context.reuse.closure.func->offset = node.offset;
+		context.reuse.closure.func->offsetEnd = node.offsetEnd;
+
 		bool success = visitASTExpr(expr, localvar);
 
 		// avoid crap in the debugger
