@@ -42,19 +42,19 @@ namespace Nany
 
 	void importNSLCoreString(IntrinsicTable& intrinsics)
 	{
-		intrinsics.add("nanyc.string.append.u8",   nanyc_string_append<uint8_t>);
-		intrinsics.add("nanyc.string.append.u16",  nanyc_string_append<uint16_t>);
-		intrinsics.add("nanyc.string.append.u32",  nanyc_string_append<uint32_t>);
-		intrinsics.add("nanyc.string.append.u64",  nanyc_string_append<uint64_t>);
-		intrinsics.add("nanyc.string.append.i8",   nanyc_string_append<int8_t>);
-		intrinsics.add("nanyc.string.append.i16",  nanyc_string_append<int16_t>);
-		intrinsics.add("nanyc.string.append.i32",  nanyc_string_append<int32_t>);
-		intrinsics.add("nanyc.string.append.i64",  nanyc_string_append<int64_t>);
-		intrinsics.add("nanyc.string.append.f32",  nanyc_string_append<float>);
-		intrinsics.add("nanyc.string.append.f64",  nanyc_string_append<double>);
-		intrinsics.add("nanyc.string.append.ptr",  nanyc_string_append_ptr);
+		intrinsics.add("__nanyc.string.append.u8",   nanyc_string_append<uint8_t>);
+		intrinsics.add("__nanyc.string.append.u16",  nanyc_string_append<uint16_t>);
+		intrinsics.add("__nanyc.string.append.u32",  nanyc_string_append<uint32_t>);
+		intrinsics.add("__nanyc.string.append.u64",  nanyc_string_append<uint64_t>);
+		intrinsics.add("__nanyc.string.append.i8",   nanyc_string_append<int8_t>);
+		intrinsics.add("__nanyc.string.append.i16",  nanyc_string_append<int16_t>);
+		intrinsics.add("__nanyc.string.append.i32",  nanyc_string_append<int32_t>);
+		intrinsics.add("__nanyc.string.append.i64",  nanyc_string_append<int64_t>);
+		intrinsics.add("__nanyc.string.append.f32",  nanyc_string_append<float>);
+		intrinsics.add("__nanyc.string.append.f64",  nanyc_string_append<double>);
+		intrinsics.add("__nanyc.string.append.ptr",  nanyc_string_append_ptr);
 
-		intrinsics.add("nanyc.cout", nanyc_cout);
+		intrinsics.add("__nanyc.cout", nanyc_cout);
 	}
 
 } // namespace Nany
