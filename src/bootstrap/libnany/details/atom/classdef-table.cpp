@@ -294,7 +294,7 @@ namespace Nany
 			Atom* atom = (this->classdef(CLID::AtomMapID(classdef.clid.atomid())).atom);
 			if (atom)
 			{
-				if (atom->nameLookupFromParent(funcdef.overloads.getList(), funcdef.name))
+				if (atom->nameLookupFromParentScope(funcdef.overloads.getList(), funcdef.name))
 				{
 					if (funcdef.overloads.size() == 1)
 					{

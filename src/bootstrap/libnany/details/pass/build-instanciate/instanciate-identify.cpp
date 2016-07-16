@@ -475,11 +475,11 @@ namespace Instanciate
 			{
 				if (not frame->atom.nameLookupOnChildren(multipleResults, name))
 				{
-					if (frame->atom.parent)
+					Atom* parentScope = frame->atom.parentScope();
+					if (parentScope)
 					{
-						auto& parent = *(frame->atom.parent);
-						if (not parent.nameLookupFromParent(multipleResults, name))
-							isProperty = tryFindProperties(operands, multipleResults, parent, name);
+						if (not parentScope->nameLookupFromParentScope(multipleResults, name))
+							isProperty = tryFindProperties(operands, multipleResults, *parentScope, name);
 					}
 				}
 			}

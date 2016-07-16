@@ -223,13 +223,23 @@ namespace Nany
 		bool canCaptureVariabes() const;
 
 		/*!
+		** \brief Get the parent scope
+		*/
+		Atom* parentScope();
+
+		/*!
+		** \brief Get the parent scope
+		*/
+		const Atom* parentScope() const;
+
+		/*!
 		** \brief Perform a name lookup from the local scope to the top root atom
 		**
 		** \param[in,out] list List where all matches will be added
 		** \param name The identifier name to find
 		** \return True if at least one overload has been found
 		*/
-		bool nameLookupFromParent(std::vector<std::reference_wrapper<Atom>>& list, const AnyString& name);
+		bool nameLookupFromParentScope(std::vector<std::reference_wrapper<Atom>>& list, const AnyString& name);
 
 		/*!
 		** \brief Perform a name lookup from the local scope only

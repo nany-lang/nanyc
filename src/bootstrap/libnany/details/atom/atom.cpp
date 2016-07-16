@@ -391,7 +391,7 @@ namespace Nany
 		assert(not name.empty());
 
 		// the current scope
-		Atom& scope = (nullptr == scopeForNameResolution) ? *this : *scopeForNameResolution;
+		Atom& scope = *this;
 		// shorthand for func call ?
 		bool isFuncCall = (name == "^()");
 
@@ -418,15 +418,15 @@ namespace Nany
 	}
 
 
-	bool Atom::nameLookupFromParent(std::vector<std::reference_wrapper<Atom>>& list, const AnyString& name)
+	bool Atom::nameLookupFromParentScope(std::vector<std::reference_wrapper<Atom>>& list, const AnyString& name)
 	{
 		assert(not name.empty());
 
 		// the current scope
-		Atom& scope = (nullptr == scopeForNameResolution) ? *this : *scopeForNameResolution;
+		Atom* scope = parentScope();
 
 		// rule: do not continue if there are some matches and if the scope is a class
-		// this is to avois spurious name resolution:
+		// this is to avoid spurious name resolution:
 		//
 		//     func foo() -> 42;
 		//
@@ -437,31 +437,28 @@ namespace Nany
 		//     }
 		//
 
-		if (scope.parent)
+		if (scope)
 		{
-			// should start from the very bottom
-			bool askToParentFirst = not scope.isClass();;
+			bool askToParentFirst = not this->isClass();
 			if (askToParentFirst)
 			{
-				if (scope.parent->nameLookupFromParent(list, name))
-					return true;
+				return // from the parent
+					(scope->nameLookupFromParentScope(list, name))
+					// or locally
+					or this->nameLookupOnChildren(list, name);
 			}
-
-			// try to resolve locally
-			bool found = scope.nameLookupOnChildren(list, name);
-
-			if (not found and (not askToParentFirst)) // try again
-				found = scope.parent->nameLookupFromParent(list, name);
-
-			return found;
+			else
+			{
+				// try to resolve locally
+				return this->nameLookupOnChildren(list, name)
+					or scope->nameLookupFromParentScope(list, name);
+			}
 		}
 		else
 		{
 			// try to resolve locally
-			return scope.nameLookupOnChildren(list, name);
+			return this->nameLookupOnChildren(list, name);
 		}
-
-		return false;
 	}
 
 
@@ -469,14 +466,11 @@ namespace Nany
 		const AnyString& prefix, const AnyString& name)
 	{
 		assert(not name.empty());
-
-		// the current scope
-		Atom& scope = (nullptr == scopeForNameResolution) ? *this : *scopeForNameResolution;
 		ShortString128 propname{prefix};
 		propname << name;
 
 		bool success = false;
-		scope.eachChild(propname, [&](Atom& child) -> bool
+		eachChild(propname, [&](Atom& child) -> bool
 		{
 			list.push_back(std::ref(child));
 			success = true;
@@ -489,13 +483,11 @@ namespace Nany
 	uint32_t Atom::invalidateInstance(const Signature& signature, uint32_t id)
 	{
 		instances[id].reset(nullptr);
-
 		pInstancesIDs[signature] = (uint32_t) -1;
 
 		auto& md = pInstancesMD[id];
 		md.sequence = nullptr;
 		md.remapAtom = nullptr;
-
 		return (uint32_t) -1;
 	}
 

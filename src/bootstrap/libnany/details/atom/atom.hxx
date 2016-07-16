@@ -6,6 +6,17 @@
 namespace Nany
 {
 
+	inline Atom* Atom::parentScope()
+	{
+		return (!scopeForNameResolution) ? parent : scopeForNameResolution;
+	}
+
+	inline const Atom* Atom::parentScope() const
+	{
+		return (!scopeForNameResolution) ? parent : scopeForNameResolution;
+	}
+
+
 	inline AnyString Atom::name() const
 	{
 		return pName;
