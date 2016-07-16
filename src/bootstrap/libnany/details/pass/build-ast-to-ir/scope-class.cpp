@@ -168,6 +168,7 @@ namespace Producer
 		uint32_t bpoffsck = out.emitStackSizeIncrease();
 
 		// making sure that debug info are available
+		context.pPreviousDbgLine = (uint32_t) -1; // forcing debug infos
 		scope.addDebugCurrentFilename();
 		scope.emitDebugpos(node);
 
