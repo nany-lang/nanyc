@@ -585,11 +585,12 @@ namespace Producer
 		scope.resetLocalCounters();
 		scope.kind = Scope::Kind::kfunc;
 		scope.broadcastNextVarID = false;
+		auto& out = sequence();
 
 		// creating a new blueprint for the function
-		uint32_t bpoffset = sequence().emitBlueprintFunc();
-		uint32_t bpoffsiz = sequence().emitBlueprintSize();
-		uint32_t bpoffsck = sequence().emitStackSizeIncrease();
+		uint32_t bpoffset = out.emitBlueprintFunc();
+		uint32_t bpoffsiz = out.emitBlueprintSize();
+		uint32_t bpoffsck = out.emitStackSizeIncrease();
 
 		// making sure that debug info are available
 		context.pPreviousDbgLine = (uint32_t) -1; // forcing debug infos
@@ -608,13 +609,13 @@ namespace Producer
 
 			isOperator = (inspector.funcname.first() == '^');
 			// update the func name
-			auto sid = sequence().stringrefs.ref(inspector.funcname);
-			sequence().at<ISA::Op::blueprint>(bpoffset).name = sid;
+			auto sid = out.stringrefs.ref(inspector.funcname);
+			out.at<ISA::Op::blueprint>(bpoffset).name = sid;
 			return inspector.body;
 		})();
 
 		// body start (for auto generation)
-		sequence().emitPragmaFuncBody();
+		out.emitPragmaFuncBody();
 
 		if (likely(body != nullptr))
 		{
@@ -627,10 +628,10 @@ namespace Producer
 		}
 
 		// end of the blueprint
-		sequence().emitEnd();
-		uint32_t blpsize = sequence().opcodeCount() - bpoffset;
-		sequence().at<ISA::Op::pragma>(bpoffsiz).value.blueprintsize = blpsize;
-		sequence().at<ISA::Op::stacksize>(bpoffsck).add = scope.pNextVarID + 1u;
+		out.emitEnd();
+		uint32_t blpsize = out.opcodeCount() - bpoffset;
+		out.at<ISA::Op::pragma>(bpoffsiz).value.blueprintsize = blpsize;
+		out.at<ISA::Op::stacksize>(bpoffsck).add = scope.pNextVarID + 1u;
 		return success;
 	}
 
