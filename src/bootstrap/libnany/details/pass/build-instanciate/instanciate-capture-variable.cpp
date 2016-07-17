@@ -22,7 +22,6 @@ namespace Instanciate
 		// get the ownership of the container to release it
 		assert(atom.candidatesForCapture != nullptr);
 		auto candidatesPtr = std::move(atom.candidatesForCapture);
-
 		auto& candidates = *candidatesPtr;
 		if (unlikely(candidates.empty()))
 			return;
@@ -32,9 +31,12 @@ namespace Instanciate
 			AnyString name;
 			CLID clid;
 		};
-		auto capturedVars = std::make_unique<CapturedVar[]>(candidates.size());
+		std::unique_ptr<CapturedVar[]> narrowedCandadiateList;
 
-		// keeping only local variables from the proposed list
+		//
+		// -- FILTERING
+		// Keeping only local variables from the candidate list
+		//
 		uint32_t count = 0;
 		{
 			if (Config::Traces::capturedVariables)
@@ -46,19 +48,26 @@ namespace Instanciate
 				uint32_t lvid = frame->findLocalVariable(varname);
 				if (lvid != 0)
 				{
-					auto& element = capturedVars[count++];
+					if (!narrowedCandadiateList)
+						narrowedCandadiateList = std::make_unique<CapturedVar[]>(candidates.size());
+
+					auto& element = narrowedCandadiateList[count++];
 					newVarname.clear() << "^trap^" << varname;
 					// the new name must be stored somewhere
 					element.name = currentSequence.stringrefs.refstr(newVarname);
 					element.clid.reclass(frame->atomid, lvid);
 
 					if (Config::Traces::capturedVariables)
-						trace() << ".. capturing var: '" << varname << '\'';
+					{
+						trace() << ".. keepiing candidate for capture: '" << varname << "', " << element.clid
+							<< " aka "
+							<< cdeftable.classdef(element.clid).print(cdeftable);
+					}
 				}
 				else
 				{
 					if (Config::Traces::capturedVariables)
-						trace() << ".. capturing var: rejected non local identifier '" << varname << '\'';
+						trace() << ".. rejecting candidate for capture: '" << varname << "' (non local var)";
 				}
 			}
 
@@ -69,11 +78,11 @@ namespace Instanciate
 			return;
 
 
+		assert(!!narrowedCandadiateList);
 		assert(atom.opcodes.sequence != nullptr and "invalid empty IR sequence");
 		if (unlikely(atom.opcodes.sequence == nullptr))
 			return;
 		auto& sequence = *atom.opcodes.sequence;
-
 		auto& table = cdeftable.originalTable();
 
 		// Base offset for the new lvid (new captured variables in the class)
@@ -102,13 +111,14 @@ namespace Instanciate
 		// new stack size
 		stacksize.add += count;
 		atom.localVariablesCount += count;
-
 		table.bulkAppend(atom.atomid, startLvid, count);
 
 
+		if (Config::Traces::capturedVariables)
+			trace() << ".. creating new local variables from {" << atom.atomid << ',' << startLvid << '}';
 		for (uint32_t i = 0; i != count; ++i)
 		{
-			auto& var = capturedVars[i];
+			auto& var = narrowedCandadiateList[i];
 
 			// new atom for the new variable member
 			auto* newVarAtom = table.atoms.createVardef(atom, var.name);
@@ -126,10 +136,23 @@ namespace Instanciate
 
 			newVarAtom->returnType.clid = cdef.clid;
 
-			// mark the captured variables as used
 			assert(var.clid.atomid() == frame->atomid);
 			if (var.clid.atomid() == frame->atomid)
+			{
+				// mark the captured variables as used to avoid spurious warnings
 				frame->lvids[var.clid.lvid()].warning.unused = false;
+
+				// reset the subtitute
+				auto& spare = cdeftable.substitute(var.clid.lvid());
+				spare.mutateToAtom(varSrcAtom);
+				spare.qualifiers.ref = true;
+			}
+
+			if (Config::Traces::capturedVariables)
+			{
+				auto& sp = cdeftable.classdef(CLID{atom.atomid, startLvid + i});
+				trace() << ".. creating local variables " << sp.clid << " as " << sp.print(cdeftable);
+			}
 		}
 
 		// When instanciating this method, automatically push captured variables
@@ -140,9 +163,12 @@ namespace Instanciate
 		{
 			if (child.isCtor())
 			{
+				if (Config::Traces::capturedVariables)
+					trace() << ".. appending " << count << " params to ctor " << child.caption();
+
 				for (uint32_t i = 0; i != count; ++i)
 				{
-					auto& var = capturedVars[i];
+					auto& var = narrowedCandadiateList[i];
 					CLID clid{atom.atomid, startLvid + i};
 
 					bool success = child.parameters.append(clid, var.name);
@@ -156,7 +182,7 @@ namespace Instanciate
 				// need extra size for the next instanciation
 				child.opcodes.stackSizeExtra = count;
 			}
-			return true;
+			return true; // continue iteration
 		});
 	}
 
@@ -167,30 +193,37 @@ namespace Instanciate
 	{
 		atomclass.eachChild([&](Atom& child) -> bool
 		{
-			if (not child.isMemberVariable())
-				return true;
-			if (not child.isCapturedVariable())
-				return true;
-
-			AnyString varname{child.name(), /*offset*/ (uint32_t)::strlen("^trap^")};
-			if (unlikely(varname.empty()))
+			if (child.isCapturedVariable())
 			{
-				ice() << "invalid empty captured variable name";
-				return true;
+				AnyString varname{child.name(), /*offset*/ (uint32_t)::strlen("^trap^")};
+				if (unlikely(varname.empty()))
+				{
+					ice() << "invalid empty captured variable name";
+					return true;
+				}
+
+				uint32_t varlvid = frame->findLocalVariable(varname);
+				if (unlikely(0 == varlvid))
+				{
+					error() << "failed to find captured variable '" << varname << "'";
+					return true;
+				}
+
+				if (not frame->verify(varlvid))
+					return true;
+
+				CLID clid{frame->atomid, varlvid};
+				overloadMatch.input.params.named.emplace_back(std::make_pair(child.name(), clid));
+
+				if (Config::Traces::capturedVariables)
+				{
+					trace() << ".. added named parameter from captured var '" << child.caption() << "' as " << clid
+						<< " from self '" << atomclass.caption() << '\'';
+				}
+
+				// checking that the definition is still accurate
+				assert(cdeftable.findClassdefAtom(cdeftable.classdef(clid)) != nullptr);
 			}
-
-			uint32_t varlvid = frame->findLocalVariable(varname);
-			if (unlikely(0 == varlvid))
-			{
-				error() << "failed to find captured variable '" << varname << "'";
-				return true;
-			}
-
-			if (not frame->verify(varlvid))
-				return true;
-
-			CLID clid{frame->atomid, varlvid};
-			overloadMatch.input.params.named.emplace_back(std::make_pair(child.name(), clid));
 			return true;
 		});
 		return true;

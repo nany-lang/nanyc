@@ -36,7 +36,7 @@ namespace Instanciate
 		{
 			// do not generate any error if already reported
 			if (frame->atomid != cdef.clid.atomid() or frame->verify(cdef.clid.lvid()))
-				return (ice() << "canBeAcquired: invalid atom " << cdef.clid);
+				return (ice() << "canBeAcquired: invalid atom " << cdef.clid << ", " << cdef.print(cdeftable));
 		}
 		#endif
 		return success;
