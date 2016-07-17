@@ -71,7 +71,6 @@ namespace Instanciate
 				generateClassVarsAutoRelease = false;
 
 
-//				assert(layerDepthLimit > 0);
 				bool bug = (layerDepthLimit == 0);
 				if (not bug)
 					--layerDepthLimit;

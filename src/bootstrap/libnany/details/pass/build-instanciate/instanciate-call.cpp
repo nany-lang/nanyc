@@ -149,14 +149,14 @@ namespace Instanciate
 
 				if (callParent and callParent == frame->atom.parent) // method from the same class
 				{
-					// 0: invalid, 1: return type, 2: first parameter
+					// 0: invalid, 1: return type, 2: first parameter (self here)
 					overloadMatch.input.params.indexed.emplace_back(CLID{frame->atomid, 2});
 				}
 			}
 		}
 
 
-		// Get all parameters (indexed, named, generic types...)
+		// overloadMatch: retrieve / append all pushed parameters (indexed, named, generic types)
 		if (not fetchPushedParameters(pushedparams, overloadMatch, *frame))
 			return false;
 
@@ -206,8 +206,25 @@ namespace Instanciate
 			tmplparams.swap(overloadMatch.result.tmplparams);
 		}
 
-		if (not atom->builtinalias.empty())
+
+		if (atom->builtinalias.empty()) // normal func call
 		{
+			Logs::Message::Ptr subreport;
+			InstanciateData info{subreport, *atom, cdeftable, build, params, tmplparams};
+			if (not doInstanciateAtomFunc(subreport, info, lvid)) // instanciate the called func
+				return false;
+
+			if (canGenerateCode())
+			{
+				for (auto& element: params) // push all parameters
+					out.emitPush(element.clid.lvid());
+				out.emitCall(lvid, atom->atomid, info.instanceid);
+			}
+			return true;
+		}
+		else
+		{
+			// not a normal func call, calling builtin intrinsic
 			if (unlikely(not tmplparams.empty()))
 				return (ice() << "invalid template parameters for builtinalias");
 			if (unlikely(pushedparams.func.indexed.size() != params.size()))
@@ -225,23 +242,9 @@ namespace Instanciate
 				frame->invalidate(lvid);
 			return builtinok;
 		}
-
-		// instanciate the called func
-		Logs::Message::Ptr subreport;
-		InstanciateData info{subreport, *atom, cdeftable, build, params, tmplparams};
-		if (not doInstanciateAtomFunc(subreport, info, lvid))
-			return false;
-
-		// opcodes
-		if (canGenerateCode())
-		{
-			for (auto& element: params) // push all parameters
-				out.emitPush(element.clid.lvid());
-
-			out.emitCall(lvid, atom->atomid, info.instanceid);
-		}
-		return true;
 	}
+
+
 
 
 	bool SequenceBuilder::generateShortCircuitInstrs(uint32_t retlvid)
@@ -383,7 +386,6 @@ namespace Instanciate
 		{
 			for (auto& param: params)
 				out.emitPush(param.clid.lvid());
-
 			out.emitCall(lvid, atom->atomid, info.instanceid);
 		}
 		return true;

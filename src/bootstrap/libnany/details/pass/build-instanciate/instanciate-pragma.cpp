@@ -19,52 +19,53 @@ namespace Instanciate
 		auto& atom = frame->atom;
 		if (atom.isFunction())
 		{
-			//
-			// cloning all function parameters (only non-ref parameters)
-			//
 			uint32_t count = atom.parameters.size();
 			atom.parameters.each([&](uint32_t i, const AnyString& name, const Vardef& vardef)
 			{
-				if (name[0] == '^') // captured
-					return;
-
 				// lvid for the given parameter
 				uint32_t lvid  = i + 1 + 1; // 1: return type, 2: first parameter
 				assert(lvid < frame->lvids.size());
 				frame->lvids[lvid].synthetic = false;
 
-				if (not cdeftable.classdef(vardef.clid).qualifiers.ref)
+
+				if (name[0] != '^')
 				{
-					if (debugmode and canGenerateCode())
-						out.emitComment(String{} << "\n ----- ---- deep copy parameter " << i);
+					// normal input parameter (not captured - does not start with '^')
+					// clone it if necessary (only non-ref parameters)
 
-					// a register has already been reserved for cloning parameters
-					uint32_t clone = 2 + count + i; // 1: return type, 2: first parameter
-					assert(clone < frame->lvids.size());
-					// the new value is not synthetic
-					frame->lvids[clone].synthetic = false;
-
-					bool r = instanciateAssignment(*frame, clone, lvid, false, false, true);
-					if (unlikely(not r))
-						frame->invalidate(clone);
-
-					if (canBeAcquired(lvid))
+					if (not cdeftable.classdef(vardef.clid).qualifiers.ref)
 					{
-						frame->lvids[lvid].autorelease = true;
-						frame->lvids[clone].autorelease = false;
-					}
+						if (debugmode and canGenerateCode())
+							out.emitComment(String{} << "\n ----- ---- deep copy parameter " << i);
 
-					if (canGenerateCode())
-					{
-						out.emitStore(lvid, clone); // register swap
-						if (debugmode)
-							out.emitComment("--\n");
+						// a register has already been reserved for cloning parameters
+						uint32_t clone = 2 + count + i; // 1: return type, 2: first parameter
+						assert(clone < frame->lvids.size());
+						// the new value is not synthetic
+						frame->lvids[clone].synthetic = false;
+
+						bool r = instanciateAssignment(*frame, clone, lvid, false, false, true);
+						if (unlikely(not r))
+							frame->invalidate(clone);
+
+						if (canBeAcquired(lvid))
+						{
+							frame->lvids[lvid].autorelease = true;
+							frame->lvids[clone].autorelease = false;
+						}
+
+						if (canGenerateCode())
+						{
+							out.emitStore(lvid, clone); // register swap
+							if (debugmode)
+								out.emitComment("--\n");
+						}
 					}
 				}
 			});
 
 			// generating some code on the fly
-			if (atom.isSpecial() and canGenerateCode())
+			if (atom.isSpecial() /*ctor, operators...*/ and canGenerateCode())
 			{
 				// variables initialization (for a ctor)
 				if (generateClassVarsAutoInit)

@@ -66,7 +66,7 @@ namespace Instanciate
 			IR::Sequence& out, IR::Sequence&, SequenceBuilder* parent = nullptr);
 
 		//! Prepare the first local registers according the given signature
-		void pushParametersFromSignature(LVID atomid, const Signature&);
+		void pushParametersFromSignature(Atom& atom, const Signature&);
 
 		//! Destructor
 		~SequenceBuilder();

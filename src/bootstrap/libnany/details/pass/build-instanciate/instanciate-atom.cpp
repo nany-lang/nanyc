@@ -113,9 +113,10 @@ namespace Instanciate
 					auto& cdef  = *(info.params[i].cdef);
 					auto& param = signature.parameters[i];
 
-					param.atom = const_cast<Atom*>(info.cdeftable.findClassdefAtom(cdef));
 					param.kind = cdef.kind;
 					param.qualifiers = cdef.qualifiers;
+					if (param.kind == nyt_any)
+						param.atom = const_cast<Atom*>(info.cdeftable.findClassdefAtom(cdef));
 					assert(param.kind != nyt_any or param.atom != nullptr);
 				}
 			}
@@ -234,7 +235,8 @@ namespace Instanciate
 			if (Config::Traces::sourceOpcodeSequence)
 				printSourceOpcodeSequence(info.cdeftable, info.atom.get(), "[ir-from-ast] ");
 
-			builder->pushParametersFromSignature(atom.atomid, signature);
+			// transfert input parameters
+			builder->pushParametersFromSignature(atom, signature);
 			//if (info.parentAtom)
 			builder->layerDepthLimit = 2; // allow the first blueprint to be instanciated
 
@@ -587,33 +589,32 @@ namespace Instanciate
 	}
 
 
-	inline void SequenceBuilder::pushParametersFromSignature(LVID atomid, const Signature& signature)
+	inline void SequenceBuilder::pushParametersFromSignature(Atom& atom, const Signature& signature)
 	{
 		assert(frame == NULL);
-		assert(atomid != 0);
 		// magic constant +2
 		//  * +1: all clid are 1-based (0 is reserved for the atom itself, not for an internal var)
 		//  * +1: the CLID{X, 1} is reserved for the return type
 
+		uint32_t count = signature.parameters.size();
+
 		// unused pseudo/invalid register
-		cdeftable.addSubstitute(nyt_void, nullptr, Qualifiers()); // unused, 1-based
-		CLID clid{atomid, 0};
+		cdeftable.addSubstitute(nyt_void, nullptr, Qualifiers()); // unused, since 1-based
 
 		// redefine return type {atomid,1}
-		clid.reclass(1);
-		auto& rettype = cdeftable.rawclassdef(clid);
-		assert(atomid == rettype.clid.atomid());
-		Atom* atom = likely(not rettype.isBuiltinOrVoid()) ? cdeftable.findRawClassdefAtom(rettype) : nullptr;
-		cdeftable.addSubstitute(rettype.kind, atom, rettype.qualifiers);
+		auto& rettype = cdeftable.rawclassdef(CLID{atom.atomid, 1});
+		assert(atom.atomid == rettype.clid.atomid());
+		Atom* atomparam = likely(not rettype.isBuiltinOrVoid()) ? cdeftable.findRawClassdefAtom(rettype) : nullptr;
+		cdeftable.addSubstitute(rettype.kind, atomparam, rettype.qualifiers);
 
 		// adding parameters
-		uint32_t count = signature.parameters.size();
 		for (uint32_t i = 0; i != count; ++i)
 		{
 			auto& param = signature.parameters[i];
 			cdeftable.addSubstitute(param.kind, param.atom, param.qualifiers);
 			assert(param.kind != nyt_any or param.atom != nullptr);
 		}
+
 		// adding reserved variables for cloning parameters (after normal parameters)
 		for (uint32_t i = 0; i != count; ++i)
 		{
