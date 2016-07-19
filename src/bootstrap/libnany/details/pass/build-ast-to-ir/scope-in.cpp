@@ -21,6 +21,7 @@ namespace Producer
 		AST::Node* container = nullptr;
 		AST::Node* predicate = nullptr;
 		AnyString requestedViewName = "default";
+		AST::Node* additionalParams = nullptr;
 
 		for (auto& childptr: node.children)
 		{
@@ -61,10 +62,21 @@ namespace Producer
 							case AST::rgIdentifier:
 							{
 								requestedViewName = vnnode.text;
+
+								auto& children = vnnode.children;
+								if (not children.empty())
+								{
+									if (children.size() == 1 and children[0]->rule == AST::rgCall)
+									{
+										additionalParams = AST::Node::Ptr::WeakPointer(children[0]);
+									}
+									else
+										return unexpectedNode(vnnode, "[expr/in/view-name/params]");
+								}
 								break;
 							}
 							default:
-								return unexpectedNode(child, "[expr/in/view-name]");
+								return unexpectedNode(vnnode, "[expr/in/view-name]");
 						}
 					}
 					break;
@@ -108,9 +120,21 @@ namespace Producer
 		context.reuse.inset.predicate->children.clear();
 		context.reuse.inset.predicate->children.push_back(predicate);
 
+		if (additionalParams)
+		{
+			auto& vec = context.reuse.inset.call->children;
+			for (auto& paramptr: additionalParams->children)
+				vec.push_back(paramptr);
+		}
 		emitDebugpos(node);
 		bool success = visitASTExpr(*context.reuse.inset.node, localvar);
 
+
+		if (additionalParams) // remove the additional parameters
+		{
+			auto& vec = context.reuse.inset.call->children;
+			vec.erase(vec.begin() + 1, vec.end());
+		}
 		// avoid crap in the debugger
 		context.reuse.inset.elementname->text.clear();
 		context.reuse.inset.viewname->text.clear();

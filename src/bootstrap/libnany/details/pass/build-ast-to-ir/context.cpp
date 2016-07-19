@@ -308,6 +308,7 @@ namespace Producer
 		reuse.inset.viewname = &viewname;
 
 		auto& call = viewname.append(AST::rgCall);
+		reuse.inset.call = &call;
 		auto& paramExprValue = call.append(AST::rgCallParameter, AST::rgExpr, AST::rgExprValue);
 		auto& func = paramExprValue.append(AST::rgFunction);
 		func.append(AST::rgFunctionKind, AST::rgFunctionKindFunction);
@@ -329,7 +330,6 @@ namespace Producer
 		// -- always 'true' predicate
 		// -- (when the predicate caluse `i in <set> | <predicate>` is missing)
 		reuse.inset.premadeAlwaysTrue = new AST::Node{AST::rgExpr};
-
 		auto& trueNew = reuse.inset.premadeAlwaysTrue->append(AST::rgNew);
 		auto& trueType = trueNew.append(AST::rgTypeDecl, AST::rgIdentifier);
 		trueType.text = "bool";

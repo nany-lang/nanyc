@@ -149,6 +149,7 @@ namespace Producer
 				AST::Node* viewname = nullptr;
 				AST::Node* elementname = nullptr;
 				AST::Node* predicate = nullptr;
+				AST::Node* call = nullptr;
 				AST::Node::Ptr premadeAlwaysTrue;
 			}
 			inset;
