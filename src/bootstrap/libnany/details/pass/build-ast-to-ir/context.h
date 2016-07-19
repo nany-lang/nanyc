@@ -155,7 +155,7 @@ namespace Producer
 
 			struct {
 				AST::Node::Ptr node;
-				std::array<AST::Node*,2> viewlvid;
+				AST::Node* viewlvid = nullptr;
 				std::array<AST::Node*,4> cursorname;
 				AST::Node* elementname = nullptr;
 				AST::Node* scope;

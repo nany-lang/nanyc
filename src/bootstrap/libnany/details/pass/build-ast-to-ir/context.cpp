@@ -345,91 +345,61 @@ namespace Producer
 		// scope
 		//     expr
 		//         expr-value
-		//             if (+2)
-		//                 expr
-		//                 |   identifier: ^not
-		//                 |       call
-		//                 |           call-parameter
-		//                 |               expr
-		//                 |                   expr-value
-		//                 |                       identifier: myview
-		//                 |                           expr-sub-dot
-		//                 |                               identifier: empty
-		//                 |                                   call
-		//                 if-then
-		//                     expr
-		//                         expr-value
-		//                             scope (+2)
-		//                                 var (+3)
-		//                                 |   ref
-		//                                 |   identifier: cursor
-		//                                 |   var-assign (+2)
-		//                                 |       operator-kind
-		//                                 |       |   operator-assignment: =
-		//                                 |       expr
-		//                                 |           expr-value
-		//                                 |               identifier: myview
-		//                                 |                   expr-sub-dot
-		//                                 |                       identifier: cursor
-		//                                 |                           call
-		//                                 expr
-		//                                     expr-value
-		//                                         if (+2)
-		//                                             expr
-		//                                             |   expr-value
-		//                                             |       identifier: cursor
-		//                                             |           expr-sub-dot
-		//                                             |               identifier: findfirst
-		//                                             |                   call
-		//                                             if-then
-		//                                                 expr
-		//                                                     expr-value
-		//                                                         scope
-		//                                                             do-while (+2)
-		//                                                                 expr
-		//                                                                 |   expr-value
-		//                                                                 |       scope (+2)
-		//                                                                 |           var (+3)
-		//                                                                 |           |   ref
-		//                                                                 |           |   identifier: i
-		//                                                                 |           |   var-assign (+2)
-		//                                                                 |           |       operator-kind
-		//                                                                 |           |       |   operator-assignment: =
-		//                                                                 |           |       expr
-		//                                                                 |           |           expr-value
-		//                                                                 |           |               identifier: cursor
-		//                                                                 |           |                   expr-sub-dot
-		//                                                                 |           |                       identifier: get
-		//                                                                 |           |                           call
-		//                                                                 |           expr
-		//                                                                 |               expr-value
-		//                                                                 |                   scope
-		//                                                                 |                       <.. user code here ..>
-		//                                                                 expr
-		//                                                                     expr-value
-		//                                                                         identifier: cursor
-		//                                                                             expr-sub-dot
-		//                                                                                 identifier: next
-		//                                                                                     call
+		//            scope (+2)
+		//                var (+3)
+		//                |   ref
+		//                |   identifier: cursor
+		//                |   var-assign (+2)
+		//                |       operator-kind
+		//                |       |   operator-assignment: =
+		//                |       expr
+		//                |           expr-value
+		//                |               identifier: myview
+		//                |                   expr-sub-dot
+		//                |                       identifier: cursor
+		//                |                           call
+		//                expr
+		//                    expr-value
+		//                        if (+2)
+		//                            expr
+		//                            |   expr-value
+		//                            |       identifier: cursor
+		//                            |           expr-sub-dot
+		//                            |               identifier: findfirst
+		//                            |                   call
+		//                            if-then
+		//                                expr
+		//                                    expr-value
+		//                                        scope
+		//                                            do-while (+2)
+		//                                                expr
+		//                                                |   expr-value
+		//                                                |       scope (+2)
+		//                                                |           var (+3)
+		//                                                |           |   ref
+		//                                                |           |   identifier: i
+		//                                                |           |   var-assign (+2)
+		//                                                |           |       operator-kind
+		//                                                |           |       |   operator-assignment: =
+		//                                                |           |       expr
+		//                                                |           |           expr-value
+		//                                                |           |               identifier: cursor
+		//                                                |           |                   expr-sub-dot
+		//                                                |           |                       identifier: get
+		//                                                |           |                           call
+		//                                                |           expr
+		//                                                |               expr-value
+		//                                                |                   scope
+		//                                                |                       <.. user code here ..>
+		//                                                expr
+		//                                                    expr-value
+		//                                                        identifier: cursor
+		//                                                            expr-sub-dot
+		//                                                                identifier: next
+		//                                                                    call
 
 		reuse.loops.node = new AST::Node{AST::rgExpr};
-		auto& nif = reuse.loops.node->append(AST::rgExprValue, AST::rgIf);
-
-		// condition if, "if empty"
-		{
-			auto& identifier = nif.append(AST::rgExpr, AST::rgIdentifier);
-			identifier.text = "^not";
-			auto& param = identifier.append(AST::rgCall, AST::rgCallParameter);
-			auto& viewname = param.append(AST::rgExpr, AST::rgExprValue, AST::rgRegister);
-			reuse.loops.viewlvid[0] = &viewname;
-			auto& empty = viewname.append(AST::rgExprSubDot, AST::rgIdentifier);
-			empty.text = "empty";
-			empty.append(AST::rgCall);
-		}
-
-		// if not empty, then...
-		auto& ifthen = nif.append(AST::rgIfThen);
-		auto& scope = ifthen.append(AST::rgExpr, AST::rgExprValue, AST::rgScope);
+		auto& scope = reuse.loops.node->append(AST::rgScope);
 
 		// capture the cursor
 		{
@@ -441,7 +411,7 @@ namespace Producer
 			opassign.text = "=";
 
 			auto& value = varAssign.append(AST::rgExpr, AST::rgExprValue, AST::rgRegister);
-			reuse.loops.viewlvid[1] = &value;
+			reuse.loops.viewlvid = &value;
 			auto& cursorCall = value.append(AST::rgExprSubDot, AST::rgIdentifier);
 			cursorCall.text = "cursor";
 			cursorCall.append(AST::rgCall);

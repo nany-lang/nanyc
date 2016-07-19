@@ -69,13 +69,13 @@ namespace Producer
 		emitDebugpos(node);
 		ShortString16 lvidstr;
 		lvidstr << viewlvid;
-		for (auto*& mnode: context.reuse.loops.viewlvid)
-			mnode->text = lvidstr;
+		context.reuse.loops.viewlvid->text = lvidstr;
 
 		ShortString32 cursorname;
 		cursorname << "%cursor_" << lvidstr;
+		AnyString crname = cursorname;
 		for (auto*& mnode: context.reuse.loops.cursorname)
-			mnode->text = cursorname;
+			mnode->text = crname;
 
 		context.reuse.loops.elementname->text = elementname;
 
