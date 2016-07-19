@@ -6,7 +6,6 @@
 #include <cassert>
 
 using namespace Yuni;
-#include <iostream>
 
 
 
@@ -505,7 +504,7 @@ namespace Nany
 		for (uint32_t i = previous; i != count; ++i)
 		{
 			CLID clid{layer.atomid, i};
-			if (not hasClassdef(clid))
+			if (0 == pClassdefs.count(clid))
 				pClassdefs[clid] = new Classdef(clid); // any with local replacement
 		}
 	}

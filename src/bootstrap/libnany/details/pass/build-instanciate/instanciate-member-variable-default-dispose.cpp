@@ -96,7 +96,7 @@ namespace Instanciate
 				auto ce = (ice() << "invalid atom from " << cdef.clid);
 				ce << " for disposing member variable '";
 				subatom.retrieveFullname(ce.data().message);
-				ce << "'";
+				ce << '\'';
 				continue;
 			}
 

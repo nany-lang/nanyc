@@ -41,8 +41,8 @@ namespace Instanciate
 					auto& cdef = cdeftable.classdef(vardef.clid);
 					assert(cdef.qualifiers.ref and "captured variables must be passed by reference");
 
-					auto& spare = cdeftable.substitute(lvid);
-					spare.import(cdef);
+					/*auto& spare = cdeftable.substitute(lvid);
+					spare.import(cdef);*/
 
 					// retrieving real atom from name to get the field index
 					const Atom* varatom = nullptr;
