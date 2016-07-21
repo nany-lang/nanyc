@@ -12,7 +12,7 @@ namespace Nany
 	}
 
 
-	bool IntrinsicTable::add(const AnyString& name, uint32_t flags, void* callback, nytype_t ret, va_list argp)
+	bool IntrinsicTable::add(const AnyString& name, void* callback, nytype_t ret, va_list argp)
 	{
 		if (YUNI_UNLIKELY(name.empty() or (0 == pByNames.count(name))))
 			return false;
@@ -21,7 +21,6 @@ namespace Nany
 
 		auto* intrinsic = new Intrinsic(name, callback);
 		intrinsic->rettype = ret;
-		intrinsic->flags   = flags;
 		intrinsic->id      = (uint32_t) pIntrinsics.size();
 
 		uint32_t count = 0;

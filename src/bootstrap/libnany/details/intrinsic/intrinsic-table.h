@@ -27,7 +27,7 @@ namespace Nany
 		*/
 		template<class T> bool add(const AnyString& name, T callback);
 
-		bool add(const AnyString& name, uint32_t flags, void* callback, nytype_t ret, va_list argp);
+		bool add(const AnyString& name, void* callback, nytype_t ret, va_list argp);
 
 		/*!
 		** \brief Get if an intrinsic exists

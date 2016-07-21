@@ -50,8 +50,6 @@ namespace Nany
 		//! All parameter types
 		std::array<nytype_t, Config::maxPushedParameters> params;
 
-		//! Flags
-		uint32_t flags = (uint32_t) nybind_default;
 		//! Intrinsic ID
 		uint32_t id = (uint32_t) -1;
 

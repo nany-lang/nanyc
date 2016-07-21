@@ -26,15 +26,6 @@
 #  define LIBNANY_DLL_EXPORT
 #endif
 
-
-#if defined(__clang__) || defined(__GNUC__)
-#  define LIBNANY_ATTR_ALLOCSIZE(A)    __attribute__((alloc_size(A)))
-#  define LIBNANY_ATTR_ALLOCSIZE2(A,B) __attribute__((alloc_size(A, B)))
-#else
-#  define LIBNANY_ATTR_ALLOCSIZE(A)
-#  define LIBNANY_ATTR_ALLOCSIZE2(A, B)
-#endif
-
 /*!
 ** \macro NY_EXPORT
 ** \brief Export / import a libnany symbol (function)
@@ -55,10 +46,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/*! Boolean type */
-typedef enum nybool_t {nyfalse = 0, nytrue} nybool_t;
-
 
 
 /*! \name Information about libnany */
@@ -116,11 +103,12 @@ NY_EXPORT nybool_t nany_check_compatible_version(uint32_t major, uint32_t minor)
 
 
 
+/*! \name Types */
+/*@{*/
+/*! Boolean type */
+typedef enum nybool_t {nyfalse = 0, nytrue} nybool_t;
 
-
-/*!
-** \brief Nany builtin types
-*/
+/*! Nany Language builtin types */
 typedef enum /* nytype_t */
 {
 	/*! No type */
@@ -160,9 +148,6 @@ enum {
 };
 
 
-
-
-
 /*!
 ** \brief Identifiers' visibility
 **
@@ -195,22 +180,8 @@ enum {
 
 
 
-/*! Intrnsic attributes */
-typedef uint32_t nybind_flag_t;
-
-/*! Flags for intrinsic attributes */
-enum {
-	/*! Default settings */
-	nybind_default = 0
-};
-
-
-
-
 /*! Opaque Thread Object */
 typedef struct nythread_t nythread_t;
-
-
 /*! Opaque Project Object */
 typedef struct nyproject_t nyproject_t;
 /*! Opaque Target Object */
@@ -225,10 +196,7 @@ typedef struct nybuild_t nybuild_t;
 typedef struct nyprogram_t nyprogram_t;
 /*! VM Thread Context */
 typedef struct nythread_t nytctx_t;
-
-
-
-
+/*@}*/
 
 
 
@@ -257,53 +225,14 @@ typedef struct nyallocator_t
 nyallocator_t;
 
 
-/*!
-** \nbrief Switch to the standard C memory allocator
-*/
+/*! Set callbacks to the standard C memory allocator */
 NY_EXPORT void nany_memalloc_set_default(nyallocator_t*);
-/*!
-** \nbrief Switch to the std C memory allocator with bounds checking
-*/
+/*! Set callbacks to the std C memory allocator with bounds checking */
 NY_EXPORT void nany_memalloc_set_with_limit(nyallocator_t*, size_t limit);
-/*!
-** \nbrief Copy allocator
-*/
+/*! Copy allocator */
 void nany_memalloc_copy(nyallocator_t* out, const nyallocator_t* const src);
 /*@}*/
 
-
-
-/*! \name URL */
-/*@{*/
-typedef struct nyurl_t
-{
-	/*! The full url (can be null, not zero-terminated) */
-	const char* url;
-	/*! Length (in bytes) of the url */
-	uint32_t url_len;
-
-	/*! Scheme (can be null, not zero-terminated) */
-	const char* scheme;
-	uint32_t scheme_len;
-	/*! hostname (can be null, not zero-terminated) */
-	const char* server;
-	uint32_t server_len;
-
-	/*! Port (0 when not set, with sport_len == 0) */
-	uint32_t port;
-
-	/*! The fragment (can be null, not zero-terminated) */
-	const char* path;
-	uint32_t path_len;
-	/*! The fragment (can be null, not zero-terminated) */
-	const char* query;
-	uint32_t query_len;
-	/*! The fragment (can be null, not zero-terminated) */
-	const char* fragment;
-	uint32_t fragment_len;
-}
-nyurl_t;
-/*@}*/
 
 
 
@@ -374,13 +303,8 @@ nyconsole_t;
 /*! Initialize a project configuration */
 NY_EXPORT void nany_console_cf_set_stdcout(nyconsole_t*);
 
-/*!
-** \nbrief Copy Cf
-*/
 void nany_console_cf_copy(nyconsole_t* out, const nyconsole_t* const src);
 /*@}*/
-
-
 
 
 
@@ -451,6 +375,8 @@ NY_EXPORT void nany_unlock(const nyproject_t*);
 /*! Try to lock a project */
 NY_EXPORT nybool_t nany_trylock(const nyproject_t*);
 /*@}*/
+
+
 
 
 
@@ -657,9 +583,9 @@ struct nyio_adapter_t
 typedef struct nyio_cf_t
 {
 	/*! event: an url has been mounted */
-	nyio_err_t (*on_mount_query)(nyprogram_t*, nytctx_t*, const nyurl_t* url, const char* path, uint32_t len);
+	nyio_err_t (*on_mount_query)(nyprogram_t*, nytctx_t*, const char* url, const char* path, uint32_t len);
 	/*! event: create an adapter from an url */
-	nyio_err_t (*on_adapter_create)(nyprogram_t*, nytctx_t*, nyio_adapter_t**, const nyurl_t* url, nyio_adapter_t* parent);
+	nyio_err_t (*on_adapter_create)(nyprogram_t*, nytctx_t*, nyio_adapter_t**, const char* url, nyio_adapter_t* parent);
 
 	/*! Flag to automatically mount some standard paths */
 	/*! \see nyio_automout_flag_t */
@@ -667,6 +593,8 @@ typedef struct nyio_cf_t
 }
 nyio_cf_t;
 /*@}*/
+
+
 
 
 
