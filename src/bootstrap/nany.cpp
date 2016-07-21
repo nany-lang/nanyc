@@ -31,14 +31,14 @@ static int printUsage(const char* const argv0)
 
 static int printBugReportInfo()
 {
-	nany_print_info_for_bugreport();
+	libnany_print_info_for_bugreport();
 	return EXIT_SUCCESS;
 }
 
 
 static int printVersion()
 {
-	std::cout << nany_version() << '\n';
+	std::cout << libnany_version() << '\n';
 	return EXIT_SUCCESS;
 }
 

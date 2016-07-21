@@ -17,7 +17,7 @@ namespace // anonymous
 	template<class T>
 	static inline void buildBugReport(T& string)
 	{
-		string << "> nanyc {c++/bootstrap} v" << nany_version();
+		string << "> nanyc {c++/bootstrap} v" << libnany_version();
 		if (debugmode)
 			string << " {debug}";
 		string << '\n';
@@ -81,13 +81,13 @@ namespace // anonymous
 
 
 
-extern "C" void nany_print_info_for_bugreport()
+extern "C" void libnany_print_info_for_bugreport()
 {
 	buildBugReport(std::cout);
 }
 
 
-extern "C" char* nany_get_info_for_bugreport(uint32_t* length)
+extern "C" char* libnany_get_info_for_bugreport(uint32_t* length)
 {
 	String string;
 	string.reserve(512);

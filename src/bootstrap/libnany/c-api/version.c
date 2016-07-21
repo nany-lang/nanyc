@@ -14,30 +14,31 @@ static inline const char* strOrNull(const char* const text)
 	return (text && *text != '\0') ? text : NULL;
 }
 
-const char* nany_website_url()
+
+const char* libnany_website_url()
 {
 	_Static_assert(LIBNANY_WEBSITE != NULL, "invalid null url");
 	return LIBNANY_WEBSITE;
 }
 
-const char* nany_version()
+const char* libnany_version()
 {
 	_Static_assert(LIBNANY_VERSION_STR != NULL, "invalid null version");
 	return LIBNANY_VERSION_STR;
 }
 
-const char* nany_version_metadata()
+const char* libnany_version_metadata()
 {
 	return strOrNull(LIBNANY_VERSION_METADATA);
 }
 
-const char* nany_version_prerelease()
+const char* libnany_version_prerelease()
 {
 	return strOrNull(LIBNANY_VERSION_PRERELEASE);
 }
 
 
-uint32_t nany_get_version(uint32_t* major, uint32_t* minor, uint32_t* patch)
+uint32_t libnany_get_version(uint32_t* major, uint32_t* minor, uint32_t* patch)
 {
 	if (major)
 		*major = LIBNANY_VERSION_MAJOR;
@@ -50,10 +51,10 @@ uint32_t nany_get_version(uint32_t* major, uint32_t* minor, uint32_t* patch)
 }
 
 
-nybool_t nany_check_compatible_version(uint32_t major, uint32_t minor)
+int libnany_check_compatible_version(uint32_t major, uint32_t minor)
 {
 	/* currently, no real incompatibilities except for version comparison */
 	return ((LIBNANY_VERSION_MAJOR >= major)
 		|| (LIBNANY_VERSION_MAJOR == major && minor <= LIBNANY_VERSION_MINOR)
-		) ? nytrue : nyfalse;
+		) ? 0 : 1;
 }

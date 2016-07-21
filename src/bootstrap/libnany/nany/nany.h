@@ -53,7 +53,7 @@ extern "C" {
 /*!
 ** \brief Print information about nany for bug reporting
 */
-NY_EXPORT void nany_print_info_for_bugreport();
+NY_EXPORT void libnany_print_info_for_bugreport();
 
 /*!
 ** \brief Export information about nany for bug reporting
@@ -61,12 +61,10 @@ NY_EXPORT void nany_print_info_for_bugreport();
 ** \param[out] length Length of the returned c-string (can be null)
 ** \return A C-String, which must be released by `free (3)`. NULL if an error occured
 */
-NY_EXPORT char* nany_get_info_for_bugreport(uint32_t* length);
+NY_EXPORT char* libnany_get_info_for_bugreport(uint32_t* length);
 
-/*!
-** \brief Get the nany's website
-*/
-NY_EXPORT const char* nany_website_url();
+/*! Get the nany's website */
+NY_EXPORT const char* libnany_website_url();
 
 /*!
 ** \brief Get the version of nany
@@ -76,14 +74,14 @@ NY_EXPORT const char* nany_website_url();
 ** \param[out] major Patch (eX: 2.4.1 -> 1) (can be null)
 ** \return The full version within a single integer (ex: 2.4.1 -> 204001)
 */
-NY_EXPORT uint32_t nany_get_version(uint32_t* major, uint32_t* minor, uint32_t* patch);
+NY_EXPORT uint32_t libnany_get_version(uint32_t* major, uint32_t* minor, uint32_t* patch);
 
 /*! Get the full version of nany (string, ex: 2.4.1-beta+2e738ae) */
-NY_EXPORT const char* nany_version();
+NY_EXPORT const char* libnany_version();
 /*! Get the version metadata (ex: '2e738ae', null if empty) */
-NY_EXPORT const char* nany_version_metadata();
+NY_EXPORT const char* libnany_version_metadata();
 /*! Get the pre-release version (ex: 'beta', null if empty) */
-NY_EXPORT const char* nany_version_prerelease();
+NY_EXPORT const char* libnany_version_prerelease();
 
 /*!
 ** \brief Check if the version is compatible with the library
@@ -91,11 +89,12 @@ NY_EXPORT const char* nany_version_prerelease();
 ** This function can be used to avoid unwanted behaviors when
 ** a program is able to use several versions of libnany
 ** \code
-** if (nyfalse == nany_check_compatible_version(0, 2))
+** if (!libnany_check_compatible_version(0, 2))
 **     fprintf(stderr, "incompatible version\n");
 ** \endcode
+** \return 0 when succeeded, != 0 if the version is incompatible
 */
-NY_EXPORT nybool_t nany_check_compatible_version(uint32_t major, uint32_t minor);
+NY_EXPORT int libnany_check_compatible_version(uint32_t major, uint32_t minor);
 /*@}*/
 
 
