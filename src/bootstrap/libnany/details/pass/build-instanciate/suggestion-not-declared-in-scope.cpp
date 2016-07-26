@@ -99,6 +99,9 @@ namespace Instanciate
 		if (unlikely(self and self->flags(Atom::Flags::error))) // error already reported
 			return false;
 
+		if (name.first() == '%') // generated variable namie - already reported
+			return false;
+
 		auto err = error();
 
 		AnyString keyword, varname;
