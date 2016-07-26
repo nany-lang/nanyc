@@ -52,6 +52,11 @@ namespace Nany
 		return type == Type::classdef;
 	}
 
+	inline bool Atom::isAnonymousClass() const
+	{
+		return type == Type::classdef and pName.empty();
+	}
+
 	inline bool Atom::isCtor() const
 	{
 		return category(Category::ctor);
@@ -152,10 +157,16 @@ namespace Nany
 		return not returnType.clid.isVoid();
 	}
 
-
 	inline bool Atom::hasGenericParameters() const
 	{
 		return not tmplparams.empty();
+	}
+
+	inline bool Atom::isContextual() const
+	{
+		return hasGenericParameters() // generic classes
+			or pName.empty() // anonymous classes
+			or (parent and parent->isFunction()); // anything inside a func which may depend from parameters
 	}
 
 

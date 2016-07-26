@@ -484,6 +484,10 @@ namespace Nany
 
 	uint32_t Atom::invalidateInstance(const Signature& signature, uint32_t id)
 	{
+		assert(id < instances.size());
+		assert(id < pInstancesMD.size());
+		assert(instances.size() == pInstancesMD.size());
+
 		instances[id].reset(nullptr);
 		pInstancesIDs[signature] = (uint32_t) -1;
 
@@ -497,12 +501,12 @@ namespace Nany
 	uint32_t Atom::createInstanceID(const Signature& signature, IR::Sequence* sequence, Atom* remapAtom)
 	{
 		assert(sequence != nullptr);
-
 		// the new instanceID
 		uint32_t iid = (uint32_t) instances.size();
 
 		instances.emplace_back(sequence);
 		pInstancesMD.emplace_back();
+		assert(instances.size() == pInstancesMD.size());
 
 		auto& md = pInstancesMD[iid];
 		md.remapAtom = remapAtom;

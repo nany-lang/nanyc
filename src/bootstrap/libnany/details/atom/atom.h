@@ -178,6 +178,8 @@ namespace Nany
 		bool isMemberVariable() const;
 		//! Get if the atom is a class member (function or variable)
 		bool isClassMember() const;
+		//! Get if the atom is an anonymous class
+		bool isAnonymousClass() const;
 		//! Is a constructor
 		bool isMemberVarDefaultInit() const;
 		//! Is a type alias
@@ -211,6 +213,12 @@ namespace Nany
 
 		//! Get if the atom has generic type parameters
 		bool hasGenericParameters() const;
+
+		/// \brief Get if the atom is contextual
+		///
+		/// Contextual means the internal values may vary from a parent
+		/// instanciation, like a class inside a function, generic types params...
+		bool isContextual() const;
 
 		/*!
 		** \brief Get if this atom can access (use) another one
