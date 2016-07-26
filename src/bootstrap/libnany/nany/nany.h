@@ -291,6 +291,8 @@ typedef struct nyconsole_t
 	void (*flush)(void*, nyconsole_output_t);
 	/*! Set the text color */
 	void (*set_color)(void*, nyconsole_output_t, nycolor_t);
+	/*! Set the text color */
+	nybool_t (*has_color)(void*, nyconsole_output_t);
 
 	/*! Internal opaque pointer*/
 	void* internal;

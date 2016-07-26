@@ -83,6 +83,14 @@ static void nany_console_set_color(void* internal, nyconsole_output_t out, nycol
 	}
 }
 
+static nybool_t nany_console_has_color(void* internal, nyconsole_output_t out)
+{
+	assert(internal != nullptr);
+	assert((uint32_t) out == nycout or (uint32_t) out == nycerr);
+	internal_t flags;
+	flags.pointer = internal;
+	return (flags.colors[out] != 0) ? nytrue : nyfalse;
+}
 
 
 
@@ -93,6 +101,7 @@ extern "C" void nany_console_cf_set_stdcout(nyconsole_t* cf)
 		cf->write_stdout = &nany_console_stdcout;
 		cf->write_stderr = &nany_console_stderr;
 		cf->set_color    = &nany_console_set_color;
+		cf->has_color    = &nany_console_has_color;
 		cf->flush        = &nany_console_flush;
 
 		internal_t internal;
