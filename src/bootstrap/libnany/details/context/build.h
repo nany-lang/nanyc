@@ -59,6 +59,15 @@ namespace Nany
 		bool attach(IR::Sequence& sequence, bool owned = false);
 
 		/*!
+		** \brief Try to resolve strict parameter types
+		**
+		** A strict may be given for a func:
+		**   func foo(p1, p2: StrictTypeP2) // Here, TypeP2 must be resolved
+		** This is required for func overloading deduction
+		*/
+		bool resolveStrictParameterTypes(Atom&);
+
+		/*!
 		** \brief Try to instanciate an entry point
 		*/
 		bool instanciate(const AnyString& entrypoint, const nytype_t* args, uint32_t& atomid, uint32_t& instanceid);

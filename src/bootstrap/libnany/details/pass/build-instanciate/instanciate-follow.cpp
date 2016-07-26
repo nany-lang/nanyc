@@ -15,7 +15,9 @@ namespace Instanciate
 
 	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::follow>& operands)
 	{
-		if (not operands.symlink)
+		// in 'signature only' mode (resolving defined parameter types), all
+		// types must be gathered
+		if (not operands.symlink or signatureOnly)
 		{
 			auto& cdef  = cdeftable.classdef(CLID{frame->atomid, operands.lvid});
 			auto& spare = cdeftable.substitute(operands.follower);

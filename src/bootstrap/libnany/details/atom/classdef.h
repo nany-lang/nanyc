@@ -97,6 +97,11 @@ namespace Nany
 		void mutateToBuiltin(nytype_t);
 
 		/*!
+		** \brief Mutate the type to builtin (or void)
+		*/
+		void mutateToBuiltinOrVoid(nytype_t);
+
+		/*!
 		** \brief Mutate the type to any
 		*/
 		void mutateToAny();

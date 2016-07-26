@@ -16,18 +16,26 @@ namespace Instanciate
 	void SequenceBuilder::pragmaBodyStart()
 	{
 		assert(frame != nullptr);
+		assert(not signatureOnly);
+		assert(codeGenerationLock == 0 and "any good reason to not generate code ?");
+
 		auto& atom = frame->atom;
 		if (atom.isFunction())
 		{
+			bool generateCode = canGenerateCode();
 			uint32_t count = atom.parameters.size();
 			atom.parameters.each([&](uint32_t i, const AnyString& name, const Vardef& vardef)
 			{
 				// lvid for the given parameter
 				uint32_t lvid  = i + 1 + 1; // 1: return type, 2: first parameter
 				assert(lvid < frame->lvids.size());
+				// Obviously, the parameters are not synthetic objects
+				// but real variables
 				frame->lvids[lvid].synthetic = false;
 
-
+				//
+				// Parameters Deep copy (if required)
+				//
 				if (name[0] != '^')
 				{
 					// normal input parameter (not captured - does not start with '^')
@@ -35,8 +43,8 @@ namespace Instanciate
 
 					if (not cdeftable.classdef(vardef.clid).qualifiers.ref)
 					{
-						if (debugmode and canGenerateCode())
-							out.emitComment(String{} << "\n ----- ---- deep copy parameter " << i);
+						if (debugmode and generateCode)
+							out.emitComment(String{"----- deep copy parameter "} << i << " aka " << name);
 
 						// a register has already been reserved for cloning parameters
 						uint32_t clone = 2 + count + i; // 1: return type, 2: first parameter
@@ -54,7 +62,7 @@ namespace Instanciate
 							frame->lvids[clone].autorelease = false;
 						}
 
-						if (canGenerateCode())
+						if (generateCode)
 						{
 							out.emitStore(lvid, clone); // register swap
 							if (debugmode)
@@ -65,7 +73,7 @@ namespace Instanciate
 			});
 
 			// generating some code on the fly
-			if (atom.isSpecial() /*ctor, operators...*/ and canGenerateCode())
+			if (atom.isSpecial() /*ctor, operators...*/ and generateCode)
 			{
 				// variables initialization (for a ctor)
 				if (generateClassVarsAutoInit)
@@ -113,6 +121,12 @@ namespace Instanciate
 
 			case IR::ISA::Pragma::bodystart:
 			{
+				// In 'signature only' mode, we only care about the
+				// parameter user types. Everything from this point in unrelevant
+				if (signatureOnly)
+					return currentSequence.invalidateCursor(*cursor);
+
+				// parameters Deep copy, implicit var auto-init...
 				pragmaBodyStart();
 				break;
 			}

@@ -45,19 +45,22 @@ namespace Instanciate
 				// instanciating the type itself, to resolve member variables
 				if (not atom.classinfo.isInstanciated)
 				{
-					Atom* newAtomRef = instanciateAtomClass(atom);
-					if (unlikely(nullptr == newAtomRef))
-						return false;
+					if (not signatureOnly)
+					{
+						Atom* newAtomRef = instanciateAtomClass(atom);
+						if (unlikely(nullptr == newAtomRef))
+							return false;
+
+						// The target atom may have changed for generic classes
+						if (atom.atomid != newAtomRef->atomid)
+						{
+							auto& spare = cdeftable.substitute(operands.lvid);
+							spare.mutateToAtom(newAtomRef);
+						}
+					}
 
 					// remove generic type parameters if any
 					pushedparams.gentypes.clear();
-
-					// The target atom may have changed for generic classes
-					if (atom.atomid != newAtomRef->atomid)
-					{
-						auto& spare = cdeftable.substitute(operands.lvid);
-						spare.mutateToAtom(newAtomRef);
-					}
 				}
 				break;
 			}

@@ -192,7 +192,7 @@ namespace Instanciate
 		else
 		{
 			// override the typeinfo
-			auto& spare = cdeftable.substitute(cdef.clid.lvid());
+			auto& spare = cdeftable.substitute(operands.lvid);
 			spare.import(cdef);
 			spare.mutateToAtom(&atom);
 
@@ -490,6 +490,7 @@ namespace Instanciate
 			// self.<something to identify>
 			if (unlikely(frame->lvids[lvid].markedAsAny))
 				return (ice() << "can not perform member lookup on 'any'");
+
 
 			auto& self = cdeftable.classdef(CLID{frame->atomid, operands.self});
 			if (unlikely(self.isBuiltinOrVoid()))

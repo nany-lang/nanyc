@@ -102,20 +102,14 @@ namespace Nany
 			for (auto& src: sources)
 				success &= src.get().build(*this);
 
-			//
-			// -- intermediate name lookup
-			//
-			// TODO remove this method
-			// report.info() << "intermediate name resolution";
-			bool successNameLookup = cdeftable.performNameLookup();
-			if (unlikely(not successNameLookup and success))
-				report.warning() << "name lookup failed";
+			// Indexing Core Objects (bool, u32, u64, f32, ...)
+			success = success and cdeftable.atoms.fetchAndIndexCoreObjects();
 
-			//
-			// -- Core Objects (bool, u32, u64, f32, ...)
-			//
-			success &= successNameLookup
-				and cdeftable.atoms.fetchAndIndexCoreObjects();
+			// Resolve strict parameter types
+			// ex: func foo(p1, p2: TypeP2) // Here TypeP2 must be resolved
+			// This will be used for deduce func overloading
+			success = success and resolveStrictParameterTypes(cdeftable.atoms.root);
+
 
 			if (Config::Traces::preAtomTable)
 				cdeftable.atoms.root.printTree(ClassdefTableView{cdeftable});

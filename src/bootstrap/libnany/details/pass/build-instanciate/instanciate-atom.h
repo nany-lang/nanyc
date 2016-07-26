@@ -30,7 +30,6 @@ namespace Instanciate
 			, report(report)
 		{
 			returnType.mutateToAny();
-
 			if (!report)
 				report = new Logs::Message{Logs::Level::none};
 		}
@@ -68,6 +67,8 @@ namespace Instanciate
 		//! Error reporting
 		Logs::Message::Ptr& report;
 
+		bool signatureOnly = false;
+
 	}; // class InstanciateData
 
 
@@ -78,6 +79,7 @@ namespace Instanciate
 	*/
 	bool instanciateAtom(InstanciateData& info);
 
+	bool instanciateAtomSignature(InstanciateData& info);
 
 
 

@@ -257,14 +257,18 @@ namespace Instanciate
 	{
 		// duplicate nop as well since they can be used to insert code
 		// (for shortcircuit for example)
-		out.emitNop();
+		if (canGenerateCode())
+			out.emitNop();
 	}
 
 
 	inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::label>& operands)
 	{
-		uint32_t lbl = out.emitLabel(operands.label);
-		(void) lbl; // avoid compiler warning for `emitLabel`
+		if (canGenerateCode())
+		{
+			uint32_t lbl = out.emitLabel(operands.label);
+			(void) lbl; // avoid compiler warning for `emitLabel`
+		}
 	}
 
 
@@ -284,24 +288,30 @@ namespace Instanciate
 
 	inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::jmp>& opc)
 	{
-		out.emit<IR::ISA::Op::jmp>() = opc;
+		if (canGenerateCode())
+			out.emit<IR::ISA::Op::jmp>() = opc;
 	}
 
 	inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::jz>& opc)
 	{
-		out.emit<IR::ISA::Op::jz>() = opc;
+		if (canGenerateCode())
+			out.emit<IR::ISA::Op::jz>() = opc;
 	}
 
 	inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::jnz>& opc)
 	{
-		out.emit<IR::ISA::Op::jnz>() = opc;
+		if (canGenerateCode())
+			out.emit<IR::ISA::Op::jnz>() = opc;
 	}
 
 	inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::comment>& opc)
 	{
 		// keep the comments in debug
 		if (Yuni::debugmode)
-			out.emitComment(currentSequence.stringrefs[opc.text]);
+		{
+			if (canGenerateCode())
+				out.emitComment(currentSequence.stringrefs[opc.text]);
+		}
 	}
 
 
@@ -333,6 +343,65 @@ namespace Instanciate
 
 namespace Nany
 {
+
+	bool Build::resolveStrictParameterTypes(Atom& atom)
+	{
+		switch (atom.type)
+		{
+			case Atom::Type::funcdef:
+			{
+				// this pass intends to resolve the given types for parameters
+				// (to be able to deduce overload later).
+				// Thus nothing to do if no parameter
+				bool hasParams = not atom.parameters.empty();
+
+				if (hasParams)
+				{
+					// input parameters (won't be used)
+					decltype(Pass::Instanciate::FuncOverloadMatch::result.params) params;
+					decltype(Pass::Instanciate::FuncOverloadMatch::result.params) tmplparams;
+					Logs::Message::Ptr newReport;
+					// Classdef table layer
+					ClassdefTableView cdeftblView{cdeftable};
+					// error reporting
+					Nany::Logs::Report report{*messages.get()};
+
+					Pass::Instanciate::InstanciateData info {
+						newReport, atom, cdeftblView, *this, params, tmplparams
+					};
+					bool success = Pass::Instanciate::instanciateAtomSignature(info);
+					if (not success)
+						report.appendEntry(newReport);
+					return success;
+				}
+				break;
+			}
+
+			case Atom::Type::classdef:
+			{
+				// do not try to do something on generic classes. It will be
+				// done later when the generic param types will be available
+				if (not atom.tmplparams.empty())
+					return true;
+			}
+			// [[fallthru]]
+			case Atom::Type::namespacedef:
+				break;
+
+			case Atom::Type::unit:
+			case Atom::Type::typealias:
+			case Atom::Type::vardef:
+				return true;
+		}
+
+		bool success = true;
+		atom.eachChild([&](Atom& subatom) -> bool
+		{
+			success &= resolveStrictParameterTypes(subatom);
+			return true;
+		});
+		return success;
+	}
 
 
 	bool Build::instanciate(const AnyString& entrypoint, const nytype_t* args, uint32_t& atomid, uint32_t& instanceid)

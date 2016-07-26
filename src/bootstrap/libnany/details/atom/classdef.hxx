@@ -94,6 +94,12 @@ namespace Nany
 		atom = nullptr;
 	}
 
+	inline void Classdef::mutateToBuiltinOrVoid(nytype_t newkind)
+	{
+		assert(newkind != nyt_any);
+		kind = newkind;
+		atom = nullptr;
+	}
 
 	inline void Classdef::mutateToAny()
 	{

@@ -398,6 +398,9 @@ namespace Instanciate
 
 		//! Flag to determine weather sub atoms can be instanciated in the same time
 		uint32_t layerDepthLimit = (uint32_t) -1;
+
+		bool signatureOnly = false;
+
 		//! cursor
 		IR::Instruction** cursor = nullptr;
 

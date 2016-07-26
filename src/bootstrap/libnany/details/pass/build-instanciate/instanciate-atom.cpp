@@ -143,27 +143,29 @@ namespace Instanciate
 
 		static bool createNewAtom(InstanciateData& info, Atom& atom)
 		{
-			auto& sequence  = *atom.opcodes.sequence;
-			auto& originaltable = info.cdeftable.originalTable();
-			// the mutex is useless here since the code instanciation is mono-threaded
-			// but it's required by the mapping (which must be thread-safe in the first passes - see attach)
-			// TODO remove this mutex
-			Mutex mutex;
+			// re-map from the parent
+			{
+				auto& sequence  = *atom.opcodes.sequence;
+				auto& originaltable = info.cdeftable.originalTable();
+				// the mutex is useless here since the code instanciation is mono-threaded
+				// but it's required by the mapping (which must be thread-safe in the first passes - see attach)
+				// TODO remove this mutex
+				Mutex mutex;
 
-			Pass::Mapping::SequenceMapping mapper{originaltable, mutex, sequence};
-			mapper.evaluateWholeSequence = false;
-			mapper.prefixNameForFirstAtomCreated = "^";
+				Pass::Mapping::SequenceMapping mapper{originaltable, mutex, sequence};
+				mapper.evaluateWholeSequence = false;
+				mapper.prefixNameForFirstAtomCreated = "^";
 
+				// run the type mapping
+				mapper.map(*atom.parent, atom.opcodes.offset);
 
-			// run the type mapping
-			mapper.map(*atom.parent, atom.opcodes.offset);
+				if (unlikely(!mapper.firstAtomCreated))
+					return (error() << "failed to remap atom '" << atom.caption() << "'");
 
-			if (unlikely(!mapper.firstAtomCreated))
-				return (error() << "failed to remap atom '" << atom.caption() << "'");
-
-			assert(info.atom.get().atomid != mapper.firstAtomCreated->atomid);
-			assert(&info.atom.get() != mapper.firstAtomCreated);
-			info.atom = std::ref(*mapper.firstAtomCreated);
+				assert(info.atom.get().atomid != mapper.firstAtomCreated->atomid);
+				assert(&info.atom.get() != mapper.firstAtomCreated);
+				info.atom = std::ref(*mapper.firstAtomCreated);
+			}
 
 			// the generic parameters are fully resolved now, avoid
 			// any new attempt to check them
@@ -175,9 +177,8 @@ namespace Instanciate
 			// to keep the types for the new atoms
 			info.shouldMergeLayer = true;
 
-			// re-update type entries
-			originaltable.performNameLookup();
-			return true;
+			// upate parameter types
+			return info.build.resolveStrictParameterTypes(newAtom);
 		}
 
 
@@ -253,7 +254,7 @@ namespace Instanciate
 			reinitStackAllocTypes(*outIR, newView, atom.atomid);
 
 			// keep all deduced types
-			if (likely(success) and info.shouldMergeLayer)
+			if (/*likely(success) and*/ info.shouldMergeLayer)
 				newView.mergeSubstitutes();
 
 			// Generating the full human readable name of the symbol with the
@@ -322,7 +323,9 @@ namespace Instanciate
 
 	bool SequenceBuilder::instanciateAtomClassClone(Atom& atom, uint32_t lvid, uint32_t rhs)
 	{
+		assert(not signatureOnly);
 		assert(atom.isClass());
+
 		if (unlikely(atom.flags(Atom::Flags::error)))
 			return false;
 
@@ -370,6 +373,8 @@ namespace Instanciate
 
 	bool SequenceBuilder::instanciateAtomClassDestructor(Atom& atom, uint32_t lvid)
 	{
+		assert(not signatureOnly);
+
 		// if the IR code produced when transforming the AST is invalid,
 		// a common scenario is that the code tries to destroy something (via unref)
 		// which is not be a real class
@@ -424,13 +429,12 @@ namespace Instanciate
 	Atom* SequenceBuilder::instanciateAtomClass(Atom& atom)
 	{
 		assert(atom.isClass());
+		assert(not signatureOnly);
 
 		// mark the atom being instanciated as 'instanciated'. For classes with gen. type parameters
 		// a new atom will be created and only this one will be marked
 		if (atom.tmplparams.empty())
-		{
 			atom.classinfo.isInstanciated = true;
-		}
 
 
 		overloadMatch.clear(); // reset
@@ -735,6 +739,74 @@ namespace Instanciate
 
 
 
+	bool instanciateAtomSignature(InstanciateData& info)
+	{
+		// Despite the location of this code, no real code instanciation
+		// of any code will be done (the code is the same, that's why).
+		// This pass only intends to resolve user-given types for parameters
+		// example:
+		//    func foo(p1, p2: UserType)
+		// The second parameter will be of interest in this case
+		// The sequence builder will stop as soon as the opcode 'bodystart'
+		// is encountered
+
+		Signature signature;
+		// the current atom, probably different from `previousAtom`
+		auto& atom = info.atom.get();
+		// the original IR sequence generated from the AST
+		auto& inputIR = *(atom.opcodes.sequence);
+		// mapping the new IR sequence to the old, since never used
+		auto* outIR = new IR::Sequence;
+		// new layer for the cdeftable
+		ClassdefTableView newview{info.cdeftable, atom.atomid, signature.parameters.size()};
+		// log
+		Logs::Report report{*info.report};
+
+		if (unlikely(!atom.opcodes.sequence or !atom.parent))
+			return (ice() << "invalid atom");
+
+		// instanciate the sequence attached to the atom
+		auto builder = std::make_unique<SequenceBuilder>
+			(report.subgroup(), newview, info.build, *outIR, inputIR, info.parent);
+
+		//if (info.parentAtom)
+		builder->layerDepthLimit = 2; // allow the first blueprint to be instanciated
+		builder->signatureOnly = true;
+		builder->codeGenerationLock = 666; // arbitrary value != 0
+
+		bool success = builder->readAndInstanciate(atom.opcodes.offset);
+		assert(builder->codeGenerationLock == 666);
+
+		if (success)
+		{
+			auto mergeType = [&](const CLID& clid)
+			{
+				auto& cdef = newview.classdef(clid);
+				auto& rawcdef = newview.originalTable().rawclassdef(clid);
+				rawcdef.qualifiers = cdef.qualifiers;
+
+				if (not cdef.isBuiltinOrVoid())
+				{
+					auto* useratom = newview.findClassdefAtom(cdef);
+					rawcdef.mutateToAtom(useratom);
+				}
+				else
+				{
+					rawcdef.qualifiers.ref = false; // no ref for builtin types
+					rawcdef.mutateToBuiltinOrVoid(cdef.kind);
+				}
+			};
+			// import parameter types
+			atom.parameters.each([&](uint32_t, const AnyString&, const Vardef& vardef)
+			{
+				mergeType(vardef.clid);
+			});
+			mergeType(CLID{atom.atomid, 1}); // return type
+		}
+		return success;
+	}
+
+
 	bool instanciateAtom(InstanciateData& info)
 	{
 		// prepare the matching signature
@@ -774,6 +846,7 @@ namespace Instanciate
 			case Tribool::Value::no:
 			{
 				// failed to instanciate last time. error already reported
+				break;
 			}
 		}
 		return false;

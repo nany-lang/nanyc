@@ -112,15 +112,6 @@ namespace Nany
 		//@}
 
 
-		//! \name Compilation
-		//@{
-		/*!
-		** \brief Tryo to resolve all types
-		*/
-		bool performNameLookup(); // Logs::Report& report);
-		//@}
-
-
 		//! \name Utilities
 		//@{
 		/*!
