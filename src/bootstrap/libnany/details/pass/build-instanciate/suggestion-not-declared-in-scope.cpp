@@ -115,10 +115,18 @@ namespace Instanciate
 				err << '\'' << keyword << ' ' << varname << "' is not declared in '";
 				err << cdeftable.keyword(*self) << ' ';
 				self->retrieveCaption(err.data().message, cdeftable);
+				if (debugmode)
+					err << " (id:" << self->atomid << ')';
 				err << '\'';
+				if (debugmode)
+					err << " {isOperator/self}";
 			}
 			else
+			{
 				err << '\'' << keyword << ' ' << varname << "' is not declared in this scope";
+				if (debugmode)
+					err << " {operator/no-self}";
+			}
 		}
 		else
 		{
@@ -143,11 +151,19 @@ namespace Instanciate
 					err << '\'' << varname << "' is not declared in '";
 					err << cdeftable.keyword(*self) << ' ';
 					self->retrieveCaption(err.data().message, cdeftable);
+					if (debugmode)
+						err << " (id:" << self->atomid << ')';
 					err << '\'';
+					if (debugmode)
+						err << " {self/func}";
 				}
 			}
 			else
+			{
 				err << '\'' << varname << "' is not declared in this scope";
+				if (debugmode)
+					err << " {func}";
+			}
 		}
 
 		// from
