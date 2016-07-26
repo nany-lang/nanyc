@@ -115,8 +115,10 @@ namespace Instanciate
 
 				hint << '\'';
 				hint << cdeftable.keyword(atom) << ' ';
-				atom.retrieveCaption(hint.text(), cdeftable);
+				hint << atom.caption(cdeftable);
 				hint << "' is a suitable candidate";
+				if (debugmode)
+					hint << " {atomid: " << atom.atomid << '}';
 			}
 		}
 		return false;
@@ -166,8 +168,10 @@ namespace Instanciate
 
 					hint << '\'';
 					hint << cdeftable.keyword(atom) << ' ';
-					atom.retrieveCaption(hint.text(), cdeftable);
+					hint << atom.caption(cdeftable);
 					hint << "' is a suitable candidate";
+					if (debugmode)
+						hint << " {b-atomid: " << atom.atomid << '}';
 
 					hint.appendEntry(resolver.subreports[i]); // subreport can be null
 				}
@@ -317,8 +321,11 @@ namespace Instanciate
 			lvidinfo.fillLogEntryWithLocation(err);
 			err << "unused variable '" << lvidinfo.userDefinedName << "' in '";
 			err << cdeftable.keyword(frame.atom) << ' ';
-			frame.atom.retrieveCaption(err.data().message, cdeftable);
+			err << frame.atom.caption(cdeftable);
 			err << '\'';
+
+			if (debugmode)
+				err << " {atomid: " << frame.atomid << '}';
 		}
 	}
 
