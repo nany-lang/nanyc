@@ -1,4 +1,3 @@
-#pragma once
 #include <yuni/yuni.h>
 #include "details/context/build.h"
 #include "details/reporting/report.h"
@@ -60,10 +59,25 @@ namespace Instanciate
 
 
 	public:
-		//! All suitable solutions
-		std::vector<bool> suitable;
 		// total number of suitable solutions (<= suitable.size())
 		uint32_t suitableCount = 0;
+		//! Flag to determine if a solution is suitable
+		std::vector<bool> suitable;
+
+		/*!
+		** \brief Scores for each solution
+		**
+		** The score is merely the number of parameters that match perfectly
+		** ex:
+		**    func foo(cref a, cref b)            // 1
+		**    func foo(cref a, cref b: std.Ascii) // 2
+		**    foo(10, 'a');                       // scores: 1: 0, 2: 1 (must call 2)
+		** ex:
+		**    func foo(cref a: i32, cref b)       // 1
+		**    func foo(cref a, cref b: std.Ascii) // 2
+		**    foo(10, 'a');                       // scores: 1: 1, 2: 1 (no perfect match)
+		*/
+		std::vector<uint32_t> scores;
 
 		//! All subreports for suitable solutions
 		std::vector<Logs::Message::Ptr> subreports;

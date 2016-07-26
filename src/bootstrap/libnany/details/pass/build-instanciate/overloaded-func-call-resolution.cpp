@@ -26,25 +26,28 @@ namespace Instanciate
 		// invalidating the result
 		atom = nullptr;
 		params = nullptr;
-		// alias
-		uint32_t solutionCount = static_cast<uint32_t>(solutions.size());
-
-		// all really suitable solutions (type match)
 		suitable.clear();
-		suitable.resize(solutionCount, false);
-		// sub-reports for error generation
+		scores.clear();
 		subreports.clear();
-		subreports.resize(solutionCount);
-		// parameter instanciation per solution
 		parameters.clear();
-		parameters.resize(solutionCount);
 
+		uint32_t solutionCount = static_cast<uint32_t>(solutions.size());
 		if (unlikely(solutionCount == 0))
 			return false;
+
+		// all really suitable solutions (type match)
+		suitable.resize(solutionCount, false);
+		// all scores for each solution
+		scores.resize(solutionCount, 0u);
+		// sub-reports for error generation
+		subreports.resize(solutionCount);
+		// parameter instanciation per solution
+		parameters.resize(solutionCount);
 
 		// the last perfect match found
 		Atom* perfectMatch = nullptr;
 		ParameterTypesRequested* perfectMatchParams = nullptr;
+		ParameterTypesRequested* perfectMatchTmplParams = nullptr;
 		// flag for determine whether a perfect match has really been found (and not invalidated a posteriori)
 		uint32_t perfectMatchCount = 0;
 
@@ -66,6 +69,7 @@ namespace Instanciate
 					// ok, the solution is "suitable"
 					++suitableCount;
 					suitable[r] = true;
+					scores[r] = overloadMatch.result.score;
 					atom = &atomsol;
 					// keeping the new parameters
 					// for using this solution, implicit object creation may be required
@@ -80,6 +84,7 @@ namespace Instanciate
 					{
 						perfectMatch = atom;
 						perfectMatchParams = params;
+						perfectMatchTmplParams = tmplparams;
 						++perfectMatchCount;
 					}
 					break;
@@ -105,17 +110,56 @@ namespace Instanciate
 
 		if (suitableCount > 1)
 		{
+			// Several suitable solutions are available. Not all types are strict enough and
+			// several overloads are possible matches. In this case, it is still possible to get
+			// a perfect match is a single solution has the best score (the score is merely the
+			// number of parameters that match perfectly)
+			//
+			// see description of the OverloadedFuncCallResolver::scores
+			if (0 == perfectMatch)
+			{
+				uint32_t bestScoreIndex = 0u;
+				uint32_t bestScore = 0u;
+				bool unique = true;
+				assert(scores.size() == suitable.size());
+				for (uint32_t r = 0; r != solutionCount; ++r)
+				{
+					if (suitable[r])
+					{
+						uint32_t s = scores[r];
+						if (s > bestScore)
+						{
+							unique = true;
+							bestScore = s;
+							bestScoreIndex = r;
+						}
+						else if (s == bestScore)
+							unique = false;
+					}
+				}
+				if (0 != bestScore and unique) // a perfect match has been found
+				{
+					perfectMatchCount = 1u;
+					perfectMatch = &(solutions[bestScoreIndex].get());
+					perfectMatchParams     = &(parameters[bestScoreIndex].first);
+					perfectMatchTmplParams = &(parameters[bestScoreIndex].second);
+				}
+			}
+
 			if (1 == perfectMatchCount)
 			{
 				// several solutions might be possible, but a perfect match has been found
 				atom = perfectMatch; // this is _the_ solution !
 				params = perfectMatchParams;
+				tmplparams = perfectMatchTmplParams;
 				suitableCount = 1;
 			}
 			else
 			{
-				// since we have several suitable solutions (types are not enough stricts),
-				// all func calls will be instanciated
+
+				// not able to find asuitable solution from the input types
+				// trying to instanciate all func calls to see if one of those
+				// is the good one
 
 				// the total number of instanciation that succeeded
 				uint instanceSuccessCount = 0;
@@ -123,7 +167,7 @@ namespace Instanciate
 				solutionsThatCanBeInstanciated.clear();
 				solutionsThatCanBeInstanciated.resize(suitable.size(), false);
 
-				for (uint32_t r = 0; r != (uint32_t) suitable.size(); ++r)
+				for (uint32_t r = 0; r != solutionCount; ++r)
 				{
 					if (not suitable[r])
 						continue;

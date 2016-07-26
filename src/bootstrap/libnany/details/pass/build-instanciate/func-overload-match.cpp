@@ -163,11 +163,11 @@ namespace Instanciate
 	inline TypeCheck::Match FuncOverloadMatch::validateAtom(Atom& atom, bool allowImplicit)
 	{
 		assert(atom.isFunction() or atom.isClass());
-
 		// some reset
 		result.params.clear();
 		result.tmplparams.clear();
 		result.funcToCall = &atom;
+		result.score = 0u;
 
 		auto& table = seq->cdeftable;
 
@@ -200,6 +200,7 @@ namespace Instanciate
 
 		pAllowImplicit = allowImplicit;
 		bool perfectMatch /*= false*/;
+		uint32_t score = 0u;
 
 		// checking input.params
 		{
@@ -213,7 +214,7 @@ namespace Instanciate
 				switch (pushParameter<withErrorReporting, true>(atom, i, input.tmplparams.indexed[i]))
 				{
 					case TypeCheck::Match::equal:       perfectMatch = false; break;
-					case TypeCheck::Match::strictEqual: break;
+					case TypeCheck::Match::strictEqual: ++score; break;
 					case TypeCheck::Match::none:        return TypeCheck::Match::none;
 				}
 			}
@@ -232,7 +233,7 @@ namespace Instanciate
 				switch (pushParameter<withErrorReporting, false>(atom, i, input.params.indexed[i]))
 				{
 					case TypeCheck::Match::equal:       perfectMatch = false; break;
-					case TypeCheck::Match::strictEqual: break;
+					case TypeCheck::Match::strictEqual: ++score; break;
 					case TypeCheck::Match::none:        return TypeCheck::Match::none;
 				}
 			}
@@ -257,7 +258,7 @@ namespace Instanciate
 					switch (pushParameter<withErrorReporting, false>(atom, index, pair.second))
 					{
 						case TypeCheck::Match::equal:       perfectMatch = false; break;
-						case TypeCheck::Match::strictEqual: break;
+						case TypeCheck::Match::strictEqual: ++score; break;
 						case TypeCheck::Match::none:        return TypeCheck::Match::none;
 					}
 				}
@@ -362,7 +363,14 @@ namespace Instanciate
 				return TypeCheck::Match::none;
 			}
 		}
-		return perfectMatch ? TypeCheck::Match::strictEqual : TypeCheck::Match::equal;
+
+		if (not perfectMatch)
+		{
+			result.score = score; // for not being equal to 0
+			return TypeCheck::Match::equal;
+		}
+		result.score = static_cast<uint32_t>(-1);
+		return TypeCheck::Match::strictEqual;
 	}
 
 
@@ -380,6 +388,7 @@ namespace Instanciate
 		report = nullptr;
 		return match;
 	}
+
 
 
 

@@ -94,10 +94,14 @@ namespace Instanciate
 			std::vector<ParamCall> params;
 			//! All template parameters
 			std::vector<ParamCall> tmplparams;
+
+			//! Score if match or partial match
+			uint32_t score = 0u;
 		}
 		result;
 
 		Logs::Report* report = nullptr;
+
 
 	private:
 		template<bool withErrorReporting>
