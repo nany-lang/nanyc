@@ -140,13 +140,18 @@ namespace Instanciate
 			if (part.empty())
 				continue;
 
-			if (not varname.empty())
-				varname.prepend(".");
+			AnyString keyword;
+			AnyString partname;
+			Atom::extractNames(keyword, partname, part);
+			String str;
+			if (not keyword.empty())
+				str << keyword << ' ';
+			str << partname;
 
-			if (part.first() != '^')
-				varname.prepend(part);
-			else
-				varname << "operator " << AnyString{part, 1, part.size() - 1};
+			if (not varname.empty())
+				str << '.';
+
+			varname.prepend(str);
 		}
 
 		auto err = error();
