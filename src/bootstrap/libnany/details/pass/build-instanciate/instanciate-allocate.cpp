@@ -24,9 +24,15 @@ namespace Instanciate
 		{
 			auto err = (error() << "cannot instanciate object of type '");
 			cdef.print(err.data().message, cdeftable, false);
-			err << "'";
+			err << '\'';
 			return frame->invalidate(operands.lvid);
 		}
+
+		if (unlikely(not atom->isClass()))
+			return (void)(error() << "type required for allocation");
+
+		if (unlikely(not atom->classinfo.isInstanciated))
+			return (void)complainClassNotInstanciated(*atom);
 
 		// propagate the object type
 		{

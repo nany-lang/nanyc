@@ -1,4 +1,5 @@
 #include "instanciate.h"
+#include <iostream>
 
 using namespace Yuni;
 
@@ -38,30 +39,33 @@ namespace Instanciate
 		}
 		auto& atom = *atomptr;
 
+
 		switch (atom.type)
 		{
 			case Atom::Type::classdef:
 			{
-				// instanciating the type itself, to resolve member variables
-				if (not atom.classinfo.isInstanciated)
+				bool requiresInstanciation =
+					// instanciating the type itself, to resolve member variables
+					(not atom.classinfo.isInstanciated)
+					// in 'signature mode' only, the types are needed but no instanciation
+					and (not signatureOnly);
+
+				if (requiresInstanciation)
 				{
-					if (not signatureOnly)
+					Atom* newAtomRef = instanciateAtomClass(atom);
+					if (unlikely(nullptr == newAtomRef))
+						return false;
+
+					// The target atom may have changed for generic classes
+					if (atom.atomid != newAtomRef->atomid)
 					{
-						Atom* newAtomRef = instanciateAtomClass(atom);
-						if (unlikely(nullptr == newAtomRef))
-							return false;
-
-						// The target atom may have changed for generic classes
-						if (atom.atomid != newAtomRef->atomid)
-						{
-							auto& spare = cdeftable.substitute(operands.lvid);
-							spare.mutateToAtom(newAtomRef);
-						}
+						auto& spare = cdeftable.substitute(operands.lvid);
+						spare.mutateToAtom(newAtomRef);
 					}
-
-					// remove generic type parameters if any
-					pushedparams.gentypes.clear();
 				}
+
+				// remove generic type parameters if any (cleanup to avoid invalid state)
+				pushedparams.gentypes.clear();
 				break;
 			}
 			case Atom::Type::funcdef:
@@ -72,19 +76,17 @@ namespace Instanciate
 					// assignment (or operators like +=)
 				}
 				else
-				{
-					error() << "pointer-to-function are not implemented yet";
-					return false;
-				}
+					return (error() << "pointer-to-function are not implemented yet");
 			}
+			// [[fallthu]]
 			default:
+			{
+				// no generic type parameters should remain at this point
+				if (unlikely(not pushedparams.gentypes.empty()))
+					ice() << "invalid pushed generic type parameters, ensureResolve '" << atom.caption() << '\'';
 				break;
+			}
 		}
-
-		// no generic type parameters should remain at this point
-		if (unlikely(not pushedparams.gentypes.empty()))
-			ice() << "invalid pushed generic type parameters, ensureResolve '" << atom.caption() << '\'';
-
 		return true;
 	}
 

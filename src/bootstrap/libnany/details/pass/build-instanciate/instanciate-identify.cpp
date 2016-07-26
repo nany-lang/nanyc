@@ -106,7 +106,6 @@ namespace Instanciate
 			? resultAtom
 			: resolveTypeAlias(resultAtom, cdefTypedef);
 
-
 		if (unlikely((!cdefTypedef and resultAtom.isTypeAlias()) or atom.flags(Atom::Flags::error)))
 			return false;
 
@@ -491,20 +490,32 @@ namespace Instanciate
 			if (unlikely(frame->lvids[lvid].markedAsAny))
 				return (ice() << "can not perform member lookup on 'any'");
 
-
-			auto& self = cdeftable.classdef(CLID{frame->atomid, operands.self});
-			if (unlikely(self.isBuiltinOrVoid()))
-				return complainInvalidMemberRequestNonClass(name, self.kind);
-
 			bool& singleHop = frame->lvids[operands.self].singleHopForReferer;
+			CLID selfclid{frame->atomid, operands.self};
 
-			selfAtom = cdeftable.findClassdefAtom(self);
+			// retrieving the self atom, if any
+			{
+				auto& self = cdeftable.classdef(selfclid);
+				if (unlikely(self.isBuiltinOrVoid()))
+					return complainInvalidMemberRequestNonClass(name, self.kind);
+				selfAtom = cdeftable.findClassdefAtom(self);
+			}
+
 			if (selfAtom != nullptr) // the parent has been fully resolved
 			{
+				// class self not instanciated ?
+				// it probably means that the atom has been forked and we're
+				// still using the old reference
+				if (unlikely(selfAtom->isClass() and (not selfAtom->classinfo.isInstanciated)))
+				{
+					if (unlikely(not signatureOnly))
+						return complainClassNotInstanciated(*selfAtom);
+				}
+
 				// since the parent has been fully resolved, no multiple
 				// solution should be available
-				assert(frame->partiallyResolved.count(self.clid) == 0
-					   or frame->partiallyResolved[self.clid].empty());
+				assert(frame->partiallyResolved.count(selfclid) == 0
+					   or frame->partiallyResolved[selfclid].empty());
 
 				if (not selfAtom->nameLookupOnChildren(multipleResults, name, &singleHop))
 				{
@@ -517,7 +528,7 @@ namespace Instanciate
 			}
 			else
 			{
-				auto it = frame->partiallyResolved.find(self.clid);
+				auto it = frame->partiallyResolved.find(selfclid);
 				if (it != frame->partiallyResolved.end())
 				{
 					auto& selfSolutions = it->second;

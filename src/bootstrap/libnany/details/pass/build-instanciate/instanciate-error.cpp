@@ -562,6 +562,15 @@ namespace Instanciate
 	}
 
 
+	bool SequenceBuilder::complainClassNotInstanciated(const Atom& atom)
+	{
+		auto err = ice();
+		err << "class not instanciated: " << atom.caption(cdeftable);
+		if (debugmode)
+			err << ", atomid: " << atom.atomid;
+		return false;
+	}
+
 
 
 

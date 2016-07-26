@@ -300,6 +300,8 @@ namespace Instanciate
 
 		void complainInvalidParametersAfterSignatureMatching(Atom&, FuncOverloadMatch& overloadMatch);
 		void complainCannotCall(const Atom&, FuncOverloadMatch& overloadMatch);
+
+		bool complainClassNotInstanciated(const Atom&);
 		//@}
 
 
@@ -400,6 +402,11 @@ namespace Instanciate
 		uint32_t layerDepthLimit = (uint32_t) -1;
 
 		bool signatureOnly = false;
+
+		//! Force mapping from an atomid to another one
+		// This mapping is required instnaciating the code from a
+		// forked atom and to avoid invalid references
+		uint32_t mappingBlueprintAtomID[2] = {0, 0};
 
 		//! cursor
 		IR::Instruction** cursor = nullptr;

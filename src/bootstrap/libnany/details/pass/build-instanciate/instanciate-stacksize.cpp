@@ -19,15 +19,13 @@ namespace Instanciate
 			// the new stack size
 			uint32_t stacksize = operands.add + frame->atom.opcodes.stackSizeExtra;
 
-			if (cdeftable.substituteAtomID() == frame->atomid)
-				frame->resizeRegisterCount(stacksize, cdeftable);
+			//if (cdeftable.substituteAtomID() == frame->atomid)
+			frame->resizeRegisterCount(stacksize, cdeftable);
 
 			if (canGenerateCode())
 				frame->offsetOpcodeStacksize = out.emitStackSizeIncrease(stacksize);
 		}
 	}
-
-
 
 
 

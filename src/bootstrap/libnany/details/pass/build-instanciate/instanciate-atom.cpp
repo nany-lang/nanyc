@@ -6,6 +6,7 @@
 #include "libnany-traces.h"
 #include "instanciate-atom.h"
 #include <memory>
+#include <iostream>
 
 using namespace Yuni;
 
@@ -172,7 +173,7 @@ namespace Instanciate
 			auto& newAtom = info.atom.get();
 			newAtom.tmplparamsForPrinting.swap(newAtom.tmplparams);
 
-			// marking the new atom as instanciated, like a standard class
+			// marking the new atom as instanciated, like any standard atom
 			newAtom.classinfo.isInstanciated = true;
 			// to keep the types for the new atoms
 			info.shouldMergeLayer = true;
@@ -187,32 +188,25 @@ namespace Instanciate
 			// No IR sequence attached for the given signature,
 			// let's instanciate the function or the class !
 
-			auto& previousAtom = info.atom.get();
-			if (unlikely(!previousAtom.opcodes.sequence or !previousAtom.parent))
+			auto& atomRequested = info.atom.get();
+			if (unlikely(!atomRequested.opcodes.sequence or !atomRequested.parent))
 			{
 				ice() << "invalid atom";
 				return nullptr;
 			}
-
-			// for template classes
-			Atom* remapAtom = nullptr;
-
-			// creaa new atom branch for the new instanciation if the atom is a generic class
-			bool instTemplateClass = (previousAtom.isClass() and previousAtom.hasGenericParameters());
-			if (instTemplateClass)
+			// In case or an anonymous class or a class with generic type parameters,
+			// it is necessary to use new atoms (t needs a forked version to work on
+			// to have different types)
+			if (atomRequested.isContextual())
 			{
-				bool creatok = createNewAtom(info, previousAtom);
-				if (unlikely(not creatok))
+				if (not createNewAtom(info, atomRequested))
 					return nullptr;
-
-				remapAtom = &info.atom.get();
-				// the atom has changed
-				assert(&info.atom.get() != &previousAtom);
+				// the atom has changed - info.atom.get() has been updated accordingly
+				assert(&info.atom.get() != &atomRequested);
 			}
 
 
-
-			// the current atom, probably different from `previousAtom`
+			// the current atom, can be different from `atomRequested`
 			auto& atom = info.atom.get();
 			// the new IR sequence for the instanciated function
 			auto* outIR = new IR::Sequence;
@@ -221,12 +215,12 @@ namespace Instanciate
 
 			// registering the new instanciation first
 			// (required for recursive functions & classes)
-			// `previousAtom` is probably `atom` itself, but different for template classes
-			info.instanceid = previousAtom.createInstanceID(signature, outIR, remapAtom);
+			// `atomRequested` is probably `atom` itself, but different for template classes
+			info.instanceid = atomRequested.createInstanceID(signature, outIR, &atom);
 
 			// new layer for the cdeftable
 			ClassdefTableView newView{info.cdeftable, atom.atomid, signature.parameters.size()};
-			// log
+			// Error reporting
 			Logs::Report report{*info.report};
 
 			// instanciate the sequence attached to the atom
@@ -240,6 +234,10 @@ namespace Instanciate
 			builder->pushParametersFromSignature(atom, signature);
 			//if (info.parentAtom)
 			builder->layerDepthLimit = 2; // allow the first blueprint to be instanciated
+
+			// atomid mapping, usefull to keep track of the good atom id
+			builder->mappingBlueprintAtomID[0] = atomRequested.atomid; // {from}
+			builder->mappingBlueprintAtomID[1] = atom.atomid;          // {to}
 
 			// Read the input IR sequence, resolve all types, and generate
 			// a new IR sequence ready for execution ! (with or without optimization passes)
@@ -272,39 +270,52 @@ namespace Instanciate
 
 			if (success)
 			{
-				if (atom.isFunction())
+				switch (atom.type)
 				{
-					// if the IR code belongs to a function, get the return type
-					// and put it into the signature (for later reuse) and into
-					// the 'info' structure for immediate use
-					auto& cdefReturn = newView.classdef(CLID{atom.atomid, 1});
-					if (not cdefReturn.isBuiltinOrVoid())
+					case Atom::Type::funcdef:
 					{
-						auto* atom = newView.findClassdefAtom(cdefReturn);
-						if (atom)
+						// if the IR code belongs to a function, get the return type
+						// and put it into the signature (for later reuse) and into
+						// the 'info' structure for immediate use
+						auto& cdefReturn = newView.classdef(CLID{atom.atomid, 1});
+						if (not cdefReturn.isBuiltinOrVoid())
 						{
-							info.returnType.mutateToAtom(atom);
+							auto* atom = newView.findClassdefAtom(cdefReturn);
+							if (atom)
+							{
+								info.returnType.mutateToAtom(atom);
+							}
+							else
+							{
+								ice() << "invalid atom pointer in func return type for '" << symbolName << '\'';
+								success = false;
+							}
 						}
 						else
-						{
-							ice() << "invalid atom pointer in func return type for '" << symbolName << '\'';
-							success = false;
-						}
+							info.returnType.kind = cdefReturn.kind;
+						break;
 					}
-					else
-						info.returnType.kind = cdefReturn.kind;
-				}
-				else
-				{
-					// not a function, so no return value (unlikely to be used anyway)
-					info.returnType.mutateToVoid();
+
+					case Atom::Type::classdef:
+					{
+						// the user may already have provided one or more constructors
+						// but if not the case, the default implementatio will be used instead
+						if (not atom.hasMember("^new"))
+							atom.renameChild("^default-new", "^new");
+					}
+					// [[fallthru]]
+					default:
+					{
+						// not a function, so no return value (unlikely to be used anyway)
+						info.returnType.mutateToVoid();
+					}
 				}
 
 				if (likely(success))
 				{
 					// registering the new instance to the atom
 					// `previousAtom` is probably `atom` itself, but different for template classes
-					previousAtom.updateInstance(info.instanceid, symbolName, info.returnType);
+					atomRequested.updateInstance(info.instanceid, symbolName, info.returnType);
 					return outIR;
 				}
 			}
@@ -312,7 +323,7 @@ namespace Instanciate
 			// failed to instanciate the input IR sequence. This can be expected, if trying
 			// to not instanciate the appropriate function (if several overloads are present
 			// for example). Anyway, remembering this signature as a 'no-go'.
-			info.instanceid = atom.invalidateInstance(signature, info.instanceid);
+			info.instanceid = atomRequested.invalidateInstance(signature, info.instanceid);
 			return nullptr;
 		}
 
@@ -433,7 +444,7 @@ namespace Instanciate
 
 		// mark the atom being instanciated as 'instanciated'. For classes with gen. type parameters
 		// a new atom will be created and only this one will be marked
-		if (atom.tmplparams.empty())
+		if (not atom.isContextual())
 			atom.classinfo.isInstanciated = true;
 
 
@@ -476,23 +487,17 @@ namespace Instanciate
 		bool instanciated = Pass::Instanciate::instanciateAtom(info);
 		report.subgroup().appendEntry(newReport);
 
-		// !!
-		// !! The target atom may have changed here (for generic classes)
-		// !!
+		// !! The target atom may have changed here
+		// (for any non contextual atoms, generic classes, anonymous classes...)
 		auto& resAtom = info.atom.get();
 
-		if (instanciated)
+		if (not instanciated) // failed
 		{
-			// the user may already have provided one or more constructors
-			// but if not the case, the default implementatio will be used instead
-			if (not resAtom.hasMember("^new"))
-				resAtom.renameChild("^default-new", "^new");
-			return &resAtom;
+			atom.flags += Atom::Flags::error;
+			resAtom.flags += Atom::Flags::error;
+			return nullptr;
 		}
-
-		atom.flags += Atom::Flags::error;
-		resAtom.flags += Atom::Flags::error;
-		return nullptr;
+		return &resAtom;
 	}
 
 
@@ -663,7 +668,7 @@ namespace Instanciate
 		if (unlikely(!parentBuilder))
 			return (ice() << "failed to find parent sequence builder");
 
-		if (not atom.tmplparams.empty())
+		if (atom.hasGenericParameters())
 			return error("recursive functions with generic type parameters is not supported yet");
 
 		// !! NOTE !!
@@ -773,6 +778,10 @@ namespace Instanciate
 		builder->layerDepthLimit = 2; // allow the first blueprint to be instanciated
 		builder->signatureOnly = true;
 		builder->codeGenerationLock = 666; // arbitrary value != 0
+
+		// Atom ID mapping, irelevant here
+		builder->mappingBlueprintAtomID[0] = atom.atomid;
+		builder->mappingBlueprintAtomID[1] = atom.atomid;
 
 		bool success = builder->readAndInstanciate(atom.opcodes.offset);
 		assert(builder->codeGenerationLock == 666);

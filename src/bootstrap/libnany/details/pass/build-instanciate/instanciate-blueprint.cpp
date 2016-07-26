@@ -70,12 +70,18 @@ namespace Instanciate
 				generateClassVarsAutoInit = false;
 				generateClassVarsAutoRelease = false;
 
-
 				bool bug = (layerDepthLimit == 0);
 				if (not bug)
 					--layerDepthLimit;
 
+				// retrieving the atomid - the atomid may be different from the one requested
+				// (class with generic types parameters, anonymous classes...)
+				assert(mappingBlueprintAtomID[0] != 0 and "mapping atomid not set");
+				assert(mappingBlueprintAtomID[1] != 0 and "mapping atomid not set");
 				uint32_t atomid = operands.atomid;
+				if (atomid == mappingBlueprintAtomID[0])
+					atomid = mappingBlueprintAtomID[1];
+
 
 				auto* atom = cdeftable.atoms().findAtom(atomid);
 				if (unlikely(nullptr == atom))
@@ -90,7 +96,8 @@ namespace Instanciate
 				// - an anonymous class (in the middle of a function for example):
 				//   'operands.lvid' will be different from 0. However, when the class
 				//   will be instanciated, we will be called again, but without any current 'frame'
-				if (operands.lvid == 0 or !frame)
+				uint32_t lvid = operands.lvid;
+				if (lvid == 0 or !frame)
 				{
 					// declare a new class
 
@@ -122,8 +129,8 @@ namespace Instanciate
 					// anonymous class
 					// The flag Atom::Flags::captureVariables should already be set via 'mapping'
 					assert(atom->flags(Atom::Flags::captureVariables));
-					// updating the attached lvid for automatic type declaration
-					cdeftable.substitute(operands.lvid).mutateToAtom(atom);
+
+					//cdeftable.substitute(lvid).mutateToAtom(atom);
 
 					// ignoring completely this blueprint, so the cursor will be
 					// moved to its final corresponding opcode 'end'
@@ -131,9 +138,16 @@ namespace Instanciate
 					if (bug)
 						*cursor = &currentSequence.at(currentSequence.offsetOf(**cursor) + 1);
 
-					bool instok = instanciateAtomClass(*atom); // instanciating the class
-					if (unlikely(not instok))
-						return;
+					Atom* resAtom = instanciateAtomClass(*atom); // instanciating the class
+					if (unlikely(!resAtom))
+					{
+						if (frame)
+							frame->invalidate(lvid);
+						break;
+					}
+
+					// updating the attached lvid for automatic type declaration
+					cdeftable.substitute(lvid).mutateToAtom(resAtom);
 				}
 				break;
 			}
@@ -218,6 +232,7 @@ namespace Instanciate
 				generateClassVarsAutoRelease = false;
 
 				uint32_t atomid = operands.atomid;
+				assert(atomid != mappingBlueprintAtomID[0] and "mapping for an unit ?");
 				auto* atom = cdeftable.atoms().findAtom(atomid);
 				if (unlikely(nullptr == atom))
 				{
