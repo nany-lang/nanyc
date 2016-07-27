@@ -205,13 +205,19 @@ namespace Instanciate
 				assert(&info.atom.get() != &atomRequested);
 			}
 
-
 			// the current atom, can be different from `atomRequested`
 			auto& atom = info.atom.get();
 			// the new IR sequence for the instanciated function
 			auto* outIR = new IR::Sequence;
 			// the original IR sequence generated from the AST
 			auto& inputIR = *(atom.opcodes.sequence);
+
+			// Do some variables require capture ? (from mapping)
+			if (!!atom.candidatesForCapture)
+			{
+				if (info.parent)
+					info.parent->captureVariables(atom);
+			}
 
 			// registering the new instanciation first
 			// (required for recursive functions & classes)
@@ -472,10 +478,6 @@ namespace Instanciate
 		params.swap(overloadMatch.result.params);
 		tmplparams.swap(overloadMatch.result.tmplparams);
 
-
-		// determine captured variables before instanciating the class
-		if (!!atom.candidatesForCapture)
-			captureVariables(atom);
 
 		Logs::Message::Ptr newReport;
 

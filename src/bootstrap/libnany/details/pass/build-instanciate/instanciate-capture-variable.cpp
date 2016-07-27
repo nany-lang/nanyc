@@ -150,8 +150,9 @@ namespace Instanciate
 
 			if (Config::Traces::capturedVariables)
 			{
-				auto& sp = cdeftable.classdef(CLID{atom.atomid, startLvid + i});
-				trace() << ".. creating local variables " << sp.clid << " as " << sp.print(cdeftable);
+				auto& sp = cdeftable.classdef(cdef.clid);
+				trace() << ".. '" << var.name << "': creating local stack variables "
+					<< sp.clid << " as '" << sp.print(cdeftable) << '\'';
 			}
 		}
 
