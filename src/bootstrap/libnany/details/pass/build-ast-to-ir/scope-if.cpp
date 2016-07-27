@@ -220,69 +220,57 @@ namespace Producer
 	bool Scope::visitASTExprIfStmt(const AST::Node& node)
 	{
 		assert(node.rule == AST::rgIf);
-		assert(node.children.size() >= 2);
+		const AST::Node* condition = nullptr;
+		const AST::Node* ifthen = nullptr;
+		const AST::Node* ifelse = nullptr;
 
-		// the condition to evaluate
-
-		switch (node.children.size())
+		for (auto& childptr: node.children)
 		{
-			case 2:
+			auto& child = *childptr;
+			switch (child.rule)
 			{
-				// if-then
-				auto& condition  = *(node.children[0]);
-				auto& thenc = *(node.children[1]);
-				return generateIfStmt(condition, thenc);
-			}
-			case 3:
-			{
-				// if-then-else
-				auto& condition  = *(node.children[0]);
-				auto& thenc = *(node.children[1]);
-				auto* elsec = AST::Node::Ptr::WeakPointer(node.children[2]);
-				return generateIfStmt(condition, thenc, elsec);
-			}
-			default:
-			{
-				ice(node) << "if: invalid ast node";
-				return false;
+				case AST::rgExpr: condition = &child; break;
+				case AST::rgIfThen:  ifthen = &child; break;
+				case AST::rgIfElse:  ifelse = &child; break;
+				default: return unexpectedNode(child, "[if-stmt]");
 			}
 		}
-		return false;
+
+		if (unlikely(!condition or !ifthen))
+			return (error(node) << "invalid if-then node");
+
+		return generateIfStmt(*condition, *ifthen, ifelse);
 	}
 
 
 	bool Scope::visitASTExprIfExpr(const AST::Node& node, LVID& localvar)
 	{
 		assert(node.rule == AST::rgIf);
-		assert(node.children.size() >= 2);
 
 		localvar = 0u;
 
-		// the condition to evaluate
+		const AST::Node* condition = nullptr;
+		const AST::Node* ifthen = nullptr;
+		const AST::Node* ifelse = nullptr;
 
-		switch (node.children.size())
+		for (auto& childptr: node.children)
 		{
-			case 3:
+			auto& child = *childptr;
+			switch (child.rule)
 			{
-				// if-then-else
-				auto& condition = *(node.children[0]);
-				auto& thenc     = *(node.children[1]);
-				auto& elsec     = *(node.children[2]);
-				return generateIfExpr(localvar, condition, thenc, elsec);
-			}
-			case 2:
-			{
-				error(node) << "'else' value expected";
-				return false;
-			}
-
-			default:
-			{
-				ice(node) << "if: invalid ast node";
-				return false;
+				case AST::rgExpr: condition = &child; break;
+				case AST::rgIfThen:  ifthen = &child; break;
+				case AST::rgIfElse:  ifelse = &child; break;
+				default: return unexpectedNode(child, "[if-stmt]");
 			}
 		}
-		return false;
+
+		if (unlikely(!condition or !ifthen))
+			return (error(node) << "invalid if-then node");
+		if (unlikely(!ifelse))
+			return (error(node) << "'else' clause is required for a conditional expression");
+
+		return generateIfExpr(localvar, *condition, *ifthen, *ifelse);
 	}
 
 
