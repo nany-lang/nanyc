@@ -17,7 +17,7 @@ namespace VM
 	{
 
 		template<class T>
-		static constexpr inline uint32_t sizeFromCapacity(uint32_t capacity)
+		static inline uint32_t sizeFromCapacity(uint32_t capacity)
 		{
 			uint32_t bytes = static_cast<uint32_t>(sizeof(T)); // the Chunk itself
 			bytes -= static_cast<uint32_t>(sizeof(T::block));  // minus the pseudo field 'block'
