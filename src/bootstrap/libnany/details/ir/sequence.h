@@ -372,6 +372,13 @@ namespace IR
 		//@}
 
 
+		//! \name Operators
+		//@{
+		//! Copy operator
+		Sequence& operator = (const Sequence&) = delete;
+		//@}
+
+
 	public:
 		//! All strings
 		StringRefs stringrefs;
