@@ -203,7 +203,8 @@ namespace VM
 			[[noreturn]] void emitLabelError(uint32_t label)
 			{
 				ShortString256 msg;
-				msg << "invalid label %" << label << " (upper: %" << upperLabelID;
+				msg << "invalid label %" << label;
+				msg << " (upper: %" << upperLabelID;
 				msg << "), opcode: +" << sequence.get().offsetOf(**cursor);
 				threadContext.cerrException(msg);
 				abortMission();
@@ -282,6 +283,9 @@ namespace VM
 					: sequence.get().jumpToLabelBackward(*cursor, label);
 				if (unlikely(not jmpsuccess))
 					emitLabelError(label);
+
+				// the labels are strictly ordered
+				upperLabelID = label;
 			}
 
 
