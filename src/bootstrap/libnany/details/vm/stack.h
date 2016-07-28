@@ -3,6 +3,7 @@
 #include "nany/nany.h"
 #include "details/context/build.h"
 
+#define NANY_VM_STACK_TRACES 0
 
 
 namespace Nany
@@ -17,6 +18,7 @@ namespace VM
 	{
 	public:
 		explicit Stack(Build&);
+		Stack(const Stack&) = delete;
 		~Stack();
 
 		/*!
@@ -29,23 +31,46 @@ namespace VM
 		*/
 		void pop(uint32_t count);
 
+		//! Operator =
+		Stack& operator = (const Stack&) = delete;
+
 
 	private:
-		void expandChunk();
+		void pushNewChunk(uint32_t count);
+		void popChunk();
+		void dump(uint32_t count) const;
 
 	private:
+		static_assert(sizeof(DataRegister) == sizeof(uint64_t), "invalid register size");
+
 		struct Chunk
 		{
-			enum { max = (8192 - sizeof(void*) * 3) / sizeof(DataRegister) };
-			DataRegister block[max];
+			static constexpr uint32_t blockSizeWanted = 8192u;
+
+			//! The maximum number of bytes that would fit in 2 pages block
+			static constexpr uint32_t blockmax =
+				static_cast<uint32_t>((blockSizeWanted - sizeof(void*) * 4) / sizeof(DataRegister));
+
 			uint32_t remains;
-			DataRegister* cursor;
-			Chunk* next;
+			uint32_t capacity;
 			Chunk* previous;
+			DataRegister* cursor;
+
+			DataRegister block[blockmax]; // [capacity]
+			// warning: the size of this struct might be bigger than expected
+			// the real size of 'block' is 'capacity', which can be greater than 'blockmax'
+			// to accept legit big stack requests
 		};
 
 		Chunk* current = nullptr;
-		Chunk* allocated = nullptr;
+		Chunk* reserve = nullptr;
+		Chunk* root = nullptr;
+
+		#if NANY_VM_STACK_TRACES != 0
+		uint32_t frameCount = 0u;
+		uint32_t stacksize = static_cast<uint32_t>(sizeof(Chunk));
+		#endif
+
 		Build& build;
 	};
 
