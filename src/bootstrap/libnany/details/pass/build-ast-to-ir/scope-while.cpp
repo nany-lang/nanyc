@@ -32,7 +32,7 @@ namespace Producer
 		bool success = true;
 
 		if (debugmode)
-			out.emitComment("while");
+			out.emitComment("while-do");
 
 		// new scope for the 'while' statement
 		OpcodeScopeLocker opscopeWhile{out};

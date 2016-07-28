@@ -110,7 +110,7 @@ namespace Producer
 
 		// post-update label ids
 		out.at<IR::ISA::Op::jz>(opOffJz).label = (hasElseClause ? labelElse : labelEnd);
-		if (opOffIntermediateEnd)
+		if (opOffIntermediateEnd != 0)
 			out.at<IR::ISA::Op::jmp>(opOffIntermediateEnd).label = labelEnd;
 		return success;
 	}
