@@ -66,31 +66,34 @@ namespace Instanciate
 			IR::Instruction** cursor = nullptr;
 		};
 
+
 		static void reinitStackAllocTypes(IR::Sequence& out, ClassdefTableView& table, uint32_t atomid)
 		{
 			PostProcessStackAllocWalker walker{table, atomid};
 			out.each(walker);
 		}
 
-		static inline void printGeneratedIRSequence(const String& symbolName,
+
+		static void printGeneratedIRSequence(const String& symbolName,
 			const IR::Sequence& out, const ClassdefTableView& newView, uint32_t offset = 0)
 		{
-			info();
-			auto entry = trace();
-			entry.message.prefix << symbolName;
-
 			String text;
+			text.reserve(out.opcodeCount() * 40); // arbitrary
 			out.print(text, &newView.atoms(), offset);
 			text.replace("\n", "\n    ");
 			text.trimRight();
 
+			info();
+			auto entry = trace();
+			entry.message.prefix << symbolName;
 			entry.trace() << "{\n    " << text << "\n}";
 			entry.info(); // for beauty
 			entry.info(); // for beauty
 			entry.info(); // for beauty
 		}
 
-		static inline void printSourceOpcodeSequence(const ClassdefTableView& cdeftable, const Atom& atom, const char* txt)
+
+		static void printSourceOpcodeSequence(const ClassdefTableView& cdeftable, const Atom& atom, const char* txt)
 		{
 			String text;
 			text << txt << cdeftable.keyword(atom) << ' '; // ex: func
