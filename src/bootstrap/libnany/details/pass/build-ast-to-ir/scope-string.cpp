@@ -66,7 +66,7 @@ namespace Producer
 					{
 						if (extended.text.size() == 1)
 						{
-							char extC;
+							char extC = '\0';
 							if (not convertCharExtended(extC, extended.text[0]))
 								return (error(extended) << "invalid escaped character '\\" << extended.text << '\'');
 							c = extC;
@@ -213,7 +213,7 @@ namespace Producer
 
 					if (child.text.size() == 1)
 					{
-						char c;
+						char c = '\0';
 						if (not convertCharExtended(c, child.text[0]))
 							return (error(child) << "invalid escaped character '\\" << child.text << '\'');
 						context.reuse.string.text += c;
