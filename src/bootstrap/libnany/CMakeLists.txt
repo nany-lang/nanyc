@@ -60,6 +60,7 @@ foreach (filename ${nsl_files})
 	string(REPLACE "${nsl_root}/" "nsl_" __funcname "${__funcname}")
 	string(REPLACE ".ny" "" __funcname "${__funcname}")
 	string(REPLACE "/" "_" __funcname "${__funcname}")
+	string(REPLACE "-" "_" __funcname "${__funcname}")
 	string(REPLACE "\\" "_" __funcname "${__funcname}")
 
 	set(target_filename "nsl2c/${__funcname}.c")
@@ -449,6 +450,8 @@ addsrc(
 	"details/vm/runtime/std.core.h"
 	"details/vm/runtime/std.core.string.cpp"
 	"details/vm/runtime/std.os.process.cpp"
+	"details/vm/runtime/std.io.cpp"
+	"details/vm/runtime/std.memory.cpp"
 	"details/vm/runtime/std.env.cpp")
 
 

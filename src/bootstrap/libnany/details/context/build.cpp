@@ -63,6 +63,8 @@ namespace Nany
 			importNSLCoreString(intrinsics);
 			importNSLOSProcess(intrinsics);
 			importNSLEnv(intrinsics);
+			importNSLIO(intrinsics);
+			importNSLMemory(intrinsics);
 		}
 
 		if (cf.on_create)

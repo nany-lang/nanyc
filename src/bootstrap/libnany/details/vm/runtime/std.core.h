@@ -23,6 +23,16 @@ namespace Nany
 	void importNSLCoreString(IntrinsicTable&);
 
 	/*!
+	** \brief Nany Standard Library 'std.memory'
+	*/
+	void importNSLMemory(IntrinsicTable&);
+
+	/*!
+	** \brief Import intrinsics related to IO accesses
+	*/
+	void importNSLIO(IntrinsicTable&);
+
+	/*!
 	** \brief Import intrinsics related to process manipulation
 	*/
 	void importNSLOSProcess(IntrinsicTable&);
