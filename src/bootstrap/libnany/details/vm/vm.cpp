@@ -9,7 +9,6 @@
 #include <csetjmp>
 #include <limits>
 
-
 using namespace Yuni;
 
 
@@ -51,6 +50,9 @@ namespace VM
 	//! Pattern for memset free regions (debug)
 	constexpr static const int patternFree = 0xCD;
 
+	//! Size that should be added to any Nany objects
+	constexpr static const size_t extraObjectSize =
+		sizeof(uint64_t); // object reference counter
 
 
 	namespace // anonymous
@@ -64,9 +66,9 @@ namespace VM
 
 			//! For C calls
 			nyvm_t cfvm;
-
+			//! Program configuratio
 			nyprogram_cf_t cf;
-
+			//! Current thread context
 			ThreadContext& threadContext;
 
 			//! Registers for the current stack frame
@@ -130,7 +132,6 @@ namespace VM
 				cfvm.console = &cf.console;
 			}
 
-
 			~Executor()
 			{
 				// releasing dyncall object
@@ -165,11 +166,13 @@ namespace VM
 				threadContext.cerrException(msg);
 				abortMission();
 			}
+
 			[[noreturn]] void emitAssert()
 			{
 				threadContext.cerrException("assertion failed");
 				abortMission();
 			}
+
 			[[noreturn]] void emitUnexpectedOpcode(const AnyString& name)
 			{
 				ShortString64 msg;
@@ -177,21 +180,25 @@ namespace VM
 				threadContext.cerrException(msg);
 				abortMission();
 			}
+
 			[[noreturn]] void emitInvalidIntrinsicParamType()
 			{
 				threadContext.cerrException("intrinsic invalid parameter type");
 				abortMission();
 			}
+
 			[[noreturn]] void emitInvalidReturnType()
 			{
 				threadContext.cerrException("intrinsic invalid return type");
 				abortMission();
 			}
+
 			[[noreturn]] void emitDividedByZero()
 			{
 				threadContext.cerrException("division by zero");
 				abortMission();
 			}
+
 			[[noreturn]] void emitUnknownPointer(void* p)
 			{
 				ShortString256 msg;
@@ -200,6 +207,7 @@ namespace VM
 				threadContext.cerrException(msg);
 				abortMission();
 			}
+
 			[[noreturn]] void emitLabelError(uint32_t label)
 			{
 				ShortString256 msg;
@@ -211,28 +219,16 @@ namespace VM
 			}
 
 
-			/*!
-			** \brief Adjust an input size for extra metadata held by an object
-			*/
-			static constexpr inline size_t extraObjectSize()
-			{
-				return sizeof(uint64_t); // object ref counter
-			}
-
-
 			template<class T> inline T* allocateraw(size_t size)
 			{
 				return (T*) allocator.allocate(&allocator, size);
 			}
-
 
 			inline void deallocate(void* object, size_t size)
 			{
 				assert(object != nullptr);
 				allocator.deallocate(&allocator, object, size);
 			}
-
-
 
 
 			void destroy(uint64_t* object, uint32_t dtorid, uint32_t instanceid)
@@ -255,7 +251,7 @@ namespace VM
 
 				// its size
 				uint64_t classsizeof = classobject->runtimeSizeof();
-				classsizeof += extraObjectSize();
+				classsizeof += extraObjectSize;
 
 				if (instanceid != (uint32_t) -1)
 				{
@@ -275,7 +271,6 @@ namespace VM
 			}
 
 
-
 			inline void gotoLabel(uint32_t label)
 			{
 				bool jmpsuccess = (label > upperLabelID)
@@ -289,25 +284,14 @@ namespace VM
 			}
 
 
-
 			// accept those opcode for debugging purposes
-			inline void visit(const IR::ISA::Operand<IR::ISA::Op::comment>&)
-			{
-			}
+			inline void visit(const IR::ISA::Operand<IR::ISA::Op::comment>&) {}
 
-			inline void visit(const IR::ISA::Operand<IR::ISA::Op::scope>&)
-			{
-			}
+			inline void visit(const IR::ISA::Operand<IR::ISA::Op::scope>&) {}
 
-			inline void visit(const IR::ISA::Operand<IR::ISA::Op::end>&)
-			{
-			}
+			inline void visit(const IR::ISA::Operand<IR::ISA::Op::end>&) {}
 
-			inline void visit(const IR::ISA::Operand<IR::ISA::Op::nop>&)
-			{
-			}
-
-
+			inline void visit(const IR::ISA::Operand<IR::ISA::Op::nop>&) {}
 
 
 			inline void visit(const IR::ISA::Operand<IR::ISA::Op::negation>& opr)
@@ -504,8 +488,8 @@ namespace VM
 				ASSERT_LVID(opr.lvid);
 				ASSERT_LVID(opr.lhs);
 				ASSERT_LVID(opr.rhs);
-				registers[opr.lvid].u64 = static_cast<uint64_t>(
-																static_cast<int64_t>(registers[opr.lhs].u64) * static_cast<int64_t>(registers[opr.rhs].u64) );
+				registers[opr.lvid].u64 =
+					static_cast<uint64_t>(static_cast<int64_t>(registers[opr.lhs].u64) * static_cast<int64_t>(registers[opr.rhs].u64) );
 			}
 
 			inline void visit(const IR::ISA::Operand<IR::ISA::Op::idiv>& opr)
@@ -861,7 +845,7 @@ namespace VM
 					size = static_cast<size_t>(registers[opr.regsize].u64);
 				}
 
-				size += extraObjectSize();
+				size += extraObjectSize;
 
 				uint64_t* pointer = allocateraw<uint64_t>(size);
 				if (YUNI_UNLIKELY(!pointer))
@@ -887,8 +871,8 @@ namespace VM
 
 				size_t oldsize = static_cast<size_t>(registers[opr.oldsize].u64);
 				size_t newsize = static_cast<size_t>(registers[opr.newsize].u64);
-				oldsize += extraObjectSize();
-				newsize += extraObjectSize();
+				oldsize += extraObjectSize;
+				newsize += extraObjectSize;
 
 				if (object)
 				{
@@ -929,7 +913,7 @@ namespace VM
 				{
 					VM_CHECK_POINTER(object, opr);
 					size_t size = static_cast<size_t>(registers[opr.regsize].u64);
-					size += extraObjectSize();
+					size += extraObjectSize;
 
 					if (YUNI_UNLIKELY(not memchecker.checkObjectSize(object, static_cast<size_t>(size))))
 						return emitPointerSizeMismatch(object, size);
@@ -952,7 +936,7 @@ namespace VM
 				uint64_t* object = reinterpret_cast<uint64_t*>(registers[opr.lvid].u64);
 				VM_CHECK_POINTER(object, opr);
 				size_t size = static_cast<size_t>(registers[opr.regsize].u64);
-				size += extraObjectSize();
+				size += extraObjectSize;
 				uint8_t pattern = static_cast<uint8_t>(registers[opr.pattern].u64);
 
 				if (YUNI_UNLIKELY(not memchecker.checkObjectSize(object, static_cast<size_t>(size))))
@@ -1095,7 +1079,7 @@ namespace VM
 			}
 
 
-			inline void call(uint32_t retlvid, uint32_t atomfunc, uint32_t instanceid)
+			void call(uint32_t retlvid, uint32_t atomfunc, uint32_t instanceid)
 			{
 				assert(retlvid == 0 or retlvid < registerCount);
 
@@ -1176,7 +1160,6 @@ namespace VM
 		}
 		return success;
 	}
-
 
 
 
