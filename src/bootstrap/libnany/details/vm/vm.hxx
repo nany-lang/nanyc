@@ -22,7 +22,7 @@ namespace VM
 
 	inline ThreadContext::ThreadContext(Program& program, const AnyString& name)
 		: program(program)
-		, cwd("/")
+		, cwd("/home")
 		, cf(program.cf)
 		, name(name)
 	{}
