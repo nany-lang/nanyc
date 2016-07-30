@@ -1,5 +1,8 @@
 #include "instanciate.h"
 #include "type-check.h"
+#ifdef YUNI_OS_UNIX
+#include <unistd.h>
+#endif
 
 using namespace Yuni;
 
@@ -15,6 +18,98 @@ namespace Instanciate
 
 	namespace // nonymous
 	{
+
+		static bool intrinsicOSIsUnix(SequenceBuilder& seq, uint32_t lvid)
+		{
+			seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_bool);
+			#ifdef YUNI_OS_UNIX
+			seq.out.emitStore_u64(lvid, 1);
+			#else
+			seq.out.emitStore_u64(lvid, 0);
+			#endif
+			return true;
+		}
+
+		static bool intrinsicOSIsPosix(SequenceBuilder& seq, uint32_t lvid)
+		{
+			seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_bool);
+			#if defined(YUNI_OS_UNIX) && defined(_POSIX_VERSION)
+			seq.out.emitStore_u64(lvid, 1);
+			#else
+			seq.out.emitStore_u64(lvid, 0);
+			#endif
+			return true;
+		}
+
+
+		static bool intrinsicOSIsLinux(SequenceBuilder& seq, uint32_t lvid)
+		{
+			seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_bool);
+			#ifdef YUNI_OS_LINUX
+			seq.out.emitStore_u64(lvid, 1);
+			#else
+			seq.out.emitStore_u64(lvid, 0);
+			#endif
+			return true;
+		}
+
+		static bool intrinsicOSIsAIX(SequenceBuilder& seq, uint32_t lvid)
+		{
+			seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_bool);
+			#ifdef YUNI_OS_AIX
+			seq.out.emitStore_u64(lvid, 1);
+			#else
+			seq.out.emitStore_u64(lvid, 0);
+			#endif
+			return true;
+		}
+
+		static bool intrinsicOSIsWindows(SequenceBuilder& seq, uint32_t lvid)
+		{
+			seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_bool);
+			#ifdef YUNI_OS_WINDOWS
+			seq.out.emitStore_u64(lvid, 1);
+			#else
+			seq.out.emitStore_u64(lvid, 0);
+			#endif
+			return true;
+		}
+
+		static bool intrinsicOSIsCygwin(SequenceBuilder& seq, uint32_t lvid)
+		{
+			seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_bool);
+			#if defined(__CYGWIN32__) || defined(__CYGWIN__)
+			seq.out.emitStore_u64(lvid, 1);
+			#else
+			seq.out.emitStore_u64(lvid, 0);
+			#endif
+			return true;
+		}
+
+		static bool intrinsicOSIsMacOS(SequenceBuilder& seq, uint32_t lvid)
+		{
+			seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_bool);
+			#ifdef YUNI_OS_MACOS
+			seq.out.emitStore_u64(lvid, 1);
+			#else
+			seq.out.emitStore_u64(lvid, 0);
+			#endif
+			return true;
+		}
+
+		static bool intrinsicOSIsBSD(SequenceBuilder& seq, uint32_t lvid)
+		{
+			seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_bool);
+			#if defined(YUNI_OS_MACOS) || defined(YUNI_OS_OPENBSD) || defined(YUNI_OS_FREEBSD) \
+				|| defined(YUNI_OS_NETBSD) || defined(YUNI_OS_DRAGONFLY)
+			seq.out.emitStore_u64(lvid, 1);
+			#else
+			seq.out.emitStore_u64(lvid, 0);
+			#endif
+			return true;
+		}
+
+
 
 		static bool intrinsicFieldset(SequenceBuilder& seq, uint32_t lvid)
 		{
@@ -873,6 +968,7 @@ namespace Instanciate
 
 		static bool intrinsicFSUB(SequenceBuilder& seq, uint32_t lvid)
 		{
+			return emitBuiltinOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitIGTE>(seq, lvid, "igte");
 			return emitBuiltinOperator<nyt_any, 0, 0, 1, &IR::Sequence::emitFSUB>(seq, lvid, "fsub");
 		}
 
@@ -1032,6 +1128,15 @@ namespace Instanciate
 			//
 			{"assert",          { 1,  &intrinsicAssert,      }},
 			{"__reinterpret",   { 2,  &intrinsicReinterpret, }},
+
+			{"os.is.linux",     { 0,  &intrinsicOSIsLinux      }},
+			{"os.is.unix",      { 0,  &intrinsicOSIsUnix       }},
+			{"os.is.posix",     { 0,  &intrinsicOSIsPosix      }},
+			{"os.is.macos",     { 0,  &intrinsicOSIsMacOS      }},
+			{"os.is.bsd",       { 0,  &intrinsicOSIsBSD        }},
+			{"os.is.aix",       { 0,  &intrinsicOSIsAIX        }},
+			{"os.is.windows",   { 0,  &intrinsicOSIsWindows    }},
+			{"os.is.cygwin",    { 0,  &intrinsicOSIsCygwin     }},
 		};
 
 	} // anonymous namespace
