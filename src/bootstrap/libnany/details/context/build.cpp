@@ -62,7 +62,6 @@ namespace Nany
 		{
 			importNSLCoreString(intrinsics);
 			importNSLOSProcess(intrinsics);
-			importNSLIONative(intrinsics);
 			importNSLEnv(intrinsics);
 		}
 

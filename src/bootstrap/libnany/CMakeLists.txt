@@ -449,7 +449,6 @@ addsrc(
 	"details/vm/runtime/std.core.h"
 	"details/vm/runtime/std.core.string.cpp"
 	"details/vm/runtime/std.os.process.cpp"
-	"details/vm/runtime/std.io.native.cpp"
 	"details/vm/runtime/std.env.cpp")
 
 
