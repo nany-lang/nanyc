@@ -243,7 +243,9 @@ namespace Mapping
 				lastPushedIndexedParameters.clear();
 
 				bool isGlobalOperator = (atom.type == Atom::Type::namespacedef)
-					and funcname[0] == '^' and (not funcname.startsWith("^view^"));
+					and funcname[0] == '^'
+					and (not funcname.startsWith("^view^"))
+					and (not funcname.startsWith("^prop"));
 
 				auto& parentAtom = (not isGlobalOperator)
 					? atom
