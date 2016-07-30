@@ -32,14 +32,8 @@ namespace VM
 	Stack::Stack(Build& build)
 		: build(build)
 	{
-		auto* chunk = (Chunk*) malloc(sizeof(Chunk)); //build.allocate<Chunk>();
-		chunk->remains  = static_cast<uint32_t>(Chunk::blockmax);
-		chunk->capacity = static_cast<uint32_t>(Chunk::blockmax);
-		chunk->previous = nullptr;
-		chunk->cursor   = current->block;
-
-		current = chunk;
-		root = chunk;
+		pushNewChunk(1); // not null for boundaries checking
+		current->remains -= 1u;
 	}
 
 
@@ -59,11 +53,11 @@ namespace VM
 	}
 
 
-	void Stack::dump(uint32_t count) const
+	void Stack::dump(const AnyString& action, uint32_t count) const
 	{
 		if (current)
 		{
-			std::cout << "== stack == +" << count << ", current: " << (void*) current
+			std::cout << "== stack == " << action << count << ", current: " << (void*) current
 				<< ", remains: " << current->remains << '/' << current->capacity
 				#if NANY_VM_STACK_TRACES != 0
 				<< ", " << frameCount << " frames"
@@ -78,6 +72,11 @@ namespace VM
 
 	void Stack::pushNewChunk(uint32_t count)
 	{
+		#if NANY_VM_STACK_TRACES != 0
+		std::cout << "== stack == requires new chunk to increase stack of "
+			<< (sizeof(DataRegister) * count) << " bytes\n";
+		#endif
+
 		Chunk* chunk;
 
 		if (reserve and count <= reserve->capacity)
@@ -117,6 +116,7 @@ namespace VM
 		auto* previous = current->previous;
 		if (!reserve)
 		{
+			// keep at least one chunk in reserve for next time
 			reserve = current;
 		}
 		else
@@ -130,7 +130,7 @@ namespace VM
 		}
 
 		current = previous;
-		assert(current != nullptr);
+		// 'current' may be null here at the very last scope, when the program stops
 	}
 
 

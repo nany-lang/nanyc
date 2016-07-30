@@ -14,7 +14,7 @@ namespace VM
 	{
 		#if NANY_VM_STACK_TRACES != 0
 		++frameCount;
-		dump(count);
+		dump("push +", count);
 		#endif
 
 		// not enough space in the current chunk to allocate N registers
@@ -28,6 +28,8 @@ namespace VM
 
 		current->cursor  += count;
 		current->remains -= count;
+		assert(registers >= current->block);
+		assert(registers < current->block + current->capacity);
 		return registers;
 	}
 
@@ -36,9 +38,13 @@ namespace VM
 	{
 		#if NANY_VM_STACK_TRACES != 0
 		--frameCount;
+		dump("pop -", count);
 		#endif
 
 		current->cursor -= count;
+		assert(current->cursor >= current->block);
+		assert(current->cursor < current->block + current->capacity);
+
 		if (YUNI_UNLIKELY((current->remains += count) == current->capacity))
 			popChunk();
 	}

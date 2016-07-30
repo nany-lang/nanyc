@@ -38,7 +38,7 @@ namespace VM
 	private:
 		void pushNewChunk(uint32_t count);
 		void popChunk();
-		void dump(uint32_t count) const;
+		void dump(const AnyString& action, uint32_t count) const;
 
 	private:
 		static_assert(sizeof(DataRegister) == sizeof(uint64_t), "invalid register size");
@@ -64,11 +64,10 @@ namespace VM
 
 		Chunk* current = nullptr;
 		Chunk* reserve = nullptr;
-		Chunk* root = nullptr;
 
 		#if NANY_VM_STACK_TRACES != 0
 		uint32_t frameCount = 0u;
-		uint32_t stacksize = static_cast<uint32_t>(sizeof(Chunk));
+		uint32_t stacksize = 0u;
 		#endif
 
 		Build& build;
