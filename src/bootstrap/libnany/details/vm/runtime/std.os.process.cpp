@@ -9,10 +9,9 @@ using namespace Yuni;
 
 
 
-static bool nanyc_os_process_execute(nyvm_t*, void* string, uint32_t timeout)
+static bool nanyc_os_process_execute(nyvm_t*, const char* cmd, uint32_t len, uint32_t timeout)
 {
-	AnyString cmd = *(reinterpret_cast<String*>(string));
-	return Process::Execute(cmd, timeout);
+	return Process::Execute(AnyString{cmd, len}, timeout);
 }
 
 
