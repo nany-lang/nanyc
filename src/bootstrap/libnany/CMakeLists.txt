@@ -520,7 +520,7 @@ set_target_properties(libnanyc-grammar PROPERTIES
 
 target_link_libraries(libnanyc-grammar PRIVATE yuni-static-core)
 target_link_libraries(libnanyc PRIVATE
-	yuni-static-core libnanyc-grammar dyncall_s re2)
+	yuni-static-core libnanyc-grammar dyncall_s) #re2
 
 set_property(TARGET libnanyc PROPERTY MACOSX_RPATH true)
 set_property(TARGET libnanyc PROPERTY LIBRARY_OUTPUT_NAME "nanyc")
