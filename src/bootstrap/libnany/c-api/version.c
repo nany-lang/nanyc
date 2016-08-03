@@ -17,13 +17,17 @@ static inline const char* strOrNull(const char* const text)
 
 const char* libnany_website_url()
 {
+	#ifdef YUNI_OS_LINUX
 	_Static_assert(LIBNANY_WEBSITE != NULL, "invalid null url");
+	#endif
 	return LIBNANY_WEBSITE;
 }
 
 const char* libnany_version()
 {
+	#ifdef YUNI_OS_LINUX
 	_Static_assert(LIBNANY_VERSION_STR != NULL, "invalid null version");
+	#endif
 	return LIBNANY_VERSION_STR;
 }
 
