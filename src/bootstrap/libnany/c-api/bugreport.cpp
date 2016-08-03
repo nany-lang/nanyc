@@ -26,22 +26,16 @@ namespace // anonymous
 		nany_details_export_compiler_version(string);
 		string << '\n';
 
-		bool custombuild = Nany::Config::maxSymbolNameLength != 64
-			or Nany::Config::maxNamespaceDepth != 32
-			or Nany::Config::maxFuncDeclParameterCount != 7
-			or Nany::Config::maxPushedParameters != 32;
-		if (custombuild)
-		{
-			string << "> !! nany.build.config: "
-				<< "pp:" << Nany::Config::maxPushedParameters
-				<< ", p:" << Nany::Config::maxFuncDeclParameterCount
-				<< ", nd:" << Nany::Config::maxNamespaceDepth
-				<< ", sl:" << Nany::Config::maxSymbolNameLength
-				<< '\n';
-		}
+		string << "> config: "
+			<< "params:" << Nany::Config::maxFuncDeclParameterCount
+			<< ", pushedparams:" << Nany::Config::maxPushedParameters
+			<< ", nmspc depth:" << Nany::Config::maxNamespaceDepth
+			<< ", symbol:" << Nany::Config::maxSymbolNameLength
+			<< ", nsl:" << Nany::Config::importNSL
+			<< '\n';
 
 		string << "> os: ";
-		#ifdef YUNI_OS_LINUX
+		if (System::linux)
 		{
 			String distribName;
 			if (IO::errNone == IO::File::LoadFromFile(distribName, "/etc/issue.net"))
@@ -53,22 +47,35 @@ namespace // anonymous
 			}
 			string << Process::System("uname -m -s -p -r") << ", ";
 		}
-		#endif
 		nany_details_export_system(string);
 		string << '\n';
 
-		string << "> cpu: " << System::CPU::Count() << " cpu(s)/core(s)\n";
-		#ifdef YUNI_OS_LINUX
+		ShortString64 cpustr;
+		cpustr << System::CPU::Count() << " cpu(s)/core(s)";
+
+		bool cpuAdded = false;
+		if (System::linux)
 		{
 			auto cpus = Process::System("sh -c \"grep 'model name' /proc/cpuinfo | cut -d':' -f 2 |  sort -u\"");
-			cpus.words("\n", [&](AnyString line) -> bool {
+			cpus.words("\n", [&](AnyString line) -> bool
+			{
 				line.trim();
 				if (not line.empty())
-					string << "> cpu: " << line << '\n';
+				{
+					string << "> cpu: " << line;
+					if (not cpuAdded)
+					{
+						string << " (" << cpustr << ')';
+						cpuAdded = true;
+					}
+					string << '\n';
+				}
 				return true;
 			});
 		}
-		#endif
+
+		if (not cpuAdded)
+			string << "> cpu: " << cpustr << '\n';
 
 		string << "> ";
 		nany_details_export_memory_usage(string);
