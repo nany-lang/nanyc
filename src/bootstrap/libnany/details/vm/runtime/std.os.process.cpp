@@ -23,7 +23,7 @@ namespace Nany
 
 	void importNSLOSProcess(IntrinsicTable& intrinsics)
 	{
-		intrinsics.add("nanyc.os.execute",   nanyc_os_process_execute);
+		intrinsics.add("__nanyc_os_execute",   nanyc_os_process_execute);
 	}
 
 } // namespace Nany

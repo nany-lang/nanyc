@@ -98,13 +98,13 @@ namespace Nany
 
 	void importNSLEnv(IntrinsicTable& intrinsics)
 	{
-		intrinsics.add("nanyc.env.set",    _nanyc_env_set);
-		intrinsics.add("nanyc.env.unset",  _nanyc_env_unset);
-		intrinsics.add("nanyc.env.read",   _nanyc_env_read);
-		intrinsics.add("nanyc.env.asbool", _nanyc_env_read_as_bool);
-		intrinsics.add("nanyc.env.asi64",  _nanyc_env_read_as_i64);
-		intrinsics.add("nanyc.env.asu64",  _nanyc_env_read_as_u64);
-		intrinsics.add("nanyc.env.exists", _nanyc_env_exists);
+		intrinsics.add("__nanyc_env_set",    _nanyc_env_set);
+		intrinsics.add("__nanyc_env_unset",  _nanyc_env_unset);
+		intrinsics.add("__nanyc_env_read",   _nanyc_env_read);
+		intrinsics.add("__nanyc_env_asbool", _nanyc_env_read_as_bool);
+		intrinsics.add("__nanyc_env_asi64",  _nanyc_env_read_as_i64);
+		intrinsics.add("__nanyc_env_asu64",  _nanyc_env_read_as_u64);
+		intrinsics.add("__nanyc_env_exists", _nanyc_env_exists);
 	}
 
 } // namespace Nany
