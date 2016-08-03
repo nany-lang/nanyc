@@ -549,11 +549,11 @@ add_dependencies(libnanyc nyt-nanyfile-to-cstring)
 install(TARGETS libnanyc
 	ARCHIVE DESTINATION "lib/libnany/${nany_version}"
 	LIBRARY DESTINATION "lib/libnany/${nany_version}"
-	COMPONENT "libnany")
+	COMPONENT "libnanyc")
 
 install(FILES ${nysrc_public_headers} 
 	DESTINATION "include/libnany/${nany_version}/nany"
-	COMPONENT "libnany-dev")
+	COMPONENT "libnanyc-dev")
 
 
 if (YUNI_COMPILER_IS_CLANG)

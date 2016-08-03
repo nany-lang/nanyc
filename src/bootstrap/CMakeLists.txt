@@ -227,7 +227,15 @@ add_custom_target(check
 
 install(TARGETS nanyc
 	RUNTIME DESTINATION "bin"
-	COMPONENT "nany")
+	COMPONENT "nanyc")
+
+install(TARGETS nanyc-dump-ast
+	RUNTIME DESTINATION "bin"
+	COMPONENT "libnanyc-dev-tools")
+
+install(TARGETS nanyc-check-syntax
+	RUNTIME DESTINATION "bin"
+	COMPONENT "libnanyc-dev-tools")
 
 
 
@@ -249,6 +257,11 @@ add_custom_target(install-libnanyc-dev
       "${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=libnanyc-dev"
       -P "${CMAKE_BINARY_DIR}/cmake_install.cmake")
 
+add_custom_target(install-libnanyc-dev-tools
+  DEPENDS libnanyc nanyc-check-syntax nanyc-dump-ast
+  COMMAND 
+      "${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=libnanyc-dev-tools"
+      -P "${CMAKE_BINARY_DIR}/cmake_install.cmake")
 
 
 macro(create_rules_for_packages output)
@@ -278,8 +291,8 @@ macro(create_rules_for_packages output)
 				--name libnanyc
 				--version "\"${nany_version}\""
 				--url "\"${nany_website}\""
-				--vendor "Nany"
-				--description "\"Nany Headers\""
+				--vendor "Nany Team"
+				--description "Nany Compiler Library"
 				--license "${nany_license}"
 				--maintainer "${nany_contact}"
 				--verbose
@@ -292,8 +305,8 @@ macro(create_rules_for_packages output)
 				--name nanyc
 				--version "\"${nany_version}\""
 				--url "\"${nany_website}\""
-				--vendor "Nany"
-				--description "\"Nany Programming Language\""
+				--vendor "Nany Team"
+				--description "Nany Programming Language"
 				--license "${nany_license}"
 				--maintainer "${nany_contact}"
 				--depends libnanyc
@@ -308,14 +321,30 @@ macro(create_rules_for_packages output)
 				--name libnanyc-${dev}
 				--version "\"${nany_version}\""
 				--url "\"${nany_website}\""
-				--vendor Nany
-				--description "\"libnanyc\""
+				--vendor "Nany Team"
+				--description "Nany Library Headers"
 				--license "${nany_license}"
 				--maintainer "${nany_contact}"
 				--depends libnanyc
 				--verbose
 				-p "../../distrib/"
 				-C "${destdir}/dev"
+
+			COMMAND "DESTDIR=${destdir}/dev-tools" "${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=libnanyc-dev-tools"
+				-P "${CMAKE_BINARY_DIR}/cmake_install.cmake"
+			COMMAND fpm -f -s dir -t ${output}
+				-a all 
+				--name libnanyc-${dev}-tools
+				--version "\"${nany_version}\""
+				--url "\"${nany_website}\""
+				--vendor "Nany Team"
+				--description "Nany Compiler Dev Tools"
+				--license "${nany_license}"
+				--maintainer "${nany_contact}"
+				--depends libnanyc
+				--verbose
+				-p "../../distrib/"
+				-C "${destdir}/dev-tools"
 
 			COMMAND rm -rf "${destdir}")
 	endif()
