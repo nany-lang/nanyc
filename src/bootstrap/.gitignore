@@ -40,10 +40,8 @@ CPackConfig.cmake
 
 # binaries
 /libnany/*.a
-/libnany.*
-/nany
-/nany.exe
-/nany-*
+/libnanyc.*
+/nanyc*
 /nyt-print-ast
 /nyt-print-ast.exe
 /nyt-check-syntax

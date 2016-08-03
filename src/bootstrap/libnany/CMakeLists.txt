@@ -462,16 +462,16 @@ if ("${NANY_STATIC}")
 endif()
 
 
-add_library(libnany-grammar STATIC EXCLUDE_FROM_ALL
+add_library(libnanyc-grammar STATIC EXCLUDE_FROM_ALL
 	${nysrc_grammar}
 	${nysrc_details_grammar})
-add_dependencies(libnany-grammar nany-grammar-cpp)
+add_dependencies(libnanyc-grammar nanyc-grammar-cpp)
 
 
 
 
 
-add_library(libnany ${mode_libnany}
+add_library(libnanyc ${mode_libnany}
 	# public headers
 	${nysrc_public_headers}
 
@@ -510,43 +510,43 @@ add_library(libnany ${mode_libnany}
 
 
 
-set_target_properties(libnany PROPERTIES
+set_target_properties(libnanyc PROPERTIES
 	VERSION   "${nany_version_major}.${nany_version_minor}.${nany_version_patch}"
 	SOVERSION "${nany_version_major}")
 
-set_target_properties(libnany-grammar PROPERTIES
+set_target_properties(libnanyc-grammar PROPERTIES
 	VERSION   "${nany_version_major}.${nany_version_minor}.${nany_version_patch}"
 	SOVERSION "${nany_version_major}")
 
-target_link_libraries(libnany-grammar PRIVATE yuni-static-core)
-target_link_libraries(libnany PRIVATE
-	yuni-static-core libnany-grammar dyncall_s re2)
+target_link_libraries(libnanyc-grammar PRIVATE yuni-static-core)
+target_link_libraries(libnanyc PRIVATE
+	yuni-static-core libnanyc-grammar dyncall_s re2)
 
-set_property(TARGET libnany PROPERTY MACOSX_RPATH true)
-set_property(TARGET libnany PROPERTY LIBRARY_OUTPUT_NAME "nany")
-set_property(TARGET libnany PROPERTY ARCHIVE_OUTPUT_NAME "nany")
-set_property(TARGET libnany PROPERTY LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/../")
-set_property(TARGET libnany PROPERTY RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/../")
+set_property(TARGET libnanyc PROPERTY MACOSX_RPATH true)
+set_property(TARGET libnanyc PROPERTY LIBRARY_OUTPUT_NAME "nanyc")
+set_property(TARGET libnanyc PROPERTY ARCHIVE_OUTPUT_NAME "nanyc")
+set_property(TARGET libnanyc PROPERTY LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/../")
+set_property(TARGET libnanyc PROPERTY RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/../")
 
-set_property(TARGET libnany-grammar PROPERTY MACOSX_RPATH true)
-set_property(TARGET libnany-grammar PROPERTY LIBRARY_OUTPUT_NAME "nany-grammar")
-set_property(TARGET libnany-grammar PROPERTY ARCHIVE_OUTPUT_NAME "nany-grammar")
-
-
-target_compile_definitions(libnany PRIVATE "LIBNANY_DLL_EXPORT=1")
+set_property(TARGET libnanyc-grammar PROPERTY MACOSX_RPATH true)
+set_property(TARGET libnanyc-grammar PROPERTY LIBRARY_OUTPUT_NAME "nanyc-grammar")
+set_property(TARGET libnanyc-grammar PROPERTY ARCHIVE_OUTPUT_NAME "nanyc-grammar")
 
 
-target_include_directories(libnany PRIVATE "${libnany_config_folder}")
-target_include_directories(libnany PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../ext/dyncall/")
-target_include_directories(libnany PUBLIC  "${CMAKE_CURRENT_LIST_DIR}")
-target_include_directories(libnany-grammar PUBLIC "${CMAKE_CURRENT_LIST_DIR}")
-
-add_dependencies(libnany nany-grammar-cpp)
-add_dependencies(libnany nyt-nanyfile-to-cstring)
+target_compile_definitions(libnanyc PRIVATE "LIBNANY_DLL_EXPORT=1")
 
 
+target_include_directories(libnanyc PRIVATE "${libnany_config_folder}")
+target_include_directories(libnanyc PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../ext/dyncall/")
+target_include_directories(libnanyc PUBLIC  "${CMAKE_CURRENT_LIST_DIR}")
+target_include_directories(libnanyc-grammar PUBLIC "${CMAKE_CURRENT_LIST_DIR}")
 
-install(TARGETS libnany
+add_dependencies(libnanyc nanyc-grammar-cpp)
+add_dependencies(libnanyc nyt-nanyfile-to-cstring)
+
+
+
+install(TARGETS libnanyc
 	ARCHIVE DESTINATION "lib/libnany/${nany_version}"
 	LIBRARY DESTINATION "lib/libnany/${nany_version}"
 	COMPONENT "libnany")
@@ -567,10 +567,10 @@ if (YUNI_COMPILER_IS_CLANG)
 		target_include_directories(${target}_analyze PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../ext/dyncall/")
 		target_include_directories(${target}_analyze PUBLIC  "${CMAKE_CURRENT_LIST_DIR}")
 
-		add_dependencies(${target}_analyze nany-grammar-cpp)
+		add_dependencies(${target}_analyze nanyc-grammar-cpp)
 		add_dependencies(${target}_analyze nyt-nanyfile-to-cstring)
 	endfunction()
 
-	add_clang_static_analysis(libnany)
+	add_clang_static_analysis(libnanyc)
 endif()
 

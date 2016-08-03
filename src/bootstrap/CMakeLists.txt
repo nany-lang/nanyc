@@ -8,7 +8,7 @@ include(CMakeParseArguments)
 
 include("cmake/messages.cmake")
 
-nmessage("Nany Compiler Suite c++/bootstrap")
+nmessage("nany c++/bootstrap")
 nmessage("")
 nmessage("cmake ${CMAKE_VERSION} in '${CMAKE_SYSTEM}' ${CMAKE_SYSTEM_PROCESSOR}")
 nmessage("  from '${CMAKE_COMMAND}', '${CMAKE_ROOT}'")
@@ -104,7 +104,7 @@ set_source_files_properties("${NANY_GRAMMAR_HXX}" PROPERTIES GENERATED true)
 set_source_files_properties("${NANY_GRAMMAR_CPP}" PROPERTIES GENERATED true)
 
 
-add_custom_target(nany-grammar-cpp
+add_custom_target(nanyc-grammar-cpp
 	DEPENDS yuni-parser-generator
 		"${NANY_GRAMMAR_CPP}" "${NANY_GRAMMAR_H}" "${NANY_GRAMMAR_HXX}"
 		"${NANY_GRAMMAR_FILE_MARKER}"
@@ -177,34 +177,34 @@ add_subdirectory("libnany")
 #
 # nany
 #
-add_executable(nany "nany.cpp")
-target_link_libraries(nany PRIVATE libnany yuni-static-core)
-set_target_properties(nany PROPERTIES
+add_executable(nanyc "nany.cpp")
+target_link_libraries(nanyc PRIVATE libnanyc yuni-static-core)
+set_target_properties(nanyc PROPERTIES
 	VERSION "${nany_version_major}.${nany_version_minor}.${nany_version_patch}")
 
 
 #
-# nany-dump-ast
+# nanyc-dump-ast
 #
-# note: this executable does not rely on `libnany` library on purpose
-# (if something goes wrong with libnany, it might be essential to simply print the input AST)
-add_executable(nany-dump-ast
+# note: this executable does not rely on `libnanyc` library on purpose
+# (if something goes wrong with libnanyc, it might be essential to simply print the input AST)
+add_executable(nanyc-dump-ast
 	dump-ast.cpp ${nysrc_grammar} ${nysrc_details_grammar})
-target_include_directories(nany-dump-ast PRIVATE "${CMAKE_CURRENT_LIST_DIR}/libnany")
-add_dependencies(nany-dump-ast nany-grammar-cpp)
-target_link_libraries(nany-dump-ast PRIVATE yuni-static-core libnany-grammar)
-set_target_properties(nany-dump-ast PROPERTIES
+target_include_directories(nanyc-dump-ast PRIVATE "${CMAKE_CURRENT_LIST_DIR}/libnany")
+add_dependencies(nanyc-dump-ast nanyc-grammar-cpp)
+target_link_libraries(nanyc-dump-ast PRIVATE yuni-static-core libnanyc-grammar)
+set_target_properties(nanyc-dump-ast PROPERTIES
 	VERSION "${nany_version_major}.${nany_version_minor}.${nany_version_patch}")
-# nany-dump-ast does not use libnany (on purpose)
-target_compile_definitions(nany-dump-ast PRIVATE "NANY_VERSION=${nany_version_string}")
+# nanyc-dump-ast does not use libnanyc (on purpose)
+target_compile_definitions(nanyc-dump-ast PRIVATE "NANY_VERSION=${nany_version_string}")
 
 
 #
-# nany-check-syntax
+# nanyc-check-syntax
 #
-add_executable(nany-check-syntax  check-syntax.cpp)
-target_link_libraries(nany-check-syntax PRIVATE libnany yuni-static-core)
-set_target_properties(nany-check-syntax PROPERTIES
+add_executable(nanyc-check-syntax  check-syntax.cpp)
+target_link_libraries(nanyc-check-syntax PRIVATE libnanyc yuni-static-core)
+set_target_properties(nanyc-check-syntax PROPERTIES
 	VERSION "${nany_version_major}.${nany_version_minor}.${nany_version_patch}")
 
 
@@ -213,9 +213,9 @@ set_target_properties(nany-check-syntax PROPERTIES
 #
 get_filename_component(nany_tests_root "${CMAKE_CURRENT_LIST_DIR}/../../tests/" REALPATH)
 add_custom_target(check
-	DEPENDS nany-check-syntax
-	COMMAND "$<TARGET_FILE:nany-check-syntax>" "--use-filename-convention" "${nany_tests_root}/parsing"
-	COMMAND "$<TARGET_FILE:nany-check-syntax>"
+	DEPENDS nanyc-check-syntax
+	COMMAND "$<TARGET_FILE:nanyc-check-syntax>" "--use-filename-convention" "${nany_tests_root}/parsing"
+	COMMAND "$<TARGET_FILE:nanyc-check-syntax>"
 		"${nany_tests_root}/build"
 		"${nany_tests_root}/contest"
 		"${nany_tests_root}/benchmark"
@@ -225,16 +225,16 @@ add_custom_target(check
 
 
 
-install(TARGETS nany
+install(TARGETS nanyc
 	RUNTIME DESTINATION "bin"
 	COMPONENT "nany")
 
 
 
-add_custom_target(install-libnany
-	DEPENDS libnany
+add_custom_target(install-libnanyc
+	DEPENDS libnanyc
 	COMMAND 
-		"${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=libnany"
+		"${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=libnanyc"
 		-P "${CMAKE_BINARY_DIR}/cmake_install.cmake")
 
 add_custom_target(install-nany
@@ -243,10 +243,10 @@ add_custom_target(install-nany
 		"${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=nany"
 		-P "${CMAKE_BINARY_DIR}/cmake_install.cmake")
 
-add_custom_target(install-libnany-dev
-  DEPENDS libnany
+add_custom_target(install-libnanyc-dev
+  DEPENDS libnanyc
   COMMAND 
-      "${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=libnany-dev"
+      "${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=libnanyc-dev"
       -P "${CMAKE_BINARY_DIR}/cmake_install.cmake")
 
 
@@ -260,7 +260,7 @@ macro(create_rules_for_packages output)
 		endif()
 
 		add_custom_target(package-${output}
-			DEPENDS libnany
+			DEPENDS libnanyc
 			COMMAND rm -rf "${destdir}"
 
 			COMMAND "${CMAKE_COMMAND}" "-E" echo ""
@@ -272,10 +272,10 @@ macro(create_rules_for_packages output)
 			COMMAND "${CMAKE_COMMAND}" "-E" echo "           [sudo] gem install fpm"
 			COMMAND "${CMAKE_COMMAND}" "-E" echo ""
 
-			COMMAND "DESTDIR=${destdir}/libnany" "${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=libnany"
+			COMMAND "DESTDIR=${destdir}/libnanyc" "${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=libnanyc"
 				-P "${CMAKE_BINARY_DIR}/cmake_install.cmake"
 			COMMAND fpm -f -s dir -t ${output}
-				--name libnany
+				--name libnanyc
 				--version "\"${nany_version}\""
 				--url "\"${nany_website}\""
 				--vendor "Nany"
@@ -284,35 +284,35 @@ macro(create_rules_for_packages output)
 				--maintainer "${nany_contact}"
 				--verbose
 				-p "../../distrib/"
-				-C "${destdir}/libnany"
+				-C "${destdir}/libnanyc"
 
-			COMMAND "DESTDIR=${destdir}/nany" "${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=nany"
+			COMMAND "DESTDIR=${destdir}/nany" "${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=nanyc"
 				-P "${CMAKE_BINARY_DIR}/cmake_install.cmake"
 			COMMAND fpm -f -s dir -t ${output}
-				--name nany
+				--name nanyc
 				--version "\"${nany_version}\""
 				--url "\"${nany_website}\""
 				--vendor "Nany"
 				--description "\"Nany Programming Language\""
 				--license "${nany_license}"
 				--maintainer "${nany_contact}"
-				--depends libnany
+				--depends libnanyc
 				--verbose
 				-p "../../distrib/"
 				-C "${destdir}/nany"
 
-			COMMAND "DESTDIR=${destdir}/dev" "${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=libnany-dev"
+			COMMAND "DESTDIR=${destdir}/dev" "${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=libnanyc-dev"
 				-P "${CMAKE_BINARY_DIR}/cmake_install.cmake"
 			COMMAND fpm -f -s dir -t ${output}
 				-a all 
-				--name libnany-${dev}
+				--name libnanyc-${dev}
 				--version "\"${nany_version}\""
 				--url "\"${nany_website}\""
 				--vendor Nany
-				--description "\"Libnany\""
+				--description "\"libnanyc\""
 				--license "${nany_license}"
 				--maintainer "${nany_contact}"
-				--depends libnany
+				--depends libnanyc
 				--verbose
 				-p "../../distrib/"
 				-C "${destdir}/dev"
