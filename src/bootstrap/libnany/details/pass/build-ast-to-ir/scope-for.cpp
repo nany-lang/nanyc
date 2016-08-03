@@ -25,7 +25,7 @@ namespace Producer
 		uint32_t viewlvid = 0;
 		// 'do' clause
 		AST::Node* forDoClause = nullptr;
-
+		AST::Node* forElseClause = nullptr;
 
 		if (debugmode)
 			out.emitComment("for");
@@ -55,6 +55,11 @@ namespace Producer
 					forDoClause = &child;
 					break;
 				}
+				case AST::rgForElse:
+				{
+					forElseClause = &child;
+					break;
+				}
 				default:
 					return unexpectedNode(child, "[for]");
 			}
@@ -79,12 +84,28 @@ namespace Producer
 
 		context.reuse.loops.elementname->text = elementname;
 
+		auto& scopeChildren = context.reuse.loops.scope->children;
 		if (forDoClause)
-			context.reuse.loops.scope->children = forDoClause->children;
-		else
-			context.reuse.loops.scope->children.clear();
+			scopeChildren = forDoClause->children;
+		if (forElseClause)
+		{
+			context.reuse.loops.ifnode->children.push_back(context.reuse.loops.elseClause);
+			context.reuse.loops.elseScope->children = forElseClause->children;
+		}
 
-		return visitASTStmt(*context.reuse.loops.node);
+
+		bool success = visitASTStmt(*context.reuse.loops.node);
+
+		// cleanup
+		if (forDoClause)
+			scopeChildren.clear();
+		if (forElseClause)
+		{
+			context.reuse.loops.ifnode->children.pop_back();
+			context.reuse.loops.elseScope->children.clear();
+		}
+
+		return success;
 	}
 
 

@@ -160,6 +160,10 @@ namespace Producer
 				std::array<AST::Node*,4> cursorname;
 				AST::Node* elementname = nullptr;
 				AST::Node* scope;
+
+				AST::Node* ifnode = nullptr;
+				AST::Node::Ptr elseClause;
+				AST::Node* elseScope = nullptr;
 			}
 			loops;
 
