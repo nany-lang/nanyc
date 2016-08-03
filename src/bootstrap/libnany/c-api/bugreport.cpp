@@ -6,6 +6,9 @@
 #include "common-debuginfo.hxx"
 #include <string.h>
 #include <iostream>
+#ifdef YUNI_OS_LINUX
+#include <sys/utsname.h>
+#endif
 
 using namespace Yuni;
 
@@ -34,22 +37,34 @@ namespace // anonymous
 			<< ", nsl:" << Nany::Config::importNSL
 			<< '\n';
 
-		string << "> os: ";
-		if (System::linux)
+		// -- OS
+		string << "> os:  ";
+		bool osDetected = false;
+		#ifdef YUNI_OS_LINUX
 		{
 			String distribName;
 			if (IO::errNone == IO::File::LoadFromFile(distribName, "/etc/issue.net"))
 			{
-				distribName.replace("\n", " ");
+				distribName.replace('\n', ' ');
 				distribName.trim();
 				if (not distribName.empty())
 					string << distribName << ", ";
 			}
-			string << Process::System("uname -m -s -p -r") << ", ";
+
+			osDetected = true;
+			struct utsname un;
+			if (uname(&un) == 0)
+				string << un.sysname << ' ' << un.release << " (" << un.machine << ')';
+			else
+				string << "(unknown linux)";
 		}
-		nany_details_export_system(string);
+		#endif
+
+		if (not osDetected)
+			nany_details_export_system(string);
 		string << '\n';
 
+		// -- CPU
 		ShortString64 cpustr;
 		cpustr << System::CPU::Count() << " cpu(s)/core(s)";
 
@@ -77,6 +92,7 @@ namespace // anonymous
 		if (not cpuAdded)
 			string << "> cpu: " << cpustr << '\n';
 
+		// -- MEMORY
 		string << "> ";
 		nany_details_export_memory_usage(string);
 		string << '\n';
