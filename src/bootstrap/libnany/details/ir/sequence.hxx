@@ -250,6 +250,13 @@ namespace IR
 		operands.instanceid = instanceid;
 	}
 
+	inline void Sequence::emitMemcheckhold(uint32_t lvid, uint32_t size)
+	{
+		auto& opr = emit<ISA::Op::memcheckhold>();
+		opr.lvid = lvid;
+		opr.size = size;
+	}
+
 	inline void Sequence::emitAssert(uint32_t lvid)
 	{
 		emit<ISA::Op::opassert>().lvid = lvid;

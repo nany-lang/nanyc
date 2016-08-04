@@ -2,7 +2,7 @@
 #include "details/atom/atom.h"
 #include "details/intrinsic/intrinsic-table.h"
 #include "types.h"
-#include "vm.h"
+#include "thread-context.h"
 
 using namespace Yuni;
 

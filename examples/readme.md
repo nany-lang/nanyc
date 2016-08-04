@@ -63,13 +63,12 @@ func main(args)
 	for filename in args do
 	{
 		// read the whole content of the file
-		var content = std.io.read(filename);
-		console << filename << ":\n" << content << "\n";
+		var content = std.io.file.read(filename);
+		console << filename << ":\n" << content << '\n';
 	}
 }
 ```
 
-- [ ] feature not fully implemented yet
 
 
 
@@ -79,15 +78,15 @@ func main(args)
 func main
 {
 	// for each line, print it to the standard output
-	console << (each in std.io.file("/tmp/myfile.txt")) << "\n";
+	for line in std.io.file.open(ro: "/tmp/myfile.txt") do
+		console << line << '\n';
 
 	// the same than above, but with line numbers
-	var lineNumber = 0;
-	for line in std.io.file("/tmp/myfile.txt") do
+	var lineNumber = 0u;
+	for line in std.io.file.open(ro: "/tmp/myfile.txt") do
 		console << (++lineNumber) << ": " << line << "\n";
 }
 ```
-- [ ] feature not fully implemented yet
 
 
 

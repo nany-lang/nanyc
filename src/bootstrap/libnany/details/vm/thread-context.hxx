@@ -1,6 +1,6 @@
 #pragma once
-#include "vm.h"
-
+#include "thread-context.h"
+#include <iostream>
 
 
 
@@ -8,6 +8,7 @@ namespace Nany
 {
 namespace VM
 {
+
 
 	inline nytctx_t* ThreadContext::self()
 	{
@@ -20,25 +21,11 @@ namespace VM
 	}
 
 
-	inline ThreadContext::ThreadContext(Program& program, const AnyString& name)
-		: program(program)
-		, cwd("/home")
-		, cf(program.cf)
-		, name(name)
-	{}
-
-
-	inline ThreadContext::ThreadContext(ThreadContext& rhs)
-		: program(rhs.program)
-		, cwd(rhs.cwd)
-		, cf(rhs.cf)
-	{}
-
-
 	inline void ThreadContext::cerr(const AnyString& msg)
 	{
 		cf.console.write_stderr(cf.console.internal, msg.c_str(), msg.size());
 	}
+
 
 	inline void ThreadContext::cerrColor(nycolor_t color)
 	{
@@ -46,16 +33,6 @@ namespace VM
 	}
 
 
-	inline void ThreadContext::cerrException(const AnyString& msg)
-	{
-		cerr("\n\n");
-		cerrColor(nyc_red);
-		cerr("exception: ");
-		cerrColor(nyc_white);
-		cerr(msg);
-		cerrColor(nyc_none);
-		cerr("\n");
-	}
 
 
 } // namespace VM

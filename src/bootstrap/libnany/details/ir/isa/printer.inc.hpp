@@ -626,6 +626,12 @@ namespace // anonymous
 		}
 
 
+		void print(const Operand<Op::memcheckhold>& operands)
+		{
+			line() << "memchecker.hold %" << operands.lvid << ", size: %" << operands.size;
+		}
+
+
 		void print(const Operand<Op::opassert>& operands)
 		{
 			line() << "assert %" << operands.lvid << " != 0";

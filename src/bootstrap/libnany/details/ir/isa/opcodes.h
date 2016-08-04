@@ -158,6 +158,8 @@ namespace ISA //!< Instruction Set Architecture
 
 		//! Assert expression
 		opassert,
+		//! Register a valid pointer (used for MemChecker)
+		memcheckhold,
 
 
 		// --- opcodes for compilation only
@@ -295,6 +297,7 @@ namespace ISA //!< Instruction Set Architecture
 				\
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::label) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::opassert) \
+				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::memcheckhold) \
 				\
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::tpush) \
 				LIBNANY_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::follow) \

@@ -9,42 +9,42 @@ namespace Nany
 
 	template<class T> struct CTypeToNanyType {};
 
-	template<> struct CTypeToNanyType<std::int8_t> final
+	template<> struct CTypeToNanyType<int8_t> final
 	{
 		static constexpr nytype_t type = nyt_i8;
 	};
 
-	template<> struct CTypeToNanyType<std::int16_t> final
+	template<> struct CTypeToNanyType<int16_t> final
 	{
 		static constexpr nytype_t type = nyt_i16;
 	};
 
-	template<> struct CTypeToNanyType<std::int32_t> final
+	template<> struct CTypeToNanyType<int32_t> final
 	{
 		static constexpr nytype_t type = nyt_i32;
 	};
 
-	template<> struct CTypeToNanyType<std::int64_t> final
+	template<> struct CTypeToNanyType<int64_t> final
 	{
 		static constexpr nytype_t type = nyt_i64;
 	};
 
-	template<> struct CTypeToNanyType<std::uint8_t> final
+	template<> struct CTypeToNanyType<uint8_t> final
 	{
 		static constexpr nytype_t type = nyt_u8;
 	};
 
-	template<> struct CTypeToNanyType<std::uint16_t> final
+	template<> struct CTypeToNanyType<uint16_t> final
 	{
 		static constexpr nytype_t type = nyt_u16;
 	};
 
-	template<> struct CTypeToNanyType<std::uint32_t> final
+	template<> struct CTypeToNanyType<uint32_t> final
 	{
 		static constexpr nytype_t type = nyt_u32;
 	};
 
-	template<> struct CTypeToNanyType<std::uint64_t> final
+	template<> struct CTypeToNanyType<uint64_t> final
 	{
 		static constexpr nytype_t type = nyt_u64;
 	};
@@ -72,11 +72,6 @@ namespace Nany
 	template<class P> struct CTypeToNanyType<const P*> final
 	{
 		static constexpr nytype_t type = nyt_ptr;
-	};
-
-	template<> struct CTypeToNanyType<Yuni::None> final
-	{
-		static constexpr nytype_t type = nyt_void;
 	};
 
 	template<> struct CTypeToNanyType<void> final

@@ -40,6 +40,7 @@ namespace VM
 		static constexpr void hold(const uint64_t*, size_t, uint32_t) {}
 		static constexpr void forget(const uint64_t*) {}
 		static constexpr bool checkObjectSize(const uint64_t*, size_t) { return true; }
+		static constexpr size_t fetchObjectSize(const uint64_t* const) { return 0; }
 		static constexpr bool has(const uint64_t*) { return true; }
 
 		static constexpr void releaseAll(nyallocator_t&) {}
@@ -81,6 +82,12 @@ namespace VM
 		{
 			auto it = ownedPointers.find(pointer);
 			return (YUNI_LIKELY(it != ownedPointers.end())) and (size == it->second.objsize);
+		}
+
+		size_t fetchObjectSize(const uint64_t* const pointer) const
+		{
+			auto it = ownedPointers.find(pointer);
+			return (YUNI_LIKELY(it != ownedPointers.end())) ? it->second.objsize : 0u;
 		}
 
 

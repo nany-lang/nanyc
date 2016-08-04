@@ -82,6 +82,8 @@ namespace IR
 		void emitNop();
 		//! Emit assert instruction
 		void emitAssert(uint32_t lvid);
+		//! Emit opcode to hold a pointer for the MemChecker
+		void emitMemcheckhold(uint32_t lvid, uint32_t size);
 
 		//! Emit equal
 		void emitEQ(uint32_t lvid, uint32_t lhs, uint32_t rhs);

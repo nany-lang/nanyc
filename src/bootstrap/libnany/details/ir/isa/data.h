@@ -678,6 +678,16 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid); }
 	};
 
+	template<> struct Operand<Nany::IR::ISA::Op::memcheckhold> final
+	{
+		constexpr static const char* opname() { return "memcheckhold"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		uint32_t size;
+		template<class T> void eachLVID(T& c) { c(lvid, size); }
+	};
+
+
 
 
 

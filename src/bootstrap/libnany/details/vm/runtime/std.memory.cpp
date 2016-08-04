@@ -20,6 +20,7 @@ static uint32_t nanyc_strlen(nyvm_t*, void* string)
 
 
 
+
 namespace Nany
 {
 

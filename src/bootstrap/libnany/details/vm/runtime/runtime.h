@@ -48,5 +48,10 @@ namespace // anonymous
 		vm->console->write_stdout(vm->console->internal, msg.c_str(), msg.size());
 	}
 
+	static inline nybool_t to_nybool(bool v)
+	{
+		return v ? nytrue : nyfalse;
+	}
+
 
 } // anonymous namespace

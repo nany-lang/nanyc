@@ -1,4 +1,4 @@
-#include "vm.h"
+#include "thread-context.h"
 #include "details/vm/types.h"
 #include "stack.h"
 #include "stacktrace.h"
@@ -50,9 +50,7 @@ namespace VM
 	//! Pattern for memset free regions (debug)
 	constexpr static const int patternFree = 0xCD;
 
-	//! Size that should be added to any Nany objects
-	constexpr static const size_t extraObjectSize =
-		sizeof(uint64_t); // object reference counter
+
 
 
 	namespace // anonymous
@@ -145,7 +143,6 @@ namespace VM
 			{
 				// dump information on the console
 				stacktrace.dump(Nany::ref(threadContext.program.build), map);
-
 				// avoid spurious err messages and memory leaks when used
 				// as scripting engine
 				memchecker.releaseAll(allocator);
@@ -161,8 +158,11 @@ namespace VM
 
 			[[noreturn]] void emitPointerSizeMismatch(void* object, size_t size)
 			{
-				ShortString64 msg;
-				msg << "pointer " << (void*) object << " size mismatch: got " << size;
+				ShortString128 msg;
+				msg << "pointer " << object << " size mismatch: got "
+					<< size << " bytes, expected "
+					<< memchecker.fetchObjectSize(reinterpret_cast<const uint64_t*>(object))
+					<< " bytes";
 				threadContext.cerrException(msg);
 				abortMission();
 			}
@@ -201,10 +201,7 @@ namespace VM
 
 			[[noreturn]] void emitUnknownPointer(void* p)
 			{
-				ShortString256 msg;
-				msg << "unknown pointer " << p << ", opcode: +";
-				msg << sequence.get().offsetOf(**cursor);
-				threadContext.cerrException(msg);
+				threadContext.cerrUnknownPointer(p, sequence.get().offsetOf(**cursor));
 				abortMission();
 			}
 
@@ -251,7 +248,7 @@ namespace VM
 
 				// its size
 				uint64_t classsizeof = classobject->runtimeSizeof();
-				classsizeof += extraObjectSize;
+				classsizeof += Config::extraObjectSize;
 
 				if (instanceid != (uint32_t) -1)
 				{
@@ -845,7 +842,7 @@ namespace VM
 					size = static_cast<size_t>(registers[opr.regsize].u64);
 				}
 
-				size += extraObjectSize;
+				size += Config::extraObjectSize;
 
 				uint64_t* pointer = allocateraw<uint64_t>(size);
 				if (YUNI_UNLIKELY(!pointer))
@@ -871,8 +868,8 @@ namespace VM
 
 				size_t oldsize = static_cast<size_t>(registers[opr.oldsize].u64);
 				size_t newsize = static_cast<size_t>(registers[opr.newsize].u64);
-				oldsize += extraObjectSize;
-				newsize += extraObjectSize;
+				oldsize += Config::extraObjectSize;
+				newsize += Config::extraObjectSize;
 
 				if (object)
 				{
@@ -902,6 +899,14 @@ namespace VM
 			}
 
 
+			void visit(const IR::ISA::Operand<IR::ISA::Op::memcheckhold>& opr)
+			{
+				uint64_t* ptr = reinterpret_cast<uint64_t*>(registers[opr.lvid].u64);
+				uint64_t size = registers[opr.size].u64 + Config::extraObjectSize;
+				memchecker.hold(ptr, size, opr.lvid);
+			}
+
+
 			void visit(const IR::ISA::Operand<IR::ISA::Op::memfree>& opr)
 			{
 				VM_PRINT_OPCODE(opr);
@@ -913,7 +918,7 @@ namespace VM
 				{
 					VM_CHECK_POINTER(object, opr);
 					size_t size = static_cast<size_t>(registers[opr.regsize].u64);
-					size += extraObjectSize;
+					size += Config::extraObjectSize;
 
 					if (YUNI_UNLIKELY(not memchecker.checkObjectSize(object, static_cast<size_t>(size))))
 						return emitPointerSizeMismatch(object, size);
@@ -936,7 +941,7 @@ namespace VM
 				uint64_t* object = reinterpret_cast<uint64_t*>(registers[opr.lvid].u64);
 				VM_CHECK_POINTER(object, opr);
 				size_t size = static_cast<size_t>(registers[opr.regsize].u64);
-				size += extraObjectSize;
+				size += Config::extraObjectSize;
 				uint8_t pattern = static_cast<uint8_t>(registers[opr.pattern].u64);
 
 				if (YUNI_UNLIKELY(not memchecker.checkObjectSize(object, static_cast<size_t>(size))))

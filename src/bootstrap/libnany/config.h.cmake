@@ -33,6 +33,11 @@ namespace Config
 	static constexpr bool removeRedundantDbgOffset = true;
 
 
+	//! Size that should be added to any Nany objects
+	// (reference counter)
+	constexpr static const size_t extraObjectSize = sizeof(uint64_t);
+
+
 	//! Import the NSL
 	static constexpr bool importNSL = true;
 

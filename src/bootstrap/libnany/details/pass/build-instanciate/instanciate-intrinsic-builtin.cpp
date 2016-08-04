@@ -19,6 +19,26 @@ namespace Instanciate
 	namespace // nonymous
 	{
 
+		static bool intrinsicMemcheckerHold(SequenceBuilder& seq, uint32_t lvid)
+		{
+			seq.cdeftable.substitute(lvid).mutateToVoid();
+
+			uint32_t ptrlvid = seq.pushedparams.func.indexed[0].lvid;
+			auto& cdefptr = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, ptrlvid});
+			if (not cdefptr.isRawPointer())
+				return seq.complainIntrinsicParameter("__nanyc_memchecker_hold", 0, cdefptr, "'__pointer'");
+
+			uint32_t sizelvid = seq.pushedparams.func.indexed[1].lvid;
+			auto& cdefsize = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, sizelvid});
+			if (not cdefsize.isBuiltinU64())
+				return seq.complainIntrinsicParameter("__nanyc_memchecker_hold", 0, cdefsize, "'__u64'");
+
+			if (seq.canGenerateCode())
+				seq.out.emitMemcheckhold(ptrlvid, sizelvid);
+			return true;
+		}
+
+
 		static bool intrinsicOSIsUnix(SequenceBuilder& seq, uint32_t lvid)
 		{
 			seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_bool);
@@ -1128,6 +1148,7 @@ namespace Instanciate
 			//
 			{"assert",          { 1,  &intrinsicAssert,      }},
 			{"__reinterpret",   { 2,  &intrinsicReinterpret, }},
+			{"__nanyc_memchecker_hold",  { 2,  &intrinsicMemcheckerHold, }},
 
 			{"os.is.linux",     { 0,  &intrinsicOSIsLinux      }},
 			{"os.is.unix",      { 0,  &intrinsicOSIsUnix       }},
