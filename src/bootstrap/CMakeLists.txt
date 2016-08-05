@@ -82,7 +82,7 @@ add_subdirectory("ext/dyncall")
 #
 get_filename_component(NANY_GRAMMAR_SOURCEDIR   "${CMAKE_CURRENT_SOURCE_DIR}/../grammar"  REALPATH)
 get_filename_component(NANY_YGR                 "${NANY_GRAMMAR_SOURCEDIR}/nany.ygr"      REALPATH)
-get_filename_component(NANY_GRAMMAR_TARGETDIR   "${CMAKE_CURRENT_BINARY_DIR}/libnany/details/grammar" REALPATH)
+get_filename_component(NANY_GRAMMAR_TARGETDIR   "${CMAKE_CURRENT_BINARY_DIR}/libnanyc/details/grammar" REALPATH)
 get_filename_component(NANY_GRAMMAR_CPP         "${NANY_GRAMMAR_TARGETDIR}/nany.cpp"      REALPATH)
 get_filename_component(NANY_GRAMMAR_H           "${NANY_GRAMMAR_TARGETDIR}/nany.h"        REALPATH)
 get_filename_component(NANY_GRAMMAR_HXX         "${NANY_GRAMMAR_TARGETDIR}/nany.hxx"      REALPATH)
@@ -164,14 +164,14 @@ set(CMAKE_CXX_FLAGS_RELEASE "${YN_FLAGS_CXX_RELEASE} ${extra_flags_release}")
 
 # Common Tools
 #include_directories("${CMAKE_CURRENT_BINARY_DIR}/") # include "ncs.grammar/..."
-#include_directories("${CMAKE_CURRENT_LIST_DIR}/libnany") # "nany/nany.h"
+#include_directories("${CMAKE_CURRENT_LIST_DIR}/libnanyc") # "nany/nany.h"
 
 
 # Tools
 add_subdirectory(tools)
 
 # Nany C library
-add_subdirectory("libnany")
+add_subdirectory("libnanyc")
 
 
 #
@@ -190,7 +190,7 @@ set_target_properties(nanyc PROPERTIES
 # (if something goes wrong with libnanyc, it might be essential to simply print the input AST)
 add_executable(nanyc-dump-ast
 	dump-ast.cpp ${nysrc_grammar} ${nysrc_details_grammar})
-target_include_directories(nanyc-dump-ast PRIVATE "${CMAKE_CURRENT_LIST_DIR}/libnany")
+target_include_directories(nanyc-dump-ast PRIVATE "${CMAKE_CURRENT_LIST_DIR}/libnanyc")
 add_dependencies(nanyc-dump-ast nanyc-grammar-cpp)
 target_link_libraries(nanyc-dump-ast PRIVATE yuni-static-core libnanyc-grammar)
 set_target_properties(nanyc-dump-ast PROPERTIES
