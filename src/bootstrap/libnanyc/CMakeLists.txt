@@ -261,7 +261,6 @@ addsrc(
 	"details/vm/thread-context.h"
 	"details/vm/thread-context.hxx"
 	"details/vm/thread-context.cpp"
-	"details/vm/fallback-adapter.cpp"
 	"details/vm/memchecker.h"
 	"details/vm/memchecker.cpp"
 	"details/vm/stacktrace.h"
@@ -426,7 +425,6 @@ addsrc(
 	"details/c-api/project.cpp"
 	"details/c-api/build.cpp"
 	"details/c-api/program.cpp"
-	"details/c-api/io-adapter-localfolder.cpp"
 	"details/c-api/console.cpp"
 	"details/c-api/bugreport.cpp"
 	"details/c-api/validator.cpp"
@@ -438,6 +436,13 @@ addsrc(
 	"details/c-api/common-debuginfo.hxx"
 	"details/c-api/version.c")
 
+
+addsrc(
+	NAME  nysrc_io_adapter
+	GROUP "IO Adapter"
+	FILES
+	"details/io-adapter/fallback.cpp"
+	"details/io-adapter/localfolder.cpp")
 
 addsrc(
 	NAME  nysrc_public_headers
@@ -479,6 +484,7 @@ add_library(libnanyc ${mode_libnany}
 	${nysrc_public_headers}
 
 	${nysrc_c_api}
+	${nysrc_io_adapter}
 
 	${nysrc_details_pass_build_ast_from_source}
 	${nysrc_details_pass_build_ast_normalize}
