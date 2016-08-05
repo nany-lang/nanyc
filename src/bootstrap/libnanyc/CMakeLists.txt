@@ -423,20 +423,20 @@ addsrc(
 	NAME  nysrc_c_api
 	GROUP "c-api"
 	FILES
-	"c-api/project.cpp"
-	"c-api/build.cpp"
-	"c-api/program.cpp"
-	"c-api/io-adapter-localfolder.cpp"
-	"c-api/console.cpp"
-	"c-api/bugreport.cpp"
-	"c-api/validator.cpp"
-	"c-api/type.cpp"
-	"c-api/run.cpp"
-	"c-api/print-ast.cpp"
-	"c-api/visibility.cpp"
-	"c-api/memalloc.c"
-	"c-api/common-debuginfo.hxx"
-	"c-api/version.c")
+	"details/c-api/project.cpp"
+	"details/c-api/build.cpp"
+	"details/c-api/program.cpp"
+	"details/c-api/io-adapter-localfolder.cpp"
+	"details/c-api/console.cpp"
+	"details/c-api/bugreport.cpp"
+	"details/c-api/validator.cpp"
+	"details/c-api/type.cpp"
+	"details/c-api/run.cpp"
+	"details/c-api/print-ast.cpp"
+	"details/c-api/visibility.cpp"
+	"details/c-api/memalloc.c"
+	"details/c-api/common-debuginfo.hxx"
+	"details/c-api/version.c")
 
 
 addsrc(
