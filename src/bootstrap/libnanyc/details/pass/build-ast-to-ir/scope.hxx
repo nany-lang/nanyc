@@ -1,7 +1,7 @@
 #pragma once
 #include "details/pass/build-ast-to-ir/scope.h"
 #include "details/fwd.h"
-#include "libnany-config.h"
+#include "libnanyc-config.h"
 
 
 

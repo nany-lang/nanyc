@@ -2,7 +2,6 @@
 #include "details/grammar/nany.h"
 #include "details/ast/ast.h"
 #include <limits>
-#include "libnany-config.h"
 
 using namespace Yuni;
 

@@ -2,7 +2,7 @@
 #include "nany/nany.h"
 #include "details/context/project.h"
 #include "details/context/build.h"
-#include "libnany-version.h"
+#include "libnanyc-version.h"
 
 using namespace Yuni;
 
@@ -99,7 +99,7 @@ namespace // anonymous
 			Nany::Logs::Message msg{Nany::Logs::Level::info};
 			msg.section = "comp";
 			msg.prefix = "nanyc {c++/bootstrap} ";
-			msg.message << 'v' << LIBNANY_VERSION_STR;
+			msg.message << 'v' << LIBNANYC_VERSION_STR;
 			if (debugmode)
 				msg.message << " {debug}";
 			msg.print(build.cf.console, false);

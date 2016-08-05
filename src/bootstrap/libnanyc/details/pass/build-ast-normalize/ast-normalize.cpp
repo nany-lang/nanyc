@@ -3,8 +3,8 @@
 #include "details/ast/ast.h"
 #include "details/context/build-info.h"
 #include "details/reporting/report.h"
-#include "libnany-config.h"
-#include "libnany-traces.h"
+#include "libnanyc-config.h"
+#include "libnanyc-traces.h"
 #include "details/utils/check-for-valid-identifier-name.h"
 #include <functional>
 

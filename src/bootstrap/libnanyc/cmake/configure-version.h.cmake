@@ -12,29 +12,29 @@
 
 
 /*! Nany default website */
-#define LIBNANY_WEBSITE  "@nany_website_url@"
+#define LIBNANYC_WEBSITE  "@nany_website_url@"
 
 /*! C++ compiler */
-#define LIBNANY_BOOTSTRAP_CXX_COMPILER   "@CMAKE_CXX_COMPILER@"
+#define LIBNANYC_BOOTSTRAP_CXX_COMPILER   "@CMAKE_CXX_COMPILER@"
 
 
 /*! Nany version version major */
-#define LIBNANY_VERSION_MAJOR  @nany_version_major@
+#define LIBNANYC_VERSION_MAJOR  @nany_version_major@
 
 /*! Nany version version minor */
-#define LIBNANY_VERSION_MINOR  @nany_version_minor@
+#define LIBNANYC_VERSION_MINOR  @nany_version_minor@
 
 /*! Nany version version patch */
-#define LIBNANY_VERSION_PATCH  @nany_version_patch@
+#define LIBNANYC_VERSION_PATCH  @nany_version_patch@
 
 /*! Nany version prerelease */
-#define LIBNANY_VERSION_PRERELEASE "@nany_version_prerelease@"
+#define LIBNANYC_VERSION_PRERELEASE "@nany_version_prerelease@"
 
 /*! Nany version metadata */
-#define LIBNANY_VERSION_METADATA "@nany_version_metadata@"
+#define LIBNANYC_VERSION_METADATA "@nany_version_metadata@"
 
 /*! Nany version string */
-#define LIBNANY_VERSION_STR "@nany_version_string@"
+#define LIBNANYC_VERSION_STR "@nany_version_string@"
 
 
 /* vim: set ft=cpp: */

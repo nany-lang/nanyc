@@ -173,7 +173,7 @@ namespace IR
 				std::cout << "== opcode == at " << (it - pBody) << "|" << (void*) it << " :: "
 					<< it->opcodes[0] << ": " << IR::ISA::print(*this, *it) << '\n';
 				#endif
-				LIBNANY_IR_VISIT_SEQUENCE(IR::ISA::Operand, visitor, *it);
+				LIBNANYC_IR_VISIT_SEQUENCE(IR::ISA::Operand, visitor, *it);
 			}
 		}
 	}
@@ -192,7 +192,7 @@ namespace IR
 				std::cout << "== opcode == at " << (it - pBody) << "|" << (void*) it << " :: "
 					<< it->opcodes[0] << ": " << IR::ISA::print(*this, *it) << '\n';
 				#endif
-				LIBNANY_IR_VISIT_SEQUENCE(const IR::ISA::Operand, visitor, *it);
+				LIBNANYC_IR_VISIT_SEQUENCE(const IR::ISA::Operand, visitor, *it);
 			}
 		}
 	}

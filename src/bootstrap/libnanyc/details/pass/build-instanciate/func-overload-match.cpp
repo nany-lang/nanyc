@@ -5,7 +5,7 @@
 #include "details/reporting/report.h"
 #include "details/errors/errors.h"
 #include "instanciate.h"
-#include "libnany-config.h"
+#include "libnanyc-config.h"
 
 using namespace Yuni;
 

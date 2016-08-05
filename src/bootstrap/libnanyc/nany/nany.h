@@ -4,36 +4,36 @@
 ** License, v. 2.0. If a copy of the MPL was not distributed with this
 ** file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
-#ifndef __LIBNANY_NANY_C_H__
-#define __LIBNANY_NANY_C_H__
+#ifndef __LIBNANYC_NANY_C_H__
+#define __LIBNANYC_NANY_C_H__
 #include <string.h>
 #include <stdint.h>
 
 #if defined(_WIN32) || defined(__CYGWIN__)
 #  ifdef __GNUC__
-#    define LIBNANY_VISIBILITY_EXPORT   __attribute__ ((dllexport))
-#    define LIBNANY_VISIBILITY_IMPORT   __attribute__ ((dllimport))
+#    define LIBNANYC_VISIBILITY_EXPORT   __attribute__ ((dllexport))
+#    define LIBNANYC_VISIBILITY_IMPORT   __attribute__ ((dllimport))
 #  else
-#    define LIBNANY_VISIBILITY_EXPORT   __declspec(dllexport) /* note: actually gcc seems to also supports this syntax */
-#    define LIBNANY_VISIBILITY_IMPORT   __declspec(dllimport) /* note: actually gcc seems to also supports this syntax */
+#    define LIBNANYC_VISIBILITY_EXPORT   __declspec(dllexport) /* note: actually gcc seems to also supports this syntax */
+#    define LIBNANYC_VISIBILITY_IMPORT   __declspec(dllimport) /* note: actually gcc seems to also supports this syntax */
 #  endif
 #else
-#  define LIBNANY_VISIBILITY_EXPORT     __attribute__((visibility("default")))
-#  define LIBNANY_VISIBILITY_IMPORT     __attribute__((visibility("default")))
+#  define LIBNANYC_VISIBILITY_EXPORT     __attribute__((visibility("default")))
+#  define LIBNANYC_VISIBILITY_IMPORT     __attribute__((visibility("default")))
 #endif
 
-#if defined(_DLL) && !defined(LIBNANY_DLL_EXPORT)
-#  define LIBNANY_DLL_EXPORT
+#if defined(_DLL) && !defined(LIBNANYC_DLL_EXPORT)
+#  define LIBNANYC_DLL_EXPORT
 #endif
 
 /*!
 ** \macro NY_EXPORT
 ** \brief Export / import a libnany symbol (function)
 */
-#if defined(LIBNANY_DLL_EXPORT)
-#	define NY_EXPORT LIBNANY_VISIBILITY_EXPORT
+#if defined(LIBNANYC_DLL_EXPORT)
+#	define NY_EXPORT LIBNANYC_VISIBILITY_EXPORT
 #else
-#	define NY_EXPORT LIBNANY_VISIBILITY_IMPORT
+#	define NY_EXPORT LIBNANYC_VISIBILITY_IMPORT
 #endif
 
 
@@ -942,4 +942,4 @@ NY_EXPORT int nany_run_file_n(const nyrun_cf_t* cf, const char* file, size_t len
 }
 #endif
 
-#endif /* __LIBNANY_NANY_C_H__ */
+#endif /* __LIBNANYC_NANY_C_H__ */

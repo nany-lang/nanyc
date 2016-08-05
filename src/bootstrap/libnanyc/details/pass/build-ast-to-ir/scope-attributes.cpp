@@ -4,7 +4,6 @@
 #include "details/utils/check-for-valid-identifier-name.h"
 #include "details/grammar/nany.h"
 #include "details/ast/ast.h"
-#include "libnany-config.h"
 
 using namespace Yuni;
 

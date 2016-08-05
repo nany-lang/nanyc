@@ -3,7 +3,7 @@
 #include "details/reporting/message.h"
 #include "details/utils/origin.h"
 #include "details/pass/build-attach-program/mapping.h"
-#include "libnany-traces.h"
+#include "libnanyc-traces.h"
 #include "instanciate-atom.h"
 #include <memory>
 #include <iostream>

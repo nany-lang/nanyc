@@ -1,6 +1,6 @@
 #include "project.h"
 #include "details/vm/runtime/std.core.h"
-#include "libnany-config.h"
+#include "libnanyc-config.h"
 
 using namespace Yuni;
 

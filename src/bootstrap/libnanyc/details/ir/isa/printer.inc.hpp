@@ -833,7 +833,7 @@ namespace // anonymous
 
 		inline void visit(const IR::Instruction& instruction)
 		{
-			LIBNANY_IR_VISIT_SEQUENCE(const IR::ISA::Operand, *this, instruction);
+			LIBNANYC_IR_VISIT_SEQUENCE(const IR::ISA::Operand, *this, instruction);
 		}
 	};
 

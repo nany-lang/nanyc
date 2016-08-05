@@ -4,8 +4,8 @@
 ** License, v. 2.0. If a copy of the MPL was not distributed with this
 ** file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
-#ifndef __LIBNANY_NANY_EXT_C_H__
-#define __LIBNANY_NANY_EXT_C_H__
+#ifndef __LIBNANYC_NANY_EXT_C_H__
+#define __LIBNANYC_NANY_EXT_C_H__
 #include "nany.h"
 
 
@@ -149,4 +149,4 @@ NY_EXPORT nybool_t nany_ext_verify_manifest(const char* file);
 }
 #endif
 
-#endif /*__LIBNANY_NANY_EXT_C_H__*/
+#endif /*__LIBNANYC_NANY_EXT_C_H__*/

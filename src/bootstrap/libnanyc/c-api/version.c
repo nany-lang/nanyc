@@ -1,5 +1,5 @@
 #include "nany/nany.h"
-#include "libnany-version.h"
+#include "libnanyc-version.h"
 #include <assert.h>
 
 // NOTE
@@ -18,47 +18,47 @@ static inline const char* strOrNull(const char* const text)
 const char* libnany_website_url()
 {
 	#ifdef YUNI_OS_LINUX
-	_Static_assert(LIBNANY_WEBSITE != NULL, "invalid null url");
+	_Static_assert(LIBNANYC_WEBSITE != NULL, "invalid null url");
 	#endif
-	return LIBNANY_WEBSITE;
+	return LIBNANYC_WEBSITE;
 }
 
 const char* libnany_version()
 {
 	#ifdef YUNI_OS_LINUX
-	_Static_assert(LIBNANY_VERSION_STR != NULL, "invalid null version");
+	_Static_assert(LIBNANYC_VERSION_STR != NULL, "invalid null version");
 	#endif
-	return LIBNANY_VERSION_STR;
+	return LIBNANYC_VERSION_STR;
 }
 
 const char* libnany_version_metadata()
 {
-	return strOrNull(LIBNANY_VERSION_METADATA);
+	return strOrNull(LIBNANYC_VERSION_METADATA);
 }
 
 const char* libnany_version_prerelease()
 {
-	return strOrNull(LIBNANY_VERSION_PRERELEASE);
+	return strOrNull(LIBNANYC_VERSION_PRERELEASE);
 }
 
 
 uint32_t libnany_get_version(uint32_t* major, uint32_t* minor, uint32_t* patch)
 {
 	if (major)
-		*major = LIBNANY_VERSION_MAJOR;
+		*major = LIBNANYC_VERSION_MAJOR;
 	if (minor)
-		*minor = LIBNANY_VERSION_MINOR;
+		*minor = LIBNANYC_VERSION_MINOR;
 	if (patch)
-		*patch = LIBNANY_VERSION_PATCH;
+		*patch = LIBNANYC_VERSION_PATCH;
 
-	return LIBNANY_VERSION_MAJOR * 100000u + LIBNANY_VERSION_MINOR * 1000u + LIBNANY_VERSION_PATCH;
+	return LIBNANYC_VERSION_MAJOR * 100000u + LIBNANYC_VERSION_MINOR * 1000u + LIBNANYC_VERSION_PATCH;
 }
 
 
 int libnany_check_compatible_version(uint32_t major, uint32_t minor)
 {
 	/* currently, no real incompatibilities except for version comparison */
-	return ((LIBNANY_VERSION_MAJOR >= major)
-		|| (LIBNANY_VERSION_MAJOR == major && minor <= LIBNANY_VERSION_MINOR)
+	return ((LIBNANYC_VERSION_MAJOR >= major)
+		|| (LIBNANYC_VERSION_MAJOR == major && minor <= LIBNANYC_VERSION_MINOR)
 		) ? 0 : 1;
 }

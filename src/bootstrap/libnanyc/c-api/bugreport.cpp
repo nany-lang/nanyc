@@ -2,7 +2,7 @@
 #include <yuni/io/file.h>
 #include <yuni/core/math.h>
 #include <yuni/core/process/program.h>
-#include "libnany-config.h"
+#include "libnanyc-config.h"
 #include "common-debuginfo.hxx"
 #include <string.h>
 #include <iostream>

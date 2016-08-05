@@ -3,7 +3,7 @@
 #include "details/reporting/report.h"
 #include "details/reporting/message.h"
 #include "details/utils/origin.h"
-#include "libnany-traces.h"
+#include "libnanyc-traces.h"
 #include "instanciate-atom.h"
 #include "func-overload-match.h"
 #include <memory>

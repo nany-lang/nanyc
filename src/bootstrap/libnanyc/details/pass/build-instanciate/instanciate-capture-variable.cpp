@@ -1,6 +1,7 @@
+#include <yuni/yuni.h>
+#include <yuni/core/string.h>
 #include "instanciate.h"
-#include "libnany-traces.h"
-#include <string.h>
+#include "libnanyc-traces.h"
 
 using namespace Yuni;
 

@@ -6,8 +6,8 @@
 #include "details/vm/runtime/std.core.h"
 #include "details/atom/classdef-table-view.h"
 #include "details/errors/errors.h"
-#include "libnany-config.h"
-#include "libnany-traces.h"
+#include "libnanyc-config.h"
+#include "libnanyc-traces.h"
 
 using namespace Yuni;
 

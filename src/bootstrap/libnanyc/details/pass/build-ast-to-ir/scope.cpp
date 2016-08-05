@@ -1,6 +1,6 @@
 #include "details/pass/build-ast-to-ir/scope.h"
 #include "details/grammar/nany.h"
-#include "libnany-config.h"
+#include "libnanyc-config.h"
 
 using namespace Yuni;
 

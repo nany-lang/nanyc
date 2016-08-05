@@ -5,7 +5,6 @@
 #include "source.h"
 #include "build-info.h"
 #include "target.h"
-#include "libnany-config.h"
 #include "details/errors/errors.h"
 #include <memory>
 #include "details/context/build.h"

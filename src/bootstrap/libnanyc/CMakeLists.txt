@@ -4,27 +4,27 @@ project(libnany)
 get_filename_component(libnany_config_folder "${CMAKE_CURRENT_BINARY_DIR}" REALPATH)
 file(MAKE_DIRECTORY "${libnany_config_folder}")
 
-if (NOT "${nany_version_string}" STREQUAL "${__LIBNANY_CONFIG_HEADER_CACHE}"
-	OR NOT EXISTS "${libnany_config_folder}/libnany-version.h")
-	nmessage("generating 'libnany-version.h' in ${libnany_config_folder}/libnany-version.h")
-	configure_file("cmake/configure-version.h.cmake" "${libnany_config_folder}/libnany-version.h" @ONLY)
-	set(__LIBNANY_CONFIG_HEADER_CACHE "${nany_version_string}" CACHE STRING "" FORCE)
+if (NOT "${nany_version_string}" STREQUAL "${__LIBNANYC_CONFIG_HEADER_CACHE}"
+	OR NOT EXISTS "${libnany_config_folder}/libnanyc-version.h")
+	nmessage("generating 'libnanyc-version.h' in ${libnany_config_folder}/libnanyc-version.h")
+	configure_file("cmake/configure-version.h.cmake" "${libnany_config_folder}/libnanyc-version.h" @ONLY)
+	set(__LIBNANYC_CONFIG_HEADER_CACHE "${nany_version_string}" CACHE STRING "" FORCE)
 else()
-	nmessage("ignoring libnany-version.h ${libnany_config_folder}/libnany-version.h (cache)")
+	nmessage("ignoring libnanyc-version.h ${libnany_config_folder}/libnanyc-version.h (cache)")
 endif()
 
-if (NOT EXISTS "${libnany_config_folder}/libnany-config.h")
-	nmessage("generating 'libnany-config.h' in ${libnany_config_folder}/libnany-config.h")
-	configure_file("cmake/configure-config.h.cmake" "${libnany_config_folder}/libnany-config.h" @ONLY)
+if (NOT EXISTS "${libnany_config_folder}/libnanyc-config.h")
+	nmessage("generating 'libnanyc-config.h' in ${libnany_config_folder}/libnanyc-config.h")
+	configure_file("cmake/configure-config.h.cmake" "${libnany_config_folder}/libnanyc-config.h" @ONLY)
 else()
-	nmessage("ignoring libnany-config.h ${libnany_config_folder}/libnany-config.h (already exists)")
+	nmessage("ignoring libnanyc-config.h ${libnany_config_folder}/libnanyc-config.h (already exists)")
 endif()
 
-if (NOT EXISTS "${libnany_config_folder}/libnany-traces.h")
-	nmessage("generating 'libnany-traces.h' in ${libnany_config_folder}/libnany-traces.h")
-	configure_file("cmake/configure-traces.h.cmake" "${libnany_config_folder}/libnany-traces.h" @ONLY)
+if (NOT EXISTS "${libnany_config_folder}/libnanyc-traces.h")
+	nmessage("generating 'libnanyc-traces.h' in ${libnany_config_folder}/libnanyc-traces.h")
+	configure_file("cmake/configure-traces.h.cmake" "${libnany_config_folder}/libnanyc-traces.h" @ONLY)
 else()
-	nmessage("ignoring libnany-traces.h ${libnany_config_folder}/libnany-traces.h (already exists)")
+	nmessage("ignoring libnanyc-traces.h ${libnany_config_folder}/libnanyc-traces.h (already exists)")
 endif()
 
 
@@ -507,9 +507,9 @@ add_library(libnanyc ${mode_libnany}
 	"details/fwd.h"
 
 	# misc
-	"${libnany_config_folder}/libnany-config.h"
-	"${libnany_config_folder}/libnany-traces.h"
-	"${libnany_config_folder}/libnany-version.h")
+	"${libnany_config_folder}/libnanyc-config.h"
+	"${libnany_config_folder}/libnanyc-traces.h"
+	"${libnany_config_folder}/libnanyc-version.h")
 
 
 
@@ -536,7 +536,7 @@ set_property(TARGET libnanyc-grammar PROPERTY LIBRARY_OUTPUT_NAME "nanyc-grammar
 set_property(TARGET libnanyc-grammar PROPERTY ARCHIVE_OUTPUT_NAME "nanyc-grammar")
 
 
-target_compile_definitions(libnanyc PRIVATE "LIBNANY_DLL_EXPORT=1")
+target_compile_definitions(libnanyc PRIVATE "LIBNANYC_DLL_EXPORT=1")
 
 
 target_include_directories(libnanyc PRIVATE "${libnany_config_folder}")

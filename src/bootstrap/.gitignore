@@ -34,9 +34,9 @@ CPackConfig.cmake
 
 # generated from the grammar
 /libnanyc/details/grammar/
-/libnanyc/libnany-config.h
-/libnanyc/libnany-traces.h
-/libnanyc/libnany-version.h
+/libnanyc/libnanyc-config.h
+/libnanyc/libnanyc-traces.h
+/libnanyc/libnanyc-version.h
 
 # binaries
 /libnanyc/*.a

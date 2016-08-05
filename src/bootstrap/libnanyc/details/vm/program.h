@@ -5,7 +5,7 @@
 #include "nany/nany.h"
 #include "details/atom/atom-map.h"
 #include "details/context/build.h"
-#include "libnany-config.h"
+#include "libnanyc-config.h"
 
 
 

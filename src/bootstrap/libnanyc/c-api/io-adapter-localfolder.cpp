@@ -4,7 +4,7 @@
 #include <yuni/io/directory.h>
 #include <yuni/io/file.h>
 #include <yuni/io/directory/info/info.h>
-#include "libnany-config.h"
+#include "libnanyc-config.h"
 
 using namespace Yuni;
 

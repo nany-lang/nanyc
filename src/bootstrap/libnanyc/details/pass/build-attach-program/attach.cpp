@@ -1,7 +1,6 @@
 #include "details/context/build.h"
 #include "details/atom/classdef-table.h"
 #include "details/reporting/report.h"
-#include "libnany-config.h"
 #include <unordered_map>
 #include "mapping.h"
 
