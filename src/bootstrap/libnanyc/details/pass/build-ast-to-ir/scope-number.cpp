@@ -83,6 +83,7 @@ namespace Producer
 		// class name
 		AnyString cn;
 		uint32_t hardcodedlvid;
+		bool negate = false;
 
 		if (not numdef.isFloat)
 		{
@@ -111,7 +112,8 @@ namespace Producer
 			{
 				bool invalidcast = false;
 
-				if (numdef.sign == ' ' or numdef.sign == '+')
+				negate = (numdef.sign == '-');
+				if (not negate)
 				{
 					if (not numdef.isUnsigned)
 					{
@@ -164,7 +166,10 @@ namespace Producer
 				}
 			}
 
-			hardcodedlvid = createLocalBuiltinInt(node, type, numdef.part1);
+			uint64_t number = (not negate)
+				? numdef.part1
+				: (uint64_t)( - static_cast<int64_t>(numdef.part1)); // reinterpret to avoid unwanted type promotion
+			hardcodedlvid = createLocalBuiltinInt(node, type, number);
 		}
 		else
 		{
