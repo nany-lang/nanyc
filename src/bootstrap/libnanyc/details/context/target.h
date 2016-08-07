@@ -73,12 +73,6 @@ namespace Nany
 
 
 	private:
-		//! Register the target to the attached project
-		void registerTargetToProject();
-		//! Remove the target from the list of all targets from the project
-		void unregisterTargetFromProject();
-
-	private:
 		//! Attached project
 		nyproject_t* project = nullptr;
 

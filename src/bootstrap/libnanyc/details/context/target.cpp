@@ -14,46 +14,10 @@ namespace Nany
 {
 
 
-	inline void CTarget::registerTargetToProject()
-	{
-		// !!internal: using `pName` and not `name`, since the internal pointer
-		// is not the same
-		auto& prj = Nany::ref(project);
-		AnyString name{pName};
-
-		// add the target in the project
-		prj.targets.all.insert(std::make_pair(name, this));
-		// event
-		if (prj.cf.on_target_added)
-			prj.cf.on_target_added(project, self(), name.c_str(), name.size());
-	}
-
-
-	inline void CTarget::unregisterTargetFromProject()
-	{
-		// remove this target from the list of all targ
-		if (project)
-		{
-			auto& prj = Nany::ref(project);
-			AnyString name{pName};
-
-			// event
-			if (prj.cf.on_target_removed)
-				prj.cf.on_target_removed(project, self(), name.c_str(), name.size());
-			// remove the target from the list of all targets
-			prj.targets.all.erase(name);
-			// reset project pointer
-			project = nullptr;
-		}
-	}
-
-
 	CTarget::CTarget(nyproject_t* project, const AnyString& name)
 		: project(project)
 		, pName{name}
 	{
-		assert(project != nullptr);
-		registerTargetToProject();
 	}
 
 
@@ -87,14 +51,16 @@ namespace Nany
 				}
 			}
 		}
-
-		registerTargetToProject();
 	}
 
 
 	CTarget::~CTarget()
 	{
-		unregisterTargetFromProject();
+		if (project)
+		{
+			Nany::ref(project).unregisterTargetFromProject(*this);
+			project = nullptr;
+		}
 
 		for (auto& ptr: pSources)
 			ptr->resetTarget(nullptr); // detach all sources from parent

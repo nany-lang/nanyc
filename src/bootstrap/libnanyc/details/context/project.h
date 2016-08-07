@@ -64,6 +64,10 @@ namespace Nany
 		//! Destructor, private, destroy() must be used instead
 		~Project();
 
+		CTarget::Ptr doCreateTarget(const AnyString& name);
+		void unregisterTargetFromProject(CTarget& target);
+		friend class CTarget;
+
 	}; // class Project
 
 

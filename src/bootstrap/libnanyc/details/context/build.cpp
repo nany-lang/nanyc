@@ -38,12 +38,21 @@ namespace Nany
 
 	void Build::init()
 	{
-		targets.clear();
-		sources.clear();
-		sources.shrink_to_fit();
-		sources.reserve(16); // arbitrary
-		messages = nullptr;
-		duration = 0;
+		if (not targets.empty()) // big cleanup
+		{
+			targets.clear();
+			targets.shrink_to_fit();
+			sources.clear();
+			sources.shrink_to_fit();
+			pAttachedSequences.clear();
+			pAttachedSequences.shrink_to_fit();
+			duration = 0;
+			buildtime = 0;
+			messages = nullptr;
+		}
+
+		targets.reserve(project.targets.all.size());
+		sources.reserve(32); // arbitrary, at least more than 20 source files from nsl
 		success = true;
 
 		// keeping our own list of targets / sources to be completely
@@ -55,7 +64,7 @@ namespace Nany
 			newtarget->eachSource([&](Source& source) {
 				sources.push_back(std::ref(source));
 			});
-			targets.insert(std::make_pair(pair.first, newtarget));
+			targets.emplace_back(newtarget);
 		}
 
 		if (Config::importNSL)

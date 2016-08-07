@@ -138,8 +138,8 @@ namespace Nany
 		//! Destructor, deallocate() must be called
 		~Build();
 
-		std::map<AnyString, CTarget::Ptr> targets;
 		std::vector<std::reference_wrapper<Source>> sources;
+		std::vector<CTarget::Ptr> targets;
 		std::vector<AttachedSequenceRef> pAttachedSequences;
 
 	}; // class Build
