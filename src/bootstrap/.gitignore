@@ -15,6 +15,7 @@ CPackConfig.cmake
 # Visual Studio stuff
 *.sln
 *.vcxproj*
+/*.VC.db
 
 # yuni related stuff
 *~
