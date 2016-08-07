@@ -139,12 +139,14 @@ static nyio_type_t nanyc_io_localfolder_statex(nyio_adapter_t* adapter, const ch
 
 static uint64_t nanyc_io_localfolder_file_read(void* file, void* buffer, uint64_t bufsize)
 {
+	assert(file != nullptr and "invalid file pointer for file_read");
 	return (*reinterpret_cast<IO::File::Stream*>(file)).read((char*)buffer, bufsize);
 }
 
 
 static uint64_t nanyc_io_localfolder_file_write(void* file, const void* buffer, uint64_t bufsize)
 {
+	assert(file != nullptr and "invalid file pointer for file_write");
 	return (*reinterpret_cast<IO::File::Stream*>(file)).write(buffer, bufsize);
 }
 
@@ -180,12 +182,14 @@ static void* nanyc_io_localfolder_file_open(nyio_adapter_t* adapter, const char*
 
 static void nanyc_io_localfolder_file_close(void* file)
 {
+	assert(file != nullptr);
 	delete reinterpret_cast<IO::File::Stream*>(file);
 }
 
 
 static nyio_err_t nanyc_io_localfolder_file_seek(void* file, uint64_t offset)
 {
+	assert(file != nullptr);
 	auto& ynfile = (*reinterpret_cast<IO::File::Stream*>(file));
 	bool success = ynfile.seek(static_cast<ssize_t>(offset), IO::File::seekOriginBegin);
 	return success ? nyioe_ok : nyioe_failed;
@@ -194,6 +198,7 @@ static nyio_err_t nanyc_io_localfolder_file_seek(void* file, uint64_t offset)
 
 static uint64_t nanyc_io_localfolder_file_tell(void* file)
 {
+	assert(file != nullptr);
 	auto& ynfile = (*reinterpret_cast<IO::File::Stream*>(file));
 	return static_cast<uint64_t>(ynfile.tell());
 }
@@ -201,6 +206,7 @@ static uint64_t nanyc_io_localfolder_file_tell(void* file)
 
 static nyio_err_t nanyc_io_localfolder_file_seek_from_end(void* file, int64_t offset)
 {
+	assert(file != nullptr);
 	auto& ynfile = (*reinterpret_cast<IO::File::Stream*>(file));
 	bool success = ynfile.seek(offset, IO::File::seekOriginEnd);
 	return success ? nyioe_ok : nyioe_failed;
@@ -209,6 +215,7 @@ static nyio_err_t nanyc_io_localfolder_file_seek_from_end(void* file, int64_t of
 
 static nyio_err_t nanyc_io_localfolder_file_seek_cur(void* file, int64_t offset)
 {
+	assert(file != nullptr);
 	auto& ynfile = (*reinterpret_cast<IO::File::Stream*>(file));
 	bool success = ynfile.seek(offset, IO::File::seekOriginCurrent);
 	return success ? nyioe_ok : nyioe_failed;
@@ -218,12 +225,14 @@ static nyio_err_t nanyc_io_localfolder_file_seek_cur(void* file, int64_t offset)
 
 static void nanyc_io_localfolder_file_flush(void* file)
 {
+	assert(file != nullptr and "invalid file pointer for file_flush");
 	(*reinterpret_cast<IO::File::Stream*>(file)).flush();
 }
 
 
 static nybool_t nanyc_io_localfolder_file_eof(void* file)
 {
+	assert(file != nullptr and "invalid file pointer for file_eof");
 	bool eof = (*reinterpret_cast<IO::File::Stream*>(file)).eof();
 	return (!eof) ? nyfalse : nytrue;
 }

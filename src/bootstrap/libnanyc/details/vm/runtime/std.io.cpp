@@ -325,6 +325,7 @@ static nyfile_t* nanyc_io_file_open(nyvm_t* vm, const char* path, uint32_t len,
 
 	f->adapter = &adapter;
 	f->fd = fd;
+	std::cout << "opening: " << adapterPath << '\n';
 	return f;
 }
 
@@ -332,6 +333,8 @@ static nyfile_t* nanyc_io_file_open(nyvm_t* vm, const char* path, uint32_t len,
 static void nanyc_io_file_close(nyvm_t* vm, nyfile_t* file)
 {
 	assert(file != nullptr);
+	assert(file->adapter != nullptr);
+	std::cout << "closing\n";
 	// close the file handle
 	file->adapter->file_close(file->fd);
 	// release internal struct
@@ -350,6 +353,7 @@ static void nanyc_io_file_flush(nyvm_t*, nyfile_t* file)
 static uint64_t nanyc_io_file_write(nyvm_t*, nyfile_t* file, const char* buffer, uint64_t size)
 {
 	assert(file != nullptr);
+	assert(file->adapter != nullptr);
 	return file->adapter->file_write(file->fd, buffer, size);
 }
 
@@ -357,6 +361,7 @@ static uint64_t nanyc_io_file_write(nyvm_t*, nyfile_t* file, const char* buffer,
 static uint64_t nanyc_io_file_read(nyvm_t*, nyfile_t* file, char* buffer, uint64_t size)
 {
 	assert(file != nullptr);
+	assert(file->adapter != nullptr);
 	return file->adapter->file_read(file->fd, buffer, size);
 }
 
@@ -364,6 +369,7 @@ static uint64_t nanyc_io_file_read(nyvm_t*, nyfile_t* file, char* buffer, uint64
 static bool nanyc_io_file_eof(nyvm_t*, nyfile_t* file)
 {
 	assert(file != nullptr);
+	assert(file->adapter != nullptr);
 	return (nyfalse != file->adapter->file_eof(file->fd));
 }
 
