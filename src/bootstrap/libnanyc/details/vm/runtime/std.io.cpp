@@ -315,6 +315,9 @@ static nyfile_t* nanyc_io_file_open(nyvm_t* vm, const char* path, uint32_t len,
 	void* fd = adapter.file_open(&adapter, adapterPath.c_str(), adapterPath.size(),
 		to_nybool(readm), to_nybool(writem), to_nybool(appendm), to_nybool(truncm));
 
+	if (YUNI_UNLIKELY(fd == adapter.invalid_fd))
+		return nullptr;
+
 	auto* allocator = vm->allocator;
 	auto* f = (nyfile_t*) allocator->allocate(allocator, sizeof(struct nyfile_t));
 	if (YUNI_UNLIKELY(!f))

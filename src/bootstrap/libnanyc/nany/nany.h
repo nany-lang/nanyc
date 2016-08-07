@@ -532,6 +532,8 @@ struct nyio_adapter_t
 {
 	/*! Internal opaque pointer */
 	void* internal;
+	/*! Value considered as invalid file descriptor */
+	void* invalid_fd;
 
 	/*! Stat a node */
 	nyio_type_t (*stat)(nyio_adapter_t*, const char* path, uint32_t len);
