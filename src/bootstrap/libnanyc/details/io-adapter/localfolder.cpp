@@ -40,20 +40,46 @@ namespace // anonymous
 	static inline String& toLocalPath(nyio_adapter_t* adapter, const char* path, uint32_t len)
 	{
 		auto& internal = *reinterpret_cast<Internal*>(adapter->internal);
-		internal.tmppath.clear();
-		if (not internal.localpath.empty())
+		if (YUNI_UNLIKELY(len == 0))
 		{
-			if (System::windows)
+			path = "/";
+			len = 1u;
+		}
+		assert(path[0] == '/');
+
+		if (not System::windows)
+		{
+			internal.tmppath.assign(internal.localpath);
+			internal.tmppath.append(path, len);
+		}
+		else
+		{
+			if (not internal.localpath.empty())
 			{
-				// TODO: deal with empty localpath and drives C:\, D:\...
-				internal.tmppath.clear();
-				internal.tmppath << internal.localpath;
+				internal.tmppath.assign(internal.localpath);
+				internal.tmppath.append(path, len);
 			}
 			else
-				internal.tmppath.assign(internal.localpath);
-		}
+			{
+				internal.tmppath.clear();
 
-		internal.tmppath << AnyString{path, len};
+				// convertir paths like `/d/subpaths`
+				if (len > 2)
+				{
+					if (path[0] == '/' and path[2] == '/' and String::IsAlpha(path[1]))
+						internal.localpath << path[1] << ":\\" << AnyString{path + 3, len - 3};
+				}
+				else if (len == 2)
+				{
+					if (path[0] == '/' and String::IsAlpha(path[1]))
+						internal.localpath << path[1] << ":\\";
+				}
+				else
+				{
+					// error, invalid path, going nowhere
+				}
+			}
+		}
 		return internal.tmppath;
 	}
 

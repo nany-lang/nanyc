@@ -124,7 +124,7 @@ namespace VM
 		// mount '/' -> '/root'
 		{
 			nyio_adapter_t adapter;
-			nyio_adapter_create_from_local_folder(&adapter, &cf.allocator, "/", 1u);
+			nyio_adapter_create_from_local_folder(&adapter, &cf.allocator, nullptr, 0u);
 			io.addMountpoint("/root", adapter);
 		}
 
