@@ -1,5 +1,6 @@
 #include "thread-context.h"
 #include <yuni/core/system/environment.h>
+#include <yuni/io/directory/system.h>
 #include <yuni/core/system/windows.hdr.h>
 
 using namespace Yuni;
@@ -121,6 +122,25 @@ namespace VM
 
 	bool ThreadContext::initializeProgramSettings()
 	{
+		String path;
+		// mount home folder
+		{
+			nyio_adapter_t adapter;
+			if (not Yuni::IO::Directory::System::UserHome(path, false))
+				return false;
+			nyio_adapter_create_from_local_folder(&adapter, &cf.allocator, path.c_str(), path.size());
+			io.addMountpoint("/home", adapter);
+		}
+
+		// mount tmp folder
+		{
+			nyio_adapter_t adapter;
+			if (not Yuni::IO::Directory::System::Temporary(path))
+				return false;
+			nyio_adapter_create_from_local_folder(&adapter, &cf.allocator, path.c_str(), path.size());
+			io.addMountpoint("/tmp", adapter);
+		}
+
 		// mount '/' -> '/root'
 		{
 			nyio_adapter_t adapter;
@@ -128,15 +148,6 @@ namespace VM
 			io.addMountpoint("/root", adapter);
 		}
 
-		// mount home folder
-		{
-			nyio_adapter_t adapter;
-			String homepath;
-			if (not System::Environment::Read((System::windows ? "USERPROFILE" : "HOME"), homepath))
-				return false;
-			nyio_adapter_create_from_local_folder(&adapter, &cf.allocator, homepath.c_str(), homepath.size());
-			io.addMountpoint("/home", adapter);
-		}
 		return true;
 	}
 
