@@ -61,6 +61,9 @@ namespace VM
 		auto& sequence = map.sequence(atomid, instanceid);
 		ThreadContext thrctx{*this, "main"};
 
+		if (not thrctx.initializeProgramSettings())
+			return 1;
+
 		//
 		// Execute the program
 		//

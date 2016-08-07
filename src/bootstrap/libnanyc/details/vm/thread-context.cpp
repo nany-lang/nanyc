@@ -1,4 +1,6 @@
 #include "thread-context.h"
+#include <yuni/core/system/environment.h>
+#include <yuni/core/system/windows.hdr.h>
 
 using namespace Yuni;
 
@@ -20,30 +22,6 @@ namespace VM
 		io.cwd = "/home";
 		// fallback adapter, which nearly always returns an error
 		initFallbackAdapter(io.fallbackAdapter);
-
-		// mount home folder
-		{
-			nyio_adapter_t adapter;
-			AnyString localjail{"/proc"};
-			nyio_adapter_create_from_local_folder(&adapter, &cf.allocator, localjail.c_str(), localjail.size());
-			io.addMountpoint("/proc", adapter);
-		}
-
-		// mount root folder
-		{
-			nyio_adapter_t adapter;
-			AnyString localjail{"/tmp"};
-			nyio_adapter_create_from_local_folder(&adapter, &cf.allocator, localjail.c_str(), localjail.size());
-			io.addMountpoint("/root", adapter);
-		}
-
-		// mount home folder
-		{
-			nyio_adapter_t adapter;
-			AnyString localjail{"/home/milipili"};
-			nyio_adapter_create_from_local_folder(&adapter, &cf.allocator, localjail.c_str(), localjail.size());
-			io.addMountpoint("/home", adapter);
-		}
 	}
 
 
@@ -139,6 +117,29 @@ namespace VM
 		adapterpath = path;
 		return fallbackAdapter;
 	}
+
+
+	bool ThreadContext::initializeProgramSettings()
+	{
+		// mount '/' -> '/root'
+		{
+			nyio_adapter_t adapter;
+			nyio_adapter_create_from_local_folder(&adapter, &cf.allocator, "/", 1u);
+			io.addMountpoint("/root", adapter);
+		}
+
+		// mount home folder
+		{
+			nyio_adapter_t adapter;
+			String homepath;
+			if (not System::Environment::Read((System::windows ? "USERPROFILE" : "HOME"), homepath))
+				return false;
+			nyio_adapter_create_from_local_folder(&adapter, &cf.allocator, homepath.c_str(), homepath.size());
+			io.addMountpoint("/home", adapter);
+		}
+		return true;
+	}
+
 
 
 

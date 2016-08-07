@@ -47,6 +47,8 @@ namespace VM
 		bool invoke(uint64_t& exitstatus, const IR::Sequence& callee, uint32_t atomid, uint32_t instanceid);
 
 
+		bool initializeProgramSettings();
+
 	public:
 		//! Attached program
 		Program& program;
