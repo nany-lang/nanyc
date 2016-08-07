@@ -15,9 +15,6 @@ namespace Nany
 		targets.anonym = new CTarget(self(), "{default}");
 		targets.nsl    = new CTarget(self(), "{nsl}");
 
-		targets.all.insert(std::make_pair(targets.anonym->name(), targets.anonym));
-		targets.all.insert(std::make_pair(targets.nsl->name(), targets.nsl));
-
 		if (Config::importNSL)
 			importNSLCore(*this);
 

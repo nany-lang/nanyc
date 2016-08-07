@@ -52,6 +52,7 @@ namespace Nany
 		: project(project)
 		, pName{name}
 	{
+		assert(project != nullptr);
 		registerTargetToProject();
 	}
 
