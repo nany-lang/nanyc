@@ -25,11 +25,22 @@ namespace // anonymous
 	// TODO avoid multiple allocations
 	struct IntrinsicIOIterator
 	{
-		nyio_adapter_t* adapter;
+		explicit IntrinsicIOIterator(nyio_adapter_t& adapter)
+			: adapter(adapter)
+		{}
+
+		// Adapter specific iterator data
 		nyio_iterator_t* internal;
-		uint32_t adapterPathInitialSize;
+
+		//! The initial request size (see request)
 		uint32_t requestInitialSize;
+		//! The initial path requested, to recreate a full virtual path
+		// (can be used as a temporary string for this virtual path - always refer to requestInitialSize)
 		String request;
+		//! The resolved mountpoint for the request
+		nyio_adapter_t& adapter;
+		//! Size of the adapter resolved path
+		uint32_t adapterpathSize;
 	};
 
 
@@ -58,21 +69,19 @@ static void* nanyc_io_folder_iterate(nyvm_t* vm, const char* path, uint32_t len,
 	bool recursive, bool files, bool folders)
 {
 	auto& tc = *reinterpret_cast<Nany::VM::ThreadContext*>(vm->tctx);
-	AnyString adapterPath;
+	AnyString adapterpath;
 	AnyString requestedPath{path, len};
-	auto& adapter = tc.io.resolve(adapterPath, requestedPath);
-	nyio_iterator_t* internal = adapter.folder_iterate(&adapter, adapterPath.c_str(), adapterPath.size(),
+	auto& adapter = tc.io.resolve(adapterpath, requestedPath);
+	nyio_iterator_t* internal = adapter.folder_iterate(&adapter, adapterpath.c_str(), adapterpath.size(),
 		to_nybool(recursive), to_nybool(files), to_nybool(folders));
 
 	if (internal)
 	{
-		// keep the adapter alive
-		auto* iterator = new IntrinsicIOIterator;
-		iterator->adapter = &adapter;
+		auto* iterator = new IntrinsicIOIterator(adapter);
 		iterator->internal = internal;
-		iterator->adapterPathInitialSize = adapterPath.size();
-		iterator->request << requestedPath << '/';
-		iterator->requestInitialSize = requestedPath.size() + 1;
+		iterator->requestInitialSize = requestedPath.size();
+		iterator->request = requestedPath;
+		iterator->adapterpathSize = adapterpath.size();
 		return iterator;
 	}
 	return nullptr;
@@ -85,7 +94,7 @@ static void nanyc_io_folder_iterator_close(nyvm_t*, void* ptr)
 	{
 		auto* iterator = reinterpret_cast<IntrinsicIOIterator*>(ptr);
 		if (iterator->internal)
-			iterator->adapter->folder_iterator_close(iterator->internal);
+			iterator->adapter.folder_iterator_close(iterator->internal);
 		delete iterator;
 	}
 }
@@ -95,7 +104,7 @@ static uint64_t nanyc_io_folder_iterator_size(nyvm_t*, void* ptr)
 {
 	auto* iterator = reinterpret_cast<IntrinsicIOIterator*>(ptr);
 	if (iterator and iterator->internal)
-		return iterator->adapter->folder_iterator_size(iterator->internal);
+		return iterator->adapter.folder_iterator_size(iterator->internal);
 	return 0;
 }
 
@@ -104,7 +113,7 @@ static const char* nanyc_io_folder_iterator_name(nyvm_t*, void* ptr)
 {
 	auto* iterator = reinterpret_cast<IntrinsicIOIterator*>(ptr);
 	if (iterator and iterator->internal)
-		return iterator->adapter->folder_iterator_name(iterator->internal);
+		return iterator->adapter.folder_iterator_name(iterator->internal);
 	return nullptr;
 }
 
@@ -114,9 +123,16 @@ static const char* nanyc_io_folder_iterator_fullpath(nyvm_t*, void* ptr)
 	auto* iterator = reinterpret_cast<IntrinsicIOIterator*>(ptr);
 	if (iterator and iterator->internal)
 	{
+		// restore the initial request
 		iterator->request.truncate(iterator->requestInitialSize);
-		iterator->request += iterator->adapter->folder_iterator_fullpath(iterator->internal)
-			+ iterator->adapterPathInitialSize + 1;
+
+		// append the relative path used by adapter
+		// .. absolute path from the adapter
+		const char* p = iterator->adapter.folder_iterator_fullpath(&iterator->adapter, iterator->internal);
+		// .. - mountpoint path
+		p += iterator->adapterpathSize;
+		// .. merging
+		iterator->request += p;
 		return iterator->request.c_str();
 	}
 	return nullptr;
@@ -128,7 +144,7 @@ static bool nanyc_io_folder_iterator_next(nyvm_t*, void* ptr)
 	auto* iterator = reinterpret_cast<IntrinsicIOIterator*>(ptr);
 	if (iterator and iterator->internal)
 	{
-		nyio_iterator_t* p = (iterator->adapter)->folder_next(iterator->internal);
+		nyio_iterator_t* p = iterator->adapter.folder_next(iterator->internal);
 		iterator->internal = p;
 		bool success = (p != nullptr);
 		return success;
@@ -328,7 +344,6 @@ static nyfile_t* nanyc_io_file_open(nyvm_t* vm, const char* path, uint32_t len,
 
 	f->adapter = &adapter;
 	f->fd = fd;
-	std::cout << "opening: " << adapterPath << '\n';
 	return f;
 }
 
@@ -337,7 +352,6 @@ static void nanyc_io_file_close(nyvm_t* vm, nyfile_t* file)
 {
 	assert(file != nullptr);
 	assert(file->adapter != nullptr);
-	std::cout << "closing\n";
 	// close the file handle
 	file->adapter->file_close(file->fd);
 	// release internal struct

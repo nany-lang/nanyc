@@ -5,6 +5,7 @@
 #include <yuni/io/file.h>
 #include <yuni/io/directory/info/info.h>
 #include "libnanyc-config.h"
+#include <iostream>
 
 using namespace Yuni;
 
@@ -19,8 +20,20 @@ namespace // anonymous
 		Internal(const AnyString& localfolder, nyallocator_t* allocator)
 			: allocator(allocator)
 		{
-			if (localfolder != '/')
-				localpath = localfolder;
+			if (not System::windows)
+			{
+				if (localfolder != '/')
+					localpath = localfolder;
+			}
+			else
+			{
+				if (not localfolder.empty())
+				{
+					localpath = localfolder;
+					localpath.trimRight('\\');
+					localpath.trimRight('/');
+				}
+			}
 		}
 
 		String localpath;
@@ -37,15 +50,13 @@ namespace // anonymous
 		return *(internal.allocator);
 	}
 
+
 	static inline String& toLocalPath(nyio_adapter_t* adapter, const char* path, uint32_t len)
 	{
+		assert(len != 0);
+		assert(path != nullptr and path[0] == '/');
+
 		auto& internal = *reinterpret_cast<Internal*>(adapter->internal);
-		if (YUNI_UNLIKELY(len == 0))
-		{
-			path = "/";
-			len = 1u;
-		}
-		assert(path[0] == '/');
 
 		if (not System::windows)
 		{
@@ -66,13 +77,17 @@ namespace // anonymous
 				// convertir paths like `/d/subpaths`
 				if (len > 2)
 				{
-					if (path[0] == '/' and path[2] == '/' and String::IsAlpha(path[1]))
-						internal.localpath << path[1] << ":\\" << AnyString{path + 3, len - 3};
+					if (path[2] == '/' and String::IsAlpha(path[1]))
+					{
+						internal.localpath << path[1];
+						internal.localpath.append(":\\", 2);
+						internal.localpath.append(path + 3, len - 3);
+					}
 				}
 				else if (len == 2)
 				{
-					if (path[0] == '/' and String::IsAlpha(path[1]))
-						internal.localpath << path[1] << ":\\";
+					if (String::IsAlpha(path[1]))
+						(internal.localpath << path[1]).append(":\\", 2);
 				}
 				else
 				{
@@ -503,11 +518,15 @@ static nyio_iterator_t* nanyc_io_localfolder_folder_next(nyio_iterator_t* it)
 }
 
 
-static const char* nanyc_io_localfolder_folder_iterator_fullpath(nyio_iterator_t* it)
+static const char* nanyc_io_localfolder_folder_iterator_fullpath(nyio_adapter_t* adapter, nyio_iterator_t* it)
 {
 	assert(it);
+	auto& internal = *reinterpret_cast<Internal*>(adapter->internal);
 	auto* itdata = reinterpret_cast<Private::IO::Directory::IteratorData*>(it);
-	return Private::IO::Directory::IteratorDataFilename(itdata).c_str();
+	const char* p = Private::IO::Directory::IteratorDataFilename(itdata).c_str();
+	// remove the part
+	p += internal.localpath.size();
+	return p;
 }
 
 

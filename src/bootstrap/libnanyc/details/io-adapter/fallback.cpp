@@ -136,6 +136,7 @@ static nyio_iterator_t*
 nanyc_io_fallback_folder_iterate(nyio_adapter_t*, const char* path, uint32_t len,
 	nybool_t recursive, nybool_t files, nybool_t folders)
 {
+	// TODO implement virtual iterator on mountpoints
 	return nullptr;
 }
 
@@ -144,7 +145,7 @@ static nyio_iterator_t* nanyc_io_fallback_folder_next(nyio_iterator_t*)
 	return nullptr;
 }
 
-static const char* nanyc_io_fallback_folder_iterator_fullpath(nyio_iterator_t*)
+static const char* nanyc_io_fallback_folder_iterator_fullpath(nyio_adapter_t*, nyio_iterator_t*)
 {
 	return nullptr;
 }

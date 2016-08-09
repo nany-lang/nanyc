@@ -1,6 +1,7 @@
 #include "thread-context.h"
 #include <yuni/core/system/environment.h>
 #include <yuni/io/directory/system.h>
+#include <yuni/core/string.h>
 #include <yuni/core/system/windows.hdr.h>
 
 using namespace Yuni;
@@ -19,10 +20,6 @@ namespace VM
 		, cf(program.cf)
 		, name(name)
 	{
-		// default current working directory
-		io.cwd = "/home";
-		// fallback adapter, which nearly always returns an error
-		initFallbackAdapter(io.fallbackAdapter);
 	}
 
 
@@ -30,11 +27,11 @@ namespace VM
 		: program(rhs.program)
 		, cf(rhs.cf)
 	{
-		memcpy(&io.fallbackAdapter, &rhs.io.fallbackAdapter, sizeof(nyio_adapter_t));
+		memcpy(&io.fallback.adapter, &rhs.io.fallback.adapter, sizeof(nyio_adapter_t));
 		io.cwd = rhs.io.cwd;
 
-		io.mountpoints.resize(rhs.io.mountpoints.size());
-		for (size_t i = 0; i != rhs.io.mountpoints.size(); ++i)
+		io.mountpointSize = rhs.io.mountpointSize;
+		for (uint32_t i = 0; i != io.mountpointSize; ++i)
 		{
 			auto& original = rhs.io.mountpoints[i];
 			auto& mountpoint = io.mountpoints[i];
@@ -50,11 +47,81 @@ namespace VM
 
 	ThreadContext::~ThreadContext()
 	{
-		for (auto& mountpoint: io.mountpoints)
+		for (uint32_t i = 0; i != io.mountpointSize; ++i)
 		{
+			auto& mountpoint = io.mountpoints[i];
 			if (mountpoint.adapter.release)
 				mountpoint.adapter.release(&mountpoint.adapter);
 		}
+	}
+
+
+	bool ThreadContext::IO::addMountpoint(const AnyString& path, nyio_adapter_t& adapter)
+	{
+		if (mountpointSize < mountpoints.max_size() and path.size() < ShortString256::chunkSize)
+		{
+			// inserting the new mountpoint at the begining
+			if (mountpointSize++ != 0)
+			{
+				uint32_t i = mountpointSize;
+				while (i --)
+					mountpoints[i + 1] = mountpoints[i];
+			}
+
+			auto& mp = mountpoints[0];
+			mp.path = path;
+			mp.path.trimRight('/');
+			if (YUNI_UNLIKELY(mp.path.empty()))
+				mp.path << '/';
+			memcpy(&mp.adapter, &adapter, sizeof(nyio_adapter_t));
+
+			// reset the input adapter to prevent it from being used
+			memset(&adapter, 0x0, sizeof(nyio_adapter_t));
+			return true;
+		}
+		return false;
+	}
+
+
+	bool ThreadContext::initializeFirstTContext()
+	{
+		// default current working directory
+		io.cwd = "/home";
+
+		// fallback filesystem
+		io.fallback.path.clear(); // just in case
+		initFallbackAdapter(io.fallback.adapter);
+
+		// reset mountpoints
+		io.mountpointSize = 0;
+
+		String path;
+
+		// mount home folder
+		{
+			bool r = Yuni::IO::Directory::System::UserHome(path) and path.size() < ShortString256::chunkSize;
+			if (YUNI_UNLIKELY(not r))
+				return false;
+			auto& mp = io.mountpoints[io.mountpointSize++];
+			mp.path = "/home";
+			nyio_adapter_create_from_local_folder(&mp.adapter, &cf.allocator, path.c_str(), path.size());
+		}
+		// mount tmp folder
+		{
+			bool r = Yuni::IO::Directory::System::Temporary(path) and path.size() < ShortString256::chunkSize;
+			if (YUNI_UNLIKELY(not r))
+				return false;
+			auto& mp = io.mountpoints[io.mountpointSize++];
+			mp.path = "/tmp";
+			nyio_adapter_create_from_local_folder(&mp.adapter, &cf.allocator, path.c_str(), path.size());
+		}
+		// mount '/' -> '/root'
+		{
+			auto& mp = io.mountpoints[io.mountpointSize++];
+			mp.path = "/root";
+			nyio_adapter_create_from_local_folder(&mp.adapter, &cf.allocator, nullptr, 0u);
+		}
+		return true;
 	}
 
 
@@ -79,76 +146,47 @@ namespace VM
 	}
 
 
-	void ThreadContext::IO::addMountpoint(const AnyString& path, nyio_adapter_t& adapter)
-	{
-		mountpoints.emplace_back();
-		auto& mp = mountpoints.back();
-		mp.path << path;
-		mp.path.trimRight('/');
-		if (mp.path.empty())
-			mp.path << '/';
-		memcpy(&mp.adapter, &adapter, sizeof(nyio_adapter_t));
-	}
-
-
 	nyio_adapter_t& ThreadContext::IO::resolve(AnyString& adapterpath, const AnyString& path)
 	{
-		for (auto& mountpoint: mountpoints)
+		// /some/root/folder[/some/adapter/folder]
+		//                 ^                     ^
+		//  mppath/msize --|        path/psize --|
+		uint32_t psize = path.size();
+		uint32_t count = mountpointSize;
+
+		for (uint32_t i = 0; i != count; ++i)
 		{
-			const auto& mpath = mountpoint.path;
-			if (path.startsWith(mpath))
+			auto& mountpoint = mountpoints[i];
+			const auto& mppath = mountpoint.path;
+			const uint32_t msize = mppath.size();
+
+			// if the request path size is strictly greater than the mountpoint path,
+			// then this mountpoint is certainly not the solution
+			if (psize < msize)
+				continue;
+
+			// not the root folder if the size do not match (so '/' is required)
+			if (msize != psize)
 			{
-				uint32_t size = mpath.size();
-				if (path.size() > size)
+				// good to go if startsWith...
+				if (path[msize] == '/' and 0 == memcmp(mppath.c_str(), path.c_str(), msize))
 				{
-					if (path[size] == '/')
-					{
-						adapterpath.adapt(path.c_str() + size, path.size() - size);
-						return mountpoint.adapter;
-					}
+					adapterpath.adapt(path.c_str() + msize, psize - msize);
+					return mountpoint.adapter;
 				}
-				else
+			}
+			else
+			{
+				// root folder, must be strictly identical
+				if (0 == memcmp(mppath.c_str(), path.c_str(), msize))
 				{
-					assert(adapterpath.empty());
-					adapterpath = "/";
+					adapterpath.adapt("/", 1u);
 					return mountpoint.adapter;
 				}
 			}
 		}
 		adapterpath = path;
-		return fallbackAdapter;
-	}
-
-
-	bool ThreadContext::initializeProgramSettings()
-	{
-		String path;
-		// mount home folder
-		{
-			nyio_adapter_t adapter;
-			if (not Yuni::IO::Directory::System::UserHome(path, false))
-				return false;
-			nyio_adapter_create_from_local_folder(&adapter, &cf.allocator, path.c_str(), path.size());
-			io.addMountpoint("/home", adapter);
-		}
-
-		// mount tmp folder
-		{
-			nyio_adapter_t adapter;
-			if (not Yuni::IO::Directory::System::Temporary(path))
-				return false;
-			nyio_adapter_create_from_local_folder(&adapter, &cf.allocator, path.c_str(), path.size());
-			io.addMountpoint("/tmp", adapter);
-		}
-
-		// mount '/' -> '/root'
-		{
-			nyio_adapter_t adapter;
-			nyio_adapter_create_from_local_folder(&adapter, &cf.allocator, nullptr, 0u);
-			io.addMountpoint("/root", adapter);
-		}
-
-		return true;
+		return fallback.adapter;
 	}
 
 

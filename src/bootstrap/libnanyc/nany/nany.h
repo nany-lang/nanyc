@@ -600,7 +600,7 @@ struct nyio_adapter_t
 	/*! Go to the next element */
 	nyio_iterator_t* (*folder_next)(nyio_iterator_t*);
 	/*! Get the full path (i.e. /baz/foo,txt) of the current element */
-	const char* (*folder_iterator_fullpath)(nyio_iterator_t*);
+	const char* (*folder_iterator_fullpath)(nyio_adapter_t*, nyio_iterator_t*);
 	/*! Get the filename (i.e. foo.txt) of the current element */
 	const char* (*folder_iterator_name)(nyio_iterator_t*);
 	/*! Get the size in bytes of the current element */

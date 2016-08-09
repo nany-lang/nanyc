@@ -2,6 +2,7 @@
 #include <yuni/yuni.h>
 #include "program.h"
 #include "details/ir/sequence.h"
+#include <array>
 
 
 
@@ -11,15 +12,15 @@ namespace Nany
 namespace VM
 {
 
+	struct Mountpoint final
+	{
+		Yuni::ShortString256 path;
+		nyio_adapter_t adapter;
+	};
+
+
 	class ThreadContext final
 	{
-	public:
-		struct Mountpoint final
-		{
-			Yuni::ShortString256 path;
-			nyio_adapter_t adapter;
-		};
-
 	public:
 		//! Default constructor
 		explicit ThreadContext(Program& program, const AnyString& name);
@@ -46,24 +47,12 @@ namespace VM
 
 		bool invoke(uint64_t& exitstatus, const IR::Sequence& callee, uint32_t atomid, uint32_t instanceid);
 
+		bool initializeFirstTContext();
 
-		bool initializeProgramSettings();
 
 	public:
 		//! Attached program
 		Program& program;
-
-		struct IO {
-			nyio_adapter_t& resolve(AnyString& relativepath, const AnyString& path);
-			void addMountpoint(const AnyString& path, nyio_adapter_t&);
-
-			//! Current working directory
-			std::vector<Mountpoint> mountpoints;
-			nyio_adapter_t fallbackAdapter;
-			// Current Working directory
-			Yuni::String cwd;
-		}
-		io;
 
 		//! Temporary structure for complex return values by intrinsics
 		struct {
@@ -73,12 +62,43 @@ namespace VM
 		}
 		returnValue;
 
+		struct IO {
+			/*!
+			** \briefFind the adapter and the relative adapter path from a virtual path
+			**
+			** \param[out] relativepath Get a non-empty absolute path (but may contain segments like '.' amd '..')
+			** \param path Am aboslute virtual path
+			** \return An adapter, fallbackAdapter if not found
+			*/
+			nyio_adapter_t& resolve(AnyString& relativepath, const AnyString& path);
+
+			/*!
+			** \brief Add a new virtual mountpoint
+			**
+			** \param path A Virtual path (may not exist)
+			** \param adapter The adapter to handle this mountpoint
+			** \return True if the operation succeeded
+			*/
+			bool addMountpoint(const AnyString& path, nyio_adapter_t& adapter);
+
+		public:
+			// Current Working directory
+			Yuni::String cwd;
+			//! The total number of mountpoints
+			uint32_t mountpointSize = 0;
+			//! All mountpoints, from the last added to the first one (stored in the reverse order)
+			std::array<Mountpoint, 32> mountpoints;
+			//! Current working directory
+			Mountpoint fallback;
+		}
+		io;
+
 		nyprogram_cf_t& cf;
 		//! Thread name
 		Yuni::ShortString64 name;
 
 	private:
-		void initFallbackAdapter(nyio_adapter_t&);
+		void initFallbackAdapter(nyio_adapter_t& adapter);
 
 	}; // class ThreadContext
 
