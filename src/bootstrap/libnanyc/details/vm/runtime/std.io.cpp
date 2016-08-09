@@ -419,6 +419,22 @@ static uint64_t nanyc_io_file_tell(nyvm_t*, nyfile_t* file)
 }
 
 
+static bool nanyc_io_mount_local(nyvm_t* vm, const char* path, uint32_t len, const char* local, uint32_t locallen)
+{
+	if (path and len and local and locallen)
+	{
+		auto& tc = *reinterpret_cast<Nany::VM::ThreadContext*>(vm->tctx);
+		nyio_adapter_t adapter;
+		nyio_adapter_create_from_local_folder(&adapter, &tc.cf.allocator, local, locallen);
+
+		bool success = tc.io.addMountpoint(AnyString{path, len}, adapter);
+
+		if (adapter.release)
+			adapter.release(&adapter);
+		return success;
+	}
+	return false;
+}
 
 
 
@@ -462,6 +478,8 @@ namespace Nany
 		intrinsics.add("__nanyc_io_file_seek_from_end",   nanyc_io_file_seek_from_end);
 		intrinsics.add("__nanyc_io_file_seek_cur",   nanyc_io_file_seek_cur);
 		intrinsics.add("__nanyc_io_file_tell",   nanyc_io_file_tell);
+
+		intrinsics.add("__nanyc_io_mount_local",   nanyc_io_mount_local);
 	}
 
 
