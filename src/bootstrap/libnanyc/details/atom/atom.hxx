@@ -25,8 +25,8 @@ namespace Nany
 
 	inline bool Atom::canCaptureVariabes() const
 	{
-		return flags.get(Flags::captureVariables)
-			or (isClassMember() and parent->flags.get(Flags::captureVariables));
+		return flags.has(Flags::captureVariables)
+			or (isClassMember() and parent->flags.has(Flags::captureVariables));
 	}
 
 
