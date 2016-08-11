@@ -34,16 +34,20 @@ namespace Nany
 		"null", "void"
 	};
 
-	static const std::unordered_set<AnyString> operatorKeywords =
+	static const std::unordered_set<AnyString> classOperators =
 	{
 		"new", "dispose", "clone",
-		"and", "or", "mod", "xor", "not",
-		"+", "-", "*", "/", "^",
-		"<<", ">>", "!=", "==", "<", ">", "<=", ">=",
-		// "=", operator copy should be used instead
 		"+=", "-=", "*=", "/=", "^=",
 		"()", "[]",
 		"++self", "self++", "--self", "self--"
+	};
+
+	static const std::unordered_set<AnyString> globalOperators =
+	{
+		"and", "or", "mod", "xor", "not",
+		"<<", ">>",
+		"+", "-", "*", "/", "^",
+		"!=", "==", "<", ">", "<=", ">="
 	};
 
 	static const std::unordered_map<AnyString, AnyString> opnormalize =
@@ -97,10 +101,10 @@ namespace Nany
 	}
 
 
-	bool complainNotValidOperator(const AST::Node& node, const AnyString& name)
+	bool complainNotValidOperator(const AST::Node& node, const AnyString& name, const char* what)
 	{
 		auto err = (error(node)
-			<< "invalid identifier name: '" << name << "' is not a valid operator");
+			<< "invalid identifier name: '" << name << "' is not a valid " << what << " operator");
 		auto& location = err.message.origins.location;
 		location.pos.offsetEnd = location.pos.offset + name.size();
 		return false;
@@ -190,9 +194,16 @@ namespace Nany
 		}
 		else
 		{
-			// checking if the operator name is one from the list
-			if (unlikely(operatorKeywords.count(name) == 0)) // not found
-				return complainNotValidOperator(node, name);
+			if (flags.has(IdNameFlag::isInClass))
+			{
+				if (unlikely(classOperators.count(name) == 0))
+					return complainNotValidOperator(node, name, "class");
+			}
+			else
+			{
+				if (unlikely(globalOperators.count(name) == 0))
+					return complainNotValidOperator(node, name, "global");
+			}
 		}
 		return true;
 	}

@@ -14,6 +14,8 @@ namespace Nany
 		isOperator,
 		//! The identifier name represents a type name
 		isType,
+		//! The identifier name is located within a class (only usefull when `isOperator`)
+		isInClass,
 	};
 
 

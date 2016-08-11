@@ -149,7 +149,10 @@ namespace Producer
 					if (unlikely(opname.rule != AST::rgFunctionKindOpname or not opname.children.empty()))
 						return unexpectedNode(opname, "[funckindfunc/child]");
 
-					if (not checkForValidIdentifierName(opname, opname.text, IdNameFlag::isOperator))
+					Flags<IdNameFlag> flags = IdNameFlag::isOperator;
+					if (hasImplicitSelf) // not within a class
+						flags += IdNameFlag::isInClass;
+					if (not checkForValidIdentifierName(opname, opname.text, flags))
 						return false;
 
 					funcname = '^';
