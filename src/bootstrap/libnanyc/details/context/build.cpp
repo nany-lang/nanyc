@@ -74,6 +74,7 @@ namespace Nany
 			importNSLEnv(intrinsics);
 			importNSLIO(intrinsics);
 			importNSLMemory(intrinsics);
+			importNSLConsole(intrinsics);
 		}
 
 		if (cf.on_create)

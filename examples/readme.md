@@ -211,11 +211,11 @@ func main
 			set: diameter = value / std.math.pi };
 	};
 
-	print("radius = \(circle.radius), circumference: \(circle.circumference)\n\n");
+	console << "radius = " << circle.radius << " circumference: " << circle.circumference" << "\n\n";
 
 	circle.circumference = 42.0;
-	print("new circumference: \(circle.circumference)\n");
-	print("new radius = \(circle.radius)\n");
+	console << "new circumference: " << circle.circumference << "\n");
+	console << "new radius = " << circle.radius << "\n";
 }
 ```
 

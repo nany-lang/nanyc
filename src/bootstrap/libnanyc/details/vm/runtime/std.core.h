@@ -42,6 +42,10 @@ namespace Nany
 	*/
 	void importNSLEnv(IntrinsicTable&);
 
+	/*!
+	** \brief Import intrinsics related to console management
+	*/
+	void importNSLConsole(IntrinsicTable&);
 
 
 } // namespace Nany

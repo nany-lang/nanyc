@@ -34,6 +34,9 @@ namespace Nany
 		"null", "void"
 	};
 
+	// TODO use a more efficient matching mecanism for small string sets
+	// (it seems that using a bunch a switch/case would be really faster)
+
 	static const std::unordered_set<AnyString> classOperators =
 	{
 		"new", "dispose", "clone",
