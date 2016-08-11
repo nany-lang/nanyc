@@ -28,7 +28,7 @@ namespace Producer
 				case AST::rgIdentifier:
 				{
 					typedefname = child.text;
-					bool ok = checkForValidIdentifierName(child, typedefname, false, true);
+					bool ok = checkForValidIdentifierName(child, typedefname, IdNameFlag::isType);
 					if (unlikely(not ok))
 						return false;
 					break;

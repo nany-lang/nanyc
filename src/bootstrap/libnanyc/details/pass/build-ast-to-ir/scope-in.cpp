@@ -36,7 +36,7 @@ namespace Producer
 					if (unlikely(identifier.rule != AST::rgIdentifier))
 						return ice(identifier) << "identifier expected";
 
-					if (unlikely(not checkForValidIdentifierName(child, identifier.text, false)))
+					if (unlikely(not checkForValidIdentifierName(child, identifier.text)))
 						return false;
 
 					elementname = identifier.text;

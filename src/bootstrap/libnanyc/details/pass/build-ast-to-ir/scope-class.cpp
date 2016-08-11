@@ -59,7 +59,7 @@ namespace Producer
 		{
 			classname = scope.getSymbolNameFromASTNode(node);
 			return not classname.empty()
-				and checkForValidIdentifierName(node, classname, false, true);
+				and checkForValidIdentifierName(node, classname, IdNameFlag::isType);
 		}
 
 

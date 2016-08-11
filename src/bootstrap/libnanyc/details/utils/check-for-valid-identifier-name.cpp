@@ -148,7 +148,8 @@ namespace Nany
 	}
 
 
-	bool checkForValidIdentifierName(const AST::Node& node, const AnyString& name, bool isOperator, bool isType)
+	// operator / type
+	bool checkForValidIdentifierName(const AST::Node& node, const AnyString& name, Flags<IdNameFlag> flags)
 	{
 		// checking the name size
 		uint32_t size = name.size();
@@ -163,14 +164,14 @@ namespace Nany
 		if (node.metadata and AST::metadata(node).fromASTTransformation)
 			return true;
 
-		if (YUNI_LIKELY(not isOperator))
+		if (YUNI_LIKELY(not flags(IdNameFlag::isOperator)))
 		{
 			// names with '_' as prefix are for internal uses only
 			if (unlikely(name.first() == '_'))
 				return complainInvalidIdentifierNameWithUnderscore(node, name);
 
 			// checking if the id name is not from one of reserved keywords
-			if (unlikely(not isType and reservedKeywords.count(name) != 0))
+			if (unlikely(not flags(IdNameFlag::isType) and reservedKeywords.count(name) != 0))
 				return complainReservedKeyword(node, name);
 
 			// warning - ascii only chars

@@ -134,7 +134,7 @@ namespace Producer
 
 					auto& symbolname = *(kindchild.children[0]);
 					AnyString name = scope.getSymbolNameFromASTNode(symbolname);
-					if (not checkForValidIdentifierName(symbolname, name, false))
+					if (not checkForValidIdentifierName(symbolname, name))
 						return false;
 					funcname = name;
 					break;
@@ -149,7 +149,7 @@ namespace Producer
 					if (unlikely(opname.rule != AST::rgFunctionKindOpname or not opname.children.empty()))
 						return unexpectedNode(opname, "[funckindfunc/child]");
 
-					if (not checkForValidIdentifierName(opname, opname.text, true))
+					if (not checkForValidIdentifierName(opname, opname.text, IdNameFlag::isOperator))
 						return false;
 
 					funcname = '^';
@@ -173,7 +173,7 @@ namespace Producer
 					{
 						auto& symbolname = *(kindchild.children[0]);
 						AnyString name = scope.getSymbolNameFromASTNode(symbolname);
-						if (not checkForValidIdentifierName(symbolname, name, false))
+						if (not checkForValidIdentifierName(symbolname, name))
 							return false;
 
 						funcname.clear();
@@ -224,7 +224,7 @@ namespace Producer
 
 					case AST::rgIdentifier: // name of the parameter
 					{
-						if (checkForValidIdentifierName(child, child.text, false))
+						if (checkForValidIdentifierName(child, child.text))
 						{
 							paramname = child.text;
 						}
