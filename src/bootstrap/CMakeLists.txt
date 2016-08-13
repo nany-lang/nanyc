@@ -29,6 +29,22 @@ include("cmake/build-settings.cmake")
 
 
 
+#
+# Architecture
+#
+include(CheckSymbolExists)
+if(WIN32)
+	check_symbol_exists("_M_AMD64" "" RTC_ARCH_X64)
+	if(NOT RTC_ARCH_X64)
+		check_symbol_exists("_M_IX86" "" RTC_ARCH_X86)
+	endif(NOT RTC_ARCH_X64)
+	# add check for arm here
+	# see http://msdn.microsoft.com/en-us/library/b0084kay.aspx
+else(WIN32)
+	check_symbol_exists("__i386__" "" RTC_ARCH_X86)
+	check_symbol_exists("__x86_64__" "" RTC_ARCH_X64)
+	check_symbol_exists("__arm__" "" RTC_ARCH_ARM)
+endif(WIN32)
 
 
 #
@@ -261,9 +277,16 @@ add_custom_target(install-libnanyc-dev-tools
       -P "${CMAKE_BINARY_DIR}/cmake_install.cmake")
 
 
-
-include("cmake/packages-deb-rpm.cmake")
-create_rules_for_packages(deb)
-create_rules_for_packages(rpm)
+#
+# Packages
+#
+if (NOT WIN32)
+	include("cmake/packages-deb-rpm.cmake")
+	create_rules_for_packages(deb)
+	create_rules_for_packages(rpm)
+else()
+	include("cmake/wix.cmake")
+	create_rules_for_msi()
+endif()
 
 # The end !

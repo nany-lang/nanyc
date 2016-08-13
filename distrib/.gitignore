@@ -6,3 +6,6 @@
 /*.zip
 /*.msi
 /*.exe
+/*.wxs
+/*.wixobj
+/*.wixpdb
