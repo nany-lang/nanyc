@@ -33,7 +33,6 @@ namespace Instanciate
 			{
 				bool success = true;
 				success &= atom.propertyLookupOnChildren(multipleResults, "^propset^", name);
-				//success &= atom.propertyLookupOnChildren(multipleResults, "^prop^+=^", name);
 				return success;
 			}
 		}
@@ -46,15 +45,22 @@ namespace Instanciate
 	Atom& SequenceBuilder::resolveTypeAlias(Atom& original, const Classdef*& resultcdef)
 	{
 		assert(original.isTypeAlias());
+		assert(resultcdef == nullptr); // a null value will indicate a fail
 
 		// trying a direct resolution
 		auto cdef = std::cref(cdeftable.classdef(original.returnType.clid));
 
-		std::unordered_set<uint32_t> encountered; // to avoid circular references
+		// set of all atomid encountered so far, to detect circular references
+		// (and avoid an infinite loop in the same time)
+		// example:
+		//    typedef A: B;
+		//    typedef B: A;
+		std::unordered_set<uint32_t> encountered;
+		// temporary atom, as potential candidate
 		Atom* alias = nullptr;
 		do
 		{
-			if (cdef.get().isBuiltin()) // gotcha !
+			if (cdef.get().isBuiltin()) // the typedef has been solved
 			{
 				resultcdef = &(cdef.get());
 				return original;
@@ -73,26 +79,23 @@ namespace Instanciate
 				break;
 			}
 
-			if (not alias->isTypeAlias()) // gotcha !
+			if (not alias->isTypeAlias()) // the typedef has been solved
 			{
 				resultcdef = &(cdef.get());
 				return *alias;
 			}
 
-			// checking for circular aliases
+			// detecting circular references...
 			if (not encountered.insert(alias->atomid).second)
 			{
-				// circular reference
 				complainTypealiasCircularRef(original, *alias);
-				break;
+				return original;
 			}
-
 			cdef = std::cref(cdeftable.classdef(alias->returnType.clid));
 		}
 		while (alias != nullptr);
 
 		complainTypedefUnresolved(original);
-		resultcdef = nullptr;
 		return original;
 	}
 
@@ -102,11 +105,12 @@ namespace Instanciate
 	{
 		auto& resultAtom = multipleResults[0].get();
 		const Classdef* cdefTypedef = nullptr;
-		auto& atom = (not resultAtom.isTypeAlias())
+		bool mustResolveATypedef = resultAtom.isTypeAlias();
+		auto& atom = (not mustResolveATypedef)
 			? resultAtom
 			: resolveTypeAlias(resultAtom, cdefTypedef);
 
-		if (unlikely((!cdefTypedef and resultAtom.isTypeAlias()) or atom.flags(Atom::Flags::error)))
+		if (unlikely((mustResolveATypedef and !cdefTypedef) or atom.flags(Atom::Flags::error)))
 			return false;
 
 		if (unlikely(cdefTypedef and cdefTypedef->isBuiltin()))

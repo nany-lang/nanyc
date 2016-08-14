@@ -345,11 +345,11 @@ namespace Mapping
 			{
 				Atom& atom = atomStack->currentAtomNotUnit();
 
-				AnyString classname = currentSequence.stringrefs[operands.name];
+				AnyString typedefname = currentSequence.stringrefs[operands.name];
 				Atom* newAliasAtom = nullptr;
 				{
 					MutexLocker locker{mutex};
-					newAliasAtom = cdeftable.atoms.createTypealias(atom, classname);
+					newAliasAtom = cdeftable.atoms.createTypealias(atom, typedefname);
 					cdeftable.registerAtom(newAliasAtom);
 				}
 
