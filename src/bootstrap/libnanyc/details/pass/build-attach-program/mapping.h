@@ -136,6 +136,14 @@ namespace Mapping
 		void deleteAllFrames();
 		static void retriveReportMetadata(void* self, Logs::Level, const AST::Node*, Yuni::String&, uint32_t&, uint32_t&);
 
+		void mapBlueprintFuncdef(IR::ISA::Operand<IR::ISA::Op::blueprint>& operands);
+		void mapBlueprintClassdef(IR::ISA::Operand<IR::ISA::Op::blueprint>& operands);
+		void mapBlueprintParam(IR::ISA::Operand<IR::ISA::Op::blueprint>& operands);
+		void mapBlueprintTypealias(IR::ISA::Operand<IR::ISA::Op::blueprint>& operands);
+		void mapBlueprintVardef(IR::ISA::Operand<IR::ISA::Op::blueprint>& operands);
+		void mapBlueprintNamespace(IR::ISA::Operand<IR::ISA::Op::blueprint>& operands);
+		void mapBlueprintUnit(IR::ISA::Operand<IR::ISA::Op::blueprint>& operands);
+
 	private:
 		//! Error reporting
 		Logs::MetadataHandler localMetadataHandler;

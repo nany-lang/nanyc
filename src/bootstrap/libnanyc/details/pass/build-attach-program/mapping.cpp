@@ -148,6 +148,269 @@ namespace Mapping
 	}
 
 
+	void SequenceMapping::mapBlueprintFuncdef(IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
+	{
+		// registering the blueprint into the outline...
+		Atom& atom = atomStack->currentAtomNotUnit();
+		AnyString funcname = currentSequence.stringrefs[operands.name];
+		if (unlikely(funcname.empty()))
+			return printError(operands, "invalid func name");
+
+		// reset last lvid and parameters
+		lastLVID = 0;
+		lastPushedNamedParameters.clear();
+		lastPushedIndexedParameters.clear();
+
+		bool isGlobalOperator = (atom.type == Atom::Type::namespacedef)
+			and funcname[0] == '^'
+			and (not funcname.startsWith("^view^"))
+			and (not funcname.startsWith("^prop"));
+
+		auto& parentAtom = (not isGlobalOperator)
+			? atom
+			: cdeftable.atoms.root;
+
+		MutexLocker locker{mutex};
+		// create a new atom in the global type table
+		auto* newatom = cdeftable.atoms.createFuncdef(parentAtom, funcname);
+		assert(newatom != nullptr);
+		newatom->opcodes.sequence  = &currentSequence;
+		newatom->opcodes.offset   = currentSequence.offsetOf(operands);
+		// create a pseudo classdef to easily retrieve the real atom from a clid
+		cdeftable.registerAtom(newatom);
+
+		operands.atomid = newatom->atomid;
+
+		// return type
+		newatom->returnType.clid.reclass(newatom->atomid, 1);
+		// scope resolution
+		if (parentAtom.atomid != atom.atomid)
+			newatom->scopeForNameResolution = &atom;
+
+		// requires additional information
+		needAtomDbgFileReport = true;
+		needAtomDbgOffsetReport = true;
+		pushNewFrame(*newatom);
+
+		// capture unknown variables ?
+		if (not isGlobalOperator)
+		{
+			if (newatom->isClassMember() and newatom->parent->flags(Atom::Flags::captureVariables))
+			{
+				atomStack->capture.enabled(newatom->parent);
+				newatom->flags += Atom::Flags::captureVariables;
+			}
+		}
+
+		if (!firstAtomCreated)
+			firstAtomCreated = newatom;
+	}
+
+
+	void SequenceMapping::mapBlueprintClassdef(IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
+	{
+		// registering the blueprint into the outline...
+		Atom& atom = atomStack->currentAtomNotUnit();
+
+		// reset last lvid and parameters
+		lastLVID = 0;
+		lastPushedNamedParameters.clear();
+		lastPushedIndexedParameters.clear();
+
+		AnyString classname = currentSequence.stringrefs[operands.name];
+
+		Atom* newClassAtom = nullptr;
+		// create a new atom in the global type table
+		if (prefixNameForFirstAtomCreated.empty())
+		{
+			MutexLocker locker{mutex};
+			newClassAtom = cdeftable.atoms.createClassdef(atom, classname);
+			// create a pseudo classdef to easily retrieve the real atom from a clid
+			cdeftable.registerAtom(newClassAtom);
+		}
+		else
+		{
+			String tmpname;
+			tmpname.reserve(classname.size() + prefixNameForFirstAtomCreated.size());
+			tmpname << prefixNameForFirstAtomCreated << classname;
+			prefixNameForFirstAtomCreated.clear();
+
+			MutexLocker locker{mutex};
+			newClassAtom = cdeftable.atoms.createClassdef(atom, tmpname);
+			// create a pseudo classdef to easily retrieve the real atom from a clid
+			cdeftable.registerAtom(newClassAtom);
+		}
+
+		assert(newClassAtom != nullptr);
+		newClassAtom->opcodes.sequence = &currentSequence;
+		newClassAtom->opcodes.offset   = currentSequence.offsetOf(operands);
+
+		// update atomid
+		operands.atomid = newClassAtom->atomid;
+		// requires additional information
+		needAtomDbgFileReport = true;
+		needAtomDbgOffsetReport = true;
+		pushNewFrame(*newClassAtom);
+
+		if (operands.lvid != 0)
+			atomStack->capture.enabled(newClassAtom);
+
+		if (!firstAtomCreated)
+			firstAtomCreated = newClassAtom;
+	}
+
+
+	void SequenceMapping::mapBlueprintParam(IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
+	{
+		auto& frame = *atomStack;
+
+		// calculating the lvid for the current parameter
+		// (+1 since %1 is the return value/type)
+		uint paramLVID = (++frame.parameterIndex) + 1;
+
+		if (unlikely(not checkForLVID(operands, paramLVID)))
+			return;
+
+		auto kind = static_cast<IR::ISA::Blueprint>(operands.kind);
+		assert(kind == IR::ISA::Blueprint::param or kind == IR::ISA::Blueprint::paramself
+			   or kind == IR::ISA::Blueprint::gentypeparam);
+
+		bool isGenTypeParam = (kind == IR::ISA::Blueprint::gentypeparam);
+		if (unlikely(not isGenTypeParam and not frame.atom.isFunction()))
+			return printError(operands, "parameter for non-function");
+
+		CLID clid{frame.atom.atomid, paramLVID};
+		AnyString name = currentSequence.stringrefs[operands.name];
+
+		auto& parameters = (not isGenTypeParam)
+			? frame.atom.parameters : frame.atom.tmplparams;
+		parameters.append(clid, name);
+
+		if (frame.capture.enabled())
+			frame.capture.knownVars[name] = frame.scope;
+
+
+		MutexLocker locker{mutex};
+		// information about the parameter itself
+		auto& cdef = cdeftable.classdef(clid);
+		cdef.instance = not isGenTypeParam;
+		cdef.qualifiers.ref = false; // should not be 'ref' by default, contrary to all other classdefs
+
+		// making sure the classdef is 'any'
+		assert(cdef.atom == nullptr and cdef.isAny());
+
+		if (isGenTypeParam)
+		{
+			// if a generic type parameter, generating an implicit typedef
+			Atom& atom = atomStack->currentAtomNotUnit();
+			auto* newAliasAtom = cdeftable.atoms.createTypealias(atom, name);
+			cdeftable.registerAtom(newAliasAtom);
+			newAliasAtom->returnType.clid = cdef.clid; // type of the typedef
+		}
+	}
+
+
+	void SequenceMapping::mapBlueprintTypealias(IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
+	{
+		Atom& atom = atomStack->currentAtomNotUnit();
+
+		AnyString typedefname = currentSequence.stringrefs[operands.name];
+		Atom* newAliasAtom = nullptr;
+		{
+			MutexLocker locker{mutex};
+			newAliasAtom = cdeftable.atoms.createTypealias(atom, typedefname);
+			cdeftable.registerAtom(newAliasAtom);
+		}
+
+		assert(newAliasAtom != nullptr);
+		newAliasAtom->opcodes.sequence = &currentSequence;
+		newAliasAtom->opcodes.offset  = currentSequence.offsetOf(operands);
+
+		switch (static_cast<uint32_t>(operands.lvid))
+		{
+			default:
+			{
+				CLID clid{atomStack->atom.atomid, operands.lvid};
+				newAliasAtom->returnType.clid = clid;
+				break;
+			}
+			case 0:
+			{
+				newAliasAtom->returnType.clid.reclassToVoid();
+				break;
+			}
+			case (uint32_t) -1: // any
+				break;
+		}
+
+		// update atomid
+		operands.atomid = newAliasAtom->atomid;
+
+		lastPushedNamedParameters.clear();
+		lastPushedIndexedParameters.clear();
+
+		if (!firstAtomCreated)
+			firstAtomCreated = newAliasAtom;
+	}
+
+
+	void SequenceMapping::mapBlueprintVardef(IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
+	{
+		// registering the blueprint into the outline...
+		Atom& atom = atomStack->currentAtomNotUnit();
+		AnyString varname = currentSequence.stringrefs[operands.name];
+		if (unlikely(varname.empty()))
+			return printError(operands, "invalid func name");
+		if (unlikely(atom.type != Atom::Type::classdef))
+			return printError(operands, "vardef: invalid parent atom");
+
+		if (atomStack->capture.enabled())
+			atomStack->capture.knownVars[varname] = atomStack->scope;
+
+		MutexLocker locker{mutex};
+		// create a new atom in the global type table
+		auto* newVarAtom = cdeftable.atoms.createVardef(atom, varname);
+		assert(newVarAtom != nullptr);
+
+		cdeftable.registerAtom(newVarAtom);
+		newVarAtom->returnType.clid.reclass(atom.atomid, operands.lvid);
+		if (!firstAtomCreated)
+			firstAtomCreated = newVarAtom;
+	}
+
+
+	void SequenceMapping::mapBlueprintNamespace(IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
+	{
+		AnyString nmname = currentSequence.stringrefs[operands.name];
+		Atom& parentAtom = atomStack->currentAtomNotUnit();
+
+		MutexLocker locker{mutex};
+		Atom* newRoot = cdeftable.atoms.createNamespace(parentAtom, nmname);
+		assert(newRoot != nullptr);
+		// create a pseudo classdef to easily retrieve the real atom from a clid
+		cdeftable.registerAtom(newRoot);
+		pushNewFrame(*newRoot);
+	}
+
+
+	void SequenceMapping::mapBlueprintUnit(IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
+	{
+		Atom& parentAtom = atomStack->currentAtomNotUnit();
+		Atom* newRoot;
+		{
+			MutexLocker locker{mutex};
+			newRoot = cdeftable.atoms.createUnit(parentAtom, currentFilename);
+			assert(newRoot != nullptr);
+			// create a pseudo classdef to easily retrieve the real atom from a clid
+			cdeftable.registerAtom(newRoot);
+		}
+		// update atomid
+		operands.atomid = newRoot->atomid;
+		assert(newRoot->atomid != 0);
+		pushNewFrame(*newRoot);
+	}
+
+
 	inline void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
 	{
 		if (unlikely(nullptr == atomStack))
@@ -158,262 +421,40 @@ namespace Mapping
 		{
 			case IR::ISA::Blueprint::vardef:
 			{
-				// registering the blueprint into the outline...
-				Atom& atom = atomStack->currentAtomNotUnit();
-				AnyString varname = currentSequence.stringrefs[operands.name];
-				if (unlikely(varname.empty()))
-					return printError(operands, "invalid func name");
-				if (unlikely(atom.type != Atom::Type::classdef))
-					return printError(operands, "vardef: invalid parent atom");
-
-				if (atomStack->capture.enabled())
-					atomStack->capture.knownVars[varname] = atomStack->scope;
-
-				MutexLocker locker{mutex};
-				// create a new atom in the global type table
-				auto* newVarAtom = cdeftable.atoms.createVardef(atom, varname);
-				assert(newVarAtom != nullptr);
-
-				cdeftable.registerAtom(newVarAtom);
-				newVarAtom->returnType.clid.reclass(atom.atomid, operands.lvid);
-				if (!firstAtomCreated)
-					firstAtomCreated = newVarAtom;
+				mapBlueprintVardef(operands);
 				break;
 			}
-
 			case IR::ISA::Blueprint::param:
 			case IR::ISA::Blueprint::paramself:
 			case IR::ISA::Blueprint::gentypeparam:
 			{
-				auto& frame = *atomStack;
-
-				// calculating the lvid for the current parameter
-				// (+1 since %1 is the return value/type)
-				uint paramLVID = (++frame.parameterIndex) + 1;
-
-				if (unlikely(not checkForLVID(operands, paramLVID)))
-					return;
-
-				bool isGenTypeParam = (kind == IR::ISA::Blueprint::gentypeparam);
-				if (unlikely(not isGenTypeParam and not frame.atom.isFunction()))
-					return printError(operands, "parameter for non-function");
-
-				CLID clid{frame.atom.atomid, paramLVID};
-				AnyString name = currentSequence.stringrefs[operands.name];
-
-				auto& parameters = (not isGenTypeParam)
-					? frame.atom.parameters : frame.atom.tmplparams;
-				parameters.append(clid, name);
-
-				if (frame.capture.enabled())
-					frame.capture.knownVars[name] = frame.scope;
-
-
-				MutexLocker locker{mutex};
-				// information about the parameter itself
-				auto& cdef = cdeftable.classdef(clid);
-				cdef.instance = not isGenTypeParam;
-				cdef.qualifiers.ref = false; // should not be 'ref' by default, contrary to all other classdefs
-
-				// making sure the classdef is 'any'
-				assert(cdef.atom == nullptr and cdef.isAny());
-
-				if (isGenTypeParam)
-				{
-					// if a generic type parameter, generating an implicit typedef
-					Atom& atom = atomStack->currentAtomNotUnit();
-					auto* newAliasAtom = cdeftable.atoms.createTypealias(atom, name);
-					cdeftable.registerAtom(newAliasAtom);
-					newAliasAtom->returnType.clid = cdef.clid; // type of the typedef
-				}
+				mapBlueprintParam(operands);
 				break;
 			}
-
 			case IR::ISA::Blueprint::funcdef:
 			{
-				// registering the blueprint into the outline...
-				Atom& atom = atomStack->currentAtomNotUnit();
-				AnyString funcname = currentSequence.stringrefs[operands.name];
-				if (unlikely(funcname.empty()))
-					return printError(operands, "invalid func name");
-
-				// reset last lvid and parameters
-				lastLVID = 0;
-				lastPushedNamedParameters.clear();
-				lastPushedIndexedParameters.clear();
-
-				bool isGlobalOperator = (atom.type == Atom::Type::namespacedef)
-					and funcname[0] == '^'
-					and (not funcname.startsWith("^view^"))
-					and (not funcname.startsWith("^prop"));
-
-				auto& parentAtom = (not isGlobalOperator)
-					? atom
-					: cdeftable.atoms.root;
-
-				MutexLocker locker{mutex};
-				// create a new atom in the global type table
-				auto* newatom = cdeftable.atoms.createFuncdef(parentAtom, funcname);
-				assert(newatom != nullptr);
-				newatom->opcodes.sequence  = &currentSequence;
-				newatom->opcodes.offset   = currentSequence.offsetOf(operands);
-				// create a pseudo classdef to easily retrieve the real atom from a clid
-				cdeftable.registerAtom(newatom);
-
-				operands.atomid = newatom->atomid;
-
-				// return type
-				newatom->returnType.clid.reclass(newatom->atomid, 1);
-				// scope resolution
-				if (parentAtom.atomid != atom.atomid)
-					newatom->scopeForNameResolution = &atom;
-
-				// requires additional information
-				needAtomDbgFileReport = true;
-				needAtomDbgOffsetReport = true;
-				pushNewFrame(*newatom);
-
-				// capture unknown variables ?
-				if (not isGlobalOperator)
-				{
-					if (newatom->isClassMember() and newatom->parent->flags(Atom::Flags::captureVariables))
-					{
-						atomStack->capture.enabled(newatom->parent);
-						newatom->flags += Atom::Flags::captureVariables;
-					}
-				}
-
-				if (!firstAtomCreated)
-					firstAtomCreated = newatom;
+				mapBlueprintFuncdef(operands);
 				break;
 			}
-
 			case IR::ISA::Blueprint::classdef:
 			{
-				// registering the blueprint into the outline...
-				Atom& atom = atomStack->currentAtomNotUnit();
-
-				// reset last lvid and parameters
-				lastLVID = 0;
-				lastPushedNamedParameters.clear();
-				lastPushedIndexedParameters.clear();
-
-				AnyString classname = currentSequence.stringrefs[operands.name];
-
-				Atom* newClassAtom = nullptr;
-				// create a new atom in the global type table
-				if (prefixNameForFirstAtomCreated.empty())
-				{
-					MutexLocker locker{mutex};
-					newClassAtom = cdeftable.atoms.createClassdef(atom, classname);
-					// create a pseudo classdef to easily retrieve the real atom from a clid
-					cdeftable.registerAtom(newClassAtom);
-				}
-				else
-				{
-					String tmpname;
-					tmpname.reserve(classname.size() + prefixNameForFirstAtomCreated.size());
-					tmpname << prefixNameForFirstAtomCreated << classname;
-					prefixNameForFirstAtomCreated.clear();
-
-					MutexLocker locker{mutex};
-					newClassAtom = cdeftable.atoms.createClassdef(atom, tmpname);
-					// create a pseudo classdef to easily retrieve the real atom from a clid
-					cdeftable.registerAtom(newClassAtom);
-				}
-
-				assert(newClassAtom != nullptr);
-				newClassAtom->opcodes.sequence = &currentSequence;
-				newClassAtom->opcodes.offset   = currentSequence.offsetOf(operands);
-
-				// update atomid
-				operands.atomid = newClassAtom->atomid;
-				// requires additional information
-				needAtomDbgFileReport = true;
-				needAtomDbgOffsetReport = true;
-				pushNewFrame(*newClassAtom);
-
-				if (operands.lvid != 0)
-					atomStack->capture.enabled(newClassAtom);
-
-				if (!firstAtomCreated)
-					firstAtomCreated = newClassAtom;
+				mapBlueprintClassdef(operands);
 				break;
 			}
 
 			case IR::ISA::Blueprint::typealias:
 			{
-				Atom& atom = atomStack->currentAtomNotUnit();
-
-				AnyString typedefname = currentSequence.stringrefs[operands.name];
-				Atom* newAliasAtom = nullptr;
-				{
-					MutexLocker locker{mutex};
-					newAliasAtom = cdeftable.atoms.createTypealias(atom, typedefname);
-					cdeftable.registerAtom(newAliasAtom);
-				}
-
-				assert(newAliasAtom != nullptr);
-				newAliasAtom->opcodes.sequence = &currentSequence;
-				newAliasAtom->opcodes.offset  = currentSequence.offsetOf(operands);
-
-				switch (static_cast<uint32_t>(operands.lvid))
-				{
-					default:
-					{
-						CLID clid{atomStack->atom.atomid, operands.lvid};
-						newAliasAtom->returnType.clid = clid;
-						break;
-					}
-					case 0:
-					{
-						newAliasAtom->returnType.clid.reclassToVoid();
-						break;
-					}
-					case (uint32_t) -1: // any
-						break;
-				}
-
-				// update atomid
-				operands.atomid = newAliasAtom->atomid;
-
-				lastPushedNamedParameters.clear();
-				lastPushedIndexedParameters.clear();
-
-				if (!firstAtomCreated)
-					firstAtomCreated = newAliasAtom;
+				mapBlueprintTypealias(operands);
 				break;
 			}
-
 			case IR::ISA::Blueprint::namespacedef:
 			{
-				AnyString nmname = currentSequence.stringrefs[operands.name];
-				Atom& parentAtom = atomStack->currentAtomNotUnit();
-
-				MutexLocker locker{mutex};
-				Atom* newRoot = cdeftable.atoms.createNamespace(parentAtom, nmname);
-				assert(newRoot != nullptr);
-				// create a pseudo classdef to easily retrieve the real atom from a clid
-				cdeftable.registerAtom(newRoot);
-				pushNewFrame(*newRoot);
+				mapBlueprintNamespace(operands);
 				break;
 			}
-
 			case IR::ISA::Blueprint::unit:
 			{
-				Atom& parentAtom = atomStack->currentAtomNotUnit();
-				Atom* newRoot;
-				{
-					MutexLocker locker{mutex};
-					newRoot = cdeftable.atoms.createUnit(parentAtom, currentFilename);
-					assert(newRoot != nullptr);
-					// create a pseudo classdef to easily retrieve the real atom from a clid
-					cdeftable.registerAtom(newRoot);
-				}
-				// update atomid
-				operands.atomid = newRoot->atomid;
-				assert(newRoot->atomid != 0);
-				pushNewFrame(*newRoot);
+				mapBlueprintUnit(operands);
 				break;
 			}
 		}
