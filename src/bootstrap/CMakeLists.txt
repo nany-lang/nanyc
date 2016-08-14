@@ -285,8 +285,8 @@ if (NOT WIN32)
 	create_rules_for_packages(deb)
 	create_rules_for_packages(rpm)
 else()
-	include("cmake/wix.cmake")
-	create_rules_for_msi()
+	include("cmake/packages-msi.cmake")
+	create_rules_for_package_msi()
 endif()
 
 # The end !

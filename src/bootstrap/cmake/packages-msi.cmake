@@ -1,4 +1,4 @@
-macro(create_rules_for_msi)
+macro(create_rules_for_package_msi)
 	if ("${CMAKE_BUILD_TYPE}" STREQUAL "debug")
 		set(wix_config_mode "Debug")
 	else()
@@ -19,7 +19,7 @@ macro(create_rules_for_msi)
 	set(wix_wxs "nanyc-${nany_version}-${wix_arch}")
 	configure_file("cmake/wix-template.cmake" "../../distrib/${wix_wxs}.wxs" @ONLY)
 
-	add_custom_target(package-wix
+	add_custom_target(package-msi
 		DEPENDS libnanyc nany nanyc-check-syntax nanyc-dump-ast
 		WORKING_DIRECTORY "../../distrib"
 		COMMAND "${CMAKE_COMMAND}" "-E" echo "-- wix candle ${wix_wxs}.wxs" 
