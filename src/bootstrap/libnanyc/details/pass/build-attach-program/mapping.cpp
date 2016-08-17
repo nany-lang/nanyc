@@ -6,6 +6,7 @@ using namespace Yuni;
 
 
 
+
 namespace Nany
 {
 namespace Pass
@@ -19,9 +20,7 @@ namespace Mapping
 		, mutex(mutex)
 		, currentSequence(sequence)
 		, localMetadataHandler(this, &retriveReportMetadata)
-
 	{
-		// reduce memory allocations
 		lastPushedNamedParameters.reserve(8); // arbitrary
 		lastPushedIndexedParameters.reserve(8);
 	}
@@ -411,7 +410,7 @@ namespace Mapping
 	}
 
 
-	inline void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
+	void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
 	{
 		if (unlikely(nullptr == atomStack))
 			return printError(operands, "invalid stack for blueprint");
@@ -708,17 +707,20 @@ namespace Mapping
 		}
 	}
 
+
 	inline void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::identifyset>& operands)
 	{
 		auto& newopc = IR::Instruction::fromOpcode(operands).to<IR::ISA::Op::identify>();
 		visit(newopc);
 	}
 
+
 	inline void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::tpush>& operands)
 	{
 		if (unlikely(not checkForLVID(operands, operands.lvid)))
 			return;
 	}
+
 
 	inline void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::push>& operands)
 	{
@@ -801,6 +803,7 @@ namespace Mapping
 		}
 	}
 
+
 	inline void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::debugpos>& operands)
 	{
 		currentLine = operands.line;
@@ -861,7 +864,6 @@ namespace Mapping
 			case IR::ISA::Op::jnz:
 			case IR::ISA::Op::nop:
 				break;
-
 				// error for all the other ones
 			default:
 				printError(operands);

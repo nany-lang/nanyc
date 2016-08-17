@@ -13,8 +13,6 @@ using namespace Yuni;
 
 
 
-
-
 namespace Nany
 {
 namespace Pass
@@ -59,8 +57,6 @@ namespace Instanciate
 			frm = previous;
 		}
 	}
-
-
 
 
 	void SequenceBuilder::releaseScopedVariables(int scope, bool forget)
@@ -204,7 +200,6 @@ namespace Instanciate
 	}
 
 
-
 	inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::inherit>& operands)
 	{
 		assert(frame != nullptr);
@@ -292,11 +287,13 @@ namespace Instanciate
 			out.emit<IR::ISA::Op::jmp>() = opc;
 	}
 
+
 	inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::jz>& opc)
 	{
 		if (canGenerateCode())
 			out.emit<IR::ISA::Op::jz>() = opc;
 	}
+
 
 	inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::jnz>& opc)
 	{
@@ -304,17 +301,12 @@ namespace Instanciate
 			out.emit<IR::ISA::Op::jnz>() = opc;
 	}
 
+
 	inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::comment>& opc)
 	{
-		// keep the comments in debug
-		if (Yuni::debugmode)
-		{
-			if (canGenerateCode())
-				out.emitComment(currentSequence.stringrefs[opc.text]);
-		}
+		if (debugmode and canGenerateCode())
+			out.emitComment(currentSequence.stringrefs[opc.text]);
 	}
-
-
 
 
 	template<IR::ISA::Op O>
@@ -329,7 +321,6 @@ namespace Instanciate
 		currentSequence.each(*this, offset);
 		return success;
 	}
-
 
 
 
@@ -395,6 +386,7 @@ namespace Nany
 		}
 
 		bool success = true;
+
 		atom.eachChild([&](Atom& subatom) -> bool
 		{
 			success &= resolveStrictParameterTypes(subatom);
