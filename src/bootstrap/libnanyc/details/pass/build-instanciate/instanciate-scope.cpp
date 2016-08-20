@@ -43,10 +43,7 @@ namespace Instanciate
 					if (Config::Traces::classdefTable)
 						printClassdefTable(*frame);
 
-					// destroy the frame
-					auto* previous = frame->previous;
-					build.deallocate(frame);
-					frame = previous;
+					popFrame();
 
 					++layerDepthLimit;
 					if (canGenerateCode())

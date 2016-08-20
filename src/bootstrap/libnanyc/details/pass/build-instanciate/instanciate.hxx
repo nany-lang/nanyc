@@ -18,6 +18,13 @@ namespace Instanciate
 		frame = newframe;
 	}
 
+	inline void SequenceBuilder::popFrame()
+	{
+		auto* previous = frame->previous;
+		build.deallocate(frame);
+		frame = previous;
+	}
+
 
 	inline void SequenceBuilder::PushedParameters::clear()
 	{
