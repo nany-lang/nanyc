@@ -20,81 +20,81 @@ namespace Instanciate
 		assert(codeGenerationLock == 0 and "any good reason to not generate code ?");
 
 		auto& atom = frame->atom;
-		if (atom.isFunction())
+		if (not atom.isFunction())
+			return;
+
+		bool generateCode = canGenerateCode();
+		uint32_t count = atom.parameters.size();
+		atom.parameters.each([&](uint32_t i, const AnyString& name, const Vardef& vardef)
 		{
-			bool generateCode = canGenerateCode();
-			uint32_t count = atom.parameters.size();
-			atom.parameters.each([&](uint32_t i, const AnyString& name, const Vardef& vardef)
+			// lvid for the given parameter
+			uint32_t lvid  = i + 1 + 1; // 1: return type, 2: first parameter
+			assert(lvid < frame->lvids.size());
+			// Obviously, the parameters are not synthetic objects
+			// but real variables
+			frame->lvids[lvid].synthetic = false;
+
+			//
+			// Parameters Deep copy (if required)
+			//
+			if (name[0] != '^')
 			{
-				// lvid for the given parameter
-				uint32_t lvid  = i + 1 + 1; // 1: return type, 2: first parameter
-				assert(lvid < frame->lvids.size());
-				// Obviously, the parameters are not synthetic objects
-				// but real variables
-				frame->lvids[lvid].synthetic = false;
+				// normal input parameter (not captured - does not start with '^')
+				// clone it if necessary (only non-ref parameters)
 
-				//
-				// Parameters Deep copy (if required)
-				//
-				if (name[0] != '^')
+				if (not cdeftable.classdef(vardef.clid).qualifiers.ref)
 				{
-					// normal input parameter (not captured - does not start with '^')
-					// clone it if necessary (only non-ref parameters)
+					if (debugmode and generateCode)
+						out.emitComment(String{"----- deep copy parameter "} << i << " aka " << name);
 
-					if (not cdeftable.classdef(vardef.clid).qualifiers.ref)
+					// a register has already been reserved for cloning parameters
+					uint32_t clone = 2 + count + i; // 1: return type, 2: first parameter
+					assert(clone < frame->lvids.size());
+					// the new value is not synthetic
+					frame->lvids[clone].synthetic = false;
+
+					bool r = instanciateAssignment(*frame, clone, lvid, false, false, true);
+					if (unlikely(not r))
+						frame->invalidate(clone);
+
+					if (canBeAcquired(lvid))
 					{
-						if (debugmode and generateCode)
-							out.emitComment(String{"----- deep copy parameter "} << i << " aka " << name);
+						frame->lvids[lvid].autorelease = true;
+						frame->lvids[clone].autorelease = false;
+					}
 
-						// a register has already been reserved for cloning parameters
-						uint32_t clone = 2 + count + i; // 1: return type, 2: first parameter
-						assert(clone < frame->lvids.size());
-						// the new value is not synthetic
-						frame->lvids[clone].synthetic = false;
-
-						bool r = instanciateAssignment(*frame, clone, lvid, false, false, true);
-						if (unlikely(not r))
-							frame->invalidate(clone);
-
-						if (canBeAcquired(lvid))
-						{
-							frame->lvids[lvid].autorelease = true;
-							frame->lvids[clone].autorelease = false;
-						}
-
-						if (generateCode)
-						{
-							out.emitStore(lvid, clone); // register swap
-							if (debugmode)
-								out.emitComment("--\n");
-						}
+					if (generateCode)
+					{
+						out.emitStore(lvid, clone); // register swap
+						if (debugmode)
+							out.emitComment("--\n");
 					}
 				}
-			});
+			}
+		});
 
-			// generating some code on the fly
-			if (atom.isSpecial() /*ctor, operators...*/ and generateCode)
+		// generating some code on the fly
+		if (atom.isSpecial() /*ctor, operators...*/ and generateCode)
+		{
+			// variables initialization (for a ctor)
+			if (generateClassVarsAutoInit)
 			{
-				// variables initialization (for a ctor)
-				if (generateClassVarsAutoInit)
-				{
-					generateClassVarsAutoInit = false;
-					generateMemberVarDefaultInitialization();
-				}
+				generateClassVarsAutoInit = false;
+				generateMemberVarDefaultInitialization();
+			}
 
-				// variables destruction (for dtor)
-				if (generateClassVarsAutoRelease)
-				{
-					generateClassVarsAutoRelease = false;
-					generateMemberVarDefaultDispose();
-				}
+			// variables destruction (for dtor)
+			if (generateClassVarsAutoRelease)
+			{
+				generateClassVarsAutoRelease = false;
+				generateMemberVarDefaultDispose();
+			}
 
-				// variables cloning (copy a ctor)
-				if (generateClassVarsAutoClone)
-				{
-					generateClassVarsAutoClone = false;
-					generateMemberVarDefaultClone();
-				}
+			// variables cloning (copy a ctor)
+			if (generateClassVarsAutoClone)
+			{
+				generateClassVarsAutoClone = false;
+				generateMemberVarDefaultClone();
 			}
 		}
 	}
