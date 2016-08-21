@@ -10,7 +10,7 @@ using namespace Yuni;
 
 
 
-extern "C" void nany_build_cf_init(nybuild_cf_t* cf, const nyproject_t* project)
+extern "C" void nybuild_cf_init(nybuild_cf_t* cf, const nyproject_t* project)
 {
 	assert(cf != NULL);
 	memset(cf, 0x0, sizeof(nybuild_cf_t));
@@ -22,11 +22,11 @@ extern "C" void nany_build_cf_init(nybuild_cf_t* cf, const nyproject_t* project)
 	else
 		nany_memalloc_set_default(&(cf->allocator));
 
-	nany_console_cf_set_stdcout(&cf->console);
+	nyconsole_cf_set_stdcout(&cf->console);
 }
 
 
-extern "C" nybuild_t* nany_build_prepare(nyproject_t* ptr, const nybuild_cf_t* cf)
+extern "C" nybuild_t* nybuild_prepare(nyproject_t* ptr, const nybuild_cf_t* cf)
 {
 	if (ptr)
 	{
@@ -49,7 +49,7 @@ extern "C" nybuild_t* nany_build_prepare(nyproject_t* ptr, const nybuild_cf_t* c
 			else
 			{
 				nybuild_cf_t ncf;
-				nany_build_cf_init(&ncf, ptr);
+				nybuild_cf_init(&ncf, ptr);
 
 				auto& allocator = const_cast<nyallocator_t&>(ncf.allocator);
 				void* inplace = allocator.allocate(&allocator, sizeof(Nany::Build));
@@ -81,7 +81,7 @@ extern "C" nybuild_t* nany_build_prepare(nyproject_t* ptr, const nybuild_cf_t* c
 }
 
 
-extern "C" nybool_t nany_build(nybuild_t* ptr)
+extern "C" nybool_t nybuild(nybuild_t* ptr)
 {
 	return ((ptr) ? Nany::ref(ptr).compile() : false) ? nytrue : nyfalse;
 }
@@ -92,7 +92,7 @@ extern "C" nybool_t nany_build(nybuild_t* ptr)
 namespace // anonymous
 {
 
-	static void nany_build_print_compiler_info_to_console(Nany::Build& build)
+	inline void nybuild_print_compiler_info_to_console(Nany::Build& build)
 	{
 		// nanyc {c++/bootstrap} v0.1.0-alpha+ed25d59 {debug}
 		{
@@ -109,7 +109,7 @@ namespace // anonymous
 } // anonymous namespace
 
 
-extern "C" void nany_build_print_report_to_console(nybuild_t* ptr, nybool_t print_header)
+extern "C" void nybuild_print_report_to_console(nybuild_t* ptr, nybool_t print_header)
 {
 	if (ptr)
 	{
@@ -118,7 +118,7 @@ extern "C" void nany_build_print_report_to_console(nybuild_t* ptr, nybool_t prin
 		try
 		{
 			if (YUNI_UNLIKELY(print_header != nyfalse))
-				nany_build_print_compiler_info_to_console(build);
+				nybuild_print_compiler_info_to_console(build);
 
 			if (!!build.messages)
 				build.messages->print(build.cf.console, false);
@@ -128,14 +128,14 @@ extern "C" void nany_build_print_report_to_console(nybuild_t* ptr, nybool_t prin
 }
 
 
-extern "C" void nany_build_ref(nybuild_t* build)
+extern "C" void nybuild_ref(nybuild_t* build)
 {
 	if (build)
 		Nany::ref(build).addRef();
 }
 
 
-extern "C" void nany_build_unref(nybuild_t* ptr)
+extern "C" void nybuild_unref(nybuild_t* ptr)
 {
 	if (ptr)
 	{

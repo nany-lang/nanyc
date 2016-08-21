@@ -65,9 +65,6 @@ namespace Producer
 
 
 
-
-
-
 		inline FuncInspector::FuncInspector(Scope& scope)
 			: scope(scope)
 			, hasImplicitSelf(scope.isWithinClass())
@@ -88,7 +85,7 @@ namespace Producer
 			else
 			{
 				// visibility from the node
-				nyvisibility_t visibility = nany_cstring_to_visibility_n(node.text.c_str(), node.text.size());
+				nyvisibility_t visibility = nycstring_to_visibility_n(node.text.c_str(), node.text.size());
 
 				if (likely(visibility != nyv_undefined))
 				{
@@ -414,7 +411,7 @@ namespace Producer
 		}
 
 
-		inline bool FuncInspector::inspectReturnType(const AST::Node& node)
+		bool FuncInspector::inspectReturnType(const AST::Node& node)
 		{
 			assert(node.rule == AST::rgFuncReturnType and "invalid return type node");
 			assert(not node.children.empty() and " should been tested already");
@@ -501,9 +498,7 @@ namespace Producer
 		}
 
 
-
-
-		inline bool FuncInspector::inspect(const AST::Node& node)
+		bool FuncInspector::inspect(const AST::Node& node)
 		{
 			// exit status
 			bool success = true;
@@ -564,13 +559,7 @@ namespace Producer
 		}
 
 
-
 	} // anonymous namespace
-
-
-
-
-
 
 
 

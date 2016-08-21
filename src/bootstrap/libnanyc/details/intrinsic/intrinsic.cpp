@@ -15,9 +15,9 @@ namespace Nany
 		{
 			if (i != 0)
 				out << ", ";
-			out << nany_type_to_cstring(params[i]);
+			out << nytype_to_cstring(params[i]);
 		}
-		out << "): " << nany_type_to_cstring(rettype);
+		out << "): " << nytype_to_cstring(rettype);
 		return out;
 	}
 

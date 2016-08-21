@@ -33,7 +33,7 @@ namespace CString
 				if (tmplparam.atom and tmplparam.kind == nyt_any)
 					out << Nany::CLID::AtomMapID(tmplparam.atom->atomid);
 				else
-					out << nany_type_to_cstring(tmplparam.kind);
+					out << nytype_to_cstring(tmplparam.kind);
 			}
 			out << ":>";
 		}
@@ -48,7 +48,7 @@ namespace CString
 			if (param.atom and param.kind == nyt_any)
 				out << Nany::CLID::AtomMapID(param.atom->atomid);
 			else
-				out << nany_type_to_cstring(param.kind);
+				out << nytype_to_cstring(param.kind);
 		}
 		out << ')';
 	}

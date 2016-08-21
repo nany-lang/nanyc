@@ -53,7 +53,7 @@ extern "C" {
 /*!
 ** \brief Print information about nany for bug reporting
 */
-NY_EXPORT void libnany_print_info_for_bugreport();
+NY_EXPORT void nylib_print_info_for_bugreport();
 
 /*!
 ** \brief Export information about nany for bug reporting
@@ -61,10 +61,10 @@ NY_EXPORT void libnany_print_info_for_bugreport();
 ** \param[out] length Length of the returned c-string (can be null)
 ** \return A C-String, which must be released by `free (3)`. NULL if an error occured
 */
-NY_EXPORT char* libnany_get_info_for_bugreport(uint32_t* length);
+NY_EXPORT char* nylib_get_info_for_bugreport(uint32_t* length);
 
 /*! Get the nany's website */
-NY_EXPORT const char* libnany_website_url();
+NY_EXPORT const char* nylib_website_url();
 
 /*!
 ** \brief Get the version of nany
@@ -74,14 +74,14 @@ NY_EXPORT const char* libnany_website_url();
 ** \param[out] major Patch (eX: 2.4.1 -> 1) (can be null)
 ** \return The full version within a single integer (ex: 2.4.1 -> 204001)
 */
-NY_EXPORT uint32_t libnany_get_version(uint32_t* major, uint32_t* minor, uint32_t* patch);
+NY_EXPORT uint32_t nylib_get_version(uint32_t* major, uint32_t* minor, uint32_t* patch);
 
 /*! Get the full version of nany (string, ex: 2.4.1-beta+2e738ae) */
-NY_EXPORT const char* libnany_version();
+NY_EXPORT const char* nylib_version();
 /*! Get the version metadata (ex: '2e738ae', null if empty) */
-NY_EXPORT const char* libnany_version_metadata();
+NY_EXPORT const char* nylib_version_metadata();
 /*! Get the pre-release version (ex: 'beta', null if empty) */
-NY_EXPORT const char* libnany_version_prerelease();
+NY_EXPORT const char* nylib_version_prerelease();
 
 /*!
 ** \brief Check if the version is compatible with the library
@@ -89,12 +89,12 @@ NY_EXPORT const char* libnany_version_prerelease();
 ** This function can be used to avoid unwanted behaviors when
 ** a program is able to use several versions of libnany
 ** \code
-** if (!libnany_check_compatible_version(0, 2))
+** if (!nylib_check_compatible_version(0, 2))
 **     fprintf(stderr, "incompatible version\n");
 ** \endcode
 ** \return 0 when succeeded, != 0 if the version is incompatible
 */
-NY_EXPORT int libnany_check_compatible_version(uint32_t major, uint32_t minor);
+NY_EXPORT int nylib_check_compatible_version(uint32_t major, uint32_t minor);
 /*@}*/
 
 
@@ -104,8 +104,11 @@ NY_EXPORT int libnany_check_compatible_version(uint32_t major, uint32_t minor);
 
 /*! \name Types */
 /*@{*/
+#ifndef LIBNANYC_NYBOOL_T
+#define LIBNANYC_NYBOOL_T
 /*! Boolean type */
 typedef enum nybool_t {nyfalse = 0, nytrue} nybool_t;
+#endif
 
 /*! Nany Language builtin types */
 typedef enum /* nytype_t */
@@ -302,9 +305,9 @@ typedef struct nyconsole_t
 nyconsole_t;
 
 /*! Initialize a project configuration */
-NY_EXPORT void nany_console_cf_set_stdcout(nyconsole_t*);
+NY_EXPORT void nyconsole_cf_set_stdcout(nyconsole_t*);
 
-void nany_console_cf_copy(nyconsole_t* out, const nyconsole_t* const src);
+void nyconsole_cf_copy(nyconsole_t* out, const nyconsole_t* const src);
 /*@}*/
 
 
@@ -338,43 +341,43 @@ nyproject_cf_t;
 **
 ** \param cf Configuration (can be null)
 ** \return A ref-counted pointer to the new project. NULL if the operation failed. The returned
-**   object must be released by `nany_project_unref`
+**   object must be released by `nyproject_unref`
 */
-NY_EXPORT nyproject_t* nany_project_create(const nyproject_cf_t* cf);
+NY_EXPORT nyproject_t* nyproject_create(const nyproject_cf_t* cf);
 
 /*!
 ** \brief Acquire a project
 ** \param project Project pointer (can be null)
 */
-NY_EXPORT void nany_project_ref(nyproject_t* project);
+NY_EXPORT void nyproject_ref(nyproject_t* project);
 
 /*!
 ** \brief Unref a project and destroy it if required
 ** \param project A Project pointer (can be null)
 */
-NY_EXPORT void nany_project_unref(nyproject_t* project);
+NY_EXPORT void nyproject_unref(nyproject_t* project);
 
 /*! Initialize a project configuration */
-NY_EXPORT void nany_project_cf_init(nyproject_cf_t*);
+NY_EXPORT void nyproject_cf_init(nyproject_cf_t*);
 
 
 /*! Add a source file to the default target */
-NY_EXPORT nybool_t nany_project_add_source_from_file(nyproject_t*, const char* filename);
+NY_EXPORT nybool_t nyproject_add_source_from_file(nyproject_t*, const char* filename);
 /*! Add a source file to the default target (with filename length) */
-NY_EXPORT nybool_t nany_project_add_source_from_file_n(nyproject_t*, const char* filename, size_t);
+NY_EXPORT nybool_t nyproject_add_source_from_file_n(nyproject_t*, const char* filename, size_t);
 
 /*! Add a source to the default target */
-NY_EXPORT nybool_t nany_project_add_source(nyproject_t*, const char* text);
+NY_EXPORT nybool_t nyproject_add_source(nyproject_t*, const char* text);
 /*! Add a source to the default target (with filename length) */
-NY_EXPORT nybool_t nany_project_add_source_n(nyproject_t*, const char* text, size_t);
+NY_EXPORT nybool_t nyproject_add_source_n(nyproject_t*, const char* text, size_t);
 
 
 /*! Lock a project */
-NY_EXPORT void nany_lock(const nyproject_t*);
+NY_EXPORT void nyproject_lock(const nyproject_t*);
 /*! Unlock a project */
-NY_EXPORT void nany_unlock(const nyproject_t*);
+NY_EXPORT void nyproject_unlock(const nyproject_t*);
 /*! Try to lock a project */
-NY_EXPORT nybool_t nany_trylock(const nyproject_t*);
+NY_EXPORT nybool_t nyproject_trylock(const nyproject_t*);
 /*@}*/
 
 
@@ -422,12 +425,12 @@ nybuild_cf_t;
 /*!
 ** \brief Create a new build
 */
-NY_EXPORT nybuild_t* nany_build_prepare(nyproject_t*, const nybuild_cf_t*);
+NY_EXPORT nybuild_t* nybuild_prepare(nyproject_t*, const nybuild_cf_t*);
 
 /*!
 ** \brief Build the project
 */
-NY_EXPORT nybool_t nany_build(nybuild_t*);
+NY_EXPORT nybool_t nybuild(nybuild_t*);
 
 /*!
 ** \brief Print the build report to the console
@@ -435,25 +438,23 @@ NY_EXPORT nybool_t nany_build(nybuild_t*);
 ** \param build A build object (can be null, will do nothing)
 ** \param print_header nytrue to add information about the compiler
 */
-NY_EXPORT void nany_build_print_report_to_console(nybuild_t* build, nybool_t print_header);
-
+NY_EXPORT void nybuild_print_report_to_console(nybuild_t* build, nybool_t print_header);
 
 
 /*!
 ** \brief Acquire a build
 ** \param build build pointer (can be null)
 */
-NY_EXPORT void nany_build_ref(nybuild_t* build);
+NY_EXPORT void nybuild_ref(nybuild_t* build);
 /*!
 ** \brief Unref a build and destroy it if required
 ** \param build A build pointer (can be null)
 */
-NY_EXPORT void nany_build_unref(nybuild_t* build);
+NY_EXPORT void nybuild_unref(nybuild_t* build);
 
 /*! Initialize a project configuration */
-NY_EXPORT void nany_build_cf_init(nybuild_cf_t* cf, const nyproject_t* project);
+NY_EXPORT void nybuild_cf_init(nybuild_cf_t* cf, const nyproject_t* project);
 /*@}*/
-
 
 
 
@@ -722,7 +723,7 @@ nyvm_t;
 **
 ** \param build A build
 */
-NY_EXPORT nyprogram_t* nany_program_prepare(nybuild_t* build, const nyprogram_cf_t* cf);
+NY_EXPORT nyprogram_t* nyprogram_prepare(nybuild_t* build, const nyprogram_cf_t* cf);
 
 /*!
 ** \brief Execute a Nany program
@@ -733,7 +734,7 @@ NY_EXPORT nyprogram_t* nany_program_prepare(nybuild_t* build, const nyprogram_cf
 **    to the program/script. Arguments must use the UTF8 encoding
 ** \return Exit status code
 */
-NY_EXPORT int nany_program_main(nyprogram_t* program, uint32_t argc, const char** argv);
+NY_EXPORT int nyprogram_main(nyprogram_t* program, uint32_t argc, const char** argv);
 
 
 
@@ -741,15 +742,15 @@ NY_EXPORT int nany_program_main(nyprogram_t* program, uint32_t argc, const char*
 ** \brief Acquire a program
 ** \param program program pointer (can be null)
 */
-NY_EXPORT void nany_program_ref(nyprogram_t* program);
+NY_EXPORT void nyprogram_ref(nyprogram_t* program);
 /*!
 ** \brief Unref a program and destroy it if required
 ** \param program A program pointer (can be null)
 */
-NY_EXPORT void nany_program_unref(nyprogram_t* program);
+NY_EXPORT void nyprogram_unref(nyprogram_t* program);
 
 /*! Initialize a project configuration */
-NY_EXPORT void nany_program_cf_init(nyprogram_cf_t* cf, const nybuild_cf_t*);
+NY_EXPORT void nyprogram_cf_init(nyprogram_cf_t* cf, const nybuild_cf_t*);
 /*@}*/
 
 
@@ -766,14 +767,14 @@ NY_EXPORT void nany_program_cf_init(nyprogram_cf_t* cf, const nybuild_cf_t*);
 **
 ** \warning Writing to the same FD by multiple threads is not thread-safe on all platforms
 */
-nybool_t nany_print_ast_from_file(const char* filename, int fd, nybool_t unixcolors);
+nybool_t nyprint_ast_from_file(const char* filename, int fd, nybool_t unixcolors);
 
 /*!
 ** \brief Print the AST of a nany source file
 **
 ** \warning Writing to the same FD by multiple threads is not thread-safe on all platforms
 */
-NY_EXPORT nybool_t nany_print_ast_from_file_n(const char* filename, size_t length, int fd, nybool_t unixcolors);
+NY_EXPORT nybool_t nyprint_ast_from_file_n(const char* filename, size_t length, int fd, nybool_t unixcolors);
 
 /*!
 ** \brief Print the AST of some nany code in memory
@@ -781,14 +782,14 @@ NY_EXPORT nybool_t nany_print_ast_from_file_n(const char* filename, size_t lengt
 ** \warning Writing to the same FD by multiple threads is not thread-safe on all platforms
 ** \param content Arbitrary utf-8 content (c-string)
 */
-NY_EXPORT nybool_t nany_print_ast_from_memory(const char* content, int fd, nybool_t unixcolors);
+NY_EXPORT nybool_t nyprint_ast_from_memory(const char* content, int fd, nybool_t unixcolors);
 /*!
 ** \brief Print the AST of some nany code in memory
 **
 ** \warning Writing to the same FD by multiple threads is not thread-safe on all platforms
 ** \param content Arbitrary utf-8 content (c-string)
 */
-NY_EXPORT  nybool_t nany_print_ast_from_memory_n(const char* content, size_t length, int fd, nybool_t unixcolors);
+NY_EXPORT  nybool_t nyprint_ast_from_memory_n(const char* content, size_t length, int fd, nybool_t unixcolors);
 
 /*!
 ** \brief Check if a filename is a valid nany source code
@@ -796,7 +797,7 @@ NY_EXPORT  nybool_t nany_print_ast_from_memory_n(const char* content, size_t len
 ** \param filename An arbitrary filename (utf-8 c-string)
 ** \return nytrue if the file has been successfully parsed, false otherwise
 */
-NY_EXPORT nybool_t nany_try_parse_file(const char* const filename);
+NY_EXPORT nybool_t nytry_parse_file(const char* const filename);
 /*!
 ** \brief Check if a filename is a valid nany source code
 **
@@ -804,7 +805,7 @@ NY_EXPORT nybool_t nany_try_parse_file(const char* const filename);
 ** \param length Length of the filename
 ** \return nytrue if the file has been successfully parsed, false otherwise
 */
-NY_EXPORT nybool_t nany_try_parse_file_n(const char* filename, size_t length);
+NY_EXPORT nybool_t nytry_parse_file_n(const char* filename, size_t length);
 
 
 
@@ -816,18 +817,18 @@ NY_EXPORT nybool_t nany_try_parse_file_n(const char* filename, size_t length);
 **
 ** An empty value will represent a "default" visibility (nyv_undefined)
 */
-NY_EXPORT nyvisibility_t  nany_cstring_to_visibility(const char* const text);
+NY_EXPORT nyvisibility_t  nycstring_to_visibility(const char* const text);
 /*!
 ** \brief Convert a C-String representing a visibility level (with given length)
 **
 ** An empty value will represent a "default" visibility (nyv_undefined)
 */
-NY_EXPORT nyvisibility_t  nany_cstring_to_visibility_n(const char* const text, size_t length);
+NY_EXPORT nyvisibility_t  nycstring_to_visibility_n(const char* const text, size_t length);
 
 /*!
 ** \brief Convert a visibility to a C-String representation
 */
-NY_EXPORT const char* nany_visibility_to_cstring(nyvisibility_t);
+NY_EXPORT const char* nyvisibility_to_cstring(nyvisibility_t);
 
 
 /*!
@@ -836,7 +837,7 @@ NY_EXPORT const char* nany_visibility_to_cstring(nyvisibility_t);
 ** \param text An arbitrary text (ex: "__uint64")
 ** \return The corresponding type (ex: nyt_uint64)
 */
-NY_EXPORT nytype_t nany_cstring_to_type(const char* const text);
+NY_EXPORT nytype_t nycstring_to_type(const char* const text);
 
 /*!
 ** \brief Convert a string into the builtin type (with length provided)
@@ -844,20 +845,18 @@ NY_EXPORT nytype_t nany_cstring_to_type(const char* const text);
 ** \param text An arbitrary text (ex: "__uint64")
 ** \return The corresponding type (ex: nyt_uint64)
 */
-NY_EXPORT nytype_t nany_cstring_to_type_n(const char* const text, size_t length);
+NY_EXPORT nytype_t nycstring_to_type_n(const char* const text, size_t length);
 
 /*!
 ** \brief Convert a type into a c-string
 */
-NY_EXPORT const char* nany_type_to_cstring(nytype_t);
+NY_EXPORT const char* nytype_to_cstring(nytype_t);
 
 /*!
 ** \brief Get the size in bytes of a Nany builtin type
 */
-NY_EXPORT uint32_t nany_type_sizeof(nytype_t);
+NY_EXPORT uint32_t nytype_sizeof(nytype_t);
 /*@}*/
-
-
 
 
 
@@ -884,10 +883,10 @@ typedef struct nyrun_cf_t
 nyrun_cf_t;
 
 /*! Initialize a template object */
-NY_EXPORT void nany_run_cf_init(nyrun_cf_t*);
+NY_EXPORT void nyrun_cf_init(nyrun_cf_t*);
 
 /*! Release resources held by a template object */
-NY_EXPORT void nany_run_cf_release(const nyrun_cf_t*);
+NY_EXPORT void nyrun_cf_release(const nyrun_cf_t*);
 /*!
 ** \brief Compile & run a nany program
 **
@@ -897,7 +896,7 @@ NY_EXPORT void nany_run_cf_release(const nyrun_cf_t*);
 ** \param argv Input arguments (ignored if null)
 ** \return Exit status code
 */
-NY_EXPORT int nany_run(const nyrun_cf_t* cf, const char* source, uint32_t argc, const char** argv);
+NY_EXPORT int nyrun(const nyrun_cf_t* cf, const char* source, uint32_t argc, const char** argv);
 
 /*!
 ** \brief Compile & run a nany program
@@ -909,7 +908,7 @@ NY_EXPORT int nany_run(const nyrun_cf_t* cf, const char* source, uint32_t argc, 
 ** \param argv Input arguments (ignored if null)
 ** \return Exit status code
 */
-NY_EXPORT int nany_run_n(const nyrun_cf_t* cf, const char* source, size_t length, uint32_t argc, const char** argv);
+NY_EXPORT int nyrun_n(const nyrun_cf_t* cf, const char* source, size_t length, uint32_t argc, const char** argv);
 
 
 /*!
@@ -922,7 +921,7 @@ NY_EXPORT int nany_run_n(const nyrun_cf_t* cf, const char* source, size_t length
 ** \param argv Input arguments (ignored if null)
 ** \return Exit status code
 */
-NY_EXPORT int nany_run_file(const nyrun_cf_t* cf, const char* file, uint32_t argc, const char** argv);
+NY_EXPORT int nyrun_file(const nyrun_cf_t* cf, const char* file, uint32_t argc, const char** argv);
 
 /*!
 ** \brief Compile & run a nany script file
@@ -934,7 +933,7 @@ NY_EXPORT int nany_run_file(const nyrun_cf_t* cf, const char* file, uint32_t arg
 ** \param argv Input arguments (ignored if null)
 ** \return Exit status code
 */
-NY_EXPORT int nany_run_file_n(const nyrun_cf_t* cf, const char* file, size_t length, uint32_t argc, const char** argv);
+NY_EXPORT int nyrun_file_n(const nyrun_cf_t* cf, const char* file, size_t length, uint32_t argc, const char** argv);
 /*@}*/
 
 

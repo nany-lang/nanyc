@@ -422,7 +422,7 @@ namespace Instanciate
 							return true;
 						}
 
-						nytype_t type = nany_cstring_to_type_n(name.c_str(), name.size());
+						nytype_t type = nycstring_to_type_n(name.c_str(), name.size());
 						if (unlikely(type == nyt_void))
 							return complainUnknownBuiltinType(name);
 

@@ -281,7 +281,7 @@ static bool batchCheckIfFilenamesConformToGrammar(std::vector<String>& filenames
 		// -- PARSE --
 		//
 		int64_t start = DateTime::NowMilliSeconds();
-		bool success = (nytrue == nany_try_parse_file_n(file.c_str(), file.size()));
+		bool success = (nytrue == nytry_parse_file_n(file.c_str(), file.size()));
 		duration = DateTime::NowMilliSeconds() - start;
 
 		success = (success == expected);

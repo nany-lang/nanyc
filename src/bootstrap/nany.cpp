@@ -31,14 +31,14 @@ static int printUsage(const char* const argv0)
 
 static int printBugReportInfo()
 {
-	libnany_print_info_for_bugreport();
+	nylib_print_info_for_bugreport();
 	return EXIT_SUCCESS;
 }
 
 
 static int printVersion()
 {
-	std::cout << libnany_version() << '\n';
+	std::cout << nylib_version() << '\n';
 	return EXIT_SUCCESS;
 }
 
@@ -66,7 +66,7 @@ int main(int argc, const char** argv)
 	if (argc > 1)
 	{
 		nyrun_cf_t runcf;
-		nany_run_cf_init(&runcf);
+		nyrun_cf_init(&runcf);
 
 
 		int firstarg = argc; // end of the list
@@ -137,10 +137,10 @@ int main(int argc, const char** argv)
 			uint32_t pargc = (nargc > 0) ? static_cast<uint32_t>(nargc) : 0;
 			const char** pargv = (!pargc ? nullptr : (++nargv));
 
-			exitstatus = nany_run_file_n(&runcf, nargv0, strlen(nargv0), pargc, pargv);
+			exitstatus = nyrun_file_n(&runcf, nargv0, strlen(nargv0), pargc, pargv);
 		}
 
-		nany_run_cf_release(&runcf);
+		nyrun_cf_release(&runcf);
 		return exitstatus;
 	}
 

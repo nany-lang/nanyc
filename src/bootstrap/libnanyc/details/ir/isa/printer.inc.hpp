@@ -277,7 +277,7 @@ namespace // anonymous
 		{
 			line() << "alloca %" << operands.lvid;
 			out << ": ";
-			out << nany_type_to_cstring((nytype_t) operands.type);
+			out << nytype_to_cstring((nytype_t) operands.type);
 
 			if (operands.atomid != (uint32_t) -1)
 				out << " atom: " << operands.atomid;
@@ -775,7 +775,7 @@ namespace // anonymous
 					}
 					case Pragma::visibility:
 					{
-						auto* text = nany_visibility_to_cstring((nyvisibility_t) operands.value.visibility);
+						auto* text = nyvisibility_to_cstring((nyvisibility_t) operands.value.visibility);
 						line() << "pragma visibility " << text;
 						break;
 					}

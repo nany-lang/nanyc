@@ -17,20 +17,6 @@ namespace Nany
 
 
 
-	Classdef::Classdef()
-		: qualifiers()
-	{
-		// keep the symbol local
-	}
-
-
-	Classdef::Classdef(const CLID& clid)
-		: kind(nyt_any)
-		, clid(clid)
-	{
-	}
-
-
 	template<class T, class TableT>
 	inline void Classdef::doPrint(T& out, const TableT& table) const
 	{
@@ -48,7 +34,6 @@ namespace Nany
 			}
 		}
 
-
 		const Atom* selfAtom = table.findClassdefAtom(*this);
 		if (selfAtom)
 		{
@@ -57,7 +42,7 @@ namespace Nany
 			selfAtom->retrieveCaption(out, table);
 		}
 		else
-			out << nany_type_to_cstring(kind);
+			out << nytype_to_cstring(kind);
 
 		if (unlikely(qualifiers.nullable))
 			out << '?';
@@ -88,11 +73,6 @@ namespace Nany
 	{
 		return isClass() and (atom->name() == name);
 	}
-
-
-
-
-
 
 
 } // namespace Nany

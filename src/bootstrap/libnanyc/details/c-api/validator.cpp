@@ -9,6 +9,7 @@ using namespace Yuni;
 
 
 
+
 namespace // anonymous
 {
 
@@ -35,7 +36,8 @@ namespace // anonymous
 
 
 
-extern "C" nybool_t nany_try_parse_file_n(const char* const filename, size_t length)
+
+extern "C" nybool_t nytry_parse_file_n(const char* const filename, size_t length)
 {
 	bool success = false;
 	if (length != 0 and length < 16*1024 and filename != nullptr)
@@ -56,11 +58,8 @@ extern "C" nybool_t nany_try_parse_file_n(const char* const filename, size_t len
 }
 
 
-extern "C" nybool_t nany_try_parse_file(const char* const filename)
+extern "C" nybool_t nytry_parse_file(const char* const filename)
 {
 	size_t length = (filename ? strlen(filename) : 0u);
-	return nany_try_parse_file_n(filename, length);
+	return nytry_parse_file_n(filename, length);
 }
-
-
-

@@ -344,7 +344,7 @@ namespace Instanciate
 			e << "operator " << AnyString{name, 1, name.size() - 1};
 		else
 			e << name;
-		e << "' on a non-class type '" << nany_type_to_cstring(kind) << '\'';
+		e << "' on a non-class type '" << nytype_to_cstring(kind) << '\'';
 		return false;
 	}
 

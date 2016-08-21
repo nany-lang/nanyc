@@ -17,12 +17,11 @@ using namespace Yuni;
 
 
 
-
 namespace // anonymous
 {
 
 	template<bool FromFileT>
-	static inline bool nany_print_ast(const AnyString& text, int fd, bool unixcolors)
+	static inline bool nyprint_ast(const AnyString& text, int fd, bool unixcolors)
 	{
 		if (unlikely(fd < 0))
 			return false;
@@ -54,19 +53,17 @@ namespace // anonymous
 		#endif
 	}
 
-
 } // anonymous namespace
 
 
 
 
-
-extern "C" nybool_t nany_print_ast_from_file_n(const char* filename, size_t length, int fd, nybool_t unixcolors)
+extern "C" nybool_t nyprint_ast_from_file_n(const char* filename, size_t length, int fd, nybool_t unixcolors)
 {
 	try
 	{
 		bool colors = (unixcolors == nytrue);
-		bool ok = nany_print_ast<true>(AnyString{filename, (uint32_t) length}, fd, colors);
+		bool ok = nyprint_ast<true>(AnyString{filename, (uint32_t) length}, fd, colors);
 		return ok ? nytrue : nyfalse;
 	}
 	catch (...) {}
@@ -74,12 +71,12 @@ extern "C" nybool_t nany_print_ast_from_file_n(const char* filename, size_t leng
 }
 
 
-extern "C" nybool_t nany_print_ast_from_memory_n(const char* content, size_t length, int fd, nybool_t unixcolors)
+extern "C" nybool_t nyprint_ast_from_memory_n(const char* content, size_t length, int fd, nybool_t unixcolors)
 {
 	try
 	{
 		bool colors = (unixcolors == nytrue);
-		bool ok = nany_print_ast<false>(AnyString{content, (uint32_t) length}, fd, colors);
+		bool ok = nyprint_ast<false>(AnyString{content, (uint32_t) length}, fd, colors);
 		return ok ? nytrue : nyfalse;
 	}
 	catch (...) {}
@@ -87,15 +84,15 @@ extern "C" nybool_t nany_print_ast_from_memory_n(const char* content, size_t len
 }
 
 
-extern "C" nybool_t nany_print_ast_from_file(const char* filename, int fd, nybool_t unixcolors)
+extern "C" nybool_t nyprint_ast_from_file(const char* filename, int fd, nybool_t unixcolors)
 {
 	size_t length = (filename ? strlen(filename) : 0u);
-	return nany_print_ast_from_file_n(filename, length, fd, unixcolors);
+	return nyprint_ast_from_file_n(filename, length, fd, unixcolors);
 }
 
 
-extern "C" nybool_t nany_print_ast_from_memory(const char* content, int fd, nybool_t unixcolors)
+extern "C" nybool_t nyprint_ast_from_memory(const char* content, int fd, nybool_t unixcolors)
 {
 	size_t length = (content ? strlen(content) : 0u);
-	return nany_print_ast_from_memory_n(content, length, fd, unixcolors);
+	return nyprint_ast_from_memory_n(content, length, fd, unixcolors);
 }

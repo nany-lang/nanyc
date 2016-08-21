@@ -7,7 +7,7 @@ using namespace Yuni;
 
 
 
-extern "C" nyvisibility_t  nany_cstring_to_visibility_n(const char* const text, size_t length)
+extern "C" nyvisibility_t  nycstring_to_visibility_n(const char* const text, size_t length)
 {
 	try
 	{
@@ -43,7 +43,7 @@ extern "C" nyvisibility_t  nany_cstring_to_visibility_n(const char* const text, 
 }
 
 
-extern "C" const char* nany_visibility_to_cstring(nyvisibility_t visibility)
+extern "C" const char* nyvisibility_to_cstring(nyvisibility_t visibility)
 {
 	static constexpr const char* const values[(uint32_t) nyv_count] =
 	{
@@ -60,9 +60,8 @@ extern "C" const char* nany_visibility_to_cstring(nyvisibility_t visibility)
 }
 
 
-extern "C" nyvisibility_t nany_cstring_to_visibility(const char* const text)
+extern "C" nyvisibility_t nycstring_to_visibility(const char* const text)
 {
 	size_t length = (text ? strlen(text) : 0u);
-	return nany_cstring_to_visibility_n(text, length);
+	return nycstring_to_visibility_n(text, length);
 }
-

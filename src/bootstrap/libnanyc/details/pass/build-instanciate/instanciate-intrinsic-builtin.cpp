@@ -265,7 +265,7 @@ namespace Instanciate
 				}
 				else
 				{
-					uint64_t size = nany_type_sizeof(cdef.kind);
+					uint64_t size = nytype_sizeof(cdef.kind);
 					seq.out.emitStore_u64(lvid, size);
 				}
 			}

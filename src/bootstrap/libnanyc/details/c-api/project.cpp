@@ -6,7 +6,7 @@ using namespace Yuni;
 
 
 
-extern "C" void nany_project_cf_init(nyproject_cf_t* cf)
+extern "C" void nyproject_cf_init(nyproject_cf_t* cf)
 {
 	assert(cf != NULL);
 	memset(cf, 0x0, sizeof(nyproject_cf_t));
@@ -14,7 +14,7 @@ extern "C" void nany_project_cf_init(nyproject_cf_t* cf)
 }
 
 
-extern "C" nyproject_t* nany_project_create(const nyproject_cf_t* cf)
+extern "C" nyproject_t* nyproject_create(const nyproject_cf_t* cf)
 {
 	Nany::Project* project;
 
@@ -30,7 +30,7 @@ extern "C" nyproject_t* nany_project_create(const nyproject_cf_t* cf)
 	else
 	{
 		nyproject_cf_t ncf;
-		nany_project_cf_init(&ncf);
+		nyproject_cf_init(&ncf);
 
 		auto& allocator = const_cast<nyallocator_t&>(ncf.allocator);
 		void* inplace = allocator.allocate(&allocator, sizeof(Nany::Project));
@@ -48,14 +48,14 @@ extern "C" nyproject_t* nany_project_create(const nyproject_cf_t* cf)
 }
 
 
-extern "C" void nany_project_ref(nyproject_t* project)
+extern "C" void nyproject_ref(nyproject_t* project)
 {
 	if (project)
 		Nany::ref(project).addRef();
 }
 
 
-extern "C" void nany_project_unref(nyproject_t* ptr)
+extern "C" void nyproject_unref(nyproject_t* ptr)
 {
 	if (ptr)
 	{
@@ -66,7 +66,7 @@ extern "C" void nany_project_unref(nyproject_t* ptr)
 }
 
 
-extern "C" nybool_t nany_project_add_source_from_file_n(nyproject_t* ptr, const char* filename, size_t len)
+extern "C" nybool_t nyproject_add_source_from_file_n(nyproject_t* ptr, const char* filename, size_t len)
 {
 	if (ptr and filename and len != 0 and len < 32*1024)
 	{
@@ -78,18 +78,18 @@ extern "C" nybool_t nany_project_add_source_from_file_n(nyproject_t* ptr, const 
 }
 
 
-extern "C" nybool_t nany_project_add_source_from_file(nyproject_t* ptr, const char* filename)
+extern "C" nybool_t nyproject_add_source_from_file(nyproject_t* ptr, const char* filename)
 {
 	if (filename != nullptr)
 	{
 		size_t length = strlen(filename);
-		return nany_project_add_source_from_file_n(ptr, filename, length);
+		return nyproject_add_source_from_file_n(ptr, filename, length);
 	}
 	return nyfalse;
 }
 
 
-extern "C" nybool_t nany_project_add_source_n(nyproject_t* ptr, const char* text, size_t len)
+extern "C" nybool_t nyproject_add_source_n(nyproject_t* ptr, const char* text, size_t len)
 {
 	if (ptr and text and len != 0 and len < 512 * 1024*1024) // arbitrary
 	{
@@ -101,32 +101,32 @@ extern "C" nybool_t nany_project_add_source_n(nyproject_t* ptr, const char* text
 }
 
 
-extern "C" nybool_t nany_project_add_source(nyproject_t* ptr, const char* text)
+extern "C" nybool_t nyproject_add_source(nyproject_t* ptr, const char* text)
 {
 	if (text != nullptr)
 	{
 		size_t length = strlen(text);
-		return nany_project_add_source_n(ptr, text, length);
+		return nyproject_add_source_n(ptr, text, length);
 	}
 	return nyfalse;
 }
 
 
-extern "C" void nany_lock(const nyproject_t* ptr)
+extern "C" void nyproject_lock(const nyproject_t* ptr)
 {
 	if (ptr)
 		Nany::ref(ptr).mutex.lock();
 }
 
 
-extern "C" void nany_unlock(const nyproject_t* ptr)
+extern "C" void nyproject_unlock(const nyproject_t* ptr)
 {
 	if (ptr)
 		Nany::ref(ptr).mutex.unlock();
 }
 
 
-extern "C" nybool_t nany_trylock(const nyproject_t* ptr)
+extern "C" nybool_t nyproject_trylock(const nyproject_t* ptr)
 {
 	return ((ptr) ? Nany::ref(ptr).mutex.trylock() : false) ? nytrue : nyfalse;
 }

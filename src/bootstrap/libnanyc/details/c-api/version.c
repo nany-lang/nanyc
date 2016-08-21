@@ -9,13 +9,14 @@
 
 
 
+
 static inline const char* strOrNull(const char* const text)
 {
 	return (text && *text != '\0') ? text : NULL;
 }
 
 
-const char* libnany_website_url()
+const char* nylib_website_url()
 {
 	#ifdef YUNI_OS_LINUX
 	_Static_assert(LIBNANYC_WEBSITE != NULL, "invalid null url");
@@ -23,7 +24,8 @@ const char* libnany_website_url()
 	return LIBNANYC_WEBSITE;
 }
 
-const char* libnany_version()
+
+const char* nylib_version()
 {
 	#ifdef YUNI_OS_LINUX
 	_Static_assert(LIBNANYC_VERSION_STR != NULL, "invalid null version");
@@ -31,18 +33,20 @@ const char* libnany_version()
 	return LIBNANYC_VERSION_STR;
 }
 
-const char* libnany_version_metadata()
+
+const char* nylib_version_metadata()
 {
 	return strOrNull(LIBNANYC_VERSION_METADATA);
 }
 
-const char* libnany_version_prerelease()
+
+const char* nylib_version_prerelease()
 {
 	return strOrNull(LIBNANYC_VERSION_PRERELEASE);
 }
 
 
-uint32_t libnany_get_version(uint32_t* major, uint32_t* minor, uint32_t* patch)
+uint32_t nylib_get_version(uint32_t* major, uint32_t* minor, uint32_t* patch)
 {
 	if (major)
 		*major = LIBNANYC_VERSION_MAJOR;
@@ -55,7 +59,7 @@ uint32_t libnany_get_version(uint32_t* major, uint32_t* minor, uint32_t* patch)
 }
 
 
-int libnany_check_compatible_version(uint32_t major, uint32_t minor)
+int nylib_check_compatible_version(uint32_t major, uint32_t minor)
 {
 	/* currently, no real incompatibilities except for version comparison */
 	return ((LIBNANYC_VERSION_MAJOR >= major)

@@ -6,6 +6,17 @@
 namespace Nany
 {
 
+	inline Classdef::Classdef()
+		: qualifiers()
+	{}
+
+
+	inline Classdef::Classdef(const CLID& clid)
+		: kind(nyt_any)
+		, clid(clid)
+	{}
+
+
 	inline bool Classdef::isBuiltin() const
 	{
 		return (kind != nyt_void) and (kind != nyt_any);

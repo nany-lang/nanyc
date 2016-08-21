@@ -8,7 +8,6 @@ using namespace Yuni;
 
 
 
-
 static const std::unordered_map<AnyString, nytype_t> translationStringToDef
 {
 	{ "__bool",    nyt_bool },
@@ -25,7 +24,8 @@ static const std::unordered_map<AnyString, nytype_t> translationStringToDef
 	{ "__f64",     nyt_f64  },
 };
 
-extern "C" nytype_t nany_cstring_to_type_n(const char* const text, size_t length)
+
+extern "C" nytype_t nycstring_to_type_n(const char* const text, size_t length)
 {
 	if (length > 3 and length < 16 and text)
 	{
@@ -35,7 +35,8 @@ extern "C" nytype_t nany_cstring_to_type_n(const char* const text, size_t length
 	return nyt_void;
 }
 
-extern "C" nytype_t nany_cstring_to_type(const char* const text)
+
+extern "C" nytype_t nycstring_to_type(const char* const text)
 {
 	size_t length = (text ? strlen(text) : 0u);
 	if (length > 3 and length < 16)
@@ -66,7 +67,9 @@ static constexpr const char* const type2cstring[nyt_count] =
 	"__f32",
 	"__f64"
 };
-extern "C" const char* nany_type_to_cstring(nytype_t type)
+
+
+extern "C" const char* nytype_to_cstring(nytype_t type)
 {
 	return (static_cast<uint32_t>(type) < nyt_count)
 		? type2cstring[static_cast<uint32_t>(type)]
@@ -93,7 +96,9 @@ static constexpr const uint32_t type2size[] =
 	(uint32_t) sizeof(float),
 	(uint32_t) sizeof(double),
 };
-extern "C" uint32_t nany_type_sizeof(nytype_t type)
+
+
+extern "C" uint32_t nytype_sizeof(nytype_t type)
 {
 	return (static_cast<uint32_t>(type) < nyt_count)
 		? type2size[static_cast<uint32_t>(type)]

@@ -14,7 +14,8 @@ union internal_t
 	uint8_t colors[4];
 };
 
-static void nany_console_stdcout(void*, const char* text, size_t length)
+
+static void nyconsole_stdcout(void*, const char* text, size_t length)
 {
 	assert(!length or text != nullptr);
 	try
@@ -24,7 +25,8 @@ static void nany_console_stdcout(void*, const char* text, size_t length)
 	catch (...) {}
 }
 
-static void nany_console_stderr(void*, const char* text, size_t length)
+
+static void nyconsole_stderr(void*, const char* text, size_t length)
 {
 	assert(!length or text != nullptr);
 	try
@@ -34,7 +36,8 @@ static void nany_console_stderr(void*, const char* text, size_t length)
 	catch (...) {}
 }
 
-static void nany_console_flush(void*, nyconsole_output_t out)
+
+static void nyconsole_flush(void*, nyconsole_output_t out)
 {
 	try
 	{
@@ -63,7 +66,8 @@ constexpr static const System::Console::Color color2yunicolor[nyc_count] =
 	System::Console::lightblue,
 };
 
-static void nany_console_set_color(void* internal, nyconsole_output_t out, nycolor_t color)
+
+static void nyconsole_set_color(void* internal, nyconsole_output_t out, nycolor_t color)
 {
 	assert(internal != nullptr);
 	assert((uint32_t) out == nycout or (uint32_t) out == nycerr);
@@ -83,7 +87,8 @@ static void nany_console_set_color(void* internal, nyconsole_output_t out, nycol
 	}
 }
 
-static nybool_t nany_console_has_color(void* internal, nyconsole_output_t out)
+
+static nybool_t nyconsole_has_color(void* internal, nyconsole_output_t out)
 {
 	assert(internal != nullptr);
 	assert((uint32_t) out == nycout or (uint32_t) out == nycerr);
@@ -93,16 +98,15 @@ static nybool_t nany_console_has_color(void* internal, nyconsole_output_t out)
 }
 
 
-
-extern "C" void nany_console_cf_set_stdcout(nyconsole_t* cf)
+extern "C" void nyconsole_cf_set_stdcout(nyconsole_t* cf)
 {
 	if (cf)
 	{
-		cf->write_stdout = &nany_console_stdcout;
-		cf->write_stderr = &nany_console_stderr;
-		cf->set_color    = &nany_console_set_color;
-		cf->has_color    = &nany_console_has_color;
-		cf->flush        = &nany_console_flush;
+		cf->write_stdout = &nyconsole_stdcout;
+		cf->write_stderr = &nyconsole_stderr;
+		cf->set_color    = &nyconsole_set_color;
+		cf->has_color    = &nyconsole_has_color;
+		cf->flush        = &nyconsole_flush;
 
 		internal_t internal;
 		static_assert(sizeof(internal.colors) <= sizeof(internal.pointer), "size mismatch");
@@ -117,7 +121,7 @@ extern "C" void nany_console_cf_set_stdcout(nyconsole_t* cf)
 }
 
 
-extern "C" void nany_console_cf_copy(nyconsole_t* out, const nyconsole_t* const src)
+extern "C" void nyconsole_cf_copy(nyconsole_t* out, const nyconsole_t* const src)
 {
 	if (out)
 		memcpy(out, src, sizeof(nyconsole_t));
