@@ -737,7 +737,6 @@ NY_EXPORT nyprogram_t* nyprogram_prepare(nybuild_t* build, const nyprogram_cf_t*
 NY_EXPORT int nyprogram_main(nyprogram_t* program, uint32_t argc, const char** argv);
 
 
-
 /*!
 ** \brief Acquire a program
 ** \param program program pointer (can be null)
@@ -752,8 +751,6 @@ NY_EXPORT void nyprogram_unref(nyprogram_t* program);
 /*! Initialize a project configuration */
 NY_EXPORT void nyprogram_cf_init(nyprogram_cf_t* cf, const nybuild_cf_t*);
 /*@}*/
-
-
 
 
 
@@ -825,9 +822,7 @@ NY_EXPORT nyvisibility_t  nycstring_to_visibility(const char* const text);
 */
 NY_EXPORT nyvisibility_t  nycstring_to_visibility_n(const char* const text, size_t length);
 
-/*!
-** \brief Convert a visibility to a C-String representation
-*/
+/*! Convert a visibility to a C-String representation */
 NY_EXPORT const char* nyvisibility_to_cstring(nyvisibility_t);
 
 
@@ -847,14 +842,10 @@ NY_EXPORT nytype_t nycstring_to_type(const char* const text);
 */
 NY_EXPORT nytype_t nycstring_to_type_n(const char* const text, size_t length);
 
-/*!
-** \brief Convert a type into a c-string
-*/
+/*! Convert a type into a c-string */
 NY_EXPORT const char* nytype_to_cstring(nytype_t);
 
-/*!
-** \brief Get the size in bytes of a Nany builtin type
-*/
+/*! Get the size (in bytes) of a Nany builtin type */
 NY_EXPORT uint32_t nytype_sizeof(nytype_t);
 /*@}*/
 

@@ -49,7 +49,6 @@ namespace Nany
 	}
 
 
-
 	Classdef& ClassdefTable::classdef(const CLID& clid)
 	{
 		assert(not clid.isVoid() and "invalid clid");
@@ -176,7 +175,6 @@ namespace Nany
 	}
 
 
-
 	void ClassdefTable::bulkCreate(std::vector<CLID>& out, uint32_t atomid, uint32_t count)
 	{
 		assert(atomid > 0);
@@ -199,6 +197,7 @@ namespace Nany
 		}
 	}
 
+
 	void ClassdefTable::bulkAppend(uint32_t atomid, uint32_t offset, uint32_t count)
 	{
 		assert(atomid > 0);
@@ -213,6 +212,7 @@ namespace Nany
 			pClassdefs.insert(std::make_pair(clid, new Classdef{clid}));
 		}
 	}
+
 
 	void ClassdefTable::registerAtom(Atom* atom)
 	{

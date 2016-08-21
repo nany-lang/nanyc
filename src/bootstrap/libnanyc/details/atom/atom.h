@@ -220,24 +220,16 @@ namespace Nany
 		/// instanciation, like a class inside a function, generic types params...
 		bool isContextual() const;
 
-		/*!
-		** \brief Get if this atom can access (use) another one
-		*/
+		//! Get if this atom can access (use) another one
 		bool canAccessTo(const Atom&) const;
 
-		/*!
-		** \brief Get if the atom can capture out-of-scope variables
-		*/
+		//! Get if the atom can capture out-of-scope variables
 		bool canCaptureVariabes() const;
 
-		/*!
-		** \brief Get the parent scope
-		*/
+		//! Get the parent atom (if any)
 		Atom* parentScope();
 
-		/*!
-		** \brief Get the parent scope
-		*/
+		//! Get the parent scope
 		const Atom* parentScope() const;
 
 		/*!
@@ -437,7 +429,6 @@ namespace Nany
 		}
 		varinfo;
 
-
 		//! Various information for classdef only
 		struct
 		{
@@ -459,7 +450,6 @@ namespace Nany
 			} clone;
 		}
 		classinfo;
-
 
 		//! Flag to determine whether this entry is a blueprint or a namespace
 		const Type type;
@@ -498,7 +488,6 @@ namespace Nany
 
 		//! A different scope for name resolution, if not null (for plugs/outlets)
 		Atom* scopeForNameResolution = nullptr;
-
 
 		//! The original IR sequence
 		struct

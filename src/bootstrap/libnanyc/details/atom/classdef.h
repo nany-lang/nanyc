@@ -86,39 +86,25 @@ namespace Nany
 
 		//! \name Mutations
 		//@{
-		/*!
-		** \brief Mutate the defintiion to 'void'
-		*/
+		//! Mutate the defintiion to 'void'
 		void mutateToVoid();
 
-		/*!
-		** \brief Mutate the type to builtin (not void)
-		*/
+		//! Mutate the type to builtin (not void)
 		void mutateToBuiltin(nytype_t);
 
-		/*!
-		** \brief Mutate the type to builtin (or void)
-		*/
+		//! Mutate the type to builtin (or void)
 		void mutateToBuiltinOrVoid(nytype_t);
 
-		/*!
-		** \brief Mutate the type to any
-		*/
+		//! Mutate the type to any
 		void mutateToAny();
 
-		/*!
-		** \brief Mutate to a well-known type (from atom)
-		*/
+		//! Mutate to a well-known type (from atom)
 		void mutateToAtom(Atom*);
 
-		/*!
-		** \brief Mutate to a ptr-2-func/method
-		*/
+		//! Mutate to a ptr-2-func/method
 		void mutateToPtr2Func(Atom*);
 
-		/*!
-		** \brief Import from another classdef
-		*/
+		//! Import from another classdef
 		void import(const Classdef& rhs);
 		//@}
 
