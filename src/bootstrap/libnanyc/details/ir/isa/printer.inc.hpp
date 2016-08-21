@@ -717,11 +717,22 @@ namespace // anonymous
 				}
 				case ISA::Blueprint::typealias:
 				{
-					line() << "typealias ";
+					line();
+					out << "typedef ";
+
 					printString(operands.name);
-					out << ": %" << (uint32_t) operands.lvid;
-					if (operands.atomid != (uint32_t) -1)
-						out << ", atom: " << operands.atomid;
+					printEOL();
+					line() << '{';
+					indent();
+					printEOL();
+
+					// ID
+					uint32_t  atomid = operands.atomid;
+					line() << "// atomid: ";
+					if (atomid != (uint32_t) -1)
+						out << atomid;
+					else
+						out << "<unspecified>";
 					break;
 				}
 				case ISA::Blueprint::namespacedef:

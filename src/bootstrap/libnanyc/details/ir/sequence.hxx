@@ -597,13 +597,15 @@ namespace IR
 		return offset;
 	}
 
-	inline void Sequence::emitBlueprintTypealias(const AnyString& name, uint32_t lvid)
+	inline uint32_t Sequence::emitBlueprintTypealias(const AnyString& name, uint32_t atomid)
 	{
+		uint32_t offset = pSize;
 		auto& operands  = emit<ISA::Op::blueprint>();
 		operands.kind   = (uint32_t) IR::ISA::Blueprint::typealias;
 		operands.name   = stringrefs.ref(name);
-		operands.atomid = static_cast<uint32_t>(-1);
-		operands.setLVID(lvid);
+		operands.atomid = atomid;
+		operands.lvid   = 0u;
+		return offset;
 	}
 
 	inline uint32_t Sequence::emitBlueprintUnit(const AnyString& filename)

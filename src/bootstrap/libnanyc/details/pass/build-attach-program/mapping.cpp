@@ -147,20 +147,25 @@ namespace Mapping
 	}
 
 
-	void SequenceMapping::mapBlueprintFuncdef(IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
+	void SequenceMapping::mapBlueprintFuncdefOrTypedef(IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
 	{
+		// functions and typedef are instanciated the sameway (with some minor differences)
+		auto kind = static_cast<IR::ISA::Blueprint>(operands.kind);
+		bool isFuncdef = (kind == IR::ISA::Blueprint::funcdef);
+
 		// registering the blueprint into the outline...
 		Atom& atom = atomStack->currentAtomNotUnit();
 		AnyString funcname = currentSequence.stringrefs[operands.name];
 		if (unlikely(funcname.empty()))
-			return printError(operands, "invalid func name");
+			return printError(operands, (isFuncdef) ? "invalid func name" : "invalid typedef name");
 
 		// reset last lvid and parameters
 		lastLVID = 0;
 		lastPushedNamedParameters.clear();
 		lastPushedIndexedParameters.clear();
 
-		bool isGlobalOperator = (atom.type == Atom::Type::namespacedef)
+		// global func operators always belong to root, even if declared in a specific namespace
+		bool isGlobalOperator = isFuncdef and atom.type == Atom::Type::namespacedef
 			and funcname[0] == '^'
 			and (not funcname.startsWith("^view^"))
 			and (not funcname.startsWith("^prop"));
@@ -171,7 +176,10 @@ namespace Mapping
 
 		MutexLocker locker{mutex};
 		// create a new atom in the global type table
-		auto* newatom = cdeftable.atoms.createFuncdef(parentAtom, funcname);
+		auto* newatom = isFuncdef
+			? cdeftable.atoms.createFuncdef(parentAtom, funcname)
+			: cdeftable.atoms.createTypealias(parentAtom, funcname);
+
 		assert(newatom != nullptr);
 		newatom->opcodes.sequence  = &currentSequence;
 		newatom->opcodes.offset   = currentSequence.offsetOf(operands);
@@ -303,53 +311,10 @@ namespace Mapping
 			// if a generic type parameter, generating an implicit typedef
 			Atom& atom = atomStack->currentAtomNotUnit();
 			auto* newAliasAtom = cdeftable.atoms.createTypealias(atom, name);
+			newAliasAtom->classinfo.isInstanciated = true;
 			cdeftable.registerAtom(newAliasAtom);
 			newAliasAtom->returnType.clid = cdef.clid; // type of the typedef
 		}
-	}
-
-
-	void SequenceMapping::mapBlueprintTypealias(IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
-	{
-		Atom& atom = atomStack->currentAtomNotUnit();
-
-		AnyString typedefname = currentSequence.stringrefs[operands.name];
-		Atom* newAliasAtom = nullptr;
-		{
-			MutexLocker locker{mutex};
-			newAliasAtom = cdeftable.atoms.createTypealias(atom, typedefname);
-			cdeftable.registerAtom(newAliasAtom);
-		}
-
-		assert(newAliasAtom != nullptr);
-		newAliasAtom->opcodes.sequence = &currentSequence;
-		newAliasAtom->opcodes.offset  = currentSequence.offsetOf(operands);
-
-		switch (static_cast<uint32_t>(operands.lvid))
-		{
-			default:
-			{
-				CLID clid{atomStack->atom.atomid, operands.lvid};
-				newAliasAtom->returnType.clid = clid;
-				break;
-			}
-			case 0:
-			{
-				newAliasAtom->returnType.clid.reclassToVoid();
-				break;
-			}
-			case (uint32_t) -1: // any
-				break;
-		}
-
-		// update atomid
-		operands.atomid = newAliasAtom->atomid;
-
-		lastPushedNamedParameters.clear();
-		lastPushedIndexedParameters.clear();
-
-		if (!firstAtomCreated)
-			firstAtomCreated = newAliasAtom;
 	}
 
 
@@ -431,19 +396,14 @@ namespace Mapping
 				break;
 			}
 			case IR::ISA::Blueprint::funcdef:
+			case IR::ISA::Blueprint::typealias:
 			{
-				mapBlueprintFuncdef(operands);
+				mapBlueprintFuncdefOrTypedef(operands);
 				break;
 			}
 			case IR::ISA::Blueprint::classdef:
 			{
 				mapBlueprintClassdef(operands);
-				break;
-			}
-
-			case IR::ISA::Blueprint::typealias:
-			{
-				mapBlueprintTypealias(operands);
 				break;
 			}
 			case IR::ISA::Blueprint::namespacedef:
@@ -524,15 +484,21 @@ namespace Mapping
 		parentAtom.localVariablesCount = localvarCount;
 		cdeftable.bulkCreate(atomStack->classdefs, parentAtom.atomid, localvarCount);
 
-		if (parentAtom.type == Atom::Type::funcdef)
+		switch (parentAtom.type)
 		{
-			// creating all related classdefs
-			// (take max with 1 to prevent against invalid opcode)
-			if (unlikely(localvarCount == 0))
-				return printError(operands, "invalid local variable count for a func blueprint");
+			case Atom::Type::funcdef:
+			case Atom::Type::typealias:
+			{
+				// creating all related classdefs
+				// (take max with 1 to prevent against invalid opcode)
+				if (unlikely(localvarCount == 0))
+					return printError(operands, "invalid local variable count for a func blueprint");
 
-			// like parameters, the return type should not 'ref' by default
-			cdeftable.classdef(CLID{parentAtom.atomid, 1}).qualifiers.ref = false;
+				// like parameters, the return type should not 'ref' by default
+				cdeftable.classdef(CLID{parentAtom.atomid, 1}).qualifiers.ref = false;
+				break;
+			}
+			default: break;
 		}
 	}
 

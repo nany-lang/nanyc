@@ -55,7 +55,7 @@ namespace Instanciate
 		}
 		else
 		{
-			assert(false and "should not happen");
+			assert(false and "no frame for blueprint end - should not happen");
 			currentSequence.invalidateCursor(*cursor);
 		}
 	}

@@ -220,8 +220,6 @@ namespace Instanciate
 		//! Declare a named variable (and checks for multiple declarations)
 		void declareNamedVariable(const AnyString& name, LVID lvid, bool autorelease = true);
 
-		void adjustSettingsNewFuncdefOperator(const AnyString& name);
-
 		void instanciateInstrinsicCall();
 		bool instanciateUserDefinedIntrinsic(const IR::ISA::Operand<IR::ISA::Op::intrinsic>& operands);
 		Yuni::Tribool::Value instanciateBuiltinIntrinsic(const AnyString& name, uint32_t lvid, bool canComplain = true);
@@ -320,6 +318,9 @@ namespace Instanciate
 		void popFrame();
 		static Logs::Report emitReportEntry(void* self, Logs::Level);
 		static void retriveReportMetadata(void* self, Logs::Level, const AST::Node*, Yuni::String&, uint32_t&, uint32_t&);
+
+		void visitBlueprintFuncOrClassOrType(const IR::ISA::Operand<IR::ISA::Op::blueprint>&);
+		void visitBlueprintUnit(const IR::ISA::Operand<IR::ISA::Op::blueprint>&);
 
 		// Current stack frame (current func / class...)
 		AtomStackFrame* frame = nullptr;

@@ -162,7 +162,7 @@ namespace Instanciate
 	template<bool withErrorReporting>
 	inline TypeCheck::Match FuncOverloadMatch::validateAtom(Atom& atom, bool allowImplicit)
 	{
-		assert(atom.isFunction() or atom.isClass());
+		assert(atom.isFunction() or atom.isClass() or atom.isTypeAlias());
 		// some reset
 		result.params.clear();
 		result.tmplparams.clear();
@@ -178,7 +178,7 @@ namespace Instanciate
 			{
 				assert(report);
 				// do not take into consideration the 'self' parameter for error reporting
-				uint32_t selfidx = static_cast<uint32_t>(atom.isClassMember() and atom.isFunction());
+				uint32_t selfidx = (atom.isClassMember() and atom.isFunction()) ? 1 : 0;
 				report->hint() << "too many parameters. Got "
 					<< (input.params.indexed.size() - selfidx)
 					<< ", expected: " << (atom.parameters.size() - selfidx);

@@ -335,18 +335,20 @@ namespace Instanciate
 namespace Nany
 {
 
+
 	bool Build::resolveStrictParameterTypes(Atom& atom)
 	{
 		switch (atom.type)
 		{
 			case Atom::Type::funcdef:
+			case Atom::Type::typealias:
 			{
 				// this pass intends to resolve the given types for parameters
 				// (to be able to deduce overload later).
-				// Thus nothing to do if no parameter
-				bool hasParams = not atom.parameters.empty();
+				// or typealias for the same reason (they can used by parameters)
+				bool needPartialInstanciation = not atom.parameters.empty() or atom.isTypeAlias();
 
-				if (hasParams)
+				if (needPartialInstanciation)
 				{
 					// input parameters (won't be used)
 					decltype(Pass::Instanciate::FuncOverloadMatch::result.params) params;
@@ -380,22 +382,29 @@ namespace Nany
 				break;
 
 			case Atom::Type::unit:
-			case Atom::Type::typealias:
 			case Atom::Type::vardef:
 				return true;
 		}
 
 		bool success = true;
 
+		// try to resolve all typedefs first
 		atom.eachChild([&](Atom& subatom) -> bool
 		{
-			success &= resolveStrictParameterTypes(subatom);
+			if (subatom.isTypeAlias())
+				success &= resolveStrictParameterTypes(subatom);
+			return true;
+		});
+
+		// .. everything else then
+		atom.eachChild([&](Atom& subatom) -> bool
+		{
+			if (not subatom.isTypeAlias())
+				success &= resolveStrictParameterTypes(subatom);
 			return true;
 		});
 		return success;
 	}
-
-
 
 
 	bool Build::instanciate(const AnyString& entrypoint, const nytype_t* args, uint32_t& atomid, uint32_t& instanceid)

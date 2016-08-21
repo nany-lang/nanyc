@@ -69,14 +69,17 @@ namespace Instanciate
 			// current atom to check
 			alias = cdeftable.findClassdefAtom(cdef.get());
 			if (unlikely(!alias))
+			{
+				warning() << "failed to retrieve atom from " << cdef.get().clid;
 				break;
+			}
 
 			if ((alias->parent == original.parent) and alias->atomid > original.atomid)
 			{
 				// same parent but declared after (the atomid is likely to be greater
 				// than the first one since registered after)
 				complainTypedefDeclaredAfter(original, *alias);
-				break;
+				return original;
 			}
 
 			if (not alias->isTypeAlias()) // the typedef has been solved
@@ -93,7 +96,7 @@ namespace Instanciate
 			}
 			cdef = std::cref(cdeftable.classdef(alias->returnType.clid));
 		}
-		while (alias != nullptr);
+		while (true);
 
 		complainTypedefUnresolved(original);
 		return original;
@@ -132,7 +135,7 @@ namespace Instanciate
 		// if the resolution is simple (aka only one solution), it is possible that the
 		// solution is a member variable (`self.myvar`). In this case, the atom will be the member itself
 		// and not its real type
-		if (atom.isMemberVariable())
+		if (atom.isMemberVariable() and not atom.isTypeAlias())
 		{
 			assert(not isLocalVar and "a member variable cannot be a local variable");
 			assert(not atom.returnType.clid.isVoid());

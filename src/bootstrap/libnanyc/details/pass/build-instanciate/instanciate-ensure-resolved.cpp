@@ -1,5 +1,4 @@
 #include "instanciate.h"
-#include <iostream>
 
 using namespace Yuni;
 
@@ -74,9 +73,9 @@ namespace Instanciate
 				{
 					// for setter, everything will be entirely resolved at the next
 					// assignment (or operators like +=)
+					break;
 				}
-				else
-					return (error() << "pointer-to-function are not implemented yet");
+				return (error() << "pointer-to-function are not implemented yet");
 			}
 			// [[fallthu]]
 			default:
