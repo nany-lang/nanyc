@@ -28,6 +28,7 @@ build_script:
   - if "%BUILD_TYPE%" == "cmake" echo "cmake generator:" "%VS_FULL%"
   - if "%BUILD_TYPE%" == "cmake" cmake -G "%VS_FULL%" . -DCMAKE_BUILD_TYPE=%CONFIGURATION%
   - if "%BUILD_TYPE%" == "cmake" cmake --build . --config %CONFIGURATION%
+  - if "%BUILD_TYPE%" == "cmake" cmake --build . --config %CONFIGURATION% --target package-msi
 
 test_script:
   - echo test_script
