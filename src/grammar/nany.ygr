@@ -149,6 +149,9 @@ tk-then: notext
 tk-else: notext
 	'else' sp
 
+tk-unittest: notext
+	'unittest' sp
+
 tk-arrow:
 	'->'
 tk-return: notext
@@ -880,6 +883,11 @@ function: notext, important
 
 
 
+// --- UNITTEST ---
+
+unittest: notext, important
+	tk-unittest entity wp scope
+
 
 
 
@@ -964,6 +972,7 @@ expr-value: notext
 	| intrinsic
 	| scope
 	| function
+	| unittest
 	| ex-value
 
 ex-value: hidden
