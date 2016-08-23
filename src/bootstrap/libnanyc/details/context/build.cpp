@@ -75,6 +75,7 @@ namespace Nany
 			importNSLIO(intrinsics);
 			importNSLMemory(intrinsics);
 			importNSLConsole(intrinsics);
+			importNSLDigest(intrinsics);
 		}
 
 		if (cf.on_create)
@@ -113,6 +114,7 @@ namespace Nany
 			for (auto& src: sources)
 				success &= src.get().build(*this);
 
+			report.warning() << "success: " << success;
 			// Indexing Core Objects (bool, u32, u64, f32, ...)
 			success = success and cdeftable.atoms.fetchAndIndexCoreObjects();
 
@@ -124,7 +126,6 @@ namespace Nany
 
 			if (Config::Traces::preAtomTable)
 				cdeftable.atoms.root.printTree(ClassdefTableView{cdeftable});
-
 			//
 			// -- instanciate
 			//

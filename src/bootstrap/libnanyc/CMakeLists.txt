@@ -459,6 +459,7 @@ addsrc(
 	"details/vm/runtime/std.core.string.cpp"
 	"details/vm/runtime/std.os.process.cpp"
 	"details/vm/runtime/std.io.cpp"
+	"details/vm/runtime/std.digest.cpp"
 	"details/vm/runtime/std.console.cpp"
 	"details/vm/runtime/std.memory.cpp"
 	"details/vm/runtime/std.env.cpp")

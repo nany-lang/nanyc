@@ -308,9 +308,9 @@ static void* nanyc_io_file_get_contents(nyvm_t* vm, const char* path, uint32_t l
 
 	if (err == nyioe_ok)
 	{
-		tc.returnValue.size = size;
+		tc.returnValue.size     = size;
 		tc.returnValue.capacity = capacity;
-		tc.returnValue.data.ptr = content;
+		tc.returnValue.data     = content;
 		return &tc.returnValue;
 	}
 	return nullptr;

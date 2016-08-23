@@ -58,7 +58,7 @@ namespace VM
 		struct {
 			uint64_t size;
 			uint64_t capacity;
-			union {uint64_t u64; void* ptr; } data;
+			void* data;
 		}
 		returnValue;
 

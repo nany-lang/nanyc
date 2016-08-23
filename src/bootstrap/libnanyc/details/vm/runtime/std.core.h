@@ -47,5 +47,10 @@ namespace Nany
 	*/
 	void importNSLConsole(IntrinsicTable&);
 
+	/*!
+	** \brief Import intrinsics related to digest
+	*/
+	void importNSLDigest(IntrinsicTable&);
+
 
 } // namespace Nany
