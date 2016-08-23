@@ -127,17 +127,18 @@ namespace Producer
 
 				case AST::rgFunctionKindOperator: success &= visitASTExprIdOperator(child, localvar); break;
 
+				// scope may appear in expr (when expr are actually statements)
+				case AST::rgScope:
+				{
+					success &= allowScope
+						? visitASTExprScope(child)
+						: unexpectedNode(child, "invalid scope declaration [expr/continuation]");
+					break;
+				}
+
 				// special for internal AST manipulation
 				case AST::rgRegister:   success &= visitASTExprRegister(child, localvar); break;
 
-				// scope may appear in expr (when expr are actually statements)
-				case AST::rgScope: {
-					if (allowScope) {
-						success &= visitASTExprScope(child);
-						break;
-					}
-				}
-				// [[fallthru]]
 				default:
 					success = unexpectedNode(child, "[expr/continuation]");
 			}
