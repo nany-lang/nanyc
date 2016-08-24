@@ -189,6 +189,7 @@ addsrc(
 	"details/pass/build-ast-to-ir/scope-intrinsic.cpp"
 	"details/pass/build-ast-to-ir/scope-generic-type-parameters.cpp"
 	"details/pass/build-ast-to-ir/scope-attributes.cpp"
+	"details/pass/build-ast-to-ir/scope-unittest.cpp"
 	"details/pass/build-ast-to-ir/source-ast-to-ir.cpp")
 
 

@@ -137,7 +137,10 @@ namespace Producer
 				}
 
 				// special for internal AST manipulation
-				case AST::rgRegister:   success &= visitASTExprRegister(child, localvar); break;
+				case AST::rgRegister: success &= visitASTExprRegister(child, localvar); break;
+
+				// unittest declarations
+				case AST::rgUnittest: success &= visitASTUnitTest(child); break;
 
 				default:
 					success = unexpectedNode(child, "[expr/continuation]");

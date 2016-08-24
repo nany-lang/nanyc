@@ -539,6 +539,26 @@ namespace Producer
 	}
 
 
+	void Context::prepareReuseForUnittest()
+	{
+		// function (+3)
+		//     function-kind
+		//     |   function-kind-function (+2)
+		//     |       symbol-name
+		//     |           identifier: ^unittest^<name>
+		//     func-body
+		//         .. scope ..
+
+		AST::Node::Ptr root = new AST::Node{AST::rgFunction};
+		reuse.unittest.node = root;
+
+		auto& symbol = root->append(AST::rgFunctionKind, AST::rgFunctionKindFunction, AST::rgSymbolName);
+		auto& identifier = symbol.append(AST::rgIdentifier);
+		reuse.unittest.funcname = &identifier;
+		reuse.unittest.funcbody = & root->append(AST::rgFuncBody);
+	}
+
+
 
 
 } // namespace Producer

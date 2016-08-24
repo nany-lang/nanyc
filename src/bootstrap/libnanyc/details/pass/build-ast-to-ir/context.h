@@ -77,6 +77,8 @@ namespace Producer
 		void prepareReuseForPropertiesGET();
 		//! re-use objects for properties
 		void prepareReuseForPropertiesSET();
+		//! re-use objects for unittest
+		void prepareReuseForUnittest();
 		//@}
 
 
@@ -190,6 +192,13 @@ namespace Producer
 				set;
 			}
 			properties;
+
+			struct {
+				AST::Node::Ptr node;
+				AST::Node* funcname = nullptr;
+				AST::Node* funcbody = nullptr;
+			}
+			unittest;
 		}
 		reuse;
 

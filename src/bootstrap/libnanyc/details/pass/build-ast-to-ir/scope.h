@@ -129,6 +129,8 @@ namespace Producer
 		bool visitASTExprTemplateParameter(const AST::Node& node);
 		bool visitASTDeclGenericTypeParameters(const AST::Node&);
 		bool visitASTDeclSingleGenericTypeParameter(const AST::Node&);
+
+		bool visitASTUnitTest(const AST::Node&);
 		//@}
 
 
