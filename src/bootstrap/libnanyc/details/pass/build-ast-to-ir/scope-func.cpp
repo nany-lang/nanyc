@@ -474,7 +474,7 @@ namespace Producer
 			{
 				assert(attrs.builtinAlias != nullptr);
 				ShortString64 value;
-				if (not AST::retrieveEntityString(value, *attrs.builtinAlias))
+				if (not AST::appendEntityAsString(value, *attrs.builtinAlias))
 					return error(*attrs.builtinAlias) << "invalid builtinalias attribute";
 
 				out.emitPragmaBuiltinAlias(value);

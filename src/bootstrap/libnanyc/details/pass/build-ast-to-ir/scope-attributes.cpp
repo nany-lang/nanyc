@@ -61,7 +61,7 @@ namespace Producer
 			}
 			attrname.clear();
 			value.clear();
-			if (not AST::retrieveEntityString(attrname, nodekey))
+			if (not AST::appendEntityAsString(attrname, nodekey))
 				return unexpectedNode(child, "invalid entity");
 
 			switch (attrname[0])
@@ -84,7 +84,7 @@ namespace Producer
 						if (unlikely(!nodevalue))
 							return (error(child) << "value expected for attribute '" << attrname << '\'');
 
-						AST::retrieveEntityString(value, *nodevalue);
+						AST::appendEntityAsString(value, *nodevalue);
 						if (value == "thread")
 						{
 							warning(child) << "ignored attribute 'per: thread'";
@@ -141,7 +141,7 @@ namespace Producer
 						if (unlikely(!nodevalue))
 							return (error(child) << "value expected for attribute '" << attrname << '\'');
 
-						AST::retrieveEntityString(value, *nodevalue);
+						AST::appendEntityAsString(value, *nodevalue);
 						bool isTrue = (value == "__true");
 						if (not isTrue and (value.empty() or value != "__false"))
 						{
