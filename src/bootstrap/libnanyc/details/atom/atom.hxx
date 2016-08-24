@@ -147,6 +147,11 @@ namespace Nany
 		return isPropertyGet() or isPropertySet() or isPropertySetCustom();
 	}
 
+	inline bool Atom::isUnittest() const
+	{
+		return category(Category::unittest);
+	}
+
 	inline bool Atom::isPublicOrPublished() const
 	{
 		return (visibility == nyv_public) or (visibility == nyv_published);

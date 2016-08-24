@@ -104,6 +104,8 @@ namespace Nany
 			propset,
 			//! property set, custom operator, for future uses
 			propsetCustom,
+			//! unittest
+			unittest,
 		};
 
 		struct Parameters final
@@ -204,6 +206,8 @@ namespace Nany
 		bool isPropertySet() const;
 		//! Get if the atom is a property setter (custom operator)
 		bool isPropertySetCustom() const;
+		//! Get if the atom is an unittest
+		bool isUnittest() const;
 
 		//! Get if the atom is publicly accessible
 		bool isPublicOrPublished() const;

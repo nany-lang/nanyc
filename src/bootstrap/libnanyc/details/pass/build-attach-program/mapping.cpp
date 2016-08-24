@@ -164,7 +164,7 @@ namespace Mapping
 		lastPushedNamedParameters.clear();
 		lastPushedIndexedParameters.clear();
 
-		// global func operators always belong to root, even if declared in a specific namespace
+		// global func operators (or unittest) always belong to root, even if declared in a specific namespace
 		bool isGlobalOperator = isFuncdef and atom.type == Atom::Type::namespacedef
 			and funcname[0] == '^'
 			and (not funcname.startsWith("^view^"))

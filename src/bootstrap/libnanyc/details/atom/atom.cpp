@@ -112,7 +112,14 @@ namespace Nany
 							}
 						}
 						else
-							category += Category::funcoperator;
+						{
+							if (newname.startsWith("^unittest^"))
+							{
+								category += Category::unittest;
+							}
+							else
+								category += Category::funcoperator;
+						}
 
 						if (category(Category::funcoperator))
 						{
@@ -234,6 +241,10 @@ namespace Nany
 						{
 							out += ':'; // ^view^
 							out.append(AnyString{pName, 6});
+						}
+						else if (isUnittest())
+						{
+							out.append(AnyString{pName, 17}); // "^unittest^module:<name>"
 						}
 						else
 							out.append(AnyString{pName, 1}); // operator like, removing ^
@@ -630,6 +641,11 @@ namespace Nany
 				keyword = "property:set";
 				varname = AnyString{name, 9};
 			}
+			else if (name.startsWith("^unittest^"))
+			{
+				keyword = "unittest";
+				varname = AnyString{name, 17}; // "^unittest^module:<testname>"
+			}
 			else
 			{
 				keyword = "operator";
@@ -659,6 +675,8 @@ namespace Nany
 					return "property:set";
 				if (isMemberVarDefaultInit())
 					return "<default-init>";
+				if (isUnittest())
+					return "unittest";
 				return "operator";
 			}
 			case Type::classdef:     return "class";
