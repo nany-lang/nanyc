@@ -130,7 +130,9 @@ namespace Nany
 			// -- instanciate
 			//
 			const nytype_t* argtypes = nullptr;
-			success = success and instanciate("main", argtypes, main.atomid, main.instanceid);
+			AnyString entrypoint{cf.entrypoint.c_str, cf.entrypoint.size};
+			if (not entrypoint.empty())
+				success = success and instanciate(entrypoint, argtypes, main.atomid, main.instanceid);
 
 			// end
 			duration += DateTime::NowMilliSeconds() - buildtime;

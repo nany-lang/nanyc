@@ -409,6 +409,8 @@ typedef struct nybuild_cf_t
 
 	/*! Make all warnings into errors */
 	nybool_t warnings_into_errors;
+	/*! Entry point to compile (ex: "main") */
+	nyanystr_t entrypoint;
 
 	/*! A project has been created */
 	void (*on_create)(nybuild_t*, nyproject_t*);

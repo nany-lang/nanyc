@@ -23,6 +23,10 @@ extern "C" void nybuild_cf_init(nybuild_cf_t* cf, const nyproject_t* project)
 		nany_memalloc_set_default(&(cf->allocator));
 
 	nyconsole_cf_set_stdcout(&cf->console);
+
+	// default entrypoint
+	cf->entrypoint.size  = 4;
+	cf->entrypoint.c_str = "main";
 }
 
 
