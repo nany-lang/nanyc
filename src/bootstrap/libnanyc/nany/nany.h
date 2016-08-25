@@ -110,6 +110,18 @@ NY_EXPORT int nylib_check_compatible_version(uint32_t major, uint32_t minor);
 typedef enum nybool_t {nyfalse = 0, nytrue} nybool_t;
 #endif
 
+
+#ifndef LIBNANYC_NYANYSTR_T
+#define LIBNANYC_NYANYSTR_T
+typedef struct
+{
+	uint32_t size;
+	const char* c_str;
+}
+nyanystr_t;
+#endif
+
+
 /*! Nany Language builtin types */
 typedef enum /* nytype_t */
 {
