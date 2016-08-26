@@ -32,7 +32,7 @@ namespace AST
 				Node::Ptr symname = new Node{rgSymbolName};
 				funcKindFunc->children.push_back(symname);
 
-				funcname = createNodeIdentifier(nullptr, true);
+				funcname = createNodeIdentifier(nullptr);
 				symname->children.push_back(funcname);
 			}
 		}
@@ -55,7 +55,7 @@ namespace AST
 		params->children.push_back(firstParam);
 
 		firstParam->children.push_back(new Node{rgCref});
-		firstParam->children.push_back(createNodeIdentifier(paramname, true));
+		firstParam->children.push_back(createNodeIdentifier(paramname));
 		return func;
 	}
 

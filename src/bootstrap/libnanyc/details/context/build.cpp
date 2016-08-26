@@ -104,9 +104,6 @@ namespace Nany
 		}
 		else
 		{
-			// initialization of some global data
-			Nany::Sema::Metadata::initialize(); // TODO remove those methods
-
 			success = true;
 
 			// build each source

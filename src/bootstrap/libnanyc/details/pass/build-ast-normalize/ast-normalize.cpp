@@ -140,7 +140,7 @@ namespace Nany
 			node.children.clear();
 
 			// re-parent the new node 'call'
-			AST::metadata(call).parent = &node;
+			call.parent = &node;
 			node.children.push_back(&call);
 		}
 
@@ -200,7 +200,7 @@ namespace Nany
 			node.children.clear();
 
 			// re-parent the new node 'call'
-			AST::metadata(call).parent = &node;
+			call.parent = &node;
 			node.children.push_back(&call);
 		}
 
@@ -624,7 +624,6 @@ namespace Nany
 
 			// transfering properties
 			ast.nodeCopyOffsetText(*newNode, node);
-			AST::metadata(newNode).originalNode = &node;
 
 
 			switch (rule)

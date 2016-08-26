@@ -19,7 +19,6 @@ namespace Nany
 	{
 		dest.offset    = source.offset;
 		dest.offsetEnd = source.offsetEnd;
-		AST::metadata(dest).originalNode = &source;
 	}
 
 
@@ -28,19 +27,18 @@ namespace Nany
 		dest.offset    = source.offset;
 		dest.offsetEnd = source.offsetEnd;
 		dest.text      = source.text;
-		AST::metadata(dest).originalNode = &source;
 	}
 
 
 	template<class T>
 	void ASTHelper::nodeEachParent(AST::Node& node, const T& callback)
 	{
-		auto* parent = AST::metadata(node).parent;
+		auto* parent = node.parent;
 		while (parent)
 		{
 			if (not callback(*parent))
 				break;
-			parent = AST::metadata(parent).parent;
+			parent = parent->parent;
 		}
 	}
 
@@ -57,7 +55,7 @@ namespace Nany
 		// when the stack size is greater than `revStackHardCodedSize`
 		std::vector<AST::Node*> reverseDynStack;
 
-		auto* parent = AST::metadata(node).parent;
+		auto* parent = node.parent;
 		while (parent)
 		{
 			reverseStack[index] = parent;
@@ -66,11 +64,11 @@ namespace Nany
 				// switching to dynamic stack mode
 				reverseDynStack.reserve(32);
 
-				parent = AST::metadata(parent).parent;
+				parent = parent->parent;
 				while (parent)
 				{
 					reverseDynStack.push_back(parent);
-					parent = AST::metadata(parent).parent;
+					parent = parent->parent;
 				}
 
 				for (auto it = reverseDynStack.rbegin(); it != reverseDynStack.rend(); ++it)
@@ -81,7 +79,7 @@ namespace Nany
 				break;
 			}
 
-			parent = AST::metadata(parent).parent;
+			parent = parent->parent;
 		}
 
 		if (index)
@@ -106,6 +104,25 @@ namespace Nany
 		for (auto it: list)
 			node = nodeAppend(*node, it);
 		return node;
+	}
+
+
+	inline void ASTHelper::nodeRulePromote(AST::Node& node, enum AST::Rule rule)
+	{
+		node.rule = rule;
+	}
+
+
+	inline AST::Node* ASTHelper::nodeCreate(enum AST::Rule rule)
+	{
+		auto* node = new AST::Node{rule};
+		return node;
+	}
+
+
+	inline AST::Node* ASTHelper::nodeAppendAsOriginal(AST::Node& parent, enum AST::Rule rule)
+	{
+		return nodeAppend(parent, rule);
 	}
 
 
