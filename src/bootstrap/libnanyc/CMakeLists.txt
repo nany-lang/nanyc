@@ -509,9 +509,6 @@ add_library(libnanyc ${mode_libnany}
 	${nysrc_details_context}
 	${nysrc_details_reporting}
 
-	# Semantic Analysis
-	"details/sema/metadata.cpp"
-	"details/sema/metadata.h"
 	# implementation - misc
 	"details/fwd.h"
 

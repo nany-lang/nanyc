@@ -1,5 +1,4 @@
 #include "details/context/source.h"
-#include "details/sema/metadata.h"
 #include "details/ast/ast.h"
 #include "details/context/build-info.h"
 #include "details/reporting/report.h"

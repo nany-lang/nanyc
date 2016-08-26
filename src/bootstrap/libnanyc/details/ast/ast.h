@@ -1,7 +1,6 @@
 #pragma once
 #include <yuni/yuni.h>
 #include <yuni/core/string.h>
-#include "details/sema/metadata.h"
 #include "details/grammar/nany.h"
 
 
