@@ -88,12 +88,13 @@ namespace Producer
 
 	void Context::generateLineIndexes(const AnyString& content)
 	{
-		uint line = 1;
-		uint length = content.size();
-		for (uint i = 0; i != length; ++i)
+		uint32_t line = 1;
+		const char* base = content.c_str();
+		const char* end  = base + content.size();
+		for (const char* c = base; c != end; ++c)
 		{
-			if (content[i] == '\n')
-				offsetToLine.emplace(i, ++line);
+			if (*c == '\n')
+				offsetToLine.emplace(c - base, ++line);
 		}
 	}
 
