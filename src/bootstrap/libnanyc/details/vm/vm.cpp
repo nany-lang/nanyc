@@ -1141,8 +1141,6 @@ namespace VM
 	{
 		// if something happens
 		exitstatus = static_cast<uint64_t>(-1);
-		// result
-		bool success = false;
 
 		if (!cf.on_thread_create
 			or nyfalse != cf.on_thread_create(program.self(), self(), nullptr, name.c_str(), name.size()))
@@ -1153,7 +1151,10 @@ namespace VM
 			{
 				executor.invoke(callee);
 				exitstatus = executor.retRegister;
-				success = true;
+
+				if (cf.on_thread_destroy)
+					cf.on_thread_destroy(program.self(), self());
+				return true;
 			}
 			else
 			{
@@ -1163,7 +1164,7 @@ namespace VM
 			if (cf.on_thread_destroy)
 				cf.on_thread_destroy(program.self(), self());
 		}
-		return success;
+		return false;
 	}
 
 
