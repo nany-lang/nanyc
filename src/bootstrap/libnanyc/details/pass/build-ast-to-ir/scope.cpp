@@ -78,6 +78,8 @@ namespace Producer
 
 		if (unlikely(not pAttributes->flags.empty()))
 		{
+			if (unlikely(context.ignoreAtoms))
+				return;
 			auto& attrs = *pAttributes;
 			auto& node  = attrs.node;
 

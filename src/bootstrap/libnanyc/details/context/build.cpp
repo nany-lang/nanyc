@@ -114,7 +114,9 @@ namespace Nany
 			for (auto& src: sources)
 				success &= src.get().build(*this);
 
-			report.warning() << "success: " << success;
+			if (unlikely(cf.ignore_atoms))
+				return true;
+
 			// Indexing Core Objects (bool, u32, u64, f32, ...)
 			success = success and cdeftable.atoms.fetchAndIndexCoreObjects();
 

@@ -2,6 +2,7 @@
 #include "details/grammar/nany.h"
 #include "details/ir/scope-locker.h"
 #include "details/ast/ast.h"
+#include <iostream>
 
 using namespace Yuni;
 
@@ -48,14 +49,14 @@ namespace Producer
 			}
 		}
 
-		if (unlikely(context.ignoreAtoms))
-			return true;
-
 		if (unlikely(!scope))
 			return (ice(node) << "invalid unittest ast declaration");
 
 		if (unlikely(testname.empty()))
 			return (error(node) << "invalid empty unittest name");
+
+		if (unlikely(context.ignoreAtoms))
+			return true;
 
 		if (!context.reuse.unittest.node)
 			context.prepareReuseForUnittest();
