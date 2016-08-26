@@ -232,14 +232,20 @@ set_target_properties(nanyc-check-syntax PROPERTIES
 # Test
 #
 get_filename_component(nany_tests_root "${CMAKE_CURRENT_LIST_DIR}/../../tests/" REALPATH)
+#add_custom_target(check
+#	DEPENDS nanyc-check-syntax
+#	COMMAND "$<TARGET_FILE:nanyc-check-syntax>" "--use-filename-convention" "${nany_tests_root}/parsing"
+#	COMMAND "$<TARGET_FILE:nanyc-check-syntax>"
+#		"${nany_tests_root}/build"
+#		"${nany_tests_root}/contest"
+#		"${nany_tests_root}/benchmark"
+#	VERBATIM)
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/empty.ny")
 add_custom_target(check
-	DEPENDS nanyc-check-syntax
-	COMMAND "$<TARGET_FILE:nanyc-check-syntax>" "--use-filename-convention" "${nany_tests_root}/parsing"
-	COMMAND "$<TARGET_FILE:nanyc-check-syntax>"
-		"${nany_tests_root}/build"
-		"${nany_tests_root}/contest"
-		"${nany_tests_root}/benchmark"
+	DEPENDS nanyc-unittest
+	COMMAND "$<TARGET_FILE:nanyc-unittest>" "{CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/empty.ny"
 	VERBATIM)
+
 
 
 
