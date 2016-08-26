@@ -188,13 +188,20 @@ add_subdirectory("libnanyc")
 
 
 #
-# nany
+# nanyc
 #
 add_executable(nanyc "nany.cpp")
 target_link_libraries(nanyc PRIVATE libnanyc yuni-static-core)
 set_target_properties(nanyc PROPERTIES
 	VERSION "${nany_version_major}.${nany_version_minor}.${nany_version_patch}")
 
+#
+# nanyc-unittest
+#
+add_executable(nanyc-unittest "unittest-runner.cpp")
+target_link_libraries(nanyc-unittest PRIVATE libnanyc yuni-static-core)
+set_target_properties(nanyc-unittest PROPERTIES
+	VERSION "${nany_version_major}.${nany_version_minor}.${nany_version_patch}")
 
 #
 # nanyc-dump-ast

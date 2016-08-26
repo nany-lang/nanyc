@@ -415,6 +415,12 @@ typedef struct nybuild_cf_t
 	/* (can be used to only retrieve the list of atoms or unittests) */
 	nybool_t ignore_atoms;
 
+	/*! Userdata */
+	void* userdata;
+
+	/*! AN unittest has been found */
+	void (*on_unittest)(void* userdata, const char* mod, uint32_t mlen, const char* name, uint32_t nlen);
+
 	/*! A project has been created */
 	void (*on_create)(nybuild_t*, nyproject_t*);
 	/*! A project has been destroyed */
@@ -716,6 +722,9 @@ typedef struct nyprogram_cf_t
 
 	/*! IO configuration */
 	nyio_cf_t io;
+
+	/*! Entry point to compile (ex: "main") */
+	nyanystr_t entrypoint;
 }
 nyprogram_cf_t;
 
@@ -942,9 +951,9 @@ NY_EXPORT int nyrun_file(const nyrun_cf_t* cf, const char* file, uint32_t argc, 
 ** \return Exit status code
 */
 NY_EXPORT int nyrun_file_n(const nyrun_cf_t* cf, const char* file, size_t length, uint32_t argc, const char** argv);
+
+NY_EXPORT int nyrun_filelist(const nyrun_cf_t* cf, const char** files, uint32_t file_count, uint32_t argc, const char** argv);
 /*@}*/
-
-
 
 
 #ifdef __cplusplus

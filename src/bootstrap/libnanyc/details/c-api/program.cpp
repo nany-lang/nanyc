@@ -22,6 +22,8 @@ extern "C" void nyprogram_cf_init(nyprogram_cf_t* cf, const nybuild_cf_t* buildc
 		nany_memalloc_copy(&(cf->allocator), &(buildcf->allocator));
 		nyconsole_cf_copy(&(cf->console), &(buildcf->console));
 	}
+
+	cf->entrypoint = buildcf->entrypoint;
 }
 
 

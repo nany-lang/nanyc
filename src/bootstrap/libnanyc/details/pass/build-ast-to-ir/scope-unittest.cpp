@@ -55,6 +55,12 @@ namespace Producer
 		if (unlikely(testname.empty()))
 			return (error(node) << "invalid empty unittest name");
 
+		if (context.cf.on_unittest)
+		{
+			AnyString name{testname, 17};
+			context.cf.on_unittest(context.cf.userdata, "<nomodule>", 10, name.c_str(), name.size());
+		}
+
 		if (unlikely(context.ignoreAtoms))
 			return true;
 

@@ -138,6 +138,29 @@ namespace // anonymous
 
 
 	/*!
+	** \brief Try to compile a list of input files
+	*/
+	std::unique_ptr<nyprogram_t> compileFilelist(const nyrun_cf_t* cf, const char** list, uint32_t count)
+	{
+		auto project = createProject(cf);
+		if (!!project)
+		{
+			String filename;
+			filename.reserve(1024);
+			for (uint32_t i = 0; i != count; ++i)
+			{
+				IO::Canonicalize(filename, list[i]);
+				auto r = nyproject_add_source_from_file_n(project.get(), filename.c_str(), filename.size());
+				if (YUNI_UNLIKELY(r == nyfalse))
+					return nullptr;
+			}
+			return build(cf, project.get());
+		}
+		return nullptr;
+	}
+
+
+	/*!
 	** \brief Try to compile the input source
 	*/
 	std::unique_ptr<nyprogram_t> compileSource(const nyrun_cf_t* cf, const AnyString& source)
@@ -177,6 +200,7 @@ namespace // anonymous
 		}
 		return exitstatus;
 	}
+
 
 } // anonymous namespace
 
@@ -230,6 +254,18 @@ extern "C" int nyrun_file(const nyrun_cf_t* cf, const char* file, uint32_t argc,
 		auto program = compileFile(cf, AnyString{file, static_cast<uint32_t>(length)}, filename);
 		if (!!program)
 			return run(program.get(), filename.c_str(), argc, argv);
+	}
+	return exitFailure;
+}
+
+
+extern "C" int nyrun_filelist(const nyrun_cf_t* cf, const char** files, uint32_t file_count, uint32_t argc, const char** argv)
+{
+	if (files and file_count != 0)
+	{
+		auto program = compileFilelist(cf, files, file_count);
+		if (!!program)
+			return run(program.get(), "a,out", argc, argv);
 	}
 	return exitFailure;
 }
