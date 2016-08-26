@@ -511,8 +511,8 @@ namespace Producer
 
 
 			// function attributes, if any
-			if (scope.attributes())
-				success &= inspectAttributes(*scope.attributes());
+			if (!!scope.attributes)
+				success &= inspectAttributes(*scope.attributes);
 
 			for (auto& childptr: node.children)
 			{
@@ -625,7 +625,7 @@ namespace Producer
 		out.emitEnd();
 		uint32_t blpsize = out.opcodeCount() - bpoffset;
 		out.at<ISA::Op::pragma>(bpoffsiz).value.blueprintsize = blpsize;
-		out.at<ISA::Op::stacksize>(bpoffsck).add = scope.pNextVarID + 1u;
+		out.at<ISA::Op::stacksize>(bpoffsck).add = scope.nextVarID + 1u;
 		return success;
 	}
 

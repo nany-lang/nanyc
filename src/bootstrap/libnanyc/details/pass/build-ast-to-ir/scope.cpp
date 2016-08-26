@@ -74,13 +74,13 @@ namespace Producer
 
 	void Scope::checkForUnknownAttributes() const
 	{
-		assert(!!pAttributes);
+		assert(!!attributes);
 
-		if (unlikely(not pAttributes->flags.empty()))
+		if (unlikely(not attributes->flags.empty()))
 		{
 			if (unlikely(context.ignoreAtoms))
 				return;
-			auto& attrs = *pAttributes;
+			auto& attrs = *attributes;
 			auto& node  = attrs.node;
 
 			if (unlikely(attrs.flags(Attributes::Flag::pushSynthetic)))

@@ -12,6 +12,10 @@ namespace Producer
 {
 
 
+	inline void Context::invalidateLastDebugLine()
+	{
+		pPreviousDbgLine = (uint32_t) -1; // forcing debug infos
+	}
 
 
 

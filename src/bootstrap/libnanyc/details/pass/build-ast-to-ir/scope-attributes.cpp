@@ -27,8 +27,8 @@ namespace Producer
 			return true;
 
 		// instanciate attributes
-		pAttributes = std::make_unique<Attributes>(node);
-		auto& attrs = *pAttributes;
+		attributes = std::make_unique<Attributes>(node);
+		auto& attrs = *attributes;
 
 		// attribute name
 		ShortString32 attrname;

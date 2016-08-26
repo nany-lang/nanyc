@@ -24,14 +24,21 @@ namespace Producer
 			typedef CString<Config::maxSymbolNameLength, false> ClassnameType;
 
 		public:
-			ClassInspector(Scope& scope);
+			ClassInspector(Scope& parentscope, uint32_t lvid);
 
 			bool inspect(const AST::Node& node);
+			bool inspectBody(const AST::Node& node);
 
 
 		public:
 			//! Parent scope
-			Scope& scope;
+			IR::Producer::Scope scope;
+
+			uint32_t lvid = 0;
+			uint32_t bpoffset;
+			uint32_t bpoffsiz;
+			uint32_t bpoffsck;
+
 			//! Class body
 			const AST::Node* body = nullptr;
 
@@ -49,9 +56,30 @@ namespace Producer
 
 
 
-		inline ClassInspector::ClassInspector(Scope& scope)
-			: scope(scope)
+		inline ClassInspector::ClassInspector(Scope& parentscope, uint32_t lvid)
+			: scope{parentscope}
+			, lvid{lvid}
 		{
+			// new scope
+			scope.moveAttributes(parentscope);
+			// reset internal counter for generating local classdef in the current scope
+			scope.resetLocalCounters();
+			scope.kind = Scope::Kind::kclass;
+			scope.broadcastNextVarID = false;
+			// a log of code relies on the fact that %{atomid:1} is the type of the return value
+			// starting from +2 to avoid to always check for the type of the atom everywhere in the code
+			scope.nextvar();
+
+			auto& out = scope.sequence();
+
+			// creating a new blueprint for the function
+			bpoffset = out.emitBlueprintClass(lvid);
+			bpoffsiz = out.emitBlueprintSize();
+			bpoffsck = out.emitStackSizeIncrease();
+
+			// making sure that debug info are available
+			scope.context.invalidateLastDebugLine();
+			scope.addDebugCurrentFilename();
 		}
 
 
@@ -65,6 +93,7 @@ namespace Producer
 
 		inline bool ClassInspector::inspect(const AST::Node& node)
 		{
+			scope.emitDebugpos(node);
 			// exit status
 			bool success = true;
 
@@ -127,13 +156,39 @@ namespace Producer
 		}
 
 
+		bool ClassInspector::inspectBody(const AST::Node& node)
+		{
+			bool success = true;
+			auto& out = scope.sequence();
+
+			// evaluate the whole function, and grab the node body for continuing evaluation
+			{
+				success = inspect(node);
+				auto& operands = out.at<ISA::Op::blueprint>(bpoffset);
+				operands.name = out.stringrefs.ref(classname);
+			}
+
+			if (likely(body != nullptr))
+			{
+				if (debugmode)
+					scope.comment("\nclass body"); // comment for clarity in code
+
+				// continue evaluating the func body independantly of the previous data and results
+				for (auto& stmtnode: body->children)
+					success &= scope.visitASTStmt(*stmtnode);
+			}
+
+
+			// end of the blueprint
+			out.emitEnd();
+			uint32_t blpsize = out.opcodeCount() - bpoffset;
+			out.at<ISA::Op::pragma>(bpoffsiz).value.blueprintsize = blpsize;
+			out.at<ISA::Op::stacksize>(bpoffsck).add = scope.nextVarID + 1u;
+			return success;
+		}
+
 
 	} // anonymous namespace
-
-
-
-
-
 
 
 
@@ -150,63 +205,9 @@ namespace Producer
 		if (localvar) // create the lvid before the new scope
 			*localvar = (lvid = nextvar());
 
-		// new scope
-		IR::Producer::Scope scope{*this};
-		scope.moveAttributes(*this);
-		// reset internal counter for generating local classdef in the current scope
-		scope.resetLocalCounters();
-		scope.kind = Scope::Kind::kclass;
-		scope.broadcastNextVarID = false;
-		// a log of code relies on the fact that %{atomid:1} is the type of the return value
-		// starting from +2 to avoid to always check for the type of the atom everywhere in the code
-		scope.nextvar();
-		auto& out = sequence();
-
-		// creating a new blueprint for the function
-		uint32_t bpoffset = out.emitBlueprintClass(lvid);
-		uint32_t bpoffsiz = out.emitBlueprintSize();
-		uint32_t bpoffsck = out.emitStackSizeIncrease();
-
-		// making sure that debug info are available
-		context.pPreviousDbgLine = (uint32_t) -1; // forcing debug infos
-		scope.addDebugCurrentFilename();
-		scope.emitDebugpos(node);
-
-		bool success = true;
-
-		// evaluate the whole function, and grab the node body for continuing evaluation
-		auto* body = ([&]() -> const AST::Node*
-		{
-			ClassInspector inspector{scope};
-			success = inspector.inspect(node);
-
-			auto& operands = out.at<ISA::Op::blueprint>(bpoffset);
-			operands.name = out.stringrefs.ref(inspector.classname);
-			return inspector.body;
-		})();
-
-		if (likely(body != nullptr))
-		{
-			if (debugmode)
-				scope.comment("\nclass body"); // comment for clarity in code
-
-			// continue evaluating the func body independantly of the previous data and results
-			for (auto& stmtnode: body->children)
-				success &= scope.visitASTStmt(*stmtnode);
-		}
-
-
-		// end of the blueprint
-		out.emitEnd();
-		uint32_t blpsize = out.opcodeCount() - bpoffset;
-		out.at<ISA::Op::pragma>(bpoffsiz).value.blueprintsize = blpsize;
-		out.at<ISA::Op::stacksize>(bpoffsck).add = scope.pNextVarID + 1u;
-		return success;
+		auto classbuilder = std::make_unique<ClassInspector>(*this, lvid);
+		return classbuilder->inspectBody(node);
 	}
-
-
-
-
 
 
 } // namespace Producer

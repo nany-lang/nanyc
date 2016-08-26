@@ -21,7 +21,7 @@ namespace Producer
 
 	inline Scope::Scope(Scope& scope)
 		: context(scope.context)
-		, pNextVarID(scope.pNextVarID)
+		, nextVarID(scope.nextVarID)
 		, kind(scope.kind)
 		, parentScope(&scope)
 	{}
@@ -32,9 +32,9 @@ namespace Producer
 		if (broadcastNextVarID)
 		{
 			assert(parentScope != nullptr); // broadcast new values to the parent
-			parentScope->pNextVarID = pNextVarID;
+			parentScope->nextVarID = nextVarID;
 		}
-		if (unlikely(!!pAttributes))
+		if (unlikely(!!attributes))
 			checkForUnknownAttributes();
 	}
 
@@ -97,7 +97,7 @@ namespace Producer
 	{
 		// 0: null
 		// 1: reserved for namespace lookup
-		pNextVarID = localvarStart;
+		nextVarID = localvarStart;
 
 		// force debug info
 		context.pPreviousDbgOffset = 0;
@@ -106,12 +106,12 @@ namespace Producer
 
 	inline uint32_t Scope::nextvar()
 	{
-		return ++pNextVarID;
+		return ++nextVarID;
 	}
 
 	inline uint32_t Scope::reserveLocalVariable()
 	{
-		return ++pNextVarID;
+		return ++nextVarID;
 	}
 
 	inline LVID Scope::createLocalBuiltinVoid(const AST::Node& node)
@@ -192,15 +192,10 @@ namespace Producer
 	}
 
 
-	inline Attributes* Scope::attributes()
-	{
-		return pAttributes.get();
-	}
-
 	inline void Scope::moveAttributes(Scope& scope)
 	{
-		pAttributes = nullptr;
-		std::swap(pAttributes, scope.pAttributes);
+		attributes = nullptr;
+		std::swap(attributes, scope.attributes);
 	}
 
 

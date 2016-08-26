@@ -188,8 +188,6 @@ namespace Producer
 		//! Get the name from a 'symbol-name' node (empty if error)
 		AnyString getSymbolNameFromASTNode(const AST::Node& node);
 
-		//! Get the attributes
-		Attributes* attributes();
 		//! Move attributes
 		void moveAttributes(Scope&);
 		//@}
@@ -233,9 +231,9 @@ namespace Producer
 			AST::Node& varAssign, bool ref);
 
 
-	private:
+	public:
 		//! Next local variable
-		LVID pNextVarID = 0u;
+		LVID nextVarID = 0u;
 		//! Kind
 		Kind kind = Kind::undefined;
 
@@ -246,7 +244,7 @@ namespace Producer
 		//! For template parameters
 		std::unique_ptr<std::vector<std::pair<uint32_t, AnyString>>> lastPushedTmplParams;
 		//! Expression attributes
-		std::unique_ptr<Attributes> pAttributes;
+		std::unique_ptr<Attributes> attributes;
 
 		//! Parent scope (if any)
 		Scope* parentScope = nullptr;

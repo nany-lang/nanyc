@@ -152,8 +152,8 @@ namespace Producer
 
 	void Scope::emitExprAttributes(uint32_t& localvar)
 	{
-		assert(!!pAttributes);
-		auto& attrs = *pAttributes;
+		assert(!!attributes);
+		auto& attrs = *attributes;
 
 		// allow to push a synthetic object (type)
 		if (unlikely(attrs.flags(Attributes::Flag::pushSynthetic)))
@@ -226,7 +226,7 @@ namespace Producer
 			scope.emitDebugpos(node);
 			scope.sequence().emitEnsureTypeResolved(localvar);
 
-			if (unlikely(!!scope.pAttributes))
+			if (unlikely(!!scope.attributes))
 				scope.emitExprAttributes(localvar);
 		}
 

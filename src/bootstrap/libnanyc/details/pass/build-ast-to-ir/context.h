@@ -82,6 +82,9 @@ namespace Producer
 		//@}
 
 
+		void invalidateLastDebugLine();
+
+
 	public:
 		//! Discard IR code generation for atoms
 		bool ignoreAtoms = false;
