@@ -7,21 +7,6 @@ namespace Nany
 {
 
 
-	template<class T>
-	inline bool ASTHelper::each(enum AST::Rule rule, const T& callback)
-	{
-		assert(isIndexEnabled(rule) and "index not enabled");
-		auto& set = index[(uint) rule];
-		auto end = set.end();
-		for (auto i = set.begin(); i != end; ++i)
-		{
-			if (not callback(*(*i)))
-				return false;
-		}
-		return true;
-	}
-
-
 	inline void ASTHelper::nodeCopyOffsetText(AST::Node& dest, const AST::Node& source)
 	{
 		dest.offset    = source.offset;
@@ -122,7 +107,6 @@ namespace Nany
 			node = nodeAppend(*node, it);
 		return node;
 	}
-
 
 
 

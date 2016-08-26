@@ -8,48 +8,9 @@ using namespace Yuni;
 namespace Nany
 {
 
-	//! Index nodes from a particular type ?
-	static std::array<bool, AST::ruleCount> indexEnabled;
-
-
-
-	void ASTHelper::initialize()
-	{
-		static Mutex mutex;
-		static bool isInitialized = false;
-
-		MutexLocker locker(mutex);
-		if (not isInitialized)
-		{
-			isInitialized = true;
-			indexEnabled[static_cast<uint32_t>(AST::rgIf)] = true;
-			indexEnabled[static_cast<uint32_t>(AST::rgVar)] = true;
-			indexEnabled[static_cast<uint32_t>(AST::rgClass)] = true;
-			indexEnabled[static_cast<uint32_t>(AST::rgFunction)] = true;
-			indexEnabled[static_cast<uint32_t>(AST::rgTypedef)] = true;
-			indexEnabled[static_cast<uint32_t>(AST::rgStringInterpolation)] = true;
-		}
-	}
-
-
-	void ASTHelper::clear()
-	{
-		for (uint i = (uint) index.size(); i--; )
-			index[i].clear();
-	}
-
-
-	bool ASTHelper::isIndexEnabled(enum AST::Rule rule) const
-	{
-		return indexEnabled[(uint) rule];
-	}
-
-
 	AST::Node* ASTHelper::nodeCreate(enum AST::Rule rule)
 	{
 		auto* node = new AST::Node{rule};
-		if (indexEnabled[(uint) rule])
-			index[(uint) rule].insert(node);
 		node->metadata = Sema::Metadata::create(node);
 		return node;
 	}
@@ -71,25 +32,6 @@ namespace Nany
 		auto* node = nodeAppend(parent, rule);
 		AST::metadata(node).fromASTTransformation = false;
 		return node;
-	}
-
-
-	inline void ASTHelper::nodeRemoveFromIndex(AST::Node& node)
-	{
-		if (indexEnabled[(uint) node.rule])
-		{
-			auto& set = index[(uint) node.rule];
-			auto i = set.find(&node);
-			if (i != set.end())
-				index[(uint) node.rule].erase(i);
-		}
-	}
-
-
-	inline void ASTHelper::nodeAddIndex(AST::Node& node)
-	{
-		if (indexEnabled[(uint) node.rule])
-			index[(uint) node.rule].insert(&node);
 	}
 
 

@@ -106,7 +106,6 @@ namespace Nany
 		{
 			// initialization of some global data
 			Nany::Sema::Metadata::initialize(); // TODO remove those methods
-			Nany::ASTHelper::initialize();
 
 			success = true;
 
