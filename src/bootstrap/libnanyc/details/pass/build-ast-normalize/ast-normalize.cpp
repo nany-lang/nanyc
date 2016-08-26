@@ -315,7 +315,8 @@ namespace Nany
 			{
 				// re-ordering nodes for operators +, *, == ...
 				// this step is mandatory to have understanding AST
-				for (uint32_t i = 0; i < static_cast<uint32_t>(node.children.size()); ++i)
+				uint32_t count = static_cast<uint32_t>(node.children.size());
+				for (uint32_t i = 0; i < count; ++i)
 				{
 					switch (node.children[i]->rule)
 					{
@@ -337,6 +338,7 @@ namespace Nany
 									{
 										ast.nodeReparentAtTheBegining(previous, node, i - 1, *(node.children[i]));
 										--i;
+										count = static_cast<uint32_t>(node.children.size());
 										break;
 									}
 
@@ -366,7 +368,8 @@ namespace Nany
 
 
 				// go for children, the container may change between each iteration
-				for (uint32_t i = 0; i < static_cast<uint32_t>(node.children.size()); ++i)
+				count = static_cast<uint32_t>(node.children.size());
+				for (uint32_t i = 0; i < count; ++i)
 				{
 					AST::Node& child = *(node.children[i]);
 
@@ -384,7 +387,7 @@ namespace Nany
 						//    - call
 						//       - expr-sub-dot
 						//          - identifier
-						if (i + 1 < static_cast<uint32_t>(node.children.size())) // another node after the current one ?
+						if (i + 1 < count) // another node after the current one ?
 						{
 							auto& nextChild = *(node.children[i + 1]);
 							auto nrule = nextChild.rule;
@@ -398,6 +401,7 @@ namespace Nany
 								case AST::rgExprTemplate:
 								case AST::rgExprSubArray:
 									ast.nodeReparentAtTheEnd(nextChild, node, i + 1, child);
+									count = static_cast<uint32_t>(node.children.size());
 									break;
 								default:
 									break;
