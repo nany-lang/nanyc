@@ -159,7 +159,11 @@ static bool runtest(nyrun_cf_t& runcf, const String& testname, const char** file
 		{
 			if (hasColorsOut)
 				System::Console::SetTextColor(std::cout, System::Console::green);
+			#ifndef YUNI_OS_WINDOWS
 			std::cout << "    \u2713  ";
+			#else
+			std::cout << "   OK  ";
+			#endif
 		}
 		else
 		{
