@@ -10,6 +10,7 @@ using namespace Yuni;
 
 
 static int printNoInputScript(const char* argv0)
+#include <iostream>
 {
 	std::cerr << argv0 << ": no input script file\n";
 	return EXIT_FAILURE;
@@ -67,7 +68,6 @@ int main(int argc, const char** argv)
 	{
 		nyrun_cf_t runcf;
 		nyrun_cf_init(&runcf);
-
 
 		int firstarg = argc; // end of the list
 

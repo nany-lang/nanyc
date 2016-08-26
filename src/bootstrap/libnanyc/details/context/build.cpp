@@ -114,7 +114,7 @@ namespace Nany
 			for (auto& src: sources)
 				success &= src.get().build(*this);
 
-			if (unlikely(cf.ignore_atoms))
+			if (unlikely(cf.ignore_atoms != nyfalse))
 				return true;
 
 			// Indexing Core Objects (bool, u32, u64, f32, ...)
