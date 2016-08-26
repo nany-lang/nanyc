@@ -4,6 +4,7 @@
 #include <yuni/datetime/timestamp.h>
 #include <yuni/core/system/cpu.h>
 #include <yuni/core/system/console/console.h>
+#include <yuni/io/file.h>
 #include <set>
 #include <iostream>
 #include <cassert>
@@ -13,6 +14,7 @@ using namespace Yuni;
 static uint32_t jobCount = 0;
 static bool hasColorsOut = false;
 static bool hasColorsErr = false;
+
 
 
 static int printBugReportInfo()
@@ -40,6 +42,8 @@ static void fetchUnittestList(nyrun_cf_t& runcf, String::Vector& torun, const ch
 {
 	runcf.build.entrypoint.size  = 0; // disable any compilation by default
 	runcf.build.entrypoint.c_str = nullptr;
+	runcf.program.entrypoint.size = 0;
+	runcf.program.entrypoint.c_str = nullptr;
 	runcf.build.ignore_atoms = nytrue;
 	runcf.build.userdata = &torun;
 	runcf.build.on_unittest = [](void* userdata, const char* mod, uint32_t modlen, const char* name, uint32_t nlen)
@@ -61,6 +65,8 @@ static int listAllUnittests(nyrun_cf_t& runcf, const char** filelist, uint32_t c
 
 	runcf.build.entrypoint.size  = 0; // disable any compilation by default
 	runcf.build.entrypoint.c_str = nullptr;
+	runcf.program.entrypoint.size = 0;
+	runcf.program.entrypoint.c_str = nullptr;
 	runcf.build.ignore_atoms = nytrue;
 	runcf.build.userdata = &alltests;
 	runcf.build.on_unittest = [](void* userdata, const char* mod, uint32_t modlen, const char* name, uint32_t nlen)
@@ -123,18 +129,44 @@ static int listAllUnittests(nyrun_cf_t& runcf, const char** filelist, uint32_t c
 
 
 template<bool Fancy>
-static bool runtest(nyrun_cf_t& runcf, const String& testname, const char** filelist, uint32_t count)
+static bool runtest(nyrun_cf_t& originalRuncf, const String& testname, const char** filelist, uint32_t count)
 {
 	ShortString256 entry;
 	entry << "^unittest^" << testname;
 	entry.replace("<nomodule>", "module");
+	bool interactive = (hasColorsOut and jobCount == 1);
+
+	auto runcf = originalRuncf;
 	runcf.build.entrypoint.size  = entry.size();
 	runcf.build.entrypoint.c_str = entry.c_str();
-	runcf.build.ignore_atoms = nytrue;
-	runcf.build.userdata = nullptr;
-	runcf.build.on_unittest = nullptr;
+	runcf.program.entrypoint = runcf.build.entrypoint;
+	runcf.build.ignore_atoms = nyfalse;
 
-	bool interactive = (hasColorsOut and jobCount == 1);
+	struct Console
+	{
+		Clob cout;
+		Clob cerr;
+	}
+	console;
+
+	runcf.console.release = nullptr;
+	runcf.console.internal = &console;
+	runcf.console.flush = [](void*, nyconsole_output_t) {};
+	runcf.console.set_color = [](void*, nyconsole_output_t, nycolor_t) {};
+	runcf.console.has_color = [](void*, nyconsole_output_t) { return nyfalse; };
+
+	runcf.console.write_stdout = [](void* userdata, const char* text, size_t length)
+	{
+		auto& console = *((Console*) userdata);
+		if (text and length)
+			console.cout.append(text, static_cast<uint32_t>(length));
+	};
+	runcf.console.write_stderr = [](void* userdata, const char* text, size_t length)
+	{
+		auto& console = *((Console*) userdata);
+		if (text and length)
+			console.cerr.append(text, static_cast<uint32_t>(length));
+	};
 
 	if (interactive and Fancy)
 	{
@@ -147,8 +179,12 @@ static bool runtest(nyrun_cf_t& runcf, const String& testname, const char** file
 	}
 
 	int64_t starttime = DateTime::NowMilliSeconds();
+
 	bool success = !nyrun_filelist(&runcf, filelist, count, 0, nullptr);
 	int64_t duration = DateTime::NowMilliSeconds() - starttime;
+
+	success &= console.cerr.empty();
+
 
 	if (Fancy)
 	{
@@ -187,7 +223,16 @@ static bool runtest(nyrun_cf_t& runcf, const String& testname, const char** file
 			std::cout << "  (" << duration << "ms)     ";
 			System::Console::ResetTextColor(std::cout);
 		}
-		std::cout << std::endl;
+		std::cout << '\n';
+
+		if (not console.cerr.empty())
+		{
+			console.cerr.trimRight();
+			console.cerr.replace("\n", "\n       | ");
+			std::cout << "       | " << console.cerr << '\n';
+		}
+
+		std::cout << std::flush;
 	}
 	return success;
 }
@@ -245,6 +290,9 @@ static bool runUnittsts(nyrun_cf_t& runcf, const String::Vector& optToRun, const
 	uint32_t successCount = 0;
 	uint32_t failCount = 0;
 	int64_t starttime = DateTime::NowMilliSeconds();
+	runcf.build.ignore_atoms = nytrue;
+	runcf.build.userdata = nullptr;
+	runcf.build.on_unittest = nullptr;
 
 	for (auto& testname: optToRun)
 	{
@@ -303,8 +351,15 @@ int main(int argc, char** argv)
 		return printNoInputScript(argv[0]);
 
 	auto** filelist = (const char**) malloc(sizeof(char*) * filecount);
-	for (uint32_t i = 0; i != filecount; ++i)
-		filelist[i] = remainingArgs[i].c_str();
+	{
+		String filename;
+		for (uint32_t i = 0; i != filecount; ++i)
+		{
+			IO::Canonicalize(filename, remainingArgs[i]);
+			remainingArgs[i] = filename;
+			filelist[i] = remainingArgs[i].c_str();
+		}
+	}
 
 	nyrun_cf_t runcf;
 	nyrun_cf_init(&runcf);
@@ -319,6 +374,19 @@ int main(int argc, char** argv)
 	}
 	else
 	{
+		if (hasColorsOut)
+			System::Console::SetTextColor(std::cout, System::Console::bold);
+		std::cout << "nanyc C++/boostrap unittest " << nylib_version();
+		if (hasColorsOut)
+			System::Console::ResetTextColor(std::cout);
+		std::cout << '\n';
+		nylib_print_info_for_bugreport();
+
+		std::cout << ">\n";
+		for (uint32_t i = 0; i != filecount; ++i)
+			std::cout << "> from '" << filelist[i] << "'\n";
+		std::cout << '\n';
+
 		if (0 == jobCount)
 			System::CPU::Count();
 

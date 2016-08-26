@@ -240,10 +240,11 @@ get_filename_component(nany_tests_root "${CMAKE_CURRENT_LIST_DIR}/../../tests/" 
 #		"${nany_tests_root}/contest"
 #		"${nany_tests_root}/benchmark"
 #	VERBATIM)
-file(WRITE "${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/empty.ny")
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/empty.ny" "func main {}\n")
 add_custom_target(check
 	DEPENDS nanyc-unittest
-	COMMAND "$<TARGET_FILE:nanyc-unittest>" "{CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/empty.ny"
+	COMMAND "${CMAKE_COMMAND}" -E "echo" # for beauty
+	COMMAND "$<TARGET_FILE:nanyc-unittest>" "${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/empty.ny"
 	VERBATIM)
 
 
