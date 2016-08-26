@@ -7,6 +7,7 @@
 #include "libnanyc-traces.h"
 #include "details/utils/check-for-valid-identifier-name.h"
 #include <functional>
+#include <deque>
 
 using namespace Yuni;
 
@@ -303,111 +304,113 @@ namespace Nany
 
 		void ASTReplicator::normalizeExprReorderOperators(AST::Node& node)
 		{
-			bool canReorder;
 			switch (node.rule)
 			{
 				case AST::rgCall:
-				case AST::rgIntrinsic: canReorder = false; break;
-				default: canReorder = true;
-			}
-
-			if (canReorder)
-			{
-				// re-ordering nodes for operators +, *, == ...
-				// this step is mandatory to have understanding AST
-				uint32_t count = static_cast<uint32_t>(node.children.size());
-				for (uint32_t i = 0; i < count; ++i)
+				case AST::rgIntrinsic:
 				{
-					switch (node.children[i]->rule)
+					// do not reorder
+					break;
+				}
+				default:
+				{
+
+					// re-ordering nodes for operators +, *, == ...
+					// this step is mandatory to have understanding AST
+					uint32_t count = static_cast<uint32_t>(node.children.size());
+					for (uint32_t i = 0; i < count; ++i)
 					{
-						case AST::rgExprAdd:
-						case AST::rgExprStream:
-						case AST::rgExprComparison:
-						case AST::rgExprLogic:
-						case AST::rgExprLogicAnd:
-						case AST::rgExprFactor:
-						case AST::rgExprPower:
-						case AST::rgExprNot:
+						switch (node.children[i]->rule)
 						{
-							if (i > 0)
+							case AST::rgExprAdd:
+							case AST::rgExprStream:
+							case AST::rgExprComparison:
+							case AST::rgExprLogic:
+							case AST::rgExprLogicAnd:
+							case AST::rgExprFactor:
+							case AST::rgExprPower:
+							case AST::rgExprNot:
 							{
-								auto& previous = *(node.children[i - 1]);
-								switch (previous.rule)
+								if (i > 0)
 								{
-									default:
+									auto& previous = *(node.children[i - 1]);
+									switch (previous.rule)
 									{
-										ast.nodeReparentAtTheBegining(previous, node, i - 1, *(node.children[i]));
-										--i;
+										default:
+										{
+											ast.nodeReparentAtTheBegining(previous, node, i - 1, *(node.children[i]));
+											--i;
+											count = static_cast<uint32_t>(node.children.size());
+											break;
+										}
+
+										// do not re-parent nodes related to the structure of expressions
+										// ('operators as exceptions')
+										case AST::rgOperatorAll:
+										case AST::rgOperatorKind:
+										case AST::rgOperatorAdd:
+										case AST::rgOperatorAssignment:
+										case AST::rgOperatorComparison:
+										case AST::rgOperatorFactor:
+										case AST::rgOperatorLogic:
+										case AST::rgOperatorLogicAnd:
+										case AST::rgOperatorPower:
+										case AST::rgOperatorNot:
+										case AST::rgOperatorStream:
+											break;
+									}
+								}
+								break;
+							}
+							default:
+								break;
+						}
+					}
+
+
+					// go for children, the container may change between each iteration
+					count = static_cast<uint32_t>(node.children.size());
+					for (uint32_t i = 0; i < count; ++i)
+					{
+						AST::Node& child = *(node.children[i]);
+
+						if (child.rule == AST::rgIdentifier)
+						{
+							// try to rearrange the following pattern:
+							// - identifier
+							//    - call [for example]
+							// - expr-sub-dot
+							//    - identifier
+							//
+							// into
+							//
+							// - identifier
+							//    - call
+							//       - expr-sub-dot
+							//          - identifier
+							if (i + 1 < count) // another node after the current one ?
+							{
+								auto& nextChild = *(node.children[i + 1]);
+								auto nrule = nextChild.rule;
+								// see expr-continuation
+
+								switch (nrule)
+								{
+									case AST::rgExprSubDot:
+									case AST::rgTypeSubDot:
+									case AST::rgCall:
+									case AST::rgExprTemplate:
+									case AST::rgExprSubArray:
+										ast.nodeReparentAtTheEnd(nextChild, node, i + 1, child);
 										count = static_cast<uint32_t>(node.children.size());
 										break;
-									}
-
-									// do not re-parent nodes related to the structure of expressions
-									// ('operators as exceptions')
-									case AST::rgOperatorAll:
-									case AST::rgOperatorKind:
-									case AST::rgOperatorAdd:
-									case AST::rgOperatorAssignment:
-									case AST::rgOperatorComparison:
-									case AST::rgOperatorFactor:
-									case AST::rgOperatorLogic:
-									case AST::rgOperatorLogicAnd:
-									case AST::rgOperatorPower:
-									case AST::rgOperatorNot:
-									case AST::rgOperatorStream:
+									default:
 										break;
 								}
 							}
-							break;
-						}
-
-						default:
-							break;
-					}
-				}
-
-
-				// go for children, the container may change between each iteration
-				count = static_cast<uint32_t>(node.children.size());
-				for (uint32_t i = 0; i < count; ++i)
-				{
-					AST::Node& child = *(node.children[i]);
-
-					if (child.rule == AST::rgIdentifier)
-					{
-						// try to rearrange the following pattern:
-						// - identifier
-						//    - call [for example]
-						// - expr-sub-dot
-						//    - identifier
-						//
-						// into
-						//
-						// - identifier
-						//    - call
-						//       - expr-sub-dot
-						//          - identifier
-						if (i + 1 < count) // another node after the current one ?
-						{
-							auto& nextChild = *(node.children[i + 1]);
-							auto nrule = nextChild.rule;
-							// see expr-continuation
-
-							switch (nrule)
-							{
-								case AST::rgExprSubDot:
-								case AST::rgTypeSubDot:
-								case AST::rgCall:
-								case AST::rgExprTemplate:
-								case AST::rgExprSubArray:
-									ast.nodeReparentAtTheEnd(nextChild, node, i + 1, child);
-									count = static_cast<uint32_t>(node.children.size());
-									break;
-								default:
-									break;
-							}
 						}
 					}
+					break;
 				}
 			}
 
