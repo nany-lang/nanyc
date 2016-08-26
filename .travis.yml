@@ -32,6 +32,7 @@ script:
     - cd src/bootstrap
     - cmake . -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
     - make -j ${NPROC}
+    - make check
     - make package-deb
     - cd ../../ && ls -lh ./distrib
 notifications:
