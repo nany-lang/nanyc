@@ -411,6 +411,9 @@ typedef struct nybuild_cf_t
 	nybool_t warnings_into_errors;
 	/*! Entry point to compile (ex: "main") */
 	nyanystr_t entrypoint;
+	/*! Ignore atoms when parsing - do not produce any IR code for atoms */
+	/* (can be used to only retrieve the list of atoms or unittests) */
+	nybool_t ignore_atoms;
 
 	/*! A project has been created */
 	void (*on_create)(nybuild_t*, nyproject_t*);

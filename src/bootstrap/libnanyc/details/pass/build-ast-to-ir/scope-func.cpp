@@ -569,6 +569,9 @@ namespace Producer
 		assert(node.rule == AST::rgFunction);
 		assert(not node.children.empty());
 
+		if (unlikely(context.ignoreAtoms))
+			return true;
+
 		// new scope
 		IR::Producer::Scope scope{*this};
 		scope.moveAttributes(*this);

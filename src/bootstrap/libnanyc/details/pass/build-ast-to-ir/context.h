@@ -83,6 +83,9 @@ namespace Producer
 
 
 	public:
+		//! Discard IR code generation for atoms
+		bool ignoreAtoms = false;
+
 		//! Information about the current build
 		nybuild_cf_t& cf;
 		//! Linked IR sequence

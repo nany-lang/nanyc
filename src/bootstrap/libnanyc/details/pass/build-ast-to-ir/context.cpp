@@ -16,7 +16,8 @@ namespace Producer
 
 
 	Context::Context(nybuild_cf_t& cf, AnyString filename, Sequence& sequence, Logs::Report report)
-		: cf(cf)
+		: ignoreAtoms(cf.ignore_atoms != nyfalse)
+		, cf(cf)
 		, sequence(sequence)
 		, report(report)
 		, dbgSourceFilename(filename)

@@ -48,6 +48,9 @@ namespace Producer
 			}
 		}
 
+		if (unlikely(context.ignoreAtoms))
+			return true;
+
 		if (unlikely(!scope))
 			return (ice(node) << "invalid unittest ast declaration");
 

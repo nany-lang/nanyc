@@ -143,6 +143,9 @@ namespace Producer
 		assert(node.rule == AST::rgClass);
 		assert(not node.children.empty());
 
+		if (unlikely(context.ignoreAtoms))
+			return true;
+
 		uint32_t lvid = 0;
 		if (localvar) // create the lvid before the new scope
 			*localvar = (lvid = nextvar());
