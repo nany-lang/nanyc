@@ -481,7 +481,7 @@ add_dependencies(libnanyc-grammar nanyc-grammar-cpp)
 
 
 
-add_library(libnanyc STATIC #${mode_libnany}
+add_library(libnanyc ${mode_libnany}
 	# public headers
 	${nysrc_public_headers}
 
