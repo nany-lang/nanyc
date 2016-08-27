@@ -492,12 +492,6 @@ namespace Nany
 					break;
 				}
 
-				case AST::rgNamespace:
-				{
-					collectNamespace(node);
-					return true; // ignore the node
-				}
-
 				case AST::rgIdentifier:
 				{
 					switch (parent.rule)
@@ -610,6 +604,12 @@ namespace Nany
 						}
 					}
 					break;
+				}
+
+				case AST::rgNamespace:
+				{
+					collectNamespace(node);
+					return true; // ignore the node
 				}
 			}
 
