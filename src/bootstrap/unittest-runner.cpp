@@ -40,6 +40,7 @@ static int printNoInputScript(const char* argv0)
 
 static void fetchUnittestList(nyrun_cf_t& runcf, String::Vector& torun, const char** filelist, uint32_t count)
 {
+	std::cout << "searching for unittests in all source files...\n" << std::flush;
 	runcf.build.entrypoint.size  = 0; // disable any compilation by default
 	runcf.build.entrypoint.c_str = nullptr;
 	runcf.program.entrypoint.size = 0;
@@ -54,7 +55,17 @@ static void fetchUnittestList(nyrun_cf_t& runcf, String::Vector& torun, const ch
 		auto& element = ((String::Vector*) userdata)->back();
 		element << module << ':' << testname;
 	};
+	int64_t starttime = DateTime::NowMilliSeconds();
 	nyrun_filelist(&runcf, filelist, count, 0, nullptr);
+	int64_t duration = DateTime::NowMilliSeconds() - starttime;
+
+	switch (torun.size())
+	{
+		case 0: std::cout << "0 test found"; break;
+		case 1: std::cout << "1 test found"; break;
+		default: std::cout << torun.size() << " tests found"; break;
+	}
+	std::cout << " (" << duration << "ms)\n\n";
 }
 
 
@@ -76,6 +87,7 @@ static int listAllUnittests(nyrun_cf_t& runcf, const char** filelist, uint32_t c
 		auto& dict = *((std::set<std::pair<String, String>>*) userdata);
 		dict.emplace(std::make_pair(String{module}, String{testname}));
 	};
+
 	int64_t starttime = DateTime::NowMilliSeconds();
 	if (0 != nyrun_filelist(&runcf, filelist, count, 0, nullptr))
 	{
@@ -244,7 +256,7 @@ static void printStatstics(const String::Vector& optToRun, int64_t duration, uin
 	{
 		case 0:  std::cout << "\n       0 test, "; break;
 		case 1:  std::cout << "\n       1 test"; break;
-		default: std::cout << "\n       " << optToRun.size() << " test, "; break;
+		default: std::cout << "\n       " << optToRun.size() << " tests, "; break;
 	}
 	if (successCount and hasColorsOut)
 		System::Console::SetTextColor(std::cout, System::Console::green);
