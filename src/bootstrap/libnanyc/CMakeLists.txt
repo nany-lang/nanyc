@@ -162,7 +162,6 @@ addsrc(
 	"details/pass/build-ast-to-ir/context.cpp"
 	"details/pass/build-ast-to-ir/context.h"
 	"details/pass/build-ast-to-ir/context.hxx"
-	"details/pass/build-ast-to-ir/producer.h"
 	"details/pass/build-ast-to-ir/scope.h"
 	"details/pass/build-ast-to-ir/scope.hxx"
 	"details/pass/build-ast-to-ir/scope.cpp"
