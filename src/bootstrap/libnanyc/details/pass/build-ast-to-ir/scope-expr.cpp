@@ -28,13 +28,10 @@ namespace Producer
 		// the result of the current expression is now the new allocated local variable
 		localvar = rid;
 
-		// any sub node ?
-		bool hasChildren   = not node.children.empty();
-
 		// promotion to identify:set
 		// since it is an assignment (=, +=, ...), only if the current node has children and
 		// if another identifier was previously given
-		bool shouldPromote = (hasChildren and /*self*/ localvar != 0 and lastIdentifyOpcOffset != 0)
+		bool shouldPromote = (/*self*/ localvar != 0 and not node.children.empty() and lastIdentifyOpcOffset != 0)
 			and (node.text == "=");
 
 		if (not shouldPromote)
@@ -42,20 +39,18 @@ namespace Producer
 			// remember the last opcode offset
 			lastIdentifyOpcOffset = offset;
 			// children
-			return (not hasChildren) or visitASTExprContinuation(node, localvar);
+			return node.children.empty() or visitASTExprContinuation(node, localvar);
 		}
-		else
+
+		auto& operands = out.at<IR::ISA::Op::identify>(lastIdentifyOpcOffset);
+		assert(operands.opcode == static_cast<uint32_t>(IR::ISA::Op::identify));
+		if (operands.opcode == static_cast<uint32_t>(IR::ISA::Op::identify))
 		{
-			auto& operands = out.at<IR::ISA::Op::identify>(lastIdentifyOpcOffset);
-			assert(operands.opcode == static_cast<uint32_t>(IR::ISA::Op::identify));
-			if (operands.opcode == static_cast<uint32_t>(IR::ISA::Op::identify))
-			{
-				operands.opcode = static_cast<uint32_t>(IR::ISA::Op::identifyset);
-				lastIdentifyOpcOffset = 0;
-			}
-			assert(not node.children.empty());
-			return visitASTExprContinuation(node, localvar);
+			operands.opcode = static_cast<uint32_t>(IR::ISA::Op::identifyset);
+			lastIdentifyOpcOffset = 0;
 		}
+		assert(not node.children.empty());
+		return visitASTExprContinuation(node, localvar);
 	}
 
 
@@ -81,9 +76,7 @@ namespace Producer
 		assert(not node.text.empty());
 		localvar = node.text.to<uint32_t>();
 		assert(localvar != 0);
-		if (node.children.empty())
-			return true;
-		return visitASTExprContinuation(node, localvar);
+		return node.children.empty() or visitASTExprContinuation(node, localvar);
 	}
 
 
