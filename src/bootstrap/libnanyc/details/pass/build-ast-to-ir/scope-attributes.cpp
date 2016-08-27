@@ -31,9 +31,9 @@ namespace Producer
 		auto& attrs = *attributes;
 
 		// attribute name
-		ShortString32 attrname;
+		ShortString32& attrname = context.reuse.attributes.attrname;
 		// temporary buffer for value interpretation
-		ShortString32 value;
+		ShortString32& value = context.reuse.attributes.value;
 
 		for (auto& childptr: node.children)
 		{

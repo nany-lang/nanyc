@@ -419,7 +419,6 @@ namespace Nany
 		}
 
 
-
 		inline void ASTReplicator::normalizeExpression(AST::Node& node)
 		{
 			if (likely(pDuplicationSuccess))
@@ -428,7 +427,6 @@ namespace Nany
 				normalizeExprTransformOperatorsToFuncCall(node);
 			}
 		}
-
 
 
 		bool ASTReplicator::generateErrorFromErrorNode(const AST::Node& node)

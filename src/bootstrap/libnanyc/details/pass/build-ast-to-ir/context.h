@@ -205,6 +205,14 @@ namespace Producer
 				AST::Node* funcbody = nullptr;
 			}
 			unittest;
+
+			struct {
+				//! Temporary buffer for the attribute name
+				Yuni::ShortString32 attrname;
+				//! Temporary buffer for the attribute value (if any)
+				Yuni::ShortString32 value;
+			}
+			attributes;
 		}
 		reuse;
 
