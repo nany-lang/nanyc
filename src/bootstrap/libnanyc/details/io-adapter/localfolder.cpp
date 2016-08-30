@@ -411,7 +411,7 @@ static nyio_err_t nanyc_io_localfolder_file_get_contents(nyio_adapter_t* adapter
 
 	*size = filesize;
 	*content = buffer;
-	*capacity = newcapacity;
+	*capacity = filesize;
 	return nyioe_ok;
 }
 
