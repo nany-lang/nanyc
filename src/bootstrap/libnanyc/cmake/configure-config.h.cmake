@@ -35,7 +35,7 @@ namespace Config
 
 	//! Size that should be added to any Nany objects
 	// (reference counter)
-	constexpr static const size_t extraObjectSize = sizeof(uint64_t);
+	constexpr static const uint32_t extraObjectSize = (uint32_t) sizeof(uint64_t);
 
 
 	//! Import the NSL
