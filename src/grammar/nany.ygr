@@ -24,13 +24,13 @@ sp: notext, hidden
 
 // --- COMMENTS ---
 
-tk-comment-line-content:
+tk-comment-line-content: notext
 	[^\n\r]*
-tk-comment-start-inline:
+tk-comment-start-inline: notext
 	'//'
-tk-comment-start-block:
+tk-comment-start-block: notext
 	'/*'
-tk-comment-end-block:
+tk-comment-end-block: notext
 	'*/'
 
 tk-comment-subbk: notext, hidden
