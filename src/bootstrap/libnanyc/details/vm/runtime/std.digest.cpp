@@ -16,10 +16,19 @@ static void* nanyc_digest_md5(nyvm_t* vm, const char* string, uint64_t length)
 	md5.fromRawData(string, length);
 	if (not md5.value().empty())
 	{
-		tc.returnValue.size     = md5.value().size();
-		tc.returnValue.capacity = md5.value().capacity();
-		tc.returnValue.data     = md5.forgetContent();
-		return &tc.returnValue;
+		uint32_t size = md5.value().size();
+		uint32_t capacity = size + Nany::Config::extraObjectSize;
+		char* cstr = (char*) vm->allocator->allocate(vm->allocator, capacity);
+		if (cstr)
+		{
+			const char* src = md5.value().c_str();
+			for (uint32_t i = 0; i != size; ++i)
+				cstr[i] = src[i];
+			tc.returnValue.size     = md5.value().size();
+			tc.returnValue.capacity = md5.value().size();
+			tc.returnValue.data     = cstr;
+			return &tc.returnValue;
+		}
 	}
 	return nullptr;
 }
