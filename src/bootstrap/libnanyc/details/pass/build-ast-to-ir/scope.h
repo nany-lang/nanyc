@@ -37,14 +37,14 @@ namespace Producer
 		};
 
 		//! Ctor
-		Attributes(const AST::Node& node): node(node) {}
+		Attributes(AST::Node& node): node(node) {}
 
 		//! Attributes presence
 		Yuni::Flags<Flag> flags;
 		//! builtinalias: or | and | ...
-		const AST::Node* builtinAlias = nullptr;
+		AST::Node* builtinAlias = nullptr;
 		//! The original attribute AST node
-		const AST::Node& node;
+		AST::Node& node;
 	};
 
 
@@ -84,66 +84,66 @@ namespace Producer
 		//! Visit an unknown node
 		bool visitAST(AST::Node&);
 
-		bool visitASTStmt(const AST::Node&);
-		bool visitASTFunc(const AST::Node&);
-		bool visitASTClass(const AST::Node&, LVID* localvar = nullptr);
-		bool visitASTType(const AST::Node&, LVID& localvar);
-		bool visitASTTypedef(const AST::Node&);
-		bool visitASTFor(const AST::Node&);
+		bool visitASTStmt(AST::Node&);
+		bool visitASTFunc(AST::Node&);
+		bool visitASTClass(AST::Node&, LVID* localvar = nullptr);
+		bool visitASTType(AST::Node&, LVID& localvar);
+		bool visitASTTypedef(AST::Node&);
+		bool visitASTFor(AST::Node&);
 
-		bool visitASTAttributes(const AST::Node&);
+		bool visitASTAttributes(AST::Node&);
 
-		bool visitASTVar(const AST::Node&);
+		bool visitASTVar(AST::Node&);
 		bool visitASTVarInClass();
 
-		bool visitASTVarValueInitialization(LVID&, const AST::Node&, const AST::Node&, const AnyString&);
+		bool visitASTVarValueInitialization(LVID&, AST::Node&, AST::Node&, const AnyString&);
 
-		bool visitASTExpr(const AST::Node&, LVID& localvar, bool allowScope = false);
-		bool visitASTExprIntrinsic(const AST::Node&, LVID& localvar);
-		bool visitASTExprReturn(const AST::Node&);
-		bool visitASTExprContinuation(const AST::Node&, LVID& localvar, bool allowScope = false);
-		bool visitASTExprIdentifier(const AST::Node&, LVID& localvar);
-		bool visitASTExprIdOperator(const AST::Node& node, LVID& localvar);
-		bool visitASTExprRegister(const AST::Node&, LVID& localvar);
-		bool visitASTExprCall(const AST::Node*, LVID& localvar, const AST::Node* parent = nullptr); // func call
-		bool visitASTExprCallParameters(const AST::Node&, ShortcircuitUpdate* shortcircuit = nullptr); // parameters of a func call
-		bool visitASTExprSubDot(const AST::Node&, LVID& localvar);
-		bool visitASTExprScope(const AST::Node&);
-		bool visitASTExprNumber(const AST::Node&, LVID& localvar);
-		bool visitASTExprString(const AST::Node&, LVID& localvar);
-		bool visitASTExprStringLiteral(const AST::Node&, LVID& localvar);
-		bool visitASTExprChar(const AST::Node&, LVID& localvar);
-		bool visitASTExprNew(const AST::Node&, LVID& localvar);
-		bool visitASTExprTypeDecl(const AST::Node&, LVID& localvar);
-		bool visitASTExprTypeof(const AST::Node&, LVID& localvar);
-		bool visitASTExprIfStmt(const AST::Node&);
-		bool visitASTExprIfExpr(const AST::Node&, LVID& localvar);
-		bool visitASTExprWhile(const AST::Node&);
-		bool visitASTExprDoWhile(const AST::Node&);
-		bool visitASTExprSwitch(const AST::Node&);
-		bool visitASTExprIn(const AST::Node&, LVID& localvar);
-		bool visitASTExprIn(const AST::Node&, LVID& localvar, Yuni::ShortString128& elementname);
-		bool visitASTExprClosure(const AST::Node&, uint32_t& localvar);
+		bool visitASTExpr(AST::Node&, LVID& localvar, bool allowScope = false);
+		bool visitASTExprIntrinsic(AST::Node&, LVID& localvar);
+		bool visitASTExprReturn(AST::Node&);
+		bool visitASTExprContinuation(AST::Node&, LVID& localvar, bool allowScope = false);
+		bool visitASTExprIdentifier(AST::Node&, LVID& localvar);
+		bool visitASTExprIdOperator(AST::Node& node, LVID& localvar);
+		bool visitASTExprRegister(AST::Node&, LVID& localvar);
+		bool visitASTExprCall(AST::Node*, LVID& localvar, AST::Node* parent = nullptr); // func call
+		bool visitASTExprCallParameters(AST::Node&, ShortcircuitUpdate* shortcircuit = nullptr); // parameters of a func call
+		bool visitASTExprSubDot(AST::Node&, LVID& localvar);
+		bool visitASTExprScope(AST::Node&);
+		bool visitASTExprNumber(AST::Node&, LVID& localvar);
+		bool visitASTExprString(AST::Node&, LVID& localvar);
+		bool visitASTExprStringLiteral(AST::Node&, LVID& localvar);
+		bool visitASTExprChar(AST::Node&, LVID& localvar);
+		bool visitASTExprNew(AST::Node&, LVID& localvar);
+		bool visitASTExprTypeDecl(AST::Node&, LVID& localvar);
+		bool visitASTExprTypeof(AST::Node&, LVID& localvar);
+		bool visitASTExprIfStmt(AST::Node&);
+		bool visitASTExprIfExpr(AST::Node&, LVID& localvar);
+		bool visitASTExprWhile(AST::Node&);
+		bool visitASTExprDoWhile(AST::Node&);
+		bool visitASTExprSwitch(AST::Node&);
+		bool visitASTExprIn(AST::Node&, LVID& localvar);
+		bool visitASTExprIn(AST::Node&, LVID& localvar, Yuni::ShortString128& elementname);
+		bool visitASTExprClosure(AST::Node&, uint32_t& localvar);
 
-		bool visitASTExprTemplate(const AST::Node&, LVID& localvar);
-		bool visitASTExprTemplateParameter(const AST::Node& node);
-		bool visitASTDeclGenericTypeParameters(const AST::Node&);
-		bool visitASTDeclSingleGenericTypeParameter(const AST::Node&);
+		bool visitASTExprTemplate(AST::Node&, LVID& localvar);
+		bool visitASTExprTemplateParameter(AST::Node& node);
+		bool visitASTDeclGenericTypeParameters(AST::Node&);
+		bool visitASTDeclSingleGenericTypeParameter(AST::Node&);
 
-		bool visitASTUnitTest(const AST::Node&);
+		bool visitASTUnitTest(AST::Node&);
 		//@}
 
 
 		//! \name Typeinfo / variables
 		//@{
 		//! Create a new local builtin float
-		LVID createLocalBuiltinFloat(const AST::Node&, nytype_t, double value);
+		LVID createLocalBuiltinFloat(AST::Node&, nytype_t, double value);
 		//! Create a new local builtin integer
-		LVID createLocalBuiltinInt(const AST::Node&, nytype_t, yuint64 value);
+		LVID createLocalBuiltinInt(AST::Node&, nytype_t, yuint64 value);
 		//! Create a new local builtin 'void'
-		LVID createLocalBuiltinVoid(const AST::Node&);
+		LVID createLocalBuiltinVoid(AST::Node&);
 		//! Create a new local variable 'any'
-		LVID createLocalBuiltinAny(const AST::Node&);
+		LVID createLocalBuiltinAny(AST::Node&);
 
 		//! Reserve a new variable id
 		LVID reserveLocalVariable();
@@ -165,14 +165,14 @@ namespace Producer
 		void comment();
 
 		//! Emit opcode related to the current position (in the current source)
-		void emitDebugpos(const AST::Node& node);
-		void emitDebugpos(const AST::Node* node);
+		void emitDebugpos(AST::Node& node);
+		void emitDebugpos(AST::Node* node);
 		void addDebugCurrentFilename();
 		void addDebugCurrentFilename(const AnyString& filename);
 		void addDebugCurrentPosition(uint line, uint offset);
 
-		bool generateIfStmt(const AST::Node& expr, const AST::Node& thenc, const AST::Node* elsec = nullptr, uint32_t* customjmpthenOffset = nullptr);
-		bool generateIfExpr(uint32_t& ifret, const AST::Node& expr, const AST::Node& thenc, const AST::Node& elsec);
+		bool generateIfStmt(AST::Node& expr, AST::Node& thenc, AST::Node* elsec = nullptr, uint32_t* customjmpthenOffset = nullptr);
+		bool generateIfExpr(uint32_t& ifret, AST::Node& expr, AST::Node& thenc, AST::Node& elsec);
 
 
 		//! \name Utilities
@@ -186,7 +186,7 @@ namespace Producer
 		bool hasDebuginfo() const;
 
 		//! Get the name from a 'symbol-name' node (empty if error)
-		AnyString getSymbolNameFromASTNode(const AST::Node& node);
+		AnyString getSymbolNameFromASTNode(AST::Node& node);
 
 		//! Move attributes
 		void moveAttributes(Scope&);
@@ -212,9 +212,9 @@ namespace Producer
 
 
 	private:
-		bool generateInitFuncForClassVar(const AnyString& varname, LVID, const AST::Node& varAssign);
-		bool generateTypeofForClassVar(LVID&, const AST::Node& varAssign);
-		template<bool BuiltinT, class DefT> bool generateNumberCode(uint32_t& localvar, const DefT& numdef, const AST::Node&);
+		bool generateInitFuncForClassVar(const AnyString& varname, LVID, AST::Node& varAssign);
+		bool generateTypeofForClassVar(LVID&, AST::Node& varAssign);
+		template<bool BuiltinT, class DefT> bool generateNumberCode(uint32_t& localvar, const DefT& numdef, AST::Node&);
 
 		//! Emit generic type parameters push
 		void emitTmplParametersIfAny();
@@ -223,11 +223,11 @@ namespace Producer
 		void prepareClosureNodeExpr(AST::Node::Ptr& out);
 		void emitExprAttributes(uint32_t& localvar);
 
-		bool emitVarInClass(const AnyString& varname, const AST::Node& node, const AST::Node* varType,
-			const AST::Node* varAssign, bool ref, bool constant);
-		bool emitVarInFunc(const AnyString& varname, const AST::Node& node, const AST::Node* varType,
-			const AST::Node* varAssign, bool ref, bool constant);
-		bool emitProperty(const AnyString& varname, const AST::Node& node, const AST::Node* varType,
+		bool emitVarInClass(const AnyString& varname, AST::Node& node, AST::Node* varType,
+			AST::Node* varAssign, bool ref, bool constant);
+		bool emitVarInFunc(const AnyString& varname, AST::Node& node, AST::Node* varType,
+			AST::Node* varAssign, bool ref, bool constant);
+		bool emitProperty(const AnyString& varname, AST::Node& node, AST::Node* varType,
 			AST::Node& varAssign, bool ref);
 
 

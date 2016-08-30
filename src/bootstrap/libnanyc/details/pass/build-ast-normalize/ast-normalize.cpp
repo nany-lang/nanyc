@@ -91,8 +91,8 @@ namespace Nany
 
 		void ASTReplicator::collectNamespace(const AST::Node& node)
 		{
-			auto entity = node.xpath({AST::rgEntity});
-			assert(!(!entity) and "mismatch grammar");
+			auto* entity = node.xpath({AST::rgEntity});
+			assert(!!entity and "mismatch grammar");
 			nmspc.first.clear();
 			nmspc.second = const_cast<AST::Node*>(&node);
 			entity->extractChildText(nmspc.first, Nany::AST::rgIdentifier, ".");
@@ -133,7 +133,7 @@ namespace Nany
 			auto& lhs  = *ast.nodeAppend(call, {AST::rgCallParameter, AST::rgExpr});
 
 			// re-parent lhs
-			ast.nodeReparentAtTheEnd(*(node.children[lhsIndex]), node, lhsIndex, lhs);
+			ast.nodeReparentAtTheEnd(node.children[lhsIndex], node, lhsIndex, lhs);
 
 			// remove all remaining nodes
 			node.children.clear();
@@ -169,7 +169,7 @@ namespace Nany
 			// nany uses a special character '^' to distinguish functions from operators
 			// (since operators may have a real name)
 			// reminder: strings are not owned by the AST
-			AnyString opname = normalizeOperatorName(node.children[opIndex]->text);
+			AnyString opname = normalizeOperatorName(node.children[opIndex].text);
 
 			// not an assignment, the input will be transformed into a global func call:
 			//
@@ -191,9 +191,9 @@ namespace Nany
 			auto& rhs  = *ast.nodeAppend(call, {AST::rgCallParameter, AST::rgExpr});
 
 			// re-parent rhs first, otherwise the index will be invalidated
-			ast.nodeReparentAtTheEnd(*(node.children[rhsIndex]), node, rhsIndex, rhs);
+			ast.nodeReparentAtTheEnd(node.children[rhsIndex], node, rhsIndex, rhs);
 			// re-parent lhs
-			ast.nodeReparentAtTheEnd(*(node.children[lhsIndex]), node, lhsIndex, lhs);
+			ast.nodeReparentAtTheEnd(node.children[lhsIndex], node, lhsIndex, lhs);
 
 			// remove all remaining nodes
 			node.children.clear();
@@ -215,9 +215,9 @@ namespace Nany
 			//      - rhs
 			//
 			assert(node.children.size() == 2);
-			auto& operatorNode = *(node.children[0]);
+			auto& operatorNode = node.children.front();
 			uint32_t rhsIndex = 1;
-			auto& rhs = *(node.children[rhsIndex]);
+			auto& rhs = node.children[rhsIndex];
 			assert(operatorNode.rule == AST::rgOperatorAssignment);
 
 			// the operator is not an assignment. the input will be transformed into
@@ -247,10 +247,9 @@ namespace Nany
 		void ASTReplicator::normalizeExprTransformOperatorsToFuncCall(AST::Node& node)
 		{
 			// go for children, the container may change between each iteration
-			for (uint32_t i = 0; i < static_cast<uint32_t>(node.children.size()); )
+			for (uint32_t i = 0; i < node.children.size(); )
 			{
-				AST::Node& child = *(node.children[i]);
-
+				AST::Node& child = node.children[i];
 				switch (child.rule)
 				{
 					// transform all expressions 'lhs <operator> rhs' into a global func call
@@ -297,7 +296,7 @@ namespace Nany
 
 			// recursive call
 			for (auto& child: node.children)
-				normalizeExprTransformOperatorsToFuncCall(*child);
+				normalizeExprTransformOperatorsToFuncCall(child);
 		}
 
 
@@ -316,10 +315,10 @@ namespace Nany
 
 					// re-ordering nodes for operators +, *, == ...
 					// this step is mandatory to have understanding AST
-					uint32_t count = static_cast<uint32_t>(node.children.size());
-					for (uint32_t i = 0; i < count; ++i)
+					uint32_t count = node.children.size();
+					for (uint32_t i = 0; i != count; ++i)
 					{
-						switch (node.children[i]->rule)
+						switch (node.children[i].rule)
 						{
 							case AST::rgExprAdd:
 							case AST::rgExprStream:
@@ -332,14 +331,14 @@ namespace Nany
 							{
 								if (i > 0)
 								{
-									auto& previous = *(node.children[i - 1]);
+									auto& previous = node.children[i - 1];
 									switch (previous.rule)
 									{
 										default:
 										{
-											ast.nodeReparentAtTheBegining(previous, node, i - 1, *(node.children[i]));
+											ast.nodeReparentAtTheBegining(previous, node, i - 1, node.children[i]);
 											--i;
-											count = static_cast<uint32_t>(node.children.size());
+											count = node.children.size();
 											break;
 										}
 
@@ -368,10 +367,10 @@ namespace Nany
 
 
 					// go for children, the container may change between each iteration
-					count = static_cast<uint32_t>(node.children.size());
+					count = node.children.size();
 					for (uint32_t i = 0; i < count; ++i)
 					{
-						AST::Node& child = *(node.children[i]);
+						AST::Node& child = node.children[i];
 
 						if (child.rule == AST::rgIdentifier)
 						{
@@ -389,7 +388,7 @@ namespace Nany
 							//          - identifier
 							if (i + 1 < count) // another node after the current one ?
 							{
-								auto& nextChild = *(node.children[i + 1]);
+								auto& nextChild = node.children[i + 1];
 								auto nrule = nextChild.rule;
 								// see expr-continuation
 
@@ -401,7 +400,7 @@ namespace Nany
 									case AST::rgExprTemplate:
 									case AST::rgExprSubArray:
 										ast.nodeReparentAtTheEnd(nextChild, node, i + 1, child);
-										count = static_cast<uint32_t>(node.children.size());
+										count = node.children.size();
 										break;
 									default:
 										break;
@@ -415,7 +414,7 @@ namespace Nany
 
 			// recursive call
 			for (auto& child: node.children)
-				normalizeExprReorderOperators(*child);
+				normalizeExprReorderOperators(child);
 		}
 
 
@@ -542,9 +541,9 @@ namespace Nany
 					{
 						case 3:
 						{
-							if (node.children[0]->rule == AST::rgTkParentheseOpen and node.children[2]->rule == AST::rgTkParentheseClose)
+							if (node.children[0].rule == AST::rgTkParentheseOpen and node.children[2].rule == AST::rgTkParentheseClose)
 							{
-								auto& middle = *(node.children[1]);
+								auto& middle = node.children[1];
 								switch (middle.rule)
 								{
 									case AST::rgIdentifier:
@@ -591,11 +590,11 @@ namespace Nany
 					//
 					// The AST will be normalized to avoid so many differences and a return type node
 					// will be added if none has been given and if a 'return-inline' node is present.
-					if (not (parent.findFirst(AST::rgFuncReturnType) < (uint32_t) parent.children.size()))
+					if (not (parent.findFirst(AST::rgFuncReturnType) < parent.children.size()))
 					{
 						// the parent does not declare any return type.
 						// do the body has a 'return-inline' node ?
-						if (node.findFirst(AST::rgReturnInline) < (uint32_t) node.children.size())
+						if (node.findFirst(AST::rgReturnInline) < node.children.size())
 						{
 							// all conditions are met. No type is present but should be
 							auto returnType =
@@ -654,7 +653,7 @@ namespace Nany
 					// a type but must be normalized as well
 					uint32_t varTypeNode = newNode->findFirst(AST::rgVarType);
 					if (varTypeNode < newNode->children.size())
-						normalizeExpression(*(newNode->children[varTypeNode]));
+						normalizeExpression(newNode->children[varTypeNode]);
 					break;
 				}
 

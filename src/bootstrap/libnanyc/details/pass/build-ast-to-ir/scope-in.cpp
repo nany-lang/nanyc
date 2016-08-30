@@ -15,7 +15,7 @@ namespace Producer
 {
 
 
-	bool Scope::visitASTExprIn(const AST::Node& node, LVID& localvar, ShortString128& elementname)
+	bool Scope::visitASTExprIn(AST::Node& node, LVID& localvar, ShortString128& elementname)
 	{
 		// lvid representing the input container
 		AST::Node* container = nullptr;
@@ -23,9 +23,8 @@ namespace Producer
 		AnyString requestedViewName = "default";
 		AST::Node* additionalParams = nullptr;
 
-		for (auto& childptr: node.children)
+		for (auto& child: node.children)
 		{
-			auto& child = *childptr;
 			switch (child.rule)
 			{
 				case AST::rgInVars:
@@ -54,9 +53,8 @@ namespace Producer
 
 				case AST::rgInViewName:
 				{
-					for (auto& ptr: child.children)
+					for (auto& vnnode: child.children)
 					{
-						auto& vnnode = *ptr;
 						switch (vnnode.rule)
 						{
 							case AST::rgIdentifier:
@@ -66,9 +64,9 @@ namespace Producer
 								auto& children = vnnode.children;
 								if (not children.empty())
 								{
-									if (children.size() == 1 and children[0]->rule == AST::rgCall)
+									if (children.size() == 1 and children[0].rule == AST::rgCall)
 									{
-										additionalParams = AST::Node::Ptr::WeakPointer(children[0]);
+										additionalParams = &(children[0]);
 									}
 									else
 										return unexpectedNode(vnnode, "[expr/in/view-name/params]");
@@ -123,8 +121,8 @@ namespace Producer
 		if (additionalParams)
 		{
 			auto& vec = context.reuse.inset.call->children;
-			for (auto& paramptr: additionalParams->children)
-				vec.push_back(paramptr);
+			for (auto& paramnode: additionalParams->children)
+				vec.push_back(&paramnode);
 		}
 		emitDebugpos(node);
 		bool success = visitASTExpr(*context.reuse.inset.node, localvar);
@@ -133,7 +131,9 @@ namespace Producer
 		if (additionalParams) // remove the additional parameters
 		{
 			auto& vec = context.reuse.inset.call->children;
-			vec.erase(vec.begin() + 1, vec.end());
+			AST::Node::Ptr firstNode = &(vec.front());
+			vec.clear();
+			vec.push_back(firstNode);
 		}
 		// avoid crap in the debugger
 		context.reuse.inset.elementname->text.clear();
@@ -142,7 +142,7 @@ namespace Producer
 	}
 
 
-	bool Scope::visitASTExprIn(const AST::Node& node, LVID& localvar)
+	bool Scope::visitASTExprIn(AST::Node& node, LVID& localvar)
 	{
 		// Name of the target ref for each element in the container (ignored here)
 		ShortString128 elementname;

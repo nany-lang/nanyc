@@ -15,16 +15,15 @@ namespace Producer
 {
 
 
-	bool Scope::visitASTExprClosure(const AST::Node& node, uint32_t& localvar)
+	bool Scope::visitASTExprClosure(AST::Node& node, uint32_t& localvar)
 	{
 		assert(node.rule == AST::rgFunction);
 		AST::Node* body = nullptr;
 		AST::Node* rettype = nullptr;
 		AST::Node* params = nullptr;
 
-		for (auto& childptr: node.children)
+		for (auto& child: node.children)
 		{
-			auto& child = *childptr;
 			switch (child.rule)
 			{
 				case AST::rgFuncBody:
@@ -44,7 +43,7 @@ namespace Producer
 				}
 				case AST::rgFunctionKind:
 				{
-					if (child.children.size() != 1 or child.children[0]->rule != AST::rgFunctionKindFunction)
+					if (child.children.size() != 1 or child.children[0].rule != AST::rgFunctionKindFunction)
 						return error(child) << "only function definition is allowed for closure";
 					break;
 				}

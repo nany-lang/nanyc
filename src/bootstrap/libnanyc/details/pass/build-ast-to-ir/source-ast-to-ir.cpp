@@ -41,8 +41,8 @@ namespace Nany
 		uint32_t bpoffsck = out.emitStackSizeIncrease();
 
 		bool success = true;
-		for (uint32_t i = 0; i != static_cast<uint32_t>(astnodes.size()); ++i)
-			success &= scope.visitAST(*(astnodes[i]));
+		for (uint32_t i = 0; i != astnodes.size(); ++i)
+			success &= scope.visitAST(astnodes[i]);
 
 		out.emitEnd();
 		uint32_t blpsize = out.opcodeCount() - bpoffset;

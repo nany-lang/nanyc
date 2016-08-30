@@ -25,8 +25,9 @@ namespace // anonymous
 				return false;
 
 			stack.pop_back();
-			for (auto it = node.children.rbegin(); it != node.children.rend(); ++it)
-				stack.push_back(std::cref(*(*it)));
+			uint32_t i = node.children.size();
+			while (i-- > 0)
+				stack.push_back(std::cref(node.children[i]));
 		}
 		while (not stack.empty());
 		return true;

@@ -26,8 +26,8 @@ namespace Producer
 		public:
 			ClassInspector(Scope& parentscope, uint32_t lvid);
 
-			bool inspect(const AST::Node& node);
-			bool inspectBody(const AST::Node& node);
+			bool inspect(AST::Node& node);
+			bool inspectBody(AST::Node& node);
 
 
 		public:
@@ -40,14 +40,14 @@ namespace Producer
 			uint32_t bpoffsck;
 
 			//! Class body
-			const AST::Node* body = nullptr;
+			AST::Node* body = nullptr;
 
 			//! name of the class (if any)
 			ClassnameType classname;
 
 
 		private:
-			bool inspectClassname(const AST::Node&);
+			bool inspectClassname(AST::Node&);
 			void createDefaultOperators();
 
 		}; // class ClassInspector
@@ -83,7 +83,7 @@ namespace Producer
 		}
 
 
-		inline bool ClassInspector::inspectClassname(const AST::Node& node)
+		inline bool ClassInspector::inspectClassname(AST::Node& node)
 		{
 			classname = scope.getSymbolNameFromASTNode(node);
 			return not classname.empty()
@@ -91,15 +91,14 @@ namespace Producer
 		}
 
 
-		inline bool ClassInspector::inspect(const AST::Node& node)
+		inline bool ClassInspector::inspect(AST::Node& node)
 		{
 			scope.emitDebugpos(node);
 			// exit status
 			bool success = true;
 
-			for (auto& childptr: node.children)
+			for (auto& child: node.children)
 			{
-				auto& child = *childptr;
 				switch (child.rule)
 				{
 					case AST::rgSymbolName:
@@ -156,7 +155,7 @@ namespace Producer
 		}
 
 
-		bool ClassInspector::inspectBody(const AST::Node& node)
+		bool ClassInspector::inspectBody(AST::Node& node)
 		{
 			bool success = true;
 			auto& out = scope.sequence();
@@ -175,7 +174,7 @@ namespace Producer
 
 				// continue evaluating the func body independantly of the previous data and results
 				for (auto& stmtnode: body->children)
-					success &= scope.visitASTStmt(*stmtnode);
+					success &= scope.visitASTStmt(stmtnode);
 			}
 
 
@@ -193,7 +192,7 @@ namespace Producer
 
 
 
-	bool Scope::visitASTClass(const AST::Node& node, LVID* localvar)
+	bool Scope::visitASTClass(AST::Node& node, LVID* localvar)
 	{
 		assert(node.rule == AST::rgClass);
 		assert(not node.children.empty());

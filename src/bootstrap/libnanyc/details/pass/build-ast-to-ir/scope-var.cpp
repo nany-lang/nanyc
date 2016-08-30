@@ -19,12 +19,11 @@ namespace Producer
 {
 
 
-	inline bool Scope::visitASTVarValueInitialization(LVID& localvar, const AST::Node& varAssign,
-		const AST::Node& varnodeDecl, const AnyString& varname)
+	inline bool Scope::visitASTVarValueInitialization(LVID& localvar, AST::Node& varAssign,
+		AST::Node& varnodeDecl, const AnyString& varname)
 	{
-		for (auto& assignptr: varAssign.children)
+		for (auto& assignChild: varAssign.children)
 		{
-			auto& assignChild = *assignptr;
 			switch (assignChild.rule)
 			{
 				case AST::rgExpr:
@@ -49,7 +48,7 @@ namespace Producer
 	}
 
 
-	inline bool Scope::generateTypeofForClassVar(LVID& lvid, const AST::Node& varAssign)
+	inline bool Scope::generateTypeofForClassVar(LVID& lvid, AST::Node& varAssign)
 	{
 		// typeof (+2)
 		//	 tk-typeof, typeof
@@ -74,14 +73,14 @@ namespace Producer
 				assert(false and "no node <expr> in <var-assign>");
 				return false;
 			}
-			param->children.push_back(varAssign.children[index]);
+			param->children.push_back(&(varAssign.children[index]));
 		}
 		return visitASTExprTypeof(*typeofn, lvid);
 	}
 
 
 	inline bool
-	Scope::generateInitFuncForClassVar(const AnyString& varname, LVID lvid, const AST::Node& varAssign)
+	Scope::generateInitFuncForClassVar(const AnyString& varname, LVID lvid, AST::Node& varAssign)
 	{
 		// name of the generated func for initialize the class variable
 		ShortString64 funcName;
@@ -108,7 +107,7 @@ namespace Producer
 			assert(false and "no node <expr> in <var-assign>");
 			return false;
 		}
-		context.reuse.func.callparam->children.push_back(varAssign.children[index]);
+		context.reuse.func.callparam->children.push_back(&(varAssign.children[index]));
 
 		bool success = visitASTFunc(*(context.reuse.func.node));
 
@@ -118,8 +117,8 @@ namespace Producer
 
 
 
-	bool Scope::emitVarInClass(const AnyString& varname, const AST::Node& node, const AST::Node* varType,
-		const AST::Node* varAssign, bool ref, bool constant)
+	bool Scope::emitVarInClass(const AnyString& varname, AST::Node& node, AST::Node* varType,
+		AST::Node* varAssign, bool ref, bool constant)
 	{
 		auto& out = sequence();
 		if (debugmode)
@@ -170,8 +169,8 @@ namespace Producer
 	}
 
 
-	bool Scope::emitVarInFunc(const AnyString& varname, const AST::Node& node, const AST::Node* varType,
-		const AST::Node* varAssign, bool ref, bool constant)
+	bool Scope::emitVarInFunc(const AnyString& varname, AST::Node& node, AST::Node* varType,
+		AST::Node* varAssign, bool ref, bool constant)
 	{
 		auto& out = sequence();
 		// create the variable itself
@@ -222,45 +221,43 @@ namespace Producer
 	}
 
 
-	bool Scope::emitProperty(const AnyString& varname, const AST::Node& node, const AST::Node* /*varType*/,
+	bool Scope::emitProperty(const AnyString& varname, AST::Node& node, AST::Node* /*varType*/,
 		AST::Node& varAssign, bool ref)
 	{
 		AST::Node* nodeGet = nullptr;
 		AST::Node* nodeSet = nullptr;
 
-		for (auto& optr: varAssign.children)
+		for (auto& object: varAssign.children)
 		{
-			auto& object = *optr;
 			switch (object.rule)
 			{
 				case AST::rgObject:
 				{
-					for (auto& ptr: object.children)
+					for (auto& child: object.children)
 					{
-						auto& child = *ptr;
 						switch (child.rule)
 						{
 							case AST::rgObjectEntry:
 							{
 								bool validAST = ((child.children.size() == 2)
-									and child.children[0]->rule == AST::rgIdentifier
-									and child.children[1]->rule == AST::rgExpr);
+									and child.children[0].rule == AST::rgIdentifier
+									and child.children[1].rule == AST::rgExpr);
 								if (unlikely(not validAST))
 									return (error(child) << "invalid AST node [property]");
 
-								AnyString name = child.children[0]->text;
+								AnyString name = child.children[0].text;
 								if (name == "get")
 								{
 									if (unlikely(nodeGet))
 										return (error(child) << "property: multiple definition of 'get'");
-									nodeGet = AST::Node::Ptr::WeakPointer(child.children[1]);
+									nodeGet = &(child.children[1]);
 									break;
 								}
 								if (name == "set")
 								{
 									if (unlikely(nodeSet))
 										return (error(child) << "property: multiple definition of 'set'");
-									nodeSet = AST::Node::Ptr::WeakPointer(child.children[1]);
+									nodeSet = &(child.children[1]);
 									break;
 								}
 
@@ -308,7 +305,7 @@ namespace Producer
 
 			auto& returnValue = *(context.reuse.properties.get.returnValue);
 			returnValue.children.clear();
-			returnValue.children.emplace_back(nodeGet);
+			returnValue.children.push_back(nodeGet);
 
 			auto& funcnode = *(context.reuse.properties.get.node);
 			success &= visitASTFunc(funcnode);
@@ -329,7 +326,7 @@ namespace Producer
 
 			auto& body = *(context.reuse.properties.set.body);
 			body.children.clear();
-			body.children.emplace_back(nodeSet);
+			body.children.push_back(nodeSet);
 
 			auto& funcnode = *(context.reuse.properties.set.node);
 			success &= visitASTFunc(funcnode);
@@ -344,7 +341,7 @@ namespace Producer
 
 
 
-	bool Scope::visitASTVar(const AST::Node& node)
+	bool Scope::visitASTVar(AST::Node& node)
 	{
 		assert(node.rule == AST::rgVar);
 		assert(not node.children.empty());
@@ -358,16 +355,15 @@ namespace Producer
 		AST::Node* varType = nullptr;
 		bool isProperty = false;
 
-		for (auto& childptr: node.children)
+		for (auto& child: node.children)
 		{
-			auto& child = *childptr;
 			switch (child.rule)
 			{
 				case AST::rgIdentifier:
 				{
 					varnodeDecl = &child;
 					varname = child.text;
-					if (unlikely(not checkForValidIdentifierName(child, varname, false)))
+					if (unlikely(not checkForValidIdentifierName(child, varname)))
 						return false;
 					break;
 				}
@@ -386,8 +382,8 @@ namespace Producer
 				case AST::rgVarType:
 				{
 					varType = &child;
-					if (child.children.size() == 1 and child.children[0]->rule == AST::rgType)
-						varType = AST::Node::Ptr::WeakPointer(child.children[0]);
+					if (child.children.size() == 1 and child.children[0].rule == AST::rgType)
+						varType = &(child.children[0]);
 					else
 						error(child) << "invalid type definition";
 					break;

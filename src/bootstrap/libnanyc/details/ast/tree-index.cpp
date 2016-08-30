@@ -28,7 +28,7 @@ namespace Nany
 		AST::Node::Ptr ptr = &node;
 
 		// remove first it from the old parent
-		oldParent.children.erase(oldParent.children.begin() + index);
+		oldParent.children.erase(index);
 
 		// add the child first, to keep a reference somewhere
 		newParent.children.push_back(ptr);
@@ -43,12 +43,12 @@ namespace Nany
 		assert(index < oldParent.children.size());
 
 		// add the child first, to keep a reference somewhere
-		newParent.children.insert(newParent.children.begin(), &node);
+		newParent.children.push_front(&node);
 		// metadata, register the new parent
 		node.parent = &newParent;
 
 		// remove it from the old parent
-		oldParent.children.erase(oldParent.children.begin() + index);
+		oldParent.children.erase(index);
 	}
 
 

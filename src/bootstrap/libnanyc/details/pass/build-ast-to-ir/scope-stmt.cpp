@@ -15,11 +15,11 @@ namespace Producer
 {
 
 
-	bool Scope::visitASTStmt(const AST::Node& orignode)
+	bool Scope::visitASTStmt(AST::Node& orignode)
 	{
 		auto& node = (orignode.rule == AST::rgExpr
-			and orignode.children.size() == 1 and orignode.children[0]->rule == AST::rgExprValue)
-			? *(orignode.children[0])
+			and orignode.children.size() == 1 and orignode.children[0].rule == AST::rgExprValue)
+			? orignode.children[0]
 			: orignode;
 
 		// invalidate the last identify opcode offset to avoid any invalid use
@@ -39,25 +39,25 @@ namespace Producer
 				//             function-kind
 				//             function-body
 				//             [...]
-				auto size = node.children.size();
+				uint32_t size = node.children.size();
 				AST::Node* child = nullptr;
 				AST::Node* attrs = nullptr;
 				switch (size)
 				{
 					case 1:
 					{
-						child = AST::Node::Ptr::WeakPointer(node.children[0]);
+						child = &(node.children[0]);
 						break;
 					}
 					case 2:
 					{
-						attrs = AST::Node::Ptr::WeakPointer(node.children[0]);
+						attrs = &(node.children[0]);
 						if (attrs->rule == AST::rgAttributes)
 						{
-							child = AST::Node::Ptr::WeakPointer(node.children[1]);
+							child = &(node.children[1]);
 							if (child->rule == AST::rgExprValue and child->children.size() == 1)
 							{
-								child = AST::Node::Ptr::WeakPointer(child->children[0]);
+								child = &(child->children[0]);
 							}
 							else
 								child = nullptr;

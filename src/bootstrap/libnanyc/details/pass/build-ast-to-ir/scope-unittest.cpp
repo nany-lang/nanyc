@@ -17,7 +17,7 @@ namespace Producer
 {
 
 
-	bool Scope::visitASTUnitTest(const AST::Node& node)
+	bool Scope::visitASTUnitTest(AST::Node& node)
 	{
 		assert(node.rule == AST::rgUnittest);
 
@@ -28,9 +28,8 @@ namespace Producer
 		testname.reserve(512);
 		testname += "^unittest^module:";
 
-		for (auto& childptr: node.children)
+		for (auto& child: node.children)
 		{
-			auto& child = *childptr;
 			switch (child.rule)
 			{
 				case AST::rgEntity:
@@ -68,7 +67,7 @@ namespace Producer
 			context.prepareReuseForUnittest();
 
 		context.reuse.unittest.funcname->text = testname;
-		context.reuse.unittest.funcbody->children.emplace_back(scope);
+		context.reuse.unittest.funcbody->children.push_back(scope);
 
 		bool success = visitASTFunc(*(context.reuse.unittest.node));
 

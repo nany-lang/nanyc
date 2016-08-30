@@ -16,7 +16,7 @@ namespace Producer
 {
 
 
-	bool Scope::visitASTExprNew(const AST::Node& node, LVID& localvar)
+	bool Scope::visitASTExprNew(AST::Node& node, LVID& localvar)
 	{
 		assert(node.rule == AST::rgNew);
 		if (unlikely(node.children.empty()))
@@ -26,13 +26,11 @@ namespace Producer
 
 		// create a new variable for the result
 		LVID rettype = 0;
-		const AST::Node* call = nullptr;
-		const AST::Node* inplace = nullptr;
+		AST::Node* call = nullptr;
+		AST::Node* inplace = nullptr;
 
-		for (auto& childptr: node.children)
+		for (auto& child: node.children)
 		{
-			auto& child = *childptr;
-
 			switch (child.rule)
 			{
 				case AST::rgTypeDecl:
@@ -71,14 +69,13 @@ namespace Producer
 
 				case AST::rgNewParameters:
 				{
-					for (auto& paramptr: child.children)
+					for (auto& param: child.children)
 					{
-						auto& param = *paramptr;
 						if (unlikely(param.rule != AST::rgNewNamedParameter or param.children.size() != 2))
 							return unexpectedNode(param, "[ir/new/params]");
 
-						auto& pname = *(param.children[0]);
-						auto& pexpr = *(param.children[1]);
+						auto& pname = param.children[0];
+						auto& pexpr = param.children[1];
 						if (unlikely(pname.rule != AST::rgIdentifier or pexpr.rule != AST::rgExpr))
 							return unexpectedNode(pname, "[ir/new/param/id]");
 

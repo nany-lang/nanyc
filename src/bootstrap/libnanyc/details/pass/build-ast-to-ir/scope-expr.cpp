@@ -14,7 +14,7 @@ namespace Producer
 {
 
 
-	bool Scope::visitASTExprIdentifier(const AST::Node& node, LVID& localvar)
+	bool Scope::visitASTExprIdentifier(AST::Node& node, LVID& localvar)
 	{
 		// value fetching
 		emitDebugpos(node);
@@ -54,9 +54,9 @@ namespace Producer
 	}
 
 
-	bool Scope::visitASTExprIdOperator(const AST::Node& node, LVID& localvar)
+	bool Scope::visitASTExprIdOperator(AST::Node& node, LVID& localvar)
 	{
-		if (unlikely((node.children.size() != 1) or (node.children[0]->rule != AST::rgFunctionKindOpname)))
+		if (unlikely((node.children.size() != 1) or (node.children[0].rule != AST::rgFunctionKindOpname)))
 			return unexpectedNode(node, "[expr/operator]");
 
 		// value fetching
@@ -64,14 +64,14 @@ namespace Producer
 		auto& out = sequence();
 		uint32_t rid = out.emitStackalloc(nextvar(), nyt_any);
 		ShortString64 idname;
-		idname << '^' << node.children[0]->text;
+		idname << '^' << node.children[0].text;
 		out.emitIdentify(rid, idname, localvar);
 		localvar = rid;
 		return true;
 	}
 
 
-	bool Scope::visitASTExprRegister(const AST::Node& node, LVID& localvar)
+	bool Scope::visitASTExprRegister(AST::Node& node, LVID& localvar)
 	{
 		assert(not node.text.empty());
 		localvar = node.text.to<uint32_t>();
@@ -80,12 +80,11 @@ namespace Producer
 	}
 
 
-	bool Scope::visitASTExprContinuation(const AST::Node& node, LVID& localvar, bool allowScope)
+	bool Scope::visitASTExprContinuation(AST::Node& node, LVID& localvar, bool allowScope)
 	{
 		bool success = true;
-		for (auto& childptr: node.children)
+		for (auto& child: node.children)
 		{
-			auto& child = *childptr;
 			switch (child.rule)
 			{
 				case AST::rgIdentifier: success &= visitASTExprIdentifier(child, localvar); break;
@@ -160,7 +159,7 @@ namespace Producer
 	}
 
 
-	bool Scope::visitASTExpr(const AST::Node& orignode, LVID& localvar, bool allowScope)
+	bool Scope::visitASTExpr(AST::Node& orignode, LVID& localvar, bool allowScope)
 	{
 		assert(not orignode.children.empty());
 
@@ -169,8 +168,8 @@ namespace Producer
 
 		// expr
 		// |   expr-value
-		const AST::Node* nodeptr = &orignode;
-		const AST::Node* attrnode = nullptr;
+		AST::Node* nodeptr = &orignode;
+		AST::Node* attrnode = nullptr;
 		if (orignode.rule == AST::rgExpr)
 		{
 			switch (orignode.children.size())
@@ -179,17 +178,17 @@ namespace Producer
 				{
 					// do not take into consideration this node
 					// (it will generate useless scopes)
-					auto& firstchild = *(orignode.children[0]);
+					auto& firstchild = orignode.children[0];
 					if (firstchild.rule == AST::rgExprValue)
 						nodeptr = &firstchild;
 					break;
 				}
 				case 2:
 				{
-					auto& firstchild = *(orignode.children[0]);
+					auto& firstchild = orignode.children[0];
 					if (firstchild.rule == AST::rgAttributes)
 					{
-						auto& sndchild = *(orignode.children[1]);
+						auto& sndchild = orignode.children[1];
 						if (sndchild.rule == AST::rgExprValue)
 						{
 							nodeptr = &sndchild;

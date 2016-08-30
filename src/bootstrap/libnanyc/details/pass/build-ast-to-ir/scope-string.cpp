@@ -43,7 +43,7 @@ namespace Producer
 
 
 
-	bool Scope::visitASTExprChar(const AST::Node& node, uint32_t& localvar)
+	bool Scope::visitASTExprChar(AST::Node& node, uint32_t& localvar)
 	{
 		char c /*= '\0'*/;
 
@@ -59,7 +59,7 @@ namespace Producer
 			}
 			case 1:
 			{
-				auto& extended = *(node.children[0]);
+				auto& extended = node.children[0];
 				switch (extended.rule)
 				{
 					case AST::rgCharExtended:
@@ -103,7 +103,7 @@ namespace Producer
 	}
 
 
-	bool Scope::visitASTExprStringLiteral(const AST::Node& node, LVID& localvar)
+	bool Scope::visitASTExprStringLiteral(AST::Node& node, LVID& localvar)
 	{
 		// when called, this rule represents an internal cstring
 		// thus, this function can not be called by an user-defined string
@@ -113,7 +113,7 @@ namespace Producer
 	}
 
 
-	bool Scope::visitASTExprString(const AST::Node& node, yuint32& localvar)
+	bool Scope::visitASTExprString(AST::Node& node, yuint32& localvar)
 	{
 		assert(node.rule == AST::rgString);
 
@@ -157,9 +157,8 @@ namespace Producer
 		};
 
 
-		for (auto& childptr: node.children)
+		for (auto& child: node.children)
 		{
-			auto& child = *childptr;
 			switch (child.rule)
 			{
 				case AST::rgStringLiteral:
@@ -185,9 +184,8 @@ namespace Producer
 						context.reuse.string.text.clear();
 					}
 
-					for (auto& ptr: child.children)
+					for (auto& expr: child.children)
 					{
-						auto& expr = *ptr;
 						if (unlikely(expr.rule != AST::rgExpr))
 							return unexpectedNode(expr, "[string-interpolation]");
 
@@ -228,7 +226,7 @@ namespace Producer
 
 				default:
 				{
-					return unexpectedNode(*childptr, "[expr-string]");
+					return unexpectedNode(child, "[expr-string]");
 				}
 			}
 		}

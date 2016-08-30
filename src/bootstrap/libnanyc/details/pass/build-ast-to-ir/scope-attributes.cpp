@@ -19,7 +19,7 @@ namespace Producer
 {
 
 
-	bool Scope::visitASTAttributes(const AST::Node& node)
+	bool Scope::visitASTAttributes(AST::Node& node)
 	{
 		assert(node.rule == AST::rgAttributes);
 
@@ -35,10 +35,8 @@ namespace Producer
 		// temporary buffer for value interpretation
 		ShortString32& value = context.reuse.attributes.value;
 
-		for (auto& childptr: node.children)
+		for (auto& child: node.children)
 		{
-			auto& child = *childptr;
-
 			// checking for node type
 			if (unlikely(child.rule != AST::rgAttributesParameter))
 				return unexpectedNode(child, "invalid node, not attribute parameter");
@@ -47,11 +45,11 @@ namespace Producer
 			switch (child.children.size())
 			{
 				case 1: nodevalue = nullptr; break;
-				case 2: nodevalue = AST::Node::Ptr::WeakPointer(child.children[1]); break;
+				case 2: nodevalue = &(child.children[1]); break;
 				default:
 					return unexpectedNode(child, "invalid attribute parameter node");
 			}
-			AST::Node& nodekey = *child.children[0];
+			AST::Node& nodekey = child.children[0];
 			if (unlikely(nodekey.rule != AST::rgEntity))
 				return unexpectedNode(child, "invalid attribute parameter name type");
 			if (nodevalue)
@@ -145,7 +143,7 @@ namespace Producer
 						bool isTrue = (value == "__true");
 						if (not isTrue and (value.empty() or value != "__false"))
 						{
-							error(*child.children[1]) << "invalid shortcircuit value, expected '__false' or '__true', got '"
+							error(child.children[1]) << "invalid shortcircuit value, expected '__false' or '__true', got '"
 								<< value << "'";
 							return false;
 						}

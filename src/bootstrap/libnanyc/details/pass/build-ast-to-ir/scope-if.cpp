@@ -16,7 +16,7 @@ namespace Producer
 {
 
 
-	bool Scope::generateIfStmt(const AST::Node& expr, const AST::Node& thenc, const AST::Node* elseptr, uint32_t* customjmpthenOffset)
+	bool Scope::generateIfStmt(AST::Node& expr, AST::Node& thenc, AST::Node* elseptr, uint32_t* customjmpthenOffset)
 	{
 		// output sequence
 		auto& out = sequence();
@@ -63,7 +63,7 @@ namespace Producer
 
 				if (unlikely(thenc.children.size() != 1))
 					return (ice(thenc) << "invalid if-then branch");
-				auto& thenNode = *(thenc.children[0]);
+				auto& thenNode = thenc.children[0];
 
 				success &= visitASTStmt(thenNode);
 			}
@@ -100,7 +100,7 @@ namespace Producer
 
 				if (unlikely(elsec.children.size() != 1))
 					return (ice(elsec) << "invalid if-then branch");
-				auto& elseNode = *(elsec.children[0]);
+				auto& elseNode = elsec.children[0];
 
 				success &= visitASTStmt(elseNode);
 			}
@@ -116,7 +116,7 @@ namespace Producer
 	}
 
 
-	bool Scope::generateIfExpr(uint32_t& ifret, const AST::Node& expr, const AST::Node& thenc, const AST::Node& elsec)
+	bool Scope::generateIfExpr(uint32_t& ifret, AST::Node& expr, AST::Node& thenc, AST::Node& elsec)
 	{
 		// output sequence
 		auto& out = sequence();
@@ -165,7 +165,7 @@ namespace Producer
 
 				if (unlikely(thenc.children.size() != 1))
 					return (ice(thenc) << "invalid if-then branch");
-				auto& thenNode = *(thenc.children[0]);
+				auto& thenNode = thenc.children[0];
 
 				uint32_t thenlvid;
 				success &= visitASTExpr(thenNode, thenlvid);
@@ -192,7 +192,7 @@ namespace Producer
 
 				if (unlikely(elsec.children.size() != 1))
 					return (ice(elsec) << "invalid if-then branch");
-				auto& elseNode = *(elsec.children[0]);
+				auto& elseNode = elsec.children[0];
 
 				uint32_t elselvid;
 				success &= visitASTExpr(elseNode, elselvid);
@@ -217,16 +217,15 @@ namespace Producer
 
 
 
-	bool Scope::visitASTExprIfStmt(const AST::Node& node)
+	bool Scope::visitASTExprIfStmt(AST::Node& node)
 	{
 		assert(node.rule == AST::rgIf);
-		const AST::Node* condition = nullptr;
-		const AST::Node* ifthen = nullptr;
-		const AST::Node* ifelse = nullptr;
+		AST::Node* condition = nullptr;
+		AST::Node* ifthen = nullptr;
+		AST::Node* ifelse = nullptr;
 
-		for (auto& childptr: node.children)
+		for (auto& child: node.children)
 		{
-			auto& child = *childptr;
 			switch (child.rule)
 			{
 				case AST::rgExpr: condition = &child; break;
@@ -243,19 +242,18 @@ namespace Producer
 	}
 
 
-	bool Scope::visitASTExprIfExpr(const AST::Node& node, LVID& localvar)
+	bool Scope::visitASTExprIfExpr(AST::Node& node, LVID& localvar)
 	{
 		assert(node.rule == AST::rgIf);
 
 		localvar = 0u;
 
-		const AST::Node* condition = nullptr;
-		const AST::Node* ifthen = nullptr;
-		const AST::Node* ifelse = nullptr;
+		AST::Node* condition = nullptr;
+		AST::Node* ifthen = nullptr;
+		AST::Node* ifelse = nullptr;
 
-		for (auto& childptr: node.children)
+		for (auto& child: node.children)
 		{
-			auto& child = *childptr;
 			switch (child.rule)
 			{
 				case AST::rgExpr: condition = &child; break;

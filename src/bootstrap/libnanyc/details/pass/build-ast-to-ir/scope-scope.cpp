@@ -15,7 +15,7 @@ namespace Producer
 {
 
 
-	bool Scope::visitASTExprScope(const AST::Node& node)
+	bool Scope::visitASTExprScope(AST::Node& node)
 	{
 		if (unlikely(kind != Kind::kfunc))
 		{
@@ -34,8 +34,8 @@ namespace Producer
 		IR::Producer::Scope scope{*this};
 
 		bool success = true;
-		for (auto& childptr: node.children)
-			success &= scope.visitASTStmt(*childptr);
+		for (auto& child: node.children)
+			success &= scope.visitASTStmt(child);
 
 		return success;
 	}

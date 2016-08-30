@@ -16,12 +16,12 @@ namespace Producer
 {
 
 
-	bool Scope::visitASTExprWhile(const AST::Node& node)
+	bool Scope::visitASTExprWhile(AST::Node& node)
 	{
 		assert(node.rule == AST::rgWhile);
 		assert(not node.children.empty());
 
-		uint32_t childcount = static_cast<uint32_t>(node.children.size());
+		uint32_t childcount = node.children.size();
 		if (unlikely(childcount != 2))
 		{
 			ice(node) << "while: invalid number of children";
@@ -50,7 +50,7 @@ namespace Producer
 		// generating the code for the condition itself
 		{
 			OpcodeScopeLocker opscopeCond{out};
-			auto& condition = *(node.children[0]);
+			auto& condition = node.children[0];
 			emitDebugpos(condition);
 			uint32_t exprEval = 0;
 			success &= visitASTExpr(condition, exprEval, false);
@@ -68,7 +68,7 @@ namespace Producer
 				out.emitComment("while-body");
 
 			OpcodeScopeLocker opscopeBody{out};
-			success &= visitASTStmt(*(node.children[1]));
+			success &= visitASTStmt(node.children[1]);
 		}
 
 		emitDebugpos(node);
@@ -84,12 +84,12 @@ namespace Producer
 	}
 
 
-	bool Scope::visitASTExprDoWhile(const AST::Node& node)
+	bool Scope::visitASTExprDoWhile(AST::Node& node)
 	{
 		assert(node.rule == AST::rgDoWhile);
 		assert(not node.children.empty());
 
-		uint32_t childcount = static_cast<uint32_t>(node.children.size());
+		uint32_t childcount = node.children.size();
 		if (unlikely(childcount != 2))
 		{
 			ice(node) << "do-while: invalid number of children";
@@ -115,7 +115,7 @@ namespace Producer
 				out.emitComment("do-while-body");
 
 			OpcodeScopeLocker opscopeBody{out};
-			success &= visitASTStmt(*(node.children[0]));
+			success &= visitASTStmt(node.children[0]);
 		}
 
 		if (debugmode)
@@ -127,7 +127,7 @@ namespace Producer
 		// generating the code for the condition itself
 		{
 			OpcodeScopeLocker opscopeCond{out};
-			auto& condition = *(node.children[1]);
+			auto& condition = node.children[1];
 			uint32_t exprEval = 0;
 			emitDebugpos(condition);
 			success &= visitASTExpr(condition, exprEval, false);
@@ -139,7 +139,6 @@ namespace Producer
 		out.emitJnz(condlvid, 0, labelWhile);
 		return success;
 	}
-
 
 
 

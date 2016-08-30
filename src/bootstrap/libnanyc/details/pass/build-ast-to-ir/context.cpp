@@ -493,7 +493,6 @@ namespace Producer
 
 		// Return types
 		reuse.properties.get.type = &root->append(AST::rgFuncReturnType, AST::rgType);
-		reuse.properties.get.type->children.reserve(1);
 
 		reuse.properties.get.typeIsRefAny = new AST::Node{AST::rgTypeQualifier};
 		reuse.properties.get.typeIsRefAny->append(AST::rgRef);

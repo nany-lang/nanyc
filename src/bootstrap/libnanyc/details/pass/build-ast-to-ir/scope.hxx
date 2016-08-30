@@ -114,28 +114,28 @@ namespace Producer
 		return ++nextVarID;
 	}
 
-	inline LVID Scope::createLocalBuiltinVoid(const AST::Node& node)
+	inline LVID Scope::createLocalBuiltinVoid(AST::Node& node)
 	{
 		emitDebugpos(node);
 		return context.sequence.emitStackalloc(nextvar(), nyt_void);
 	}
 
 
-	inline LVID Scope::createLocalBuiltinAny(const AST::Node& node)
+	inline LVID Scope::createLocalBuiltinAny(AST::Node& node)
 	{
 		emitDebugpos(node);
 		return context.sequence.emitStackalloc(nextvar(), nyt_any);
 	}
 
 
-	inline LVID Scope::createLocalBuiltinFloat(const AST::Node& node, nytype_t type, double value)
+	inline LVID Scope::createLocalBuiltinFloat(AST::Node& node, nytype_t type, double value)
 	{
 		emitDebugpos(node);
 		return context.sequence.emitStackalloc_f64(nextvar(), type, value);
 	}
 
 
-	inline LVID Scope::createLocalBuiltinInt(const AST::Node& node, nytype_t type, yuint64 value)
+	inline LVID Scope::createLocalBuiltinInt(AST::Node& node, nytype_t type, yuint64 value)
 	{
 		emitDebugpos(node);
 		return context.sequence.emitStackalloc_u64(nextvar(), type, value);
@@ -170,14 +170,14 @@ namespace Producer
 	}
 
 
-	inline void Scope::emitDebugpos(const AST::Node* node)
+	inline void Scope::emitDebugpos(AST::Node* node)
 	{
 		if (node)
 			emitDebugpos(*node);
 	}
 
 
-	inline bool Scope::visitASTExprSubDot(const AST::Node& node, LVID& localvar)
+	inline bool Scope::visitASTExprSubDot(AST::Node& node, LVID& localvar)
 	{
 		emitTmplParametersIfAny();
 		context.sequence.emitEnsureTypeResolved(localvar);

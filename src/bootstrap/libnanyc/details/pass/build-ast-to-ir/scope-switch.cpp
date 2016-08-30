@@ -17,7 +17,7 @@ namespace Producer
 {
 
 
-	bool Scope::visitASTExprSwitch(const AST::Node& node)
+	bool Scope::visitASTExprSwitch(AST::Node& node)
 	{
 		assert(node.rule == AST::rgSwitch);
 		bool success = true;
@@ -67,10 +67,8 @@ namespace Producer
 		uint32_t labelCount = 0;
 
 
-		for (auto& childptr: node.children)
+		for (auto& child: node.children)
 		{
-			auto& child = *childptr;
-
 			switch (child.rule)
 			{
 				case AST::rgSwitchCase:
@@ -86,10 +84,10 @@ namespace Producer
 					{
 						OpcodeScopeLocker opscopeCase{out};
 						rhs->children.clear();
-						rhs->children.push_back(child.children[0]);
+						rhs->children.push_back(&(child.children[0]));
 
 						bodyScope.children.clear();
-						bodyScope.children.push_back(child.children[1]);
+						bodyScope.children.push_back(&(child.children[1]));
 
 						success &= generateIfStmt(*exprCase, bodyScope, /*else*/nullptr, &(labels[labelCount]));
 						++labelCount;
@@ -101,7 +99,7 @@ namespace Producer
 				{
 					if (child.children.size() == 1)
 					{
-						auto& condition = *(child.children[0]);
+						auto& condition = child.children[0];
 						emitDebugpos(condition);
 						success &= visitASTExpr(condition, valuelvid, false);
 

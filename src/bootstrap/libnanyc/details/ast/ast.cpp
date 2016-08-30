@@ -13,7 +13,6 @@ namespace AST
 	Node* createNodeFunc(Node*& funcname)
 	{
 		Node* func = new Node{rgFunction};
-		func->children.reserve(4);
 
 		// no visibility, using the default one
 		// // visibility: public

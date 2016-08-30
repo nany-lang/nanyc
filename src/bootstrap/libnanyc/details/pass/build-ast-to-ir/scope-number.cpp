@@ -76,7 +76,7 @@ namespace Producer
 
 
 	template<bool BuiltinT, class DefT>
-	inline bool Scope::generateNumberCode(uint32_t& localvar, const DefT& numdef, const AST::Node& node)
+	inline bool Scope::generateNumberCode(uint32_t& localvar, const DefT& numdef, AST::Node& node)
 	{
 		// checking for invalid float values
 		nytype_t type = nyt_void;
@@ -212,7 +212,7 @@ namespace Producer
 
 
 
-	bool Scope::visitASTExprNumber(const AST::Node& node, yuint32& localvar)
+	bool Scope::visitASTExprNumber(AST::Node& node, yuint32& localvar)
 	{
 		assert(node.rule == AST::rgNumber);
 		assert(not node.children.empty());
@@ -225,31 +225,31 @@ namespace Producer
 
 		emitDebugpos(node);
 
-		for (auto& childptr: node.children)
+		for (auto& child: node.children)
 		{
-			switch (childptr->rule)
+			switch (child.rule)
 			{
 				case AST::rgNumberValue: // standard number definition
 				{
 					bool firstPart = true;
-					for (auto& subnodeptr: childptr->children)
+					for (auto& subnode: child.children)
 					{
-						switch (subnodeptr->rule)
+						switch (subnode.rule)
 						{
 							case AST::rgInteger:
 							{
 								if (likely(firstPart))
 								{
-									if (not subnodeptr->text.to<uint64>(numdef.part1))
+									if (not subnode.text.to<uint64>(numdef.part1))
 									{
-										error(*subnodeptr) << "invalid integer value";
+										error(subnode) << "invalid integer value";
 										return false;
 									}
 									firstPart = false;
 								}
 								else
 								{
-									numdef.part2 = subnodeptr->text;
+									numdef.part2 = subnode.text;
 									numdef.part2.trimRight('0'); // remove useless zeros
 									// as far as we know, it is a float64 by default
 									numdef.isFloat = true;
@@ -259,7 +259,7 @@ namespace Producer
 
 							default:
 							{
-								ice(*subnodeptr) << "[expr-number]";
+								ice(subnode) << "[expr-number]";
 								return false;
 							}
 						}
@@ -269,17 +269,16 @@ namespace Producer
 
 				case AST::rgNumberSign: // + -
 				{
-					assert(not childptr->text.empty() and "invalid ast");
-					numdef.sign = childptr->text[0];
+					assert(not child.text.empty() and "invalid ast");
+					numdef.sign = child.text[0];
 					assert(numdef.sign == '+' or numdef.sign == '-');
 					break;
 				}
 
 				case AST::rgNumberQualifier: // unsigned / signed / float
 				{
-					for (auto& subnodeptr: childptr->children)
+					for (auto& subnode: child.children)
 					{
-						auto& subnode = *(subnodeptr);
 						switch (subnode.rule)
 						{
 							case AST::rgNumberQualifierType:
@@ -332,7 +331,7 @@ namespace Producer
 
 				default:
 				{
-					ice(*childptr) << "[expr-number]";
+					ice(child) << "[expr-number]";
 					return false;
 				}
 			}

@@ -15,7 +15,7 @@ namespace Producer
 {
 
 
-	bool Scope::visitASTFor(const AST::Node& node)
+	bool Scope::visitASTFor(AST::Node& node)
 	{
 		// Name of the target ref for each element in the container
 		ShortString128 elementname;
@@ -32,9 +32,8 @@ namespace Producer
 
 		OpcodeScopeLocker opscopeElse{out};
 
-		for (auto& childptr: node.children)
+		for (auto& child: node.children)
 		{
-			auto& child = *childptr;
 			switch (child.rule)
 			{
 				case AST::rgIn:
@@ -87,6 +86,7 @@ namespace Producer
 		auto& scopeChildren = context.reuse.loops.scope->children;
 		if (forDoClause)
 			scopeChildren = forDoClause->children;
+
 		if (forElseClause)
 		{
 			context.reuse.loops.ifnode->children.push_back(context.reuse.loops.elseClause);

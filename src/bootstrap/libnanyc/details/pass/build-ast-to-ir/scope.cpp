@@ -15,7 +15,7 @@ namespace Producer
 {
 
 
-	void Scope::emitDebugpos(const AST::Node& node)
+	void Scope::emitDebugpos(AST::Node& node)
 	{
 		if (node.offset > 0)
 		{
@@ -50,12 +50,12 @@ namespace Producer
 	}
 
 
-	AnyString Scope::getSymbolNameFromASTNode(const AST::Node& node)
+	AnyString Scope::getSymbolNameFromASTNode(AST::Node& node)
 	{
 		assert(node.rule == AST::rgSymbolName);
 		assert(node.children.size() == 1);
 
-		auto& identifier = *(node.children[0]);
+		auto& identifier = node.children.front();
 		if (unlikely(identifier.rule != AST::rgIdentifier))
 		{
 			unexpectedNode(node, "expected identifier");

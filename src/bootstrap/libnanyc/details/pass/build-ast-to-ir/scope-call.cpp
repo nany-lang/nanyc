@@ -15,7 +15,7 @@ namespace IR
 namespace Producer
 {
 
-	inline bool Scope::visitASTExprCallParameters(const AST::Node& node, ShortcircuitUpdate* shortcircuit)
+	inline bool Scope::visitASTExprCallParameters(AST::Node& node, ShortcircuitUpdate* shortcircuit)
 	{
 		assert(node.rule == AST::rgCall);
 		// parameter index
@@ -33,9 +33,8 @@ namespace Producer
 		// the sequence
 		auto& out = sequence();
 
-		for (auto& childptr: node.children)
+		for (auto& child: node.children)
 		{
-			auto& child = *childptr;
 			switch (child.rule)
 			{
 				case AST::rgCallParameter:
@@ -64,9 +63,8 @@ namespace Producer
 					// parameter name
 					AnyString name;
 
-					for (auto& paramChildptr: child.children)
+					for (auto& paramchild: child.children)
 					{
-						auto& paramchild = *paramChildptr;
 						switch (paramchild.rule)
 						{
 							case AST::rgExpr:
@@ -156,7 +154,7 @@ namespace Producer
 
 
 
-	bool Scope::visitASTExprCall(const AST::Node* node, LVID& localvar, const AST::Node* parent)
+	bool Scope::visitASTExprCall(AST::Node* node, LVID& localvar, AST::Node* parent)
 	{
 		assert(!node or node->rule == AST::rgCall);
 

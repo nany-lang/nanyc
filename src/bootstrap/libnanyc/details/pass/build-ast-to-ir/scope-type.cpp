@@ -15,14 +15,14 @@ namespace IR
 namespace Producer
 {
 
-	bool Scope::visitASTExprTypeDecl(const AST::Node& node, LVID& localvar)
+	bool Scope::visitASTExprTypeDecl(AST::Node& node, LVID& localvar)
 	{
 		assert(node.rule == AST::rgTypeDecl);
 		localvar = 0;
 
 		if (node.children.size() == 1)
 		{
-			auto& identifier = *(node.children[0]);
+			auto& identifier = node.children[0];
 			if (identifier.children.empty())
 			{
 				if (identifier.text == "any") // no real information, already 'any'
@@ -56,7 +56,7 @@ namespace Producer
 
 
 
-	bool Scope::visitASTType(const AST::Node& node, LVID& localvar)
+	bool Scope::visitASTType(AST::Node& node, LVID& localvar)
 	{
 		assert(node.rule == AST::rgType);
 		assert(not node.children.empty());
@@ -67,10 +67,8 @@ namespace Producer
 		bool isConst = false;
 		localvar = 0; // reset
 
-		for (auto& childptr: node.children)
+		for (auto& child: node.children)
 		{
-			auto& child = *childptr;
-
 			switch (child.rule)
 			{
 				case AST::rgTypeDecl:
@@ -90,7 +88,7 @@ namespace Producer
 				{
 					for (auto& qualifier: child.children)
 					{
-						switch (qualifier->rule)
+						switch (qualifier.rule)
 						{
 							case AST::rgRef:   isRef   = true; break;
 							case AST::rgConst: isConst = true; break;
@@ -129,8 +127,6 @@ namespace Producer
 		}
 		return success;
 	}
-
-
 
 
 

@@ -15,7 +15,7 @@ namespace Producer
 {
 
 
-	bool Scope::visitASTExprReturn(const AST::Node& node)
+	bool Scope::visitASTExprReturn(AST::Node& node)
 	{
 		assert(node.rule == AST::rgReturn);
 		// assert(not node.children.empty()); -- a return may be empty
@@ -24,10 +24,8 @@ namespace Producer
 		bool hasReturnValue = false;
 		auto& out = sequence();
 
-		for (auto& childptr: node.children)
+		for (auto& child: node.children)
 		{
-			auto& child = *childptr;
-
 			switch (child.rule)
 			{
 				case AST::rgExpr:

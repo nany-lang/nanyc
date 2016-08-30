@@ -18,12 +18,11 @@ namespace Producer
 {
 
 
-	inline bool Scope::visitASTDeclSingleGenericTypeParameter(const AST::Node& node)
+	inline bool Scope::visitASTDeclSingleGenericTypeParameter(AST::Node& node)
 	{
 		assert(node.rule == AST::rgFuncParam);
-		for (auto& childptr: node.children)
+		for (auto& child: node.children)
 		{
-			auto& child = *childptr;
 			switch (child.rule)
 			{
 				case AST::rgIdentifier:
@@ -56,7 +55,7 @@ namespace Producer
 	}
 
 
-	bool Scope::visitASTDeclGenericTypeParameters(const AST::Node& node)
+	bool Scope::visitASTDeclGenericTypeParameters(AST::Node& node)
 	{
 		assert(node.rule == AST::rgClassTemplateParams);
 		if (unlikely(node.children.empty()))
@@ -67,9 +66,8 @@ namespace Producer
 
 		bool success = true;
 
-		for (auto& childptr: node.children)
+		for (auto& child: node.children)
 		{
-			auto& child = *childptr;
 			switch (child.rule)
 			{
 				case AST::rgFuncParam:
@@ -88,17 +86,15 @@ namespace Producer
 
 
 
-	inline bool Scope::visitASTExprTemplateParameter(const AST::Node& node)
+	inline bool Scope::visitASTExprTemplateParameter(AST::Node& node)
 	{
 		assert(node.rule == AST::rgCallTemplateParameter or node.rule == AST::rgCallTemplateNamedParameter);
 
-		const AST::Node* type = nullptr;
+		AST::Node* type = nullptr;
 		AnyString name;
 
-		for (auto& childptr: node.children)
+		for (auto& child: node.children)
 		{
-			auto& child = *childptr;
-
 			switch (child.rule)
 			{
 				case AST::rgType:
@@ -132,13 +128,12 @@ namespace Producer
 
 
 
-	bool Scope::visitASTExprTemplate(const AST::Node& node, LVID& localvar)
+	bool Scope::visitASTExprTemplate(AST::Node& node, LVID& localvar)
 	{
 		assert(node.rule == AST::rgExprTemplate or node.rule == AST::rgExprTypeTemplate);
 
-		for (auto& childptr: node.children)
+		for (auto& child: node.children)
 		{
-			auto& child = *childptr;
 			switch (child.rule)
 			{
 				case AST::rgCallTemplateParameters:
@@ -147,9 +142,8 @@ namespace Producer
 					lastPushedTmplParams->reserve(child.children.size());
 
 					bool success = true;
-					for (auto& ptr: child.children)
+					for (auto& param: child.children)
 					{
-						auto& param = *ptr;
 						switch (param.rule)
 						{
 							case AST::rgCallTemplateParameter:
