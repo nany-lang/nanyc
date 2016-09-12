@@ -4,6 +4,12 @@
 #include "details/fwd.h"
 #include <functional> // std::hash
 
+#ifdef YUNI_OS_MSVC
+#define LIBYUNI_CLID_UNION  0
+#else
+#define LIBYUNI_CLID_UNION  1
+#endif
+
 
 
 
@@ -53,8 +59,12 @@ namespace Nany
 
 
 	private:
+		#if !LIBYUNI_CLID_UNION
 		uint32_t m_atomid = 0;
 		uint32_t m_lvid = 0;
+		#else
+		union { uint32_t u32[2]; uint64_t u64; } m_data = {{0,0}};
+		#endif
 
 	}; // class CLID
 
