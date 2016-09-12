@@ -6,100 +6,82 @@
 namespace Nany
 {
 
-	inline CLID CLID::AtomMapID(yuint32 atomid)
+	inline CLID CLID::AtomMapID(uint32_t atomid)
 	{
 		assert(atomid != 0);
 		return CLID{atomid, 0};
 	}
 
 
-
-	inline CLID::CLID()
-	{
-		data.u64 = 0;
-	}
-
-
-	inline CLID::CLID(yuint32 atomid, LVID lvid)
+	inline CLID::CLID(uint32_t atomid, uint32_t lvid)
+		: m_atomid(atomid)
+		, m_lvid(lvid)
 	{
 		assert(lvid < 1000000); // arbitrary integrity check
-		data.u32[0] = lvid;
-		data.u32[1] = atomid;
 	}
-
-
-	inline CLID::CLID(const CLID& rhs)
-		: data(rhs.data)
-	{}
 
 
 	inline bool CLID::isVoid() const
 	{
-		return data.u64 == 0;
+		return !m_atomid and !m_lvid;
 	}
 
 
-	inline void CLID::reclass(LVID lvid)
+	inline void CLID::reclass(uint32_t lvid)
 	{
 		assert(lvid < 1000000); // arbitrary integrity check
-		data.u32[0] = lvid;
+		m_lvid = lvid;
 	}
 
 
-	inline void CLID::reclass(yuint32 atomid, LVID lvid)
+	inline void CLID::reclass(uint32_t atomid, uint32_t lvid)
 	{
 		assert(lvid < 1000000); // arbitrary integrity check
-		data.u32[0] = lvid;
-		data.u32[1] = atomid;
+		m_atomid = atomid;
+		m_lvid = lvid;
 	}
 
 
 	inline void CLID::reclassToVoid()
 	{
-		data.u64 = 0;
-	}
-
-
-	inline CLID& CLID::operator = (const CLID& rhs)
-	{
-		data = rhs.data;
-		return *this;
+		m_atomid = 0;
+		m_lvid = 0;
 	}
 
 
 	inline bool CLID::operator == (const CLID& rhs) const
 	{
-		return data.u64 == rhs.data.u64;
+		return m_atomid == rhs.m_atomid and m_lvid == rhs.m_lvid;
 	}
 
 
 	inline bool CLID::operator != (const CLID& rhs) const
 	{
-		return data.u64 != rhs.data.u64;
+		return m_atomid != rhs.m_atomid or m_lvid != rhs.m_lvid;
 	}
 
 
 	inline bool CLID::operator <  (const CLID& rhs) const
 	{
-		return data.u64 < rhs.data.u64;
+		return m_atomid < rhs.m_atomid and m_lvid < rhs.m_lvid;
 	}
 
 
 	inline size_t CLID::hash() const
 	{
-		return static_cast<size_t>(data.u64);
+		return std::hash<uint32_t>()(m_atomid) xor std::hash<uint32_t>()(m_lvid);
 	}
 
 
-	inline yuint32 CLID::atomid() const
+	inline uint32_t CLID::atomid() const
 	{
-		return data.u32[1];
+		return m_atomid;
 	}
 
 
-	inline LVID CLID::lvid() const
+	inline uint32_t CLID::lvid() const
 	{
-		return data.u32[0];
+		return m_lvid;
 	}
 
 
@@ -114,7 +96,7 @@ namespace std
 {
 	template<> struct hash<Nany::CLID> final
 	{
-		size_t operator() (const Nany::CLID& clid) const
+		inline size_t operator() (const Nany::CLID& clid) const
 		{
 			return clid.hash();
 		}
@@ -138,7 +120,7 @@ namespace CString
 	public:
 		static void Perform(CStringT& string, const Nany::CLID& rhs)
 		{
-			string << "{" << rhs.atomid() << ':' << rhs.lvid() << '}';
+			string << '{' << rhs.atomid() << ':' << rhs.lvid() << '}';
 		}
 	};
 
@@ -151,7 +133,7 @@ namespace CString
 
 inline std::ostream& operator << (std::ostream& out, const Nany::CLID& rhs)
 {
-	out << "{" << rhs.atomid() << ':' << rhs.lvid() << '}';
+	out << '{' << rhs.atomid() << ':' << rhs.lvid() << '}';
 	return out;
 }
 

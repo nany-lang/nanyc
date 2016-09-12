@@ -14,37 +14,36 @@ namespace Nany
 	{
 	public:
 		//! Create a CLID for an atom id
-		static CLID AtomMapID(yuint32 atomid);
+		static CLID AtomMapID(uint32_t atomid);
 
 	public:
 		//! Default constructor
-		CLID();
+		CLID() = default;
 		//! Default constructor with initial value
-		CLID(yuint32 atomid, LVID lvid);
+		CLID(uint32_t atomid, uint32_t lvid);
 		//! Copy constructor
-		CLID(const CLID&);
+		CLID(const CLID&) = default;
 
 		//! Get if the clid is valid (aka != 0)
 		bool isVoid() const;
 
 		//! update the class id from lvid only
-		void reclass(LVID lvid);
+		void reclass(uint32_t lvid);
 		//! update the class id from {atom id, lvid}
-		void reclass(yuint32 atomid, LVID lvid);
+		void reclass(uint32_t atomid, uint32_t lvid);
 		//! update to 'void'
 		void reclassToVoid();
 
 		//! Get the atom id of the clid
-		yuint32 atomid() const;
+		uint32_t atomid() const;
 		//! Get the lvid part
-		LVID lvid() const;
-
+		uint32_t lvid() const;
 
 		//! hash of the clid
 		size_t hash() const;
 
 		//! Assignment operator
-		CLID& operator = (const CLID&);
+		CLID& operator = (const CLID&) = default;
 		//! Equal operator
 		bool operator == (const CLID&) const;
 		//! Not equal operator
@@ -54,7 +53,8 @@ namespace Nany
 
 
 	private:
-		union { yuint32 u32[2]; yuint64 u64; } data;
+		uint32_t m_atomid = 0;
+		uint32_t m_lvid = 0;
 
 	}; // class CLID
 
