@@ -19,7 +19,7 @@ namespace Builtin
 
 	template<> struct TypeToEnumValue<void> final
 	{
-		typedef void NativeType;
+		using NativeType = void;
 		enum { value = nyt_void, size = 0 };
 		static AnyString toTypeString() { return "void"; }
 	};
@@ -27,7 +27,7 @@ namespace Builtin
 	# define NY_DECLARE_BUILTIN(TYPE, ENUM, SIZE) \
 		template<> struct TypeToEnumValue<TYPE> final \
 		{ \
-			typedef yuint64 NativeType; \
+			using NativeType = yuint64; \
 			enum { value = ENUM, size = SIZE }; \
 			static AnyString toTypeString() { return #TYPE; } \
 		}

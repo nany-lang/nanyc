@@ -14,8 +14,8 @@ namespace Nany
 		: public Yuni::IIntrusiveSmartPtr<Project, false, Yuni::Policy::SingleThreaded>
 	{
 	public:
-		typedef Yuni::IIntrusiveSmartPtr<Project, false, Yuni::Policy::SingleThreaded> IntrusiveSmartPtr;
-		typedef IntrusiveSmartPtr::Ptr Ptr;
+		using IntrusiveSmartPtr = Yuni::IIntrusiveSmartPtr<Project, false, Yuni::Policy::SingleThreaded>;
+		using Ptr = IntrusiveSmartPtr::Ptr;
 
 	public:
 		//! Ctor with an user-defined settings

@@ -13,11 +13,11 @@ static void nanyc_cout(nyvm_t* tctx, void* string, uint32_t length)
 }
 
 
-template<class T> struct IntCast { typedef T value; };
-template<> struct IntCast<int8_t> { typedef int32_t value; };
-template<> struct IntCast<uint8_t> { typedef uint32_t value; };
-template<> struct IntCast<int16_t> { typedef int32_t value; };
-template<> struct IntCast<uint16_t> { typedef uint32_t value; };
+template<class T> struct IntCast    { using value = T;        };
+template<> struct IntCast<int8_t>   { using value = int32_t;  };
+template<> struct IntCast<uint8_t>  { using value = uint32_t; };
+template<> struct IntCast<int16_t>  { using value = int32_t;  };
+template<> struct IntCast<uint16_t> { using value = uint32_t; };
 
 template<class T> static uint32_t nanyc_string_append(nyvm_t*, void* string, T value)
 {

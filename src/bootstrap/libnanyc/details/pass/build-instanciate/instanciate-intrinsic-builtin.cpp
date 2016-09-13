@@ -1085,7 +1085,7 @@ namespace Instanciate
 
 
 
-		typedef bool (*BuiltinIntrinsic)(SequenceBuilder&, uint32_t);
+		using BuiltinIntrinsic = bool (*)(SequenceBuilder&, uint32_t);
 
 		static const std::unordered_map<AnyString, std::pair<uint32_t, BuiltinIntrinsic>> builtinDispatch =
 		{

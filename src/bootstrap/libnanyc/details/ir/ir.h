@@ -10,9 +10,9 @@ namespace IR
 {
 
 	//! Operand type
-	typedef yuint64 Operand;
+	using Operand = uint64_t;
 
-	typedef yuint32 Offset;
+	using Offset = uint32_t;
 
 
 

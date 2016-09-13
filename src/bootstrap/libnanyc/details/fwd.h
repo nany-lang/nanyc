@@ -18,7 +18,7 @@ namespace Nany
 {
 
 	//! Local var ID
-	typedef yuint32 LVID;
+	using LVID = uint32_t;
 
 	static inline constexpr bool lvidIsAny(LVID lvid) { return lvid == (LVID) -1; }
 

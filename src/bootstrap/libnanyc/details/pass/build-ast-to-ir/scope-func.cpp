@@ -24,7 +24,7 @@ namespace Producer
 		class FuncInspector final : public Yuni::NonCopyable<FuncInspector>
 		{
 		public:
-			typedef CString<Config::maxSymbolNameLength, false> FuncnameType;
+			using FuncnameType = CString<Config::maxSymbolNameLength, false>;
 
 
 		public:

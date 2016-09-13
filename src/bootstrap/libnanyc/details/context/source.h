@@ -26,11 +26,11 @@ namespace Nany
 	{
 	public:
 		//! The class ancestor
-		typedef Yuni::IIntrusiveSmartPtr<Source, false, Yuni::Policy::SingleThreaded>  Ancestor;
+		using Ancestor = Yuni::IIntrusiveSmartPtr<Source, false, Yuni::Policy::SingleThreaded>;
 		//! The most suitable smart ptr for the class
-		typedef Ancestor::SmartPtrType<Source>::Ptr  Ptr;
+		using Ptr = Ancestor::SmartPtrType<Source>::Ptr;
 		//! Threading policy
-		typedef Ancestor::ThreadingPolicy ThreadingPolicy;
+		using ThreadingPolicy = Ancestor::ThreadingPolicy;
 
 		enum class Type
 		{

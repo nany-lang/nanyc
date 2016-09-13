@@ -20,9 +20,9 @@ namespace Nany
 	{
 	public:
 		//! The class ancestor
-		typedef Yuni::IIntrusiveSmartPtr<Funcdef, false, Yuni::Policy::SingleThreaded>  Ancestor;
+		using Ancestor = Yuni::IIntrusiveSmartPtr<Funcdef, false, Yuni::Policy::SingleThreaded>;
 		//! The most suitable smart ptr for the class
-		typedef Ancestor::SmartPtrType<Funcdef>::Ptr  Ptr;
+		using Ptr = Ancestor::SmartPtrType<Funcdef>::Ptr;
 
 	public:
 		//! \name Queries

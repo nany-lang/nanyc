@@ -21,11 +21,11 @@ namespace Logs
 	{
 	public:
 		//! The class ancestor
-		typedef Yuni::IIntrusiveSmartPtr<Message, false, Yuni::Policy::ObjectLevelLockable>  Ancestor;
+		using Ancestor = Yuni::IIntrusiveSmartPtr<Message, false, Yuni::Policy::ObjectLevelLockable>;
 		//! The most suitable smart ptr for the class
-		typedef Ancestor::SmartPtrType<Message>::Ptr  Ptr;
+		using Ptr = Ancestor::SmartPtrType<Message>::Ptr;
 		//! Threading policy
-		typedef Ancestor::ThreadingPolicy ThreadingPolicy;
+		using ThreadingPolicy = Ancestor::ThreadingPolicy;
 
 
 	public:

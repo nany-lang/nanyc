@@ -101,7 +101,7 @@ namespace Nany
 		if (YUNI_UNLIKELY(name.empty() or (0 != pByNames.count(name))))
 			return false;
 
-		typedef Yuni::Bind<T> B;
+		using B = Yuni::Bind<T>;
 		static_assert(B::argumentCount < Config::maxPushedParameters, "too many params");
 
 		pIntrinsics.emplace_back(new Intrinsic(name, reinterpret_cast<void*>(callback)));

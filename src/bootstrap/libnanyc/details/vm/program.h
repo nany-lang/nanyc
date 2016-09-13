@@ -19,9 +19,9 @@ namespace VM
 	{
 	public:
 		//! Intrusive Smarptr
-		typedef IIntrusiveSmartPtr<Build, false, Yuni::Policy::SingleThreaded> IntrusivePtr;
+		using IntrusivePtr = IIntrusiveSmartPtr<Build, false, Yuni::Policy::SingleThreaded>;
 		//! The threading policy of this object
-		typedef IntrusivePtr::ThreadingPolicy ThreadingPolicy;
+		using ThreadingPolicy = IntrusivePtr::ThreadingPolicy;
 
 
 	public:

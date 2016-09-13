@@ -21,7 +21,7 @@ namespace Producer
 		class ClassInspector final
 		{
 		public:
-			typedef CString<Config::maxSymbolNameLength, false> ClassnameType;
+			using ClassnameType = CString<Config::maxSymbolNameLength, false>;
 
 		public:
 			ClassInspector(Scope& parentscope, uint32_t lvid);

@@ -39,9 +39,9 @@ namespace Nany
 	{
 	public:
 		//! The class ancestor
-		typedef Yuni::IIntrusiveSmartPtr<Atom, false, Yuni::Policy::SingleThreaded>  Ancestor;
+		using Ancestor = Yuni::IIntrusiveSmartPtr<Atom, false, Yuni::Policy::SingleThreaded>;
 		//! The most suitable smart ptr for the class
-		typedef Ancestor::SmartPtrType<Atom>::Ptr  Ptr;
+		using Ptr = Ancestor::SmartPtrType<Atom>::Ptr;
 
 		enum class Type: yuint8
 		{
