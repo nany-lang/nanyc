@@ -63,11 +63,11 @@ NY_EXPORT void nylib_print_info_for_bugreport();
 */
 NY_EXPORT char* nylib_get_info_for_bugreport(uint32_t* length);
 
-/*! Get the nany's website */
+/*! nany's website */
 NY_EXPORT const char* nylib_website_url();
 
 /*!
-** \brief Get the version of nany
+** \brief Get the version of libnany
 **
 ** \param[out] major Major version (eX: 2.4.1 -> 2) (can be null)
 ** \param[out] major Minor version (eX: 2.4.1 -> 4) (can be null)
