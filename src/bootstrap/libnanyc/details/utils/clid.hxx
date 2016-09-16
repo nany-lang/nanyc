@@ -1,5 +1,6 @@
 #pragma once
 #include "clid.h"
+#include <iosfwd>
 
 
 
@@ -129,9 +130,5 @@ namespace CString
 
 
 
-inline std::ostream& operator << (std::ostream& out, const Nany::CLID& rhs)
-{
-	out << '{' << rhs.atomid() << ':' << rhs.lvid() << '}';
-	return out;
-}
 
+std::ostream& operator << (std::ostream& out, const Nany::CLID& rhs);
