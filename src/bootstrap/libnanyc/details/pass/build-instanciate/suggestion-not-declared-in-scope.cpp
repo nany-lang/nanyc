@@ -80,7 +80,7 @@ namespace Instanciate
 		static inline bool stringsAreCloseEnough(uint& note, const AnyString& a, const AnyString& b)
 		{
 			note = LevenshteinDistance(a, b) + (uint) a.size();
-			note += (uint) Math::Abs((ssize_t) a.size() - (ssize_t) b.size());
+			note += (uint) Math::Abs((::ssize_t) a.size() - (::ssize_t) b.size());
 			return (note <= 8);
 		}
 

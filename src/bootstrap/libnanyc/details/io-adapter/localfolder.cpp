@@ -206,7 +206,7 @@ static nyio_err_t nanyc_io_localfolder_file_seek(void* file, uint64_t offset)
 {
 	assert(file != nullptr);
 	auto& ynfile = (*reinterpret_cast<IO::File::Stream*>(file));
-	bool success = ynfile.seek(static_cast<ssize_t>(offset), IO::File::seekOriginBegin);
+	bool success = ynfile.seek(static_cast<::ssize_t>(offset), IO::File::seekOriginBegin);
 	return success ? nyioe_ok : nyioe_failed;
 }
 
