@@ -124,14 +124,14 @@ nyanystr_t;
 /*! Create an nyanystr_t from a c-string */
 static inline nyanystr_t nyanystr(const char* const text)
 {
-	nyanystr_t s = {.size = ((text) ? (uint32_t) strlen(text) : 0), .c_str = text};
+	nyanystr_t s = {((text) ? (uint32_t) strlen(text) : 0), text};
 	return s;
 }
 
 /*! Create an nyanystr_t from a c-string and a given length */
 static inline nyanystr_t nyanystr_ex(const char* const text, uint32_t len)
 {
-	nyanystr_t s = {.size = len, .c_str = text};
+	nyanystr_t s = {len, text};
 	return s;
 }
 
