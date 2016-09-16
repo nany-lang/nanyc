@@ -71,8 +71,8 @@ NY_EXPORT const char* nylib_website_url();
 ** \brief Get the version of libnany
 **
 ** \param[out] major Major version (eX: 2.4.1 -> 2) (can be null)
-** \param[out] major Minor version (eX: 2.4.1 -> 4) (can be null)
-** \param[out] major Patch (eX: 2.4.1 -> 1) (can be null)
+** \param[out] minor Minor version (eX: 2.4.1 -> 4) (can be null)
+** \param[out] patch Patch (eX: 2.4.1 -> 1) (can be null)
 ** \return The full version within a single integer (ex: 2.4.1 -> 204001)
 */
 NY_EXPORT uint32_t nylib_get_version(uint32_t* major, uint32_t* minor, uint32_t* patch);
@@ -960,7 +960,6 @@ NY_EXPORT int nyrun_n(const nyrun_cf_t* cf, const char* source, size_t length, u
 **
 ** \param cf A template for settings (can be null)
 ** \param file a filename (can be null)
-** \param length Length in bytes of the filename
 ** \param argc The number of additional input arguments (ignored if <= 0)
 ** \param argv Input arguments (ignored if null)
 ** \return Exit status code
