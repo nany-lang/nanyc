@@ -13,8 +13,8 @@ func howManyAudioFilesAtUrl(url): u64
 		{
 			// the given url is a folder
 			// retrieving a virtual list of all files in this folder, matching our criteria
-			var files = (inode in std.io.folder(url) :recursive) | inode.type == ntFile
-				and inode.name == :regex{ .*\.{mp3,wav,ogg,wma} };
+			var files = (entry in std.io.folder(url) :recursive) | entry.type == ntFile
+				and entry.name == :regex{ .*\.{mp3,wav,ogg,wma} };
 
 			// retrieving how many files this folder has
 			return files.size;
