@@ -22,7 +22,10 @@ namespace Producer
 			auto it = context.offsetToLine.lower_bound(node.offset);
 			if (it != context.offsetToLine.end())
 			{
-				if (it->first == node.offset or (--it != context.offsetToLine.end()))
+				bool emit = (it->first == node.offset);
+				if (not emit and context.offsetToLine.begin() != it)
+					emit = (--it != context.offsetToLine.end());
+				if (emit)
 					addDebugCurrentPosition(it->second, node.offset - it->first);
 			}
 		}
