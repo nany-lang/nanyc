@@ -1,8 +1,10 @@
 sudo: required
 dist: trusty
 language: ruby
+osx_image: xcode8
 os:
     - linux
+    - osx
 compiler:
     - gcc
 rvm:
@@ -19,7 +21,6 @@ before_install:
     - if [ $TRAVIS_OS_NAME == linux ]; then ruby --version; rvm --version; bundle --version; gem --version; fi
     - if [ $TRAVIS_OS_NAME == linux ]; then gem install fpm; fi
     - if [ $TRAVIS_OS_NAME == linux ]; then gem env; fi
-    - if [ $TRAVIS_OS_NAME == macos ]; then brew install ossp-uuid; fi
     - if [ $TRAVIS_OS_NAME == linux ]; then export NPROC=$(nproc); fi
     - if [ $TRAVIS_OS_NAME == macos ]; then export NPROC=1; fi
 install:
@@ -33,7 +34,7 @@ script:
     - cmake . -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
     - make -j ${NPROC}
     - make check
-    - make package-deb
+    - if [ $TRAVIS_OS_NAME == linux ]; then make package-deb; fi
     - cd ../../ && ls -lh ./distrib
 notifications:
     slack:
