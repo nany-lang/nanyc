@@ -23,6 +23,7 @@ nmessage("configuration: ${CMAKE_BUILD_TYPE}")
 
 #set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 set(CMAKE_DISABLE_SOURCE_CHANGES  ON)
+set(CMAKE_MACOSX_RPATH 1)
 
 include("cmake/utils.cmake")
 include("cmake/build-settings.cmake")
