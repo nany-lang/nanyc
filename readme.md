@@ -31,9 +31,7 @@ to native code or bytecode, or to be run as script.
 
 ## Contributing
 
-**Note**: this project uses [Zenhub](https://www.zenhub.io/) for tickets
-management and upvoting
-
+[Contributing guide](http://nany.io/en/contributing/)
 
 
 
