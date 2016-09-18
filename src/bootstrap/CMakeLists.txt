@@ -245,7 +245,7 @@ file(WRITE "${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/empty.ny" "func 
 add_custom_target(check
 	DEPENDS nanyc-unittest
 	COMMAND "${CMAKE_COMMAND}" -E "echo" # for beauty
-	COMMAND "$<TARGET_FILE:nanyc-unittest>" "${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/empty.ny"
+	COMMAND "$<TARGET_FILE:nanyc-unittest>" --with-nsl "${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/empty.ny"
 	VERBATIM)
 
 

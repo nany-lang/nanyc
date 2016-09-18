@@ -326,6 +326,7 @@ int main(int argc, char** argv)
 	String::Vector optToRun;
 	String::Vector remainingArgs;
 	bool optListAll = false;
+	bool optWithNSLTests = false;
 
 	// The command line options parser
 	{
@@ -333,6 +334,7 @@ int main(int argc, char** argv)
 		options.addFlag(optListAll, 'l', "list", "List all unit tests");
 		options.addFlag(optToRun, 'r', "run", "Run a specific test");
 		options.add(jobCount, 'j', "job", "Specifies the number of jobs (commands) to run simultaneously");
+		options.addFlag(optWithNSLTests, ' ', "with-nsl", "Import NSL unittests");
 		options.remainingArguments(remainingArgs);
 
 		// Help
@@ -375,7 +377,8 @@ int main(int argc, char** argv)
 
 	nyrun_cf_t runcf;
 	nyrun_cf_init(&runcf);
-	runcf.project.with_nsl_unittests = nytrue;
+	if (optWithNSLTests)
+		runcf.project.with_nsl_unittests = nytrue;
 
 	int exitcode = EXIT_SUCCESS;
 	hasColorsOut = System::Console::IsStdoutTTY();
