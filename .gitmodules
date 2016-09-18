@@ -6,10 +6,6 @@
 	path = tests
 	url = https://github.com/nany-lang/nany-tests
 	branch = master
-[submodule "src/nsl"]
-	path = src/nsl
-	url = https://github.com/nany-lang/nany-nsl
-	branch = master
 [submodule "src/bootstrap/ext/dyncall"]
 	path = src/bootstrap/ext/dyncall
 	url = https://github.com/nany-lang/ext-dyncall
