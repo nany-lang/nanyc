@@ -41,7 +41,7 @@ static int printNoInputScript(const char* argv0)
 static void fetchUnittestList(nyrun_cf_t& runcf, String::Vector& torun, const char** filelist, uint32_t count)
 {
 	std::cout << "searching for unittests in all source files...\n" << std::flush;
-	runcf.build.entrypoint.size  = 0; // disable any compilation by default
+	runcf.build.entrypoint.size = 0; // disable any compilation by default
 	runcf.build.entrypoint.c_str = nullptr;
 	runcf.program.entrypoint.size = 0;
 	runcf.program.entrypoint.c_str = nullptr;
@@ -375,6 +375,7 @@ int main(int argc, char** argv)
 
 	nyrun_cf_t runcf;
 	nyrun_cf_init(&runcf);
+	runcf.project.with_nsl_unittests = nytrue;
 
 	int exitcode = EXIT_SUCCESS;
 	hasColorsOut = System::Console::IsStdoutTTY();

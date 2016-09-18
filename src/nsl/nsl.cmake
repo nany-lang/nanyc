@@ -5,7 +5,6 @@ set(nsl_files
 	# std.core
 	"${nsl_root}/std.core/bool.ny"
 	"${nsl_root}/std.core/string.ny"
-	"${nsl_root}/std.core/unittest-string.ny"
 	"${nsl_root}/std.core/f64.ny"
 	"${nsl_root}/std.core/f32.ny"
 	"${nsl_root}/std.core/i64.ny"
@@ -33,7 +32,6 @@ set(nsl_files
 	"${nsl_root}/std.io/folder.ny"
 	"${nsl_root}/std.io/folder-object.ny"
 	"${nsl_root}/std.io/io.ny"
-	"${nsl_root}/std.io/unittest.ny"
 
 	# std.math
 	"${nsl_root}/std.math/math.ny"
@@ -53,3 +51,12 @@ set(nsl_files
 	"${nsl_root}/std.digest/digest.ny"
 
 	CACHE INTERNAL "Nany Standard Library - File list")
+
+
+
+
+set(nsl_files_unittest
+	"${nsl_root}/std.core/unittest-string.ny"
+	"${nsl_root}/std.io/unittest.ny"
+
+	CACHE INTERNAL "Nany Standard Library - File list unittest")

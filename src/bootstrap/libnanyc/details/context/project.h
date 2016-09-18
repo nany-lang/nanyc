@@ -24,7 +24,7 @@ namespace Nany
 		Project(const Project&) = delete;
 
 		//! Initialize the project (after the ref count has been incremented)
-		void init();
+		void init(bool unittests);
 		//! Call the destructor and release this
 		void destroy();
 
