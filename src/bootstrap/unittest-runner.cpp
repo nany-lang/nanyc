@@ -41,7 +41,7 @@ static int printNoInputScript(const char* argv0)
 static void fetchUnittestList(nyrun_cf_t& runcf, String::Vector& torun, const char** filelist, uint32_t count)
 {
 	std::cout << "searching for unittests in all source files...\n" << std::flush;
-	runcf.build.entrypoint.size  = 0; // disable any compilation by default
+	runcf.build.entrypoint.size = 0; // disable any compilation by default
 	runcf.build.entrypoint.c_str = nullptr;
 	runcf.program.entrypoint.size = 0;
 	runcf.program.entrypoint.c_str = nullptr;
@@ -326,6 +326,7 @@ int main(int argc, char** argv)
 	String::Vector optToRun;
 	String::Vector remainingArgs;
 	bool optListAll = false;
+	bool optWithNSLTests = false;
 
 	// The command line options parser
 	{
@@ -333,6 +334,7 @@ int main(int argc, char** argv)
 		options.addFlag(optListAll, 'l', "list", "List all unit tests");
 		options.addFlag(optToRun, 'r', "run", "Run a specific test");
 		options.add(jobCount, 'j', "job", "Specifies the number of jobs (commands) to run simultaneously");
+		options.addFlag(optWithNSLTests, ' ', "with-nsl", "Import NSL unittests");
 		options.remainingArguments(remainingArgs);
 
 		// Help
@@ -375,6 +377,8 @@ int main(int argc, char** argv)
 
 	nyrun_cf_t runcf;
 	nyrun_cf_init(&runcf);
+	if (optWithNSLTests)
+		runcf.project.with_nsl_unittests = nytrue;
 
 	int exitcode = EXIT_SUCCESS;
 	hasColorsOut = System::Console::IsStdoutTTY();

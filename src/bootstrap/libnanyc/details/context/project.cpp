@@ -41,13 +41,17 @@ namespace Nany
 	}
 
 
-	void Project::init()
+	void Project::init(bool unittests)
 	{
 		targets.anonym = doCreateTarget("{default}");
 		targets.nsl    = doCreateTarget("{nsl}");
 
 		if (Config::importNSL)
+		{
 			importNSLCore(*this);
+			if (unittests)
+				importNSLUnittests(*this);
+		}
 
 		if (cf.on_create)
 			cf.on_create(self());

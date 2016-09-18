@@ -18,6 +18,11 @@ namespace Nany
 	void importNSLCore(Project&);
 
 	/*!
+	** \brief Nany Standard Library 'std.core'
+	*/
+	void importNSLUnittests(Project&);
+
+	/*!
 	** \brief Import intrinsics related to string manipulation
 	*/
 	void importNSLCoreString(IntrinsicTable&);

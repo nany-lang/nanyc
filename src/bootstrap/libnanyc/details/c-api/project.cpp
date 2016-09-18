@@ -42,8 +42,8 @@ extern "C" nyproject_t* nyproject_create(const nyproject_cf_t* cf)
 	// making sure that user-events do not destroy the project by mistake
 	project->addRef();
 	// initialize the project after incrementing the ref count
-	project->init();
-
+	bool withUnittests = (cf->with_nsl_unittests != nyfalse);
+	project->init(withUnittests);
 	return project->self();
 }
 

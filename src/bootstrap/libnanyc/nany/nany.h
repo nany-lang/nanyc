@@ -371,6 +371,9 @@ typedef struct nyproject_cf_t
 	void (*on_target_added)(nyproject_t*, nytarget_t*, const char* name, uint32_t len);
 	/*! A target has been removed */
 	void (*on_target_removed)(nyproject_t*, nytarget_t*, const char* name, uint32_t len);
+
+	/*! Load unittsts from nsl */
+	nybool_t with_nsl_unittests;
 }
 nyproject_cf_t;
 
