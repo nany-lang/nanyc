@@ -5,6 +5,7 @@ set(nsl_files
 	# std.core
 	"${nsl_root}/std.core/bool.ny"
 	"${nsl_root}/std.core/string.ny"
+	"${nsl_root}/std.core/details-string.ny"
 	"${nsl_root}/std.core/f64.ny"
 	"${nsl_root}/std.core/f32.ny"
 	"${nsl_root}/std.core/i64.ny"
