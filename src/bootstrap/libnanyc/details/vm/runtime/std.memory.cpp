@@ -1,21 +1,17 @@
 #include "std.core.h"
 #include "details/intrinsic/intrinsic-table.h"
-#include <yuni/yuni.h>
-#include <yuni/core/string.h>
-
-using namespace Yuni;
+#include <limits>
 
 
 
 
-static uint32_t nanyc_strlen(nyvm_t*, void* string)
+template<class T>
+static T nanyc_strlen(nyvm_t*, void* string)
 {
-	if (string)
-	{
-		size_t l = strlen(reinterpret_cast<const char*>(string));
-		return  (l < static_cast<uint32_t>(-1)) ? static_cast<uint32_t>(l) : 0u;
-	}
-	return 0u;
+	size_t len = string ? strlen(reinterpret_cast<const char*>(string)) : 0u;
+	return (sizeof(size_t) == sizeof(T) or len < std::numeric_limits<T>::max())
+		? static_cast<T>(len)
+		: static_cast<T>(-1);
 }
 
 
@@ -26,7 +22,7 @@ namespace Nany
 
 	void importNSLMemory(IntrinsicTable& intrinsics)
 	{
-		intrinsics.add("__nanyc_strlen",  nanyc_strlen);
+		intrinsics.add("strlen32",  nanyc_strlen<uint32_t>);
 	}
 
 
