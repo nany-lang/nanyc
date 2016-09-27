@@ -23,6 +23,7 @@ namespace Nany
 	void importNSLMemory(IntrinsicTable& intrinsics)
 	{
 		intrinsics.add("strlen32",  nanyc_strlen<uint32_t>);
+		intrinsics.add("strlen64",  nanyc_strlen<uint64_t>);
 	}
 
 
