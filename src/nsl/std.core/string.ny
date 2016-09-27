@@ -156,7 +156,7 @@ public class string
 		-> append(text.m_cstr, text.m_size);
 
 	func appendCString(str: __pointer)
-		-> append(str, std.memory.strlen(str));
+		-> append(str, !!strlen(str));
 
 
 	//! Extend the string by appending a C-string
