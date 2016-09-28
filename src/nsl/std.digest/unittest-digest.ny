@@ -18,6 +18,13 @@ unittest std.digest.md5
 			printerr("       got: '\(digest)'\n");
 			printerr("    expect: '\(expect)'\n");
 		}
+		ref digest2 = std.digest.md5(text.data, 0__u64 + text.size.pod);
+		if digest2 != expect then
+		{
+			printerr("error: fail '\(text)'\n");
+			printerr("       got: '\(digest2)'\n");
+			printerr("    expect: '\(expect)'\n");
+		}
 	}
 
 	// from RFC
