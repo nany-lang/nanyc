@@ -18,6 +18,7 @@ unittest std.core.string.stayempty
 	assert(s.count('_') == 0u);
 	assert(s.last == '\0');
 	assert(s.first == '\0');
+	assert(s.data == null);
 
 	s.clear();
 	assert(s.size == 0u);
@@ -29,6 +30,7 @@ unittest std.core.string.stayempty
 	assert(s.count('_') == 0u);
 	assert(s.last == '\0');
 	assert(s.first == '\0');
+	assert(s.data == null);
 
 	s = "";
 	assert(s.size == 0u);
@@ -40,6 +42,7 @@ unittest std.core.string.stayempty
 	assert(s.count('_') == 0u);
 	assert(s.last == '\0');
 	assert(s.first == '\0');
+	assert(s.data == null);
 
 	s.append("");
 	assert(s.size == 0u);
@@ -51,6 +54,7 @@ unittest std.core.string.stayempty
 	assert(s.count('_') == 0u);
 	assert(s.last == '\0');
 	assert(s.first == '\0');
+	assert(s.data == null);
 
 	s += "";
 	assert(s.size == 0u);
@@ -62,6 +66,7 @@ unittest std.core.string.stayempty
 	assert(s.count('_') == 0u);
 	assert(s.last == '\0');
 	assert(s.first == '\0');
+	assert(s.data == null);
 
 	s << "";
 	assert(s.size == 0u);
@@ -73,6 +78,7 @@ unittest std.core.string.stayempty
 	assert(s.count('_') == 0u);
 	assert(s.last == '\0');
 	assert(s.first == '\0');
+	assert(s.data == null);
 
 	s.reserve(0u);
 	assert(s.size == 0u);
@@ -84,6 +90,7 @@ unittest std.core.string.stayempty
 	assert(s.count('_') == 0u);
 	assert(s.last == '\0');
 	assert(s.first == '\0');
+	assert(s.data == null);
 }
 
 
@@ -102,6 +109,7 @@ unittest std.core.string.smallstring
 	assert(s.count('o') == 1u);
 	assert(s.last == 'o');
 	assert(s.first == 'h');
+	assert(s.data != null);
 
 	s += " world !";
 	assert(s.capacity >= 13u);
@@ -118,6 +126,7 @@ unittest std.core.string.smallstring
 	assert(s.count(' ') == 2u);
 	assert(s.last == '!');
 	assert(s.first == 'h');
+	assert(s.data != null);
 }
 
 
