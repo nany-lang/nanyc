@@ -51,9 +51,5 @@ public typedef i64: __i64;
 // public typedef intptr_t: __i64;
 
 
-
-//! Boolean
-public typedef bool: __bool;
-
 //! Pointer
 public typedef ptr: __pointer;
