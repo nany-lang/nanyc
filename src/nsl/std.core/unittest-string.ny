@@ -91,6 +91,11 @@ unittest std.core.string.stayempty
 	assert(s.last == '\0');
 	assert(s.first == '\0');
 	assert(s.data == null);
+
+	s.append(null);
+	s += null;
+	s << null;
+	s.append(null, 0u);
 }
 
 
