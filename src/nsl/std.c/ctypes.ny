@@ -39,16 +39,16 @@ public typedef i64: __i64;
 
 
 //! Alias for the standard C ssize_t
-public typedef ssize_t: __i64;
+// public typedef ssize_t: __i64;
 
 //! Alias for the standard C size_t
-public typedef size_t: __u64;
+// public typedef size_t: __u64;
 
 //! Alias for the standard C ptrdiff_t
-public typedef ptrdiff_t: __i64;
+// public typedef ptrdiff_t: __i64;
 
 //! Alias for the standard C intptr_t
-public typedef intptr_t: __i64;
+// public typedef intptr_t: __i64;
 
 
 
