@@ -108,6 +108,9 @@ public class string
 	var last
 		-> new std.Ascii(if m_size != 0__u32 then !!load.u8(m_cstr + m_size - 1__u32) else 0__u8);
 
+	//! Get the internal raw pointer
+	var data
+		-> m_cstr;
 
 	/*!
 	** \brief Increase the capacity of the container if necessary
