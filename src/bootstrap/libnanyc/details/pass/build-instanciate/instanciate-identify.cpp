@@ -74,7 +74,7 @@ namespace Instanciate
 				break;
 			}
 
-			if ((alias->parent == original.parent) and alias->atomid > original.atomid)
+			if (unlikely((alias->parent == original.parent) and alias->atomid > original.atomid))
 			{
 				// same parent but declared after (the atomid is likely to be greater
 				// than the first one since registered after)
@@ -89,7 +89,7 @@ namespace Instanciate
 			}
 
 			// detecting circular references...
-			if (not encountered.insert(alias->atomid).second)
+			if (unlikely(not encountered.insert(alias->atomid).second))
 			{
 				complainTypealiasCircularRef(original, *alias);
 				return original;
