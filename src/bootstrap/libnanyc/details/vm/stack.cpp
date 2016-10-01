@@ -1,4 +1,5 @@
 #include "stack.h"
+#include <yuni/string.h>
 #include <cstdlib>
 #include <new>
 #include <iostream>
@@ -29,8 +30,7 @@ namespace VM
 	} // anonymous namespace
 
 
-	Stack::Stack(Build& build)
-		: build(build)
+	Stack::Stack()
 	{
 		pushNewChunk(1); // not null for boundaries checking
 		current->remains -= 1u;
