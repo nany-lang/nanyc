@@ -301,8 +301,7 @@ namespace Instanciate
 
 					case Atom::Type::classdef:
 					{
-						// the user may already have provided one or more constructors
-						// but if not the case, the default implementatio will be used instead
+						// provides the default ctor implementation if not user-defined
 						if (not atom.hasMember("^new"))
 							atom.renameChild("^default-new", "^new");
 					}
