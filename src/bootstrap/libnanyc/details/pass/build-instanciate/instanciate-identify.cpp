@@ -70,7 +70,7 @@ namespace Instanciate
 			alias = cdeftable.findClassdefAtom(cdef.get());
 			if (unlikely(!alias))
 			{
-				warning() << "failed to retrieve atom from " << cdef.get().clid;
+				ice() << "identify typedef: failed to retrieve atom from " << cdef.get().clid;
 				break;
 			}
 
