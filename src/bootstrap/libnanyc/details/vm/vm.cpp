@@ -114,7 +114,6 @@ namespace VM
 				: allocator(threadContext.program.cf.allocator)
 				, cf(threadContext.program.cf)
 				, threadContext(threadContext)
-				, stack(Nany::ref(threadContext.program.build))
 				, map(threadContext.program.map)
 				, sequence(std::cref(callee))
 				, userDefinedIntrinsics(Nany::ref(threadContext.program.build).intrinsics)

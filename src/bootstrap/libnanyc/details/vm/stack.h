@@ -1,7 +1,6 @@
 #pragma once
 #include "types.h"
 #include "nany/nany.h"
-#include "details/context/build.h"
 
 #define NANY_VM_STACK_TRACES 0
 
@@ -17,7 +16,7 @@ namespace VM
 	class Stack final
 	{
 	public:
-		explicit Stack(Build&);
+		Stack();
 		Stack(const Stack&) = delete;
 		~Stack();
 
@@ -69,8 +68,6 @@ namespace VM
 		uint32_t frameCount = 0u;
 		uint32_t stacksize = 0u;
 		#endif
-
-		Build& build;
 	};
 
 
