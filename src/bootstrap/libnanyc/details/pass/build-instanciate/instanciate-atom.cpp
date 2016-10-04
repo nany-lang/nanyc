@@ -788,36 +788,35 @@ namespace Instanciate
 		builder->mappingBlueprintAtomID[0] = atom.atomid;
 		builder->mappingBlueprintAtomID[1] = atom.atomid;
 
-		bool success = builder->readAndInstanciate(atom.opcodes.offset);
+		bool instanciated = builder->readAndInstanciate(atom.opcodes.offset);
 		assert(builder->codeGenerationLock == 666);
+		if (not instanciated)
+			return false;
 
-		if (success)
+		auto mergeType = [&](const CLID& clid)
 		{
-			auto mergeType = [&](const CLID& clid)
-			{
-				auto& cdef = newview.classdef(clid);
-				auto& rawcdef = newview.originalTable().rawclassdef(clid);
-				rawcdef.qualifiers = cdef.qualifiers;
+			auto& cdef = newview.classdef(clid);
+			auto& rawcdef = newview.originalTable().rawclassdef(clid);
+			rawcdef.qualifiers = cdef.qualifiers;
 
-				if (not cdef.isBuiltinOrVoid())
-				{
-					auto* useratom = newview.findClassdefAtom(cdef);
-					rawcdef.mutateToAtom(useratom);
-				}
-				else
-				{
-					rawcdef.qualifiers.ref = false; // no ref for builtin types
-					rawcdef.mutateToBuiltinOrVoid(cdef.kind);
-				}
-			};
-			// import parameter types
-			atom.parameters.each([&](uint32_t, const AnyString&, const Vardef& vardef)
+			if (not cdef.isBuiltinOrVoid())
 			{
-				mergeType(vardef.clid);
-			});
-			mergeType(CLID{atom.atomid, 1}); // return type
-		}
-		return success;
+				auto* useratom = newview.findClassdefAtom(cdef);
+				rawcdef.mutateToAtom(useratom);
+			}
+			else
+			{
+				rawcdef.qualifiers.ref = false; // no ref for builtin types
+				rawcdef.mutateToBuiltinOrVoid(cdef.kind);
+			}
+		};
+		// import parameter types
+		atom.parameters.each([&](uint32_t, const AnyString&, const Vardef& vardef)
+		{
+			mergeType(vardef.clid);
+		});
+		mergeType(CLID{atom.atomid, 1}); // return type
+		return true;
 	}
 
 
