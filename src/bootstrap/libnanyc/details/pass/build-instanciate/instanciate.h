@@ -65,9 +65,6 @@ namespace Instanciate
 		SequenceBuilder(Logs::Report, ClassdefTableView&, Build&,
 			IR::Sequence* out, IR::Sequence&, SequenceBuilder* parent = nullptr);
 
-		//! Prepare the first local registers according the given signature
-		void pushParametersFromSignature(Atom& atom, const Signature&);
-
 		//! Destructor
 		~SequenceBuilder();
 		//@}
