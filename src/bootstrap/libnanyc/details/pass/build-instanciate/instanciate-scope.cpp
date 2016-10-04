@@ -1,4 +1,5 @@
 #include "instanciate.h"
+#include "instanciate-debug.h"
 #include "libnanyc-traces.h"
 
 using namespace Yuni;
@@ -41,7 +42,7 @@ namespace Instanciate
 				if (frame->previous != nullptr)
 				{
 					if (Config::Traces::classdefTable)
-						printClassdefTable(*frame);
+						debugPrintClassdefs(*frame, cdeftable);
 
 					popFrame();
 

@@ -297,15 +297,6 @@ namespace Instanciate
 		//@}
 
 
-		//! \name Debugging
-		//@{
-		//! Print all classdefs
-		void printClassdefTable();
-		//! Print the classdefs of a given frame
-		void printClassdefTable(const AtomStackFrame& currentframe);
-		//@}
-
-
 	public:
 		bool doInstanciateAtomFunc(Logs::Message::Ptr& subreport, InstanciateData& info, uint32_t retlvid);
 		void pushNewFrame(Atom& atom);

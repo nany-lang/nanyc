@@ -5,6 +5,7 @@
 #include "details/utils/origin.h"
 #include "libnanyc-traces.h"
 #include "instanciate-atom.h"
+#include "instanciate-debug.h"
 #include "func-overload-match.h"
 #include <memory>
 
@@ -47,7 +48,10 @@ namespace Instanciate
 	SequenceBuilder::~SequenceBuilder()
 	{
 		if (Config::Traces::allTypeDefinitions)
-			printClassdefTable();
+		{
+			for (auto* f = frame; f != nullptr; f = f->previous)
+				debugPrintClassdefs(*f, cdeftable);
+		}
 
 		auto* frm = frame;
 		while (frm)
@@ -155,48 +159,6 @@ namespace Instanciate
 			}
 		}
 		return startOffset;
-	}
-
-
-	void SequenceBuilder::printClassdefTable(const AtomStackFrame& currentframe)
-	{
-		// new entry
-		{
-			auto entry = trace();
-			entry.message.prefix << cdeftable.keyword(currentframe.atom) << ' ';
-			currentframe.atom.retrieveCaption(entry.message.prefix, cdeftable);
-			entry << " - type matrix, after instanciation - atom " << currentframe.atom.atomid;
-		}
-
-		for (uint32_t i = 0; i != currentframe.localVariablesCount(); ++i)
-		{
-			auto clid = CLID{currentframe.atomid, i};
-			auto entry = trace();
-
-			if (cdeftable.hasClassdef(clid) or cdeftable.hasSubstitute(clid))
-			{
-				cdeftable.printClassdef(entry.message.message, clid, cdeftable.classdef(clid));
-				entry.message.message.trimRight();
-
-				if (cdeftable.hasSubstitute(clid))
-					entry << " (local replacement)";
-
-				if (currentframe.lvids[i].isConstexpr)
-					entry << " (constexpr)";
-
-				if (currentframe.lvids[i].errorReported)
-					entry << " [ERROR]";
-			}
-			else
-				entry << "    " << clid << ": !!INVALID CLID";
-		}
-	}
-
-
-	void SequenceBuilder::printClassdefTable()
-	{
-		for (auto* f = frame; f != nullptr; f = f->previous)
-			printClassdefTable(*f);
 	}
 
 

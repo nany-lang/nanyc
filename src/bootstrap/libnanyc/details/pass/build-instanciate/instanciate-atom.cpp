@@ -5,6 +5,7 @@
 #include "details/pass/build-attach-program/mapping.h"
 #include "libnanyc-traces.h"
 #include "instanciate-atom.h"
+#include "instanciate-debug.h"
 #include <memory>
 
 using namespace Yuni;
@@ -20,36 +21,6 @@ namespace Instanciate
 {
 
 	namespace {
-
-
-	void printGeneratedIRSequence(const String& symbolName,
-		const IR::Sequence& out, const ClassdefTableView& newView, uint32_t offset = 0)
-	{
-		String text;
-		text.reserve(out.opcodeCount() * 40); // arbitrary
-		out.print(text, &newView.atoms(), offset);
-		text.replace("\n", "\n    ");
-		text.trimRight();
-
-		info();
-		auto entry = trace();
-		entry.message.prefix << symbolName;
-		entry.trace() << "{\n    " << text << "\n}";
-		entry.info(); // for beauty
-		entry.info(); // for beauty
-		entry.info(); // for beauty
-	}
-
-
-	void printSourceOpcodeSequence(const ClassdefTableView& cdeftable, const Atom& atom, const char* txt)
-	{
-		String text;
-		text << txt << cdeftable.keyword(atom) << ' '; // ex: func
-		atom.retrieveCaption(text, cdeftable);  // ex: A.foo(...)...
-		auto& seqprint = *(atom.opcodes.sequence);
-		uint32_t offset = atom.opcodes.offset;
-		printGeneratedIRSequence(text, seqprint, cdeftable, offset);
-	}
 
 
 	void prepareSignature(Signature& signature, InstanciateData& info)
@@ -232,7 +203,7 @@ namespace Instanciate
 			(report.subgroup(), newView, info.build, outIR, inputIR, info.parent);
 
 		if (Config::Traces::sourceOpcodeSequence)
-			printSourceOpcodeSequence(info.cdeftable, info.atom.get(), "[ir-from-ast] ");
+			debugPrintSourceOpcodeSequence(info.cdeftable, info.atom.get(), "[ir-from-ast] ");
 
 		// transfert input parameters
 		pushSubstituteTypesFromSignatureParameters(*builder, atom, signature);
@@ -265,7 +236,7 @@ namespace Instanciate
 			atom.retrieveCaption(symbolName, newView);  // ex: A.foo(...)...
 		}
 		if (Config::Traces::generatedOpcodeSequence)
-			printGeneratedIRSequence(symbolName, *outIR, newView);
+			debugPrintIRSequence(symbolName, *outIR, newView);
 
 		if (success)
 		{
@@ -476,7 +447,7 @@ namespace Instanciate
 		if (unlikely(TypeCheck::Match::none == match))
 		{
 			if (Config::Traces::sourceOpcodeSequence)
-				printSourceOpcodeSequence(cdeftable, atom, "[FAIL-IR] ");
+				debugPrintSourceOpcodeSequence(cdeftable, atom, "[FAIL-IR] ");
 			// fail - try again to produce error message, hint, and any suggestion
 			complainInvalidParametersAfterSignatureMatching(atom, overloadMatch);
 			return nullptr;
