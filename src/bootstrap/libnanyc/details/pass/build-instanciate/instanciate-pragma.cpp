@@ -106,6 +106,19 @@ namespace Instanciate
 		}
 
 
+		void pragmaCodegen(SequenceBuilder& seq, bool onoff)
+		{
+			auto& refcount = seq.codeGenerationLock;
+			if (onoff)
+			{
+				if (refcount > 0) // re-enable code generation
+					--refcount;
+			}
+			else
+				++refcount;
+		}
+
+
 	} // anonymous namespace
 
 
@@ -120,16 +133,9 @@ namespace Instanciate
 		{
 			case IR::ISA::Pragma::codegen:
 			{
-				if (operands.value.codegen != 0)
-				{
-					if (codeGenerationLock > 0) // re-enable code generation
-						--codeGenerationLock;
-				}
-				else
-					++codeGenerationLock;
+				pragmaCodegen(*this, operands.value.codegen != 0);
 				break;
 			}
-
 			case IR::ISA::Pragma::bodystart:
 			{
 				// In 'signature only' mode, we only care about the
