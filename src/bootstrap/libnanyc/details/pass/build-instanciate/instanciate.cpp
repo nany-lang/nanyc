@@ -24,10 +24,10 @@ namespace Instanciate
 	SequenceBuilder::SequenceBuilder(Logs::Report report, ClassdefTableView& cdeftable, Build& build,
 		IR::Sequence* out, IR::Sequence& sequence, SequenceBuilder* parent)
 		: cdeftable(cdeftable)
-		, build(build)
-		, intrinsics(build.intrinsics)
 		, out(out)
 		, currentSequence(sequence)
+		, build(build)
+		, intrinsics(build.intrinsics)
 		, overloadMatch(this)
 		, parent(parent)
 		, localErrorHandler(this, &emitReportEntry)

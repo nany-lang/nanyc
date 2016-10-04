@@ -327,10 +327,6 @@ namespace Instanciate
 
 		// Isolate
 		ClassdefTableView cdeftable;
-		//! Build context
-		Build& build;
-		//! intrinsics
-		const IntrinsicTable& intrinsics;
 		// New opcode sequence
 		IR::Sequence* out = nullptr;
 		// Current sequence
@@ -340,6 +336,11 @@ namespace Instanciate
 		uint32_t codeGenerationLock = 0;
 		//! Flag to prevent error generation when != 0
 		uint32_t errorGenerationLock = 0;
+
+		//! Build context
+		Build& build;
+		//! intrinsics
+		const IntrinsicTable& intrinsics;
 
 		//! All pushed parameters
 		struct PushedParameters final
