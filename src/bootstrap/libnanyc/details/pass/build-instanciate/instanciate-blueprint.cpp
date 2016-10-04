@@ -134,6 +134,28 @@ namespace Instanciate
 	}
 
 
+	void blueprintParameter(SequenceBuilder& seq, const IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
+	{
+		auto kind = static_cast<IR::ISA::Blueprint>(operands.kind);
+		assert(seq.frame != nullptr);
+		uint32_t lvid = operands.lvid;
+		auto& cdef = seq.cdeftable.substitute(lvid);
+		cdef.qualifiers.ref = false;
+		bool isvar = (kind == IR::ISA::Blueprint::param);
+		cdef.instance = isvar;
+		seq.frame->lvids[lvid].synthetic = (not isvar);
+
+		// Do not emit warning for 'unused variable' on template parameters
+		if (kind == IR::ISA::Blueprint::gentypeparam)
+			seq.frame->lvids[lvid].warning.unused = false;
+
+		// param name
+		const auto& name = seq.currentSequence.stringrefs[operands.name];
+		// declare the new name as locally accessible
+		seq.declareNamedVariable(name, lvid, false);
+	}
+
+
 	} // anonymous namespace
 
 
@@ -147,25 +169,9 @@ namespace Instanciate
 			case IR::ISA::Blueprint::param: // -- function parameter
 			case IR::ISA::Blueprint::gentypeparam:
 			{
-				assert(frame != nullptr);
-				uint32_t lvid = operands.lvid;
-				auto& cdef = cdeftable.substitute(lvid);
-				cdef.qualifiers.ref = false;
-				bool isvar = (kind == IR::ISA::Blueprint::param);
-				cdef.instance = isvar;
-				frame->lvids[lvid].synthetic = (not isvar);
-
-				// Do not emit warning for 'unused variable' on template parameters
-				if (kind == IR::ISA::Blueprint::gentypeparam)
-					frame->lvids[lvid].warning.unused = false;
-
-				// param name
-				const auto& name = currentSequence.stringrefs[operands.name];
-				// declare the new name as locally accessible
-				declareNamedVariable(name, lvid, false);
-				return;
+				blueprintParameter(*this, operands);
+				break;
 			}
-
 			case IR::ISA::Blueprint::paramself: // -- function parameter
 			{
 				// -- with automatic variable assignment for operator new
