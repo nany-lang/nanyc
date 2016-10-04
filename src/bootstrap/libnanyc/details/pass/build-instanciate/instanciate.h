@@ -203,8 +203,6 @@ namespace Instanciate
 		//! Try to capture variables from a list of potentiel candidates created by the mapping
 		void captureVariables(Atom& atom);
 
-		bool pragmaBlueprint(const IR::ISA::Operand<IR::ISA::Op::pragma>& operands);
-
 		Atom* instanciateAtomClass(Atom& atom);
 		bool instanciateAtomClassDestructor(Atom& atom, uint32_t self);
 		bool instanciateAtomClassClone(Atom& atom, uint32_t self, uint32_t rhs);
