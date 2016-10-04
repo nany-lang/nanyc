@@ -114,29 +114,29 @@ namespace Instanciate
 	}
 
 
-	} // anonymous namespace
-
-
-
-
-	void SequenceBuilder::visitBlueprintUnit(const IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
+	void blueprintUnit(SequenceBuilder& seq, const IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
 	{
-		pushedparams.clear();
-		generateClassVarsAutoInit = false;
-		generateClassVarsAutoRelease = false;
+		seq.pushedparams.clear();
+		seq.generateClassVarsAutoInit = false;
+		seq.generateClassVarsAutoRelease = false;
 
 		uint32_t atomid = operands.atomid;
-		assert(atomid != mappingBlueprintAtomID[0] and "mapping for an unit ?");
-		auto* atom = cdeftable.atoms().findAtom(atomid);
+		assert(atomid != seq.mappingBlueprintAtomID[0] and "mapping for an unit ?");
+		auto* atom = seq.cdeftable.atoms().findAtom(atomid);
 		if (unlikely(nullptr == atom))
 		{
-			complainOperand(IR::Instruction::fromOpcode(operands), "invalid unit atom");
+			seq.complainOperand(IR::Instruction::fromOpcode(operands), "invalid unit atom");
 			return;
 		}
 
-		pushNewFrame(*atom);
-		frame->offsetOpcodeBlueprint = currentSequence.offsetOf(**cursor);
+		seq.pushNewFrame(*atom);
+		seq.frame->offsetOpcodeBlueprint = seq.currentSequence.offsetOf(**seq.cursor);
 	}
+
+
+	} // anonymous namespace
+
+
 
 
 	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
@@ -218,15 +218,16 @@ namespace Instanciate
 				return;
 			}
 
-			case IR::ISA::Blueprint::unit:
-			{
-				visitBlueprintUnit(operands);
-				return;
-			}
-
 			case IR::ISA::Blueprint::namespacedef:
+			{
 				// see mapping instead
 				break;
+			}
+			case IR::ISA::Blueprint::unit:
+			{
+				blueprintUnit(*this, operands);
+				break;
+			}
 		}
 	}
 
