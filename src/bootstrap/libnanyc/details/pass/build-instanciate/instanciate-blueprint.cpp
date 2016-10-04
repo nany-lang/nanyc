@@ -14,34 +14,38 @@ namespace Instanciate
 {
 
 
-	void SequenceBuilder::visitBlueprintFuncOrClassOrType(const IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
-	{
-		pushedparams.clear();
-		generateClassVarsAutoInit = false;
-		generateClassVarsAutoRelease = false;
+	namespace {
 
-		bool bug = (layerDepthLimit == 0); // TODO: determine why this value can be zero with this opcode
+
+	void blueprintFuncOrClassOrType(SequenceBuilder& seq, const IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
+	{
+		seq.pushedparams.clear();
+		seq.generateClassVarsAutoInit = false;
+		seq.generateClassVarsAutoRelease = false;
+
+		bool bug = (seq.layerDepthLimit == 0); // TODO: determine why this value can be zero with this opcode
 		if (not bug)
-			--layerDepthLimit;
+			--seq.layerDepthLimit;
 
 		uint32_t atomid = operands.atomid;
 		uint32_t lvid   = operands.lvid;
 
 		// retrieving the atomid - the atomid may be different from the one requested
 		// (class with generic types parameters, anonymous classes...)
-		assert(mappingBlueprintAtomID[0] != 0 and "mapping atomid not set");
-		assert(mappingBlueprintAtomID[1] != 0 and "mapping atomid not set");
-		if (atomid == mappingBlueprintAtomID[0])
-			atomid = mappingBlueprintAtomID[1];
+		assert(seq.mappingBlueprintAtomID[0] != 0 and "mapping atomid not set");
+		assert(seq.mappingBlueprintAtomID[1] != 0 and "mapping atomid not set");
+		if (atomid == seq.mappingBlueprintAtomID[0])
+			atomid = seq.mappingBlueprintAtomID[1];
 
-		auto* atomptr = cdeftable.atoms().findAtom(atomid);
+		auto* atomptr = seq.cdeftable.atoms().findAtom(atomid);
 		if (unlikely(nullptr == atomptr))
 		{
-			complainOperand(IR::Instruction::fromOpcode(operands), "invalid atom");
+			seq.complainOperand(IR::Instruction::fromOpcode(operands), "invalid atom");
 			return;
 		}
 		auto& atom = *atomptr;
 		assert(atom.isFunction() or atom.isClass() or atom.isTypeAlias());
+		auto& currentSequence = seq.currentSequence;
 
 		// 2 cases can be encountered:
 		// - a normal class definition: 'operands.lvid' will be equal to 0
@@ -49,10 +53,10 @@ namespace Instanciate
 		// - an anonymous class (in the middle of a function for example):
 		//   'operands.lvid' will be different from 0. However, when the class
 		//   will be instanciated, we will be called again, but without any current 'frame'
-		if (lvid == 0 or !frame)
+		if (lvid == 0 or seq.frame == nullptr)
 		{
-			pushNewFrame(atom);
-			frame->offsetOpcodeBlueprint = currentSequence.offsetOf(**cursor);
+			seq.pushNewFrame(atom);
+			seq.frame->offsetOpcodeBlueprint = currentSequence.offsetOf(**seq.cursor);
 
 			auto kind = static_cast<IR::ISA::Blueprint>(operands.kind);
 			if (kind == IR::ISA::Blueprint::funcdef)
@@ -66,17 +70,17 @@ namespace Instanciate
 					{
 						case 'd':
 							if (atomname == "^default-new")
-								generateClassVarsAutoInit = true; // same as '^new'
+								seq.generateClassVarsAutoInit = true; // same as '^new'
 							else if (atomname == "^dispose")
-								generateClassVarsAutoRelease = true;
+								seq.generateClassVarsAutoRelease = true;
 							break;
 						case 'n':
 							if (atomname == "^new")
-								generateClassVarsAutoInit = true; // same as '^default-new'
+								seq.generateClassVarsAutoInit = true; // same as '^default-new'
 							break;
 						case 'o':
 							if (atomname == "^obj-clone")
-								generateClassVarsAutoClone = true;
+								seq.generateClassVarsAutoClone = true;
 							break;
 					}
 				}
@@ -85,9 +89,9 @@ namespace Instanciate
 		else
 		{
 			// ignoring completely this blueprint
-			currentSequence.moveCursorFromBlueprintToEnd(*cursor);
+			currentSequence.moveCursorFromBlueprintToEnd(*seq.cursor);
 			if (bug)
-				*cursor = &currentSequence.at(currentSequence.offsetOf(**cursor) + 1);
+				*seq.cursor = &currentSequence.at(currentSequence.offsetOf(**seq.cursor) + 1);
 
 			if (lvid != 0 and atom.isClass())
 			{
@@ -95,19 +99,24 @@ namespace Instanciate
 				// The flag Atom::Flags::captureVariables should already be set via 'mapping'
 				assert(atom.flags(Atom::Flags::captureVariables));
 
-				Atom* resAtom = instanciateAtomClass(atom); // instanciating the class
+				Atom* resAtom = seq.instanciateAtomClass(atom); // instanciating the class
 				if (unlikely(!resAtom))
 				{
-					if (frame)
-						frame->invalidate(lvid);
+					if (seq.frame)
+						seq.frame->invalidate(lvid);
 					return;
 				}
 
 				// updating the attached lvid for automatic type declaration
-				cdeftable.substitute(lvid).mutateToAtom(resAtom);
+				seq.cdeftable.substitute(lvid).mutateToAtom(resAtom);
 			}
 		}
 	}
+
+
+	} // anonymous namespace
+
+
 
 
 	void SequenceBuilder::visitBlueprintUnit(const IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
@@ -182,7 +191,7 @@ namespace Instanciate
 			case IR::ISA::Blueprint::classdef:
 			case IR::ISA::Blueprint::typealias:
 			{
-				visitBlueprintFuncOrClassOrType(operands);
+				blueprintFuncOrClassOrType(*this, operands);
 				return;
 			}
 
