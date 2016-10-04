@@ -179,7 +179,6 @@ namespace Instanciate
 	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::pragma>& operands)
 	{
 		assert(static_cast<uint32_t>(operands.pragma) < IR::ISA::PragmaCount);
-
 		auto pragma = static_cast<IR::ISA::Pragma>(operands.pragma);
 		switch (pragma)
 		{
@@ -203,25 +202,21 @@ namespace Instanciate
 				pragmaBlueprintSize(*this, operands.value.blueprintsize);
 				break;
 			}
-
 			case IR::ISA::Pragma::visibility:
 			{
 				assert(frame != nullptr);
 				break;
 			}
-
 			case IR::ISA::Pragma::shortcircuitOpNopOffset:
 			{
 				shortcircuit.label = operands.value.shortcircuitMetadata.label;
 				break;
 			}
-
 			case IR::ISA::Pragma::shortcircuitMutateToBool:
 			{
 				pragmaShortcircuitMutateToBool(*this, operands);
 				break;
 			}
-
 			case IR::ISA::Pragma::synthetic:
 			{
 				uint32_t lvid = operands.value.synthetic.lvid;
@@ -229,7 +224,6 @@ namespace Instanciate
 				frame->lvids[lvid].synthetic = onoff;
 				break;
 			}
-
 			case IR::ISA::Pragma::suggest:
 			case IR::ISA::Pragma::builtinalias:
 			case IR::ISA::Pragma::shortcircuit:
@@ -237,8 +231,6 @@ namespace Instanciate
 				break;
 		}
 	}
-
-
 
 
 
