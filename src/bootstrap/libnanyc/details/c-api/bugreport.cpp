@@ -17,28 +17,38 @@ using namespace Yuni;
 namespace // anonymous
 {
 
-	template<class T>
-	static inline void buildBugReport(T& string)
+	template<class S> void printNanyVersion(S& out)
 	{
-		string << "> nanyc {c++/bootstrap} v" << nylib_version();
+		out << "> nanyc {c++/bootstrap} v" << nylib_version();
 		if (debugmode)
-			string << " {debug}";
-		string << '\n';
+			out << " {debug}";
+		out << '\n';
+	}
 
-		string << "> compiled with ";
-		nany_details_export_compiler_version(string);
-		string << '\n';
 
-		string << "> config: "
-			<< "params:" << Nany::Config::maxFuncDeclParameterCount
-			<< ", pushedparams:" << Nany::Config::maxPushedParameters
-			<< ", nmspc depth:" << Nany::Config::maxNamespaceDepth
-			<< ", symbol:" << Nany::Config::maxSymbolNameLength
-			<< ", nsl:" << Nany::Config::importNSL
-			<< '\n';
+	template<class S> void printCompiler(S& out)
+	{
+		out << "> compiled with ";
+		nany_details_export_compiler_version(out);
+		out << '\n';
+	}
 
-		// -- OS
-		string << "> os:  ";
+
+	template<class S> void printBuildFlags(S& out)
+	{
+		out << "> config: ";
+		out << "params:" << Nany::Config::maxFuncDeclParameterCount;
+		out << ", pushedparams:" << Nany::Config::maxPushedParameters;
+		out << ", nmspc depth:" << Nany::Config::maxNamespaceDepth;
+		out << ", symbol:" << Nany::Config::maxSymbolNameLength;
+		out << ", nsl:" << Nany::Config::importNSL;
+		out << '\n';
+	}
+
+
+	template<class S> void printOS(S& out)
+	{
+		out << "> os:  ";
 		bool osDetected = false;
 		#ifdef YUNI_OS_LINUX
 		{
@@ -48,23 +58,26 @@ namespace // anonymous
 				distribName.replace('\n', ' ');
 				distribName.trim();
 				if (not distribName.empty())
-					string << distribName << ", ";
+					out << distribName << ", ";
 			}
 
 			osDetected = true;
 			struct utsname un;
 			if (uname(&un) == 0)
-				string << un.sysname << ' ' << un.release << " (" << un.machine << ')';
+				out << un.sysname << ' ' << un.release << " (" << un.machine << ')';
 			else
-				string << "(unknown linux)";
+				out << "(unknown linux)";
 		}
 		#endif
 
 		if (not osDetected)
-			nany_details_export_system(string);
-		string << '\n';
+			nany_details_export_system(out);
+		out << '\n';
+	}
 
-		// -- CPU
+
+	template<class S> void printCPU(S& out)
+	{
 		ShortString64 cpustr;
 		cpustr << System::CPU::Count() << " cpu(s)/core(s)";
 
@@ -77,26 +90,41 @@ namespace // anonymous
 				line.trim();
 				if (not line.empty())
 				{
-					string << "> cpu: " << line;
+					out << "> cpu: " << line;
 					if (not cpuAdded)
 					{
-						string << " (" << cpustr << ')';
+						out << " (" << cpustr << ')';
 						cpuAdded = true;
 					}
-					string << '\n';
+					out << '\n';
 				}
 				return true;
 			});
 		}
 
 		if (not cpuAdded)
-			string << "> cpu: " << cpustr << '\n';
-
-		// -- MEMORY
-		string << "> ";
-		nany_details_export_memory_usage(string);
-		string << '\n';
+			out << "> cpu: " << cpustr << '\n';
 	}
+
+
+	template<class S> void printMemory(S& out)
+	{
+		out << "> ";
+		nany_details_export_memory_usage(out);
+		out << '\n';
+	}
+
+
+	template<class S> void buildBugReport(S& out)
+	{
+		printNanyVersion(out);
+		printCompiler(out);
+		printBuildFlags(out);
+		printOS(out);
+		printCPU(out);
+		printMemory(out);
+	}
+
 
 } // anonymous namespace
 
