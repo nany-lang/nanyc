@@ -138,6 +138,39 @@ namespace Instanciate
 		}
 
 
+		void pragmaShortcircuitMutateToBool(SequenceBuilder& seq, const IR::ISA::Operand<IR::ISA::Op::pragma>& operands)
+		{
+			uint32_t lvid = operands.value.shortcircuitMutate.lvid;
+			uint32_t source = operands.value.shortcircuitMutate.source;
+
+			seq.frame->lvids[lvid].synthetic = false;
+
+			if (true)
+			{
+				auto& instr = *(*seq.cursor - 1);
+				assert(instr.opcodes[0] == static_cast<uint32_t>(IR::ISA::Op::stackalloc));
+				uint32_t sizeoflvid = instr.to<IR::ISA::Op::stackalloc>().lvid;
+
+				// sizeof
+				auto& atombool = *(seq.cdeftable.atoms().core.object[nyt_bool]);
+				seq.out->emitSizeof(sizeoflvid, atombool.atomid);
+
+				auto& opc = seq.cdeftable.substitute(lvid);
+				opc.mutateToAtom(&atombool);
+				opc.qualifiers.ref = true;
+
+				// ALLOC: memory allocation of the new temporary object
+				seq.out->emitMemalloc(lvid, sizeoflvid);
+				seq.out->emitRef(lvid);
+				seq.frame->lvids[lvid].autorelease = true;
+				// reset the internal value of the object
+				seq.out->emitFieldset(source, /*self*/lvid, 0); // builtin
+			}
+			else
+				seq.out->emitStore(lvid, source);
+		}
+
+
 	} // anonymous namespace
 
 
@@ -185,34 +218,7 @@ namespace Instanciate
 
 			case IR::ISA::Pragma::shortcircuitMutateToBool:
 			{
-				uint32_t lvid = operands.value.shortcircuitMutate.lvid;
-				uint32_t source = operands.value.shortcircuitMutate.source;
-
-				frame->lvids[lvid].synthetic = false;
-
-				if (true)
-				{
-					auto& instr = *(*cursor - 1);
-					assert(instr.opcodes[0] == static_cast<uint32_t>(IR::ISA::Op::stackalloc));
-					uint32_t sizeoflvid = instr.to<IR::ISA::Op::stackalloc>().lvid;
-
-					// sizeof
-					auto& atombool = *(cdeftable.atoms().core.object[nyt_bool]);
-					out->emitSizeof(sizeoflvid, atombool.atomid);
-
-					auto& opc = cdeftable.substitute(lvid);
-					opc.mutateToAtom(&atombool);
-					opc.qualifiers.ref = true;
-
-					// ALLOC: memory allocation of the new temporary object
-					out->emitMemalloc(lvid, sizeoflvid);
-					out->emitRef(lvid);
-					frame->lvids[lvid].autorelease = true;
-					// reset the internal value of the object
-					out->emitFieldset(source, /*self*/lvid, 0); // builtin
-				}
-				else
-					out->emitStore(lvid, source);
+				pragmaShortcircuitMutateToBool(*this, operands);
 				break;
 			}
 
