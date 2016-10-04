@@ -17,7 +17,7 @@ using namespace Yuni;
 namespace // anonymous
 {
 
-	template<class S> void printNanyVersion(S& out)
+	void printNanyVersion(String& out)
 	{
 		out << "> nanyc {c++/bootstrap} v" << nylib_version();
 		if (debugmode)
@@ -26,7 +26,7 @@ namespace // anonymous
 	}
 
 
-	template<class S> void printCompiler(S& out)
+	void printCompiler(String& out)
 	{
 		out << "> compiled with ";
 		nany_details_export_compiler_version(out);
@@ -34,7 +34,7 @@ namespace // anonymous
 	}
 
 
-	template<class S> void printBuildFlags(S& out)
+	void printBuildFlags(String& out)
 	{
 		out << "> config: ";
 		out << "params:" << Nany::Config::maxFuncDeclParameterCount;
@@ -46,7 +46,7 @@ namespace // anonymous
 	}
 
 
-	template<class S> void printOS(S& out)
+	void printOS(String& out)
 	{
 		out << "> os:  ";
 		bool osDetected = false;
@@ -76,7 +76,7 @@ namespace // anonymous
 	}
 
 
-	template<class S> void printCPU(S& out)
+	void printCPU(String& out)
 	{
 		ShortString64 cpustr;
 		cpustr << System::CPU::Count() << " cpu(s)/core(s)";
@@ -107,7 +107,7 @@ namespace // anonymous
 	}
 
 
-	template<class S> void printMemory(S& out)
+	void printMemory(String& out)
 	{
 		out << "> ";
 		nany_details_export_memory_usage(out);
@@ -115,7 +115,7 @@ namespace // anonymous
 	}
 
 
-	template<class S> void buildBugReport(S& out)
+	void buildBugReport(String& out)
 	{
 		printNanyVersion(out);
 		printCompiler(out);
@@ -133,7 +133,9 @@ namespace // anonymous
 
 extern "C" void nylib_print_info_for_bugreport()
 {
-	buildBugReport(std::cout);
+	String out;
+	buildBugReport(out);
+	std::cout << out;
 }
 
 
