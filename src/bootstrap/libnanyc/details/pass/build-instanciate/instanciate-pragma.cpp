@@ -119,6 +119,25 @@ namespace Instanciate
 		}
 
 
+		void pragmaBlueprintSize(SequenceBuilder& seq, uint32_t opcodeCount)
+		{
+			if (0 == seq.layerDepthLimit)
+			{
+				// ignore the current blueprint
+				//*cursor += operands.value.blueprintsize;
+				assert(seq.frame != nullptr);
+				assert(seq.frame->offsetOpcodeBlueprint != (uint32_t) -1);
+				auto startOffset = seq.frame->offsetOpcodeBlueprint;
+				if (unlikely(opcodeCount < 3))
+					return (void) (ice() << "invalid blueprint size when instanciating atom");
+
+				// goto the end of the blueprint
+				// -2: the final 'end' opcode must be interpreted
+				*seq.cursor = &seq.currentSequence.at(startOffset + opcodeCount - 1 - 1);
+			}
+		}
+
+
 	} // anonymous namespace
 
 
@@ -146,28 +165,9 @@ namespace Instanciate
 					pragmaBodyStart(*this); // params deep copy, implicit var auto-init...
 				break;
 			}
-
 			case IR::ISA::Pragma::blueprintsize:
 			{
-				if (0 == layerDepthLimit)
-				{
-					// ignore the current blueprint
-					//*cursor += operands.value.blueprintsize;
-					assert(frame != nullptr);
-					assert(frame->offsetOpcodeBlueprint != (uint32_t) -1);
-					auto startOffset = frame->offsetOpcodeBlueprint;
-					uint32_t count = operands.value.blueprintsize;
-
-					if (unlikely(count < 3))
-					{
-						ice() << "invalid blueprint size when instanciating atom";
-						break;
-					}
-
-					// goto the end of the blueprint
-					// -2: the final 'end' opcode must be interpreted
-					*cursor = &currentSequence.at(startOffset + count - 1 - 1);
-				}
+				pragmaBlueprintSize(*this, operands.value.blueprintsize);
 				break;
 			}
 
