@@ -204,7 +204,6 @@ namespace Instanciate
 		void captureVariables(Atom& atom);
 
 		bool pragmaBlueprint(const IR::ISA::Operand<IR::ISA::Op::pragma>& operands);
-		void pragmaBodyStart();
 
 		Atom* instanciateAtomClass(Atom& atom);
 		bool instanciateAtomClassDestructor(Atom& atom, uint32_t self);

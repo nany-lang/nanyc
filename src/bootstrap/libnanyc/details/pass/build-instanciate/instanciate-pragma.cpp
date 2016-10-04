@@ -13,92 +13,102 @@ namespace Instanciate
 {
 
 
-	void SequenceBuilder::pragmaBodyStart()
+	namespace // anonymous
 	{
-		assert(frame != nullptr);
-		assert(not signatureOnly);
-		assert(codeGenerationLock == 0 and "any good reason to not generate code ?");
-		assert(out != nullptr and "no output IR sequence");
 
-		auto& atom = frame->atom;
-		if (not atom.isFunction())
-			return;
-
-		bool generateCode = canGenerateCode();
-		uint32_t count = atom.parameters.size();
-		atom.parameters.each([&](uint32_t i, const AnyString& name, const Vardef& vardef)
+		void pragmaBodyStart(SequenceBuilder& seq)
 		{
-			// lvid for the given parameter
-			uint32_t lvid  = i + 1 + 1; // 1: return type, 2: first parameter
-			assert(lvid < frame->lvids.size());
-			// Obviously, the parameters are not synthetic objects
-			// but real variables
-			frame->lvids[lvid].synthetic = false;
+			assert(seq.frame != nullptr);
+			assert(not seq.signatureOnly);
+			assert(seq.codeGenerationLock == 0 and "any good reason to not generate code ?");
+			assert(seq.out != nullptr and "no output IR sequence");
 
-			//
-			// Parameters Deep copy (if required)
-			//
-			if (name[0] != '^')
+			auto& frame = *seq.frame;
+			auto& atom = frame.atom;
+			if (not atom.isFunction())
+				return;
+
+			bool generateCode = seq.canGenerateCode();
+			uint32_t count = atom.parameters.size();
+
+			atom.parameters.each([&](uint32_t i, const AnyString& name, const Vardef& vardef)
 			{
-				// normal input parameter (not captured - does not start with '^')
-				// clone it if necessary (only non-ref parameters)
+				// lvid for the given parameter
+				uint32_t lvid  = i + 1 + 1; // 1: return type, 2: first parameter
+				assert(lvid < frame.lvids.size());
+				// Obviously, the parameters are not synthetic objects
+				// but real variables
+				frame.lvids[lvid].synthetic = false;
 
-				if (not cdeftable.classdef(vardef.clid).qualifiers.ref)
+				//
+				// Parameters Deep copy (if required)
+				//
+				if (name[0] != '^')
 				{
-					if (debugmode and generateCode)
-						out->emitComment(String{"----- deep copy parameter "} << i << " aka " << name);
+					// normal input parameter (not captured - does not start with '^')
+					// clone it if necessary (only non-ref parameters)
 
-					// a register has already been reserved for cloning parameters
-					uint32_t clone = 2 + count + i; // 1: return type, 2: first parameter
-					assert(clone < frame->lvids.size());
-					// the new value is not synthetic
-					frame->lvids[clone].synthetic = false;
-
-					bool r = instanciateAssignment(*frame, clone, lvid, false, false, true);
-					if (unlikely(not r))
-						frame->invalidate(clone);
-
-					if (canBeAcquired(lvid))
+					if (not seq.cdeftable.classdef(vardef.clid).qualifiers.ref)
 					{
-						frame->lvids[lvid].autorelease = true;
-						frame->lvids[clone].autorelease = false;
-					}
+						if (debugmode and generateCode)
+							seq.out->emitComment(String{"----- deep copy parameter "} << i << " aka " << name);
 
-					if (generateCode)
-					{
-						out->emitStore(lvid, clone); // register swap
-						if (debugmode)
-							out->emitComment("--\n");
+						// a register has already been reserved for cloning parameters
+						uint32_t clone = 2 + count + i; // 1: return type, 2: first parameter
+						assert(clone < frame.lvids.size());
+						// the new value is not synthetic
+						frame.lvids[clone].synthetic = false;
+
+						bool r = seq.instanciateAssignment(frame, clone, lvid, false, false, true);
+						if (unlikely(not r))
+							frame.invalidate(clone);
+
+						if (seq.canBeAcquired(lvid))
+						{
+							frame.lvids[lvid].autorelease = true;
+							frame.lvids[clone].autorelease = false;
+						}
+
+						if (generateCode)
+						{
+							seq.out->emitStore(lvid, clone); // register swap
+							if (debugmode)
+								seq.out->emitComment("--\n");
+						}
 					}
 				}
-			}
-		});
+			});
 
-		// generating some code on the fly
-		if (atom.isSpecial() /*ctor, operators...*/ and generateCode)
-		{
-			// variables initialization (for a ctor)
-			if (generateClassVarsAutoInit)
+			// generating some code on the fly
+			if (atom.isSpecial() /*ctor, operators...*/ and generateCode)
 			{
-				generateClassVarsAutoInit = false;
-				generateMemberVarDefaultInitialization();
-			}
+				// variables initialization (for a ctor)
+				if (seq.generateClassVarsAutoInit)
+				{
+					seq.generateClassVarsAutoInit = false;
+					seq.generateMemberVarDefaultInitialization();
+				}
 
-			// variables destruction (for dtor)
-			if (generateClassVarsAutoRelease)
-			{
-				generateClassVarsAutoRelease = false;
-				generateMemberVarDefaultDispose();
-			}
+				// variables destruction (for dtor)
+				if (seq.generateClassVarsAutoRelease)
+				{
+					seq.generateClassVarsAutoRelease = false;
+					seq.generateMemberVarDefaultDispose();
+				}
 
-			// variables cloning (copy a ctor)
-			if (generateClassVarsAutoClone)
-			{
-				generateClassVarsAutoClone = false;
-				generateMemberVarDefaultClone();
+				// variables cloning (copy a ctor)
+				if (seq.generateClassVarsAutoClone)
+				{
+					seq.generateClassVarsAutoClone = false;
+					seq.generateMemberVarDefaultClone();
+				}
 			}
 		}
-	}
+
+
+	} // anonymous namespace
+
+
 
 
 	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::pragma>& operands)
@@ -125,10 +135,9 @@ namespace Instanciate
 				// In 'signature only' mode, we only care about the
 				// parameter user types. Everything from this point in unrelevant
 				if (signatureOnly)
-					return currentSequence.invalidateCursor(*cursor);
-
-				// parameters Deep copy, implicit var auto-init...
-				pragmaBodyStart();
+					currentSequence.invalidateCursor(*cursor);
+				else
+					pragmaBodyStart(*this); // params deep copy, implicit var auto-init...
 				break;
 			}
 
