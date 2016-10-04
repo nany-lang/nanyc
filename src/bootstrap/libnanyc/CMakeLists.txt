@@ -292,6 +292,7 @@ addsrc(
 	"details/pass/build-instanciate/instanciate-member-variable-default-init.cpp"
 	"details/pass/build-instanciate/instanciate-member-variable-default-dispose.cpp"
 	"details/pass/build-instanciate/instanciate-member-variable-default-clone.cpp"
+	"details/pass/build-instanciate/instanciate-update-all-stackalloc.cpp"
 	"details/pass/build-instanciate/overloaded-func-call-resolution.cpp"
 	"details/pass/build-instanciate/overloaded-func-call-resolution.h"
 	"details/pass/build-instanciate/suggestion-not-declared-in-scope.cpp")
