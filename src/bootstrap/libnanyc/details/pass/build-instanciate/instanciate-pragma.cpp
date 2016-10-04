@@ -45,7 +45,7 @@ namespace Instanciate
 				if (not cdeftable.classdef(vardef.clid).qualifiers.ref)
 				{
 					if (debugmode and generateCode)
-						out.emitComment(String{"----- deep copy parameter "} << i << " aka " << name);
+						out->emitComment(String{"----- deep copy parameter "} << i << " aka " << name);
 
 					// a register has already been reserved for cloning parameters
 					uint32_t clone = 2 + count + i; // 1: return type, 2: first parameter
@@ -65,9 +65,9 @@ namespace Instanciate
 
 					if (generateCode)
 					{
-						out.emitStore(lvid, clone); // register swap
+						out->emitStore(lvid, clone); // register swap
 						if (debugmode)
-							out.emitComment("--\n");
+							out->emitComment("--\n");
 					}
 				}
 			}
@@ -182,21 +182,21 @@ namespace Instanciate
 
 					// sizeof
 					auto& atombool = *(cdeftable.atoms().core.object[nyt_bool]);
-					out.emitSizeof(sizeoflvid, atombool.atomid);
+					out->emitSizeof(sizeoflvid, atombool.atomid);
 
 					auto& opc = cdeftable.substitute(lvid);
 					opc.mutateToAtom(&atombool);
 					opc.qualifiers.ref = true;
 
 					// ALLOC: memory allocation of the new temporary object
-					out.emitMemalloc(lvid, sizeoflvid);
-					out.emitRef(lvid);
+					out->emitMemalloc(lvid, sizeoflvid);
+					out->emitRef(lvid);
 					frame->lvids[lvid].autorelease = true;
 					// reset the internal value of the object
-					out.emitFieldset(source, /*self*/lvid, 0); // builtin
+					out->emitFieldset(source, /*self*/lvid, 0); // builtin
 				}
 				else
-					out.emitStore(lvid, source);
+					out->emitStore(lvid, source);
 				break;
 			}
 

@@ -45,7 +45,7 @@ namespace Instanciate
 		}
 
 		if (canGenerateCode())
-			out.emitUnref(lvid, atom->classinfo.dtor.atomid, atom->classinfo.dtor.instanceid);
+			out->emitUnref(lvid, atom->classinfo.dtor.atomid, atom->classinfo.dtor.instanceid);
 	}
 
 
@@ -63,7 +63,7 @@ namespace Instanciate
 		if (canGenerateCode())
 		{
 			if (canBeAcquired(operands.lvid))
-				out.emitRef(operands.lvid); // manual var acquisition
+				out->emitRef(operands.lvid); // manual var acquisition
 		}
 	}
 

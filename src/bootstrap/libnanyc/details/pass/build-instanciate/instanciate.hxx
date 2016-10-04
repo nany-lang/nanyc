@@ -82,7 +82,7 @@ namespace Instanciate
 		assert(lvid > 1);
 		assert(canBeAcquired(lvid));
 
-		out.emitRef(lvid);
+		out->emitRef(lvid);
 
 		// force unref
 		assert(lvid < frame->lvids.size());

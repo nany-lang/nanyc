@@ -30,12 +30,12 @@ namespace Instanciate
 					return;
 				}
 
-				out.emitSizeof(operands.lvid, atom->atomid);
+				out->emitSizeof(operands.lvid, atom->atomid);
 			}
 			else
 			{
 				uint64_t size = nytype_sizeof(cdef.kind);
-				out.emitStore_u64(operands.lvid, size);
+				out->emitStore_u64(operands.lvid, size);
 			}
 		}
 	}

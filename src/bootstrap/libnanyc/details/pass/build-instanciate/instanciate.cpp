@@ -22,7 +22,7 @@ namespace Instanciate
 
 
 	SequenceBuilder::SequenceBuilder(Logs::Report report, ClassdefTableView& cdeftable, Build& build,
-		IR::Sequence& out, IR::Sequence& sequence, SequenceBuilder* parent)
+		IR::Sequence* out, IR::Sequence& sequence, SequenceBuilder* parent)
 		: cdeftable(cdeftable)
 		, build(build)
 		, intrinsics(build.intrinsics)
@@ -80,7 +80,7 @@ namespace Instanciate
 				if (clcvr.autorelease)
 				{
 					//if (not clcvr.userDefinedName.empty())
-					//	out.emitComment(String{"unref var "} << clcvr.userDefinedName << " -> %" << i);
+					//	out->emitComment(String{"unref var "} << clcvr.userDefinedName << " -> %" << i);
 					tryUnrefObject(i);
 				}
 
@@ -120,7 +120,7 @@ namespace Instanciate
 		assert(frame != nullptr);
 		assert(frame->offsetOpcodeStacksize != (uint32_t) -1);
 
-		auto& operands = out.at<IR::ISA::Op::stacksize>(frame->offsetOpcodeStacksize);
+		auto& operands = out->at<IR::ISA::Op::stacksize>(frame->offsetOpcodeStacksize);
 		uint32_t startOffset = operands.add;
 		int scope = frame->scope;
 
@@ -138,8 +138,8 @@ namespace Instanciate
 				auto& lvidinfo = frame->lvids[lvid];
 				lvidinfo.scope = scope;
 				lvidinfo.synthetic = false;
-				lvidinfo.offsetDeclOut = out.opcodeCount();
-				out.emitStackalloc(startOffset + i, nyt_any);
+				lvidinfo.offsetDeclOut = out->opcodeCount();
+				out->emitStackalloc(startOffset + i, nyt_any);
 			}
 		}
 		else
@@ -253,7 +253,7 @@ namespace Instanciate
 		// duplicate nop as well since they can be used to insert code
 		// (for shortcircuit for example)
 		if (canGenerateCode())
-			out.emitNop();
+			out->emitNop();
 	}
 
 
@@ -261,7 +261,7 @@ namespace Instanciate
 	{
 		if (canGenerateCode())
 		{
-			uint32_t lbl = out.emitLabel(operands.label);
+			uint32_t lbl = out->emitLabel(operands.label);
 			(void) lbl; // avoid compiler warning for `emitLabel`
 		}
 	}
@@ -284,28 +284,28 @@ namespace Instanciate
 	inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::jmp>& opc)
 	{
 		if (canGenerateCode())
-			out.emit<IR::ISA::Op::jmp>() = opc;
+			out->emit<IR::ISA::Op::jmp>() = opc;
 	}
 
 
 	inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::jz>& opc)
 	{
 		if (canGenerateCode())
-			out.emit<IR::ISA::Op::jz>() = opc;
+			out->emit<IR::ISA::Op::jz>() = opc;
 	}
 
 
 	inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::jnz>& opc)
 	{
 		if (canGenerateCode())
-			out.emit<IR::ISA::Op::jnz>() = opc;
+			out->emit<IR::ISA::Op::jnz>() = opc;
 	}
 
 
 	inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::comment>& opc)
 	{
 		if (debugmode and canGenerateCode())
-			out.emitComment(currentSequence.stringrefs[opc.text]);
+			out->emitComment(currentSequence.stringrefs[opc.text]);
 	}
 
 

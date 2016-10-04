@@ -90,13 +90,13 @@ namespace Instanciate
 				}
 
 				if (canGenerateCode())
-					out.emitPush(element.lvid);
+					out->emitPush(element.lvid);
 			}
 			if (unlikely(hasErrors))
 				return false;
 
 			if (canGenerateCode())
-				out.emitIntrinsic(operands.lvid, nullptr, intrinsic->id);
+				out->emitIntrinsic(operands.lvid, nullptr, intrinsic->id);
 			return true;
 		})();
 

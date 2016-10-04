@@ -63,7 +63,7 @@ namespace Instanciate
 		//@{
 		//! Default constructor (importSignature must be called after)
 		SequenceBuilder(Logs::Report, ClassdefTableView&, Build&,
-			IR::Sequence& out, IR::Sequence&, SequenceBuilder* parent = nullptr);
+			IR::Sequence* out, IR::Sequence&, SequenceBuilder* parent = nullptr);
 
 		//! Prepare the first local registers according the given signature
 		void pushParametersFromSignature(Atom& atom, const Signature&);
@@ -332,7 +332,7 @@ namespace Instanciate
 		//! intrinsics
 		const IntrinsicTable& intrinsics;
 		// New opcode sequence
-		IR::Sequence& out;
+		IR::Sequence* out = nullptr;
 		// Current sequence
 		IR::Sequence& currentSequence;
 

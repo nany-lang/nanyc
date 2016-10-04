@@ -49,8 +49,8 @@ namespace Instanciate
 		// copy only variable instances
 		if (canGenerateCode())
 		{
-			lvidinfo.offsetDeclOut = out.opcodeCount();
-			out.emitStackalloc(operands.lvid, type);
+			lvidinfo.offsetDeclOut = out->opcodeCount();
+			out->emitStackalloc(operands.lvid, type);
 		}
 	}
 

@@ -234,7 +234,7 @@ namespace Instanciate
 
 			// instanciate the sequence attached to the atom
 			auto builder = std::make_unique<SequenceBuilder>
-				(report.subgroup(), newView, info.build, *outIR, inputIR, info.parent);
+				(report.subgroup(), newView, info.build, outIR, inputIR, info.parent);
 
 			if (Config::Traces::sourceOpcodeSequence)
 				printSourceOpcodeSequence(info.cdeftable, info.atom.get(), "[ir-from-ast] ");
@@ -755,8 +755,8 @@ namespace Instanciate
 		auto& atom = info.atom.get();
 		// the original IR sequence generated from the AST
 		auto& inputIR = *(atom.opcodes.sequence);
-		// mapping the new IR sequence to the old, since never used
-		auto* outIR = new IR::Sequence;
+		// no output
+		IR::Sequence* outIR = nullptr;
 		// new layer for the cdeftable
 		ClassdefTableView newview{info.cdeftable, atom.atomid, signature.parameters.size()};
 		// log
@@ -775,7 +775,7 @@ namespace Instanciate
 
 		// instanciate the sequence attached to the atom
 		auto builder = std::make_unique<SequenceBuilder>
-			(report.subgroup(), newview, info.build, *outIR, inputIR, info.parent);
+			(report.subgroup(), newview, info.build, outIR, inputIR, info.parent);
 
 		//if (info.parentAtom)
 		builder->layerDepthLimit = 2; // allow the first blueprint to be instanciated
