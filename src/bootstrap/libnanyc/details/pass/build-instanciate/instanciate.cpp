@@ -362,7 +362,7 @@ namespace Nany
 					Pass::Instanciate::InstanciateData info {
 						newReport, atom, cdeftblView, *this, params, tmplparams
 					};
-					bool success = Pass::Instanciate::instanciateAtomSignature(info);
+					bool success = Pass::Instanciate::instanciateAtomParameterTypes(info);
 					if (not success)
 						report.appendEntry(newReport);
 					return success;

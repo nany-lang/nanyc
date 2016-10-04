@@ -739,12 +739,10 @@ namespace Instanciate
 	}
 
 
-
-
-	bool instanciateAtomSignature(InstanciateData& info)
+	bool instanciateAtomParameterTypes(InstanciateData& info)
 	{
 		// Despite the location of this code, no real code instanciation
-		// of any code will be done (the code is the same, that's why).
+		// of any sort will be done (the code is the same, that's why).
 		// This pass only intends to resolve user-given types for parameters
 		// example:
 		//    func foo(p1, p2: UserType)

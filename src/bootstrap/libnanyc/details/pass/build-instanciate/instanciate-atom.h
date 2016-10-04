@@ -79,7 +79,7 @@ namespace Instanciate
 	*/
 	bool instanciateAtom(InstanciateData& info);
 
-	bool instanciateAtomSignature(InstanciateData& info);
+	bool instanciateAtomParameterTypes(InstanciateData& info);
 
 
 
