@@ -376,6 +376,30 @@ namespace Instanciate
 	}
 
 
+	bool instanciateRecursiveAtom(InstanciateData& info)
+	{
+		Atom& atom = info.atom.get();
+		// mark the func as recursive
+		atom.flags += Atom::Flags::recursive;
+		if (unlikely(not atom.isFunction()))
+		{
+			ice() << "cannot mark non function '" << atom.caption() << "' as recursive";
+			return false;
+		}
+
+		bool success = (info.parent
+			and info.parent->getReturnTypeForRecursiveFunc(atom, info.returnType));
+
+		if (unlikely(not success))
+		{
+			info.returnType.mutateToAny();
+			error() << "parameters/return types must be fully defined to allow recursive func calls";
+			return false;
+		}
+		return true;
+	}
+
+
 	} // anonymous namespace
 
 
@@ -710,31 +734,6 @@ namespace Instanciate
 				if (unlikely(nullptr == parentBuilder->cdeftable.findClassdefAtom(cdef)))
 					return false;
 			}
-		}
-		return true;
-	}
-
-
-	static bool instanciateRecursiveAtom(InstanciateData& info)
-	{
-		Atom& atom  = info.atom.get();
-		// mark the func as recursive
-		atom.flags += Atom::Flags::recursive;
-		if (unlikely(not atom.isFunction()))
-		{
-			ice() << "cannot mark non function '" << atom.caption() << "' as recursive";
-			return false;
-		}
-
-
-		bool success = (info.parent
-			and info.parent->getReturnTypeForRecursiveFunc(atom, info.returnType));
-
-		if (unlikely(not success))
-		{
-			info.returnType.mutateToAny();
-			error() << "parameters/return types must be fully defined to allow recursive func calls";
-			return false;
 		}
 		return true;
 	}
