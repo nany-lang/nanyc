@@ -18,6 +18,7 @@ namespace Instanciate
 		assert(frame != nullptr);
 		assert(not signatureOnly);
 		assert(codeGenerationLock == 0 and "any good reason to not generate code ?");
+		assert(out != nullptr and "no output IR sequence");
 
 		auto& atom = frame->atom;
 		if (not atom.isFunction())
