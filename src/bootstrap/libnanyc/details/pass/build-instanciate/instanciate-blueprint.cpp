@@ -156,6 +156,29 @@ namespace Instanciate
 	}
 
 
+	void blueprintParamSelf(SequenceBuilder& seq, const IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
+	{
+		// -- with automatic variable assignment for operator new
+		// example: operator new (self varname) {}
+		assert(seq.frame != nullptr);
+		auto& frame = *seq.frame;
+
+		if (unlikely(not frame.atom.isClassMember()))
+		{
+			error() << "automatic variable assignment is only allowed in class operator 'new'";
+			return;
+		}
+
+		if (!frame.selfParameters.get())
+			frame.selfParameters = std::make_unique<decltype(frame.selfParameters)::element_type>();
+
+		uint32_t sid  = operands.name;
+		uint32_t lvid = operands.lvid;
+		AnyString varname = seq.currentSequence.stringrefs[sid];
+		(*frame.selfParameters)[varname].first = lvid;
+	}
+
+
 	} // anonymous namespace
 
 
@@ -174,25 +197,9 @@ namespace Instanciate
 			}
 			case IR::ISA::Blueprint::paramself: // -- function parameter
 			{
-				// -- with automatic variable assignment for operator new
-				// example: operator new (self varname) {}
-				assert(frame != nullptr);
-				if (unlikely(not frame->atom.isClassMember()))
-				{
-					error() << "automatic variable assignment is only allowed in class operator 'new'";
-					break;
-				}
-
-				if (!frame->selfParameters.get())
-					frame->selfParameters = std::make_unique<decltype(frame->selfParameters)::element_type>();
-
-				uint32_t sid  = operands.name;
-				uint32_t lvid = operands.lvid;
-				AnyString varname = currentSequence.stringrefs[sid];
-				(*frame->selfParameters)[varname].first = lvid;
-				return;
+				blueprintParamSelf(*this, operands);
+				break;
 			}
-
 			case IR::ISA::Blueprint::funcdef:
 			case IR::ISA::Blueprint::classdef:
 			case IR::ISA::Blueprint::typealias:
