@@ -66,14 +66,14 @@ namespace Instanciate
 		};
 
 
-		static void reinitStackAllocTypes(IR::Sequence& out, ClassdefTableView& table, uint32_t atomid)
+		void reinitStackAllocTypes(IR::Sequence& out, ClassdefTableView& table, uint32_t atomid)
 		{
 			PostProcessStackAllocWalker walker{table, atomid};
 			out.each(walker);
 		}
 
 
-		static void printGeneratedIRSequence(const String& symbolName,
+		void printGeneratedIRSequence(const String& symbolName,
 			const IR::Sequence& out, const ClassdefTableView& newView, uint32_t offset = 0)
 		{
 			String text;
@@ -92,7 +92,7 @@ namespace Instanciate
 		}
 
 
-		static void printSourceOpcodeSequence(const ClassdefTableView& cdeftable, const Atom& atom, const char* txt)
+		void printSourceOpcodeSequence(const ClassdefTableView& cdeftable, const Atom& atom, const char* txt)
 		{
 			String text;
 			text << txt << cdeftable.keyword(atom) << ' '; // ex: func
@@ -103,7 +103,7 @@ namespace Instanciate
 		}
 
 
-		static inline void prepareSignature(Signature& signature, InstanciateData& info)
+		inline void prepareSignature(Signature& signature, InstanciateData& info)
 		{
 			uint32_t count = static_cast<uint32_t>(info.params.size());
 			if (count != 0)
@@ -144,7 +144,7 @@ namespace Instanciate
 		}
 
 
-		static bool createNewAtom(InstanciateData& info, Atom& atom)
+		bool createNewAtom(InstanciateData& info, Atom& atom)
 		{
 			// re-map from the parent
 			{
@@ -186,7 +186,7 @@ namespace Instanciate
 		}
 
 
-		static IR::Sequence* performAtomInstanciation(InstanciateData& info, Signature& signature)
+		IR::Sequence* performAtomInstanciation(InstanciateData& info, Signature& signature)
 		{
 			// No IR sequence attached for the given signature,
 			// let's instanciate the function or the class !
