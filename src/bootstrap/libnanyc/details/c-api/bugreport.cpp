@@ -6,6 +6,7 @@
 #include "common-debuginfo.hxx"
 #include <string.h>
 #include <iostream>
+#include <memory>
 #ifdef YUNI_OS_LINUX
 #include <sys/utsname.h>
 #endif
@@ -134,27 +135,36 @@ namespace // anonymous
 
 extern "C" void nylib_print_info_for_bugreport()
 {
-	String out;
-	buildBugReport(out);
-	std::cout << out;
+	try
+	{
+		String out;
+		buildBugReport(out);
+		std::cout << out;
+	}
+	catch (const std::exception& e)
+	{
+		std::cout << "nany: exception: " << e.what() << '\n';
+	}
 }
 
 
 extern "C" char* nylib_get_info_for_bugreport(uint32_t* length)
 {
-	String string;
-	buildBugReport(string);
-
-	char* result = (char*)::malloc(sizeof(char) * (string.sizeInBytes() + 1));
-	if (!result)
+	try
 	{
-		if (length)
-			*length = 0u;
-		return nullptr;
+		String string;
+		buildBugReport(string);
+
+		uint32_t size = string.size();
+		auto result = std::make_unique<char[]>(size + 1);
+		memcpy(result.get(), string.data(), size);
+		result[size] = '\0';
+		if (size)
+			*length = size;
+		return result.release();
 	}
-	memcpy(result, string.data(), string.sizeInBytes());
-	result[string.sizeInBytes()] = '\0';
+	catch (...) {}
 	if (length)
-		*length = string.size();
-	return result;
+		*length = 0;
+	return nullptr;
 }
