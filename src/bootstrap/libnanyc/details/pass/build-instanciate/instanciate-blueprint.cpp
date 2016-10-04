@@ -179,6 +179,29 @@ namespace Instanciate
 	}
 
 
+	void blueprintVardef(SequenceBuilder& seq, const IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
+	{
+		// update the type of the variable member
+		if (seq.frame != nullptr)
+		{
+			if (seq.frame->atom.isClass())
+			{
+				uint32_t sid  = operands.name;
+				const AnyString& varname = seq.currentSequence.stringrefs[sid];
+
+				Atom* atom = nullptr;
+				if (1 != seq.frame->atom.findVarAtom(atom, varname))
+				{
+					ice() << "unknown variable member '" << varname << "'";
+					return;
+				}
+				atom->returnType.clid.reclass(seq.frame->atomid, operands.lvid);
+			}
+		}
+		seq.pushedparams.clear();
+	}
+
+
 	} // anonymous namespace
 
 
@@ -205,32 +228,13 @@ namespace Instanciate
 			case IR::ISA::Blueprint::typealias:
 			{
 				blueprintFuncOrClassOrType(*this, operands);
-				return;
+				break;
 			}
-
 			case IR::ISA::Blueprint::vardef:
 			{
-				// update the type of the variable member
-				if (frame != nullptr)
-				{
-					if (frame->atom.isClass())
-					{
-						uint32_t sid  = operands.name;
-						const AnyString& varname = currentSequence.stringrefs[sid];
-
-						Atom* atom = nullptr;
-						if (1 != frame->atom.findVarAtom(atom, varname))
-						{
-							ice() << "unknown variable member '" << varname << "'";
-							break;
-						}
-						atom->returnType.clid.reclass(frame->atomid, operands.lvid);
-					}
-				}
-				pushedparams.clear();
-				return;
+				blueprintVardef(*this, operands);
+				break;
 			}
-
 			case IR::ISA::Blueprint::namespacedef:
 			{
 				// see mapping instead
@@ -243,7 +247,6 @@ namespace Instanciate
 			}
 		}
 	}
-
 
 
 
