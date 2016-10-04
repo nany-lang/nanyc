@@ -316,7 +316,6 @@ namespace Instanciate
 		static Logs::Report emitReportEntry(void* self, Logs::Level);
 		static void retriveReportMetadata(void* self, Logs::Level, const AST::Node*, Yuni::String&, uint32_t&, uint32_t&);
 
-		void visitBlueprintFuncOrClassOrType(const IR::ISA::Operand<IR::ISA::Op::blueprint>&);
 		void visitBlueprintUnit(const IR::ISA::Operand<IR::ISA::Op::blueprint>&);
 
 		// Current stack frame (current func / class...)
