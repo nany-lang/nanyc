@@ -117,6 +117,7 @@ namespace // anonymous
 
 	void buildBugReport(String& out)
 	{
+		out.reserve(512);
 		printNanyVersion(out);
 		printCompiler(out);
 		printBuildFlags(out);
@@ -142,7 +143,6 @@ extern "C" void nylib_print_info_for_bugreport()
 extern "C" char* nylib_get_info_for_bugreport(uint32_t* length)
 {
 	String string;
-	string.reserve(512);
 	buildBugReport(string);
 
 	char* result = (char*)::malloc(sizeof(char) * (string.sizeInBytes() + 1));
