@@ -23,7 +23,7 @@ namespace Instanciate
 			frame->resizeRegisterCount(stacksize, cdeftable);
 
 			if (canGenerateCode())
-				frame->offsetOpcodeStacksize = out.emitStackSizeIncrease(stacksize);
+				frame->offsetOpcodeStacksize = out->emitStackSizeIncrease(stacksize);
 		}
 	}
 

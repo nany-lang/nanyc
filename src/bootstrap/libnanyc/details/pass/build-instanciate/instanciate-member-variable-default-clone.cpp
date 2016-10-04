@@ -20,7 +20,7 @@ namespace Instanciate
 		assert(frame->offsetOpcodeStacksize != (uint32_t) -1);
 
 		// special location: in a constructor - initializing all variables with their def value
-		// note: do not keep a reference on 'out.at...', since the internal buffer might be reized
+		// note: do not keep a reference on 'out->at...', since the internal buffer might be reized
 		auto& parentAtom = *(frame->atom.parent);
 
 		// do not warn about rhs (unused). The parameter is used, but not via its name
@@ -59,7 +59,7 @@ namespace Instanciate
 			auto& subatom = subatomref.get();
 			auto& cdef    = cdeftable.classdef(subatom.returnType.clid); // type of the var member
 			if (debugmode)
-				out.emitComment(String{"\nCLONE for '"} << subatom.name() << '\'');
+				out->emitComment(String{"\nCLONE for '"} << subatom.name() << '\'');
 
 			switch (cdef.kind)
 			{
@@ -82,12 +82,12 @@ namespace Instanciate
 					cdefrhs.qualifiers = cdef.qualifiers;
 
 					// fetching the rhs value, from the object being copied
-					out.emitFieldget(rhsptr, /*rhs*/ 3, subatom.varinfo.effectiveFieldIndex);
+					out->emitFieldget(rhsptr, /*rhs*/ 3, subatom.varinfo.effectiveFieldIndex);
 
 					// perform a deep copy to the local variable
 					instanciateAssignment(*frame, lhsptr, rhsptr, false);
 					// .. copied to the member
-					out.emitFieldset(lhsptr, /*self*/ 2, subatom.varinfo.effectiveFieldIndex);
+					out->emitFieldset(lhsptr, /*self*/ 2, subatom.varinfo.effectiveFieldIndex);
 
 					// prevent the cloned object from being released at the end of the scope
 					assert(canBeAcquired(lhsptr));
@@ -102,9 +102,9 @@ namespace Instanciate
 				default:
 				{
 					// rhs value, from the object being clone
-					out.emitFieldget(lvid, /*rhs*/  3, subatom.varinfo.effectiveFieldIndex);
+					out->emitFieldget(lvid, /*rhs*/  3, subatom.varinfo.effectiveFieldIndex);
 					// .. copied directly into the local member
-					out.emitFieldset(lvid, /*self*/ 2, subatom.varinfo.effectiveFieldIndex);
+					out->emitFieldset(lvid, /*self*/ 2, subatom.varinfo.effectiveFieldIndex);
 					++lvid;
 				}
 			}
@@ -114,10 +114,10 @@ namespace Instanciate
 		if (userDefinedClone)
 		{
 			if (debugmode)
-				out.emitComment("\nuser's defined clone method");
-			out.emitPush(2); // self
-			out.emitPush(3); // rhs
-			out.emitCall(lvid, userDefinedClone->atomid, 0);
+				out->emitComment("\nuser's defined clone method");
+			out->emitPush(2); // self
+			out->emitPush(3); // rhs
+			out->emitCall(lvid, userDefinedClone->atomid, 0);
 			++lvid;
 		}
 	}

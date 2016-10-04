@@ -157,7 +157,7 @@ namespace Instanciate
 				case TypeCheck::Match::strictEqual:
 				{
 					if (debugmode)
-						out.emitComment("return from func");
+						out->emitComment("return from func");
 
 					if (not retIsVoid)
 					{
@@ -189,13 +189,13 @@ namespace Instanciate
 						// release all variables declared in the function
 						releaseScopedVariables(0 /*all scopes*/);
 						// the return value
-						out.emitReturn(retlvid, 0);
+						out->emitReturn(retlvid, 0);
 					}
 					else
 					{
 						releaseScopedVariables(0 /*all scopes*/);
 						// the return value
-						out.emitReturn();
+						out->emitReturn();
 					}
 					break;
 				}

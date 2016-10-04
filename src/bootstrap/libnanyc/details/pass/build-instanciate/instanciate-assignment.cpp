@@ -59,7 +59,7 @@ namespace Instanciate
 			{
 				// read the first field, assuming that the first one if actually the same type
 				if (canGenerateCode())
-					out.emitFieldget(lhs, rhs, 0);
+					out->emitFieldget(lhs, rhs, 0);
 				return true;
 			}
 		}
@@ -111,7 +111,7 @@ namespace Instanciate
 				// NOTE: the qualifiers from `cdeflhs` are not valid and correspond to nothing
 				auto& originalcdef = cdeftable.classdef(CLID{atomid, lhs});
 				if (debugmode and canGenerateCode())
-					out.emitComment(originalcdef.print(cdeftable) << originalcdef.clid);
+					out->emitComment(originalcdef.print(cdeftable) << originalcdef.clid);
 
 				if (originalcdef.qualifiers.ref)
 				{
@@ -156,7 +156,7 @@ namespace Instanciate
 			comment << "%" << lhs << " = %" << rhs << " aka '";
 			cdeflhs.print(comment, cdeftable, false);
 			comment << '\'';
-			out.emitComment(comment);
+			out->emitComment(comment);
 		}
 
 		switch (strategy)
@@ -165,9 +165,9 @@ namespace Instanciate
 			{
 				if (canGenerateCode())
 				{
-					out.emitStore(lhs, rhs);
+					out->emitStore(lhs, rhs);
 					if (isMemberVariable)
-						out.emitFieldset(lhs, origin.self, origin.field);
+						out->emitFieldset(lhs, origin.self, origin.field);
 				}
 				break;
 			}
@@ -182,7 +182,7 @@ namespace Instanciate
 				{
 					// acquire first the right value to make sure that all data are alive
 					// example: a = a
-					out.emitRef(rhs);
+					out->emitRef(rhs);
 					// release the old left value
 					if (canDisposeLHS)
 					{
@@ -192,12 +192,12 @@ namespace Instanciate
 					}
 
 					// copy the pointer
-					out.emitStore(lhs, rhs);
+					out->emitStore(lhs, rhs);
 
 					if (isMemberVariable)
 					{
-						out.emitRef(lhs); // re-acquire for the object
-						out.emitFieldset(lhs, origin.self, origin.field);
+						out->emitRef(lhs); // re-acquire for the object
+						out->emitFieldset(lhs, origin.self, origin.field);
 					}
 				}
 				break;
@@ -220,7 +220,7 @@ namespace Instanciate
 				{
 					// acquire first the right value to make sure that all data are alive
 					// example: a = a
-					out.emitRef(rhs);
+					out->emitRef(rhs);
 					// release the old left value
 					if (canDisposeLHS)
 					{
@@ -229,32 +229,32 @@ namespace Instanciate
 							tryUnrefObject(lhs);
 					}
 
-					// note: do not keep a reference on 'out.at...', since the internal buffer might be reized
+					// note: do not keep a reference on 'out->at...', since the internal buffer might be reized
 					uint32_t lvid = createLocalVariables(/*count*/ 2);
 					uint32_t retcall = lvid + 1;
 
-					uint32_t rsizof  = out.emitStackalloc(lvid, nyt_u64);
-					out.emitSizeof(rsizof, rhsAtom->atomid);
+					uint32_t rsizof  = out->emitStackalloc(lvid, nyt_u64);
+					out->emitSizeof(rsizof, rhsAtom->atomid);
 
 					// re-allocate some memory
-					out.emitMemalloc(lhs, rsizof);
-					out.emitRef(lhs);
+					out->emitMemalloc(lhs, rsizof);
+					out->emitRef(lhs);
 					assert(lhs < frame.lvids.size());
 					frame.lvids[lhs].origin.memalloc = true;
 
-					out.emitStackalloc(retcall, nyt_void);
+					out->emitStackalloc(retcall, nyt_void);
 					// call operator 'clone'
-					out.emitPush(lhs); // self
-					out.emitPush(rhs); // rhs, the object to copy
-					out.emitCall(retcall, rhsAtom->classinfo.clone.atomid, rhsAtom->classinfo.clone.instanceid);
+					out->emitPush(lhs); // self
+					out->emitPush(rhs); // rhs, the object to copy
+					out->emitCall(retcall, rhsAtom->classinfo.clone.atomid, rhsAtom->classinfo.clone.instanceid);
 
 					// release rhs - copy is done
 					tryUnrefObject(rhs);
 
 					if (isMemberVariable)
 					{
-						out.emitRef(lhs);
-						out.emitFieldset(lhs, origin.self, origin.field);
+						out->emitRef(lhs);
+						out->emitFieldset(lhs, origin.self, origin.field);
 					}
 				}
 				break;
@@ -314,8 +314,8 @@ namespace Instanciate
 			frame->lvids[operands.lvid].autorelease = true;
 			if (canGenerateCode())
 			{
-				out.emitStore(operands.lvid, lhs);
-				out.emitRef(operands.lvid);
+				out->emitStore(operands.lvid, lhs);
+				out->emitRef(operands.lvid);
 			}
 		}
 		return true;

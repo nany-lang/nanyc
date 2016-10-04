@@ -20,7 +20,7 @@ namespace Instanciate
 		assert(frame->offsetOpcodeStacksize != (uint32_t) -1);
 
 		// special location: in a constructor - initializing all variables with their def value
-		// note: do not keep a reference on 'out.at...', since the internal buffer might be reized
+		// note: do not keep a reference on 'out->at...', since the internal buffer might be reized
 		auto& funcAtom = frame->atom;
 		if (unlikely(funcAtom.parent == nullptr))
 			return (void)(ice() << "invalid parent atom for variable initialization in ctor");
@@ -54,11 +54,11 @@ namespace Instanciate
 					if (unlikely(!varatom))
 						return (void)(ice() << "invalid atom for automatic initialization of captured variable '" << name << '\'');
 
-					out.emitFieldset(lvid, /*self*/ 2, varatom->varinfo.effectiveFieldIndex);
+					out->emitFieldset(lvid, /*self*/ 2, varatom->varinfo.effectiveFieldIndex);
 
 					// acquire 'lvid' to keep it alive
 					if (canBeAcquired(cdef))
-						out.emitRef(lvid);
+						out->emitRef(lvid);
 				}
 			});
 		}
@@ -95,15 +95,15 @@ namespace Instanciate
 			{
 				auto& subatom = subatomref.get();
 				if (debugmode)
-					out.emitComment(String() << "initialization for " << subatom.name() << " via default-init");
+					out->emitComment(String() << "initialization for " << subatom.name() << " via default-init");
 
 				uint32_t instanceid = static_cast<uint32_t>(-1);
 				bool localSuccess = instanciateAtomFunc(instanceid, subatom, /*ret*/ 0, /*self*/ 2);
 
 				if (likely(localSuccess))
 				{
-					out.emitPush(2); // %2 -> self
-					out.emitCall(lvid, subatom.atomid, instanceid);
+					out->emitPush(2); // %2 -> self
+					out->emitCall(lvid, subatom.atomid, instanceid);
 				}
 				++lvid; // always increment it to ease debugging
 			}
@@ -113,7 +113,7 @@ namespace Instanciate
 			auto& selfParameters = *(frame->selfParameters.get());
 			auto selfparamlistEnd = selfParameters.end();
 			if (debugmode)
-				out.emitComment(String() << "initialization with " << selfParameters.size() << " self-parameter(s)");
+				out->emitComment(String() << "initialization with " << selfParameters.size() << " self-parameter(s)");
 
 			for (auto& subatomref: atomvars)
 			{
@@ -133,18 +133,18 @@ namespace Instanciate
 				if (selfIT == selfparamlistEnd)
 				{
 					if (debugmode)
-						out.emitComment(String() << "initialization for " << subatomname << " via default-init");
+						out->emitComment(String() << "initialization for " << subatomname << " via default-init");
 
 					if (localSuccess)
 					{
-						out.emitPush(2); // %2 -> self
-						out.emitCall(lvid, subatom.atomid, instanceid);
+						out->emitPush(2); // %2 -> self
+						out->emitCall(lvid, subatom.atomid, instanceid);
 					}
 				}
 				else
 				{
 					if (debugmode)
-						out.emitComment(String() << "initialization for " << subatomname << " via self-parameter");
+						out->emitComment(String() << "initialization for " << subatomname << " via self-parameter");
 
 					if (localSuccess)
 					{
@@ -171,11 +171,11 @@ namespace Instanciate
 							return;
 						}
 
-						out.emitFieldset(lvid, /*self*/ 2, varatom->varinfo.effectiveFieldIndex);
+						out->emitFieldset(lvid, /*self*/ 2, varatom->varinfo.effectiveFieldIndex);
 
 						// acquire 'lvid' to keep it alive
 						if (canBeAcquired(cdef))
-							out.emitRef(lvid);
+							out->emitRef(lvid);
 					}
 
 					// mark it as 'used' to suppress spurious error reporting

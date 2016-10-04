@@ -20,7 +20,7 @@ namespace Instanciate
 		assert(frame->offsetOpcodeStacksize != (uint32_t) -1);
 
 		// special location: in a constructor - initializing all variables with their def value
-		// note: do not keep a reference on 'out.at...', since the internal buffer might be reized
+		// note: do not keep a reference on 'out->at...', since the internal buffer might be reized
 		auto& parentAtom = *(frame->atom.parent);
 
 
@@ -51,9 +51,9 @@ namespace Instanciate
 		if (userDefinedDispose)
 		{
 			if (debugmode)
-				out.emitComment("calling user destructor");
-			out.emitPush(2); // self
-			out.emitCall(lvid, userDefinedDispose->atomid, 0);
+				out->emitComment("calling user destructor");
+			out->emitPush(2); // self
+			out->emitCall(lvid, userDefinedDispose->atomid, 0);
 			cdeftable.substitute(lvid).mutateToVoid();
 			++lvid;
 		}
@@ -72,7 +72,7 @@ namespace Instanciate
 
 			if (debugmode and not commentAdded)
 			{
-				out.emitComment("releasing variable members");
+				out->emitComment("releasing variable members");
 				commentAdded = true;
 			}
 
@@ -81,9 +81,9 @@ namespace Instanciate
 
 			// type propagation
 			cdeftable.substitute(reglvid).import(cdef);
-			// out.emitComment(String() << "dispose for " << subatom.name);
+			// out->emitComment(String() << "dispose for " << subatom.name);
 			// read the pointer
-			out.emitFieldget(reglvid, /*self*/ 2, subatom.varinfo.effectiveFieldIndex);
+			out->emitFieldget(reglvid, /*self*/ 2, subatom.varinfo.effectiveFieldIndex);
 
 			auto& origin  = frame->lvids[reglvid].origin.varMember;
 			origin.self   = 2;
@@ -107,7 +107,7 @@ namespace Instanciate
 			}
 
 			auto& classinfo = typeAtom->classinfo;
-			out.emitUnref(reglvid, classinfo.dtor.atomid, classinfo.dtor.instanceid);
+			out->emitUnref(reglvid, classinfo.dtor.atomid, classinfo.dtor.instanceid);
 		}
 	}
 

@@ -217,8 +217,8 @@ namespace Instanciate
 			if (canGenerateCode())
 			{
 				for (auto& element: params) // push all parameters
-					out.emitPush(element.clid.lvid());
-				out.emitCall(lvid, atom->atomid, info.instanceid);
+					out->emitPush(element.clid.lvid());
+				out->emitCall(lvid, atom->atomid, info.instanceid);
 			}
 			return true;
 		}
@@ -264,11 +264,11 @@ namespace Instanciate
 			return false;
 
 		uint32_t offset = frame->lvids[lvid].offsetDeclOut;
-		if (unlikely(not (offset > 0 and offset < out.opcodeCount())))
+		if (unlikely(not (offset > 0 and offset < out->opcodeCount())))
 			return (ice() << "invalid opcode offset for generating shortcircuit");
 
 		// checking if the referenced offset is really a stackalloc
-		assert(out.at(offset).opcodes[0] == static_cast<uint32_t>(IR::ISA::Op::stackalloc));
+		assert(out->at(offset).opcodes[0] == static_cast<uint32_t>(IR::ISA::Op::stackalloc));
 
 		// lvid of the first parameter
 		uint32_t lvidvalue = pushedparams.func.indexed[0].lvid;
@@ -279,11 +279,11 @@ namespace Instanciate
 			if (unlikely(cdeftable.atoms().core.object[nyt_bool] != atom))
 				return (error() << "boolean expected");
 
-			uint32_t newlvid = out.at<IR::ISA::Op::stackalloc>(offset).lvid;
+			uint32_t newlvid = out->at<IR::ISA::Op::stackalloc>(offset).lvid;
 			++offset;
-			assert(out.at(offset).opcodes[0] == static_cast<uint32_t>(IR::ISA::Op::nop));
+			assert(out->at(offset).opcodes[0] == static_cast<uint32_t>(IR::ISA::Op::nop));
 
-			auto& fieldget  = out.at<IR::ISA::Op::fieldget>(offset);
+			auto& fieldget  = out->at<IR::ISA::Op::fieldget>(offset);
 			fieldget.opcode = static_cast<uint32_t>(IR::ISA::Op::fieldget);
 			fieldget.lvid   = newlvid;
 			fieldget.self   = lvidvalue;
@@ -293,11 +293,11 @@ namespace Instanciate
 
 		// go to the next nop (can be first one if the parameter was __bool)
 		++offset;
-		assert(out.at(offset).opcodes[0] == static_cast<uint32_t>(IR::ISA::Op::nop));
+		assert(out->at(offset).opcodes[0] == static_cast<uint32_t>(IR::ISA::Op::nop));
 
 		if (not shortcircuit.compareTo) // if true then
 		{
-			auto& condjmp  = out.at<IR::ISA::Op::jz>(offset);
+			auto& condjmp  = out->at<IR::ISA::Op::jz>(offset);
 			condjmp.opcode = static_cast<uint32_t>(IR::ISA::Op::jz); // promotion
 			condjmp.lvid   = lvidvalue;
 			condjmp.result = retlvid; // func return
@@ -305,7 +305,7 @@ namespace Instanciate
 		}
 		else // if false then
 		{
-			auto& condjmp  = out.at<IR::ISA::Op::jnz>(offset);
+			auto& condjmp  = out->at<IR::ISA::Op::jnz>(offset);
 			condjmp.opcode = static_cast<uint32_t>(IR::ISA::Op::jnz); // promotion
 			condjmp.lvid   = lvidvalue;
 			condjmp.result = retlvid; // func return
@@ -385,8 +385,8 @@ namespace Instanciate
 		if (canGenerateCode())
 		{
 			for (auto& param: params)
-				out.emitPush(param.clid.lvid());
-			out.emitCall(lvid, atom->atomid, info.instanceid);
+				out->emitPush(param.clid.lvid());
+			out->emitCall(lvid, atom->atomid, info.instanceid);
 		}
 		return true;
 	}

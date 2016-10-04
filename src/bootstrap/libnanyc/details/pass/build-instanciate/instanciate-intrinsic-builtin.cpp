@@ -34,7 +34,7 @@ namespace Instanciate
 				return seq.complainIntrinsicParameter("__nanyc_memchecker_hold", 0, cdefsize, "'__u64'");
 
 			if (seq.canGenerateCode())
-				seq.out.emitMemcheckhold(ptrlvid, sizelvid);
+				seq.out->emitMemcheckhold(ptrlvid, sizelvid);
 			return true;
 		}
 
@@ -43,9 +43,9 @@ namespace Instanciate
 		{
 			seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_bool);
 			#ifdef YUNI_OS_UNIX
-			seq.out.emitStore_u64(lvid, 1);
+			seq.out->emitStore_u64(lvid, 1);
 			#else
-			seq.out.emitStore_u64(lvid, 0);
+			seq.out->emitStore_u64(lvid, 0);
 			#endif
 			return true;
 		}
@@ -54,9 +54,9 @@ namespace Instanciate
 		{
 			seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_bool);
 			#if defined(YUNI_OS_UNIX) && defined(_POSIX_VERSION)
-			seq.out.emitStore_u64(lvid, 1);
+			seq.out->emitStore_u64(lvid, 1);
 			#else
-			seq.out.emitStore_u64(lvid, 0);
+			seq.out->emitStore_u64(lvid, 0);
 			#endif
 			return true;
 		}
@@ -66,9 +66,9 @@ namespace Instanciate
 		{
 			seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_bool);
 			#ifdef YUNI_OS_LINUX
-			seq.out.emitStore_u64(lvid, 1);
+			seq.out->emitStore_u64(lvid, 1);
 			#else
-			seq.out.emitStore_u64(lvid, 0);
+			seq.out->emitStore_u64(lvid, 0);
 			#endif
 			return true;
 		}
@@ -77,9 +77,9 @@ namespace Instanciate
 		{
 			seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_bool);
 			#ifdef YUNI_OS_AIX
-			seq.out.emitStore_u64(lvid, 1);
+			seq.out->emitStore_u64(lvid, 1);
 			#else
-			seq.out.emitStore_u64(lvid, 0);
+			seq.out->emitStore_u64(lvid, 0);
 			#endif
 			return true;
 		}
@@ -88,9 +88,9 @@ namespace Instanciate
 		{
 			seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_bool);
 			#ifdef YUNI_OS_WINDOWS
-			seq.out.emitStore_u64(lvid, 1);
+			seq.out->emitStore_u64(lvid, 1);
 			#else
-			seq.out.emitStore_u64(lvid, 0);
+			seq.out->emitStore_u64(lvid, 0);
 			#endif
 			return true;
 		}
@@ -99,9 +99,9 @@ namespace Instanciate
 		{
 			seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_bool);
 			#if defined(__CYGWIN32__) || defined(__CYGWIN__)
-			seq.out.emitStore_u64(lvid, 1);
+			seq.out->emitStore_u64(lvid, 1);
 			#else
-			seq.out.emitStore_u64(lvid, 0);
+			seq.out->emitStore_u64(lvid, 0);
 			#endif
 			return true;
 		}
@@ -110,9 +110,9 @@ namespace Instanciate
 		{
 			seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_bool);
 			#ifdef YUNI_OS_MACOS
-			seq.out.emitStore_u64(lvid, 1);
+			seq.out->emitStore_u64(lvid, 1);
 			#else
-			seq.out.emitStore_u64(lvid, 0);
+			seq.out->emitStore_u64(lvid, 0);
 			#endif
 			return true;
 		}
@@ -122,9 +122,9 @@ namespace Instanciate
 			seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_bool);
 			#if defined(YUNI_OS_MACOS) || defined(YUNI_OS_OPENBSD) || defined(YUNI_OS_FREEBSD) \
 				|| defined(YUNI_OS_NETBSD) || defined(YUNI_OS_DRAGONFLY)
-			seq.out.emitStore_u64(lvid, 1);
+			seq.out->emitStore_u64(lvid, 1);
 			#else
-			seq.out.emitStore_u64(lvid, 0);
+			seq.out->emitStore_u64(lvid, 0);
 			#endif
 			return true;
 		}
@@ -140,7 +140,7 @@ namespace Instanciate
 			if (unlikely(sid == (uint32_t) -1))
 				return (ice() << "invalid string-id for field name (got lvid " << lvidsid << ')');
 
-			AnyString varname = seq.out.stringrefs[sid];
+			AnyString varname = seq.out->stringrefs[sid];
 			if (unlikely(varname.empty()))
 				return (ice() << "invalid empty field name");
 
@@ -183,13 +183,13 @@ namespace Instanciate
 				if (not implicitBuiltin)
 				{
 					seq.tryToAcquireObject(objlvid);
-					seq.out.emitFieldset(objlvid, /*self*/ 2, varatom->varinfo.effectiveFieldIndex);
+					seq.out->emitFieldset(objlvid, /*self*/ 2, varatom->varinfo.effectiveFieldIndex);
 				}
 				else
 				{
 					uint32_t lvidvalue = seq.createLocalVariables();
-					seq.out.emitFieldget(lvidvalue, objlvid, 0);
-					seq.out.emitFieldset(lvidvalue, /*self*/ 2, varatom->varinfo.effectiveFieldIndex);
+					seq.out->emitFieldget(lvidvalue, objlvid, 0);
+					seq.out->emitFieldset(lvidvalue, /*self*/ 2, varatom->varinfo.effectiveFieldIndex);
 				}
 			}
 			return true;
@@ -225,12 +225,12 @@ namespace Instanciate
 				{
 					// retrieving the pointer address of the object in input
 					// the objlvid representing the object is already the address
-					seq.out.emitStore(lvid, objlvid);
+					seq.out->emitStore(lvid, objlvid);
 				}
 				else
 				{
 					// can not be acquired, not an object - NULL
-					seq.out.emitStore_u64(lvid, 0);
+					seq.out->emitStore_u64(lvid, 0);
 				}
 			}
 			return true;
@@ -261,12 +261,12 @@ namespace Instanciate
 				if (not isBuiltinOrVoid)
 				{
 					assert(atom != nullptr);
-					seq.out.emitSizeof(lvid, atom->atomid);
+					seq.out->emitSizeof(lvid, atom->atomid);
 				}
 				else
 				{
 					uint64_t size = nytype_sizeof(cdef.kind);
-					seq.out.emitStore_u64(lvid, size);
+					seq.out->emitStore_u64(lvid, size);
 				}
 			}
 			return true;
@@ -283,7 +283,7 @@ namespace Instanciate
 				return seq.complainIntrinsicParameter("memory.allocate", 0, cdef, "'__u64'");
 
 			if (seq.canGenerateCode())
-				seq.out.emitMemalloc(lvid, objlvid);
+				seq.out->emitMemalloc(lvid, objlvid);
 			return true;
 		}
 
@@ -309,8 +309,8 @@ namespace Instanciate
 
 			if (seq.canGenerateCode())
 			{
-				seq.out.emitStore(lvid, ptrlvid);
-				seq.out.emitMemrealloc(lvid, oldsizelvid, newsizelvid);
+				seq.out->emitStore(lvid, ptrlvid);
+				seq.out->emitMemrealloc(lvid, oldsizelvid, newsizelvid);
 			}
 			return true;
 		}
@@ -331,7 +331,7 @@ namespace Instanciate
 				return seq.complainIntrinsicParameter("memory.dispose", 1, cdef, "'__u64'");
 
 			if (seq.canGenerateCode())
-				seq.out.emitMemFree(objlvid, size);
+				seq.out->emitMemFree(objlvid, size);
 			return true;
 		}
 
@@ -356,7 +356,7 @@ namespace Instanciate
 				return seq.complainIntrinsicParameter("memory.memset", 2, cdef, "'__u32'");
 
 			if (seq.canGenerateCode())
-				seq.out.emitMemFill(objlvid, size, patternlvid);
+				seq.out->emitMemFill(objlvid, size, patternlvid);
 			return true;
 		}
 
@@ -380,7 +380,7 @@ namespace Instanciate
 				return seq.complainIntrinsicParameter("memory.copy", 2, cdef, "'__u64'");
 
 			if (seq.canGenerateCode())
-				seq.out.emitMemCopy(objlvid, src, size);
+				seq.out->emitMemCopy(objlvid, src, size);
 			return true;
 		}
 
@@ -404,7 +404,7 @@ namespace Instanciate
 				return seq.complainIntrinsicParameter("memory.move", 2, cdef, "'__u64'");
 
 			if (seq.canGenerateCode())
-				seq.out.emitMemMove(objlvid, src, size);
+				seq.out->emitMemMove(objlvid, src, size);
 			return true;
 		}
 
@@ -429,8 +429,8 @@ namespace Instanciate
 
 			if (seq.canGenerateCode())
 			{
-				seq.out.emitStore(lvid, size);
-				seq.out.emitMemCmp(objlvid, src, lvid);
+				seq.out->emitStore(lvid, size);
+				seq.out->emitMemCmp(objlvid, src, lvid);
 			}
 			return true;
 		}
@@ -446,7 +446,7 @@ namespace Instanciate
 				return seq.complainIntrinsicParameter("load.u64", 0, cdef, "'__pointer'");
 
 			if (seq.canGenerateCode())
-				seq.out.emitLoadU64(lvid, ptrlvid);
+				seq.out->emitLoadU64(lvid, ptrlvid);
 			return true;
 		}
 
@@ -460,7 +460,7 @@ namespace Instanciate
 				return seq.complainIntrinsicParameter("load.u32", 0, cdef, "'__pointer'");
 
 			if (seq.canGenerateCode())
-				seq.out.emitLoadU32(lvid, ptrlvid);
+				seq.out->emitLoadU32(lvid, ptrlvid);
 			return true;
 		}
 
@@ -474,7 +474,7 @@ namespace Instanciate
 				return seq.complainIntrinsicParameter("load.u8", 0, cdef, "'__pointer'");
 
 			if (seq.canGenerateCode())
-				seq.out.emitLoadU8(lvid, ptrlvid);
+				seq.out->emitLoadU8(lvid, ptrlvid);
 			return true;
 		}
 
@@ -490,9 +490,9 @@ namespace Instanciate
 			if (seq.canGenerateCode())
 			{
 				if (sizeof(uint64_t) == sizeof(void*))
-					seq.out.emitLoadU64(lvid, ptrlvid);
+					seq.out->emitLoadU64(lvid, ptrlvid);
 				else
-					seq.out.emitLoadU32(lvid, ptrlvid);
+					seq.out->emitLoadU32(lvid, ptrlvid);
 			}
 			return true;
 		}
@@ -512,7 +512,7 @@ namespace Instanciate
 				return seq.complainIntrinsicParameter("store.u64", 1, cdefvalue, "'__u64'");
 
 			if (seq.canGenerateCode())
-				seq.out.emitStoreU64(value, ptrlvid);
+				seq.out->emitStoreU64(value, ptrlvid);
 			return true;
 		}
 
@@ -531,7 +531,7 @@ namespace Instanciate
 				return seq.complainIntrinsicParameter("store.u32", 1, cdefvalue, "'__u32'");
 
 			if (seq.canGenerateCode())
-				seq.out.emitStoreU32(value, ptrlvid);
+				seq.out->emitStoreU32(value, ptrlvid);
 			return true;
 		}
 
@@ -550,7 +550,7 @@ namespace Instanciate
 				return seq.complainIntrinsicParameter("store.u8", 1, cdefvalue, "'__u8'");
 
 			if (seq.canGenerateCode())
-				seq.out.emitStoreU8(value, ptrlvid);
+				seq.out->emitStoreU8(value, ptrlvid);
 			return true;
 		}
 
@@ -572,9 +572,9 @@ namespace Instanciate
 			if (seq.canGenerateCode())
 			{
 				if (sizeof(uint64_t) == sizeof(void*))
-					seq.out.emitStoreU64(value, ptrlvid);
+					seq.out->emitStoreU64(value, ptrlvid);
 				else
-					seq.out.emitStoreU32(value, ptrlvid);
+					seq.out->emitStoreU32(value, ptrlvid);
 			}
 			return true;
 		}
@@ -595,11 +595,11 @@ namespace Instanciate
 				if (atom != nullptr and atom->builtinMapping != nyt_void)
 				{
 					if (debugmode)
-						seq.out.emitComment("reading inner 'pod' variable");
+						seq.out->emitComment("reading inner 'pod' variable");
 					atomBuiltinCast = atom;
 					builtinlhs = atom->builtinMapping;
 					uint32_t newlvid = seq.createLocalVariables();
-					seq.out.emitFieldget(newlvid, lhs, 0);
+					seq.out->emitFieldget(newlvid, lhs, 0);
 					lhs = newlvid;
 
 					if (builtinlhs != nyt_bool) // allow only bool for complex types
@@ -635,19 +635,19 @@ namespace Instanciate
 
 					// RESULT: opresult: the first one is the result of the operation (and, +, -...)
 					seq.cdeftable.substitute(opresult).mutateToBuiltin(nyt_bool);
-					seq.out.emitNOT(opresult, lhs);
+					seq.out->emitNOT(opresult, lhs);
 
 					// SIZEOF: the second variable on the stack is `sizeof(<object>)`
 					// (sizeof the object to allocate)
 					seq.cdeftable.substitute(sizeoflvid).mutateToBuiltin(nyt_u64);
-					seq.out.emitSizeof(sizeoflvid, atomBuiltinCast->atomid);
+					seq.out->emitSizeof(sizeoflvid, atomBuiltinCast->atomid);
 
 					// ALLOC: memory allocation of the new temporary object
-					seq.out.emitMemalloc(lvid, sizeoflvid);
-					seq.out.emitRef(lvid);
+					seq.out->emitMemalloc(lvid, sizeoflvid);
+					seq.out->emitRef(lvid);
 					seq.frame->lvids[lvid].autorelease = true;
 					// reset the internal value of the object
-					seq.out.emitFieldset(opresult, /*self*/lvid, 0); // builtin
+					seq.out->emitFieldset(opresult, /*self*/lvid, 0); // builtin
 				}
 			}
 			else
@@ -655,7 +655,7 @@ namespace Instanciate
 				// no convertion to perform, direct call
 				seq.cdeftable.substitute(lvid).mutateToBuiltin(builtinlhs);
 				if (seq.canGenerateCode())
-					seq.out.emitNOT(lvid, lhs);
+					seq.out->emitNOT(lvid, lhs);
 			}
 			return true;
 		}
@@ -680,14 +680,14 @@ namespace Instanciate
 				if (atom != nullptr and atom->builtinMapping != nyt_void)
 				{
 					if (debugmode)
-						seq.out.emitComment("reading inner 'pod' variable");
+						seq.out->emitComment("reading inner 'pod' variable");
 					atomBuiltinCast = atom;
 					builtinlhs = atom->builtinMapping;
 
 					if (seq.canGenerateCode())
 					{
 						uint32_t newlvid = seq.createLocalVariables();
-						seq.out.emitFieldget(newlvid, lhs, 0);
+						seq.out->emitFieldget(newlvid, lhs, 0);
 						lhs = newlvid;
 					}
 				}
@@ -711,7 +711,7 @@ namespace Instanciate
 			}
 
 			if (seq.canGenerateCode())
-				seq.out.emitAssert(lhs);
+				seq.out->emitAssert(lhs);
 			return true;
 		}
 
@@ -730,14 +730,14 @@ namespace Instanciate
 			spare.import(cdef);
 			spare.qualifiers = cdef.qualifiers;
 
-			seq.out.emitStore(lvid, lhs);
+			seq.out->emitStore(lvid, lhs);
 
 			auto& lvidinfo = seq.frame->lvids[lvid];
 			lvidinfo.synthetic = false;
 
 			if (seq.canBeAcquired(cdef) and seq.canGenerateCode()) // re-acquire the object
 			{
-				seq.out.emitRef(lvid);
+				seq.out->emitRef(lvid);
 				lvidinfo.autorelease = true;
 				lvidinfo.scope = seq.frame->scope;
 			}
@@ -786,11 +786,11 @@ namespace Instanciate
 				if (atom != nullptr and atom->builtinMapping != nyt_void)
 				{
 					if (debugmode)
-						seq.out.emitComment("reading inner 'pod' variable");
+						seq.out->emitComment("reading inner 'pod' variable");
 
 					builtinlhs = atom->builtinMapping;
 					uint32_t newlvid = seq.createLocalVariables();
-					seq.out.emitFieldget(newlvid, lhs, 0);
+					seq.out->emitFieldget(newlvid, lhs, 0);
 					lhs = newlvid;
 					atomBuiltinCast = atom;
 				}
@@ -807,11 +807,11 @@ namespace Instanciate
 				if (atom != nullptr and (atom->builtinMapping != nyt_void))
 				{
 					if (debugmode)
-						seq.out.emitComment("reading inner 'pod' variable");
+						seq.out->emitComment("reading inner 'pod' variable");
 
 					builtinrhs = atom->builtinMapping;
 					uint32_t newlvid = seq.createLocalVariables();
-					seq.out.emitFieldget(newlvid, rhs, 0);
+					seq.out->emitFieldget(newlvid, rhs, 0);
 					rhs = newlvid;
 					atomBuiltinCast = atom;
 				}
@@ -893,7 +893,7 @@ namespace Instanciate
 				if (seq.canGenerateCode())
 				{
 					if (debugmode)
-						seq.out.emitComment(ShortString32() << "builtin " << name);
+						seq.out->emitComment(ShortString32() << "builtin " << name);
 
 					// creating two variables on the stack
 					uint32_t opresult   = seq.createLocalVariables(2);
@@ -901,19 +901,19 @@ namespace Instanciate
 
 					// RESULT: opresult: the first one is the result of the operation (and, +, -...)
 					seq.cdeftable.substitute(opresult).mutateToBuiltin(rettype);
-					(seq.out.*M)(opresult, lhs, rhs);
+					(seq.out->*M)(opresult, lhs, rhs);
 
 					// SIZEOF: the second variable on the stack is `sizeof(<object>)`
 					// (sizeof the object to allocate)
 					seq.cdeftable.substitute(sizeoflvid).mutateToBuiltin(nyt_u64);
-					seq.out.emitSizeof(sizeoflvid, atomBuiltinCast->atomid);
+					seq.out->emitSizeof(sizeoflvid, atomBuiltinCast->atomid);
 
 					// ALLOC: memory allocation of the new temporary object
-					seq.out.emitMemalloc(lvid, sizeoflvid);
-					seq.out.emitRef(lvid);
+					seq.out->emitMemalloc(lvid, sizeoflvid);
+					seq.out->emitRef(lvid);
 					seq.frame->lvids[lvid].autorelease = true;
 					// reset the internal value of the object
-					seq.out.emitFieldset(opresult, /*self*/lvid, 0); // builtin
+					seq.out->emitFieldset(opresult, /*self*/lvid, 0); // builtin
 				}
 			}
 			else
@@ -923,8 +923,8 @@ namespace Instanciate
 				if (seq.canGenerateCode())
 				{
 					if (debugmode)
-						seq.out.emitComment(ShortString32() << "builtin " << name);
-					(seq.out.*M)(lvid, lhs, rhs);
+						seq.out->emitComment(ShortString32() << "builtin " << name);
+					(seq.out->*M)(lvid, lhs, rhs);
 				}
 			}
 			return true;

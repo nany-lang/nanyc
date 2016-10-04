@@ -191,7 +191,7 @@ namespace Instanciate
 			{
 				// read the address
 				assert(self != 0 and "'self can be null only for type resolution'");
-				out.emitFieldget(operands.lvid, self, atom.varinfo.effectiveFieldIndex);
+				out->emitFieldget(operands.lvid, self, atom.varinfo.effectiveFieldIndex);
 				tryToAcquireObject(operands.lvid, cdefvar);
 			}
 		}
@@ -255,9 +255,9 @@ namespace Instanciate
 		if (canGenerateCode())
 		{
 			for (auto& param: params)
-				out.emitPush(param.clid.lvid());
+				out->emitPush(param.clid.lvid());
 
-			out.emitCall(lvid, propatom.atomid, info.instanceid);
+			out->emitCall(lvid, propatom.atomid, info.instanceid);
 		}
 		return true;
 	}
@@ -381,7 +381,7 @@ namespace Instanciate
 						auto& opc = cdeftable.substitute(lvid);
 						opc.mutateToBuiltin(nyt_ptr);
 						opc.qualifiers.ref = false;
-						out.emitStore_u64(lvid, 0);
+						out->emitStore_u64(lvid, 0);
 						frame->lvids[lvid].synthetic = false;
 						return true;
 					}
@@ -408,7 +408,7 @@ namespace Instanciate
 							auto& opc = cdeftable.substitute(lvid);
 							opc.mutateToBuiltin(nyt_bool);
 							opc.qualifiers.ref = false;
-							out.emitStore_u64(lvid, 0);
+							out->emitStore_u64(lvid, 0);
 							frame->lvids[lvid].synthetic = false;
 							return true;
 						}
@@ -417,7 +417,7 @@ namespace Instanciate
 							auto& opc = cdeftable.substitute(lvid);
 							opc.mutateToBuiltin(nyt_bool);
 							opc.qualifiers.ref = false;
-							out.emitStore_u64(lvid, 1);
+							out->emitStore_u64(lvid, 1);
 							frame->lvids[lvid].synthetic = false;
 							return true;
 						}
@@ -447,7 +447,7 @@ namespace Instanciate
 
 				// acquire the variable
 				if (canGenerateCode())
-					out.emitStore(lvid, lvidVar);
+					out->emitStore(lvid, lvidVar);
 
 				auto& varcdef = cdeftable.classdef(CLID{frame->atomid, lvidVar});
 				if (not varcdef.isBuiltin())
