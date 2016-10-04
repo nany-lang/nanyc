@@ -6,6 +6,7 @@
 #include "common-debuginfo.hxx"
 #include <string.h>
 #include <iostream>
+#include <memory>
 #ifdef YUNI_OS_LINUX
 #include <sys/utsname.h>
 #endif
@@ -17,28 +18,38 @@ using namespace Yuni;
 namespace // anonymous
 {
 
-	template<class T>
-	static inline void buildBugReport(T& string)
+	void printNanyVersion(String& out)
 	{
-		string << "> nanyc {c++/bootstrap} v" << nylib_version();
+		out << "> nanyc {c++/bootstrap} v" << nylib_version();
 		if (debugmode)
-			string << " {debug}";
-		string << '\n';
+			out << " {debug}";
+		out << '\n';
+	}
 
-		string << "> compiled with ";
-		nany_details_export_compiler_version(string);
-		string << '\n';
 
-		string << "> config: "
-			<< "params:" << Nany::Config::maxFuncDeclParameterCount
-			<< ", pushedparams:" << Nany::Config::maxPushedParameters
-			<< ", nmspc depth:" << Nany::Config::maxNamespaceDepth
-			<< ", symbol:" << Nany::Config::maxSymbolNameLength
-			<< ", nsl:" << Nany::Config::importNSL
-			<< '\n';
+	void printCompiler(String& out)
+	{
+		out << "> compiled with ";
+		nany_details_export_compiler_version(out);
+		out << '\n';
+	}
 
-		// -- OS
-		string << "> os:  ";
+
+	void printBuildFlags(String& out)
+	{
+		out << "> config: ";
+		out << "params:" << Nany::Config::maxFuncDeclParameterCount;
+		out << ", pushedparams:" << Nany::Config::maxPushedParameters;
+		out << ", nmspc depth:" << Nany::Config::maxNamespaceDepth;
+		out << ", symbol:" << Nany::Config::maxSymbolNameLength;
+		out << ", nsl:" << Nany::Config::importNSL;
+		out << '\n';
+	}
+
+
+	void printOS(String& out)
+	{
+		out << "> os:  ";
 		bool osDetected = false;
 		#ifdef YUNI_OS_LINUX
 		{
@@ -48,23 +59,26 @@ namespace // anonymous
 				distribName.replace('\n', ' ');
 				distribName.trim();
 				if (not distribName.empty())
-					string << distribName << ", ";
+					out << distribName << ", ";
 			}
 
 			osDetected = true;
 			struct utsname un;
 			if (uname(&un) == 0)
-				string << un.sysname << ' ' << un.release << " (" << un.machine << ')';
+				out << un.sysname << ' ' << un.release << " (" << un.machine << ')';
 			else
-				string << "(unknown linux)";
+				out << "(unknown linux)";
 		}
 		#endif
 
 		if (not osDetected)
-			nany_details_export_system(string);
-		string << '\n';
+			nany_details_export_system(out);
+		out << '\n';
+	}
 
-		// -- CPU
+
+	void printCPU(String& out)
+	{
 		ShortString64 cpustr;
 		cpustr << System::CPU::Count() << " cpu(s)/core(s)";
 
@@ -77,26 +91,42 @@ namespace // anonymous
 				line.trim();
 				if (not line.empty())
 				{
-					string << "> cpu: " << line;
+					out << "> cpu: " << line;
 					if (not cpuAdded)
 					{
-						string << " (" << cpustr << ')';
+						out << " (" << cpustr << ')';
 						cpuAdded = true;
 					}
-					string << '\n';
+					out << '\n';
 				}
 				return true;
 			});
 		}
 
 		if (not cpuAdded)
-			string << "> cpu: " << cpustr << '\n';
-
-		// -- MEMORY
-		string << "> ";
-		nany_details_export_memory_usage(string);
-		string << '\n';
+			out << "> cpu: " << cpustr << '\n';
 	}
+
+
+	void printMemory(String& out)
+	{
+		out << "> ";
+		nany_details_export_memory_usage(out);
+		out << '\n';
+	}
+
+
+	void buildBugReport(String& out)
+	{
+		out.reserve(512);
+		printNanyVersion(out);
+		printCompiler(out);
+		printBuildFlags(out);
+		printOS(out);
+		printCPU(out);
+		printMemory(out);
+	}
+
 
 } // anonymous namespace
 
@@ -105,26 +135,36 @@ namespace // anonymous
 
 extern "C" void nylib_print_info_for_bugreport()
 {
-	buildBugReport(std::cout);
+	try
+	{
+		String out;
+		buildBugReport(out);
+		std::cout << out;
+	}
+	catch (const std::exception& e)
+	{
+		std::cout << "nany: exception: " << e.what() << '\n';
+	}
 }
 
 
 extern "C" char* nylib_get_info_for_bugreport(uint32_t* length)
 {
-	String string;
-	string.reserve(512);
-	buildBugReport(string);
-
-	char* result = (char*)::malloc(sizeof(char) * (string.sizeInBytes() + 1));
-	if (!result)
+	try
 	{
-		if (length)
-			*length = 0u;
-		return nullptr;
+		String string;
+		buildBugReport(string);
+
+		uint32_t size = string.size();
+		auto result = std::make_unique<char[]>(size + 1);
+		memcpy(result.get(), string.data(), size);
+		result[size] = '\0';
+		if (size)
+			*length = size;
+		return result.release();
 	}
-	memcpy(result, string.data(), string.sizeInBytes());
-	result[string.sizeInBytes()] = '\0';
+	catch (...) {}
 	if (length)
-		*length = string.size();
-	return result;
+		*length = 0;
+	return nullptr;
 }
