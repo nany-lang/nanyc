@@ -34,6 +34,18 @@ namespace complain
 	}
 
 
+	bool classNotInstanciated(const Atom& atom)
+	{
+		auto err = ice();
+		auto* seq = Logs::userHandler<SequenceBuilder>();
+		if (seq)
+			err << "class not instanciated: " << atom.caption(seq->cdeftable);
+		if (debugmode)
+			err << ", atomid: " << atom.atomid;
+		return false;
+	}
+
+
 
 
 } // namespace complain
@@ -569,16 +581,6 @@ namespace complain
 
 		overloadMatch.report = &err;
 		overloadMatch.validateWithErrReport(atom);
-	}
-
-
-	bool SequenceBuilder::complainClassNotInstanciated(const Atom& atom)
-	{
-		auto err = ice();
-		err << "class not instanciated: " << atom.caption(cdeftable);
-		if (debugmode)
-			err << ", atomid: " << atom.atomid;
-		return false;
 	}
 
 

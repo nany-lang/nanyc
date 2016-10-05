@@ -1,4 +1,5 @@
 #include "instanciate.h"
+#include "instanciate-error.h"
 #include "instanciate-atom.h"
 #include "libnanyc-traces.h"
 
@@ -516,7 +517,7 @@ namespace Instanciate
 				if (unlikely(selfAtom->isClass() and (not selfAtom->classinfo.isInstanciated)))
 				{
 					if (unlikely(not signatureOnly))
-						return complainClassNotInstanciated(*selfAtom);
+						return complain::classNotInstanciated(*selfAtom);
 				}
 
 				// since the parent has been fully resolved, no multiple

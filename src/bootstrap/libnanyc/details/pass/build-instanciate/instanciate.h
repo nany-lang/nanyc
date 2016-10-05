@@ -284,8 +284,6 @@ namespace Instanciate
 
 		void complainInvalidParametersAfterSignatureMatching(Atom&, FuncOverloadMatch& overloadMatch);
 		void complainCannotCall(const Atom&, FuncOverloadMatch& overloadMatch);
-
-		bool complainClassNotInstanciated(const Atom&);
 		//@}
 
 
