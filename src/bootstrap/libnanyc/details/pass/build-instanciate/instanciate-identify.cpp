@@ -15,28 +15,21 @@ namespace Pass
 namespace Instanciate
 {
 
-	namespace // anonymous
+	namespace {
+
+
+	bool tryFindProperties(const IR::ISA::Operand<IR::ISA::Op::identify>& operands,
+		std::vector<std::reference_wrapper<Atom>>& multipleResults,
+		Atom& atom, const AnyString& name)
 	{
+		// 'identifyset' is strictly identical to 'identify', but it indicates
+		// that we should resolve a setter and not a getter
+		bool setter = (operands.opcode == static_cast<uint32_t>(IR::ISA::Op::identifyset));
+		return (not setter)
+			? atom.propertyLookupOnChildren(multipleResults, "^propget^", name)
+			: atom.propertyLookupOnChildren(multipleResults, "^propset^", name);
+	}
 
-		static bool tryFindProperties(const IR::ISA::Operand<IR::ISA::Op::identify>& operands,
-			std::vector<std::reference_wrapper<Atom>>& multipleResults,
-			Atom& atom, const AnyString& name)
-		{
-			// 'identifyset' is strictly identical to 'identify', but it indicates
-			// that we should resolve a setter and not a getter
-			bool setter = (operands.opcode == static_cast<uint32_t>(IR::ISA::Op::identifyset));
-
-			if (not setter)
-			{
-				return atom.propertyLookupOnChildren(multipleResults, "^propget^", name);
-			}
-			else
-			{
-				bool success = true;
-				success &= atom.propertyLookupOnChildren(multipleResults, "^propset^", name);
-				return success;
-			}
-		}
 
 	} // anonymous namespace
 
