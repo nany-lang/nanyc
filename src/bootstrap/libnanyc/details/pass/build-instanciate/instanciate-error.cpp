@@ -46,6 +46,13 @@ namespace complain
 	}
 
 
+	bool classRequired()
+	{
+		error() << "type class required";
+		return false;
+	}
+
+
 
 
 } // namespace complain

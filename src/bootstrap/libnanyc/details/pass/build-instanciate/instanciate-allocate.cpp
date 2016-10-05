@@ -30,7 +30,7 @@ namespace Instanciate
 		}
 
 		if (unlikely(not atom->isClass()))
-			return (void)(error() << "type required for allocation");
+			return (void) complain::classRequired();
 
 		if (unlikely(not atom->classinfo.isInstanciated))
 			return (void) complain::classNotInstanciated(*atom);
