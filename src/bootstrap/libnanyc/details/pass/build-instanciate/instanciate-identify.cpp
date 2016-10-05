@@ -64,7 +64,7 @@ namespace Instanciate
 			alias = cdeftable.findClassdefAtom(cdef.get());
 			if (unlikely(!alias))
 			{
-				ice() << "identify typedef: failed to retrieve atom from " << cdef.get().clid;
+				complain::invalidTypedef(cdef.get());
 				break;
 			}
 
@@ -559,9 +559,10 @@ namespace Instanciate
 					// trying capturing variable from anonymous classes
 					if (firstChance)
 					{
-						if (frame->atom.canCaptureVariabes() and identifyCapturedVar(operands, name))
-							return true;
-						return complainUnknownIdentifier(selfAtom, frame->atom, name);
+						bool captured = frame->atom.canCaptureVariabes() and identifyCapturedVar(operands, name);
+						return (likely(captured))
+							? true
+							: complain::notDeclaredInThisScope(selfAtom, frame->atom, name);
 					}
 					break;
 				}

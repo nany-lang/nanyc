@@ -280,6 +280,7 @@ addsrc(
 	"details/pass/build-instanciate/instanciate-sizeof.cpp"
 	"details/pass/build-instanciate/instanciate-error.h"
 	"details/pass/build-instanciate/instanciate-error.cpp"
+	"details/pass/build-instanciate/instanciate-error-not-declared.cpp"
 	"details/pass/build-instanciate/instanciate-intrinsic.cpp"
 	"details/pass/build-instanciate/instanciate-intrinsic-builtin.cpp"
 	"details/pass/build-instanciate/instanciate-return.cpp"
@@ -297,8 +298,7 @@ addsrc(
 	"details/pass/build-instanciate/instanciate-debug.h"
 	"details/pass/build-instanciate/instanciate-debug.cpp"
 	"details/pass/build-instanciate/overloaded-func-call-resolution.cpp"
-	"details/pass/build-instanciate/overloaded-func-call-resolution.h"
-	"details/pass/build-instanciate/suggestion-not-declared-in-scope.cpp")
+	"details/pass/build-instanciate/overloaded-func-call-resolution.h")
 
 
 addsrc(

@@ -44,6 +44,12 @@ namespace complain
 	//! Ambigous property call
 	bool ambigousPropertyCall(const AnyString& identifier);
 
+	//! Invalid typedef
+	bool invalidTypedef(const Classdef&);
+
+	//! Unknown identifier
+	bool notDeclaredInThisScope(const Atom* self, const Atom& atom, const AnyString& name);
+
 
 
 
