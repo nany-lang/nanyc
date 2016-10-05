@@ -222,9 +222,6 @@ namespace Instanciate
 
 		//! \name Errors
 		//@{
-		//! Emit a new ICE log entry (ICE on classdef)
-		YString iceClassdef(const Classdef&, const AnyString& msg) const;
-
 		bool checkForIntrinsicParamCount(const AnyString& name, uint32_t count);
 
 		bool complainUnknownIdentifier(const Atom* self, const Atom& atom, const AnyString& name);

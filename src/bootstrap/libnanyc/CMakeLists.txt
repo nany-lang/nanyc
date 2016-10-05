@@ -278,6 +278,7 @@ addsrc(
 	"details/pass/build-instanciate/instanciate-builtin.cpp"
 	"details/pass/build-instanciate/instanciate-call.cpp"
 	"details/pass/build-instanciate/instanciate-sizeof.cpp"
+	"details/pass/build-instanciate/instanciate-error.h"
 	"details/pass/build-instanciate/instanciate-error.cpp"
 	"details/pass/build-instanciate/instanciate-intrinsic.cpp"
 	"details/pass/build-instanciate/instanciate-intrinsic-builtin.cpp"

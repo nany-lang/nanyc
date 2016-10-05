@@ -1,5 +1,6 @@
 #include "instanciate.h"
 #include "overloaded-func-call-resolution.h"
+#include "details/errors/errors.h"
 
 using namespace Yuni;
 
@@ -12,6 +13,24 @@ namespace Pass
 {
 namespace Instanciate
 {
+namespace complain
+{
+
+
+	bool classdef(const Classdef& cdef, const char* usertxt)
+	{
+		auto entry = (ice() << usertxt << ": " << cdef.clid << ' ');
+		auto* seq = Logs::userHandler<SequenceBuilder>();
+		if (seq)
+			cdef.print(entry, seq->cdeftable);
+		return false;
+	}
+
+
+
+
+} // namespace complain
+
 
 	Logs::Report SequenceBuilder::emitReportEntry(void* self, Logs::Level level)
 	{
@@ -65,15 +84,6 @@ namespace Instanciate
 	}
 
 
-
-
-	YString SequenceBuilder::iceClassdef(const Classdef& cdef, const AnyString& msg) const
-	{
-		success = false;
-		auto ce = (ice() << msg << ": " << cdef.clid << ' ');
-		cdef.print(ce, cdeftable);
-		return ce.data().message;
-	}
 
 
 	bool SequenceBuilder::complainRedeclared(const AnyString& name, uint32_t previousDeclaration)
