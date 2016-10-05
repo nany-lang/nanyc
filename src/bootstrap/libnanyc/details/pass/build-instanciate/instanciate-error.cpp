@@ -108,9 +108,110 @@ namespace complain
 	}
 
 
+	bool returnTypeMismatch(const Classdef& expected, const Classdef& usertype)
+	{
+		auto err = (error() << "type mismatch in 'return' statement");
+		auto* seq = Logs::userHandler<SequenceBuilder>();
+		if (seq)
+		{
+			auto hint = err.hint();
+			if (debugmode)
+			{
+				usertype.print((hint << "got '%" << usertype.clid << ':'), seq->cdeftable);
+				expected.print((hint << "', expected '%" << expected.clid << ':'), seq->cdeftable);
+			}
+			else
+			{
+				usertype.print((hint << "got '"), seq->cdeftable);
+				expected.print((hint << "', expected '"), seq->cdeftable);
+			}
+			hint << '\'';
+		}
+		return false;
+	}
+
+
+	bool returnTypeImplicitConversion(const Classdef& expected, const Classdef& usertype, uint32_t line, uint32_t offset)
+	{
+		auto err = (error() << "implicit conversion not supported in 'return'");
+		auto* seq = Logs::userHandler<SequenceBuilder>();
+		if (seq)
+		{
+			auto hint = err.hint();
+			if (debugmode)
+			{
+				usertype.print((hint << "got '%" << usertype.clid << ':'), seq->cdeftable);
+				expected.print((hint << "', expected '%" << expected.clid << ':'), seq->cdeftable);
+			}
+			else
+			{
+				usertype.print((hint << "got '"), seq->cdeftable);
+				expected.print((hint << "', expected '"), seq->cdeftable);
+			}
+			hint << '\'';
+			if (line != 0)
+				hint.origins().location.pos.line   = line;
+			if (offset != 0)
+				hint.origins().location.pos.offset = offset;
+		}
+		return false;
+	}
+
+
+	bool returnTypeMissing(const Classdef* expected, const Classdef* usertype)
+	{
+		if (expected)
+		{
+			String tstr;
+			auto* seq = Logs::userHandler<SequenceBuilder>();
+			if (seq)
+				expected->print(tstr, seq->cdeftable);
+			error() << "return-statement with no value, in function returning '" << tstr << '\'';
+		}
+		else if (usertype)
+		{
+			error() << "return-statement with a value, in function returning 'void'";
+		}
+		else
+		{
+			ice() << "mismatch return";
+		}
+		return false;
+	}
+
+
+	bool returnMultipleTypes(const Classdef& expected, const Classdef& usertype, uint32_t line, uint32_t offset)
+	{
+		auto err = (error() << "multiple incompatible types for 'return'");
+		auto* seq = Logs::userHandler<SequenceBuilder>();
+		if (seq)
+		{
+			auto hint = err.hint();
+			if (debugmode)
+			{
+				usertype.print((hint << "got '%" << usertype.clid << ':'), seq->cdeftable);
+				expected.print((hint << "', expected '%" << expected.clid << ':'), seq->cdeftable);
+			}
+			else
+			{
+				usertype.print((hint << "got '"), seq->cdeftable);
+				expected.print((hint << "', expected '"), seq->cdeftable);
+			}
+			hint << '\'';
+			if (line != 0)
+				hint.origins().location.pos.line   = line;
+			if (offset != 0)
+				hint.origins().location.pos.offset = offset;
+		}
+		return false;
+	}
+
+
 
 
 } // namespace complain
+
+
 
 
 	Logs::Report SequenceBuilder::emitReportEntry(void* self, Logs::Level level)
@@ -524,94 +625,6 @@ namespace complain
 		overloadMatch.report = &err;
 		overloadMatch.validateWithErrReport(atom);
 		return false;
-	}
-
-
-	void SequenceBuilder::complainReturnTypeMissing(const Classdef* expected, const Classdef* usertype)
-	{
-		if (usertype != nullptr or expected != nullptr)
-		{
-			// one of the return type is void, but not both
-			if (usertype)
-			{
-				error() << "return-statement with a value, in function returning 'void'";
-			}
-
-			if (expected)
-			{
-				String tstr;
-				expected->print(tstr, cdeftable);
-				error() << "return-statement with no value, in function returning '" << tstr << '\'';
-				return;
-			}
-		}
-		else
-			ice() << "mismatch return";
-	}
-
-
-	void SequenceBuilder::complainReturnTypeMismatch(const Classdef& expected, const Classdef& usertype)
-	{
-		auto err = (error() << "type mismatch in 'return' statement");
-		auto hint = err.hint();
-		if (debugmode)
-		{
-			usertype.print((hint << "got '%" << usertype.clid << ':'), cdeftable);
-			expected.print((hint << "', expected '%" << expected.clid << ':'), cdeftable);
-		}
-		else
-		{
-			usertype.print((hint << "got '"), cdeftable);
-			expected.print((hint << "', expected '"), cdeftable);
-		}
-		hint << '\'';
-	}
-
-
-	void SequenceBuilder::complainReturnTypeImplicitConv(const Classdef& expected, const Classdef& usertype, uint32_t line, uint32_t offset)
-	{
-		auto err = (error() << "implicit conversion is not allowed in 'return'");
-		auto hint = err.hint();
-		if (debugmode)
-		{
-			usertype.print((hint << "got '%" << usertype.clid << ':'), cdeftable);
-			expected.print((hint << "', expected '%" << expected.clid << ':'), cdeftable);
-		}
-		else
-		{
-			usertype.print((hint << "got '"), cdeftable);
-			expected.print((hint << "', expected '"), cdeftable);
-		}
-		hint << '\'';
-
-		if (line != 0)
-			hint.origins().location.pos.line   = line;
-		if (offset != 0)
-			hint.origins().location.pos.offset = offset;
-	}
-
-
-	void SequenceBuilder::complainReturnTypeMultiple(const Classdef& expected, const Classdef& usertype, uint32_t line, uint32_t offset)
-	{
-		auto err = (error() << "multiple return types in 'return'");
-		auto hint = err.hint();
-
-		if (debugmode)
-		{
-			usertype.print((hint << "got '%" << usertype.clid << ':'), cdeftable);
-			expected.print((hint << "', expected '%" << expected.clid << ':'), cdeftable);
-		}
-		else
-		{
-			usertype.print((hint << "got '"), cdeftable);
-			expected.print((hint << "', expected '"), cdeftable);
-		}
-		hint << '\'';
-
-		if (line != 0)
-			hint.origins().location.pos.line   = line;
-		if (offset != 0)
-			hint.origins().location.pos.offset = offset;
 	}
 
 

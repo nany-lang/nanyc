@@ -1,4 +1,5 @@
 #include "instanciate.h"
+#include "instanciate-error.h"
 
 using namespace Yuni;
 
@@ -64,11 +65,11 @@ namespace Instanciate
 				{
 					if (expectedcdef->isAny()) // accept implicit convertions to 'any'
 						break;
-					return complainReturnTypeImplicitConv(*expectedcdef, *usercdef);
+					return (void) complain::returnTypeImplicitConversion(*expectedcdef, *usercdef);
 				}
 				case TypeCheck::Match::none:
 				{
-					return complainReturnTypeMismatch(*expectedcdef, *usercdef);
+					return (void) complain::returnTypeMismatch(*expectedcdef, *usercdef);
 				}
 			}
 
@@ -89,18 +90,18 @@ namespace Instanciate
 						}
 						case TypeCheck::Match::equal:
 						{
-							return complainReturnTypeImplicitConv(cdefPreviousReturn, *usercdef, marker.line, marker.offset);
+							return (void) complain::returnTypeImplicitConversion(cdefPreviousReturn, *usercdef, marker.line, marker.offset);
 						}
 						case TypeCheck::Match::none:
 						{
-							return complainReturnTypeMultiple(cdefPreviousReturn, *usercdef, marker.line, marker.offset);
+							return (void) complain::returnMultipleTypes(cdefPreviousReturn, *usercdef, marker.line, marker.offset);
 						}
 					}
 				}
 				else
 				{
 					// can not be void
-					return complainReturnTypeMissing(nullptr, usercdef);
+					return (void) complain::returnTypeMissing(nullptr, usercdef);
 				}
 			}
 		}
@@ -121,7 +122,7 @@ namespace Instanciate
 				{
 					// one of the values are 'null'
 					if (unlikely(usercdef != nullptr or expectedcdef != nullptr))
-						return complainReturnTypeMissing(expectedcdef, usercdef);
+						return (void) complain::returnTypeMissing(expectedcdef, usercdef);
 				}
 			}
 		}
