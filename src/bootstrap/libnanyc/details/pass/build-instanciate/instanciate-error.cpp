@@ -256,6 +256,15 @@ namespace complain
 	}
 
 
+	bool multipleDefinitions(const Atom& atom, const AnyString& deffor)
+	{
+		auto err = (error() << atom.keyword() << ' ');
+		atom.retrieveFullname(err.data().message);
+		err << ": multiple definition for " << deffor;
+		return false;
+	}
+
+
 
 
 } // namespace complain
@@ -446,15 +455,6 @@ namespace complain
 				}
 			}
 		}
-		return false;
-	}
-
-
-	bool SequenceBuilder::complainMultipleDefinitions(const Atom& atom, const AnyString& funcOrOpName)
-	{
-		auto err = (error() << atom.keyword() << ' ');
-		atom.retrieveFullname(err.data().message);
-		err << ": multiple definition for " << funcOrOpName;
 		return false;
 	}
 

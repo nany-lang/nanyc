@@ -342,7 +342,7 @@ namespace Instanciate
 					return false;
 				break;
 			}
-			default: return complainMultipleDefinitions(atom, "operator 'clone'");
+			default: return complain::multipleDefinitions(atom, "operator 'clone'");
 		}
 
 
@@ -365,7 +365,7 @@ namespace Instanciate
 			{
 				return complainMissingOperator(atom, "clone");
 			}
-			default: return complainMultipleDefinitions(atom, "operator 'obj-clone'");
+			default: return complain::multipleDefinitions(atom, "operator 'obj-clone'");
 		}
 		return false;
 	}
@@ -398,7 +398,7 @@ namespace Instanciate
 					return false;
 				break;
 			}
-			default: return complainMultipleDefinitions(atom, "operator 'dispose'");
+			default: return complain::multipleDefinitions(atom, "operator 'dispose'");
 		}
 
 		Atom* dtor = nullptr;
@@ -420,7 +420,7 @@ namespace Instanciate
 			{
 				return complainMissingOperator(atom, "dispose");
 			}
-			default: return complainMultipleDefinitions(atom, "operator 'dispose'");
+			default: return complain::multipleDefinitions(atom, "operator 'dispose'");
 		}
 		return false;
 	}
