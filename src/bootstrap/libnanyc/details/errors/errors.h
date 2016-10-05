@@ -82,11 +82,21 @@ namespace Nany
 
 
 
-
-
-
 namespace Logs
 {
+
+
+	//! Get the current user handler
+	void* userHandlerPointer();
+
+	/*!
+	** \brief Get the current user handler
+	*/
+	template<class T> T* userHandler()
+	{
+		return reinterpret_cast<T*>(userHandlerPointer());
+	}
+
 
 	//! Callback for generating reporting
 	typedef Report (*Callback)(void*, Logs::Level);
