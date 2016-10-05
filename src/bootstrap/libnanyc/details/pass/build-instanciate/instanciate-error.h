@@ -32,6 +32,10 @@ namespace complain
 	bool classNotInstanciated(const Atom&);
 
 
+	//! A class is required
+	bool classRequired();
+
+
 
 
 } // namespace complain
