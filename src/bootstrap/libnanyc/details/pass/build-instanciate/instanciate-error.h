@@ -48,6 +48,10 @@ namespace complain
 	bool noproperty(const AnyString& identifier);
 
 
+	//! Ambigous property call
+	bool ambigousPropertyCall(const AnyString& identifier);
+
+
 
 
 } // namespace complain
