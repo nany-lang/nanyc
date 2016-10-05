@@ -240,11 +240,6 @@ namespace Instanciate
 		void complainReturnTypeImplicitConv(const Classdef& expected, const Classdef& usertype, uint32_t line = 0, uint32_t offset = 0);
 		void complainReturnTypeMultiple(const Classdef& expected, const Classdef& usertype, uint32_t line = 0, uint32_t offset = 0);
 
-		/*!
-		** \brief Complain about an unknown intrinsic
-		** \param name Intrinsic name
-		*/
-		bool complainUnknownIntrinsic(const AnyString& name);
 
 		//! Restriction on builtin intrinsics
 		bool complainBuiltinIntrinsicDoesNotAccept(const AnyString& name, const AnyString& what);

@@ -1,4 +1,5 @@
 #include "instanciate.h"
+#include "instanciate-error.h"
 #include "type-check.h"
 #ifdef YUNI_OS_UNIX
 #include <unistd.h>
@@ -1199,7 +1200,7 @@ namespace Instanciate
 		if (unlikely(it == builtinDispatch.end()))
 		{
 			if (canProduceError)
-				complainUnknownIntrinsic(name);
+				complain::unknownIntrinsic(name);
 			return Tribool::Value::indeterminate;
 		}
 

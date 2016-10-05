@@ -1,5 +1,6 @@
 #include "instanciate.h"
 #include "details/intrinsic/intrinsic-table.h"
+#include "instanciate-error.h"
 
 using namespace Yuni;
 
@@ -61,7 +62,7 @@ namespace Instanciate
 						intrinsic = intrinsics.find(name);
 				}
 				if (unlikely(intrinsic == nullptr))
-					return complainUnknownIntrinsic(name);
+					return complain::unknownIntrinsic(name);
 			}
 
 
