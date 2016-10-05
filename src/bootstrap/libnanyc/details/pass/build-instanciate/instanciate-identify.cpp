@@ -70,9 +70,9 @@ namespace Instanciate
 
 			if (unlikely((alias->parent == original.parent) and alias->atomid > original.atomid))
 			{
-				// same parent but declared after (the atomid is likely to be greater
+				// same parent but declared after (the atomid will be greater
 				// than the first one since registered after)
-				complainTypedefDeclaredAfter(original, *alias);
+				complain::typedefRefDeclaredAfter(original, *alias);
 				return original;
 			}
 
@@ -85,14 +85,14 @@ namespace Instanciate
 			// detecting circular references...
 			if (unlikely(not encountered.insert(alias->atomid).second))
 			{
-				complainTypealiasCircularRef(original, *alias);
+				complain::typedefCircularReference(original, *alias);
 				return original;
 			}
 			cdef = std::cref(cdeftable.classdef(alias->returnType.clid));
 		}
 		while (true);
 
-		complainTypedefUnresolved(original);
+		complain::typedefNotResolved(original);
 		return original;
 	}
 

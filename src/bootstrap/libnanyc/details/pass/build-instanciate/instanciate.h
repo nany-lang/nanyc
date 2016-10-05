@@ -251,10 +251,6 @@ namespace Instanciate
 		bool complainIntrinsicParameter(const AnyString& name, uint32_t pindex, const Classdef& got,
 			const AnyString& expected = nullptr);
 
-		void complainTypealiasCircularRef(const Atom& original, const Atom& responsible);
-		void complainTypedefDeclaredAfter(const Atom& original, const Atom& responsible);
-		void complainTypedefUnresolved(const Atom& original);
-
 		bool complainMultipleDefinitions(const Atom&, const AnyString& funcOrOpName);
 
 		//! Emit a new error message with additional information on the given operand
