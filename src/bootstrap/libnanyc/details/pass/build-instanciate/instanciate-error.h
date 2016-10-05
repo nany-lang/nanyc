@@ -23,30 +23,23 @@ namespace complain
 	//! Invalid classdef (ICE)
 	bool classdef(const Classdef&, const char* usertxt);
 
-
 	//! Unknown intrinsic
 	bool unknownIntrinsic(const AnyString& name);
-
 
 	//! Class not instanciated (not ready for use)
 	bool classNotInstanciated(const Atom&);
 
-
 	//! A class is required
 	bool classRequired();
-
 
 	//! Failed to allocate class object (null atom, due to previous error)
 	bool canNotAllocateClassNullAtom(const Classdef&, uint32_t lvid);
 
-
 	//! Invalid Self (not a class)
 	bool invalidClassSelf(const AnyString& identifier);
 
-
 	//! No property found
 	bool noproperty(const AnyString& identifier);
-
 
 	//! Ambigous property call
 	bool ambigousPropertyCall(const AnyString& identifier);
