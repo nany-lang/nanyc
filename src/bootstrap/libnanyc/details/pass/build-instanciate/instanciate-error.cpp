@@ -27,6 +27,13 @@ namespace complain
 	}
 
 
+	bool unknownIntrinsic(const AnyString& name)
+	{
+		error() << "unknown intrinsic '!!" << name << '\'';
+		return false;
+	}
+
+
 
 
 } // namespace complain
@@ -231,13 +238,6 @@ namespace complain
 	bool SequenceBuilder::complainBuiltinIntrinsicDoesNotAccept(const AnyString& name, const AnyString& what)
 	{
 		error() << "builtin intrinsic '" << name << "' does not accept " << what;
-		return false;
-	}
-
-
-	bool SequenceBuilder::complainUnknownIntrinsic(const AnyString& name)
-	{
-		error() << "unknown intrinsic '!!" << name << '\'';
 		return false;
 	}
 

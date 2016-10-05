@@ -24,6 +24,10 @@ namespace complain
 	bool classdef(const Classdef&, const char* usertxt);
 
 
+	//! Unknown intrinsic
+	bool unknownIntrinsic(const AnyString& name);
+
+
 
 
 } // namespace complain
