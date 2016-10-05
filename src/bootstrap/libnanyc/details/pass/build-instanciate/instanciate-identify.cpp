@@ -610,10 +610,10 @@ namespace Instanciate
 						return true;
 					}
 				}
-				default: // multiple solutions
+				default:
 				{
 					// multiple solutions are not acceptable for properties
-					error() << "ambigous property call for '" << name << '\'';
+					complain::ambigousPropertyCall(name);
 					break;
 				}
 				case 0: // no identifier found from 'atom map'

@@ -92,6 +92,13 @@ namespace complain
 	}
 
 
+	bool ambigousPropertyCall(const AnyString& identifier)
+	{
+		error() << "ambigous property call for '" << identifier << '\'';
+		return false;
+	}
+
+
 
 
 } // namespace complain
