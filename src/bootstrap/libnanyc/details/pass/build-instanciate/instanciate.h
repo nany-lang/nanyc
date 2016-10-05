@@ -251,8 +251,6 @@ namespace Instanciate
 		bool complainIntrinsicParameter(const AnyString& name, uint32_t pindex, const Classdef& got,
 			const AnyString& expected = nullptr);
 
-		bool complainMultipleDefinitions(const Atom&, const AnyString& funcOrOpName);
-
 		//! Emit a new error message with additional information on the given operand
 		bool complainOperand(const IR::Instruction& operands, AnyString msg = nullptr);
 

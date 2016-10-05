@@ -50,6 +50,11 @@ namespace complain
 	//! Unknown identifier
 	bool notDeclaredInThisScope(const Atom* self, const Atom& atom, const AnyString& name);
 
+	//! Multiple definitions
+	bool multipleDefinitions(const Atom&, const AnyString& deffor);
+
+
+
 
 	//! Return type mismatch
 	bool returnTypeMismatch(const Classdef& expected, const Classdef& usertype);
@@ -64,6 +69,8 @@ namespace complain
 	bool returnMultipleTypes(const Classdef& expected, const Classdef& usertype, uint32_t line, uint32_t offset);
 
 
+
+
 	//! Circular reference for typedef
 	bool typedefCircularReference(const Atom& original, const Atom& responsible);
 
@@ -72,7 +79,6 @@ namespace complain
 
 	//! Reference to typedef declaration after the current one
 	bool typedefRefDeclaredAfter(const Atom& original, const Atom& responsible);
-
 
 
 
