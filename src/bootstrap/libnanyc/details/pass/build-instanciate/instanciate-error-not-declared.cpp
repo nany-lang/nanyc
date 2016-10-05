@@ -1,4 +1,5 @@
 #include "instanciate.h"
+#include "instanciate-error.h"
 #include <yuni/string.h>
 #include <yuni/core/math.h>
 #include <vector>
@@ -15,74 +16,74 @@ namespace Pass
 {
 namespace Instanciate
 {
+namespace complain
+{
 
 
+	namespace {
 
-	namespace // anonymous
+
+	uint32_t LevenshteinDistance(const AnyString& source, const AnyString& target)
 	{
+		if (source.empty())
+			return target.size();
+		if (target.empty())
+			return source.size();
 
-		static uint LevenshteinDistance(const AnyString& source, const AnyString& target)
+		std::vector<std::vector<uint32_t>>  matrix(source.size() + 1);
+		for (uint32_t i = 0; i <= source.size(); ++i)
+			matrix[i].resize(target.size() + 1);
+
+		for (uint32_t i = 0; i <= source.size(); ++i)
+			matrix[i][0] = i;
+
+		for (uint32_t j = 0; j <= target.size(); ++j)
+			matrix[0][j] = j;
+
+		for (uint32_t i = 1; i <= source.size(); ++i)
 		{
-			if (source.empty())
-				return target.size();
-			if (target.empty())
-				return source.size();
+			auto s_i = source[i - 1];
 
-			std::vector<std::vector<uint>>  matrix(source.size() + 1);
-			for (uint32_t i = 0; i <= source.size(); ++i)
-				matrix[i].resize(target.size() + 1);
-
-			for (uint32_t i = 0; i <= source.size(); ++i)
-				matrix[i][0] = i;
-
-			for (uint32_t j = 0; j <= target.size(); ++j)
-				matrix[0][j] = j;
-
-			for (uint32_t i = 1; i <= source.size(); ++i)
+			// Step 4
+			for (uint32_t j = 1; j <= target.size(); ++j)
 			{
-				auto s_i = source[i - 1];
+				auto t_j = target[j - 1];
 
-				// Step 4
-				for (uint32_t j = 1; j <= target.size(); ++j)
+				uint32_t cost = (s_i == t_j) ? 0 : 1;
+
+				// Step 6
+				uint32_t above = matrix[i - 1][j];
+				uint32_t left  = matrix[i][j - 1];
+				uint32_t diag  = matrix[i - 1][j - 1];
+
+				uint32_t cell = std::min(above + 1, std::min(left + 1, diag + cost));
+
+				if (i > 2 and j > 2)
 				{
-					auto t_j = target[j - 1];
+					uint32_t trans = matrix[i - 2][j - 2] + 1;
 
-					uint32_t cost = (s_i == t_j) ? 0 : 1;
-
-					// Step 6
-					uint32_t above = matrix[i - 1][j];
-					uint32_t left  = matrix[i][j - 1];
-					uint32_t diag  = matrix[i - 1][j - 1];
-
-					uint32_t cell = std::min(above + 1, std::min(left + 1, diag + cost));
-
-					if (i > 2 and j > 2)
-					{
-						uint32_t trans = matrix[i - 2][j - 2] + 1;
-
-						if (source[i - 2] != t_j)
-							++trans;
-						if (s_i != target[j - 2])
-							++trans;
-						if (cell > trans)
-							cell = trans;
-					}
-
-					matrix[i][j] = cell;
+					if (source[i - 2] != t_j)
+						++trans;
+					if (s_i != target[j - 2])
+						++trans;
+					if (cell > trans)
+						cell = trans;
 				}
+
+				matrix[i][j] = cell;
 			}
-
-			return matrix[source.size()][target.size()];
 		}
 
+		return matrix[source.size()][target.size()];
+	}
 
 
-		static inline bool stringsAreCloseEnough(uint& note, const AnyString& a, const AnyString& b)
-		{
-			note = LevenshteinDistance(a, b) + (uint) a.size();
-			note += (uint) Math::Abs((::ssize_t) a.size() - (::ssize_t) b.size());
-			return (note <= 8);
-		}
+	bool stringsAreCloseEnough(uint& note, const AnyString& a, const AnyString& b)
+	{
+		note = LevenshteinDistance(a, b) + (uint) a.size();
+		note += (uint) Math::Abs((::ssize_t) a.size() - (::ssize_t) b.size());
+		return (note <= 8);
+	}
 
 
 	} // anonymous namespace
@@ -90,7 +91,7 @@ namespace Instanciate
 
 
 
-	bool SequenceBuilder::complainUnknownIdentifier(const Atom* self, const Atom& atom, const AnyString& name)
+	bool notDeclaredInThisScope(const Atom* self, const Atom& atom, const AnyString& name)
 	{
 		assert(not name.empty());
 		if (unlikely(name.empty())) // should never happen
@@ -104,9 +105,17 @@ namespace Instanciate
 
 		auto err = error();
 
+		auto* seq = Logs::userHandler<SequenceBuilder>();
+		if (!seq)
+		{
+			err << "not declared in scope <invalid sequence builder>";
+			return false;
+		}
+
 		AnyString keyword, varname;
 		Atom::extractNames(keyword, varname, name);
 		bool isOperator = (not keyword.empty());
+		auto& cdeftable = seq->cdeftable;
 
 		if (isOperator) // operator, view...
 		{
@@ -179,10 +188,10 @@ namespace Instanciate
 			uint32_t note;
 
 			// reverse order, to get the nearest first
-			uint32_t i = (uint) frame->lvids.size();
+			auto i = (uint32_t) seq->frame->lvids.size();
 			while (i-- > 0)
 			{
-				auto& crlcvr = frame->lvids[i];
+				auto& crlcvr = seq->frame->lvids[i];
 
 				// only take non-empty names and avoid the hidden parameter 'self'
 				if (crlcvr.userDefinedName.empty() or crlcvr.userDefinedName == "self")
@@ -192,7 +201,7 @@ namespace Instanciate
 					continue;
 
 				auto suggest = (err.suggest() << "var " << crlcvr.userDefinedName);
-				auto* varAtom = cdeftable.findClassdefAtom(cdeftable.classdef(CLID{frame->atomid, i}));
+				auto* varAtom = cdeftable.findClassdefAtom(cdeftable.classdef(CLID{seq->frame->atomid, i}));
 				if (varAtom)
 				{
 					suggest << ": ";
@@ -262,6 +271,7 @@ namespace Instanciate
 
 
 
+} // namespace complain
 } // namespace Instanciate
 } // namespace Pass
 } // namespace Nany

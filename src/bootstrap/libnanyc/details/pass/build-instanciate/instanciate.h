@@ -224,7 +224,6 @@ namespace Instanciate
 		//@{
 		bool checkForIntrinsicParamCount(const AnyString& name, uint32_t count);
 
-		bool complainUnknownIdentifier(const Atom* self, const Atom& atom, const AnyString& name);
 
 		bool complainInvalidType(const char* origin, const Classdef& from, const Classdef& to);
 

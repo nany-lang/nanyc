@@ -99,6 +99,15 @@ namespace complain
 	}
 
 
+	bool invalidTypedef(const Classdef& cdef)
+	{
+		auto entry = (error() << "invalid typedef definition");
+		if (debugmode)
+			entry << " (got null atom, " << cdef.clid << ')';
+		return false;
+	}
+
+
 
 
 } // namespace complain
