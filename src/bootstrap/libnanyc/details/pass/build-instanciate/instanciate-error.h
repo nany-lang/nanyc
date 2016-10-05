@@ -51,6 +51,19 @@ namespace complain
 	bool notDeclaredInThisScope(const Atom* self, const Atom& atom, const AnyString& name);
 
 
+	//! Return type mismatch
+	bool returnTypeMismatch(const Classdef& expected, const Classdef& usertype);
+
+	//! Return with implicit conversion
+	bool returnTypeImplicitConversion(const Classdef& expected, const Classdef& usertype, uint32_t line = 0, uint32_t offset = 0);
+
+	//! Return type is missing
+	bool returnTypeMissing(const Classdef* expected, const Classdef* usertype);
+
+	//! Multiple types for return
+	bool returnMultipleTypes(const Classdef& expected, const Classdef& usertype, uint32_t line, uint32_t offset);
+
+
 
 
 } // namespace complain
