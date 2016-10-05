@@ -618,7 +618,7 @@ namespace Instanciate
 				}
 				case 0: // no identifier found from 'atom map'
 				{
-					error() << "no property found for '" << name << '\'';
+					complain::noproperty(name);
 					break;
 				}
 			}

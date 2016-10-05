@@ -85,6 +85,13 @@ namespace complain
 	}
 
 
+	bool noproperty(const AnyString& identifier)
+	{
+		error() << "no property found for '" << identifier << '\'';
+		return false;
+	}
+
+
 
 
 } // namespace complain

@@ -44,6 +44,10 @@ namespace complain
 	bool invalidClassSelf(const AnyString& identifier);
 
 
+	//! No property found
+	bool noproperty(const AnyString& identifier);
+
+
 
 
 } // namespace complain
