@@ -22,12 +22,7 @@ namespace Instanciate
 		auto& cdef = cdeftable.classdef(CLID{frame->atomid, operands.atomid});
 		Atom* atom = (not cdef.isBuiltinOrVoid()) ? cdeftable.findClassdefAtom(cdef) : nullptr;
 		if (unlikely(atom == nullptr))
-		{
-			auto err = (error() << "cannot instanciate object of type '");
-			cdef.print(err.data().message, cdeftable, false);
-			err << '\'';
-			return frame->invalidate(operands.lvid);
-		}
+			return (void) complain::canNotAllocateClassNullAtom(cdef, operands.lvid);
 
 		if (unlikely(not atom->isClass()))
 			return (void) complain::classRequired();
@@ -57,7 +52,6 @@ namespace Instanciate
 			acquireObject(operands.lvid);
 		}
 	}
-
 
 
 

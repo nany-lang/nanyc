@@ -53,6 +53,23 @@ namespace complain
 	}
 
 
+	bool canNotAllocateClassNullAtom(const Classdef& cdef, uint32_t lvid)
+	{
+		auto* seq = Logs::userHandler<SequenceBuilder>();
+		auto err = (error() << "cannot instanciate object of type '");
+		if (seq)
+			cdef.print(err.data().message, seq->cdeftable, false);
+		else
+			err << "<invalid sequence builder>";
+		err << '\'';
+		if (debugmode)
+			err << " (null atom, probably due to previous error)";
+		if (seq and seq->frame)
+			seq->frame->invalidate(lvid);
+		return false;
+	}
+
+
 
 
 } // namespace complain

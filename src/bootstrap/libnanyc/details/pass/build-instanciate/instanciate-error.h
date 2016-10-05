@@ -36,6 +36,10 @@ namespace complain
 	bool classRequired();
 
 
+	//! Failed to allocate class object (null atom, due to previous error)
+	bool canNotAllocateClassNullAtom(const Classdef&, uint32_t lvid);
+
+
 
 
 } // namespace complain
