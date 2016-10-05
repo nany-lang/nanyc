@@ -83,6 +83,14 @@ namespace Logs
 	}
 
 
+	void* userHandlerPointer()
+	{
+		return localMetadataHandler.userdefined;
+	}
+
+
+
+
 } // namespace Logs
 } // namespace Nany
 
