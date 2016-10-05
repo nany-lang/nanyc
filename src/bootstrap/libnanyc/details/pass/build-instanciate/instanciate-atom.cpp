@@ -6,6 +6,7 @@
 #include "libnanyc-traces.h"
 #include "instanciate-atom.h"
 #include "instanciate-debug.h"
+#include "instanciate-error.h"
 #include <memory>
 
 using namespace Yuni;
@@ -548,10 +549,7 @@ namespace Instanciate
 			return (success = false);
 
 		if (unlikely(info.instanceid == static_cast<uint32_t>(-1)))
-		{
-			iceClassdef(info.returnType, "return: invalid instance id");
-			return false;
-		}
+			return complain::classdef(info.returnType, "return: invalid instance id");
 
 		// import the return type of the instanciated sequence
 		if (retlvid != 0)
