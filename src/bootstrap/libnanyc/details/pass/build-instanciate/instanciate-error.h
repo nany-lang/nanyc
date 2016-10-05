@@ -64,6 +64,16 @@ namespace complain
 	bool returnMultipleTypes(const Classdef& expected, const Classdef& usertype, uint32_t line, uint32_t offset);
 
 
+	//! Circular reference for typedef
+	bool typedefCircularReference(const Atom& original, const Atom& responsible);
+
+	//! Unknown typedef
+	bool typedefNotResolved(const Atom& original);
+
+	//! Reference to typedef declaration after the current one
+	bool typedefRefDeclaredAfter(const Atom& original, const Atom& responsible);
+
+
 
 
 } // namespace complain

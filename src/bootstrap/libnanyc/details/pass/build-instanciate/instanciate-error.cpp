@@ -207,6 +207,55 @@ namespace complain
 	}
 
 
+	bool typedefCircularReference(const Atom& original, const Atom& responsible)
+	{
+		auto err = (error() << "cannot resolve type alias '");
+		auto* seq = Logs::userHandler<SequenceBuilder>();
+		if (seq)
+			original.retrieveCaption(err.data().message, seq->cdeftable);
+		err << "': circular dependcy";
+
+		if (responsible.atomid != original.atomid and seq)
+		{
+			auto hint = (err.hint() << "when trying to resolve '");
+			responsible.retrieveCaption(hint.data().message, seq->cdeftable);
+			hint << '\'';
+		}
+		return false;
+	}
+
+
+	bool typedefNotResolved(const Atom& original)
+	{
+		auto err = (error() << "cannot resolve type alias '");
+		auto* seq = Logs::userHandler<SequenceBuilder>();
+		if (seq)
+			original.retrieveCaption(err.data().message, seq->cdeftable);
+		err << '\'';
+		return false;
+	}
+
+
+	bool typedefRefDeclaredAfter(const Atom& original, const Atom& responsible)
+	{
+		auto err = (error() << "cannot resolve type alias");
+		auto* seq = Logs::userHandler<SequenceBuilder>();
+		if (seq)
+		{
+			err << " '";
+			original.retrieveCaption(err.data().message, seq->cdeftable);
+			err << "': type alias '";
+			responsible.retrieveCaption(err.data().message, seq->cdeftable);
+			err << "' not resolved yet";
+
+			auto hint = (err.hint() << "when trying to resolve '");
+			responsible.retrieveCaption(hint.data().message, seq->cdeftable);
+			hint << '\'';
+		}
+		return false;
+	}
+
+
 
 
 } // namespace complain
@@ -575,43 +624,6 @@ namespace complain
 		to.print(err.data().message, cdeftable, false);
 		err << '\'';
 		return false;
-	}
-
-
-	void SequenceBuilder::complainTypealiasCircularRef(const Atom& original, const Atom& responsible)
-	{
-		auto err = (error() << "cannot resolve type alias '");
-		original.retrieveCaption(err.data().message, cdeftable);
-		err << "': circular dependcy";
-
-		if (responsible.atomid != original.atomid)
-		{
-			auto hint = (err.hint() << "when trying to resolve '");
-			responsible.retrieveCaption(hint.data().message, cdeftable);
-			hint << '\'';
-		}
-	}
-
-
-	void SequenceBuilder::complainTypedefDeclaredAfter(const Atom& original, const Atom& responsible)
-	{
-		auto err = error() << "cannot resolve type alias '";
-		original.retrieveCaption(err.data().message, cdeftable);
-		err << "': type alias '";
-		responsible.retrieveCaption(err.data().message, cdeftable);
-		err << "' not resolved yet";
-
-		auto hint = (err.hint() << "when trying to resolve '");
-		responsible.retrieveCaption(hint.data().message, cdeftable);
-		hint << '\'';
-	}
-
-
-	void SequenceBuilder::complainTypedefUnresolved(const Atom& original)
-	{
-		auto err = error() << "cannot resolve type alias '";
-		original.retrieveCaption(err.data().message, cdeftable);
-		err << "'";
 	}
 
 
