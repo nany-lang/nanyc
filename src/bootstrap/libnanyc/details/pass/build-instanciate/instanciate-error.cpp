@@ -70,6 +70,21 @@ namespace complain
 	}
 
 
+	bool invalidClassSelf(const AnyString& identifier)
+	{
+		auto entry = ice();
+		entry << "identify: invalid 'self' object for '" << identifier;
+		entry << "' from '";
+		auto* seq = Logs::userHandler<SequenceBuilder>();
+		if (seq and seq->frame)
+			entry << seq->frame->atom.caption();
+		else
+			entry << "<invalid sequence builder/frame>";
+		entry << "' (class expected)";
+		return false;
+	}
+
+
 
 
 } // namespace complain

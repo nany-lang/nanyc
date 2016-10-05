@@ -40,6 +40,10 @@ namespace complain
 	bool canNotAllocateClassNullAtom(const Classdef&, uint32_t lvid);
 
 
+	//! Invalid Self (not a class)
+	bool invalidClassSelf(const AnyString& identifier);
+
+
 
 
 } // namespace complain
