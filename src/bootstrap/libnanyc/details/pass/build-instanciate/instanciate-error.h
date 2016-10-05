@@ -28,6 +28,10 @@ namespace complain
 	bool unknownIntrinsic(const AnyString& name);
 
 
+	//! Class not instanciated (not ready for use)
+	bool classNotInstanciated(const Atom&);
+
+
 
 
 } // namespace complain

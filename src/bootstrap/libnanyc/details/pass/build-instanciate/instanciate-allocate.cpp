@@ -1,4 +1,5 @@
 #include "instanciate.h"
+#include "instanciate-error.h"
 
 using namespace Yuni;
 
@@ -32,7 +33,7 @@ namespace Instanciate
 			return (void)(error() << "type required for allocation");
 
 		if (unlikely(not atom->classinfo.isInstanciated))
-			return (void)complainClassNotInstanciated(*atom);
+			return (void) complain::classNotInstanciated(*atom);
 
 		// propagate the object type
 		{

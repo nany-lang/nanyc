@@ -1,4 +1,5 @@
 #include "instanciate.h"
+#include "instanciate-error.h"
 
 using namespace Yuni;
 
@@ -30,7 +31,7 @@ namespace Instanciate
 						{
 							if (unlikely(atom->isClass() and not atom->classinfo.isInstanciated))
 							{
-								complainClassNotInstanciated(*atom);
+								complain::classNotInstanciated(*atom);
 								break;
 							}
 							// ok the type is an object
