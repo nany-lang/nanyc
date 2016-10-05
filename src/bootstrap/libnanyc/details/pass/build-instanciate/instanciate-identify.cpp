@@ -164,11 +164,7 @@ namespace Instanciate
 						// 'self' can stay null
 					}
 					else
-					{
-						ice() << "identify: invalid 'self' object for '" << name << "' from '"
-							<< frame->atom.caption() << '\'';
-						return false;
-					}
+						return complain::invalidClassSelf(name);
 				}
 			}
 
