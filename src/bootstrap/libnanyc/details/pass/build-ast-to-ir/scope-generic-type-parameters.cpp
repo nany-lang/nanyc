@@ -18,7 +18,10 @@ namespace Producer
 {
 
 
-	inline bool Scope::visitASTDeclSingleGenericTypeParameter(AST::Node& node)
+	namespace {
+
+
+	bool declSingleGenericTypeParameter(Scope& scope, AST::Node& node)
 	{
 		assert(node.rule == AST::rgFuncParam);
 		for (auto& child: node.children)
@@ -28,11 +31,10 @@ namespace Producer
 				case AST::rgIdentifier:
 				{
 					const AnyString& name = child.text;
-					bool ok = checkForValidIdentifierName(child, name);
-					if (unlikely(not ok))
+					if (not checkForValidIdentifierName(child, name))
 						return false;
-					emitDebugpos(child);
-					sequence().emitBlueprintGenericTypeParam(nextvar(), name);
+					scope.emitDebugpos(child);
+					scope.sequence().emitBlueprintGenericTypeParam(scope.nextvar(), name);
 					break;
 				}
 				case AST::rgVarType:
@@ -55,38 +57,7 @@ namespace Producer
 	}
 
 
-	bool Scope::visitASTDeclGenericTypeParameters(AST::Node& node)
-	{
-		assert(node.rule == AST::rgClassTemplateParams);
-		if (unlikely(node.children.empty()))
-			return true;
-
-		if (debugmode)
-			sequence().emitComment("generic type parameters");
-
-		bool success = true;
-
-		for (auto& child: node.children)
-		{
-			switch (child.rule)
-			{
-				case AST::rgFuncParam:
-				{
-					success &= visitASTDeclSingleGenericTypeParameter(child);
-					break;
-				}
-				default:
-					return unexpectedNode(child, "[gen-type-params]");
-			}
-		}
-		return success;
-	}
-
-
-
-
-
-	inline bool Scope::visitASTExprTemplateParameter(AST::Node& node)
+	bool exprTemplateParameter(Scope& scope, AST::Node& node)
 	{
 		assert(node.rule == AST::rgCallTemplateParameter or node.rule == AST::rgCallTemplateNamedParameter);
 
@@ -116,16 +87,48 @@ namespace Producer
 			return (ice(node) << "invalid node type");
 
 		uint32_t localvar = 0;
-		if (not visitASTType(*type, localvar))
+		if (not scope.visitASTType(*type, localvar))
 			return false;
 
 		if (unlikely(localvar == (uint32_t) -1))
 			return (error(*type) << "'any' is not accepted as parameter");
 
-		lastPushedTmplParams->emplace_back(localvar, name);
+		scope.lastPushedTmplParams->emplace_back(localvar, name);
 		return true;
 	}
 
+
+	} // namespace
+
+
+
+
+	bool Scope::visitASTDeclGenericTypeParameters(AST::Node& node)
+	{
+		assert(node.rule == AST::rgClassTemplateParams);
+		if (unlikely(node.children.empty()))
+			return true;
+
+		if (debugmode)
+			sequence().emitComment("generic type parameters");
+
+		bool success = true;
+
+		for (auto& child: node.children)
+		{
+			switch (child.rule)
+			{
+				case AST::rgFuncParam:
+				{
+					success &= declSingleGenericTypeParameter(*this, child);
+					break;
+				}
+				default:
+					return unexpectedNode(child, "[gen-type-params]");
+			}
+		}
+		return success;
+	}
 
 
 	bool Scope::visitASTExprTemplate(AST::Node& node, LVID& localvar)
@@ -149,7 +152,7 @@ namespace Producer
 							case AST::rgCallTemplateParameter:
 							case AST::rgCallTemplateNamedParameter:
 							{
-								success &= visitASTExprTemplateParameter(param);
+								success &= exprTemplateParameter(*this, param);
 								break;
 							}
 							default:

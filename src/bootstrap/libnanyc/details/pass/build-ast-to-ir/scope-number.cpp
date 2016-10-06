@@ -15,68 +15,61 @@ namespace IR
 namespace Producer
 {
 
-	namespace // anonymous
+	namespace {
+
+
+	struct NumberDef final
 	{
+		// Is the number signed or unsigned ?
+		bool isUnsigned = false;
+		// Is the number a floating-point number ?
+		bool isFloat = false;
+		// how many bits used by the number ? (32 by default)
+		uint bits = 32;
+		// Sign of the number: ' ', '+', '-'
+		char sign = ' ';
 
-		struct NumberDef final
+		//! The first part of the number
+		uint64_t part1 = 0;
+		//! Second part of the number
+		AnyString part2; // the second part may have additional zero
+	};
+
+
+	constexpr bool validNumberOfBits(uint32_t bits)
+	{
+		return bits == 32 or bits == 64 or bits == 16 or bits == 8;
+	}
+
+
+	bool convertASTNumberToDouble(double& value, uint64 part1, const AnyString& part2, char sign)
+	{
+		if (part1 == 0 and part2.empty()) // obvious zero value
 		{
-			// Is the number signed or unsigned ?
-			bool isUnsigned = false;
-			// Is the number a floating-point number ?
-			bool isFloat = false;
-			// how many bits used by the number ? (32 by default)
-			uint bits = 32;
-			// Sign of the number: ' ', '+', '-'
-			char sign = ' ';
-
-			//! The first part of the number
-			uint64_t part1 = 0;
-			//! Second part of the number
-			AnyString part2; // the second part may have additional zero
-		};
-
-
-		static constexpr inline bool validNumberOfBits(uint32_t bits)
-		{
-			return bits == 32 or bits == 64 or bits == 16 or bits == 8;
+			value = 0.;
 		}
-
-
-		static bool convertASTNumberToDouble(double& value, uint64 part1, const AnyString& part2, char sign)
+		else
 		{
-			if (part1 == 0 and part2.empty()) // obvious zero value
+			ShortString128 tmp;
+			if (sign == '-') // append the sign of the number
+				tmp += '-';
+
+			tmp << part1;
+			if (not part2.empty())
+				tmp << '.' << part2;
+
+			if (unlikely(not tmp.to<double>(value)))
 			{
 				value = 0.;
+				return false;
 			}
-			else
-			{
-				ShortString128 tmp;
-				if (sign == '-') // append the sign of the number
-					tmp += '-';
-
-				tmp << part1;
-				if (not part2.empty())
-					tmp << '.' << part2;
-
-				if (unlikely(not tmp.to<double>(value)))
-				{
-					value = 0.;
-					return false;
-				}
-			}
-			return true;
 		}
-
-
-	} // anonymous namespace
-
-
-
-
+		return true;
+	}
 
 
 	template<bool BuiltinT, class DefT>
-	inline bool Scope::generateNumberCode(uint32_t& localvar, const DefT& numdef, AST::Node& node)
+	bool generateNumberCode(Scope& scope, uint32_t& localvar, const DefT& numdef, AST::Node& node)
 	{
 		// checking for invalid float values
 		nytype_t type = nyt_void;
@@ -169,7 +162,7 @@ namespace Producer
 			uint64_t number = (not negate)
 				? numdef.part1
 				: (uint64_t)( - static_cast<int64_t>(numdef.part1)); // reinterpret to avoid unwanted type promotion
-			hardcodedlvid = createLocalBuiltinInt(node, type, number);
+			hardcodedlvid = scope.createLocalBuiltinInt(node, type, number);
 		}
 		else
 		{
@@ -181,7 +174,7 @@ namespace Producer
 			type = (numdef.bits == 32) ? nyt_f32 : nyt_f64;
 			if (not BuiltinT)
 				cn.adapt((numdef.bits == 32) ? "f32" : "f64", 3);
-			hardcodedlvid = createLocalBuiltinFloat(node, type, value);
+			hardcodedlvid = scope.createLocalBuiltinFloat(node, type, value);
 		}
 
 		if (BuiltinT)
@@ -191,23 +184,26 @@ namespace Producer
 		}
 		else
 		{
-			if (!context.reuse.literal.node)
-				context.prepareReuseForLiterals();
+			if (!scope.context.reuse.literal.node)
+				scope.context.prepareReuseForLiterals();
 
 			assert(not cn.empty());
-			context.reuse.literal.classname->text = cn;
+			scope.context.reuse.literal.classname->text = cn;
 			ShortString16 lvidstr;
 			lvidstr = hardcodedlvid;
-			context.reuse.literal.lvidnode->text = lvidstr;
+			scope.context.reuse.literal.lvidnode->text = lvidstr;
 
-			bool success = visitASTExprNew(*(context.reuse.literal.node), localvar);
+			bool success = scope.visitASTExprNew(*(scope.context.reuse.literal.node), localvar);
 
 			// avoid crap in the debugger
-			context.reuse.literal.classname->text.clear();
-			context.reuse.literal.lvidnode->text.clear();
+			scope.context.reuse.literal.classname->text.clear();
+			scope.context.reuse.literal.lvidnode->text.clear();
 			return success;
 		}
 	}
+
+
+	} // anonymous namespace
 
 
 
@@ -337,15 +333,12 @@ namespace Producer
 			}
 		}
 
-
 		assert(numdef.bits == 64 or numdef.bits == 32 or numdef.bits == 16 or numdef.bits == 8);
 
 		return (not builtin)
-			? generateNumberCode<false>(localvar, numdef, node)
-			: generateNumberCode<true> (localvar, numdef, node);
+			? generateNumberCode<false>(*this, localvar, numdef, node)
+			: generateNumberCode<true> (*this, localvar, numdef, node);
 	}
-
-
 
 
 

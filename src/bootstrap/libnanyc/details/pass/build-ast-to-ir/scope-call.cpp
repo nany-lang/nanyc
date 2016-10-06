@@ -15,7 +15,8 @@ namespace IR
 namespace Producer
 {
 
-	inline bool Scope::visitASTExprCallParameters(AST::Node& node, ShortcircuitUpdate* shortcircuit)
+
+	bool Scope::visitASTExprCallParameters(AST::Node& node, ShortcircuitUpdate* shortcircuit)
 	{
 		assert(node.rule == AST::rgCall);
 		// parameter index
@@ -141,7 +142,7 @@ namespace Producer
 		}
 
 		// push all parameters, indexed and named
-		for (uint i = 0; i != paramCount; ++i)
+		for (uint32_t i = 0; i != paramCount; ++i)
 		{
 			const auto& info = pushedIndexedParam[i];
 			if (info.name.empty())
@@ -151,7 +152,6 @@ namespace Producer
 		}
 		return true;
 	}
-
 
 
 	bool Scope::visitASTExprCall(AST::Node* node, LVID& localvar, AST::Node* parent)
@@ -203,7 +203,6 @@ namespace Producer
 			{
 				uint32_t ret__bool = out.emitStackalloc(nextvar(), nyt_any);
 
-
 				// using another intermediate value to mutate it into a real object
 				// if necessary
 				uint32_t callret = out.emitStackalloc(nextvar(), nyt_any);
@@ -253,9 +252,6 @@ namespace Producer
 		}
 		return false;
 	}
-
-
-
 
 
 
