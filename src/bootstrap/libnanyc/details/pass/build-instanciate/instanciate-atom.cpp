@@ -65,8 +65,10 @@ namespace Instanciate
 	}
 
 
-	bool createNewAtom(InstanciateData& info, Atom& atom)
+	bool createSpecializedAtom(InstanciateData& info, Atom& atom)
 	{
+		// create a new atom with non-generic parameters / from a contextual atom
+		// (generic/anonymous class)
 		// re-map from the parent
 		{
 			auto& sequence  = *atom.opcodes.sequence;
@@ -169,7 +171,7 @@ namespace Instanciate
 		// to have different types)
 		if (atomRequested.isContextual())
 		{
-			if (not createNewAtom(info, atomRequested))
+			if (not createSpecializedAtom(info, atomRequested))
 				return nullptr;
 			// the atom has changed - info.atom.get() has been updated accordingly
 			assert(&info.atom.get() != &atomRequested);
