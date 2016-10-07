@@ -104,8 +104,7 @@ namespace Instanciate
 		info.shouldMergeLayer = true;
 
 		// upate parameter types
-		bool resolved = resolveStrictParameterTypes(info.build, newAtom);
-		return resolved;
+		return resolveStrictParameterTypes(info.build, newAtom, &info);
 	}
 
 
@@ -323,7 +322,7 @@ namespace Instanciate
 
 
 
-	bool resolveStrictParameterTypes(Build& build, Atom& atom)
+	bool resolveStrictParameterTypes(Build& build, Atom& atom, InstanciateData* originalInfo)
 	{
 		switch (atom.type)
 		{
@@ -334,14 +333,18 @@ namespace Instanciate
 				// (to be able to deduce overload later).
 				// or typealias for the same reason (they can used by parameters)
 				bool needPartialInstanciation = not atom.parameters.empty() or atom.isTypeAlias();
-				if (needPartialInstanciation)
+				if (not needPartialInstanciation)
+					break;
+
+				// Classdef table layer
+				ClassdefTableView cdeftblView{build.cdeftable};
+
+				if (not (originalInfo and atom.isTypeAlias()))
 				{
 					// input parameters (won't be used)
 					decltype(Pass::Instanciate::FuncOverloadMatch::result.params) params;
 					decltype(Pass::Instanciate::FuncOverloadMatch::result.params) tmplparams;
 					Logs::Message::Ptr newReport;
-					// Classdef table layer
-					ClassdefTableView cdeftblView{build.cdeftable};
 					// error reporting
 					Nany::Logs::Report report{*build.messages.get()};
 
@@ -353,13 +356,27 @@ namespace Instanciate
 						report.appendEntry(newReport);
 					return success;
 				}
+				else
+				{
+					// import generic type parameter from instanciation info
+					auto& tmplparams = originalInfo->tmplparams;
+					auto pindex = atom.classinfo.nextFieldIndex;
+					if (unlikely(not (pindex < tmplparams.size())))
+						return (ice() << "gen type invalid index");
+					atom.returnType.clid = CLID::AtomMapID(atom.atomid);
+					auto& srccdef = build.cdeftable.classdef(tmplparams[pindex].clid);
+					auto& rawcdef = build.cdeftable.rawclassdef(CLID::AtomMapID(atom.atomid));
+					rawcdef.import(srccdef);
+					rawcdef.qualifiers.merge(srccdef.qualifiers);
+					return true;
+				}
 				break;
 			}
-
 			case Atom::Type::classdef:
 			{
 				// do not try to do something on generic classes. It will be
 				// done later when the generic param types will be available
+				// (will be empty when instanciating a generic class)
 				if (not atom.tmplparams.empty())
 					return true;
 			}
@@ -377,7 +394,7 @@ namespace Instanciate
 		atom.eachChild([&](Atom& subatom) -> bool
 		{
 			if (subatom.isTypeAlias())
-				success &= resolveStrictParameterTypes(build, subatom);
+				success &= resolveStrictParameterTypes(build, subatom, originalInfo);
 			return true;
 		});
 

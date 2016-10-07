@@ -310,10 +310,12 @@ namespace Mapping
 		{
 			// if a generic type parameter, generating an implicit typedef
 			Atom& atom = atomStack->currentAtomNotUnit();
+			auto pindex = atom.size(); // children are currently only typedefs from gen params
 			auto* newAliasAtom = cdeftable.atoms.createTypealias(atom, name);
 			newAliasAtom->classinfo.isInstanciated = true;
 			cdeftable.registerAtom(newAliasAtom);
 			newAliasAtom->returnType.clid = cdef.clid; // type of the typedef
+			newAliasAtom->classinfo.nextFieldIndex = static_cast<uint16_t>(pindex);
 		}
 	}
 
