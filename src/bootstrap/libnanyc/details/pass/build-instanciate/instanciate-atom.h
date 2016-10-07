@@ -91,6 +91,16 @@ namespace Instanciate
 	void updateTypesInAllStackallocOp(IR::Sequence&, ClassdefTableView&, uint32_t atomid);
 
 
+	/*!
+	** \brief Try to resolve strict parameter types
+	**
+	** A strict may be given for a func:
+	**   func foo(p1, p2: StrictTypeP2) // Here, TypeP2 must be resolved
+	** This is required for func overloading deduction
+	*/
+	bool resolveStrictParameterTypes(Build&, Atom& atom);
+
+
 
 
 } // namespace Instanciate

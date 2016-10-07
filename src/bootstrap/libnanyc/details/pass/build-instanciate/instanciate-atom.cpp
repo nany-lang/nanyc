@@ -104,7 +104,7 @@ namespace Instanciate
 		info.shouldMergeLayer = true;
 
 		// upate parameter types
-		bool resolved = info.build.resolveStrictParameterTypes(newAtom);
+		bool resolved = resolveStrictParameterTypes(info.build, newAtom);
 		return resolved;
 	}
 
@@ -321,6 +321,75 @@ namespace Instanciate
 	} // anonymous namespace
 
 
+
+
+	bool resolveStrictParameterTypes(Build& build, Atom& atom)
+	{
+		switch (atom.type)
+		{
+			case Atom::Type::funcdef:
+			case Atom::Type::typealias:
+			{
+				// this pass intends to resolve the given types for parameters
+				// (to be able to deduce overload later).
+				// or typealias for the same reason (they can used by parameters)
+				bool needPartialInstanciation = not atom.parameters.empty() or atom.isTypeAlias();
+				if (needPartialInstanciation)
+				{
+					// input parameters (won't be used)
+					decltype(Pass::Instanciate::FuncOverloadMatch::result.params) params;
+					decltype(Pass::Instanciate::FuncOverloadMatch::result.params) tmplparams;
+					Logs::Message::Ptr newReport;
+					// Classdef table layer
+					ClassdefTableView cdeftblView{build.cdeftable};
+					// error reporting
+					Nany::Logs::Report report{*build.messages.get()};
+
+					Pass::Instanciate::InstanciateData info {
+						newReport, atom, cdeftblView, build, params, tmplparams
+					};
+					bool success = Pass::Instanciate::instanciateAtomParameterTypes(info);
+					if (not success)
+						report.appendEntry(newReport);
+					return success;
+				}
+				break;
+			}
+
+			case Atom::Type::classdef:
+			{
+				// do not try to do something on generic classes. It will be
+				// done later when the generic param types will be available
+				if (not atom.tmplparams.empty())
+					return true;
+			}
+			// [[fallthru]]
+			case Atom::Type::namespacedef:
+				break;
+			case Atom::Type::unit:
+			case Atom::Type::vardef:
+				return true;
+		}
+
+		bool success = true;
+
+		// try to resolve all typedefs first
+		atom.eachChild([&](Atom& subatom) -> bool
+		{
+			if (subatom.isTypeAlias())
+				success &= resolveStrictParameterTypes(build, subatom);
+			return true;
+		});
+
+		// .. everything else then
+		atom.eachChild([&](Atom& subatom) -> bool
+		{
+			if (not subatom.isTypeAlias())
+				success &= resolveStrictParameterTypes(build, subatom);
+			return true;
+		});
+		return success;
+	}
 
 
 	bool SequenceBuilder::instanciateAtomClassClone(Atom& atom, uint32_t lvid, uint32_t rhs)
