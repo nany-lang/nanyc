@@ -65,6 +65,6 @@ namespace Nany
 
 
 
-inline std::ostream& operator << (std::ostream& out, const Nany::CLID& rhs);
+std::ostream& operator << (std::ostream& out, const Nany::CLID& rhs);
 
 #include "clid.hxx"

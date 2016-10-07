@@ -14,6 +14,7 @@ namespace IR
 namespace Producer
 {
 
+
 	bool Scope::visitASTTypedef(AST::Node& node)
 	{
 		assert(node.rule == AST::rgTypedef);
@@ -38,7 +39,6 @@ namespace Producer
 					typeexpr = &child;
 					break;
 				}
-
 				default:
 					return unexpectedNode(child, "[ir/typedef]");
 			}

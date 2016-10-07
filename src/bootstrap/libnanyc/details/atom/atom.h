@@ -439,6 +439,7 @@ namespace Nany
 			//! Flag to determine whether the class has already been instanciated or not
 			bool isInstanciated = false;
 			//! Next field index for new variable members
+			// (can be used to retrieve the generic type parameter index when the atom is a typedef)
 			uint16_t nextFieldIndex = 0;
 
 			//! Direct access to the destructor (used for reduce compilation time)

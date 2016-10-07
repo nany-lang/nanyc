@@ -211,12 +211,6 @@ namespace Producer
 	}
 
 
-
-
-
-
-
-
 	bool Scope::visitASTExprIfStmt(AST::Node& node)
 	{
 		assert(node.rule == AST::rgIf);
@@ -270,7 +264,6 @@ namespace Producer
 
 		return generateIfExpr(localvar, *condition, *ifthen, *ifelse);
 	}
-
 
 
 

@@ -7,13 +7,13 @@ using namespace Yuni;
 
 
 
-
 namespace Nany
 {
 namespace IR
 {
 namespace Producer
 {
+
 
 	bool Scope::visitASTExprTypeDecl(AST::Node& node, LVID& localvar)
 	{
@@ -30,7 +30,6 @@ namespace Producer
 					localvar = LVID(-1);
 					return true;
 				}
-
 				if (identifier.text == "void")
 				{
 					localvar = 0;
@@ -48,12 +47,10 @@ namespace Producer
 				}
 			}
 		}
-
 		IR::Producer::Scope scope{*this};
 		OpcodeCodegenDisabler codegenDisabler{sequence()};
 		return scope.visitASTExpr(node, localvar);
 	}
-
 
 
 	bool Scope::visitASTType(AST::Node& node, LVID& localvar)
@@ -83,7 +80,6 @@ namespace Producer
 						reallyVoid = true;
 					break;
 				}
-
 				case AST::rgTypeQualifier:
 				{
 					for (auto& qualifier: child.children)
@@ -99,12 +95,10 @@ namespace Producer
 					}
 					break;
 				}
-
 				case AST::rgClass:
 				{
 					break;
 				}
-
 				default:
 					success = unexpectedNode(child, "[ir/type]");
 			}

@@ -65,8 +65,10 @@ namespace Instanciate
 	}
 
 
-	bool createNewAtom(InstanciateData& info, Atom& atom)
+	bool createSpecializedAtom(InstanciateData& info, Atom& atom)
 	{
+		// create a new atom with non-generic parameters / from a contextual atom
+		// (generic/anonymous class)
 		// re-map from the parent
 		{
 			auto& sequence  = *atom.opcodes.sequence;
@@ -102,8 +104,7 @@ namespace Instanciate
 		info.shouldMergeLayer = true;
 
 		// upate parameter types
-		bool resolved = info.build.resolveStrictParameterTypes(newAtom);
-		return resolved;
+		return resolveStrictParameterTypes(info.build, newAtom, &info);
 	}
 
 
@@ -169,7 +170,7 @@ namespace Instanciate
 		// to have different types)
 		if (atomRequested.isContextual())
 		{
-			if (not createNewAtom(info, atomRequested))
+			if (not createSpecializedAtom(info, atomRequested))
 				return nullptr;
 			// the atom has changed - info.atom.get() has been updated accordingly
 			assert(&info.atom.get() != &atomRequested);
@@ -321,6 +322,93 @@ namespace Instanciate
 
 
 
+	bool resolveStrictParameterTypes(Build& build, Atom& atom, InstanciateData* originalInfo)
+	{
+		switch (atom.type)
+		{
+			case Atom::Type::funcdef:
+			case Atom::Type::typealias:
+			{
+				// this pass intends to resolve the given types for parameters
+				// (to be able to deduce overload later).
+				// or typealias for the same reason (they can used by parameters)
+				bool needPartialInstanciation = not atom.parameters.empty() or atom.isTypeAlias();
+				if (not needPartialInstanciation)
+					break;
+
+				// Classdef table layer
+				ClassdefTableView cdeftblView{build.cdeftable};
+
+				if (not (originalInfo and atom.isTypeAlias()))
+				{
+					// input parameters (won't be used)
+					decltype(Pass::Instanciate::FuncOverloadMatch::result.params) params;
+					decltype(Pass::Instanciate::FuncOverloadMatch::result.params) tmplparams;
+					Logs::Message::Ptr newReport;
+					// error reporting
+					Nany::Logs::Report report{*build.messages.get()};
+
+					Pass::Instanciate::InstanciateData info {
+						newReport, atom, cdeftblView, build, params, tmplparams
+					};
+					bool success = Pass::Instanciate::instanciateAtomParameterTypes(info);
+					if (not success)
+						report.appendEntry(newReport);
+					return success;
+				}
+				else
+				{
+					// import generic type parameter from instanciation info
+					auto& tmplparams = originalInfo->tmplparams;
+					auto pindex = atom.classinfo.nextFieldIndex;
+					if (unlikely(not (pindex < tmplparams.size())))
+						return (ice() << "gen type invalid index");
+					atom.returnType.clid = CLID::AtomMapID(atom.atomid);
+					auto& srccdef = build.cdeftable.classdef(tmplparams[pindex].clid);
+					auto& rawcdef = build.cdeftable.rawclassdef(CLID::AtomMapID(atom.atomid));
+					rawcdef.import(srccdef);
+					rawcdef.qualifiers.merge(srccdef.qualifiers);
+					return true;
+				}
+				break;
+			}
+			case Atom::Type::classdef:
+			{
+				// do not try to do something on generic classes. It will be
+				// done later when the generic param types will be available
+				// (will be empty when instanciating a generic class)
+				if (not atom.tmplparams.empty())
+					return true;
+			}
+			// [[fallthru]]
+			case Atom::Type::namespacedef:
+				break;
+			case Atom::Type::unit:
+			case Atom::Type::vardef:
+				return true;
+		}
+
+		bool success = true;
+
+		// try to resolve all typedefs first
+		atom.eachChild([&](Atom& subatom) -> bool
+		{
+			if (subatom.isTypeAlias())
+				success &= resolveStrictParameterTypes(build, subatom, originalInfo);
+			return true;
+		});
+
+		// .. everything else then
+		atom.eachChild([&](Atom& subatom) -> bool
+		{
+			if (not subatom.isTypeAlias())
+				success &= resolveStrictParameterTypes(build, subatom);
+			return true;
+		});
+		return success;
+	}
+
+
 	bool SequenceBuilder::instanciateAtomClassClone(Atom& atom, uint32_t lvid, uint32_t rhs)
 	{
 		assert(not signatureOnly);
@@ -344,7 +432,6 @@ namespace Instanciate
 			}
 			default: return complain::multipleDefinitions(atom, "operator 'clone'");
 		}
-
 
 		Atom* clone = nullptr;
 		switch (atom.findFuncAtom(clone, "^obj-clone"))

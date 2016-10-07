@@ -19,7 +19,10 @@ namespace Producer
 {
 
 
-	inline bool Scope::visitASTVarValueInitialization(LVID& localvar, AST::Node& varAssign,
+	namespace {
+
+
+	bool varValueInitialization(Scope& scope, LVID& localvar, AST::Node& varAssign,
 		AST::Node& varnodeDecl, const AnyString& varname)
 	{
 		for (auto& assignChild: varAssign.children)
@@ -28,7 +31,7 @@ namespace Producer
 			{
 				case AST::rgExpr:
 				{
-					bool success = visitASTExpr(assignChild, localvar);
+					bool success = scope.visitASTExpr(assignChild, localvar);
 					if (unlikely(not success))
 					{
 						error(varnodeDecl) << "could not declare '" << varname << "': error in initialization";
@@ -48,7 +51,7 @@ namespace Producer
 	}
 
 
-	inline bool Scope::generateTypeofForClassVar(LVID& lvid, AST::Node& varAssign)
+	bool generateTypeofForClassVar(Scope& scope, LVID& lvid, AST::Node& varAssign)
 	{
 		// typeof (+2)
 		//	 tk-typeof, typeof
@@ -75,12 +78,11 @@ namespace Producer
 			}
 			param->children.push_back(&(varAssign.children[index]));
 		}
-		return visitASTExprTypeof(*typeofn, lvid);
+		return scope.visitASTExprTypeof(*typeofn, lvid);
 	}
 
 
-	inline bool
-	Scope::generateInitFuncForClassVar(const AnyString& varname, LVID lvid, AST::Node& varAssign)
+	bool generateInitFuncForClassVar(Scope& scope, const AnyString& varname, LVID lvid, AST::Node& varAssign)
 	{
 		// name of the generated func for initialize the class variable
 		ShortString64 funcName;
@@ -94,11 +96,11 @@ namespace Producer
 		// the first parameter is the result of the default value
 		// the second parameter is the register where the name of member has been stored
 
-		if (!context.reuse.func.node)
-			context.prepareReuseForVariableMembers();
+		if (!scope.context.reuse.func.node)
+			scope.context.prepareReuseForVariableMembers();
 
-		context.reuse.func.funcname->text = funcName;
-		context.reuse.func.varname->text  = varname;
+		scope.context.reuse.func.funcname->text = funcName;
+		scope.context.reuse.func.varname->text  = varname;
 
 		// Updating the EXPR
 		uint index = varAssign.findFirst(AST::rgExpr);
@@ -107,13 +109,17 @@ namespace Producer
 			assert(false and "no node <expr> in <var-assign>");
 			return false;
 		}
-		context.reuse.func.callparam->children.push_back(&(varAssign.children[index]));
+		scope.context.reuse.func.callparam->children.push_back(&(varAssign.children[index]));
 
-		bool success = visitASTFunc(*(context.reuse.func.node));
+		bool success = scope.visitASTFunc(*(scope.context.reuse.func.node));
 
-		context.reuse.func.callparam->children.clear();
+		scope.context.reuse.func.callparam->children.clear();
 		return success;
 	}
+
+
+	} // namespace
+
 
 
 
@@ -141,7 +147,7 @@ namespace Producer
 		else
 		{
 			// type definition, via typeof(varAssign)
-			if (not generateTypeofForClassVar(lvid, *varAssign))
+			if (not generateTypeofForClassVar(*this, lvid, *varAssign))
 				return false;
 		}
 		if (unlikely(0 == lvid))
@@ -164,8 +170,7 @@ namespace Producer
 		out.emitBlueprintVardef(mbvar, varname);
 
 		// generating an INIT func for the variable
-		return generateInitFuncForClassVar(varname, mbvar, *varAssign);
-
+		return generateInitFuncForClassVar(*this, varname, mbvar, *varAssign);
 	}
 
 
@@ -198,7 +203,7 @@ namespace Producer
 		{
 			LVID rhs = 0;
 			IR::OpcodeScopeLocker opscope{out};
-			if (not visitASTVarValueInitialization(rhs, *varAssign, node, varname))
+			if (not varValueInitialization(*this, rhs, *varAssign, node, varname))
 				return false;
 
 			assert(rhs != 0);

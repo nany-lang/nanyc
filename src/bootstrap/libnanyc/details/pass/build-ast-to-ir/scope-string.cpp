@@ -16,30 +16,32 @@ namespace IR
 namespace Producer
 {
 
-	namespace // anonymous
-	{
+	namespace {
 
-		static inline bool convertCharExtended(char& out, char c)
+
+	bool convertCharExtended(char& out, char c)
+	{
+		switch (c)
 		{
-			switch (c)
-			{
-				case 'r':  out = '\r'; break;
-				case 'n':  out = '\n'; break;
-				case 't':  out = '\t'; break;
-				case 'v':  out = '\v'; break;
-				case '\\': out = '\\'; break;
-				case '"':  out = '"'; break;
-				case 'a':  out = '\a'; break;
-				case 'b':  out = '\b'; break;
-				case 'f':  out = '\f'; break;
-				case '0':  out = '\0'; break;
-				case 'c':  /* produce no further output */ break;
-				default: return false;
-			}
-			return true;
+			case 'r':  out = '\r'; break;
+			case 'n':  out = '\n'; break;
+			case 't':  out = '\t'; break;
+			case 'v':  out = '\v'; break;
+			case '\\': out = '\\'; break;
+			case '"':  out = '"'; break;
+			case 'a':  out = '\a'; break;
+			case 'b':  out = '\b'; break;
+			case 'f':  out = '\f'; break;
+			case '0':  out = '\0'; break;
+			case 'c':  /* produce no further output */ break;
+			default: return false;
 		}
+		return true;
+	}
+
 
 	} // anonymous namespace
+
 
 
 
@@ -156,7 +158,6 @@ namespace Producer
 			out.emitCall(ret, calllvid);
 		};
 
-
 		for (auto& child: node.children)
 		{
 			switch (child.rule)
@@ -171,7 +172,6 @@ namespace Producer
 					}
 					break;
 				}
-
 				case AST::rgStringInterpolation:
 				{
 					if (child.children.empty())
@@ -203,7 +203,6 @@ namespace Producer
 					}
 					break;
 				}
-
 				case AST::rgCharExtended:
 				{
 					if (nullptr == firstLiteralNode)
@@ -223,7 +222,6 @@ namespace Producer
 					}
 					break;
 				}
-
 				default:
 				{
 					return unexpectedNode(child, "[expr-string]");
@@ -235,8 +233,6 @@ namespace Producer
 			flush();
 		return true;
 	}
-
-
 
 
 

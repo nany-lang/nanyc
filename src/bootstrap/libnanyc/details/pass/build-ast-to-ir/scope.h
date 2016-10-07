@@ -96,8 +96,6 @@ namespace Producer
 		bool visitASTVar(AST::Node&);
 		bool visitASTVarInClass();
 
-		bool visitASTVarValueInitialization(LVID&, AST::Node&, AST::Node&, const AnyString&);
-
 		bool visitASTExpr(AST::Node&, LVID& localvar, bool allowScope = false);
 		bool visitASTExprIntrinsic(AST::Node&, LVID& localvar);
 		bool visitASTExprReturn(AST::Node&);
@@ -126,9 +124,7 @@ namespace Producer
 		bool visitASTExprClosure(AST::Node&, uint32_t& localvar);
 
 		bool visitASTExprTemplate(AST::Node&, LVID& localvar);
-		bool visitASTExprTemplateParameter(AST::Node& node);
 		bool visitASTDeclGenericTypeParameters(AST::Node&);
-		bool visitASTDeclSingleGenericTypeParameter(AST::Node&);
 
 		bool visitASTUnitTest(AST::Node&);
 		//@}
@@ -212,10 +208,6 @@ namespace Producer
 
 
 	private:
-		bool generateInitFuncForClassVar(const AnyString& varname, LVID, AST::Node& varAssign);
-		bool generateTypeofForClassVar(LVID&, AST::Node& varAssign);
-		template<bool BuiltinT, class DefT> bool generateNumberCode(uint32_t& localvar, const DefT& numdef, AST::Node&);
-
 		//! Emit generic type parameters push
 		void emitTmplParametersIfAny();
 		void doEmitTmplParameters();
