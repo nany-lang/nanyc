@@ -127,8 +127,3 @@ namespace CString
 } // namespace CString
 } // namespace Extension
 } // namespace Yuni
-
-
-
-
-std::ostream& operator << (std::ostream& out, const Nany::CLID& rhs);
