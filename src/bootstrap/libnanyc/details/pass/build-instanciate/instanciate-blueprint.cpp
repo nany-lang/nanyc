@@ -149,9 +149,8 @@ namespace Instanciate
 		if (kind == IR::ISA::Blueprint::gentypeparam)
 			seq.frame->lvids[lvid].warning.unused = false;
 
-		// param name
-		const auto& name = seq.currentSequence.stringrefs[operands.name];
 		// declare the new name as locally accessible
+		const auto& name = seq.currentSequence.stringrefs[operands.name];
 		seq.declareNamedVariable(name, lvid, false);
 	}
 

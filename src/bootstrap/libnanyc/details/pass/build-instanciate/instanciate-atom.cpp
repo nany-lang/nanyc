@@ -347,7 +347,6 @@ namespace Instanciate
 			default: return complain::multipleDefinitions(atom, "operator 'clone'");
 		}
 
-
 		Atom* clone = nullptr;
 		switch (atom.findFuncAtom(clone, "^obj-clone"))
 		{
