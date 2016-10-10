@@ -18,6 +18,7 @@ set(nsl_files
 	"${nsl_root}/std.core/utils.ny"
 	"${nsl_root}/std.core/pointer.ny"
 	"${nsl_root}/std.core/ascii.ny"
+	"${nsl_root}/std.core/containers/array.ny"
 
 	# C types
 	"${nsl_root}/std.c/ctypes.ny"
