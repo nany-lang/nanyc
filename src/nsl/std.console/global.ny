@@ -5,13 +5,14 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 
-/*!
-** \brief Global Console input / output
-*/
+//! Standard console output
 public var console
-	-> new std.Console;
+	-> new std.console.Out;
 
 
+//! Standard console error output
+public var stderr
+	-> new std.console.Error;
 
 
 
