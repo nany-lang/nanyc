@@ -4,11 +4,11 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-namespace std;
+namespace std.console;
 
 
 
-public class Console
+public class Out
 {
 	func write(cref value: string)
 	{
@@ -33,52 +33,51 @@ public class Console
 	var colors
 		-> new bool(!!__nanyc_console_out_has_colors);
 
-	//! Error output
-	var error -> new Error;
-
-
-	class Error
-	{
-		func write(cref value)
-		{
-			var size = value.size.pod;
-			if size != 0__u32 then
-				!!__nanyc_console_err(value.m_cstr, size);
-		}
-
-		func write(cref value: bool)
-			-> write(if value then "true" else "false");
-
-
-		func write(cref value)
-			-> write((new string) += value);
-
-
-		func flush
-			-> !!__nanyc_console_err_flush;
-
-		//! Are colors supported
-		var colors
-			-> new bool(!!__nanyc_console_err_has_colors);
-
-	} // class Error
-
-
 } // class Console
 
 
-
-public operator << (ref console: std.Console, cref value): ref std.Console
+public class Error
 {
-	console.write(value);
-	return console;
+	func write(cref value)
+	{
+		var size = value.size.pod;
+		if size != 0__u32 then
+			!!__nanyc_console_err(value.m_cstr, size);
+	}
+
+	func write(cref value: bool)
+		-> write(if value then "true" else "false");
+
+
+	func write(cref value)
+		-> write((new string) += value);
+
+
+	func flush
+		-> !!__nanyc_console_err_flush;
+
+	//! Are colors supported
+	var colors
+		-> new bool(!!__nanyc_console_err_has_colors);
+
+} // class Error
+
+
+
+
+
+
+public operator << (ref out: std.console.Out, cref value): ref std.console.Out
+{
+	out.write(value);
+	return out;
 }
 
 
-public operator << (ref console: std.Console.Error, cref value): ref std.Console.Error
+public operator << (ref out: std.console.Error, cref value): ref std.console.Error
 {
-	console.write(value);
-	return console;
+	out.write(value);
+	return out;
 }
 
 
