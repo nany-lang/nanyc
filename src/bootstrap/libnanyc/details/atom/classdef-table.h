@@ -14,7 +14,6 @@ namespace Nany
 {
 
 	// forward class
-	class LocalVariables;
 	class ClassdefTableView;
 	class Atom;
 
@@ -190,7 +189,6 @@ namespace Nany
 		mutable LayerItem layer;
 
 		friend class ClassdefTableView;
-		friend class LocalVariables;
 
 	}; // class ClassdefTable
 
