@@ -379,9 +379,9 @@ int main(int argc, char** argv)
 			if (options.errors())
 			{
 				std::cout << "Abort due to error\n";
-				return 1;
+				return EXIT_FAILURE;
 			}
-			return 0;
+			return EXIT_SUCCESS;
 		}
 
 		if (optVersion)
