@@ -338,7 +338,7 @@ namespace
 
 	void shuffleUnittests(std::vector<String>& unittests)
 	{
-		std::cout << "shuffling the tests... (--shuffle)\n";
+		std::cout << "shuffling the tests...\n";
 		auto seed = std::chrono::system_clock::now().time_since_epoch().count();
 		auto useed = static_cast<uint32_t>(seed);
 		std::shuffle(unittests.begin(), unittests.end(), std::default_random_engine(useed));
@@ -357,6 +357,7 @@ int main(int argc, char** argv)
 	bool optListAll = false;
 	bool optWithNSLTests = false;
 	bool optShuffle = false;
+	uint32_t optRepeat = 1;
 
 	// The command line options parser
 	{
@@ -364,7 +365,8 @@ int main(int argc, char** argv)
 		options.addFlag(optListAll, 'l', "list", "List all unit tests");
 		options.addFlag(optToRun, 'r', "run", "Run a specific test");
 		options.add(jobCount, 'j', "job", "Specifies the number of jobs (commands) to run simultaneously");
-		options.addFlag(optShuffle, ' ', "shuffle", "Randomly rearrange unittests");
+		options.addFlag(optShuffle, ' ', "shuffle", "Randomly rearrange the tests");
+		options.add(optRepeat, ' ', "repeat", "Repeat the execution of the tests N times");
 		options.addFlag(optWithNSLTests, ' ', "with-nsl", "Import NSL unittests");
 		options.remainingArguments(remainingArgs);
 
@@ -429,13 +431,25 @@ int main(int argc, char** argv)
 		// no unittest provided from the command - default: all
 		if (optToRun.empty())
 			fetchUnittestList(runcf, optToRun, filelist.get(), filecount);
-		if (optShuffle)
-			shuffleUnittests(optToRun);
 
-		std::cout << '\n'; // for beauty
+		for (uint32_t r = 0; r != optRepeat; ++r)
+		{
+			if (optShuffle)
+				shuffleUnittests(optToRun);
 
-		bool success = runUnittsts(runcf, optToRun, filelist.get(), filecount);
-		exitcode = (success) ? EXIT_SUCCESS : EXIT_FAILURE;
+			if (optShuffle or optRepeat > 1)
+			{
+				std::cout << "running " << optToRun.size() << " tests...";
+				if (optRepeat > 1)
+					std::cout << " (pass " << (r + 1) << '/' << optRepeat << ')';
+				std::cout << '\n';
+			}
+			std::cout << '\n';
+
+			bool success = runUnittsts(runcf, optToRun, filelist.get(), filecount);
+			if (not success)
+				exitcode = EXIT_FAILURE;
+		}
 	}
 	return exitcode;
 }
