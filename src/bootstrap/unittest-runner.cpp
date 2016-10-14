@@ -369,7 +369,7 @@ int main(int argc, char** argv)
 	if (filecount == 0)
 		return printNoInputScript(argv[0]);
 
-	auto** filelist = (const char**) malloc(sizeof(char*) * filecount);
+	auto filelist = std::make_unique<const char*[]>(filecount);
 	{
 		String filename;
 		for (uint32_t i = 0; i != filecount; ++i)
@@ -391,7 +391,7 @@ int main(int argc, char** argv)
 
 	if (optListAll)
 	{
-		exitcode = listAllUnittests(runcf, filelist, filecount);
+		exitcode = listAllUnittests(runcf, filelist.get(), filecount);
 	}
 	else
 	{
@@ -413,12 +413,11 @@ int main(int argc, char** argv)
 
 		// no unittest provided from the command - default: all
 		if (optToRun.empty())
-			fetchUnittestList(runcf, optToRun, filelist, filecount);
+			fetchUnittestList(runcf, optToRun, filelist.get(), filecount);
 
-		bool success = runUnittsts(runcf, optToRun, filelist, filecount);
+		bool success = runUnittsts(runcf, optToRun, filelist.get(), filecount);
 		exitcode = (success) ? EXIT_SUCCESS : EXIT_FAILURE;
 	}
 
-	free(filelist);
 	return exitcode;
 }
