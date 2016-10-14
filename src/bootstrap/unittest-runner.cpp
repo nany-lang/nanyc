@@ -8,6 +8,8 @@
 #include <set>
 #include <iostream>
 #include <cassert>
+#include <random>
+#include <chrono>
 
 using namespace Yuni;
 
@@ -68,7 +70,7 @@ namespace
 			case 1: std::cout << "1 test found"; break;
 			default: std::cout << torun.size() << " tests found"; break;
 		}
-		std::cout << " (" << duration << "ms)\n\n";
+		std::cout << " (" << duration << "ms)\n";
 	}
 
 
@@ -198,7 +200,6 @@ namespace
 		int64_t duration = DateTime::NowMilliSeconds() - starttime;
 
 		success &= console.cerr.empty();
-
 
 		if (Fancy)
 		{
@@ -335,6 +336,15 @@ namespace
 	}
 
 
+	void shuffleUnittests(std::vector<String>& unittests)
+	{
+		std::cout << "shuffling the tests... (--shuffle)\n";
+		auto seed = std::chrono::system_clock::now().time_since_epoch().count();
+		auto useed = static_cast<uint32_t>(seed);
+		std::shuffle(unittests.begin(), unittests.end(), std::default_random_engine(useed));
+	}
+
+
 } // anonymous
 
 
@@ -346,6 +356,7 @@ int main(int argc, char** argv)
 	std::vector<String> remainingArgs;
 	bool optListAll = false;
 	bool optWithNSLTests = false;
+	bool optShuffle = false;
 
 	// The command line options parser
 	{
@@ -353,6 +364,7 @@ int main(int argc, char** argv)
 		options.addFlag(optListAll, 'l', "list", "List all unit tests");
 		options.addFlag(optToRun, 'r', "run", "Run a specific test");
 		options.add(jobCount, 'j', "job", "Specifies the number of jobs (commands) to run simultaneously");
+		options.addFlag(optShuffle, ' ', "shuffle", "Randomly rearrange unittests");
 		options.addFlag(optWithNSLTests, ' ', "with-nsl", "Import NSL unittests");
 		options.remainingArguments(remainingArgs);
 
@@ -411,12 +423,16 @@ int main(int argc, char** argv)
 			std::cout << "> from '" << filelist[i] << "'\n";
 		std::cout << '\n';
 
-		if (0 == jobCount)
-			System::CPU::Count();
+		if (0 == jobCount or jobCount > 128)
+			jobCount = System::CPU::Count();
 
 		// no unittest provided from the command - default: all
 		if (optToRun.empty())
 			fetchUnittestList(runcf, optToRun, filelist.get(), filecount);
+		if (optShuffle)
+			shuffleUnittests(optToRun);
+
+		std::cout << '\n'; // for beauty
 
 		bool success = runUnittsts(runcf, optToRun, filelist.get(), filecount);
 		exitcode = (success) ? EXIT_SUCCESS : EXIT_FAILURE;
