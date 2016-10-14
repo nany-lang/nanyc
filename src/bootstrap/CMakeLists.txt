@@ -199,7 +199,7 @@ set_target_properties(nanyc PROPERTIES
 #
 # nanyc-unittest
 #
-add_executable(nanyc-unittest "unittest-runner.cpp")
+add_executable(nanyc-unittest "unittest.cpp")
 target_link_libraries(nanyc-unittest PRIVATE libnanyc yuni-static-core)
 set_target_properties(nanyc-unittest PROPERTIES
 	VERSION "${nany_version_major}.${nany_version_minor}.${nany_version_patch}")
