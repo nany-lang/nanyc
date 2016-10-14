@@ -41,7 +41,7 @@ namespace
 	}
 
 
-	void fetchUnittestList(nyrun_cf_t& runcf, String::Vector& torun, const char** filelist, uint32_t count)
+	void fetchUnittestList(nyrun_cf_t& runcf, std::vector<String>& torun, const char** filelist, uint32_t count)
 	{
 		std::cout << "searching for unittests in all source files...\n" << std::flush;
 		runcf.build.entrypoint.size = 0; // disable any compilation by default
@@ -54,8 +54,8 @@ namespace
 		{
 			AnyString module{mod, modlen};
 			AnyString testname{name, nlen};
-			((String::Vector*) userdata)->emplace_back();
-			auto& element = ((String::Vector*) userdata)->back();
+			((std::vector<String>*) userdata)->emplace_back();
+			auto& element = ((std::vector<String>*) userdata)->back();
 			element << module << ':' << testname;
 		};
 		int64_t starttime = DateTime::NowMilliSeconds();
@@ -252,7 +252,7 @@ namespace
 	}
 
 
-	void printStatstics(const String::Vector& optToRun, int64_t duration, uint32_t successCount, uint32_t failCount)
+	void printStatstics(const std::vector<String>& optToRun, int64_t duration, uint32_t successCount, uint32_t failCount)
 	{
 		switch (optToRun.size())
 		{
@@ -293,7 +293,7 @@ namespace
 	}
 
 
-	bool runUnittsts(nyrun_cf_t& runcf, const String::Vector& optToRun, const char** filelist, uint32_t filecount)
+	bool runUnittsts(nyrun_cf_t& runcf, const std::vector<String>& optToRun, const char** filelist, uint32_t filecount)
 	{
 		if (optToRun.empty())
 		{
@@ -320,6 +320,21 @@ namespace
 	}
 
 
+	auto canonicalizeAllFilenames(std::vector<String>& remainingArgs)
+	{
+		auto filelist = std::make_unique<const char*[]>(remainingArgs.size());
+		String filename;
+		size_t i = 0;
+		for (auto& arg: remainingArgs)
+		{
+			IO::Canonicalize(filename, arg);
+			arg = filename;
+			filelist[i++] = arg.c_str();
+		}
+		return filelist;
+	}
+
+
 } // anonymous
 
 
@@ -327,9 +342,8 @@ namespace
 
 int main(int argc, char** argv)
 {
-	// options
-	String::Vector optToRun;
-	String::Vector remainingArgs;
+	std::vector<String> optToRun;
+	std::vector<String> remainingArgs;
 	bool optListAll = false;
 	bool optWithNSLTests = false;
 
@@ -342,7 +356,6 @@ int main(int argc, char** argv)
 		options.addFlag(optWithNSLTests, ' ', "with-nsl", "Import NSL unittests");
 		options.remainingArguments(remainingArgs);
 
-		// Help
 		options.addParagraph("\nHelp");
 		bool optBugreport = false;
 		options.addFlag(optBugreport, ' ', "bugreport", "Display some useful information to report a bug");
@@ -353,7 +366,7 @@ int main(int argc, char** argv)
 		{
 			if (options.errors())
 			{
-				std::cout << "Abort due to error" << std::endl;
+				std::cout << "Abort due to error\n";
 				return 1;
 			}
 			return 0;
@@ -365,20 +378,10 @@ int main(int argc, char** argv)
 			return printBugReportInfo();
 	}
 
-	uint32_t filecount = (uint32_t) remainingArgs.size();
+	auto filecount = static_cast<uint32_t>(remainingArgs.size());
 	if (filecount == 0)
 		return printNoInputScript(argv[0]);
-
-	auto filelist = std::make_unique<const char*[]>(filecount);
-	{
-		String filename;
-		for (uint32_t i = 0; i != filecount; ++i)
-		{
-			IO::Canonicalize(filename, remainingArgs[i]);
-			remainingArgs[i] = filename;
-			filelist[i] = remainingArgs[i].c_str();
-		}
-	}
+	auto filelist = canonicalizeAllFilenames(remainingArgs);
 
 	nyrun_cf_t runcf;
 	nyrun_cf_init(&runcf);
@@ -418,6 +421,5 @@ int main(int argc, char** argv)
 		bool success = runUnittsts(runcf, optToRun, filelist.get(), filecount);
 		exitcode = (success) ? EXIT_SUCCESS : EXIT_FAILURE;
 	}
-
 	return exitcode;
 }
