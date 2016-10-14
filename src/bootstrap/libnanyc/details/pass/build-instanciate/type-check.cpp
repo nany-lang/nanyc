@@ -131,8 +131,8 @@ namespace TypeCheck
 			return Match::strictEqual;
 
 		// constness
-		if (from.qualifiers.constant and (not to.qualifiers.constant))
-			return Match::none;
+		//if (from.qualifiers.constant and (not to.qualifiers.constant))
+		//	return Match::none;
 
 		// the target accepts anything
 		if (to.isAny())
