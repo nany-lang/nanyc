@@ -21,21 +21,8 @@ before_install:
     - if [ $TRAVIS_OS_NAME == linux ]; then ruby --version; rvm --version; bundle --version; gem --version; fi
     - if [ $TRAVIS_OS_NAME == linux ]; then gem install fpm; fi
     - if [ $TRAVIS_OS_NAME == linux ]; then gem env; fi
-    - if [ $TRAVIS_OS_NAME == linux ]; then export NPROC=$(nproc); fi
-    - if [ $TRAVIS_OS_NAME == macos ]; then export NPROC=1; fi
-install:
-    - if [ $TRAVIS_OS_NAME == linux -a "$CC" == "" ]; then export CC="gcc-4.9"; fi
-    - if [ $TRAVIS_OS_NAME == linux -a "$CXX" == "" ]; then export CXX="g++-4.9"; fi
-    - if [ $TRAVIS_OS_NAME == linux -a "$CC" == "gcc" ]; then export CC="gcc-4.9"; fi
-    - if [ $TRAVIS_OS_NAME == linux -a "$CXX" == "g++" ]; then export CXX="g++-4.9"; fi
 script:
-    - env
-    - cd src/bootstrap
-    - cmake . -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
-    - make -j ${NPROC}
-    - make check
-    - if [ $TRAVIS_OS_NAME == linux ]; then make package-deb; fi
-    - cd ../../ && ls -lh ./distrib
+    - assets/build/build.sh
 notifications:
     slack:
         rooms:
