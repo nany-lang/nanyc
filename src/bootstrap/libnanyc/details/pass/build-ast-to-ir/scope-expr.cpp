@@ -114,6 +114,7 @@ namespace Producer
 
 				case AST::rgIn:         success &= visitASTExprIn(child, localvar); break;
 				case AST::rgFunction:   success &= visitASTExprClosure(child, localvar); break;
+				case AST::rgObject:     success &= visitASTExprObject(child, localvar); break;
 
 				case AST::rgAttributes: success &= visitASTAttributes(child); break;
 

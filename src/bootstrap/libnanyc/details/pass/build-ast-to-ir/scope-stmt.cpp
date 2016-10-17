@@ -97,6 +97,7 @@ namespace Producer
 			case AST::rgTypedef: return visitASTTypedef(node);
 
 			case AST::rgClassVisibility: /*currently ignored */ return true;
+			case AST::rgFunction: return visitASTFunc(node);
 
 			default: return unexpectedNode(node, "[ir/stmt]");
 		}

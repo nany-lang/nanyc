@@ -44,7 +44,7 @@ namespace Producer
 					break; // operator =
 				}
 				default:
-					return unexpectedNode(assignChild, "[var]");
+					return unexpectedNode(assignChild, "[var/init]");
 			}
 		}
 		return true;

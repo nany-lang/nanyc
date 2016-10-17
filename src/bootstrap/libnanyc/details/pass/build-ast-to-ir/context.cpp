@@ -560,6 +560,22 @@ namespace Producer
 	}
 
 
+	void Context::prepareReuseForAnonymObjects()
+	{
+		// expr-group
+		// |   expr-value
+		// |       new
+		// |           type-decl
+		// |               class
+		// |                   class-body
+
+		AST::Node::Ptr root = new AST::Node{AST::rgExprGroup};
+		reuse.object.node = root;
+		auto& typedecl = root->append(AST::rgExprValue, AST::rgNew, AST::rgTypeDecl);
+		reuse.object.classbody = &typedecl.append(AST::rgClass, AST::rgClassBody);
+	}
+
+
 
 
 } // namespace Producer
