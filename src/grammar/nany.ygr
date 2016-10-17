@@ -602,17 +602,8 @@ object-entry: notext
 
 object: notext
 	tk-brace-open
-	(object-entry (wp tk-comma wp object-entry)* (wp tk-comma)?)?
-	wp
+	object-entry (wp tk-comma wp object-entry)* wp
 	tk-brace-close
-
-dict-entry: notext
-	expr wp tk-colon wp expr wp
-
-dict: notext
-	tk-bracket-open
-	wp dict-entry (tk-comma wp dict-entry)*
-	tk-bracket-close
 
 
 
@@ -984,7 +975,6 @@ ex-value: hidden
 		| identifier
 		| number-def
 		| string
-		| dict
 		| interval
 		| array
 		| env-var
