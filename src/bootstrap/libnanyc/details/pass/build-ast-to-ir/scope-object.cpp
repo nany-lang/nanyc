@@ -74,11 +74,34 @@ namespace Producer
 					assert(identifier != nullptr); // invalid ast
 					assert(expr != nullptr);
 
-					AST::Node::Ptr var = new AST::Node{AST::rgVar};
-					var->append(AST::rgVarByValue);
-					var->children.push_back(identifier);
-					(var->append(AST::rgVarProperty)).children.push_back(expr);
-					classbody.children.push_back(var);
+					auto& grandChild = expr->firstChild().firstChild();
+					bool isFunc = grandChild.rule == AST::rgFunction;
+
+					if (not isFunc)
+					{
+						AST::Node::Ptr var = new AST::Node{AST::rgVar};
+						var->append(AST::rgVarByValue);
+						var->children.push_back(identifier);
+						(var->append(AST::rgVarProperty)).children.push_back(expr);
+						classbody.children.push_back(var);
+					}
+					else
+					{
+						bool found = not grandChild.each(AST::rgFunctionKind, [&](AST::Node& subnode) -> bool
+						{
+							subnode.each(AST::rgFunctionKindFunction, [&](AST::Node& kind) -> bool {
+								kind.children.clear();
+								kind.append(AST::rgSymbolName).children.push_back(identifier);
+								found = true;
+								return false;
+							});
+							return false;
+						});
+						if (found)
+							classbody.children.push_back(&grandChild);
+						else
+							error(child) << "failed to update function name";
+					}
 					break;
 				}
 				default:
