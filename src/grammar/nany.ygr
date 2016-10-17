@@ -961,10 +961,10 @@ expr-value: notext
 	| each
 	| in
 	| intrinsic
-	| scope
 	| function
 	| unittest
 	| ex-value
+	| scope
 
 ex-value: hidden
 	// all expr which can be continued
