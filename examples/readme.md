@@ -221,6 +221,22 @@ func main
 
 
 
+## Anonymous classes
+
+```nany
+func createButton: any -> {
+	click: func {
+		console << "Clicked !\n";
+	}
+}
+
+func main {
+	var button = createButton();
+	button.click();
+}
+```
+
+
 ## Resources
 
  * [Feature Matrix](http://nany.io/en/feature-matrix/)
