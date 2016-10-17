@@ -122,6 +122,7 @@ namespace Producer
 		bool visitASTExprIn(AST::Node&, LVID& localvar);
 		bool visitASTExprIn(AST::Node&, LVID& localvar, Yuni::ShortString128& elementname);
 		bool visitASTExprClosure(AST::Node&, uint32_t& localvar);
+		bool visitASTExprObject(AST::Node&, uint32_t& localvar);
 
 		bool visitASTExprTemplate(AST::Node&, LVID& localvar);
 		bool visitASTDeclGenericTypeParameters(AST::Node&);

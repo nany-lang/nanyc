@@ -79,6 +79,8 @@ namespace Producer
 		void prepareReuseForPropertiesSET();
 		//! re-use objects for unittest
 		void prepareReuseForUnittest();
+		//! re-use objects for anonymous objects
+		void prepareReuseForAnonymObjects();
 		//@}
 
 
@@ -213,6 +215,12 @@ namespace Producer
 				Yuni::ShortString32 value;
 			}
 			attributes;
+
+			struct {
+				AST::Node::Ptr node;
+				AST::Node* classbody = nullptr;
+			}
+			object;
 		}
 		reuse;
 

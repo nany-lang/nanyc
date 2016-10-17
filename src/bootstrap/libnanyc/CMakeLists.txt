@@ -222,6 +222,7 @@ addsrc(
 	"details/pass/build-ast-to-ir/scope-typeof.cpp"
 	"details/pass/build-ast-to-ir/scope-typedef.cpp"
 	"details/pass/build-ast-to-ir/scope-new.cpp"
+	"details/pass/build-ast-to-ir/scope-object.cpp"
 	"details/pass/build-ast-to-ir/scope-var.cpp"
 	"details/pass/build-ast-to-ir/scope-class.cpp"
 	"details/pass/build-ast-to-ir/scope-expr.cpp"
