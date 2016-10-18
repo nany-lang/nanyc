@@ -551,6 +551,13 @@ namespace IR
 		opc.value.shortcircuitMutate.source = source;
 	}
 
+	inline void Sequence::emitCommonType(uint32_t lvid, uint32_t previous)
+	{
+		auto& opc = emit<ISA::Op::commontype>();
+		opc.lvid = lvid;
+		opc.previous = previous;
+	}
+
 	inline uint32_t Sequence::emitLabel(uint32_t labelid)
 	{
 		emit<IR::ISA::Op::label>().label = labelid;

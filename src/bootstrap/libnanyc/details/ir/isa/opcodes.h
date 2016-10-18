@@ -172,6 +172,8 @@ namespace ISA //!< Instruction Set Architecture
 		//! try to identify completely the type of sub expression
 		// (if not already done by 'identity')
 		ensureresolved,
+		//! common type
+		commontype,
 		//! assign a variable to another
 		assign,
 		//! declare a register as 'self'
@@ -308,6 +310,7 @@ namespace ISA //!< Instruction Set Architecture
 				LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::identify) \
 				LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::identifyset) \
 				LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::ensureresolved) \
+				LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::commontype) \
 				LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::assign) \
 				LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::self) \
 				LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::comment) \
