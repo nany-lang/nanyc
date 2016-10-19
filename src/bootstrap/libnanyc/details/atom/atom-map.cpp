@@ -10,6 +10,51 @@ using namespace Yuni;
 namespace Nany
 {
 
+	namespace {
+
+
+	bool createDummyAtom(Atom::Ptr& out)
+	{
+		out = Atom::createDummy();
+		out->builtinMapping = nyt_void;
+		return true;
+	}
+
+
+	bool findCoreObject(Atom::Ptr& out, nytype_t kind, const AnyString& name, Atom& root)
+	{
+		if (not Config::importNSL)
+			return createDummyAtom(out);
+
+		Atom* atom = nullptr;
+		switch (root.findClassAtom(atom, name))
+		{
+			case 1:
+			{
+				assert(atom != nullptr);
+				out = atom;
+				atom->builtinMapping = kind;
+				return true;
+			}
+			case 0:
+			{
+				error() << "failed to find builtin 'class " << name << "' from nsl";
+				break;
+			}
+			default:
+			{
+				error() << "multiple definition for 'class" << name << "'";
+			}
+		}
+		return false;
+	}
+
+
+	} // anonymous namespace
+
+
+
+
 	AtomMap::AtomMap(StringRefs& stringrefs)
 		: root(AnyString(), Atom::Type::namespacedef) // global namespace
 		, stringrefs(stringrefs)
@@ -28,11 +73,22 @@ namespace Nany
 	}
 
 
+	Atom* AtomMap::createVardef(Atom& parent, const AnyString& name)
+	{
+		assert(not name.empty());
+		auto* atom = createNewAtom(Atom::Type::vardef, parent, name);
+		auto fieldindex = parent.classinfo.nextFieldIndex++;
+		atom->varinfo.fieldindex = fieldindex;
+		atom->varinfo.effectiveFieldIndex = fieldindex;
+		return atom;
+	}
+
+
 	const IR::Sequence* AtomMap::fetchSequence(uint32_t atomid, uint32_t instanceid) const
 	{
-		if (atomid < pByIndex.size())
-			return pByIndex[atomid]->fetchInstance(instanceid);
-		return nullptr;
+		return (atomid < pByIndex.size())
+			? pByIndex[atomid]->fetchInstance(instanceid)
+			: nullptr;
 	}
 
 
@@ -42,46 +98,6 @@ namespace Nany
 			return pByIndex[atomid]->fetchInstanceCaption(instanceid);
 		return AnyString{};
 	}
-
-
-
-
-	namespace // anonymous
-	{
-		static inline bool findCoreObject(Atom::Ptr& out, nytype_t kind, const AnyString& name, Atom& root)
-		{
-			if (Config::importNSL)
-			{
-				Atom* atom;
-				switch (root.findClassAtom(atom, name))
-				{
-					case 1:
-					{
-						out = atom;
-						atom->builtinMapping = kind;
-						return true;
-					}
-					case 0:
-					{
-						error() << "failed to find builtin 'class " << name << "' from nsl";
-						break;
-					}
-					default:
-					{
-						error() << "multiple definition for 'class" << name << "'";
-					}
-				}
-				return false;
-			}
-			else
-			{
-				out = Atom::createDummy();
-				out->builtinMapping = nyt_void;
-				return true;
-			}
-		}
-
-	} // anonymous namespace
 
 
 	bool AtomMap::fetchAndIndexCoreObjects()
@@ -112,7 +128,6 @@ namespace Nany
 		}
 		return success;
 	}
-
 
 
 } // namespace Nany
