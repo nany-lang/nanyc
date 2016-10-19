@@ -317,14 +317,14 @@ namespace Nany
 	}
 
 
-	inline const IR::Sequence& Atom::instance(uint32_t instanceid) const
+	inline const IR::Sequence& Atom::sequence(uint32_t instanceid) const
 	{
 		assert(instanceid < instances.size());
 		return *(instances[instanceid].get());
 	}
 
 
-	inline const IR::Sequence* Atom::fetchInstance(uint32_t instanceid) const
+	inline const IR::Sequence* Atom::sequenceIfExists(uint32_t instanceid) const
 	{
 		return (instanceid < instances.size()) ? instances[instanceid].get() : nullptr;
 	}

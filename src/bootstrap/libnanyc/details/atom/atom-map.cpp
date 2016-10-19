@@ -84,14 +84,6 @@ namespace Nany
 	}
 
 
-	const IR::Sequence* AtomMap::fetchSequence(uint32_t atomid, uint32_t instanceid) const
-	{
-		return (atomid < pByIndex.size())
-			? pByIndex[atomid]->fetchInstance(instanceid)
-			: nullptr;
-	}
-
-
 	AnyString AtomMap::fetchSequenceCaption(uint32_t atomid, uint32_t instanceid) const
 	{
 		if (atomid < pByIndex.size())

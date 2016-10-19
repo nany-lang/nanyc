@@ -39,8 +39,10 @@ namespace Nany
 		Atom* createUnit(Atom& parent, const AnyString& name);
 
 
-		const IR::Sequence* fetchSequence(uint32_t atomid, uint32_t instanceid) const;
+		//! Find the IR sequence for a given {atomid/instanceid} (null if not found)
+		const IR::Sequence* sequenceIfExists(uint32_t atomid, uint32_t instanceid) const;
 
+		//! Find the IR sequence for a given {atomid/instanceid}
 		const IR::Sequence& sequence(uint32_t atomid, uint32_t instanceid) const;
 
 		//! Retrieve the human readable name of an atom (empty if not found)

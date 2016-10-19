@@ -345,14 +345,14 @@ namespace Nany
 		AnyString findInstanceCaption(const IR::Sequence&) const;
 
 		//! Fetch the sequence according its instance id
-		const IR::Sequence* fetchInstance(uint32_t instanceid) const;
+		const IR::Sequence* sequenceIfExists(uint32_t instanceid) const;
 
 		AnyString fetchInstanceCaption(uint32_t instanceid) const;
 
 		/*!
 		** \brief Fetch the sequence according its instance id
 		*/
-		const IR::Sequence& instance(uint32_t instanceid) const;
+		const IR::Sequence& sequence(uint32_t instanceid) const;
 
 		/*!
 		** \brief Keep an instance of the atom for a given signature
