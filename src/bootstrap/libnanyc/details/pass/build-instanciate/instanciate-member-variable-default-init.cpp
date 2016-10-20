@@ -26,7 +26,7 @@ namespace Instanciate
 			return (void)(ice() << "invalid parent atom for variable initialization in ctor");
 
 		auto& parentAtom = *(funcAtom.parent);
-		if (parentAtom.empty())
+		if (not parentAtom.hasChildren())
 			return;
 
 

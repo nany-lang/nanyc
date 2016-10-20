@@ -319,8 +319,8 @@ namespace Nany
 		//! Get the number of children
 		uint32_t size() const;
 
-		//! Get if the atom is empty (no child)
-		bool empty() const;
+		//! Get if this atom owns children (sub-classes, methods...)
+		bool hasChildren() const;
 		//@}
 
 

@@ -358,9 +358,9 @@ namespace Nany
 	}
 
 
-	inline bool Atom::empty() const
+	inline bool Atom::hasChildren() const
 	{
-		return m_children.empty();
+		return not m_children.empty();
 	}
 
 
