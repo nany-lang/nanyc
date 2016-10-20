@@ -42,16 +42,17 @@ namespace Nany
 	}
 
 
-	inline const IR::Sequence& AtomMap::sequence(uint32_t atomid, uint32_t instanceid) const
+	inline const IR::Sequence& AtomMap::sequence(uint32_t atomid, uint32_t index) const
 	{
 		assert(atomid < m_byIndex.size());
-		return m_byIndex[atomid]->sequence(instanceid);
+		return m_byIndex[atomid]->instantiation(index).sequence();
 	}
 
 
-	inline const IR::Sequence* AtomMap::sequenceIfExists(uint32_t atomid, uint32_t instanceid) const
+	inline const IR::Sequence* AtomMap::sequenceIfExists(uint32_t atomid, uint32_t index) const
 	{
-		return (atomid < m_byIndex.size()) ? m_byIndex[atomid]->sequenceIfExists(instanceid) : nullptr;
+		return (atomid < m_byIndex.size())
+			? m_byIndex[atomid]->instantiation(index).sequenceIfExists() : nullptr;
 	}
 
 

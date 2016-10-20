@@ -317,35 +317,6 @@ namespace Nany
 	}
 
 
-	inline const IR::Sequence& Atom::sequence(uint32_t instanceid) const
-	{
-		assert(instanceid < instances.size());
-		return *(instances[instanceid].get());
-	}
-
-
-	inline const IR::Sequence* Atom::sequenceIfExists(uint32_t instanceid) const
-	{
-		return (instanceid < instances.size()) ? instances[instanceid].get() : nullptr;
-	}
-
-
-	inline AnyString Atom::fetchInstanceCaption(uint32_t instanceid) const
-	{
-		return (instanceid < instances.size())
-			? AnyString{m_instancesMD[instanceid].symbol} : AnyString{};
-	}
-
-
-	inline void Atom::updateInstance(uint32_t id, Yuni::String& symbol, const Classdef& rettype)
-	{
-		auto& md = m_instancesMD[id];
-		md.rettype.import(rettype);
-		md.rettype.qualifiers = rettype.qualifiers;
-		md.symbol.swap(symbol);
-	}
-
-
 	inline uint64_t Atom::runtimeSizeof() const
 	{
 		return classinfo.nextFieldIndex * sizeof(uint64_t);
@@ -361,6 +332,32 @@ namespace Nany
 	inline bool Atom::hasChildren() const
 	{
 		return not m_children.empty();
+	}
+
+
+	inline Atom::InstantiationRef Atom::instantiation(uint32_t index) const
+	{
+		return InstantiationRef{*this, index};
+	}
+
+
+	inline const IR::Sequence* Atom::InstantiationRef::sequenceIfExists() const
+	{
+		return (m_index < m_atom.instances.size()) ? m_atom.instances[m_index].get() : nullptr;
+	}
+
+
+	inline const IR::Sequence& Atom::InstantiationRef::sequence() const
+	{
+		assert(m_index < m_atom.instances.size());
+		return *(m_atom.instances[m_index].get());
+	}
+
+
+	inline AnyString Atom::InstantiationRef::symbolname() const
+	{
+		return (m_index < m_atom.instances.size())
+			? AnyString{m_atom.m_instancesMD[m_index].symbol} : AnyString{};
 	}
 
 

@@ -40,13 +40,13 @@ namespace Nany
 
 
 		//! Find the IR sequence for a given {atomid/instanceid} (null if not found)
-		const IR::Sequence* sequenceIfExists(uint32_t atomid, uint32_t instanceid) const;
+		const IR::Sequence* sequenceIfExists(uint32_t atomid, uint32_t index) const;
 
 		//! Find the IR sequence for a given {atomid/instanceid}
-		const IR::Sequence& sequence(uint32_t atomid, uint32_t instanceid) const;
+		const IR::Sequence& sequence(uint32_t atomid, uint32_t index) const;
 
 		//! Retrieve the human readable name of an atom (empty if not found)
-		AnyString fetchSequenceCaption(uint32_t atomid, uint32_t instanceid) const;
+		AnyString symbolname(uint32_t atomid, uint32_t index) const;
 
 		//! Retrive an Atom object from its unique id (const)
 		const Atom* findAtom(uint32_t atomid) const;

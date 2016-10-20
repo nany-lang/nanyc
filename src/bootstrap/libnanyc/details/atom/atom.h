@@ -145,6 +145,23 @@ namespace Nany
 		};
 
 
+		struct InstantiationRef final
+		{
+			InstantiationRef(const Atom& atom, uint32_t index): m_atom(atom), m_index(index) {}
+
+			//! Get the attached IR sequence
+			const IR::Sequence& sequence() const;
+			//! Get the attached IR sequence, if any
+			const IR::Sequence* sequenceIfExists() const;
+			//! Get the symbol name of the instantiation (with fully qualified types)
+			AnyString symbolname() const;
+
+		private:
+			const Atom& m_atom;
+			uint32_t m_index;
+		};
+
+
 	public:
 		//! Create a dummy atom
 		static Atom* createDummy();
@@ -330,47 +347,34 @@ namespace Nany
 		uint64_t runtimeSizeof() const;
 		//@}
 
-
-		//! \name Instances
+		//! \name Instantiations
 		//@{
-		/*!
-		** \brief Fetch the sequence for a given signature (if any) and update the signature
-		*/
-		Yuni::Tribool::Value
-		findInstance(const Signature& signature, uint32_t& iid, Classdef&, Atom*& remapAtom) const;
-		//! Find Instance ID
-		uint32_t findInstanceID(const IR::Sequence&) const;
-
-		//! Get the caption for a sequence instance
-		AnyString findInstanceCaption(const IR::Sequence&) const;
-
-		//! Fetch the sequence according its instance id
-		const IR::Sequence* sequenceIfExists(uint32_t instanceid) const;
-
-		AnyString fetchInstanceCaption(uint32_t instanceid) const;
-
-		/*!
-		** \brief Fetch the sequence according its instance id
-		*/
-		const IR::Sequence& sequence(uint32_t instanceid) const;
+		//! Retrieve information about the Nth instantiation of this atom
+		InstantiationRef instantiation(uint32_t index) const;
 
 		/*!
 		** \brief Keep an instance of the atom for a given signature
-		**
 		** \param signature The signature of the atom (parameters)
 		** \param sequence The sequence itself (must not be null)
+		** \return index of the instantiation
 		*/
-		uint32_t createInstanceID(const Signature& signature, IR::Sequence* sequence, Atom* remapAtom);
+		uint32_t createInstantiation(const Signature& signature, IR::Sequence* sequence, Atom* remapAtom);
 
 		/*!
 		** \brief Update atom instance
 		** \param symbol The complete symbol name (ex: "func A.foo(b: ref __i32): ref __i32")
 		** \note The content of 'symbol' will be moved to avoid memory allocation
 		*/
-		void updateInstance(uint32_t id, Yuni::String& symbol, const Classdef& rettype);
+		void updateInstantiation(uint32_t index, Yuni::String&& symbol, const Classdef& rettype);
 
-		//! Mark as invalid a given signature
-		uint32_t invalidateInstance(const Signature& signature, uint32_t id);
+		//! Mark the instantiation (and its signature) as invalid
+		// (always returns -1)
+		uint32_t invalidateInstantiation(uint32_t index, const Signature& signature);
+
+		/*!
+		** \brief Fetch the sequence for a given signature (if any) and update the signature
+		*/
+		Yuni::Tribool::Value isInstantiationValid(const Signature& signature, uint32_t& iid, Classdef&, Atom*& remapAtom) const;
 		//@}
 
 

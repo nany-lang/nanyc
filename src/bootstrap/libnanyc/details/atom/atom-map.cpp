@@ -84,10 +84,10 @@ namespace Nany
 	}
 
 
-	AnyString AtomMap::fetchSequenceCaption(uint32_t atomid, uint32_t instanceid) const
+	AnyString AtomMap::symbolname(uint32_t atomid, uint32_t index) const
 	{
 		if (atomid < m_byIndex.size())
-			return m_byIndex[atomid]->fetchInstanceCaption(instanceid);
+			return m_byIndex[atomid]->instantiation(index).symbolname();
 		return AnyString{};
 	}
 
