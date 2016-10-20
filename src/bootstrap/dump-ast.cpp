@@ -4,6 +4,7 @@
 #include <yuni/core/getopt.h>
 #include "details/grammar/nany.h"
 #include <iostream>
+#include <vector>
 
 using namespace Yuni;
 
@@ -46,7 +47,7 @@ static int printVersion()
 int main(int argc, char** argv)
 {
 	// all input filenames
-	String::Vector filenames;
+	std::vector<String> filenames;
 	// no colors
 	bool noColors = false;
 
