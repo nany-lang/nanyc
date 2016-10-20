@@ -67,7 +67,7 @@ namespace Instanciate
 		// process user-defined parameters
 
 		std::vector<std::reference_wrapper<Atom>> atomvars;
-		atomvars.reserve(parentAtom.size());
+		atomvars.reserve(parentAtom.childrenCount());
 
 		parentAtom.eachChild([&](Atom& subatom) -> bool
 		{

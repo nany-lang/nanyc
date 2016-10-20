@@ -317,7 +317,7 @@ namespace Nany
 		bool findParent(const Atom& atom) const;
 
 		//! Get the number of children
-		uint32_t size() const;
+		uint32_t childrenCount() const;
 
 		//! Get if this atom owns children (sub-classes, methods...)
 		bool hasChildren() const;

@@ -310,7 +310,7 @@ namespace Mapping
 		{
 			// if a generic type parameter, generating an implicit typedef
 			Atom& atom = atomStack->currentAtomNotUnit();
-			auto pindex = atom.size(); // children are currently only typedefs from gen params
+			auto pindex = atom.childrenCount(); // children are currently only typedefs from generic params
 			auto* newAliasAtom = cdeftable.atoms.createTypealias(atom, name);
 			newAliasAtom->classinfo.isInstanciated = true;
 			cdeftable.registerAtom(newAliasAtom);

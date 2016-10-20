@@ -352,7 +352,7 @@ namespace Nany
 	}
 
 
-	inline uint32_t Atom::size() const
+	inline uint32_t Atom::childrenCount() const
 	{
 		return (uint32_t) m_children.size();
 	}
