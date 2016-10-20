@@ -16,16 +16,16 @@ using namespace Yuni;
 #define unlikely(X)  YUNI_UNLIKELY(X)
 
 
+namespace {
 
 
-static bool printAST(const AnyString filename, bool unixcolors)
+bool printAST(const AnyString filename, bool unixcolors)
 {
 	if (filename.empty())
 		return false;
 
 	Nany::AST::Parser parser;
 	bool success = parser.loadFromFile(filename);
-
 	if (parser.root != nullptr) // the AST might be empty
 	{
 		Clob out;
@@ -36,12 +36,17 @@ static bool printAST(const AnyString filename, bool unixcolors)
 }
 
 
-static int printVersion()
+int printVersion()
 {
 	assert(strlen(YUNI_STRINGIZE(NANY_VERSION)) >= 5 and "empty version");
 	std::cout << YUNI_STRINGIZE(NANY_VERSION) << '\n';
 	return EXIT_SUCCESS;
 }
+
+
+} // namespace
+
+
 
 
 int main(int argc, char** argv)
@@ -98,11 +103,9 @@ int main(int argc, char** argv)
 		}
 	}
 
-
 	// colors
 	bool withColors = ((not noColors) and System::Console::IsStdoutTTY());
 	bool success = true;
-
 	for (auto& path: filenames)
 		success &= printAST(path, withColors);
 
