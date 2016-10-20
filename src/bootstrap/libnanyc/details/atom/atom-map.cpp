@@ -59,16 +59,16 @@ namespace Nany
 		: root(AnyString(), Atom::Type::namespacedef) // global namespace
 		, stringrefs(stringrefs)
 	{
-		// since `pAtomGrpID` will start from 1
-		pByIndex.push_back(nullptr);
+		// since `m_atomGrpID` will start from 1
+		m_byIndex.push_back(nullptr);
 	}
 
 
 	Atom* AtomMap::createNewAtom(Atom::Type type, Atom& parent, const AnyString& name)
 	{
 		auto* newnode   = new Atom(parent, stringrefs.refstr(name), type);
-		newnode->atomid = ++pAtomGrpID;
-		pByIndex.emplace_back(newnode);
+		newnode->atomid = ++m_atomGrpID;
+		m_byIndex.emplace_back(newnode);
 		return newnode;
 	}
 
@@ -86,8 +86,8 @@ namespace Nany
 
 	AnyString AtomMap::fetchSequenceCaption(uint32_t atomid, uint32_t instanceid) const
 	{
-		if (atomid < pByIndex.size())
-			return pByIndex[atomid]->fetchInstanceCaption(instanceid);
+		if (atomid < m_byIndex.size())
+			return m_byIndex[atomid]->fetchInstanceCaption(instanceid);
 		return AnyString{};
 	}
 

@@ -16,111 +16,111 @@ namespace IR
 
 	inline Sequence::~Sequence()
 	{
-		free(pBody);
+		free(m_body);
 	}
 
 
 	inline size_t Sequence::sizeInBytes() const
 	{
-		return pCapacity * sizeof(Instruction) + stringrefs.sizeInBytes();
+		return m_capacity * sizeof(Instruction) + stringrefs.sizeInBytes();
 	}
 
 
 	inline void Sequence::reserve(uint32_t count)
 	{
-		if (pCapacity < count)
+		if (m_capacity < count)
 			grow(count);
 	}
 
 
 	inline uint32_t Sequence::opcodeCount() const
 	{
-		return pSize;
+		return m_size;
 	}
 
 
 	inline uint32_t Sequence::capacity() const
 	{
-		return pCapacity;
+		return m_capacity;
 	}
 
 
 	inline const Instruction& Sequence::at(uint32_t offset) const
 	{
-		assert(offset < pSize);
-		return pBody[offset];
+		assert(offset < m_size);
+		return m_body[offset];
 	}
 
 
 	inline Instruction& Sequence::at(uint32_t offset)
 	{
-		assert(offset < pSize);
-		return pBody[offset];
+		assert(offset < m_size);
+		return m_body[offset];
 	}
 
 
 	template<ISA::Op O> inline ISA::Operand<O>& Sequence::at(uint32_t offset)
 	{
-		assert(offset < pSize);
-		static_assert(sizeof(Instruction) >= sizeof(ISA::Operand<O>), "pSize mismatch");
-		return reinterpret_cast<ISA::Operand<O>&>(pBody[offset]);
+		assert(offset < m_size);
+		static_assert(sizeof(Instruction) >= sizeof(ISA::Operand<O>), "m_size mismatch");
+		return reinterpret_cast<ISA::Operand<O>&>(m_body[offset]);
 	}
 
 
 	template<ISA::Op O> inline const ISA::Operand<O>& Sequence::at(uint32_t offset) const
 	{
-		assert(offset < pSize);
-		static_assert(sizeof(Instruction) >= sizeof(ISA::Operand<O>), "pSize mismatch");
-		return reinterpret_cast<ISA::Operand<O>&>(pBody[offset]);
+		assert(offset < m_size);
+		static_assert(sizeof(Instruction) >= sizeof(ISA::Operand<O>), "m_size mismatch");
+		return reinterpret_cast<ISA::Operand<O>&>(m_body[offset]);
 	}
 
 
 	inline uint32_t Sequence::offsetOf(const Instruction& instr) const
 	{
-		assert(pSize > 0 and pCapacity > 0);
-		assert(&instr >= pBody);
-		assert(&instr <  pBody + pSize);
+		assert(m_size > 0 and m_capacity > 0);
+		assert(&instr >= m_body);
+		assert(&instr <  m_body + m_size);
 
-		auto start = reinterpret_cast<std::uintptr_t>(pBody);
+		auto start = reinterpret_cast<std::uintptr_t>(m_body);
 		auto end   = reinterpret_cast<std::uintptr_t>(&instr);
 		assert((end - start) / sizeof(Instruction) < 512 * 1024 * 1024); // arbitrary
 
 		uint32_t r = static_cast<uint32_t>(((end - start) / sizeof(Instruction)));
-		assert(r < pSize);
+		assert(r < m_size);
 		return r;
 	}
 
 	inline bool Sequence::isCursorValid(const Instruction& instr) const
 	{
-		return (pSize > 0 and pCapacity > 0)
-			and (&instr >= pBody)
-			and (&instr <  pBody + pSize);
+		return (m_size > 0 and m_capacity > 0)
+			and (&instr >= m_body)
+			and (&instr <  m_body + m_size);
 	}
 
 
 	template<ISA::Op O>
 	inline uint32_t Sequence::offsetOf(const ISA::Operand<O>& instr) const
 	{
-		static_assert(sizeof(Instruction) >= sizeof(ISA::Operand<O>), "pSize mismatch");
+		static_assert(sizeof(Instruction) >= sizeof(ISA::Operand<O>), "m_size mismatch");
 		return offsetOf(IR::Instruction::fromOpcode(instr));
 	}
 
 
 	inline void Sequence::invalidateCursor(const Instruction*& cursor) const
 	{
-		cursor = pBody + pSize;
+		cursor = m_body + m_size;
 	}
 
 
 	inline void Sequence::invalidateCursor(Instruction*& cursor) const
 	{
-		cursor = pBody + pSize;
+		cursor = m_body + m_size;
 	}
 
 
 	inline bool Sequence::jumpToLabelForward(const Instruction*& cursor, uint32_t label) const
 	{
-		const auto* const end = pBody + pSize;
+		const auto* const end = m_body + m_size;
 		const Instruction* instr = cursor;
 		while (++instr < end)
 		{
@@ -141,7 +141,7 @@ namespace IR
 
 	inline bool Sequence::jumpToLabelBackward(const Instruction*& cursor, uint32_t label) const
 	{
-		const auto* const base = pBody;
+		const auto* const base = m_body;
 		const Instruction* instr = cursor;
 		while (instr-- > base)
 		{
@@ -162,15 +162,15 @@ namespace IR
 
 	template<class T> inline void Sequence::each(T& visitor, uint32_t offset)
 	{
-		if (likely(offset < pSize))
+		if (likely(offset < m_size))
 		{
-			auto* it = pBody + offset;
-			const auto* const end = pBody + pSize;
+			auto* it = m_body + offset;
+			const auto* const end = m_body + m_size;
 			visitor.cursor = &it;
 			for ( ; it < end; ++it)
 			{
 				#if NANY_PRINT_sequence_OPCODES != 0
-				std::cout << "== opcode == at " << (it - pBody) << "|" << (void*) it << " :: "
+				std::cout << "== opcode == at " << (it - m_body) << "|" << (void*) it << " :: "
 					<< it->opcodes[0] << ": " << IR::ISA::print(*this, *it) << '\n';
 				#endif
 				LIBNANYC_IR_VISIT_SEQUENCE(IR::ISA::Operand, visitor, *it);
@@ -181,15 +181,15 @@ namespace IR
 
 	template<class T> inline void Sequence::each(T& visitor, uint32_t offset) const
 	{
-		if (likely(offset < pSize))
+		if (likely(offset < m_size))
 		{
-			const auto* it = pBody + offset;
-			const auto* const end = pBody + pSize;
+			const auto* it = m_body + offset;
+			const auto* const end = m_body + m_size;
 			visitor.cursor = &it;
 			for ( ; it < end; ++it)
 			{
 				#if NANY_PRINT_sequence_OPCODES != 0
-				std::cout << "== opcode == at " << (it - pBody) << "|" << (void*) it << " :: "
+				std::cout << "== opcode == at " << (it - m_body) << "|" << (void*) it << " :: "
 					<< it->opcodes[0] << ": " << IR::ISA::print(*this, *it) << '\n';
 				#endif
 				LIBNANYC_IR_VISIT_SEQUENCE(const IR::ISA::Operand, visitor, *it);
@@ -203,9 +203,9 @@ namespace IR
 
 	template<ISA::Op O> inline ISA::Operand<O>& Sequence::emitraw()
 	{
-		static_assert(sizeof(Instruction) >= sizeof(ISA::Operand<O>), "pSize mismatch");
-		assert(pSize + 1 <= pCapacity);
-		auto& result = at<O>(pSize++);
+		static_assert(sizeof(Instruction) >= sizeof(ISA::Operand<O>), "m_size mismatch");
+		assert(m_size + 1 <= m_capacity);
+		auto& result = at<O>(m_size++);
 		result.opcode = static_cast<uint32_t>(O);
 		return result;
 	}
@@ -213,12 +213,12 @@ namespace IR
 
 	template<ISA::Op O> inline ISA::Operand<O>& Sequence::emit()
 	{
-		if (unlikely(pCapacity < pSize + 1))
-			grow(pSize + 1);
+		if (unlikely(m_capacity < m_size + 1))
+			grow(m_size + 1);
 
-		static_assert(sizeof(Instruction) >= sizeof(ISA::Operand<O>), "pSize mismatch");
-		assert(pSize + 1 <= pCapacity);
-		auto& result = at<O>(pSize++);
+		static_assert(sizeof(Instruction) >= sizeof(ISA::Operand<O>), "m_size mismatch");
+		assert(m_size + 1 <= m_capacity);
+		auto& result = at<O>(m_size++);
 		result.opcode = static_cast<uint32_t>(O);
 		return result;
 	}
@@ -578,7 +578,7 @@ namespace IR
 
 	inline uint32_t Sequence::emitStackSizeIncrease(uint32_t size)
 	{
-		uint32_t offset = pSize;
+		uint32_t offset = m_size;
 		emit<ISA::Op::stacksize>().add = size;
 		return offset;
 	}
@@ -590,7 +590,7 @@ namespace IR
 
 	inline uint32_t Sequence::emitBlueprintSize()
 	{
-		uint32_t offset = pSize;
+		uint32_t offset = m_size;
 		auto& operands = emit<ISA::Op::pragma>();
 		operands.pragma = ISA::Pragma::blueprintsize;
 		operands.value.blueprintsize = 0;
@@ -599,7 +599,7 @@ namespace IR
 
 	inline uint32_t Sequence::emitBlueprintTypealias(const AnyString& name, uint32_t atomid)
 	{
-		uint32_t offset = pSize;
+		uint32_t offset = m_size;
 		auto& operands  = emit<ISA::Op::blueprint>();
 		operands.kind   = (uint32_t) IR::ISA::Blueprint::typealias;
 		operands.name   = stringrefs.ref(name);
@@ -610,7 +610,7 @@ namespace IR
 
 	inline uint32_t Sequence::emitBlueprintUnit(const AnyString& filename)
 	{
-		uint32_t offset = pSize;
+		uint32_t offset = m_size;
 		auto& operands  = emit<ISA::Op::blueprint>();
 		operands.kind   = (uint32_t) IR::ISA::Blueprint::unit;
 		operands.name   = stringrefs.ref(filename);
@@ -630,7 +630,7 @@ namespace IR
 
 	inline uint32_t Sequence::emitBlueprintClass(uint32_t lvid)
 	{
-		uint32_t offset = pSize;
+		uint32_t offset = m_size;
 		auto& operands  = emit<ISA::Op::blueprint>();
 		operands.kind   = (uint32_t) IR::ISA::Blueprint::classdef;
 		operands.name   = 0u;
@@ -650,7 +650,7 @@ namespace IR
 
 	inline uint32_t Sequence::emitBlueprintFunc()
 	{
-		uint32_t offset = pSize;
+		uint32_t offset = m_size;
 		auto& operands  = emit<ISA::Op::blueprint>();
 		operands.kind   = (uint32_t) IR::ISA::Blueprint::funcdef;
 		operands.name   = 0u;
@@ -661,7 +661,7 @@ namespace IR
 
 	inline uint32_t Sequence::emitBlueprintGenericTypeParam(LVID lvid, const AnyString& name)
 	{
-		uint32_t offset = pSize;
+		uint32_t offset = m_size;
 		auto& operands  = emit<ISA::Op::blueprint>();
 		operands.kind   = (uint32_t) IR::ISA::Blueprint::gentypeparam;
 		operands.name   = stringrefs.ref(name);
@@ -672,7 +672,7 @@ namespace IR
 
 	inline uint32_t Sequence::emitBlueprintGenericTypeParam(LVID lvid)
 	{
-		uint32_t offset = pSize;
+		uint32_t offset = m_size;
 		auto& operands  = emit<ISA::Op::blueprint>();
 		operands.kind   = (uint32_t) IR::ISA::Blueprint::gentypeparam;
 		operands.name   = 0;
@@ -683,7 +683,7 @@ namespace IR
 
 	inline uint32_t Sequence::emitBlueprintParam(LVID lvid, const AnyString& name)
 	{
-		uint32_t offset = pSize;
+		uint32_t offset = m_size;
 		auto& operands  = emit<ISA::Op::blueprint>();
 		operands.kind   = (uint32_t) IR::ISA::Blueprint::param;
 		operands.name   = stringrefs.ref(name);
@@ -694,7 +694,7 @@ namespace IR
 
 	inline uint32_t Sequence::emitBlueprintParam(LVID lvid)
 	{
-		uint32_t offset = pSize;
+		uint32_t offset = m_size;
 		auto& operands  = emit<ISA::Op::blueprint>();
 		operands.kind   = (uint32_t) IR::ISA::Blueprint::param;
 		operands.name   = 0;

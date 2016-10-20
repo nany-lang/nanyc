@@ -528,27 +528,24 @@ namespace Nany
 		//! Default constructor, with a parent
 		explicit Atom(Atom& rootparent, const AnyString& name, Type type);
 
-	private:
-		//! All children
-		std::multimap<AnyString, Ptr> pChildren;
-
-		//! All code instances
-		std::unordered_map<Signature, uint32_t> pInstancesIDs;
-		//! Return types per instance id
-		std::vector<Classdef> pInstancesRetTypes;
-
 		struct InstanceMetadata final {
 			IR::Sequence* sequence = nullptr;
 			Classdef rettype;
 			Atom* remapAtom = nullptr;
 			Yuni::String symbol;
 		};
-		//! Symbol names for instances in `pInstances`
-		std::vector<InstanceMetadata> pInstancesMD;
 
+	private:
+		//! Atoms that belong to this atom (sub-classes, methods...)
+		std::multimap<AnyString, Ptr> m_children;
+		//! All code instances
+		std::unordered_map<Signature, uint32_t> m_instancesIDs;
+		//! Return types per instance id
+		std::vector<Classdef> m_instancesReturnTypes;
+		//! Symbol names for instances in `m_instances`
+		std::vector<InstanceMetadata> m_instancesMD;
 		//! Name of the current atom
-		AnyString pName;
-
+		AnyString m_name;
 		// nakama !
 		friend class AtomMap;
 

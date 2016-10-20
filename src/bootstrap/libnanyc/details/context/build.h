@@ -134,9 +134,9 @@ namespace Nany
 		//! Destructor, deallocate() must be called
 		~Build();
 
-		std::vector<std::reference_wrapper<Source>> sources;
-		std::vector<CTarget::Ptr> targets;
-		std::vector<AttachedSequenceRef> pAttachedSequences;
+		std::vector<std::reference_wrapper<Source>> m_sources;
+		std::vector<CTarget::Ptr> m_targets;
+		std::vector<AttachedSequenceRef> m_attachedSequences;
 
 	}; // class Build
 

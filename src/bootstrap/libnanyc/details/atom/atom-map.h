@@ -75,8 +75,8 @@ namespace Nany
 		Atom* createNewAtom(Atom::Type type, Atom& root, const AnyString& name);
 
 	private:
-		std::vector<Atom*> pByIndex;
-		yuint32 pAtomGrpID = 0;
+		std::vector<Atom*> m_byIndex;
+		yuint32 m_atomGrpID = 0;
 		friend class ClassdefTable;
 
 	}; // class AtomMap

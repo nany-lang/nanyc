@@ -15,7 +15,7 @@ namespace Nany
 	ClassdefTable::ClassdefTable()
 		: atoms(stringrefs)
 	{
-		pClassdefs.insert(std::make_pair(CLID{}, new Classdef));
+		m_classdefs.insert(std::make_pair(CLID{}, new Classdef));
 	}
 
 
@@ -26,13 +26,13 @@ namespace Nany
 		assert(source != target and "same target !");
 
 		// looking for the source
-		auto it = pClassdefs.find(source);
-		if (it != pClassdefs.end())
+		auto it = m_classdefs.find(source);
+		if (it != m_classdefs.end())
 		{
 			// return *(it->second);
 			// looking for the target
-			auto ittarget = pClassdefs.find(target);
-			if (ittarget != pClassdefs.end())
+			auto ittarget = m_classdefs.find(target);
+			if (ittarget != m_classdefs.end())
 			{
 				// the target has been found, replacing the classdef
 				ittarget->second = it->second;
@@ -41,7 +41,7 @@ namespace Nany
 			//else
 			//{
 			//	// the target has not been found
-			//	pClassdefs.insert(std::make_pair(target, it->second));
+			//	m_classdefs.insert(std::make_pair(target, it->second));
 			//}
 			//return true;
 		}
@@ -54,27 +54,27 @@ namespace Nany
 		assert(not clid.isVoid() and "invalid clid");
 
 		// pick first substitutes
-		if (clid.atomid() == layer.atomid)
+		if (clid.atomid() == m_layer.atomid)
 		{
-			assert(clid.lvid() < layer.count);
-			if (layer.flags[clid.lvid()])
-				return layer.storage[clid.lvid()];
+			assert(clid.lvid() < m_layer.count);
+			if (m_layer.flags[clid.lvid()])
+				return m_layer.storage[clid.lvid()];
 		}
 
-		auto it = pClassdefs.find(clid);
-		if (unlikely(it == pClassdefs.end()))
+		auto it = m_classdefs.find(clid);
+		if (unlikely(it == m_classdefs.end()))
 		{
 			assert(false and "classdef not found");
-			it = pClassdefs.find(CLID{});
+			it = m_classdefs.find(CLID{});
 		}
 		auto& result = *(it->second);
 
-		if (result.clid.atomid() == layer.atomid) // dealing with hard links
+		if (result.clid.atomid() == m_layer.atomid) // dealing with hard links
 		{
 			auto lvid = result.clid.lvid();
-			assert(lvid < layer.count);
-			if (layer.flags[lvid])
-				return layer.storage[lvid];
+			assert(lvid < m_layer.count);
+			if (m_layer.flags[lvid])
+				return m_layer.storage[lvid];
 		}
 		return result;
 	}
@@ -85,11 +85,11 @@ namespace Nany
 		assert(not clid.isVoid() and "invalid clid");
 		// TODO use an alternate (and more efficient) container for the special classdefs atomid=0
 
-		auto it = pClassdefs.find(clid);
-		if (unlikely(it == pClassdefs.end()))
+		auto it = m_classdefs.find(clid);
+		if (unlikely(it == m_classdefs.end()))
 		{
 			assert(false and "failed to find clid");
-			it = pClassdefs.find(CLID{});
+			it = m_classdefs.find(CLID{});
 		}
 		return *(it->second);
 	}
@@ -100,11 +100,11 @@ namespace Nany
 		assert(not clid.isVoid() and "invalid clid");
 		// TODO use an alternate (and more efficient) container for the special classdefs atomid=0
 
-		auto it = pClassdefs.find(clid);
-		if (unlikely(it == pClassdefs.end()))
+		auto it = m_classdefs.find(clid);
+		if (unlikely(it == m_classdefs.end()))
 		{
 			assert(false and "failed to find clid");
-			it = pClassdefs.find(CLID{});
+			it = m_classdefs.find(CLID{});
 		}
 		return *(it->second);
 	}
@@ -116,27 +116,27 @@ namespace Nany
 		// TODO use an alternate (and more efficient) container for the special classdefs atomid=0
 
 		// pick first substitutes
-		if (clid.atomid() == layer.atomid)
+		if (clid.atomid() == m_layer.atomid)
 		{
-			assert(clid.lvid() < layer.count);
-			if (layer.flags[clid.lvid()])
-				return layer.storage[clid.lvid()];
+			assert(clid.lvid() < m_layer.count);
+			if (m_layer.flags[clid.lvid()])
+				return m_layer.storage[clid.lvid()];
 		}
 
-		auto it = pClassdefs.find(clid);
-		if (unlikely(it == pClassdefs.end()))
+		auto it = m_classdefs.find(clid);
+		if (unlikely(it == m_classdefs.end()))
 		{
 			assert(false and "classdef not found");
-			it = pClassdefs.find(CLID{});
+			it = m_classdefs.find(CLID{});
 		}
 		auto& result = *(it->second);
 
-		if (result.clid.atomid() == layer.atomid) // dealing with hard links
+		if (result.clid.atomid() == m_layer.atomid) // dealing with hard links
 		{
 			auto lvid = result.clid.lvid();
-			assert(lvid < layer.count);
-			if (layer.flags[lvid])
-				return layer.storage[lvid];
+			assert(lvid < m_layer.count);
+			if (m_layer.flags[lvid])
+				return m_layer.storage[lvid];
 		}
 		return result;
 	}
@@ -191,9 +191,9 @@ namespace Nany
 			out.push_back(clid);
 
 			// check that the entry does not already exists
-			assert(pClassdefs.find(clid) == pClassdefs.end());
+			assert(m_classdefs.find(clid) == m_classdefs.end());
 			// insert the new classdef
-			pClassdefs.insert(std::make_pair(clid, new Classdef{clid}));
+			m_classdefs.insert(std::make_pair(clid, new Classdef{clid}));
 		}
 	}
 
@@ -207,9 +207,9 @@ namespace Nany
 			CLID clid{atomid, i};
 
 			// check that the entry does not already exists
-			assert(pClassdefs.find(clid) == pClassdefs.end());
+			assert(m_classdefs.find(clid) == m_classdefs.end());
 			// insert the new classdef
-			pClassdefs.insert(std::make_pair(clid, new Classdef{clid}));
+			m_classdefs.insert(std::make_pair(clid, new Classdef{clid}));
 		}
 	}
 
@@ -224,7 +224,7 @@ namespace Nany
 			const CLID& clid = CLID::AtomMapID(atom->atomid);
 			auto* newClassdef = new Classdef(clid);
 			newClassdef->mutateToAtom(atom);
-			pClassdefs.insert(std::make_pair(clid, newClassdef));
+			m_classdefs.insert(std::make_pair(clid, newClassdef));
 		}
 	}
 
@@ -280,10 +280,10 @@ namespace Nany
 		if (hasClassdef(clid))
 			clid = classdef(clid).clid; // take into consideration symlinks
 
-		if (clid.atomid() == layer.atomid)
+		if (clid.atomid() == m_layer.atomid)
 		{
-			assert(clid.lvid() < layer.count);
-			return (layer.flags[clid.lvid()]);
+			assert(clid.lvid() < m_layer.count);
+			return (m_layer.flags[clid.lvid()]);
 		}
 		return false;
 	}
@@ -291,79 +291,79 @@ namespace Nany
 
 	void ClassdefTable::substituteResize(uint32_t count)
 	{
-		uint32_t previous = layer.count;
+		uint32_t previous = m_layer.count;
 		if (count <= previous)
 			return;
 
-		layer.count = count;
-		layer.flags.resize(count);
+		m_layer.count = count;
+		m_layer.flags.resize(count);
 		for (uint32_t i = previous; i != count; ++i)
-			layer.flags[i] = false; // true;
+			m_layer.flags[i] = false; // true;
 
-		layer.storage.reserve(count);
-		assert(layer.storage.size() <= count);
-		for (uint32_t i = static_cast<uint32_t>(layer.storage.size()); i != count; ++i)
-			layer.storage.emplace_back(CLID{layer.atomid, i});
+		m_layer.storage.reserve(count);
+		assert(m_layer.storage.size() <= count);
+		for (uint32_t i = static_cast<uint32_t>(m_layer.storage.size()); i != count; ++i)
+			m_layer.storage.emplace_back(CLID{m_layer.atomid, i});
 
 		// checking for missing classdef
 		// functions are sometimes generating on the fly (ctor, clone...)
 		for (uint32_t i = previous; i != count; ++i)
 		{
-			CLID clid{layer.atomid, i};
-			if (0 == pClassdefs.count(clid))
-				pClassdefs[clid] = new Classdef(clid); // any with local replacement
+			CLID clid{m_layer.atomid, i};
+			if (0 == m_classdefs.count(clid))
+				m_classdefs[clid] = new Classdef(clid); // any with local replacement
 		}
 	}
 
 
 	void ClassdefTable::mergeSubstitutes()
 	{
-		auto atomid = layer.atomid;
+		auto atomid = m_layer.atomid;
 		if (unlikely(atomid == (LVID) -1))
 			throw "invalid atom id for merging substitutions";
 
-		for (uint32_t i = 0; i != layer.count; ++i)
+		for (uint32_t i = 0; i != m_layer.count; ++i)
 		{
-			if (layer.flags[i])
-				pClassdefs[CLID{atomid, i}] = new Classdef(layer.storage[i]);
+			if (m_layer.flags[i])
+				m_classdefs[CLID{atomid, i}] = new Classdef(m_layer.storage[i]);
 		}
 
 		// invalidate the current layer
-		layer.atomid = static_cast<uint32_t>(-1);
+		m_layer.atomid = static_cast<uint32_t>(-1);
 	}
 
 
 	Classdef& ClassdefTable::substitute(LVID lvid) const
 	{
-		assert(lvid < layer.count);
-		if (not layer.flags[lvid])
+		assert(lvid < m_layer.count);
+		if (not m_layer.flags[lvid])
 		{
-			layer.flags[lvid] = true;
-			auto& newcdef = layer.storage[lvid];
+			m_layer.flags[lvid] = true;
+			auto& newcdef = m_layer.storage[lvid];
 
 			// preserve qualifiers
-			auto it = pClassdefs.find(CLID{layer.atomid, lvid});
-			if (it != pClassdefs.end())
+			auto it = m_classdefs.find(CLID{m_layer.atomid, lvid});
+			if (it != m_classdefs.end())
 				newcdef.qualifiers = (*(it->second)).qualifiers;
 
 			// set clid
-			newcdef.clid.reclass(layer.atomid, lvid);
+			newcdef.clid.reclass(m_layer.atomid, lvid);
 			return newcdef;
 		}
-		return layer.storage[lvid];
+		return m_layer.storage[lvid];
 	}
 
 
 	Classdef& ClassdefTable::addSubstitute(nytype_t kind, Atom* atom, const Qualifiers& qualifiers) const
 	{
 		// atom can be null
-		layer.flags.push_back(true);
-		layer.storage.emplace_back();
-		++layer.count;
-		assert(layer.count == layer.flags.size());
-		assert(layer.count == layer.storage.size());
+		m_layer.flags.push_back(true);
+		m_layer.storage.emplace_back();
+		++m_layer.count;
+		assert(m_layer.count == m_layer.flags.size());
+		assert(m_layer.count == m_layer.storage.size());
 
-		auto& ret = layer.storage.back();
+		auto& ret = m_layer.storage.back();
 		switch (kind)
 		{
 			case nyt_any:  ret.mutateToAtom(atom); break;
@@ -374,7 +374,7 @@ namespace Nany
 		// preserve qualifiers
 		ret.qualifiers = qualifiers;
 		// set clid
-		ret.clid.reclass(layer.atomid, layer.count - 1);
+		ret.clid.reclass(m_layer.atomid, m_layer.count - 1);
 		return ret;
 	}
 

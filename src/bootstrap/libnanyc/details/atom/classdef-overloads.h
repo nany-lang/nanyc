@@ -29,7 +29,7 @@ namespace Nany
 
 	private:
 		//! Follow some indexed parameter (atomid/parameter index type)
-		std::vector<std::reference_wrapper<Atom>> pOverloads;
+		std::vector<std::reference_wrapper<Atom>> m_overloads;
 
 	}; // class ClassdefFollow
 

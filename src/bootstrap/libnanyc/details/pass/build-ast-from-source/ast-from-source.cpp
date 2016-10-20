@@ -9,19 +9,17 @@ namespace Nany
 	bool Source::passASTFromSourceWL()
 	{
 		auto& parser = pBuildInfo->parsing.parser;
-		switch (pType)
+		switch (m_type)
 		{
 			case Type::file:
-				return parser.loadFromFile(pFilename) and parser.root;
+				return parser.loadFromFile(m_filename) and parser.root;
 
 			case Type::memory:
-				return parser.load(pContent) and parser.root;
+				return parser.load(m_content) and parser.root;
 		}
 
 		return false;
 	}
-
-
 
 
 } // namespace Nany

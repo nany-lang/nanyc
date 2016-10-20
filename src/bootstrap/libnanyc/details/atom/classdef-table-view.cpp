@@ -47,7 +47,7 @@ namespace Nany
 
 		out << "CLASSDEF TABLE\n";
 		std::map<yuint32, std::map<LVID, Classdef*>> orderedlist;
-		for (auto& pair: table.pClassdefs)
+		for (auto& pair: table.m_classdefs)
 			orderedlist[pair.first.atomid()][pair.first.lvid()] = Classdef::Ptr::WeakPointer(pair.second);
 
 		bool firstAtom = true;

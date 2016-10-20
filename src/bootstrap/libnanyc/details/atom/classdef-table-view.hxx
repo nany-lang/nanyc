@@ -30,7 +30,7 @@ namespace Nany
 		previous.storage.reserve((count + 2) * 2); // arbitrary, but at least 'count+2'
 
 		// swap the layer
-		previous.swap(table.layer);
+		previous.swap(table.m_layer);
 		canSwap = true;
 	}
 
@@ -38,7 +38,7 @@ namespace Nany
 	inline ClassdefTableView::~ClassdefTableView()
 	{
 		if (canSwap)
-			table.layer.swap(previous);
+			table.m_layer.swap(previous);
 	}
 
 

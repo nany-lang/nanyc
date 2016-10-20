@@ -232,7 +232,7 @@ namespace Nany
 	Atom::Atom(const AnyString& name, Atom::Type type)
 		: category{findCategory(nullptr, type, name)}
 		, type(type)
-		, pName{name}
+		, m_name{name}
 	{}
 
 
@@ -240,15 +240,15 @@ namespace Nany
 		: category{findCategory(&rootparent, type, name)}
 		, type(type)
 		, parent(&rootparent)
-		, pName{name}
+		, m_name{name}
 	{
-		rootparent.pChildren.emplace(AnyString{pName}, this);
+		rootparent.m_children.emplace(AnyString{m_name}, this);
 	}
 
 
 	Atom::~Atom()
 	{
-		assert(instances.size() == pInstancesMD.size());
+		assert(instances.size() == m_instancesMD.size());
 		if (opcodes.owned)
 			delete opcodes.sequence;
 	}
@@ -296,13 +296,13 @@ namespace Nany
 				{
 					if (not isSpecial())
 					{
-						out += pName;
+						out += m_name;
 					}
 					else
 					{
 						if (isMemberVarDefaultInit())
 						{
-							AnyString sub{pName, 14};
+							AnyString sub{m_name, 14};
 							auto ix = sub.find('-');
 
 							if (ix < sub.size())
@@ -316,21 +316,21 @@ namespace Nany
 						else if (isProperty())
 						{
 							if (isPropertyGet() or isPropertySet()) // ^propget^ / ^propset^
-								out << AnyString{pName, 9};
+								out << AnyString{m_name, 9};
 							else
 								out << "<unmanaged prop>";
 						}
 						else if (isView())
 						{
 							out += ':'; // ^view^
-							out.append(AnyString{pName, 6});
+							out.append(AnyString{m_name, 6});
 						}
 						else if (isUnittest())
 						{
-							out.append(AnyString{pName, 17}); // "^unittest^module:<name>"
+							out.append(AnyString{m_name, 17}); // "^unittest^module:<name>"
 						}
 						else
-							out.append(AnyString{pName, 1}); // operator like, removing ^
+							out.append(AnyString{m_name, 1}); // operator like, removing ^
 					}
 
 					if (not tmplparamsForPrinting.empty())
@@ -340,7 +340,7 @@ namespace Nany
 
 				case Type::classdef:
 				{
-					out += pName;
+					out += m_name;
 
 					if (not tmplparamsForPrinting.empty())
 						atomParametersPrinter(out, tmplparamsForPrinting, table, false, "<:", ":>");
@@ -352,7 +352,7 @@ namespace Nany
 				case Type::vardef:
 				case Type::unit:
 				{
-					out += pName;
+					out += m_name;
 					break;
 				}
 			}
@@ -493,13 +493,13 @@ namespace Nany
 	uint32_t Atom::invalidateInstance(const Signature& signature, uint32_t id)
 	{
 		assert(id < instances.size());
-		assert(id < pInstancesMD.size());
-		assert(instances.size() == pInstancesMD.size());
+		assert(id < m_instancesMD.size());
+		assert(instances.size() == m_instancesMD.size());
 
 		instances[id].reset(nullptr);
-		pInstancesIDs[signature] = (uint32_t) -1;
+		m_instancesIDs[signature] = (uint32_t) -1;
 
-		auto& md = pInstancesMD[id];
+		auto& md = m_instancesMD[id];
 		md.sequence = nullptr;
 		md.remapAtom = nullptr;
 		return (uint32_t) -1;
@@ -513,29 +513,29 @@ namespace Nany
 		uint32_t iid = (uint32_t) instances.size();
 
 		instances.emplace_back(sequence);
-		pInstancesMD.emplace_back();
-		assert(instances.size() == pInstancesMD.size());
+		m_instancesMD.emplace_back();
+		assert(instances.size() == m_instancesMD.size());
 
-		auto& md = pInstancesMD[iid];
+		auto& md = m_instancesMD[iid];
 		md.remapAtom = remapAtom;
 		md.sequence  = sequence;
 
-		pInstancesIDs.insert(std::make_pair(signature, iid));
-		assert(instances.size() == pInstancesMD.size());
+		m_instancesIDs.insert(std::make_pair(signature, iid));
+		assert(instances.size() == m_instancesMD.size());
 		return iid;
 	}
 
 
 	Tribool::Value Atom::findInstance(const Signature& signature, uint32_t& iid, Classdef& rettype, Atom*& remapAtom) const
 	{
-		auto it = pInstancesIDs.find(signature);
-		if (it != pInstancesIDs.end())
+		auto it = m_instancesIDs.find(signature);
+		if (it != m_instancesIDs.end())
 		{
 			uint32_t id = it->second;
 			if (id != (uint32_t) -1)
 			{
-				assert(id < pInstancesMD.size());
-				auto& md  = pInstancesMD[id];
+				assert(id < m_instancesMD.size());
+				auto& md  = m_instancesMD[id];
 
 				iid       = id;
 				remapAtom = md.remapAtom;
@@ -552,12 +552,12 @@ namespace Nany
 
 	void Atom::printInstances(Clob& out, const AtomMap& atommap) const
 	{
-		assert(instances.size() == pInstancesMD.size());
+		assert(instances.size() == m_instancesMD.size());
 		String prgm;
 
 		for (size_t i = 0; i != instances.size(); ++i)
 		{
-			out << pInstancesMD[i].symbol << " // " << atomid << " #" << i << "\n{\n";
+			out << m_instancesMD[i].symbol << " // " << atomid << " #" << i << "\n{\n";
 
 			instances[i].get()->print(prgm, &atommap);
 
@@ -584,7 +584,7 @@ namespace Nany
 		for (size_t i = 0; i != instances.size(); ++i)
 		{
 			if (&sequence == instances[i].get())
-				return pInstancesMD[i].symbol;
+				return m_instancesMD[i].symbol;
 		}
 		return AnyString{};
 	}
@@ -695,7 +695,7 @@ namespace Nany
 
 		eachChild([&](Atom& child) -> bool
 		{
-			if (child.isClass() and child.pName == name)
+			if (child.isClass() and child.m_name == name)
 			{
 				if (likely(atomA == nullptr))
 				{
@@ -726,7 +726,7 @@ namespace Nany
 
 		eachChild([&](Atom& child) -> bool
 		{
-			if (child.isFunction() and child.pName == name)
+			if (child.isFunction() and child.m_name == name)
 			{
 				if (likely(atomA == nullptr))
 				{
@@ -757,7 +757,7 @@ namespace Nany
 
 		eachChild([&](Atom& child) -> bool
 		{
-			if (child.isMemberVariable() and child.pName == name)
+			if (child.isMemberVariable() and child.m_name == name)
 			{
 				if (likely(atomA == nullptr))
 				{
@@ -787,7 +787,7 @@ namespace Nany
 
 		eachChild([&](Atom& child) -> bool
 		{
-			if (child.isNamespace() and child.pName == name)
+			if (child.isNamespace() and child.m_name == name)
 			{
 				atomA = &child;
 				return false;
@@ -801,18 +801,17 @@ namespace Nany
 	void Atom::renameChild(const AnyString& from, const AnyString& to)
 	{
 		Ptr child;
-		auto range = pChildren.equal_range(from);
+		auto range = m_children.equal_range(from);
 		for (auto it = range.first; it != range.second; )
 		{
 			if (unlikely(!!child)) // error
 				return;
 			child = it->second;
-			it = pChildren.erase(it);
+			it = m_children.erase(it);
 		}
-
-		child->pName = to;
+		child->m_name = to;
 		child->category = findCategory(child->parent, child->type, to);
-		pChildren.emplace(AnyString{child->pName}, child);
+		m_children.emplace(AnyString{child->m_name}, child);
 	}
 
 
