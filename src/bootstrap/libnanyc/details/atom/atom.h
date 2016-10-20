@@ -540,8 +540,6 @@ namespace Nany
 		std::multimap<AnyString, Ptr> m_children;
 		//! All code instances
 		std::unordered_map<Signature, uint32_t> m_instancesIDs;
-		//! Return types per instance id
-		std::vector<Classdef> m_instancesReturnTypes;
 		//! Symbol names for instances in `m_instances`
 		std::vector<InstanceMetadata> m_instancesMD;
 		//! Name of the current atom
