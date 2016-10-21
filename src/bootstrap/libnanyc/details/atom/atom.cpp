@@ -242,7 +242,7 @@ namespace Nany
 		, parent(&rootparent)
 		, pName{name}
 	{
-		rootparent.pChildren.insert(std::pair<AnyString, Atom::Ptr>(pName, this));
+		rootparent.pChildren.emplace(AnyString{pName}, this);
 	}
 
 
@@ -277,7 +277,6 @@ namespace Nany
 			// not on the same target ? Only public elements are accessible
 			return atom.isPublicOrPublished();
 		}
-		return false; // fallback
 	}
 
 
@@ -361,27 +360,29 @@ namespace Nany
 	}
 
 
-	YString Atom::fullname() const
+	String Atom::fullname() const
 	{
-		YString out;
+		String out;
 		retrieveFullname(out);
 		return out;
 	}
 
 
-	void Atom::retrieveCaption(YString& out, const ClassdefTableView& table) const
+	void Atom::retrieveCaption(String& out, const ClassdefTableView& table) const
 	{
 		makeCaption(out, *this, &table);
 	}
 
-	YString Atom::caption(const ClassdefTableView& view) const
+
+	String Atom::caption(const ClassdefTableView& view) const
 	{
 		String out;
 		retrieveCaption(out, view);
 		return out;
 	}
 
-	YString Atom::caption() const
+
+	String Atom::caption() const
 	{
 		String out;
 		makeCaption(out, *this, nullptr);
@@ -655,6 +656,7 @@ namespace Nany
 		}
 	}
 
+
 	AnyString Atom::keyword() const
 	{
 		switch (type)
@@ -714,7 +716,6 @@ namespace Nany
 		out = atomA;
 		return atomA ? 1 : 0;
 	}
-
 
 
 	uint32_t Atom::findFuncAtom(Atom*& out, const AnyString& name)
