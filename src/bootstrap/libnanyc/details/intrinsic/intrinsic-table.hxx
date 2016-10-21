@@ -144,7 +144,7 @@ namespace Nany
 	}
 
 
-	inline const Intrinsic* IntrinsicTable::find(const AnyString& name) const
+	inline Intrinsic::Ptr IntrinsicTable::find(const AnyString& name) const
 	{
 		auto it = pByNames.find(name);
 		return (it != pByNames.end()) ? it->second : nullptr;

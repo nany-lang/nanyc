@@ -43,7 +43,7 @@ namespace Nany
 		/*!
 		** \brief Find an intrinsic by its name
 		*/
-		const Intrinsic* find(const AnyString& name) const;
+		Intrinsic::Ptr find(const AnyString& name) const;
 
 		/*!
 		** \brief Get the intrinsic for a given intrinsic id
@@ -55,7 +55,7 @@ namespace Nany
 		//! All intrinsics
 		std::vector<Intrinsic::Ptr> pIntrinsics;
 		//! All intrinsics, ordered by their name
-		std::unordered_map<AnyString, Intrinsic*> pByNames;
+		std::unordered_map<AnyString, Intrinsic::Ptr> pByNames;
 
 	}; // class IntrinsicTable
 
