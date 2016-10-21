@@ -33,6 +33,7 @@ namespace Nany
 		{}
 
 		Intrinsic(const Intrinsic&) = default;
+		Intrinsic& operator = (const Intrinsic&) = delete;
 
 		YString print() const;
 
