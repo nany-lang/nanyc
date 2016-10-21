@@ -20,8 +20,7 @@ namespace Logs
 	namespace {
 
 
-	template<bool unify>
-	void printMessageRecursive(nyconsole_t& out, const Message& message, String& xx, uint32_t indent = 0)
+	void printMessageRecursive(nyconsole_t& out, const Message& message, bool unify, String& xx, uint32_t indent = 0)
 	{
 		Message::ThreadingPolicy::MutexLocker locker{message};
 
@@ -211,7 +210,7 @@ namespace Logs
 		}
 
 		for (auto& ptr: message.entries)
-			printMessageRecursive<unify>(out, *ptr, xx, indent);
+			printMessageRecursive(out, *ptr, unify, xx, indent);
 	}
 
 
@@ -251,10 +250,7 @@ namespace Logs
 		{
 			String tmp;
 			tmp.reserve(1024);
-			if (unify)
-				printMessageRecursive<true>(out, *this, tmp);
-			else
-				printMessageRecursive<false>(out, *this, tmp);
+			printMessageRecursive(out, *this, unify, tmp);
 		}
 	}
 
