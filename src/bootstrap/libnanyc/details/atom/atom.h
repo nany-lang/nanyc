@@ -529,7 +529,6 @@ namespace Nany
 		explicit Atom(Atom& rootparent, const AnyString& name, Type type);
 		void doPrintTree(const ClassdefTableView& table, uint depth) const;
 		void doAppendCaption(YString& out, const ClassdefTableView* table, bool fullname = true) const;
-		void name(const AnyString& newname);
 
 	private:
 		//! All children

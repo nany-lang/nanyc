@@ -60,106 +60,103 @@ namespace Nany
 	}
 
 
+	Flags<Atom::Category> findCategory(Atom* parent, Atom::Type type, const AnyString& name)
+	{
+		Flags<Atom::Category> category;
+
+		if (parent and parent->type == Atom::Type::classdef)
+			category += Atom::Category::classParent;
+
+		if (unlikely(name.empty()))
+			return category;
+
+		switch (type)
+		{
+			case Atom::Type::funcdef:
+			{
+				if (name[0] == '^')
+				{
+					category += Atom::Category::special;
+
+					if (category(Atom::Category::classParent))
+					{
+						if (name == "^new" or name == "^default-new")
+						{
+							category += Atom::Category::ctor;
+						}
+						else if (name == "^clone")
+						{
+							category += Atom::Category::clone;
+						}
+						else if (name == "^#user-dispose")
+						{
+							category += Atom::Category::dtor;
+						}
+						else if (name.startsWith("^view^"))
+						{
+							category += Atom::Category::view;
+						}
+						else if (name.startsWith("^default-var-%"))
+						{
+							category += Atom::Category::defvarInit;
+						}
+						else
+						{
+							category += Atom::Category::funcoperator;
+							if (name == "^()")
+								category += Atom::Category::functor;
+						}
+					}
+					else
+					{
+						if (name.startsWith("^unittest^"))
+							category += Atom::Category::unittest;
+						else
+							category += Atom::Category::funcoperator;
+					}
+
+					if (category(Atom::Category::funcoperator))
+					{
+						if (name.startsWith("^propget^"))
+							category += Atom::Category::propget;
+						else if (name.startsWith("^propset^"))
+							category += Atom::Category::propset;
+					}
+				}
+				break;
+			}
+			case Atom::Type::vardef:
+			{
+				if (name.startsWith("^trap^"))
+					category += Atom::Category::capturedVar;
+				break;
+			}
+			default:
+				break;
+		}
+		return category;
+	}
+
+
 	} // anonymous namespace
 
 
 
 
-	inline void Atom::name(const AnyString& newname)
-	{
-		pName = newname;
-		category.clear();
-
-		if (parent and parent->type == Type::classdef)
-			category += Category::classParent;
-
-		if (not newname.empty())
-		{
-			switch (type)
-			{
-				case Type::funcdef:
-				{
-					if (newname[0] == '^')
-					{
-						category += Category::special;
-
-						if (category(Category::classParent))
-						{
-							if (newname == "^new" or newname == "^default-new")
-							{
-								category += Category::ctor;
-							}
-							else if (newname == "^clone")
-							{
-								category += Category::clone;
-							}
-							else if (newname == "^#user-dispose")
-							{
-								category += Category::dtor;
-							}
-							else if (newname.startsWith("^view^"))
-							{
-								category += Category::view;
-							}
-							else if (newname.startsWith("^default-var-%"))
-							{
-								category += Category::defvarInit;
-							}
-							else
-							{
-								category += Category::funcoperator;
-								if (newname == "^()")
-									category += Category::functor;
-							}
-						}
-						else
-						{
-							if (newname.startsWith("^unittest^"))
-							{
-								category += Category::unittest;
-							}
-							else
-								category += Category::funcoperator;
-						}
-
-						if (category(Category::funcoperator))
-						{
-							if (newname.startsWith("^propget^"))
-								category += Category::propget;
-							else if (newname.startsWith("^propset^"))
-								category += Category::propset;
-						}
-					}
-					break;
-				}
-
-				case Type::vardef:
-				{
-					if (newname.startsWith("^trap^"))
-						category += Category::capturedVar;
-					break;
-				}
-
-				default:
-					break;
-			}
-		}
-	}
+	Atom::Atom(const AnyString& name, Atom::Type type)
+		: category{findCategory(nullptr, type, name)}
+		, type(type)
+		, pName{name}
+	{}
 
 
-	Atom::Atom(const AnyString& atomName, Atom::Type type)
-		: type(type)
-	{
-		this->name(atomName);
-	}
-
-
-	Atom::Atom(Atom& rootparent, const AnyString& atomName, Atom::Type type)
-		: type(type)
+	Atom::Atom(Atom& rootparent, const AnyString& name, Atom::Type type)
+		: category{findCategory(&rootparent, type, name)}
+		, type(type)
 		, parent(&rootparent)
+		, pName{name}
 	{
-		this->name(atomName);
-		rootparent.pChildren.insert(std::pair<AnyString, Atom::Ptr>(atomName, this));
+		rootparent.pChildren.insert(std::pair<AnyString, Atom::Ptr>(pName, this));
 	}
 
 
@@ -814,8 +811,9 @@ namespace Nany
 			it = pChildren.erase(it);
 		}
 
-		child->name(to);
-		pChildren.insert(std::pair<AnyString, Atom::Ptr>(to, child));
+		child->pName = to;
+		child->category = findCategory(child->parent, child->type, to);
+		pChildren.emplace(AnyString{child->pName}, child);
 	}
 
 
