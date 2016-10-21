@@ -14,50 +14,51 @@ using namespace Yuni;
 namespace Nany
 {
 
-	namespace // anonymous
+	namespace {
+
+
+	template<class OutT, class ListT, class TableT>
+	void atomParametersPrinter(OutT& out, ListT& list, const TableT* table, bool avoidSelf, AnyString sepBefore, AnyString sepAfter)
 	{
-
-		template<class OutT, class ListT, class TableT>
-		static void atomParametersPrinter(OutT& out, ListT& list, const TableT* table, bool avoidSelf, AnyString sepBefore, AnyString sepAfter)
+		bool first = true;
+		out << sepBefore;
+		list.each([&](uint32_t i, const AnyString& paramname, const Vardef& vardef)
 		{
-			bool first = true;
-			out << sepBefore;
-			list.each([&](uint32_t i, const AnyString& paramname, const Vardef& vardef)
+			// avoid the first virtual parameter
+			if (avoidSelf and i == 0 and paramname == "self")
+				return;
+
+			if (not first)
+				out << ", ";
+			first = false;
+			out << paramname;
+
+			if (table)
 			{
-				// avoid the first virtual parameter
-				if (avoidSelf and i == 0 and paramname == "self")
-					return;
-
-				if (not first)
-					out << ", ";
-				first = false;
-				out << paramname;
-
-				if (table)
+				if (table) // and table->hasClassdef(vardef.clid))
 				{
-					if (table) // and table->hasClassdef(vardef.clid))
+					if (table->hasClassdef(vardef.clid))
 					{
-						if (table->hasClassdef(vardef.clid))
+						auto& retcdef = table->rawclassdef(vardef.clid);
+						if (not retcdef.isVoid())
 						{
-							auto& retcdef = table->rawclassdef(vardef.clid);
-							if (not retcdef.isVoid())
-							{
-								out << ": ";
-								retcdef.print(out, *table, false);
-								if (debugmode)
-									out << ' ' << retcdef.clid;
-							}
+							out << ": ";
+							retcdef.print(out, *table, false);
+							if (debugmode)
+								out << ' ' << retcdef.clid;
 						}
 					}
 				}
-				else
-				{
-					if (not vardef.clid.isVoid())
-						out << ": any";
-				}
-			});
-			out << sepAfter;
-		}
+			}
+			else
+			{
+				if (not vardef.clid.isVoid())
+					out << ": any";
+			}
+		});
+		out << sepAfter;
+	}
+
 
 	} // anonymous namespace
 
