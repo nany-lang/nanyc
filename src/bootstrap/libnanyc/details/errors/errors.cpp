@@ -100,23 +100,25 @@ namespace Logs
 namespace Nany
 {
 
-	namespace // anonymous
-	{
+	namespace {
 
-		static inline void retrieveMetadata(Logs::Report& entry, const AST::Node* node = nullptr)
+
+	void retrieveMetadata(Logs::Report& entry, const AST::Node* node = nullptr)
+	{
+		auto& mdstate = Logs::localMetadataHandler;
+		if (mdstate.callback)
 		{
-			auto& mdstate = Logs::localMetadataHandler;
-			if (mdstate.callback)
-			{
-				auto& filename = entry.message.origins.location.filename;
-				auto& line     = entry.message.origins.location.pos.line;
-				auto& offset   = entry.message.origins.location.pos.offset;
-				auto level     = entry.message.level;
-				mdstate.callback(mdstate.userdefined, level, node, filename, line, offset);
-			}
+			auto& filename = entry.message.origins.location.filename;
+			auto& line     = entry.message.origins.location.pos.line;
+			auto& offset   = entry.message.origins.location.pos.offset;
+			auto level     = entry.message.level;
+			mdstate.callback(mdstate.userdefined, level, node, filename, line, offset);
 		}
+	}
 
 	} // anonymous namespace
+
+
 
 
 	Logs::Report error()
