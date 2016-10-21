@@ -138,6 +138,92 @@ namespace Nany
 	}
 
 
+	void makeCaption(String& out, const Atom& atom, const ClassdefTableView* table, bool fullname = true)
+	{
+		// append the name of its ancestor, with the table to resolve their specialization
+		// (for template clsses for example)
+		atom.retrieveFullname(out, table, fullname); // parents
+
+		switch (atom.type)
+		{
+			case Atom::Type::funcdef:
+			{
+				if (atom.isMemberVarDefaultInit())
+					break;
+				if (atom.isSpecial()) // for beauty
+					out << ' ';
+				if (atom.isProperty()) // just the name for properties
+					break;
+			}
+			// [[fallthu]]
+			case Atom::Type::classdef:
+			case Atom::Type::typealias:
+			{
+				if (not atom.tmplparams.empty())
+					atomParametersPrinter(out, atom.tmplparams, table, false, "<:", ":>");
+				if (not atom.parameters.empty())
+					atomParametersPrinter(out, atom.parameters, table, true, "(", ")");
+
+				if (table)
+				{
+					if (not atom.returnType.clid.isVoid() and table->hasClassdef(atom.returnType.clid))
+					{
+						auto& retcdef = table->classdef(atom.returnType.clid);
+						if (not retcdef.isVoid())
+						{
+							out.write(": ", 2);
+							retcdef.print(out, *table, false);
+						}
+						break;
+					}
+				}
+				else
+				{
+					if (not atom.returnType.clid.isVoid())
+						out << ": ref";
+					break;
+				}
+				break;
+			}
+
+			case Atom::Type::namespacedef:
+			case Atom::Type::vardef:
+			case Atom::Type::unit:
+				break;
+		}
+	}
+
+
+	void printTreeRecursive(const Atom& atom, const ClassdefTableView& table, uint depth = 0)
+	{
+		auto entry = trace();
+		for (uint i = depth; i--; )
+			entry.message.prefix << "    ";
+
+		if (atom.parent != nullptr)
+		{
+			entry.message.prefix << table.keyword(atom) << ' ';
+			bool parentNames = atom.isNamespace() or atom.isUnit();
+			makeCaption(entry.data().message, atom, &table, parentNames);
+			entry << " [id:" << atom.atomid;
+			if (atom.isMemberVariable())
+				entry << ", field: " << atom.varinfo.effectiveFieldIndex;
+			entry << ']';
+		}
+		else
+			entry << "{global namespace}";
+
+		++depth;
+		atom.eachChild([&table, depth] (const Atom& child) -> bool {
+			printTreeRecursive(child, table, depth);
+			return true;
+		});
+
+		if (Atom::Type::classdef == atom.type)
+			trace(); // for beauty
+	}
+
+
 	} // anonymous namespace
 
 
@@ -283,67 +369,9 @@ namespace Nany
 	}
 
 
-	void Atom::doAppendCaption(YString& out, const ClassdefTableView* table, bool fullname) const
-	{
-		// append the name of its ancestor, with the table to resolve their specialization
-		// (for template clsses for example)
-		retrieveFullname(out, table, fullname); // parents
-
-		switch (type)
-		{
-			case Type::funcdef:
-			{
-				if (isMemberVarDefaultInit())
-					break;
-
-				if (isSpecial()) // for beauty
-					out << ' ';
-
-				if (isProperty()) // just the name for properties
-					break;
-			}
-			// [[fallthu]]
-			case Type::classdef:
-			case Type::typealias:
-			{
-				if (not tmplparams.empty())
-					atomParametersPrinter(out, tmplparams, table, false, "<:", ":>");
-				if (not parameters.empty())
-					atomParametersPrinter(out, parameters, table, true, "(", ")");
-
-				if (table)
-				{
-					if (not returnType.clid.isVoid() and table->hasClassdef(returnType.clid))
-					{
-						auto& retcdef = table->classdef(returnType.clid);
-						if (not retcdef.isVoid())
-						{
-							out.write(": ", 2);
-							retcdef.print(out, *table, false);
-						}
-						break;
-					}
-				}
-				else
-				{
-					if (not returnType.clid.isVoid())
-						out << ": ref";
-					break;
-				}
-				break;
-			}
-
-			case Type::namespacedef:
-			case Type::vardef:
-			case Type::unit:
-				break;
-		}
-	}
-
-
 	void Atom::retrieveCaption(YString& out, const ClassdefTableView& table) const
 	{
-		doAppendCaption(out, &table);
+		makeCaption(out, *this, &table);
 	}
 
 	YString Atom::caption(const ClassdefTableView& view) const
@@ -356,44 +384,14 @@ namespace Nany
 	YString Atom::caption() const
 	{
 		String out;
-		doAppendCaption(out, nullptr);
+		makeCaption(out, *this, nullptr);
 		return out;
-	}
-
-
-
-
-	inline void Atom::doPrintTree(const ClassdefTableView& table, uint depth) const
-	{
-		auto entry = trace();
-		for (uint i = depth; i--; )
-			entry.message.prefix << "    ";
-
-		if (parent != nullptr)
-		{
-			entry.message.prefix << table.keyword(*this) << ' ';
-			bool parentNames = isNamespace() or isUnit();
-			doAppendCaption(entry.data().message, &table, parentNames);
-			entry << " [id:" << atomid;
-			if (isMemberVariable())
-				entry << ", field: " << varinfo.effectiveFieldIndex;
-			entry << ']';
-		}
-		else
-			entry << "{global namespace}";
-
-		++depth;
-		for (auto& child: pChildren)
-			child.second->doPrintTree(table, depth);
-
-		if (Type::classdef == type)
-			trace(); // for beauty
 	}
 
 
 	void Atom::printTree(const ClassdefTableView& table) const
 	{
-		doPrintTree(table, 0);
+		printTreeRecursive(*this, table);
 	}
 
 

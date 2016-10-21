@@ -527,8 +527,6 @@ namespace Nany
 		explicit Atom(const AnyString& name, Type type);
 		//! Default constructor, with a parent
 		explicit Atom(Atom& rootparent, const AnyString& name, Type type);
-		void doPrintTree(const ClassdefTableView& table, uint depth) const;
-		void doAppendCaption(YString& out, const ClassdefTableView* table, bool fullname = true) const;
 
 	private:
 		//! All children
