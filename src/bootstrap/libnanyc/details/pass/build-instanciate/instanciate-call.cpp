@@ -14,45 +14,45 @@ namespace Pass
 namespace Instanciate
 {
 
-	namespace // anonymous
+	namespace {
+
+
+	template<class P, class O>
+	bool fetchPushedParameters(const P& pushedparams, O& overloadMatch, const AtomStackFrame& frame)
 	{
+		uint32_t atomid = frame.atomid;
 
-		template<class P, class O>
-		static inline bool fetchPushedParameters(const P& pushedparams, O& overloadMatch, const AtomStackFrame& frame)
+		// parameters
+		for (auto indxparm: pushedparams.func.indexed)
 		{
-			uint32_t atomid = frame.atomid;
-
-			// parameters
-			for (auto indxparm: pushedparams.func.indexed)
-			{
-				if (not frame.verify(indxparm.lvid))
-					return false;
-				overloadMatch.input.params.indexed.emplace_back(CLID{atomid, indxparm.lvid});
-			}
-			// named parameters
-			for (auto nmparm: pushedparams.func.named)
-			{
-				if (not frame.verify(nmparm.lvid))
-					return false;
-				overloadMatch.input.params.named.emplace_back(std::make_pair(nmparm.name, CLID{atomid, nmparm.lvid}));
-			}
-
-			// template parameters
-			for (auto indxparm: pushedparams.gentypes.indexed)
-			{
-				if (not frame.verify(indxparm.lvid))
-					return false;
-				overloadMatch.input.tmplparams.indexed.emplace_back(CLID{atomid, indxparm.lvid});
-			}
-			// named template parameters
-			for (auto nmparm: pushedparams.gentypes.named)
-			{
-				if (not frame.verify(nmparm.lvid))
-					return false;
-				overloadMatch.input.tmplparams.named.emplace_back(std::make_pair(nmparm.name, CLID{atomid, nmparm.lvid}));
-			}
-			return true;
+			if (not frame.verify(indxparm.lvid))
+				return false;
+			overloadMatch.input.params.indexed.emplace_back(CLID{atomid, indxparm.lvid});
 		}
+		// named parameters
+		for (auto nmparm: pushedparams.func.named)
+		{
+			if (not frame.verify(nmparm.lvid))
+				return false;
+			overloadMatch.input.params.named.emplace_back(std::make_pair(nmparm.name, CLID{atomid, nmparm.lvid}));
+		}
+
+		// template parameters
+		for (auto indxparm: pushedparams.gentypes.indexed)
+		{
+			if (not frame.verify(indxparm.lvid))
+				return false;
+			overloadMatch.input.tmplparams.indexed.emplace_back(CLID{atomid, indxparm.lvid});
+		}
+		// named template parameters
+		for (auto nmparm: pushedparams.gentypes.named)
+		{
+			if (not frame.verify(nmparm.lvid))
+				return false;
+			overloadMatch.input.tmplparams.named.emplace_back(std::make_pair(nmparm.name, CLID{atomid, nmparm.lvid}));
+		}
+		return true;
+	}
 
 
 	} // anonymous namespace
