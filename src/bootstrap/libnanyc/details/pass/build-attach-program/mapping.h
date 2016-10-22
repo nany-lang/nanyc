@@ -125,14 +125,11 @@ namespace Mapping
 		void visit(IR::ISA::Operand<IR::ISA::Op::qualifiers>&);
 		template<IR::ISA::Op O> void visit(IR::ISA::Operand<O>& operands);
 
-	private:
-		template<IR::ISA::Op O> void printError(const IR::ISA::Operand<O>& operands, AnyString msg = nullptr);
 		void printError(const IR::Instruction& operands, AnyString msg = nullptr);
-		template<IR::ISA::Op O> bool checkForLVID(const IR::ISA::Operand<O>& operands, LVID lvid);
-		void attachFuncCall(const IR::ISA::Operand<IR::ISA::Op::call>&);
-		void resetClassdefOriginFromCurrentPosition(Classdef& cdef);
 
-		void pushNewFrame(Atom& atom);
+	private:
+		void attachFuncCall(const IR::ISA::Operand<IR::ISA::Op::call>&);
+
 		void deleteAllFrames();
 		static void retriveReportMetadata(void* self, Logs::Level, const AST::Node*, Yuni::String&, uint32_t&, uint32_t&);
 

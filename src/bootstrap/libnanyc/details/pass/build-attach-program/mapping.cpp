@@ -14,6 +14,51 @@ namespace Pass
 namespace Mapping
 {
 
+	namespace {
+
+
+	void pushNewFrame(std::unique_ptr<AtomStackFrame>& atomStack, Atom& atom)
+	{
+		std::unique_ptr<AtomStackFrame> next{atomStack.release()};
+		atomStack = std::make_unique<AtomStackFrame>(atom, next);
+	}
+
+
+	void resetClassdefOriginFromCurrentPosition(SequenceMapping& mapping, Classdef& cdef)
+	{
+		cdef.origins.filename = mapping.currentFilename;
+		cdef.origins.line     = mapping.currentLine;
+		cdef.origins.offset   = mapping.currentOffset;
+	}
+
+
+	template<IR::ISA::Op O>
+	void operandError(SequenceMapping& mapping, const IR::ISA::Operand<O>& operands, AnyString msg)
+	{
+		mapping.printError(IR::Instruction::fromOpcode(operands), msg);
+	}
+
+
+	template<IR::ISA::Op O>
+	bool checkForLVID(SequenceMapping& mapping, const IR::ISA::Operand<O>& operands, LVID lvid)
+	{
+		if (debugmode)
+		{
+			if (unlikely(lvid == 0 or not (lvid < mapping.atomStack->classdefs.size())))
+			{
+				operandError(mapping, operands, String{"mapping: invalid lvid %"} << lvid
+					<< " (upper bound: %" << mapping.atomStack->classdefs.size() << ')');
+				return false;
+			}
+		}
+		return true;
+	}
+
+
+	} // anonymous namespace
+
+
+
 
 	SequenceMapping::SequenceMapping(ClassdefTable& cdeftable, Mutex& mutex, IR::Sequence& sequence)
 		: cdeftable(cdeftable)
@@ -36,13 +81,6 @@ namespace Mapping
 	}
 
 
-	inline void SequenceMapping::pushNewFrame(Atom& atom)
-	{
-		std::unique_ptr<AtomStackFrame> next{atomStack.release()};
-		atomStack = std::make_unique<AtomStackFrame>(atom, next);
-	}
-
-
 	void SequenceMapping::printError(const IR::Instruction& operands, AnyString msg)
 	{
 		// example: ICE: unknown opcode 'resolveAttribute': from 'ref %4 = resolve %3."()"'
@@ -57,7 +95,7 @@ namespace Mapping
 	}
 
 
-	inline void AtomStackFrame::CaptureVariables::enabled(Atom* newatom)
+	void AtomStackFrame::CaptureVariables::enabled(Atom* newatom)
 	{
 		atom = newatom;
 		atom->flags += Atom::Flags::captureVariables;
@@ -70,42 +108,11 @@ namespace Mapping
 	}
 
 
-	template<IR::ISA::Op O>
-	inline void SequenceMapping::printError(const IR::ISA::Operand<O>& operands, AnyString msg)
-	{
-		printError(IR::Instruction::fromOpcode(operands), msg);
-	}
-
-
-	template<IR::ISA::Op O>
-	inline bool SequenceMapping::checkForLVID(const IR::ISA::Operand<O>& operands, LVID lvid)
-	{
-		if (debugmode)
-		{
-			if (unlikely(lvid == 0 or not (lvid < atomStack->classdefs.size())))
-			{
-				printError(operands, String{"mapping: invalid lvid %"} << lvid << " (upper bound: %"
-					<< atomStack->classdefs.size() << ')');
-				return false;
-			}
-		}
-		return true;
-	}
-
-
-	inline void SequenceMapping::resetClassdefOriginFromCurrentPosition(Classdef& cdef)
-	{
-		cdef.origins.filename = currentFilename;
-		cdef.origins.line     = currentLine;
-		cdef.origins.offset   = currentOffset;
-	}
-
-
 	void SequenceMapping::attachFuncCall(const IR::ISA::Operand<IR::ISA::Op::call>& operands)
 	{
-		if (unlikely(not checkForLVID(operands, operands.ptr2func)))
+		if (unlikely(not checkForLVID(*this, operands, operands.ptr2func)))
 			return;
-		if (unlikely(not checkForLVID(operands, operands.lvid)))
+		if (unlikely(not checkForLVID(*this, operands, operands.lvid)))
 			return;
 
 		auto& stackframe     = *atomStack;
@@ -119,8 +126,7 @@ namespace Mapping
 
 			MutexLocker locker{mutex};
 
-			resetClassdefOriginFromCurrentPosition(cdeftable.classdef(clidRetValue));
-
+			resetClassdefOriginFromCurrentPosition(*this, cdeftable.classdef(clidRetValue));
 			auto& funcdef = cdeftable.addClassdefInterfaceSelf(clidFuncToCall);
 			funcdef.resetReturnType(clidRetValue);
 			funcdef.clid = clidFuncToCall;
@@ -157,7 +163,7 @@ namespace Mapping
 		Atom& atom = atomStack->currentAtomNotUnit();
 		AnyString funcname = currentSequence.stringrefs[operands.name];
 		if (unlikely(funcname.empty()))
-			return printError(operands, (isFuncdef) ? "invalid func name" : "invalid typedef name");
+			return operandError(*this, operands, (isFuncdef) ? "invalid func name" : "invalid typedef name");
 
 		// reset last lvid and parameters
 		lastLVID = 0;
@@ -197,7 +203,7 @@ namespace Mapping
 		// requires additional information
 		needAtomDbgFileReport = true;
 		needAtomDbgOffsetReport = true;
-		pushNewFrame(*newatom);
+		pushNewFrame(atomStack, *newatom);
 
 		// capture unknown variables ?
 		if (not isGlobalOperator)
@@ -257,7 +263,7 @@ namespace Mapping
 		// requires additional information
 		needAtomDbgFileReport = true;
 		needAtomDbgOffsetReport = true;
-		pushNewFrame(*newClassAtom);
+		pushNewFrame(atomStack, *newClassAtom);
 
 		if (operands.lvid != 0)
 			atomStack->capture.enabled(newClassAtom);
@@ -275,7 +281,7 @@ namespace Mapping
 		// (+1 since %1 is the return value/type)
 		uint paramLVID = (++frame.parameterIndex) + 1;
 
-		if (unlikely(not checkForLVID(operands, paramLVID)))
+		if (unlikely(not checkForLVID(*this, operands, paramLVID)))
 			return;
 
 		auto kind = static_cast<IR::ISA::Blueprint>(operands.kind);
@@ -284,7 +290,7 @@ namespace Mapping
 
 		bool isGenTypeParam = (kind == IR::ISA::Blueprint::gentypeparam);
 		if (unlikely(not isGenTypeParam and not frame.atom.isFunction()))
-			return printError(operands, "parameter for non-function");
+			return operandError(*this, operands, "parameter for non-function");
 
 		CLID clid{frame.atom.atomid, paramLVID};
 		AnyString name = currentSequence.stringrefs[operands.name];
@@ -295,7 +301,6 @@ namespace Mapping
 
 		if (frame.capture.enabled())
 			frame.capture.knownVars[name] = frame.scope;
-
 
 		MutexLocker locker{mutex};
 		// information about the parameter itself
@@ -326,9 +331,9 @@ namespace Mapping
 		Atom& atom = atomStack->currentAtomNotUnit();
 		AnyString varname = currentSequence.stringrefs[operands.name];
 		if (unlikely(varname.empty()))
-			return printError(operands, "invalid func name");
+			return operandError(*this, operands, "invalid func name");
 		if (unlikely(atom.type != Atom::Type::classdef))
-			return printError(operands, "vardef: invalid parent atom");
+			return operandError(*this, operands, "vardef: invalid parent atom");
 
 		if (atomStack->capture.enabled())
 			atomStack->capture.knownVars[varname] = atomStack->scope;
@@ -355,7 +360,7 @@ namespace Mapping
 		assert(newRoot != nullptr);
 		// create a pseudo classdef to easily retrieve the real atom from a clid
 		cdeftable.registerAtom(newRoot);
-		pushNewFrame(*newRoot);
+		pushNewFrame(atomStack, *newRoot);
 	}
 
 
@@ -373,14 +378,14 @@ namespace Mapping
 		// update atomid
 		operands.atomid = newRoot->atomid;
 		assert(newRoot->atomid != 0);
-		pushNewFrame(*newRoot);
+		pushNewFrame(atomStack, *newRoot);
 	}
 
 
 	void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
 	{
 		if (unlikely(nullptr == atomStack))
-			return printError(operands, "invalid stack for blueprint");
+			return operandError(*this, operands, "invalid stack for blueprint");
 
 		auto kind = static_cast<IR::ISA::Blueprint>(operands.kind);
 		switch (kind)
@@ -422,13 +427,12 @@ namespace Mapping
 	}
 
 
-	inline void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::pragma>& operands)
+	void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::pragma>& operands)
 	{
 		if (unlikely(nullptr == atomStack))
-			return printError(operands, "invalid stack for blueprint pragma");
+			return operandError(*this, operands, "invalid stack for blueprint pragma");
 
 		assert(static_cast<uint32_t>(operands.pragma) < IR::ISA::PragmaCount);
-
 		switch ((IR::ISA::Pragma) operands.pragma)
 		{
 			case IR::ISA::Pragma::codegen:
@@ -469,14 +473,14 @@ namespace Mapping
 	}
 
 
-	inline void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::stacksize>& operands)
+	void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::stacksize>& operands)
 	{
 		if (unlikely(nullptr == atomStack))
-			return printError(operands, "invalid parent atom");
+			return operandError(*this, operands, "invalid parent atom");
 
 		Atom& parentAtom = atomStack->atom;
 		if (unlikely(parentAtom.atomid == 0))
-			return printError(operands, "mapping: invalid parent atom id");
+			return operandError(*this, operands, "mapping: invalid parent atom id");
 
 		// creating all related classdefs
 		// (take max with 1 to prevent against invalid opcode)
@@ -494,7 +498,7 @@ namespace Mapping
 				// creating all related classdefs
 				// (take max with 1 to prevent against invalid opcode)
 				if (unlikely(localvarCount == 0))
-					return printError(operands, "invalid local variable count for a func blueprint");
+					return operandError(*this, operands, "invalid local variable count for a func blueprint");
 
 				// like parameters, the return type should not 'ref' by default
 				cdeftable.classdef(CLID{parentAtom.atomid, 1}).qualifiers.ref = false;
@@ -505,17 +509,17 @@ namespace Mapping
 	}
 
 
-	inline void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::scope>& operands)
+	void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::scope>& operands)
 	{
 		if (unlikely(nullptr == atomStack))
-			return printError(operands, "invalid stack");
+			return operandError(*this, operands, "invalid stack");
 
 		++(atomStack->scope);
 		lastLVID = 0;
 	}
 
 
-	inline void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::end>&)
+	void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::end>&)
 	{
 		// reset the last lvid
 		lastLVID = 0u;
@@ -558,16 +562,16 @@ namespace Mapping
 	}
 
 
-	inline void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::stackalloc>& operands)
+	void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::stackalloc>& operands)
 	{
-		if (unlikely(not checkForLVID(operands, operands.lvid)))
+		if (unlikely(not checkForLVID(*this, operands, operands.lvid)))
 			return;
 		lastLVID = operands.lvid;
 		auto clid = atomStack->classdefs[operands.lvid];
 
 		MutexLocker locker{mutex};
 		auto& cdef = cdeftable.classdef(clid);
-		resetClassdefOriginFromCurrentPosition(cdef);
+		resetClassdefOriginFromCurrentPosition(*this, cdef);
 		switch ((nytype_t) operands.type)
 		{
 			default:
@@ -582,12 +586,12 @@ namespace Mapping
 	}
 
 
-	inline void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::self>& operands)
+	void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::self>& operands)
 	{
-		if (unlikely(not checkForLVID(operands, operands.self)))
+		if (unlikely(not checkForLVID(*this, operands, operands.self)))
 			return;
 		if (unlikely(nullptr == atomStack))
-			return printError(operands, "invalid atom stack for 'resolveAsSelf'");
+			return operandError(*this, operands, "invalid atom stack for 'resolveAsSelf'");
 
 		// we can have at least 2 patterns:
 		//
@@ -603,28 +607,28 @@ namespace Mapping
 			{
 				MutexLocker locker{mutex};
 				auto& cdef = cdeftable.classdef(clid);
-				resetClassdefOriginFromCurrentPosition(cdef);
+				resetClassdefOriginFromCurrentPosition(*this, cdef);
 				cdef.mutateToAtom(&(rit->atom));
 				cdef.qualifiers.ref = true;
 				return;
 			}
 		}
 
-		// fallback - error
-		printError(operands, "failed to find parent class for 'resolveAsSelf'");
+		// fallback - operandError
+		operandError(*this, operands, "failed to find parent class for 'resolveAsSelf'");
 	}
 
 
-	inline void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::identify>& operands)
+	void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::identify>& operands)
 	{
-		if (unlikely(not checkForLVID(operands, operands.lvid)))
+		if (unlikely(not checkForLVID(*this, operands, operands.lvid)))
 			return;
 
 		if (unlikely(operands.text == 0))
-			return printError(operands, "invalid symbol name");
+			return operandError(*this, operands, "invalid symbol name");
 		AnyString name = currentSequence.stringrefs[operands.text];
 		if (unlikely(name.empty()))
-			return printError(operands, "invalid empty identifier");
+			return operandError(*this, operands, "invalid empty identifier");
 
 		lastLVID = operands.lvid;
 		auto& atomFrame = *atomStack;
@@ -651,13 +655,13 @@ namespace Mapping
 			// will see later - currently unknown
 			// classdef.mutateToAny();
 			cdeftable.addClassdefInterfaceSelf(clid, name);
-			resetClassdefOriginFromCurrentPosition(cdeftable.classdef(clid));
+			resetClassdefOriginFromCurrentPosition(*this, cdeftable.classdef(clid));
 		}
 		else
 		{
 			// trying to resolve an attribute
 			// (aka `parent.current`)
-			if (not checkForLVID(operands, operands.self))
+			if (not checkForLVID(*this, operands, operands.self))
 				return;
 
 			// the type is currently unknown
@@ -671,28 +675,28 @@ namespace Mapping
 			funcdef.clid  = clid;
 			auto& cdef = cdeftable.classdef(clid);
 			cdef.parentclid = selfClassdef;
-			resetClassdefOriginFromCurrentPosition(cdef);
+			resetClassdefOriginFromCurrentPosition(*this, cdef);
 		}
 	}
 
 
-	inline void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::identifyset>& operands)
+	void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::identifyset>& operands)
 	{
 		auto& newopc = IR::Instruction::fromOpcode(operands).to<IR::ISA::Op::identify>();
 		visit(newopc);
 	}
 
 
-	inline void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::tpush>& operands)
+	void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::tpush>& operands)
 	{
-		if (unlikely(not checkForLVID(operands, operands.lvid)))
+		if (unlikely(not checkForLVID(*this, operands, operands.lvid)))
 			return;
 	}
 
 
-	inline void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::push>& operands)
+	void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::push>& operands)
 	{
-		if (unlikely(not checkForLVID(operands, operands.lvid)))
+		if (unlikely(not checkForLVID(*this, operands, operands.lvid)))
 			return;
 
 		if (operands.name != 0) // named parameter
@@ -703,14 +707,14 @@ namespace Mapping
 		else
 		{
 			if (unlikely(not lastPushedNamedParameters.empty()))
-				return printError(operands, "named parameters must be provided after standard parameters");
+				return operandError(*this, operands, "named parameters must be provided after standard parameters");
 
 			lastPushedIndexedParameters.emplace_back(operands.lvid);
 		}
 	}
 
 
-	inline void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::call>& operands)
+	void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::call>& operands)
 	{
 		attachFuncCall(operands);
 		lastLVID = operands.lvid;
@@ -719,11 +723,11 @@ namespace Mapping
 	}
 
 
-	inline void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::ret>& operands)
+	void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::ret>& operands)
 	{
 		if (operands.lvid != 0)
 		{
-			if (unlikely(not checkForLVID(operands, operands.lvid)))
+			if (unlikely(not checkForLVID(*this, operands, operands.lvid)))
 				return;
 
 			auto& classdefRetValue = atomStack->classdefs[1]; // 1 is the return value
@@ -736,11 +740,11 @@ namespace Mapping
 	}
 
 
-	inline void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::follow>& operands)
+	void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::follow>& operands)
 	{
-		if (unlikely(not checkForLVID(operands, operands.lvid)))
+		if (unlikely(not checkForLVID(*this, operands, operands.lvid)))
 			return;
-		if (unlikely(not checkForLVID(operands, operands.follower)))
+		if (unlikely(not checkForLVID(*this, operands, operands.follower)))
 			return;
 
 		auto& clidFollower = atomStack->classdefs[operands.follower];
@@ -754,14 +758,14 @@ namespace Mapping
 	}
 
 
-	inline void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::intrinsic>& operands)
+	void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::intrinsic>& operands)
 	{
-		if (unlikely(not checkForLVID(operands, operands.lvid)))
+		if (unlikely(not checkForLVID(*this, operands, operands.lvid)))
 			return;
 	}
 
 
-	inline void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::debugfile>& operands)
+	void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::debugfile>& operands)
 	{
 		currentFilename = currentSequence.stringrefs[operands.filename].c_str();
 		if (needAtomDbgFileReport)
@@ -772,7 +776,7 @@ namespace Mapping
 	}
 
 
-	inline void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::debugpos>& operands)
+	void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::debugpos>& operands)
 	{
 		currentLine = operands.line;
 		currentOffset = operands.offset;
@@ -786,7 +790,7 @@ namespace Mapping
 	}
 
 
-	inline void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::qualifiers>& operands)
+	void SequenceMapping::visit(IR::ISA::Operand<IR::ISA::Op::qualifiers>& operands)
 	{
 		assert(static_cast<uint32_t>(operands.qualifier) < IR::ISA::TypeQualifierCount);
 		CLID clid {atomStack->atom.atomid, operands.lvid};
@@ -794,7 +798,7 @@ namespace Mapping
 
 		MutexLocker locker{mutex};
 		if (debugmode and not cdeftable.hasClassdef(clid))
-			return printError(operands, "invalid clid");
+			return operandError(*this, operands, "invalid clid");
 
 		auto& qualifiers = cdeftable.classdef(clid).qualifiers;
 		switch (operands.qualifier)
@@ -806,7 +810,7 @@ namespace Mapping
 
 
 	template<IR::ISA::Op O>
-	inline void SequenceMapping::visit(IR::ISA::Operand<O>& operands)
+	void SequenceMapping::visit(IR::ISA::Operand<O>& operands)
 	{
 		switch (O)
 		{
@@ -834,7 +838,7 @@ namespace Mapping
 				break;
 				// error for all the other ones
 			default:
-				printError(operands);
+				operandError(*this, operands, "unsupported opcode in mapping");
 				break;
 		}
 	}
@@ -844,7 +848,7 @@ namespace Mapping
 	{
 		// some reset if reused
 		assert(not atomStack);
-		pushNewFrame(parentAtom);
+		pushNewFrame(atomStack, parentAtom);
 
 		lastLVID = 0u;
 		lastPushedNamedParameters.clear();
