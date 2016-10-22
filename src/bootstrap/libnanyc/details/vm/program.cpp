@@ -15,26 +15,27 @@ namespace Nany
 namespace VM
 {
 
-	namespace // anonymous
-	{
+	namespace {
 
-		static inline void flushAll(nyconsole_t& console)
+
+	void flushAll(nyconsole_t& console)
+	{
+		if (console.flush)
 		{
-			if (console.flush)
-			{
-				console.flush(console.internal, nycerr);
-				console.flush(console.internal, nycout);
-			}
+			console.flush(console.internal, nycerr);
+			console.flush(console.internal, nycout);
 		}
+	}
 
 
 	} // anonymous namespace
 
 
+
+
 	void Program::destroy()
 	{
 		this->~Program();
-
 		auto& allocator = const_cast<nyallocator_t&>(cf.allocator);
 		allocator.deallocate(&allocator, this, sizeof(Nany::VM::Program));
 	}

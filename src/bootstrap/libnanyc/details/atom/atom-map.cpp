@@ -10,78 +10,86 @@ using namespace Yuni;
 namespace Nany
 {
 
+	namespace {
+
+
+	bool createDummyAtom(Atom::Ptr& out)
+	{
+		out = Atom::createDummy();
+		out->builtinMapping = nyt_void;
+		return true;
+	}
+
+
+	bool findCoreObject(Atom::Ptr& out, nytype_t kind, const AnyString& name, Atom& root)
+	{
+		if (not Config::importNSL)
+			return createDummyAtom(out);
+
+		Atom* atom = nullptr;
+		switch (root.findClassAtom(atom, name))
+		{
+			case 1:
+			{
+				assert(atom != nullptr);
+				out = atom;
+				atom->builtinMapping = kind;
+				return true;
+			}
+			case 0:
+			{
+				error() << "failed to find builtin 'class " << name << "' from nsl";
+				break;
+			}
+			default:
+			{
+				error() << "multiple definition for 'class" << name << "'";
+			}
+		}
+		return false;
+	}
+
+
+	} // anonymous namespace
+
+
+
+
 	AtomMap::AtomMap(StringRefs& stringrefs)
 		: root(AnyString(), Atom::Type::namespacedef) // global namespace
 		, stringrefs(stringrefs)
 	{
-		// since `pAtomGrpID` will start from 1
-		pByIndex.push_back(nullptr);
+		// since `m_atomGrpID` will start from 1
+		m_byIndex.push_back(nullptr);
 	}
 
 
 	Atom* AtomMap::createNewAtom(Atom::Type type, Atom& parent, const AnyString& name)
 	{
 		auto* newnode   = new Atom(parent, stringrefs.refstr(name), type);
-		newnode->atomid = ++pAtomGrpID;
-		pByIndex.emplace_back(newnode);
+		newnode->atomid = ++m_atomGrpID;
+		m_byIndex.emplace_back(newnode);
 		return newnode;
 	}
 
 
-	const IR::Sequence* AtomMap::fetchSequence(uint32_t atomid, uint32_t instanceid) const
+	Atom* AtomMap::createVardef(Atom& parent, const AnyString& name)
 	{
-		if (atomid < pByIndex.size())
-			return pByIndex[atomid]->fetchInstance(instanceid);
-		return nullptr;
+		assert(not name.empty());
+		auto* atom = createNewAtom(Atom::Type::vardef, parent, name);
+		auto fieldindex = parent.classinfo.nextFieldIndex++;
+		atom->varinfo.fieldindex = fieldindex;
+		atom->varinfo.effectiveFieldIndex = fieldindex;
+		return atom;
 	}
 
 
-	AnyString AtomMap::fetchSequenceCaption(uint32_t atomid, uint32_t instanceid) const
+	AnyString AtomMap::symbolname(uint32_t atomid, uint32_t index) const
 	{
-		if (atomid < pByIndex.size())
-			return pByIndex[atomid]->fetchInstanceCaption(instanceid);
+		if (atomid < m_byIndex.size())
+			return m_byIndex[atomid]->instantiation(index).symbolname();
 		return AnyString{};
 	}
-
-
-
-
-	namespace // anonymous
-	{
-		static inline bool findCoreObject(Atom::Ptr& out, nytype_t kind, const AnyString& name, Atom& root)
-		{
-			if (Config::importNSL)
-			{
-				Atom* atom;
-				switch (root.findClassAtom(atom, name))
-				{
-					case 1:
-					{
-						out = atom;
-						atom->builtinMapping = kind;
-						return true;
-					}
-					case 0:
-					{
-						error() << "failed to find builtin 'class " << name << "' from nsl";
-						break;
-					}
-					default:
-					{
-						error() << "multiple definition for 'class" << name << "'";
-					}
-				}
-				return false;
-			}
-			else
-			{
-				out = Atom::createDummy();
-				out->builtinMapping = nyt_void;
-				return true;
-			}
-		}
-
-	} // anonymous namespace
 
 
 	bool AtomMap::fetchAndIndexCoreObjects()
@@ -112,7 +120,6 @@ namespace Nany
 		}
 		return success;
 	}
-
 
 
 } // namespace Nany

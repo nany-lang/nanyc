@@ -14,157 +14,241 @@ using namespace Yuni;
 namespace Nany
 {
 
-	namespace // anonymous
+	namespace {
+
+
+	template<class OutT, class ListT, class TableT>
+	void atomParametersPrinter(OutT& out, ListT& list, const TableT* table, bool avoidSelf, AnyString sepBefore, AnyString sepAfter)
 	{
-
-		template<class OutT, class ListT, class TableT>
-		static void atomParametersPrinter(OutT& out, ListT& list, const TableT* table, bool avoidSelf, AnyString sepBefore, AnyString sepAfter)
+		bool first = true;
+		out << sepBefore;
+		list.each([&](uint32_t i, const AnyString& paramname, const Vardef& vardef)
 		{
-			bool first = true;
-			out << sepBefore;
-			list.each([&](uint32_t i, const AnyString& paramname, const Vardef& vardef)
-			{
-				// avoid the first virtual parameter
-				if (avoidSelf and i == 0 and paramname == "self")
-					return;
+			// avoid the first virtual parameter
+			if (avoidSelf and i == 0 and paramname == "self")
+				return;
 
-				if (not first)
-					out << ", ";
-				first = false;
-				out << paramname;
+			if (not first)
+				out << ", ";
+			first = false;
+			out << paramname;
+
+			if (table)
+			{
+				if (table) // and table->hasClassdef(vardef.clid))
+				{
+					if (table->hasClassdef(vardef.clid))
+					{
+						auto& retcdef = table->rawclassdef(vardef.clid);
+						if (not retcdef.isVoid())
+						{
+							out << ": ";
+							retcdef.print(out, *table, false);
+							if (debugmode)
+								out << ' ' << retcdef.clid;
+						}
+					}
+				}
+			}
+			else
+			{
+				if (not vardef.clid.isVoid())
+					out << ": any";
+			}
+		});
+		out << sepAfter;
+	}
+
+
+	Flags<Atom::Category> findCategory(Atom* parent, Atom::Type type, const AnyString& name)
+	{
+		Flags<Atom::Category> category;
+
+		if (parent and parent->type == Atom::Type::classdef)
+			category += Atom::Category::classParent;
+
+		if (unlikely(name.empty()))
+			return category;
+
+		switch (type)
+		{
+			case Atom::Type::funcdef:
+			{
+				if (name[0] == '^')
+				{
+					category += Atom::Category::special;
+
+					if (category(Atom::Category::classParent))
+					{
+						if (name == "^new" or name == "^default-new")
+						{
+							category += Atom::Category::ctor;
+						}
+						else if (name == "^clone")
+						{
+							category += Atom::Category::clone;
+						}
+						else if (name == "^#user-dispose")
+						{
+							category += Atom::Category::dtor;
+						}
+						else if (name.startsWith("^view^"))
+						{
+							category += Atom::Category::view;
+						}
+						else if (name.startsWith("^default-var-%"))
+						{
+							category += Atom::Category::defvarInit;
+						}
+						else
+						{
+							category += Atom::Category::funcoperator;
+							if (name == "^()")
+								category += Atom::Category::functor;
+						}
+					}
+					else
+					{
+						if (name.startsWith("^unittest^"))
+							category += Atom::Category::unittest;
+						else
+							category += Atom::Category::funcoperator;
+					}
+
+					if (category(Atom::Category::funcoperator))
+					{
+						if (name.startsWith("^propget^"))
+							category += Atom::Category::propget;
+						else if (name.startsWith("^propset^"))
+							category += Atom::Category::propset;
+					}
+				}
+				break;
+			}
+			case Atom::Type::vardef:
+			{
+				if (name.startsWith("^trap^"))
+					category += Atom::Category::capturedVar;
+				break;
+			}
+			default:
+				break;
+		}
+		return category;
+	}
+
+
+	void makeCaption(String& out, const Atom& atom, const ClassdefTableView* table, bool fullname = true)
+	{
+		// append the name of its ancestor, with the table to resolve their specialization
+		// (for template clsses for example)
+		atom.retrieveFullname(out, table, fullname); // parents
+
+		switch (atom.type)
+		{
+			case Atom::Type::funcdef:
+			{
+				if (atom.isMemberVarDefaultInit())
+					break;
+				if (atom.isSpecial()) // for beauty
+					out << ' ';
+				if (atom.isProperty()) // just the name for properties
+					break;
+			}
+			// [[fallthu]]
+			case Atom::Type::classdef:
+			case Atom::Type::typealias:
+			{
+				if (not atom.tmplparams.empty())
+					atomParametersPrinter(out, atom.tmplparams, table, false, "<:", ":>");
+				if (not atom.parameters.empty())
+					atomParametersPrinter(out, atom.parameters, table, true, "(", ")");
 
 				if (table)
 				{
-					if (table) // and table->hasClassdef(vardef.clid))
+					if (not atom.returnType.clid.isVoid() and table->hasClassdef(atom.returnType.clid))
 					{
-						if (table->hasClassdef(vardef.clid))
+						auto& retcdef = table->classdef(atom.returnType.clid);
+						if (not retcdef.isVoid())
 						{
-							auto& retcdef = table->rawclassdef(vardef.clid);
-							if (not retcdef.isVoid())
-							{
-								out << ": ";
-								retcdef.print(out, *table, false);
-								if (debugmode)
-									out << ' ' << retcdef.clid;
-							}
+							out.write(": ", 2);
+							retcdef.print(out, *table, false);
 						}
+						break;
 					}
 				}
 				else
 				{
-					if (not vardef.clid.isVoid())
-						out << ": any";
+					if (not atom.returnType.clid.isVoid())
+						out << ": ref";
+					break;
 				}
-			});
-			out << sepAfter;
+				break;
+			}
+
+			case Atom::Type::namespacedef:
+			case Atom::Type::vardef:
+			case Atom::Type::unit:
+				break;
 		}
+	}
+
+
+	void printTreeRecursive(const Atom& atom, const ClassdefTableView& table, uint depth = 0)
+	{
+		auto entry = trace();
+		for (uint i = depth; i--; )
+			entry.message.prefix << "    ";
+
+		if (atom.parent != nullptr)
+		{
+			entry.message.prefix << table.keyword(atom) << ' ';
+			bool parentNames = atom.isNamespace() or atom.isUnit();
+			makeCaption(entry.data().message, atom, &table, parentNames);
+			entry << " [id:" << atom.atomid;
+			if (atom.isMemberVariable())
+				entry << ", field: " << atom.varinfo.effectiveFieldIndex;
+			entry << ']';
+		}
+		else
+			entry << "{global namespace}";
+
+		++depth;
+		atom.eachChild([&table, depth] (const Atom& child) -> bool {
+			printTreeRecursive(child, table, depth);
+			return true;
+		});
+
+		if (Atom::Type::classdef == atom.type)
+			trace(); // for beauty
+	}
+
 
 	} // anonymous namespace
 
 
 
 
-	inline void Atom::name(const AnyString& newname)
-	{
-		pName = newname;
-		category.clear();
-
-		if (parent and parent->type == Type::classdef)
-			category += Category::classParent;
-
-		if (not newname.empty())
-		{
-			switch (type)
-			{
-				case Type::funcdef:
-				{
-					if (newname[0] == '^')
-					{
-						category += Category::special;
-
-						if (category(Category::classParent))
-						{
-							if (newname == "^new" or newname == "^default-new")
-							{
-								category += Category::ctor;
-							}
-							else if (newname == "^clone")
-							{
-								category += Category::clone;
-							}
-							else if (newname == "^#user-dispose")
-							{
-								category += Category::dtor;
-							}
-							else if (newname.startsWith("^view^"))
-							{
-								category += Category::view;
-							}
-							else if (newname.startsWith("^default-var-%"))
-							{
-								category += Category::defvarInit;
-							}
-							else
-							{
-								category += Category::funcoperator;
-								if (newname == "^()")
-									category += Category::functor;
-							}
-						}
-						else
-						{
-							if (newname.startsWith("^unittest^"))
-							{
-								category += Category::unittest;
-							}
-							else
-								category += Category::funcoperator;
-						}
-
-						if (category(Category::funcoperator))
-						{
-							if (newname.startsWith("^propget^"))
-								category += Category::propget;
-							else if (newname.startsWith("^propset^"))
-								category += Category::propset;
-						}
-					}
-					break;
-				}
-
-				case Type::vardef:
-				{
-					if (newname.startsWith("^trap^"))
-						category += Category::capturedVar;
-					break;
-				}
-
-				default:
-					break;
-			}
-		}
-	}
+	Atom::Atom(const AnyString& name, Atom::Type type)
+		: category{findCategory(nullptr, type, name)}
+		, type(type)
+		, m_name{name}
+	{}
 
 
-	Atom::Atom(const AnyString& atomName, Atom::Type type)
-		: type(type)
-	{
-		this->name(atomName);
-	}
-
-
-	Atom::Atom(Atom& rootparent, const AnyString& atomName, Atom::Type type)
-		: type(type)
+	Atom::Atom(Atom& rootparent, const AnyString& name, Atom::Type type)
+		: category{findCategory(&rootparent, type, name)}
+		, type(type)
 		, parent(&rootparent)
+		, m_name{name}
 	{
-		this->name(atomName);
-		rootparent.pChildren.insert(std::pair<AnyString, Atom::Ptr>(atomName, this));
+		rootparent.m_children.emplace(AnyString{m_name}, this);
 	}
 
 
 	Atom::~Atom()
 	{
-		assert(instances.size() == pInstancesMD.size());
+		assert(instances.size() == m_instancesMD.size());
 		if (opcodes.owned)
 			delete opcodes.sequence;
 	}
@@ -193,7 +277,6 @@ namespace Nany
 			// not on the same target ? Only public elements are accessible
 			return atom.isPublicOrPublished();
 		}
-		return false; // fallback
 	}
 
 
@@ -213,13 +296,13 @@ namespace Nany
 				{
 					if (not isSpecial())
 					{
-						out += pName;
+						out += m_name;
 					}
 					else
 					{
 						if (isMemberVarDefaultInit())
 						{
-							AnyString sub{pName, 14};
+							AnyString sub{m_name, 14};
 							auto ix = sub.find('-');
 
 							if (ix < sub.size())
@@ -233,21 +316,21 @@ namespace Nany
 						else if (isProperty())
 						{
 							if (isPropertyGet() or isPropertySet()) // ^propget^ / ^propset^
-								out << AnyString{pName, 9};
+								out << AnyString{m_name, 9};
 							else
 								out << "<unmanaged prop>";
 						}
 						else if (isView())
 						{
 							out += ':'; // ^view^
-							out.append(AnyString{pName, 6});
+							out.append(AnyString{m_name, 6});
 						}
 						else if (isUnittest())
 						{
-							out.append(AnyString{pName, 17}); // "^unittest^module:<name>"
+							out.append(AnyString{m_name, 17}); // "^unittest^module:<name>"
 						}
 						else
-							out.append(AnyString{pName, 1}); // operator like, removing ^
+							out.append(AnyString{m_name, 1}); // operator like, removing ^
 					}
 
 					if (not tmplparamsForPrinting.empty())
@@ -257,7 +340,7 @@ namespace Nany
 
 				case Type::classdef:
 				{
-					out += pName;
+					out += m_name;
 
 					if (not tmplparamsForPrinting.empty())
 						atomParametersPrinter(out, tmplparamsForPrinting, table, false, "<:", ":>");
@@ -269,7 +352,7 @@ namespace Nany
 				case Type::vardef:
 				case Type::unit:
 				{
-					out += pName;
+					out += m_name;
 					break;
 				}
 			}
@@ -277,125 +360,39 @@ namespace Nany
 	}
 
 
-	YString Atom::fullname() const
+	String Atom::fullname() const
 	{
-		YString out;
+		String out;
 		retrieveFullname(out);
 		return out;
 	}
 
 
-	void Atom::doAppendCaption(YString& out, const ClassdefTableView* table, bool fullname) const
+	void Atom::retrieveCaption(String& out, const ClassdefTableView& table) const
 	{
-		// append the name of its ancestor, with the table to resolve their specialization
-		// (for template clsses for example)
-		retrieveFullname(out, table, fullname); // parents
-
-		switch (type)
-		{
-			case Type::funcdef:
-			{
-				if (isMemberVarDefaultInit())
-					break;
-
-				if (isSpecial()) // for beauty
-					out << ' ';
-
-				if (isProperty()) // just the name for properties
-					break;
-			}
-			// [[fallthu]]
-			case Type::classdef:
-			case Type::typealias:
-			{
-				if (not tmplparams.empty())
-					atomParametersPrinter(out, tmplparams, table, false, "<:", ":>");
-				if (not parameters.empty())
-					atomParametersPrinter(out, parameters, table, true, "(", ")");
-
-				if (table)
-				{
-					if (not returnType.clid.isVoid() and table->hasClassdef(returnType.clid))
-					{
-						auto& retcdef = table->classdef(returnType.clid);
-						if (not retcdef.isVoid())
-						{
-							out.write(": ", 2);
-							retcdef.print(out, *table, false);
-						}
-						break;
-					}
-				}
-				else
-				{
-					if (not returnType.clid.isVoid())
-						out << ": ref";
-					break;
-				}
-				break;
-			}
-
-			case Type::namespacedef:
-			case Type::vardef:
-			case Type::unit:
-				break;
-		}
+		makeCaption(out, *this, &table);
 	}
 
 
-	void Atom::retrieveCaption(YString& out, const ClassdefTableView& table) const
-	{
-		doAppendCaption(out, &table);
-	}
-
-	YString Atom::caption(const ClassdefTableView& view) const
+	String Atom::caption(const ClassdefTableView& view) const
 	{
 		String out;
 		retrieveCaption(out, view);
 		return out;
 	}
 
-	YString Atom::caption() const
+
+	String Atom::caption() const
 	{
 		String out;
-		doAppendCaption(out, nullptr);
+		makeCaption(out, *this, nullptr);
 		return out;
-	}
-
-
-
-
-	inline void Atom::doPrintTree(const ClassdefTableView& table, uint depth) const
-	{
-		auto entry = trace();
-		for (uint i = depth; i--; )
-			entry.message.prefix << "    ";
-
-		if (parent != nullptr)
-		{
-			entry.message.prefix << table.keyword(*this) << ' ';
-			bool parentNames = isNamespace() or isUnit();
-			doAppendCaption(entry.data().message, &table, parentNames);
-			entry << " [id:" << atomid;
-			if (isMemberVariable())
-				entry << ", field: " << varinfo.effectiveFieldIndex;
-			entry << ']';
-		}
-		else
-			entry << "{global namespace}";
-
-		++depth;
-		for (auto& child: pChildren)
-			child.second->doPrintTree(table, depth);
-
-		if (Type::classdef == type)
-			trace(); // for beauty
 	}
 
 
 	void Atom::printTree(const ClassdefTableView& table) const
 	{
-		doPrintTree(table, 0);
+		printTreeRecursive(*this, table);
 	}
 
 
@@ -493,52 +490,59 @@ namespace Nany
 	}
 
 
-	uint32_t Atom::invalidateInstance(const Signature& signature, uint32_t id)
+	uint32_t Atom::invalidateInstantiation(uint32_t index, const Signature& signature)
 	{
-		assert(id < instances.size());
-		assert(id < pInstancesMD.size());
-		assert(instances.size() == pInstancesMD.size());
+		assert(index < instances.size());
+		assert(index < m_instancesMD.size());
+		assert(instances.size() == m_instancesMD.size());
 
-		instances[id].reset(nullptr);
-		pInstancesIDs[signature] = (uint32_t) -1;
-
-		auto& md = pInstancesMD[id];
-		md.sequence = nullptr;
-		md.remapAtom = nullptr;
+		instances[index].reset(nullptr);
+		m_instancesIDs[signature] = (uint32_t) -1;
+		auto& details = m_instancesMD[index];
+		details.sequence = nullptr;
+		details.remapAtom = nullptr;
 		return (uint32_t) -1;
 	}
 
 
-	uint32_t Atom::createInstanceID(const Signature& signature, IR::Sequence* sequence, Atom* remapAtom)
+	uint32_t Atom::createInstantiation(const Signature& signature, IR::Sequence* sequence, Atom* remapAtom)
 	{
 		assert(sequence != nullptr);
-		// the new instanceID
-		uint32_t iid = (uint32_t) instances.size();
-
+		uint32_t index = static_cast<uint32_t>(instances.size());
 		instances.emplace_back(sequence);
-		pInstancesMD.emplace_back();
-		assert(instances.size() == pInstancesMD.size());
+		m_instancesMD.emplace_back();
+		assert(instances.size() == m_instancesMD.size());
 
-		auto& md = pInstancesMD[iid];
-		md.remapAtom = remapAtom;
-		md.sequence  = sequence;
+		auto& details = m_instancesMD[index];
+		details.remapAtom = remapAtom;
+		details.sequence  = sequence;
 
-		pInstancesIDs.insert(std::make_pair(signature, iid));
-		assert(instances.size() == pInstancesMD.size());
-		return iid;
+		m_instancesIDs.emplace(signature, index);
+		assert(instances.size() == m_instancesMD.size());
+		return index;
 	}
 
 
-	Tribool::Value Atom::findInstance(const Signature& signature, uint32_t& iid, Classdef& rettype, Atom*& remapAtom) const
+	void Atom::updateInstantiation(uint32_t index, String&& symbol, const Classdef& rettype)
 	{
-		auto it = pInstancesIDs.find(signature);
-		if (it != pInstancesIDs.end())
+		assert(index < m_instancesMD.size());
+		auto& details = m_instancesMD[index];
+		details.rettype.import(rettype);
+		details.rettype.qualifiers = rettype.qualifiers;
+		details.symbol = std::move(symbol);
+	}
+
+
+	Tribool::Value Atom::isInstantiationValid(const Signature& signature, uint32_t& iid, Classdef& rettype, Atom*& remapAtom) const
+	{
+		auto it = m_instancesIDs.find(signature);
+		if (it != m_instancesIDs.end())
 		{
 			uint32_t id = it->second;
 			if (id != (uint32_t) -1)
 			{
-				assert(id < pInstancesMD.size());
-				auto& md  = pInstancesMD[id];
+				assert(id < m_instancesMD.size());
+				auto& md  = m_instancesMD[id];
 
 				iid       = id;
 				remapAtom = md.remapAtom;
@@ -555,12 +559,12 @@ namespace Nany
 
 	void Atom::printInstances(Clob& out, const AtomMap& atommap) const
 	{
-		assert(instances.size() == pInstancesMD.size());
+		assert(instances.size() == m_instancesMD.size());
 		String prgm;
 
 		for (size_t i = 0; i != instances.size(); ++i)
 		{
-			out << pInstancesMD[i].symbol << " // " << atomid << " #" << i << "\n{\n";
+			out << m_instancesMD[i].symbol << " // " << atomid << " #" << i << "\n{\n";
 
 			instances[i].get()->print(prgm, &atommap);
 
@@ -568,28 +572,6 @@ namespace Nany
 			prgm.trimRight();
 			out << prgm << "\n}\n";
 		}
-	}
-
-
-	uint32_t Atom::findInstanceID(const IR::Sequence& sequence) const
-	{
-		for (size_t i = 0; i != instances.size(); ++i)
-		{
-			if (&sequence == instances[i].get())
-				return static_cast<uint32_t>(i);
-		}
-		return (uint32_t) -1;
-	}
-
-
-	AnyString Atom::findInstanceCaption(const IR::Sequence& sequence) const
-	{
-		for (size_t i = 0; i != instances.size(); ++i)
-		{
-			if (&sequence == instances[i].get())
-				return pInstancesMD[i].symbol;
-		}
-		return AnyString{};
 	}
 
 
@@ -659,6 +641,7 @@ namespace Nany
 		}
 	}
 
+
 	AnyString Atom::keyword() const
 	{
 		switch (type)
@@ -697,7 +680,7 @@ namespace Nany
 
 		eachChild([&](Atom& child) -> bool
 		{
-			if (child.isClass() and child.pName == name)
+			if (child.isClass() and child.m_name == name)
 			{
 				if (likely(atomA == nullptr))
 				{
@@ -720,7 +703,6 @@ namespace Nany
 	}
 
 
-
 	uint32_t Atom::findFuncAtom(Atom*& out, const AnyString& name)
 	{
 		// first, try to find the dtor function
@@ -729,7 +711,7 @@ namespace Nany
 
 		eachChild([&](Atom& child) -> bool
 		{
-			if (child.isFunction() and child.pName == name)
+			if (child.isFunction() and child.m_name == name)
 			{
 				if (likely(atomA == nullptr))
 				{
@@ -760,7 +742,7 @@ namespace Nany
 
 		eachChild([&](Atom& child) -> bool
 		{
-			if (child.isMemberVariable() and child.pName == name)
+			if (child.isMemberVariable() and child.m_name == name)
 			{
 				if (likely(atomA == nullptr))
 				{
@@ -790,7 +772,7 @@ namespace Nany
 
 		eachChild([&](Atom& child) -> bool
 		{
-			if (child.isNamespace() and child.pName == name)
+			if (child.isNamespace() and child.m_name == name)
 			{
 				atomA = &child;
 				return false;
@@ -804,17 +786,17 @@ namespace Nany
 	void Atom::renameChild(const AnyString& from, const AnyString& to)
 	{
 		Ptr child;
-		auto range = pChildren.equal_range(from);
+		auto range = m_children.equal_range(from);
 		for (auto it = range.first; it != range.second; )
 		{
 			if (unlikely(!!child)) // error
 				return;
 			child = it->second;
-			it = pChildren.erase(it);
+			it = m_children.erase(it);
 		}
-
-		child->name(to);
-		pChildren.insert(std::pair<AnyString, Atom::Ptr>(to, child));
+		child->m_name = to;
+		child->category = findCategory(child->parent, child->type, to);
+		m_children.emplace(AnyString{child->m_name}, child);
 	}
 
 

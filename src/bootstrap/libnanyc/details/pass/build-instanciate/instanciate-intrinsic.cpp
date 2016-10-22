@@ -39,7 +39,7 @@ namespace Instanciate
 			}
 
 			// trying user-defined intrinsic
-			auto* intrinsic = intrinsics.find(name);
+			auto intrinsic = intrinsics.find(name);
 
 			// if not found, this could be a compiler intrinsic
 			if (intrinsic == nullptr)

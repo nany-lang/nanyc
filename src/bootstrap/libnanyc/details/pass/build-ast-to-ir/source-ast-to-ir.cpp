@@ -27,16 +27,16 @@ namespace Nany
 		auto& out = buildinfo.parsing.sequence;
 
 		// helper for generating IR code
-		auto producer = std::make_unique<IR::Producer::Context>(buildinfo.cf, pFilename, out, report);
+		auto producer = std::make_unique<IR::Producer::Context>(buildinfo.cf, m_filename, out, report);
 		// generate namespace-related opcodes
 		producer->useNamespace(buildinfo.parsing.nmspc.first);
 		// map code offset (in bytes) with line numbers (from source input)
-		producer->generateLineIndexes(pContent);
+		producer->generateLineIndexes(m_content);
 
 		// generate IR code for all AST nodes
 		IR::Producer::Scope scope{*producer};
 		scope.addDebugCurrentFilename();
-		uint32_t bpoffset = out.emitBlueprintUnit(pFilename);
+		uint32_t bpoffset = out.emitBlueprintUnit(m_filename);
 		uint32_t bpoffsiz = out.emitBlueprintSize();
 		uint32_t bpoffsck = out.emitStackSizeIncrease();
 
@@ -51,8 +51,8 @@ namespace Nany
 
 		// do not keep back information
 		buildinfo.parsing.parser.clear();
-		pContent.clear();
-		pContent.shrink();
+		m_content.clear();
+		m_content.shrink();
 		return success;
 	}
 

@@ -53,7 +53,7 @@ namespace VM
 
 			build.printStderr(" in '");
 
-			const auto& caption = map.fetchSequenceCaption(frame.atomidInstance[0], frame.atomidInstance[1]);
+			auto caption = map.symbolname(frame.atomidInstance[0], frame.atomidInstance[1]);
 			build.cerrColor(nyc_white);
 			build.printStderr(caption);
 			build.cerrColor(nyc_none);

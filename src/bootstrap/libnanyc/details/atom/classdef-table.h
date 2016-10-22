@@ -184,9 +184,9 @@ namespace Nany
 		};
 
 		//! All class definitions
-		std::unordered_map<CLID, Classdef::Ptr> pClassdefs;
+		std::unordered_map<CLID, Classdef::Ptr> m_classdefs;
 		//! The current layer
-		mutable LayerItem layer;
+		mutable LayerItem m_layer;
 
 		friend class ClassdefTableView;
 

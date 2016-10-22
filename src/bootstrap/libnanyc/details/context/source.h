@@ -79,16 +79,16 @@ namespace Nany
 
 	private:
 		//! Type of the source
-		const Type pType = Type::memory;
+		const Type m_type = Type::memory;
 		//! Filename (if any)
-		Yuni::String pFilename;
+		Yuni::String m_filename;
 		//! Content (content of the file or raw content)
-		Yuni::String pContent;
+		Yuni::String m_content;
 		//! Parent target
-		CTarget* pTarget = nullptr;
+		CTarget* m_target = nullptr;
 
 		//! Date of the last modified
-		yint64 pLastCompiled = 0;
+		yint64 m_lastCompiled = 0;
 		//! Build-related info
 		std::unique_ptr<BuildInfoSource> pBuildInfo;
 

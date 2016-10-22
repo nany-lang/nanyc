@@ -8,30 +8,30 @@ namespace Nany
 
 	inline bool ClassdefOverloads::empty() const
 	{
-		return pOverloads.empty();
+		return m_overloads.empty();
 	}
 
 
 	inline uint ClassdefOverloads::size() const
 	{
-		return (uint) pOverloads.size();
+		return (uint) m_overloads.size();
 	}
 
 
 	inline void ClassdefOverloads::clear()
 	{
-		pOverloads.clear();
+		m_overloads.clear();
 	}
 
 
 	inline std::vector<std::reference_wrapper<Atom>>&  ClassdefOverloads::getList()
 	{
-		return pOverloads;
+		return m_overloads;
 	}
 
 	inline const std::vector<std::reference_wrapper<Atom>>&  ClassdefOverloads::getList() const
 	{
-		return pOverloads;
+		return m_overloads;
 	}
 
 

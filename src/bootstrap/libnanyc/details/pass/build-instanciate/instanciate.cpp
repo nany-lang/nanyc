@@ -21,6 +21,9 @@ namespace Pass
 namespace Instanciate
 {
 
+	Logs::Report emitReportEntry(void* self, Logs::Level);
+	void retriveReportMetadata(void* self, Logs::Level, const AST::Node*, Yuni::String&, uint32_t&, uint32_t&);
+
 
 	SequenceBuilder::SequenceBuilder(Logs::Report report, ClassdefTableView& cdeftable, Build& build,
 		IR::Sequence* out, IR::Sequence& sequence, SequenceBuilder* parent)

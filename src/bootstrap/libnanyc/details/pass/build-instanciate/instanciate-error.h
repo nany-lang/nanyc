@@ -16,6 +16,9 @@ namespace Pass
 {
 namespace Instanciate
 {
+
+	class OverloadedFuncCallResolver;
+
 namespace complain
 {
 
@@ -79,6 +82,16 @@ namespace complain
 
 	//! Reference to typedef declaration after the current one
 	bool typedefRefDeclaredAfter(const Atom& original, const Atom& responsible);
+
+
+	//! Already declared
+	bool redeclared(const AnyString& name, uint32_t previousDeclaration);
+
+	bool multipleOverloads(LVID lvid);
+
+	bool multipleOverloads(LVID lvid, const std::vector<std::reference_wrapper<Atom>>& solutions
+	   , const OverloadedFuncCallResolver& resolver);
+
 
 
 

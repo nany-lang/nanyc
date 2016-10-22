@@ -19,7 +19,7 @@ namespace Nany
 
 	inline AnyString Atom::name() const
 	{
-		return pName;
+		return m_name;
 	}
 
 
@@ -54,7 +54,7 @@ namespace Nany
 
 	inline bool Atom::isAnonymousClass() const
 	{
-		return type == Type::classdef and pName.empty();
+		return type == Type::classdef and m_name.empty();
 	}
 
 	inline bool Atom::isCtor() const
@@ -170,7 +170,7 @@ namespace Nany
 	inline bool Atom::isContextual() const
 	{
 		return hasGenericParameters() // generic classes
-			or pName.empty() // anonymous classes
+			or m_name.empty() // anonymous classes
 			or (parent and parent->isFunction()); // anything inside a func which may depend from parameters
 	}
 
@@ -178,7 +178,7 @@ namespace Nany
 	template<class C>
 	inline void Atom::eachChild(const C& callback)
 	{
-		for (auto& pair: pChildren)
+		for (auto& pair: m_children)
 		{
 			if (not callback(*pair.second))
 				return;
@@ -188,7 +188,7 @@ namespace Nany
 	template<class C>
 	inline void Atom::eachChild(const C& callback) const
 	{
-		for (auto& pair: pChildren)
+		for (auto& pair: m_children)
 		{
 			if (not callback(*pair.second))
 				return;
@@ -201,7 +201,7 @@ namespace Nany
 		switch (type)
 		{
 			case Type::funcdef: return category(Category::functor);
-			default:            return (pChildren.count(name) != 0);
+			default:            return (m_children.count(name) != 0);
 		}
 		return false;
 	}
@@ -211,7 +211,7 @@ namespace Nany
 	inline void Atom::eachChild(const AnyString& needle, const C& callback)
 	{
 		assert(not needle.empty());
-		auto range = pChildren.equal_range(needle);
+		auto range = m_children.equal_range(needle);
 		for (auto it = range.first; it != range.second; ++it)
 		{
 			if (not callback(*(it->second)))
@@ -223,7 +223,7 @@ namespace Nany
 	inline void Atom::eachChild(const AnyString& needle, const C& callback) const
 	{
 		assert(not needle.empty());
-		auto range = pChildren.equal_range(needle);
+		auto range = m_children.equal_range(needle);
 		for (auto it = range.first; it != range.second; ++it)
 		{
 			if (not callback(*(it->second)))
@@ -317,50 +317,47 @@ namespace Nany
 	}
 
 
-	inline const IR::Sequence& Atom::instance(uint32_t instanceid) const
-	{
-		assert(instanceid < instances.size());
-		return *(instances[instanceid].get());
-	}
-
-
-	inline const IR::Sequence* Atom::fetchInstance(uint32_t instanceid) const
-	{
-		return (instanceid < instances.size()) ? instances[instanceid].get() : nullptr;
-	}
-
-
-	inline AnyString Atom::fetchInstanceCaption(uint32_t instanceid) const
-	{
-		return (instanceid < instances.size())
-			? AnyString{pInstancesMD[instanceid].symbol} : AnyString{};
-	}
-
-
-	inline void Atom::updateInstance(uint32_t id, Yuni::String& symbol, const Classdef& rettype)
-	{
-		auto& md = pInstancesMD[id];
-		md.rettype.import(rettype);
-		md.rettype.qualifiers = rettype.qualifiers;
-		md.symbol.swap(symbol);
-	}
-
-
 	inline uint64_t Atom::runtimeSizeof() const
 	{
 		return classinfo.nextFieldIndex * sizeof(uint64_t);
 	}
 
 
-	inline uint32_t Atom::size() const
+	inline uint32_t Atom::childrenCount() const
 	{
-		return (uint32_t) pChildren.size();
+		return (uint32_t) m_children.size();
 	}
 
 
-	inline bool Atom::empty() const
+	inline bool Atom::hasChildren() const
 	{
-		return pChildren.empty();
+		return not m_children.empty();
+	}
+
+
+	inline Atom::InstantiationRef Atom::instantiation(uint32_t index) const
+	{
+		return InstantiationRef{*this, index};
+	}
+
+
+	inline const IR::Sequence* Atom::InstantiationRef::sequenceIfExists() const
+	{
+		return (m_index < m_atom.instances.size()) ? m_atom.instances[m_index].get() : nullptr;
+	}
+
+
+	inline const IR::Sequence& Atom::InstantiationRef::sequence() const
+	{
+		assert(m_index < m_atom.instances.size());
+		return *(m_atom.instances[m_index].get());
+	}
+
+
+	inline AnyString Atom::InstantiationRef::symbolname() const
+	{
+		return (m_index < m_atom.instances.size())
+			? AnyString{m_atom.m_instancesMD[m_index].symbol} : AnyString{};
 	}
 
 

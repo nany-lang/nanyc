@@ -38,21 +38,21 @@ namespace Nany
 
 	void Build::init()
 	{
-		if (not targets.empty()) // big cleanup
+		if (not m_targets.empty()) // big cleanup
 		{
-			targets.clear();
-			targets.shrink_to_fit();
-			sources.clear();
-			sources.shrink_to_fit();
-			pAttachedSequences.clear();
-			pAttachedSequences.shrink_to_fit();
+			m_targets.clear();
+			m_targets.shrink_to_fit();
+			m_sources.clear();
+			m_sources.shrink_to_fit();
+			m_attachedSequences.clear();
+			m_attachedSequences.shrink_to_fit();
 			duration = 0;
 			buildtime = 0;
 			messages = nullptr;
 		}
 
-		targets.reserve(project.targets.all.size());
-		sources.reserve(32); // arbitrary, at least more than 20 source files from nsl
+		m_targets.reserve(project.targets.all.size());
+		m_sources.reserve(32); // arbitrary, at least more than 20 source files from nsl
 		success = true;
 
 		// keeping our own list of targets / sources to be completely
@@ -62,9 +62,9 @@ namespace Nany
 		{
 			CTarget::Ptr newtarget = new CTarget{project.self(), *pair.second};
 			newtarget->eachSource([&](Source& source) {
-				sources.push_back(std::ref(source));
+				m_sources.push_back(std::ref(source));
 			});
-			targets.emplace_back(newtarget);
+			m_targets.emplace_back(newtarget);
 		}
 
 		if (Config::importNSL)
@@ -98,7 +98,7 @@ namespace Nany
 
 		buildtime = DateTime::NowMilliSeconds();
 
-		if (unlikely(sources.empty()))
+		if (unlikely(m_sources.empty()))
 		{
 			report.error() << "no target to build";
 		}
@@ -107,7 +107,7 @@ namespace Nany
 			success = true;
 
 			// build each source
-			for (auto& src: sources)
+			for (auto& src: m_sources)
 				success &= src.get().build(*this);
 
 			if (unlikely(cf.ignore_atoms != nyfalse))

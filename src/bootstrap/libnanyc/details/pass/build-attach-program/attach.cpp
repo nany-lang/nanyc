@@ -19,7 +19,7 @@ namespace Nany
 		// keep the sequence somewhere
 		{
 			MutexLocker locker{mutex};
-			pAttachedSequences.push_back(AttachedSequenceRef{&sequence, owned});
+			m_attachedSequences.push_back(AttachedSequenceRef{&sequence, owned});
 		}
 
 		Pass::Mapping::SequenceMapping mapper{cdeftable, mutex, sequence};

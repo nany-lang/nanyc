@@ -19,9 +19,9 @@ namespace Nany
 	inline Build::~Build()
 	{
 		// clear internal containers before releasing the project itself
-		pAttachedSequences.clear();
-		sources.clear();
-		targets.clear();
+		m_attachedSequences.clear();
+		m_sources.clear();
+		m_targets.clear();
 
 		if (project.release())
 			project.destroy();

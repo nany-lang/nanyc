@@ -18,9 +18,9 @@ namespace Nany
 
 	inline bool ClassdefTable::hasClassdef(const CLID& clid) const
 	{
-		return (clid.atomid() == layer.atomid)
-			? (clid.lvid() < layer.count and layer.flags[clid.lvid()])
-			: (0 != pClassdefs.count(clid));
+		return (clid.atomid() == m_layer.atomid)
+			? (clid.lvid() < m_layer.count and m_layer.flags[clid.lvid()])
+			: (0 != m_classdefs.count(clid));
 	}
 
 
@@ -53,7 +53,7 @@ namespace Nany
 
 	inline LVID ClassdefTable::substituteAtomID() const
 	{
-		return layer.atomid;
+		return m_layer.atomid;
 	}
 
 

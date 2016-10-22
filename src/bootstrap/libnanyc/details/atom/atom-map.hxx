@@ -2,9 +2,9 @@
 #include "atom-map.h"
 
 
-
 namespace Nany
 {
+
 
 	inline Atom* AtomMap::createNamespace(Atom& parent, const AnyString& name)
 	{
@@ -14,11 +14,13 @@ namespace Nany
 			? nmspc : createNewAtom(Atom::Type::namespacedef, parent, name);
 	}
 
+
 	inline Atom* AtomMap::createFuncdef(Atom& parent, const AnyString& name)
 	{
 		assert(not name.empty());
 		return createNewAtom(Atom::Type::funcdef, parent, name);
 	}
+
 
 	inline Atom* AtomMap::createClassdef(Atom& parent, const AnyString& name)
 	{
@@ -26,46 +28,44 @@ namespace Nany
 		return createNewAtom(Atom::Type::classdef, parent, name);
 	}
 
+
 	inline Atom* AtomMap::createTypealias(Atom& parent, const AnyString& name)
 	{
 		assert(not name.empty());
 		return createNewAtom(Atom::Type::typealias, parent, name);
 	}
 
+
 	inline Atom* AtomMap::createUnit(Atom& parent, const AnyString& name)
 	{
 		return createNewAtom(Atom::Type::unit, parent, name);
 	}
 
-	inline Atom* AtomMap::createVardef(Atom& parent, const AnyString& name)
+
+	inline const IR::Sequence& AtomMap::sequence(uint32_t atomid, uint32_t index) const
 	{
-		assert(not name.empty());
-		auto* atom = createNewAtom(Atom::Type::vardef, parent, name);
-		auto fieldindex = parent.classinfo.nextFieldIndex++;
-		atom->varinfo.fieldindex = fieldindex;
-		atom->varinfo.effectiveFieldIndex = fieldindex;
-		return atom;
+		assert(atomid < m_byIndex.size());
+		return m_byIndex[atomid]->instantiation(index).sequence();
 	}
 
 
-	inline const IR::Sequence& AtomMap::sequence(uint32_t atomid, uint32_t instanceid) const
+	inline const IR::Sequence* AtomMap::sequenceIfExists(uint32_t atomid, uint32_t index) const
 	{
-		assert(atomid < pByIndex.size());
-		return pByIndex[atomid]->instance(instanceid);
+		return (atomid < m_byIndex.size())
+			? m_byIndex[atomid]->instantiation(index).sequenceIfExists() : nullptr;
 	}
 
 
 	inline const Atom* AtomMap::findAtom(uint32_t atomid) const
 	{
-		return atomid < pByIndex.size() ? pByIndex[atomid] : nullptr;
+		return atomid < m_byIndex.size() ? m_byIndex[atomid] : nullptr;
 	}
 
 
 	inline Atom* AtomMap::findAtom(uint32_t atomid)
 	{
-		return atomid < pByIndex.size() ? pByIndex[atomid] : nullptr;
+		return atomid < m_byIndex.size() ? m_byIndex[atomid] : nullptr;
 	}
-
 
 
 } // namespace Nany

@@ -26,7 +26,7 @@ namespace Instanciate
 			return (void)(ice() << "invalid parent atom for variable initialization in ctor");
 
 		auto& parentAtom = *(funcAtom.parent);
-		if (parentAtom.empty())
+		if (not parentAtom.hasChildren())
 			return;
 
 
@@ -67,7 +67,7 @@ namespace Instanciate
 		// process user-defined parameters
 
 		std::vector<std::reference_wrapper<Atom>> atomvars;
-		atomvars.reserve(parentAtom.size());
+		atomvars.reserve(parentAtom.childrenCount());
 
 		parentAtom.eachChild([&](Atom& subatom) -> bool
 		{

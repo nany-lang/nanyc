@@ -9,7 +9,7 @@ namespace Nany
 	inline void Source::resetTarget(CTarget* target)
 	{
 		ThreadingPolicy::MutexLocker locker{*this};
-		pTarget = target;
+		m_target = target;
 	}
 
 

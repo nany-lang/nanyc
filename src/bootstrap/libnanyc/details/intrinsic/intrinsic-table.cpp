@@ -19,9 +19,9 @@ namespace Nany
 		if (YUNI_UNLIKELY(nullptr == callback))
 			return false;
 
-		auto* intrinsic = new Intrinsic(name, callback);
+		Intrinsic::Ptr intrinsic = new Intrinsic(name, callback);
 		intrinsic->rettype = ret;
-		intrinsic->id      = (uint32_t) pIntrinsics.size();
+		intrinsic->id = (uint32_t) pIntrinsics.size();
 
 		uint32_t count = 0;
 		do
@@ -31,10 +31,7 @@ namespace Nany
 				break;
 
 			if (unlikely(count >= Config::maxPushedParameters or i >= static_cast<int>(nyt_count)))
-			{
-				delete intrinsic;
 				return false;
-			}
 
 			intrinsic->params[count] = static_cast<nytype_t>(i);
 			++count;
@@ -42,8 +39,6 @@ namespace Nany
 		while (true);
 
 		intrinsic->paramcount = count;
-
-
 		pIntrinsics.emplace_back(intrinsic);
 		pByNames.insert(std::make_pair(AnyString{intrinsic->name}, intrinsic));
 		return true;

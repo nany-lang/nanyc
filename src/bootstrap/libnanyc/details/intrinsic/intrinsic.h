@@ -33,23 +33,21 @@ namespace Nany
 		{}
 
 		Intrinsic(const Intrinsic&) = default;
+		Intrinsic& operator = (const Intrinsic&) = delete;
 
 		YString print() const;
 
 	public:
 		//! C-Callback
-		void* callback;
-
+		void* callback = nullptr;
 		//! name of the intrinsic
 		const Yuni::ShortString64 name;
-
 		//! The return type
 		nytype_t rettype = nyt_void;
 		//! The total number of parameters
 		uint32_t paramcount = 0;
 		//! All parameter types
 		std::array<nytype_t, Config::maxPushedParameters> params;
-
 		//! Intrinsic ID
 		uint32_t id = (uint32_t) -1;
 

@@ -204,48 +204,29 @@ namespace Producer
 
 
 	public:
-		//! Context
 		Context& context;
-
-
-	private:
-		//! Emit generic type parameters push
-		void emitTmplParametersIfAny();
-		void doEmitTmplParameters();
-
-		void prepareClosureNodeExpr(AST::Node::Ptr& out);
-		void emitExprAttributes(uint32_t& localvar);
-
-		bool emitVarInClass(const AnyString& varname, AST::Node& node, AST::Node* varType,
-			AST::Node* varAssign, bool ref, bool constant);
-		bool emitVarInFunc(const AnyString& varname, AST::Node& node, AST::Node* varType,
-			AST::Node* varAssign, bool ref, bool constant);
-		bool emitProperty(const AnyString& varname, AST::Node& node, AST::Node* varType,
-			AST::Node& varAssign, bool ref);
-
-
-	public:
 		//! Next local variable
 		LVID nextVarID = 0u;
 		//! Kind
 		Kind kind = Kind::undefined;
-
 		//! Opcode offset of the last identify opcode
 		// (to allow to promote identify:get to identify:set)
 		uint32_t lastIdentifyOpcOffset = 0u;
-
 		//! For template parameters
 		std::unique_ptr<std::vector<std::pair<uint32_t, AnyString>>> lastPushedTmplParams;
 		//! Expression attributes
 		std::unique_ptr<Attributes> attributes;
-
 		//! Parent scope (if any)
 		Scope* parentScope = nullptr;
 		//! BroadcastNextVarID
 		bool broadcastNextVarID = true;
-
 		//! Nakama
 		friend class Context;
+
+	private:
+		void emitTmplParametersIfAny();
+		void doEmitTmplParameters();
+		void emitExprAttributes(uint32_t& localvar);
 
 	}; // class Scope
 

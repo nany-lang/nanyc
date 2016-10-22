@@ -179,8 +179,6 @@ namespace Instanciate
 		//! Generate the clone function of the current class
 		void generateMemberVarDefaultClone();
 
-		//! Generate short circuit jumps
-		bool generateShortCircuitInstrs(uint32_t retlvid);
 
 		bool instanciateAssignment(const IR::ISA::Operand<IR::ISA::Op::call>& operands);
 
@@ -190,12 +188,6 @@ namespace Instanciate
 		//! perform type resolution and fetch data (local variable, func...)
 		bool identify(const IR::ISA::Operand<IR::ISA::Op::identify>& operands, const AnyString& name, bool firstChance = true);
 		bool identifyCapturedVar(const IR::ISA::Operand<IR::ISA::Op::identify>& operands, const AnyString& name);
-		bool emitIdentifyForSingleResult(bool isLocalVar, const Classdef& cdef,
-			const IR::ISA::Operand<IR::ISA::Op::identify>& operands, const AnyString& name);
-		bool emitIdentifyForProperty(const IR::ISA::Operand<IR::ISA::Op::identify>& operands,
-			Atom& propatom, uint32_t self);
-
-		bool ensureResolve(const IR::ISA::Operand<IR::ISA::Op::ensureresolved>& operands);
 
 		//! Try to capture variables from a list of potentiel candidates created by the mapping
 		void captureVariables(Atom& atom);
@@ -206,9 +198,6 @@ namespace Instanciate
 
 		bool instanciateAtomFunc(uint32_t& instanceid, Atom& funcAtom, uint32_t retlvid, uint32_t p1 = 0, uint32_t p2 = 0);
 
-
-		bool emitFuncCall(const IR::ISA::Operand<IR::ISA::Op::call>& operands);
-		bool emitPropsetCall(const IR::ISA::Operand<IR::ISA::Op::call>& operands);
 		bool pushCapturedVarsAsParameters(const Atom& atomclass);
 
 		//! Declare a named variable (and checks for multiple declarations)
@@ -223,55 +212,30 @@ namespace Instanciate
 		//! \name Errors
 		//@{
 		bool checkForIntrinsicParamCount(const AnyString& name, uint32_t count);
-
-
 		bool complainInvalidType(const char* origin, const Classdef& from, const Classdef& to);
-
-		bool complainMultipleOverloads(LVID lvid, const std::vector<std::reference_wrapper<Atom>>& solutions,
-			const OverloadedFuncCallResolver& resolver);
-
-		bool complainMultipleOverloads(LVID lvid);
-
-		bool complainRedeclared(const AnyString& name, uint32_t previousDeclaration);
-
 		void complainReturnTypeMultiple(const Classdef& expected, const Classdef& usertype, uint32_t line = 0, uint32_t offset = 0);
-
-
 		//! Restriction on builtin intrinsics
 		bool complainBuiltinIntrinsicDoesNotAccept(const AnyString& name, const AnyString& what);
-
 		//! Complain about named parameters used with an intrinsic
 		bool complainIntrinsicWithNamedParameters(const AnyString& name);
-
 		//! Complain about generic type parameters used with an intrinsic
 		bool complainIntrinsicWithGenTypeParameters(const AnyString& name);
-
 		bool complainIntrinsicParameterCount(const AnyString& name, uint32_t count);
-
 		bool complainIntrinsicParameter(const AnyString& name, uint32_t pindex, const Classdef& got,
 			const AnyString& expected = nullptr);
-
 		//! Emit a new error message with additional information on the given operand
 		bool complainOperand(const IR::Instruction& operands, AnyString msg = nullptr);
-
 		//! Emit a new warning/error for an unused variable
 		void complainUnusedVariable(const AtomStackFrame&, uint32_t lvid) const;
-
 		//! Emit a new error on a member request on a non-class type
 		bool complainInvalidMemberRequestNonClass(const AnyString& name, nytype_t) const;
-
 		//! Unknown builtin type
 		bool complainUnknownBuiltinType(const AnyString& name) const;
-
 		//! invalid self reference for var assignment
 		bool complainInvalidSelfRefForVariableAssignment(uint32_t lvid) const;
-
 		bool complainMissingOperator(Atom&, const AnyString& name) const;
-
 		bool complainCannotCall(Atom& atom, FuncOverloadMatch& overloadMatch);
-
 		void complainPushedSynthetic(const CLID&, uint32_t paramindex, const AnyString& paramname = nullptr);
-
 		void complainInvalidParametersAfterSignatureMatching(Atom&, FuncOverloadMatch& overloadMatch);
 		void complainCannotCall(const Atom&, FuncOverloadMatch& overloadMatch);
 		//@}
@@ -281,19 +245,15 @@ namespace Instanciate
 		bool doInstanciateAtomFunc(Logs::Message::Ptr& subreport, InstanciateData& info, uint32_t retlvid);
 		void pushNewFrame(Atom& atom);
 		void popFrame();
-		static Logs::Report emitReportEntry(void* self, Logs::Level);
-		static void retriveReportMetadata(void* self, Logs::Level, const AST::Node*, Yuni::String&, uint32_t&, uint32_t&);
 
 		// Current stack frame (current func / class...)
 		AtomStackFrame* frame = nullptr;
-
 		// Isolate
 		ClassdefTableView cdeftable;
 		// New opcode sequence
 		IR::Sequence* out = nullptr;
 		// Current sequence
 		IR::Sequence& currentSequence;
-
 		//! Flag to prevent code generation when != 0 (used for typeof for example)
 		uint32_t codeGenerationLock = 0;
 		//! Flag to prevent error generation when != 0
@@ -327,21 +287,17 @@ namespace Instanciate
 		// Helper for resolving func overloads (reused by each opcode 'call')
 		FuncOverloadMatch overloadMatch;
 
-
 		const char* currentFilename = nullptr;
 		uint32_t currentLine = 1;
 		uint32_t currentOffset = 1;
-
 		//! Results for opcode 'resolve'
 		std::vector<std::reference_wrapper<Atom>> multipleResults;
-
 		//! Flag to generate variable member destruction after opcode 'stack size'
 		bool generateClassVarsAutoInit = false;
 		//! Flag to generate variable member initialization after opcode 'stack size'
 		bool generateClassVarsAutoRelease = false;
 		//! Flag to generate variable member cloning after opcode 'stack size'
 		bool generateClassVarsAutoClone = false;
-
 		//! Flag to skip code instanciation as soon as the opcode blueprint size is encountered
 		bool shouldSkipCurrentAtom = false;
 
@@ -356,23 +312,18 @@ namespace Instanciate
 
 		//! Previous sequence builder
 		SequenceBuilder* parent = nullptr;
-
 		//! Error reporting
 		Logs::Handler localErrorHandler;
 		Logs::MetadataHandler localMetadataHandler;
 		//! Current report
 		mutable Logs::Report report;
-
 		//! Flag to determine weather sub atoms can be instanciated in the same time
 		uint32_t layerDepthLimit = (uint32_t) -1;
-
 		bool signatureOnly = false;
-
 		//! Force mapping from an atomid to another one
 		// This mapping is required instnaciating the code from a
 		// forked atom and to avoid invalid references
 		uint32_t mappingBlueprintAtomID[2] = {0, 0};
-
 		//! cursor
 		IR::Instruction** cursor = nullptr;
 

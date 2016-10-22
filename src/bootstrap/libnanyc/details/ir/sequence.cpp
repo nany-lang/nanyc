@@ -53,32 +53,32 @@ namespace IR
 
 	void Sequence::clear()
 	{
-		pSize = 0;
+		m_size = 0;
 		stringrefs.clear();
-		free(pBody);
-		pCapacity = 0;
-		pBody = nullptr;
+		free(m_body);
+		m_capacity = 0;
+		m_body = nullptr;
 	}
 
 
 	void Sequence::grow(uint32_t count)
 	{
 		assert(count > 0);
-		auto newcapa = pCapacity;
+		auto newcapa = m_capacity;
 		do { newcapa += 1000u; } while (newcapa < count);
 
-		auto* newbody = (Instruction*) realloc(pBody, sizeof(Instruction) * newcapa);
+		auto* newbody = (Instruction*) realloc(m_body, sizeof(Instruction) * newcapa);
 		if (unlikely(nullptr == newbody))
 			throw std::bad_alloc();
-		pBody = newbody;
-		pCapacity = newcapa;
+		m_body = newbody;
+		m_capacity = newcapa;
 	}
 
 
 	void Sequence::print(YString& out, const AtomMap* atommap, uint32_t offset) const
 	{
 		using namespace IR::ISA;
-		out.reserve(out.size() + (pSize * 100)); // arbitrary
+		out.reserve(out.size() + (m_size * 100)); // arbitrary
 		Printer<String> printer{out, *this};
 		printer.atommap = atommap;
 		printer.offset = offset;

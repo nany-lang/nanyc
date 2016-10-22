@@ -392,11 +392,11 @@ namespace IR
 
 	private:
 		//! Size of the sequence
-		uint32_t pSize = 0u;
+		uint32_t m_size = 0u;
 		//! Capacity of the sequence
-		uint32_t pCapacity = 0u;
-		//! pBody of the sequence
-		Instruction* pBody = nullptr;
+		uint32_t m_capacity = 0u;
+		//! m_body of the sequence
+		Instruction* m_body = nullptr;
 
 	}; // class Sequence
 

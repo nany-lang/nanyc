@@ -13,9 +13,6 @@ namespace Nany
 	class ClassdefTable;
 
 
-
-
-
 	/*!
 	** \brief Atoms
 	** \note This class is not thread-safe
@@ -23,61 +20,40 @@ namespace Nany
 	class AtomMap final
 	{
 	public:
-		/*!
-		** \brief Create a new atom related to a part of a namespace
-		*/
+		//! Create a new atom related to a part of a namespace
 		Atom* createNamespace(Atom& parent, const AnyString& name);
 
-		/*!
-		** \brief Create a new atom related to a function
-		*/
+		//! Create a new atom related to a function
 		Atom* createFuncdef(Atom& parent, const AnyString& name);
 
-		/*!
-		** \brief Create a new atom related to a class
-		*/
+		//! Create a new atom related to a class
 		Atom* createClassdef(Atom& parent, const AnyString& name);
 
-		/*!
-		** \brief Create a new atom related to a variable
-		*/
+		//! Create a new atom related to a variable
 		Atom* createVardef(Atom& parent, const AnyString& name);
 
-		/*!
-		** \brief Create a new atom related to a type alias
-		*/
+		//! Create a new atom related to a type alias
 		Atom* createTypealias(Atom& parent, const AnyString& name);
 
-		/*!
-		** \brief Create a new atom related to an unit (source file)
-		*/
+		//! Create a new atom related to an unit (source file)
 		Atom* createUnit(Atom& parent, const AnyString& name);
 
 
-		/*
-		** \brief Fetch a sequence
-		*/
-		const IR::Sequence* fetchSequence(uint32_t atomid, uint32_t instanceid) const;
+		//! Find the IR sequence for a given {atomid/instanceid} (null if not found)
+		const IR::Sequence* sequenceIfExists(uint32_t atomid, uint32_t index) const;
 
-		/*
-		** \brief Fetch a sequence
-		*/
-		const IR::Sequence& sequence(uint32_t atomid, uint32_t instanceid) const;
+		//! Find the IR sequence for a given {atomid/instanceid}
+		const IR::Sequence& sequence(uint32_t atomid, uint32_t index) const;
 
-		/*!
-		** \brief Retrieve the human readable name of an atom
-		*/
-		AnyString fetchSequenceCaption(uint32_t atomid, uint32_t instanceid) const;
+		//! Retrieve the human readable name of an atom (empty if not found)
+		AnyString symbolname(uint32_t atomid, uint32_t index) const;
 
-		//! Retrieve atom {const}
+		//! Retrive an Atom object from its unique id (const)
 		const Atom* findAtom(uint32_t atomid) const;
-		//! Retrieve atom
+		//! Retrive an Atom object from its unique id
 		Atom* findAtom(uint32_t atomid);
 
-
-		/*!
-		** \brief Try to retrieve the corresponding classes for core objects (bool, i32...)
-		*/
+		//! Try to retrieve the corresponding classes for core objects (bool, i32...)
 		bool fetchAndIndexCoreObjects();
 
 
@@ -99,8 +75,8 @@ namespace Nany
 		Atom* createNewAtom(Atom::Type type, Atom& root, const AnyString& name);
 
 	private:
-		std::vector<Atom*> pByIndex;
-		yuint32 pAtomGrpID = 0;
+		std::vector<Atom*> m_byIndex;
+		yuint32 m_atomGrpID = 0;
 		friend class ClassdefTable;
 
 	}; // class AtomMap

@@ -36,16 +36,16 @@ namespace Nany
 				pSources.push_back(newsource);
 				auto& ref = *newsource;
 
-				switch (ref.pType)
+				switch (ref.m_type)
 				{
 					case Source::Type::memory:
 					{
-						pSourcesByName.insert(std::make_pair(ref.pFilename, std::ref(ref)));
+						pSourcesByName.insert(std::make_pair(ref.m_filename, std::ref(ref)));
 						break;
 					}
 					case Source::Type::file:
 					{
-						pSourcesByFilename.insert(std::make_pair(ref.pFilename, std::ref(ref)));
+						pSourcesByFilename.insert(std::make_pair(ref.m_filename, std::ref(ref)));
 						break;
 					}
 				}
@@ -78,9 +78,9 @@ namespace Nany
 		{
 			Source::Ptr source{new Source(this, Source::Type::memory, name, content)};
 
-			auto it = pSourcesByName.find(source->pFilename);
+			auto it = pSourcesByName.find(source->m_filename);
 			if (it == pSourcesByName.end())
-				pSourcesByName.insert(std::make_pair(AnyString{source->pFilename}, std::ref(*source)));
+				pSourcesByName.insert(std::make_pair(AnyString{source->m_filename}, std::ref(*source)));
 			else
 				it->second = std::ref(*source);
 
@@ -95,9 +95,9 @@ namespace Nany
 		{
 			auto source = std::make_unique<Source>(this, Source::Type::file, filename, AnyString());
 
-			auto it = pSourcesByFilename.find(source->pFilename);
+			auto it = pSourcesByFilename.find(source->m_filename);
 			if (it == pSourcesByFilename.end())
-				pSourcesByFilename.insert(std::make_pair(AnyString{source->pFilename}, std::ref(*source)));
+				pSourcesByFilename.insert(std::make_pair(AnyString{source->m_filename}, std::ref(*source)));
 			else
 				it->second = std::ref(*source);
 
@@ -122,9 +122,6 @@ namespace Nany
 		}
 		return true;
 	}
-
-
-
 
 
 } // namespace nany

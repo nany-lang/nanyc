@@ -243,14 +243,13 @@ namespace // anonymous
 			if (atommap and atomid != 0)
 			{
 				out << " // ";
-				auto caption = atommap->fetchSequenceCaption(atomid, instanceid);
+				auto caption = atommap->symbolname(atomid, instanceid);
 				if (not caption.empty())
 					out << caption;
 				else
 					out << "<not-found>";
 			}
 		}
-
 
 		void print(const Operand<Op::assign>& operands)
 		{

@@ -14,20 +14,21 @@ namespace Nany
 namespace VM
 {
 
-	namespace // anonymous
-	{
+	namespace {
 
-		template<class T>
-		static inline uint32_t sizeFromCapacity(uint32_t capacity)
-		{
-			uint32_t bytes = static_cast<uint32_t>(sizeof(T)); // the Chunk itself
-			bytes -= static_cast<uint32_t>(sizeof(T::block));  // minus the pseudo field 'block'
-			bytes += static_cast<uint32_t>(capacity * sizeof(DataRegister));
-			return bytes;
-		}
+
+	template<class T> uint32_t sizeFromCapacity(uint32_t capacity)
+	{
+		uint32_t bytes = static_cast<uint32_t>(sizeof(T)); // the Chunk itself
+		bytes -= static_cast<uint32_t>(sizeof(T::block));  // minus the pseudo field 'block'
+		bytes += static_cast<uint32_t>(capacity * sizeof(DataRegister));
+		return bytes;
+	}
 
 
 	} // anonymous namespace
+
+
 
 
 	Stack::Stack()

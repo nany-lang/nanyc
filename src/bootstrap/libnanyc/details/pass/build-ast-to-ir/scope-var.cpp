@@ -118,22 +118,17 @@ namespace Producer
 	}
 
 
-	} // namespace
-
-
-
-
-	bool Scope::emitVarInClass(const AnyString& varname, AST::Node& node, AST::Node* varType,
+	bool emitVarInClass(Scope& scope, const AnyString& varname, AST::Node& node, AST::Node* varType,
 		AST::Node* varAssign, bool ref, bool constant)
 	{
-		auto& out = sequence();
+		auto& out = scope.sequence();
 		if (debugmode)
 		{
 			out.emitComment();
 			out.emitComment(String{"class var "} << varname);
 		}
 		// the new member variable
-		auto mbvar = nextvar();
+		auto mbvar = scope.nextvar();
 		out.emitStackalloc(mbvar, nyt_any);
 
 		// the type of the expression
@@ -141,13 +136,13 @@ namespace Producer
 
 		if (varType != nullptr)
 		{
-			if (not visitASTType(*varType, lvid))
+			if (not scope.visitASTType(*varType, lvid))
 				return false;
 		}
 		else
 		{
 			// type definition, via typeof(varAssign)
-			if (not generateTypeofForClassVar(*this, lvid, *varAssign))
+			if (not generateTypeofForClassVar(scope, lvid, *varAssign))
 				return false;
 		}
 		if (unlikely(0 == lvid))
@@ -166,25 +161,25 @@ namespace Producer
 			out.emitQualifierConst(mbvar, true);
 
 		// variable definition
-		emitDebugpos(node);
+		scope.emitDebugpos(node);
 		out.emitBlueprintVardef(mbvar, varname);
 
 		// generating an INIT func for the variable
-		return generateInitFuncForClassVar(*this, varname, mbvar, *varAssign);
+		return generateInitFuncForClassVar(scope, varname, mbvar, *varAssign);
 	}
 
 
-	bool Scope::emitVarInFunc(const AnyString& varname, AST::Node& node, AST::Node* varType,
+	bool emitVarInFunc(Scope& scope, const AnyString& varname, AST::Node& node, AST::Node* varType,
 		AST::Node* varAssign, bool ref, bool constant)
 	{
-		auto& out = sequence();
+		auto& out = scope.sequence();
 		// create the variable itself
-		uint32_t varlvid  = out.emitStackalloc(nextvar(), nyt_any);
+		uint32_t varlvid  = out.emitStackalloc(scope.nextvar(), nyt_any);
 
 		if (varType != nullptr)
 		{
 			uint32_t lvidtype;
-			if (not visitASTType(*varType, lvidtype) or lvidtype == 0)
+			if (not scope.visitASTType(*varType, lvidtype) or lvidtype == 0)
 				return false;
 
 			// follow
@@ -203,7 +198,7 @@ namespace Producer
 		{
 			LVID rhs = 0;
 			IR::OpcodeScopeLocker opscope{out};
-			if (not varValueInitialization(*this, rhs, *varAssign, node, varname))
+			if (not varValueInitialization(scope, rhs, *varAssign, node, varname))
 				return false;
 
 			assert(rhs != 0);
@@ -220,13 +215,13 @@ namespace Producer
 
 		// important: the alias must be declared *after* the right value
 		// (otherwise it may be used by the code)
-		emitDebugpos(node); // reset the debug position
+		scope.emitDebugpos(node); // reset the debug position
 		out.emitNameAlias(varlvid, varname);
 		return true;
 	}
 
 
-	bool Scope::emitProperty(const AnyString& varname, AST::Node& node, AST::Node* /*varType*/,
+	bool emitProperty(Scope& scope, const AnyString& varname, AST::Node& node, AST::Node* /*varType*/,
 		AST::Node& varAssign, bool ref)
 	{
 		AST::Node* nodeGet = nullptr;
@@ -295,54 +290,58 @@ namespace Producer
 
 		if (nodeGet)
 		{
-			if (!context.reuse.properties.get.node)
-				context.prepareReuseForPropertiesGET();
+			if (!scope.context.reuse.properties.get.node)
+				scope.context.prepareReuseForPropertiesGET();
 
 			propname << "^propget^" << varname;
-			context.reuse.properties.get.propname->text = propname;
+			scope.context.reuse.properties.get.propname->text = propname;
 
-			auto& type = *(context.reuse.properties.get.type);
+			auto& type = *(scope.context.reuse.properties.get.type);
 			type.children.clear();
 			if (ref)
-				type.children.push_back(context.reuse.properties.get.typeIsRefAny);
+				type.children.push_back(scope.context.reuse.properties.get.typeIsRefAny);
 			else
-				type.children.push_back(context.reuse.properties.get.typeIsAny);
+				type.children.push_back(scope.context.reuse.properties.get.typeIsAny);
 
-			auto& returnValue = *(context.reuse.properties.get.returnValue);
+			auto& returnValue = *(scope.context.reuse.properties.get.returnValue);
 			returnValue.children.clear();
 			returnValue.children.push_back(nodeGet);
 
-			auto& funcnode = *(context.reuse.properties.get.node);
-			success &= visitASTFunc(funcnode);
+			auto& funcnode = *(scope.context.reuse.properties.get.node);
+			success &= scope.visitASTFunc(funcnode);
 
 			// to avoid crap printed in the debugger
-			context.reuse.properties.get.propname->text.clear();
+			scope.context.reuse.properties.get.propname->text.clear();
 			type.children.clear();
 			returnValue.children.clear();
 		}
 
 		if (nodeSet)
 		{
-			if (!context.reuse.properties.set.node)
-				context.prepareReuseForPropertiesSET();
+			if (!scope.context.reuse.properties.set.node)
+				scope.context.prepareReuseForPropertiesSET();
 
 			propname.clear() << "^propset^" << varname;
-			context.reuse.properties.set.propname->text = propname;
+			scope.context.reuse.properties.set.propname->text = propname;
 
-			auto& body = *(context.reuse.properties.set.body);
+			auto& body = *(scope.context.reuse.properties.set.body);
 			body.children.clear();
 			body.children.push_back(nodeSet);
 
-			auto& funcnode = *(context.reuse.properties.set.node);
-			success &= visitASTFunc(funcnode);
+			auto& funcnode = *(scope.context.reuse.properties.set.node);
+			success &= scope.visitASTFunc(funcnode);
 
 			// to avoid crap printed in the debugger
-			context.reuse.properties.set.propname->text.clear();
+			scope.context.reuse.properties.set.propname->text.clear();
 			body.children.clear();
 		}
 
 		return success;
 	}
+
+
+	} // namespace
+
 
 
 
@@ -439,9 +438,9 @@ namespace Producer
 			switch (kind)
 			{
 				case Kind::kfunc:
-					return emitVarInFunc(varname, *varnodeDecl, varType, varAssign, ref, constant);
+					return emitVarInFunc(*this, varname, *varnodeDecl, varType, varAssign, ref, constant);
 				case Kind::kclass:
-					return emitVarInClass(varname, *varnodeDecl, varType, varAssign, ref, constant);
+					return emitVarInClass(*this, varname, *varnodeDecl, varType, varAssign, ref, constant);
 				default:
 					return (ice(*varnodeDecl) << "var declaration: unsupported scope type");
 			}
@@ -457,7 +456,7 @@ namespace Producer
 			{
 				case Kind::kclass:
 				case Kind::undefined:
-					return emitProperty(varname, *varnodeDecl, varType, *varAssign, ref);
+					return emitProperty(*this, varname, *varnodeDecl, varType, *varAssign, ref);
 				case Kind::kfunc:
 					return (error(*varnodeDecl) << "properties in functions not implemented");
 			}

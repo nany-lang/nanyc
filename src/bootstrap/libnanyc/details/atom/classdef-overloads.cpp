@@ -13,7 +13,7 @@ namespace Nany
 		if (clearBefore)
 			out.clear();
 
-		for (auto& atom: pOverloads)
+		for (auto& atom: m_overloads)
 		{
 			out << "        overload ";
 			atom.get().retrieveCaption(out, table);

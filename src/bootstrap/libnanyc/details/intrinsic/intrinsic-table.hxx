@@ -104,8 +104,9 @@ namespace Nany
 		using B = Yuni::Bind<T>;
 		static_assert(B::argumentCount < Config::maxPushedParameters, "too many params");
 
-		pIntrinsics.emplace_back(new Intrinsic(name, reinterpret_cast<void*>(callback)));
-		auto& intrinsic = *(pIntrinsics.back());
+		Intrinsic::Ptr ptr = new Intrinsic(name, reinterpret_cast<void*>(callback));
+		pIntrinsics.emplace_back(ptr);
+		auto& intrinsic = *ptr;
 		pByNames.insert(std::make_pair(AnyString{intrinsic.name}, &intrinsic));
 		intrinsic.id = ((uint32_t)pIntrinsics.size() - 1);
 
@@ -144,7 +145,7 @@ namespace Nany
 	}
 
 
-	inline const Intrinsic* IntrinsicTable::find(const AnyString& name) const
+	inline Intrinsic::Ptr IntrinsicTable::find(const AnyString& name) const
 	{
 		auto it = pByNames.find(name);
 		return (it != pByNames.end()) ? it->second : nullptr;
@@ -156,7 +157,6 @@ namespace Nany
 		assert(id < pIntrinsics.size());
 		return *(pIntrinsics[id]);
 	}
-
 
 
 } // namespace Nany

@@ -31,6 +31,186 @@ namespace Instanciate
 	}
 
 
+	bool emitIdentifyForSingleResult(SequenceBuilder& seq, bool isLocalVar, const Classdef& cdef,
+		const IR::ISA::Operand<IR::ISA::Op::identify>& operands, const AnyString& name)
+	{
+		auto& resultAtom = seq.multipleResults[0].get();
+		const Classdef* cdefTypedef = nullptr;
+		bool mustResolveATypedef = resultAtom.isTypeAlias();
+		auto& atom = (not mustResolveATypedef)
+			? resultAtom
+			: seq.resolveTypeAlias(resultAtom, cdefTypedef);
+		auto& frame = *seq.frame;
+
+		if (unlikely((mustResolveATypedef and !cdefTypedef) or atom.flags(Atom::Flags::error)))
+			return false;
+
+		if (unlikely(cdefTypedef and cdefTypedef->isBuiltin()))
+		{
+			auto& spare = seq.cdeftable.substitute(cdef.clid.lvid());
+			spare.import(*cdefTypedef);
+
+			if (isLocalVar)
+			{
+				// disable optimisation to avoid unwanted behavior
+				auto& lvidinfo = frame.lvids[operands.lvid];
+				lvidinfo.synthetic = false;
+				lvidinfo.origin.memalloc = false;
+				lvidinfo.origin.returnedValue = false;
+			}
+			return true;
+		}
+
+		// if the resolution is simple (aka only one solution), it is possible that the
+		// solution is a member variable (`self.myvar`). In this case, the atom will be the member itself
+		// and not its real type
+		if (atom.isMemberVariable() and not atom.isTypeAlias())
+		{
+			assert(not isLocalVar and "a member variable cannot be a local variable");
+			assert(not atom.returnType.clid.isVoid());
+
+			// member variable - the real type is held by 'returnType'
+			auto& cdefvar = seq.cdeftable.classdef(atom.returnType.clid);
+			auto* atomvar = (not cdefvar.isBuiltin()) ? seq.cdeftable.findClassdefAtom(cdefvar) : nullptr;
+			if (unlikely(!atomvar and not cdefvar.isBuiltin()))
+				return (ice() << "invalid variable member type for " << atom.fullname());
+
+			auto& spare = seq.cdeftable.substitute(operands.lvid);
+			spare.import(cdefvar);
+			if (atomvar)
+				spare.mutateToAtom(atomvar);
+
+			uint32_t self = operands.self;
+			if (self == 0) // implicit 'self' ?
+			{
+				if (frame.atom.isClassMember())
+				{
+					// 'self' is given by the first parameter
+					self = 2; // 1: return type, 2: first parameter
+				}
+				else
+				{
+					// no 'self' available since it just does not exist, which can be expected
+					// for type resolution (the type resolution is done directly from the atom class,
+					// where the initialization is done via a proxy function)
+					// It's ok for type resolution since we already know we're dealing with a variable member)
+					if (frame.atom.isClass() and (not seq.canGenerateCode()))
+					{
+						// 'self' can stay null
+					}
+					else
+						return complain::invalidClassSelf(name);
+				}
+			}
+
+			auto& lvidinfo = frame.lvids[operands.lvid];
+			lvidinfo.synthetic = false;
+
+			auto& origin  = lvidinfo.origin.varMember;
+			assert(atom.atomid != 0);
+			origin.self   = self;
+			origin.atomid = atom.atomid;
+			origin.field  = atom.varinfo.effectiveFieldIndex;
+
+			if (seq.canGenerateCode())
+			{
+				// read the address
+				assert(self != 0 and "'self can be null only for type resolution'");
+				seq.out->emitFieldget(operands.lvid, self, atom.varinfo.effectiveFieldIndex);
+				seq.tryToAcquireObject(operands.lvid, cdefvar);
+			}
+		}
+		else
+		{
+			// override the typeinfo
+			auto& spare = seq.cdeftable.substitute(operands.lvid);
+			spare.import(cdef);
+			spare.mutateToAtom(&atom);
+
+			if (isLocalVar)
+			{
+				// disable optimisation to avoid unwanted behavior
+				auto& lvidinfo = frame.lvids[operands.lvid];
+				lvidinfo.synthetic = false;
+				lvidinfo.origin.memalloc = false;
+				lvidinfo.origin.returnedValue = false;
+
+				if (seq.canGenerateCode())
+					seq.acquireObject(operands.lvid);
+			}
+		}
+		return true;
+	}
+
+
+	bool emitIdentifyForProperty(SequenceBuilder& seq, const IR::ISA::Operand<IR::ISA::Op::identify>& operands,
+		Atom& propatom, uint32_t self)
+	{
+		// report for instanciation
+		Logs::Message::Ptr subreport;
+		// all pushed parameters
+		decltype(FuncOverloadMatch::result.params) params;
+		// all pushed template parameters
+		decltype(FuncOverloadMatch::result.params) tmplparams;
+		// return value
+		uint32_t lvid = operands.lvid;
+		// current atom
+		uint32_t atomid = seq.frame->atomid;
+
+		// preparing the overload matcher
+		auto& overloadMatch = seq.overloadMatch;
+		overloadMatch.clear();
+		overloadMatch.input.rettype.push_back(CLID{atomid, lvid});
+		if (self != (uint32_t) -1 and self != 0)
+			overloadMatch.input.params.indexed.emplace_back(CLID{atomid, self});
+
+		// try to validate the func call
+		// (no error reporting, since no overload is present)
+		if (unlikely(TypeCheck::Match::none == overloadMatch.validate(propatom)))
+			return seq.complainCannotCall(propatom, overloadMatch);
+
+		// get new parameters
+		params.swap(overloadMatch.result.params);
+		tmplparams.swap(overloadMatch.result.tmplparams);
+
+		InstanciateData info{subreport, propatom, seq.cdeftable, seq.build, params, tmplparams};
+		if (not seq.doInstanciateAtomFunc(subreport, info, lvid))
+			return false;
+
+		if (seq.canGenerateCode())
+		{
+			for (auto& param: params)
+				seq.out->emitPush(param.clid.lvid());
+
+			seq.out->emitCall(lvid, propatom.atomid, info.instanceid);
+		}
+		return true;
+	}
+
+
+	bool identifyByPointerAssignment(SequenceBuilder& seq, const AnyString& name, const IR::ISA::Operand<IR::ISA::Op::identify>& operands)
+	{
+		// since self was marked as an 'assignment', we're trying to resolve here '^()'
+		if (unlikely(name != "^()"))
+		{
+			ice() << "invalid resolve name for assignment (got '" << name << "')";
+			return false;
+		}
+		auto& frame = *seq.frame;
+		if (0 != frame.lvids[operands.self].propsetCallSelf)
+		{
+			auto& cdef  = seq.cdeftable.classdef(CLID{frame.atomid, operands.self});
+			auto& spare = seq.cdeftable.substitute(operands.lvid);
+			spare.import(cdef);
+			frame.lvids[operands.lvid].propsetCallSelf =
+				frame.lvids[operands.self].propsetCallSelf;
+		}
+		// remember this special case
+		frame.lvids[operands.lvid].pointerAssignment = true;
+		return true;
+	}
+
+
 	} // anonymous namespace
 
 
@@ -97,164 +277,6 @@ namespace Instanciate
 	}
 
 
-	inline bool SequenceBuilder::emitIdentifyForSingleResult(bool isLocalVar, const Classdef& cdef,
-		const IR::ISA::Operand<IR::ISA::Op::identify>& operands, const AnyString& name)
-	{
-		auto& resultAtom = multipleResults[0].get();
-		const Classdef* cdefTypedef = nullptr;
-		bool mustResolveATypedef = resultAtom.isTypeAlias();
-		auto& atom = (not mustResolveATypedef)
-			? resultAtom
-			: resolveTypeAlias(resultAtom, cdefTypedef);
-
-		if (unlikely((mustResolveATypedef and !cdefTypedef) or atom.flags(Atom::Flags::error)))
-			return false;
-
-		if (unlikely(cdefTypedef and cdefTypedef->isBuiltin()))
-		{
-			auto& spare = cdeftable.substitute(cdef.clid.lvid());
-			spare.import(*cdefTypedef);
-
-			if (isLocalVar)
-			{
-				// disable optimisation to avoid unwanted behavior
-				auto& lvidinfo = frame->lvids[operands.lvid];
-				lvidinfo.synthetic = false;
-				lvidinfo.origin.memalloc = false;
-				lvidinfo.origin.returnedValue = false;
-			}
-			return true;
-		}
-
-		// if the resolution is simple (aka only one solution), it is possible that the
-		// solution is a member variable (`self.myvar`). In this case, the atom will be the member itself
-		// and not its real type
-		if (atom.isMemberVariable() and not atom.isTypeAlias())
-		{
-			assert(not isLocalVar and "a member variable cannot be a local variable");
-			assert(not atom.returnType.clid.isVoid());
-
-			// member variable - the real type is held by 'returnType'
-			auto& cdefvar = cdeftable.classdef(atom.returnType.clid);
-			auto* atomvar = (not cdefvar.isBuiltin()) ? cdeftable.findClassdefAtom(cdefvar) : nullptr;
-			if (unlikely(!atomvar and not cdefvar.isBuiltin()))
-				return (ice() << "invalid variable member type for " << atom.fullname());
-
-			auto& spare = cdeftable.substitute(operands.lvid);
-			spare.import(cdefvar);
-			if (atomvar)
-				spare.mutateToAtom(atomvar);
-
-			uint32_t self = operands.self;
-			if (self == 0) // implicit 'self' ?
-			{
-				if (frame->atom.isClassMember())
-				{
-					// 'self' is given by the first parameter
-					self = 2; // 1: return type, 2: first parameter
-				}
-				else
-				{
-					// no 'self' available since it just does not exist, which can be expected
-					// for type resolution (the type resolution is done directly from the atom class,
-					// where the initialization is done via a proxy function)
-					// It's ok for type resolution since we already know we're dealing with a variable member)
-					if (frame->atom.isClass() and (not canGenerateCode()))
-					{
-						// 'self' can stay null
-					}
-					else
-						return complain::invalidClassSelf(name);
-				}
-			}
-
-			auto& lvidinfo = frame->lvids[operands.lvid];
-			lvidinfo.synthetic = false;
-
-			auto& origin  = lvidinfo.origin.varMember;
-			assert(atom.atomid != 0);
-			origin.self   = self;
-			origin.atomid = atom.atomid;
-			origin.field  = atom.varinfo.effectiveFieldIndex;
-
-			if (canGenerateCode())
-			{
-				// read the address
-				assert(self != 0 and "'self can be null only for type resolution'");
-				out->emitFieldget(operands.lvid, self, atom.varinfo.effectiveFieldIndex);
-				tryToAcquireObject(operands.lvid, cdefvar);
-			}
-		}
-		else
-		{
-			// override the typeinfo
-			auto& spare = cdeftable.substitute(operands.lvid);
-			spare.import(cdef);
-			spare.mutateToAtom(&atom);
-
-			if (isLocalVar)
-			{
-				// disable optimisation to avoid unwanted behavior
-				auto& lvidinfo = frame->lvids[operands.lvid];
-				lvidinfo.synthetic = false;
-				lvidinfo.origin.memalloc = false;
-				lvidinfo.origin.returnedValue = false;
-
-				if (canGenerateCode())
-					acquireObject(operands.lvid);
-			}
-		}
-		return true;
-	}
-
-
-	bool SequenceBuilder::emitIdentifyForProperty(const IR::ISA::Operand<IR::ISA::Op::identify>& operands,
-		Atom& propatom, uint32_t self)
-	{
-		// report for instanciation
-		Logs::Message::Ptr subreport;
-		// all pushed parameters
-		decltype(FuncOverloadMatch::result.params) params;
-		// all pushed template parameters
-		decltype(FuncOverloadMatch::result.params) tmplparams;
-		// return value
-		uint32_t lvid = operands.lvid;
-		// current atom
-		uint32_t atomid = frame->atomid;
-
-		// preparing the overload matcher
-		overloadMatch.clear();
-		overloadMatch.input.rettype.push_back(CLID{atomid, lvid});
-		if (self != (uint32_t) -1 and self != 0)
-			overloadMatch.input.params.indexed.emplace_back(CLID{atomid, self});
-
-		// try to validate the func call
-		// (no error reporting, since no overload is present)
-		if (unlikely(TypeCheck::Match::none == overloadMatch.validate(propatom)))
-			return complainCannotCall(propatom, overloadMatch);
-
-		// get new parameters
-		params.swap(overloadMatch.result.params);
-		tmplparams.swap(overloadMatch.result.tmplparams);
-
-
-		InstanciateData info{subreport, propatom, cdeftable, build, params, tmplparams};
-		if (not doInstanciateAtomFunc(subreport, info, lvid))
-			return false;
-
-		if (canGenerateCode())
-		{
-			for (auto& param: params)
-				out->emitPush(param.clid.lvid());
-
-			out->emitCall(lvid, propatom.atomid, info.instanceid);
-		}
-		return true;
-	}
-
-
-
-
 	bool SequenceBuilder::identify(const IR::ISA::Operand<IR::ISA::Op::identify>& operands,
 		const AnyString& name, bool firstChance)
 	{
@@ -264,7 +286,6 @@ namespace Instanciate
 		// keeping traces of the code logic
 		frame->lvids[lvid].resolvedName = name;
 		frame->lvids[lvid].referer = operands.self;
-
 
 		if (name == '=') // it is an assignment, not a real method call
 		{
@@ -290,29 +311,8 @@ namespace Instanciate
 		{
 			if (not frame->verify(operands.self))
 				return false;
-
 			if (frame->lvids[operands.self].pointerAssignment)
-			{
-				// since self was marked as an 'assignment', we're trying to resolve here '^()'
-				if (unlikely(name != "^()"))
-				{
-					ice() << "invalid resolve name for assignment (got '" << name << "')";
-					return false;
-				}
-
-				if (0 != frame->lvids[operands.self].propsetCallSelf)
-				{
-					auto& cdef  = cdeftable.classdef(CLID{frame->atomid, operands.self});
-					auto& spare = cdeftable.substitute(lvid);
-					spare.import(cdef);
-					frame->lvids[lvid].propsetCallSelf =
-						frame->lvids[operands.self].propsetCallSelf;
-				}
-
-				// remember this special case
-				frame->lvids[lvid].pointerAssignment = true;
-				return true;
-			}
+				return identifyByPointerAssignment(*this, name, operands);
 		}
 
 		auto& cdef = cdeftable.classdef(CLID{frame->atomid, lvid});
@@ -342,7 +342,6 @@ namespace Instanciate
 		// getter will be directly resolved here but setter later
 		// (-1 since this special value will be user to determine if it is a propset)
 		uint32_t propself = (uint32_t) -1;
-
 
 		if (0 == operands.self)
 		{
@@ -431,7 +430,6 @@ namespace Instanciate
 				frame->lvids[lvidVar].hasBeenUsed = true;
 				frame->lvids[lvid].alias = lvidVar;
 				frame->lvids[lvid].synthetic = false;
-
 				if (not frame->verify(lvidVar)) // suppress spurious errors from previous ones
 					return false;
 
@@ -536,14 +534,13 @@ namespace Instanciate
 			}
 		}
 
-
 		if (not isProperty)
 		{
 			switch (multipleResults.size())
 			{
 				case 1: // unique match count
 				{
-					return emitIdentifyForSingleResult(isLocalVar, cdef, operands, name);
+					return emitIdentifyForSingleResult(*this, isLocalVar, cdef, operands, name);
 				}
 				default: // multiple solutions
 				{
@@ -590,7 +587,7 @@ namespace Instanciate
 							trace() << "property: resolved '" << name << "' from '"
 								<< frame->atom.caption() << "' as getter " << cdef.clid;
 						}
-						return emitIdentifyForProperty(operands, propatom, propself);
+						return emitIdentifyForProperty(*this, operands, propatom, propself);
 					}
 					else
 					{
@@ -626,7 +623,6 @@ namespace Instanciate
 		}
 		return false;
 	}
-
 
 
 	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::identify>& operands)
