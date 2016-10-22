@@ -216,14 +216,6 @@ namespace Producer
 		void prepareClosureNodeExpr(AST::Node::Ptr& out);
 		void emitExprAttributes(uint32_t& localvar);
 
-		bool emitVarInClass(const AnyString& varname, AST::Node& node, AST::Node* varType,
-			AST::Node* varAssign, bool ref, bool constant);
-		bool emitVarInFunc(const AnyString& varname, AST::Node& node, AST::Node* varType,
-			AST::Node* varAssign, bool ref, bool constant);
-		bool emitProperty(const AnyString& varname, AST::Node& node, AST::Node* varType,
-			AST::Node& varAssign, bool ref);
-
-
 	public:
 		//! Next local variable
 		LVID nextVarID = 0u;
