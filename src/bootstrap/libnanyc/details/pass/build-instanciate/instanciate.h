@@ -219,10 +219,6 @@ namespace Instanciate
 		//@{
 		bool checkForIntrinsicParamCount(const AnyString& name, uint32_t count);
 		bool complainInvalidType(const char* origin, const Classdef& from, const Classdef& to);
-		bool complainMultipleOverloads(LVID lvid, const std::vector<std::reference_wrapper<Atom>>& solutions,
-			const OverloadedFuncCallResolver& resolver);
-		bool complainMultipleOverloads(LVID lvid);
-		bool complainRedeclared(const AnyString& name, uint32_t previousDeclaration);
 		void complainReturnTypeMultiple(const Classdef& expected, const Classdef& usertype, uint32_t line = 0, uint32_t offset = 0);
 		//! Restriction on builtin intrinsics
 		bool complainBuiltinIntrinsicDoesNotAccept(const AnyString& name, const AnyString& what);

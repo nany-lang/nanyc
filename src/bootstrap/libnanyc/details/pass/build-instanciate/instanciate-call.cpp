@@ -1,5 +1,6 @@
 #include "instanciate.h"
 #include "instanciate-atom.h"
+#include "instanciate-error.h"
 #include "overloaded-func-call-resolution.h"
 
 using namespace Yuni;
@@ -173,7 +174,7 @@ namespace Instanciate
 
 			OverloadedFuncCallResolver resolver{&seq, seq.report, overloadMatch, cdeftable, seq.build};
 			if (unlikely(not resolver.resolve(solutions)))
-				return seq.complainMultipleOverloads(operands.ptr2func, solutions, resolver);
+				return complain::multipleOverloads(operands.ptr2func, solutions, resolver);
 
 			assert(resolver.atom != nullptr and "atom not properly initialized");
 			assert(resolver.params != nullptr);

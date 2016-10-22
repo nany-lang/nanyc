@@ -265,6 +265,145 @@ namespace complain
 	}
 
 
+	bool redeclared(const AnyString& name, uint32_t previousDeclaration)
+	{
+		auto err = (error() << "redeclaration of '" << name << '\'');
+		err << " in '";
+		auto* seq = Logs::userHandler<SequenceBuilder>();
+		if (seq)
+		{
+			err << seq->cdeftable.keyword(seq->frame->atom) << ' ';
+			seq->frame->atom.retrieveCaption(err.data().message, seq->cdeftable);
+		}
+		err << '\'';
+
+		auto suggest = (err.hint() << "previous declaration of '" << name << '\'');
+		if (seq)
+		{
+			auto& lr = seq->frame->lvids[previousDeclaration];
+			lr.fillLogEntryWithLocation(suggest);
+		}
+		return false;
+	}
+
+
+	bool multipleOverloads(LVID lvid)
+	{
+		auto* seq = Logs::userHandler<SequenceBuilder>();
+		auto* frame = seq->frame;
+		assert(frame != nullptr);
+		auto err = (error() << "ambigous resolution");
+		if (not frame->lvids[lvid].resolvedName.empty())
+			err << " for '" << frame->lvids[lvid].resolvedName << "'";
+
+		CLID clid{frame->atomid, lvid};
+		if (debugmode)
+			err << ' ' << clid;
+
+		auto it = frame->partiallyResolved.find(clid);
+		if (it != frame->partiallyResolved.end())
+		{
+			auto& solutions = it->second;
+			for (size_t i = 0; i != solutions.size(); ++i)
+			{
+				auto& atom = solutions[i].get();
+				auto hint = err.hint();
+				hint.message.origins.location.resetFromAtom(atom);
+
+				if (seq)
+				{
+					hint << '\'';
+					hint << seq->cdeftable.keyword(atom) << ' ';
+					hint << atom.caption(seq->cdeftable);
+					hint << "' is a suitable candidate";
+					if (debugmode)
+						hint << " {atomid: " << atom.atomid << '}';
+				}
+			}
+		}
+		return false;
+	}
+
+
+	bool multipleOverloads(LVID lvid, const std::vector<std::reference_wrapper<Atom>>& solutions
+	   , const OverloadedFuncCallResolver& resolver)
+	{
+		assert(solutions.size() == resolver.suitable.size());
+		auto* seq = Logs::userHandler<SequenceBuilder>();
+
+		auto* frame = seq->frame;
+		String varname;
+		for (auto l = frame->lvids[lvid].referer; l != 0; l = frame->lvids[l].referer)
+		{
+			auto& part = frame->lvids[l].resolvedName;
+			if (not part.empty())
+			{
+				AnyString keyword;
+				AnyString partname;
+				Atom::extractNames(keyword, partname, part);
+				String str;
+				if (not keyword.empty())
+					str << keyword << ' ';
+				str << partname;
+				if (not varname.empty())
+					str << '.';
+				varname.prepend(str);
+			}
+		}
+
+		auto err = error();
+
+		if (resolver.suitableCount > 0)
+		{
+			// generating the error
+			err << "ambiguous call to overloaded function '" << varname;
+			seq->overloadMatch.printInputParameters(err.data().message);
+			err << '\'';
+
+			for (size_t i = 0; i != solutions.size(); ++i)
+			{
+				if (resolver.suitable[i])
+				{
+					auto& atom = solutions[i].get();
+					auto hint = err.hint();
+					hint.message.origins.location.resetFromAtom(atom);
+
+					hint << '\'';
+					hint << seq->cdeftable.keyword(atom) << ' ';
+					hint << atom.caption(seq->cdeftable);
+					hint << "' is a suitable candidate";
+					if (debugmode)
+						hint << " {b-atomid: " << atom.atomid << '}';
+
+					hint.appendEntry(resolver.subreports[i]); // subreport can be null
+				}
+			}
+		}
+		else
+		{
+			err << "no matching function to call '" << varname;
+			seq->overloadMatch.printInputParameters(err.data().message);
+			err << '\'';
+
+			for (size_t i = 0; i != solutions.size(); ++i)
+			{
+				auto& atom = solutions[i].get();
+				//if (atom.flags(Atom::Flags::suggestInReport))
+				{
+					auto hint  = (err.hint() << "see ");
+					hint.message.origins.location.resetFromAtom(atom);
+
+					hint << '\'';
+					hint << seq->cdeftable.keyword(atom) << ' ';
+					atom.retrieveCaption(hint.text(), seq->cdeftable);
+					hint << '\'';
+
+					hint.appendEntry(resolver.subreports[i]); // subreport can be null
+				}
+			}
+		}
+		return false;
+	}
 
 
 } // namespace complain
@@ -272,7 +411,7 @@ namespace complain
 
 
 
-	Logs::Report SequenceBuilder::emitReportEntry(void* self, Logs::Level level)
+	Logs::Report emitReportEntry(void* self, Logs::Level level)
 	{
 		auto& sb = *(reinterpret_cast<SequenceBuilder*>(self));
 
@@ -315,147 +454,13 @@ namespace complain
 		return entry;
 	}
 
-	void SequenceBuilder::retriveReportMetadata(void* self, Logs::Level, const AST::Node*, String& filename, uint32_t& line, uint32_t& offset)
+
+	void retriveReportMetadata(void* self, Logs::Level, const AST::Node*, String& filename, uint32_t& line, uint32_t& offset)
 	{
 		auto& sb = *(reinterpret_cast<SequenceBuilder*>(self));
 		filename = sb.currentFilename;
 		line     = sb.currentLine;
 		offset   = sb.currentOffset;
-	}
-
-
-
-
-	bool SequenceBuilder::complainRedeclared(const AnyString& name, uint32_t previousDeclaration)
-	{
-		success = false;
-		auto err = (error() << "redeclaration of '" << name << '\'');
-		err << " in '";
-		err << cdeftable.keyword(frame->atom) << ' ';
-		frame->atom.retrieveCaption(err.data().message, cdeftable);
-		err << '\'';
-
-		auto suggest = (err.hint() << "previous declaration of '" << name << '\'');
-		auto& lr = frame->lvids[previousDeclaration];
-		lr.fillLogEntryWithLocation(suggest);
-		return false;
-	}
-
-
-	bool SequenceBuilder::complainMultipleOverloads(LVID lvid)
-	{
-		assert(frame != nullptr);
-		auto err = (error() << "ambigous resolution");
-		if (not frame->lvids[lvid].resolvedName.empty())
-			err << " for '" << frame->lvids[lvid].resolvedName << "'";
-
-		CLID clid{frame->atomid, lvid};
-		if (debugmode)
-			err << ' ' << clid;
-
-		auto it = frame->partiallyResolved.find(clid);
-		if (it != frame->partiallyResolved.end())
-		{
-			auto& solutions = it->second;
-			for (size_t i = 0; i != solutions.size(); ++i)
-			{
-				auto& atom = solutions[i].get();
-				auto hint = err.hint();
-				hint.message.origins.location.resetFromAtom(atom);
-
-				hint << '\'';
-				hint << cdeftable.keyword(atom) << ' ';
-				hint << atom.caption(cdeftable);
-				hint << "' is a suitable candidate";
-				if (debugmode)
-					hint << " {atomid: " << atom.atomid << '}';
-			}
-		}
-		return false;
-	}
-
-
-	bool SequenceBuilder::complainMultipleOverloads(LVID lvid, const std::vector<std::reference_wrapper<Atom>>& solutions
-	   , const OverloadedFuncCallResolver& resolver)
-	{
-		assert(solutions.size() == resolver.suitable.size());
-
-		success = false;
-
-		// variable name
-		String varname;
-		for (auto l = frame->lvids[lvid].referer; l != 0; l = frame->lvids[l].referer)
-		{
-			auto& part = frame->lvids[l].resolvedName;
-			if (part.empty())
-				continue;
-
-			AnyString keyword;
-			AnyString partname;
-			Atom::extractNames(keyword, partname, part);
-			String str;
-			if (not keyword.empty())
-				str << keyword << ' ';
-			str << partname;
-
-			if (not varname.empty())
-				str << '.';
-
-			varname.prepend(str);
-		}
-
-		auto err = error();
-
-		if (resolver.suitableCount > 0)
-		{
-			// generating the error
-			err << "ambiguous call to overloaded function '" << varname;
-			overloadMatch.printInputParameters(err.data().message);
-			err << '\'';
-
-			for (size_t i = 0; i != solutions.size(); ++i)
-			{
-				if (resolver.suitable[i])
-				{
-					auto& atom = solutions[i].get();
-					auto hint = err.hint();
-					hint.message.origins.location.resetFromAtom(atom);
-
-					hint << '\'';
-					hint << cdeftable.keyword(atom) << ' ';
-					hint << atom.caption(cdeftable);
-					hint << "' is a suitable candidate";
-					if (debugmode)
-						hint << " {b-atomid: " << atom.atomid << '}';
-
-					hint.appendEntry(resolver.subreports[i]); // subreport can be null
-				}
-			}
-		}
-		else
-		{
-			err << "no matching function to call '" << varname;
-			overloadMatch.printInputParameters(err.data().message);
-			err << '\'';
-
-			for (size_t i = 0; i != solutions.size(); ++i)
-			{
-				auto& atom = solutions[i].get();
-				//if (atom.flags(Atom::Flags::suggestInReport))
-				{
-					auto hint  = (err.hint() << "see ");
-					hint.message.origins.location.resetFromAtom(atom);
-
-					hint << '\'';
-					hint << cdeftable.keyword(atom) << ' ';
-					atom.retrieveCaption(hint.text(), cdeftable);
-					hint << '\'';
-
-					hint.appendEntry(resolver.subreports[i]); // subreport can be null
-				}
-			}
-		}
-		return false;
 	}
 
 

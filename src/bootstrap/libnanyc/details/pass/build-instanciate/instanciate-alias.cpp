@@ -1,4 +1,5 @@
 #include "instanciate.h"
+#include "instanciate-error.h"
 
 using namespace Yuni;
 
@@ -52,7 +53,7 @@ namespace Instanciate
 		{
 			lr.errorReported = true;
 			frame->invalidate(lvid);
-			complainRedeclared(name, previousDecl);
+			complain::redeclared(name, previousDecl);
 		}
 	}
 

@@ -1,4 +1,5 @@
 #include "instanciate.h"
+#include "instanciate-error.h"
 
 using namespace Yuni;
 
@@ -23,7 +24,7 @@ namespace Instanciate
 		if (unlikely(0 != frame->partiallyResolved.count(clid)))
 		{
 			// auto& resolveList = frame->resolvePerCLID[clid];
-			return complainMultipleOverloads(operands.lvid);
+			return complain::multipleOverloads(operands.lvid);
 		}
 
 		auto& cdef = cdeftable.classdef(clid);
