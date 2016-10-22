@@ -188,11 +188,6 @@ namespace Instanciate
 		//! perform type resolution and fetch data (local variable, func...)
 		bool identify(const IR::ISA::Operand<IR::ISA::Op::identify>& operands, const AnyString& name, bool firstChance = true);
 		bool identifyCapturedVar(const IR::ISA::Operand<IR::ISA::Op::identify>& operands, const AnyString& name);
-		bool emitIdentifyForSingleResult(bool isLocalVar, const Classdef& cdef,
-			const IR::ISA::Operand<IR::ISA::Op::identify>& operands, const AnyString& name);
-		bool emitIdentifyForProperty(const IR::ISA::Operand<IR::ISA::Op::identify>& operands,
-			Atom& propatom, uint32_t self);
-
 		bool ensureResolve(const IR::ISA::Operand<IR::ISA::Op::ensureresolved>& operands);
 
 		//! Try to capture variables from a list of potentiel candidates created by the mapping
