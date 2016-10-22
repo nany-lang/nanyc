@@ -255,8 +255,6 @@ namespace Instanciate
 		bool doInstanciateAtomFunc(Logs::Message::Ptr& subreport, InstanciateData& info, uint32_t retlvid);
 		void pushNewFrame(Atom& atom);
 		void popFrame();
-		static Logs::Report emitReportEntry(void* self, Logs::Level);
-		static void retriveReportMetadata(void* self, Logs::Level, const AST::Node*, Yuni::String&, uint32_t&, uint32_t&);
 
 		// Current stack frame (current func / class...)
 		AtomStackFrame* frame = nullptr;
