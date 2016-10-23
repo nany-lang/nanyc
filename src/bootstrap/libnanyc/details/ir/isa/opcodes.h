@@ -1,8 +1,5 @@
 #pragma once
-#include <yuni/yuni.h>
-#include <yuni/core/string.h>
-#include <type_traits>
-#include <yuni/core/static/if.h>
+#include <cstdint>
 
 #ifdef alloca
 # undef alloca

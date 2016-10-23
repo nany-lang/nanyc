@@ -4,6 +4,7 @@
 #include "details/fwd.h"
 #include "opcodes.h"
 #include <iosfwd>
+#include <yuni/core/string.h>
 
 
 // forward declaration
