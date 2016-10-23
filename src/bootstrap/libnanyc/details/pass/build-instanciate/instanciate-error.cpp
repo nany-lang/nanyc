@@ -46,6 +46,17 @@ namespace complain
 	}
 
 
+	bool classOrFuncExpected(const Classdef& cdef)
+	{
+		auto e = (error() << "class or function expected, got '");
+		auto* seq = Logs::userHandler<SequenceBuilder>();
+		if (seq)
+			cdef.print(e.data().message, seq->cdeftable, false);
+		e << "' instead";
+		return false;
+	}
+
+
 	bool classRequired()
 	{
 		error() << "type class required";
