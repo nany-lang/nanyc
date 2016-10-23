@@ -18,38 +18,51 @@ namespace Producer
 	bool Scope::visitASTExprTypeof(AST::Node& node, LVID& localvar)
 	{
 		assert(node.rule == AST::rgTypeof);
-
-		// reset the value of the localvar, result of the expr
 		localvar = 0;
-		AST::Node* expr = nullptr;
+		using TypeInfo = std::pair<std::reference_wrapper<AST::Node>, uint32_t>;
+		std::vector<TypeInfo> types;
 
 		for (auto& child: node.children)
 		{
 			if (child.rule == AST::rgCall)
 			{
-				if (child.children.size() != 1)
+				types.reserve(child.children.size());
+				for (auto& param: child.children)
 				{
-					error(child) << "invalid number of parameters for typeof-expression";
-					return false;
+					if (param.rule == AST::rgCallParameter)
+						types.emplace_back(std::make_pair(std::ref(param.firstChild()), 0u));
 				}
-				auto& parameter = child.children[0];
-				if (parameter.rule != AST::rgCallParameter or parameter.children.size() != 1)
-					return unexpectedNode(parameter, "ir/typeof/param");
-
-				expr = &(parameter.children[0]);
 			}
-			else
-				return unexpectedNode(child, "[ir/typeof]");
 		}
 
-		if (unlikely(nullptr == expr))
-			return (ice(node) << "invalid typeof expression");
+		uint32_t count = static_cast<uint32_t>(types.size());
+		if (unlikely(count == 0))
+			return (error(node) << "at least one type is required for 'typeof'");
+
+		auto& out = sequence();
+		bool success = true;
 
 		IR::Producer::Scope scope{*this};
-		emitDebugpos(node);
-		OpcodeCodegenDisabler codegen{sequence()};
-		sequence().emitComment("typeof expression");
-		return scope.visitASTExpr(*expr, localvar);
+		for (auto& typeinfo: types)
+		{
+			auto& expr = typeinfo.first.get();
+			emitDebugpos(expr);
+			OpcodeCodegenDisabler codegen{out};
+			if (debugmode)
+				out.emitComment("typeof expression");
+			success &= scope.visitASTExpr(expr, typeinfo.second);
+		}
+		if (count > 1u and success)
+		{
+			uint32_t previous = 0;
+			for (auto& typeinfo: types)
+			{
+				out.emitCommonType(typeinfo.second, previous);
+				previous = typeinfo.second;
+			}
+		}
+		localvar = types.back().second;
+		return success;
 	}
 
 
