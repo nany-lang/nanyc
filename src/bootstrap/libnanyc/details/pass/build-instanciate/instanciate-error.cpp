@@ -425,20 +425,17 @@ namespace complain
 	Logs::Report emitReportEntry(void* self, Logs::Level level)
 	{
 		auto& sb = *(reinterpret_cast<SequenceBuilder*>(self));
-
 		switch (level)
 		{
 			default:
 				break;
 			case Logs::Level::warning:
 			{
-				if (nyfalse != sb.build.cf.warnings_into_errors)
-				{
-					level = Logs::Level::error;
-					sb.success = false;
-				}
-				break;
+				if (nyfalse == sb.build.cf.warnings_into_errors)
+					break;
+				level = Logs::Level::error;
 			}
+			// [[fallthru]]
 			case Logs::Level::error:
 			case Logs::Level::ICE:
 			{
@@ -446,13 +443,12 @@ namespace complain
 				break;
 			}
 		}
-
 		auto entry = sb.report.fromErrLevel(level);
 		if (debugmode)
 		{
-			if (sb.cursor and sb.currentSequence.isCursorValid(**sb.cursor))
+			if (level == Logs::Level::error or level == Logs::Level::ICE)
 			{
-				if (level == Logs::Level::error or level == Logs::Level::ICE)
+				if (sb.cursor and sb.currentSequence.isCursorValid(**sb.cursor))
 				{
 					uint32_t offset = sb.currentSequence.offsetOf(**sb.cursor);
 					auto h = entry.hint();
