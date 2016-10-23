@@ -5,6 +5,10 @@
 # undef alloca
 #endif
 
+#define LIBNANYC_IR_PRINT_OPCODES 0
+#if LIBNANYC_IR_PRINT_OPCODES != 0
+#include <iostream>
+#endif
 
 
 
@@ -211,10 +215,16 @@ namespace ISA //!< Instruction Set Architecture
 
 
 
+	#if LIBNANYC_IR_PRINT_OPCODES != 0
+	#define __LIBNANYC_IR_PRINT_OPCODE(OPCODE) std::cout << " -- opc " << (void*) this << " -- " << opc << " as " << #OPCODE << std::endl;
+	#else
+	#define __LIBNANYC_IR_PRINT_OPCODE(OPCODE)
+	#endif
 
 	#define LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, OPCODE) \
 		case OPCODE: \
 		{ \
+			__LIBNANYC_IR_PRINT_OPCODE(OPCODE) \
 			(VISITOR).visit(reinterpret_cast<PREFIX<(OPCODE)>&>((IT))); \
 			break; \
 		}

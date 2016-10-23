@@ -452,7 +452,11 @@ namespace complain
 				{
 					uint32_t offset = sb.currentSequence.offsetOf(**sb.cursor);
 					auto h = entry.hint();
-					h << "dump opcodes at +" << offset << "\n";
+					h << "dump opcodes at +" << offset << " [from SequenceBuilder ";
+					h << self;
+					if (sb.signatureOnly)
+						h << ", signature only";
+					h << "]\n";
 					auto* map = &(sb.cdeftable.originalTable().atoms);
 					IR::ISA::printExtract(h.message.message, sb.currentSequence, offset, map);
 				}

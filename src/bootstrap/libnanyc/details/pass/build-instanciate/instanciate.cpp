@@ -283,7 +283,13 @@ namespace Instanciate
 
 	bool SequenceBuilder::readAndInstanciate(uint32_t offset)
 	{
+		#if LIBNANYC_IR_PRINT_OPCODES != 0
+		std::cout << "\n\n -- sequence builder read start from " << (void*) this << "\n";
+		#endif
 		currentSequence.each(*this, offset);
+		#if LIBNANYC_IR_PRINT_OPCODES != 0
+		std::cout << " -- END " << (void*) this << std::endl;
+		#endif
 		return success;
 	}
 
