@@ -815,14 +815,16 @@ namespace Instanciate
 				if (atom != nullptr and atom->builtinMapping != nyt_void)
 				{
 					builtinlhs = atom->builtinMapping;
-					uint32_t newlvid = seq.createLocalVariables();
 					if (seq.canGenerateCode())
 					{
+						uint32_t newlvid = seq.createLocalVariables();
 						if (debugmode)
 							seq.out->emitComment("reading inner 'pod' variable");
 						seq.out->emitFieldget(newlvid, lhs, 0);
+						lhs = newlvid;
 					}
-					lhs = newlvid;
+					else
+						lhs = (uint32_t) -1;
 					atomBuiltinCast = atom;
 				}
 			}
@@ -838,14 +840,16 @@ namespace Instanciate
 				if (atom != nullptr and (atom->builtinMapping != nyt_void))
 				{
 					builtinrhs = atom->builtinMapping;
-					uint32_t newlvid = seq.createLocalVariables();
 					if (seq.canGenerateCode())
 					{
+						uint32_t newlvid = seq.createLocalVariables();
 						if (debugmode)
 							seq.out->emitComment("reading inner 'pod' variable");
 						seq.out->emitFieldget(newlvid, rhs, 0);
+						rhs = newlvid;
 					}
-					rhs = newlvid;
+					else
+						rhs = (uint32_t) -1;
 					atomBuiltinCast = atom;
 				}
 			}
