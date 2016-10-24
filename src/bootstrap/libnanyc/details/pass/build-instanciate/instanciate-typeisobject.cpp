@@ -29,9 +29,11 @@ namespace Instanciate
 				{
 					if (unlikely(atom->isClass() or atom->isFunction()))
 					{
-						if (unlikely(atom->isClass() and not atom->classinfo.isInstanciated))
+						if (canGenerateCode()) // checking for real object only when they exist
+						{
+							if (unlikely(atom->isClass() and not atom->classinfo.isInstanciated))
 							return complain::classNotInstanciated(*atom);
-						// ok the type is an object
+						}
 						return true;
 					}
 				}

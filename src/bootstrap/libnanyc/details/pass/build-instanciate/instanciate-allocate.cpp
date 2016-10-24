@@ -27,8 +27,11 @@ namespace Instanciate
 		if (unlikely(not atom->isClass()))
 			return (void) complain::classRequired();
 
-		if (unlikely(not atom->classinfo.isInstanciated))
-			return (void) complain::classNotInstanciated(*atom);
+		if (canGenerateCode()) // checking for real object only when they exist
+		{
+			if (unlikely(not atom->classinfo.isInstanciated and canGenerateCode()))
+				return (void) complain::classNotInstanciated(*atom);
+		}
 
 		// propagate the object type
 		{
