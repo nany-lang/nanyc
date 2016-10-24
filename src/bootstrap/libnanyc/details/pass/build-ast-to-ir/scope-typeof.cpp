@@ -57,6 +57,7 @@ namespace Producer
 			uint32_t previous = 0;
 			for (auto& typeinfo: types)
 			{
+				emitDebugpos(typeinfo.first.get());
 				out.emitCommonType(typeinfo.second, previous);
 				previous = typeinfo.second;
 			}
