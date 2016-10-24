@@ -43,22 +43,28 @@ namespace Instanciate
 		static bool intrinsicOSIsUnix(SequenceBuilder& seq, uint32_t lvid)
 		{
 			seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_bool);
-			#ifdef YUNI_OS_UNIX
-			seq.out->emitStore_u64(lvid, 1);
-			#else
-			seq.out->emitStore_u64(lvid, 0);
-			#endif
+			if (seq.canGenerateCode())
+			{
+				#ifdef YUNI_OS_UNIX
+				seq.out->emitStore_u64(lvid, 1);
+				#else
+				seq.out->emitStore_u64(lvid, 0);
+				#endif
+			}
 			return true;
 		}
 
 		static bool intrinsicOSIsPosix(SequenceBuilder& seq, uint32_t lvid)
 		{
 			seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_bool);
-			#if defined(YUNI_OS_UNIX) && defined(_POSIX_VERSION)
-			seq.out->emitStore_u64(lvid, 1);
-			#else
-			seq.out->emitStore_u64(lvid, 0);
-			#endif
+			if (seq.canGenerateCode())
+			{
+				#if defined(YUNI_OS_UNIX) && defined(_POSIX_VERSION)
+				seq.out->emitStore_u64(lvid, 1);
+				#else
+				seq.out->emitStore_u64(lvid, 0);
+				#endif
+			}
 			return true;
 		}
 
@@ -66,67 +72,85 @@ namespace Instanciate
 		static bool intrinsicOSIsLinux(SequenceBuilder& seq, uint32_t lvid)
 		{
 			seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_bool);
-			#ifdef YUNI_OS_LINUX
-			seq.out->emitStore_u64(lvid, 1);
-			#else
-			seq.out->emitStore_u64(lvid, 0);
-			#endif
+			if (seq.canGenerateCode())
+			{
+				#ifdef YUNI_OS_LINUX
+				seq.out->emitStore_u64(lvid, 1);
+				#else
+				seq.out->emitStore_u64(lvid, 0);
+				#endif
+			}
 			return true;
 		}
 
 		static bool intrinsicOSIsAIX(SequenceBuilder& seq, uint32_t lvid)
 		{
 			seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_bool);
-			#ifdef YUNI_OS_AIX
-			seq.out->emitStore_u64(lvid, 1);
-			#else
-			seq.out->emitStore_u64(lvid, 0);
-			#endif
+			if (seq.canGenerateCode())
+			{
+				#ifdef YUNI_OS_AIX
+				seq.out->emitStore_u64(lvid, 1);
+				#else
+				seq.out->emitStore_u64(lvid, 0);
+				#endif
+			}
 			return true;
 		}
 
 		static bool intrinsicOSIsWindows(SequenceBuilder& seq, uint32_t lvid)
 		{
 			seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_bool);
-			#ifdef YUNI_OS_WINDOWS
-			seq.out->emitStore_u64(lvid, 1);
-			#else
-			seq.out->emitStore_u64(lvid, 0);
-			#endif
+			if (seq.canGenerateCode())
+			{
+				#ifdef YUNI_OS_WINDOWS
+				seq.out->emitStore_u64(lvid, 1);
+				#else
+				seq.out->emitStore_u64(lvid, 0);
+				#endif
+			}
 			return true;
 		}
 
 		static bool intrinsicOSIsCygwin(SequenceBuilder& seq, uint32_t lvid)
 		{
 			seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_bool);
-			#if defined(__CYGWIN32__) || defined(__CYGWIN__)
-			seq.out->emitStore_u64(lvid, 1);
-			#else
-			seq.out->emitStore_u64(lvid, 0);
-			#endif
+			if (seq.canGenerateCode())
+			{
+				#if defined(__CYGWIN32__) || defined(__CYGWIN__)
+				seq.out->emitStore_u64(lvid, 1);
+				#else
+				seq.out->emitStore_u64(lvid, 0);
+				#endif
+			}
 			return true;
 		}
 
 		static bool intrinsicOSIsMacOS(SequenceBuilder& seq, uint32_t lvid)
 		{
 			seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_bool);
-			#ifdef YUNI_OS_MACOS
-			seq.out->emitStore_u64(lvid, 1);
-			#else
-			seq.out->emitStore_u64(lvid, 0);
-			#endif
+			if (seq.canGenerateCode())
+			{
+				#ifdef YUNI_OS_MACOS
+				seq.out->emitStore_u64(lvid, 1);
+				#else
+				seq.out->emitStore_u64(lvid, 0);
+				#endif
+			}
 			return true;
 		}
 
 		static bool intrinsicOSIsBSD(SequenceBuilder& seq, uint32_t lvid)
 		{
 			seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_bool);
-			#if defined(YUNI_OS_MACOS) || defined(YUNI_OS_OPENBSD) || defined(YUNI_OS_FREEBSD) \
-				|| defined(YUNI_OS_NETBSD) || defined(YUNI_OS_DRAGONFLY)
-			seq.out->emitStore_u64(lvid, 1);
-			#else
-			seq.out->emitStore_u64(lvid, 0);
-			#endif
+			if (seq.canGenerateCode())
+			{
+				#if defined(YUNI_OS_MACOS) || defined(YUNI_OS_OPENBSD) || defined(YUNI_OS_FREEBSD) \
+					|| defined(YUNI_OS_NETBSD) || defined(YUNI_OS_DRAGONFLY)
+				seq.out->emitStore_u64(lvid, 1);
+				#else
+				seq.out->emitStore_u64(lvid, 0);
+				#endif
+			}
 			return true;
 		}
 
@@ -595,12 +619,15 @@ namespace Instanciate
 				auto* atom = seq.cdeftable.findClassdefAtom(cdeflhs);
 				if (atom != nullptr and atom->builtinMapping != nyt_void)
 				{
-					if (debugmode)
-						seq.out->emitComment("reading inner 'pod' variable");
 					atomBuiltinCast = atom;
 					builtinlhs = atom->builtinMapping;
 					uint32_t newlvid = seq.createLocalVariables();
-					seq.out->emitFieldget(newlvid, lhs, 0);
+					if (seq.canGenerateCode())
+					{
+						if (debugmode)
+							seq.out->emitComment("reading inner 'pod' variable");
+						seq.out->emitFieldget(newlvid, lhs, 0);
+					}
 					lhs = newlvid;
 
 					if (builtinlhs != nyt_bool) // allow only bool for complex types
@@ -680,7 +707,7 @@ namespace Instanciate
 				auto* atom = seq.cdeftable.findClassdefAtom(cdeflhs);
 				if (atom != nullptr and atom->builtinMapping != nyt_void)
 				{
-					if (debugmode)
+					if (debugmode and seq.canGenerateCode())
 						seq.out->emitComment("reading inner 'pod' variable");
 					atomBuiltinCast = atom;
 					builtinlhs = atom->builtinMapping;
@@ -731,7 +758,8 @@ namespace Instanciate
 			spare.import(cdef);
 			spare.qualifiers = cdef.qualifiers;
 
-			seq.out->emitStore(lvid, lhs);
+			if (seq.canGenerateCode())
+				seq.out->emitStore(lvid, lhs);
 
 			auto& lvidinfo = seq.frame->lvids[lvid];
 			lvidinfo.synthetic = false;
@@ -786,12 +814,14 @@ namespace Instanciate
 				auto* atom = seq.cdeftable.findClassdefAtom(cdeflhs);
 				if (atom != nullptr and atom->builtinMapping != nyt_void)
 				{
-					if (debugmode)
-						seq.out->emitComment("reading inner 'pod' variable");
-
 					builtinlhs = atom->builtinMapping;
 					uint32_t newlvid = seq.createLocalVariables();
-					seq.out->emitFieldget(newlvid, lhs, 0);
+					if (seq.canGenerateCode())
+					{
+						if (debugmode)
+							seq.out->emitComment("reading inner 'pod' variable");
+						seq.out->emitFieldget(newlvid, lhs, 0);
+					}
 					lhs = newlvid;
 					atomBuiltinCast = atom;
 				}
@@ -807,12 +837,14 @@ namespace Instanciate
 				auto* atom = seq.cdeftable.findClassdefAtom(cdefrhs);
 				if (atom != nullptr and (atom->builtinMapping != nyt_void))
 				{
-					if (debugmode)
-						seq.out->emitComment("reading inner 'pod' variable");
-
 					builtinrhs = atom->builtinMapping;
 					uint32_t newlvid = seq.createLocalVariables();
-					seq.out->emitFieldget(newlvid, rhs, 0);
+					if (seq.canGenerateCode())
+					{
+						if (debugmode)
+							seq.out->emitComment("reading inner 'pod' variable");
+						seq.out->emitFieldget(newlvid, rhs, 0);
+					}
 					rhs = newlvid;
 					atomBuiltinCast = atom;
 				}
