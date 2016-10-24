@@ -124,6 +124,7 @@ namespace Instanciate
 	uint32_t SequenceBuilder::createLocalVariables(uint32_t count)
 	{
 		assert(count > 0);
+		assert(canGenerateCode());
 		assert(frame != nullptr);
 		assert(frame->offsetOpcodeStacksize != (uint32_t) -1);
 
@@ -135,31 +136,16 @@ namespace Instanciate
 		frame->resizeRegisterCount(operands.add, cdeftable);
 		assert(startOffset + count <= frame->lvids.size());
 
-		if (canGenerateCode())
+		for (uint32_t i = 0; i != count; ++i)
 		{
-			for (uint32_t i = 0; i != count; ++i)
-			{
-				uint32_t lvid = startOffset + i;
-				cdeftable.substitute(lvid).mutateToAny();
+			uint32_t lvid = startOffset + i;
+			cdeftable.substitute(lvid).mutateToAny();
 
-				auto& lvidinfo = frame->lvids[lvid];
-				lvidinfo.scope = scope;
-				lvidinfo.synthetic = false;
-				lvidinfo.offsetDeclOut = out->opcodeCount();
-				out->emitStackalloc(startOffset + i, nyt_any);
-			}
-		}
-		else
-		{
-			for (uint32_t i = 0; i != count; ++i)
-			{
-				uint32_t lvid = startOffset + i;
-				cdeftable.substitute(lvid).mutateToAny();
-
-				auto& lvidinfo = frame->lvids[lvid];
-				lvidinfo.scope = scope;
-				lvidinfo.synthetic = false;
-			}
+			auto& lvidinfo = frame->lvids[lvid];
+			lvidinfo.scope = scope;
+			lvidinfo.synthetic = false;
+			lvidinfo.offsetDeclOut = out->opcodeCount();
+			out->emitStackalloc(startOffset + i, nyt_any);
 		}
 		return startOffset;
 	}
