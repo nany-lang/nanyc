@@ -7,11 +7,8 @@
 namespace std.console;
 
 
-
-public class Out
-{
-	func write(cref value: string)
-	{
+public class Out {
+	func write(cref value: string) {
 		var size = value.size.pod;
 		if size != 0__u32 then
 			!!__nanyc_console_out(value.m_cstr, size);
@@ -20,14 +17,11 @@ public class Out
 	func write(cref value: bool)
 		-> write(if value then "true" else "false");
 
-
 	func write(cref value)
 		-> write((new string) += value);
 
-
 	func flush
 		-> !!__nanyc_console_out_flush;
-
 
 	//! Are colors supported
 	var colors
@@ -36,10 +30,8 @@ public class Out
 } // class Console
 
 
-public class Error
-{
-	func write(cref value)
-	{
+public class Error {
+	func write(cref value) {
 		var size = value.size.pod;
 		if size != 0__u32 then
 			!!__nanyc_console_err(value.m_cstr, size);
@@ -48,10 +40,8 @@ public class Error
 	func write(cref value: bool)
 		-> write(if value then "true" else "false");
 
-
 	func write(cref value)
 		-> write((new string) += value);
-
 
 	func flush
 		-> !!__nanyc_console_err_flush;
@@ -65,23 +55,12 @@ public class Error
 
 
 
-
-
-public operator << (ref out: std.console.Out, cref value): ref std.console.Out
-{
+public operator << (ref out: std.console.Out, cref value): ref std.console.Out {
 	out.write(value);
 	return out;
 }
 
-
-public operator << (ref out: std.console.Error, cref value): ref std.console.Error
-{
+public operator << (ref out: std.console.Error, cref value): ref std.console.Error {
 	out.write(value);
 	return out;
 }
-
-
-
-
-// -*- mode: nany;-*-
-// vim: set filetype=nany:

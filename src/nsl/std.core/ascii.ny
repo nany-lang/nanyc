@@ -7,27 +7,20 @@
 namespace std;
 
 
-
-
-class Ascii
-{
+class Ascii {
 	operator new;
 
-	#[nosuggest] operator new (value: __u8)
-	{
+	#[nosuggest] operator new (value: __u8) {
 		m_value = value;
 	}
 
-	operator new (cref value: u8)
-	{
+	operator new (cref value: u8) {
 		m_value = value.pod;
 	}
 
-	operator new (cref ascii: Ascii)
-	{
+	operator new (cref ascii: Ascii) {
 		m_value = ascii.m_value;
 	}
-
 
 	//! Integer representation
 	var asU8 -> { get: new u8(m_value), set: reset(value) };
@@ -74,16 +67,12 @@ class Ascii
 	var valid
 		-> new bool(m_value < 127__u8);
 
-
 internal:
 	func reset(value: __u8)    { m_value = value; }
 	func reset(cref value: u8) { m_value = value.pod; }
-
 	//! internal representation of an ascii
 	var m_value: __u8 = 0__u8;
 }
-
-
 
 
 
@@ -105,10 +94,3 @@ public operator <= (cref a: Ascii, cref b: Ascii): bool
 
 public operator > (cref a: Ascii, cref b: Ascii): bool
 	-> new bool(a.m_value >= b.m_value);
-
-
-
-
-
-// -*- mode: nany;-*-
-// vim: set filetype=nany:

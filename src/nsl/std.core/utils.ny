@@ -8,7 +8,6 @@
 /// \ingroup std.core
 
 
-
 /*!
 ** \brief Abort the program if assertion is false
 */
@@ -24,42 +23,28 @@ public func assert(expr: __bool);
 
 
 
-/*!
-** \brief Print a string to stdout
-*/
-public func print(cref text: string)
-{
+//! Print a string to stdout
+public func print(cref text: string) {
 	if not text.empty then
 		!!__nanyc_console_out(text.m_cstr, text.m_size);
 }
 
-/*!
-** \brief Print to stdout any value convertible to a string
-*/
-public func print(cref value)
-{
+//! Print to stdout any value convertible to a string
+public func print(cref value) {
 	print((new string) << value);
 }
 
 
-/*!
-** \brief Print a string to stderr
-*/
-public func printerr(cref text: string)
-{
+//! Print a string to stderr
+public func printerr(cref text: string) {
 	if not text.empty then
 		!!__nanyc_console_err(text.m_cstr, text.m_size);
 }
 
-/*!
-** \brief Print to stderr any value convertible to a string
-*/
-public func printerr(cref value)
-{
+//! Print to stderr any value convertible to a string
+public func printerr(cref value) {
 	printerr((new string) << value);
 }
-
-
 
 
 public operator + (cref lhs, cref rhs): any
@@ -73,9 +58,3 @@ public operator * (cref lhs, cref rhs): any
 
 public operator / (cref lhs, cref rhs): any
 	-> (new typeof(lhs) (lhs)) /= rhs;
-
-
-
-
-// -*- mode: nany;-*-
-// vim: set filetype=nany:

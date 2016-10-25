@@ -8,8 +8,6 @@
 namespace std.os;
 
 
-
-
 //! Get if the current os is an AIX variant
 public var aix
 	-> new bool(!!os.is.aix);
@@ -41,11 +39,3 @@ public var unix
 //! Get if the current os is Microsoft Windows
 public var windows
 	-> new bool(!!os.is.windows);
-
-
-
-
-
-
-// -*- mode: nany;-*-
-// vim: set filetype=nany:

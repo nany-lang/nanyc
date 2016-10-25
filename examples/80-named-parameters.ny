@@ -1,15 +1,12 @@
-func load(memory)
-{
+func load(memory) {
 	console << "loading content from memory content: \(memory) \n";
 }
 
-func load(file)
-{
+func load(file) {
 	console << "loading content from file: \(url) \n";
 }
 
-func main
-{
+func main {
 	load(memory: “hello world”);
 	load(file: "/tmp/myfile.txt");
 }

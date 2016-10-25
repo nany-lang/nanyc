@@ -9,33 +9,25 @@
 // \ingroup std.core
 
 
-
-
-/*!
-** \brief Wraps a raw pointer
-*/
-class pointer<:T:>
-{
+//! Wraps a raw pointer
+class pointer<:T:> {
 	typedef ValueType: T;
 
 	operator new;
-	operator new(p: __pointer)
-	{
+
+	operator new(p: __pointer) {
 		m_ptr = p;
 	}
 
-	operator new(p: __pointer, offset)
-	{
+	operator new(p: __pointer, offset) {
 		m_ptr = !!add(p, offset * !!sizeof(#[__nanyc_synthetic] T));
 	}
 
-	operator new(ref object: T)
-	{
+	operator new(ref object: T) {
 		m_ptr = !!pointer(object);
 	}
 
-	operator new(ref object: T)
-	{
+	operator new(ref object: T) {
 		m_ptr = !!add(!!pointer(object), offset * !!sizeof(#[__nanyc_synthetic] T));
 	}
 
@@ -44,59 +36,47 @@ class pointer<:T:>
 		-> new bool(m_ptr == null);
 
 	//! Reset the pointer to null
-	func clear
-	{
+	func clear {
 		m_ptr = null;
 	}
 
 	//! Get the object referenced by the pointer
-	func deref: ref T
-	{
+	func deref: ref T {
 		assert(m_ptr != null);
 		return !!__reinterpret(m_ptr, #[__nanyc_synthetic] T);
 	}
 
-
-	func move(to: __pointer)
-	{
+	func move(to: __pointer) {
 		m_ptr = to;
 	}
 
-	func move(cref to: T)
-	{
+	func move(cref to: T) {
 		m_ptr = !!pointer(to);
 	}
 
-	func move(cref to)
-	{
+	func move(cref to) {
 		m_ptr = to.m_ptr;
 	}
-
 
 	var addressof
 		-> new u64(!!__reinterpret(m_ptr, #[__nanyc_synthetic] __u64));
 
-
-	operator += (offset): ref
-	{
+	operator += (offset): ref {
 		m_ptr = !!add(m_ptr, offset * !!sizeof(#[__nanyc_synthetic] T));
 		return self;
 	}
 
-	operator -= (offset): ref
-	{
+	operator -= (offset): ref {
 		m_ptr = !!sub(m_ptr, offset * !!sizeof(#[__nanyc_synthetic] T));
 		return self;
 	}
 
-	operator *= (offset): ref
-	{
+	operator *= (offset): ref {
 		m_ptr = !!mul(m_ptr, offset * !!sizeof(T));
 		return self;
 	}
 
-	operator /= (offset): ref
-	{
+	operator /= (offset): ref {
 		m_ptr = !!div(m_ptr, offset * !!sizeof(T));
 		return self;
 	}
@@ -106,7 +86,6 @@ internal:
 	var m_ptr: __pointer = null;
 
 } // class pointer
-
 
 
 
@@ -178,11 +157,3 @@ public operator not (cref p: pointer): bool
 #[__nanyc_builtinalias: neq, nosuggest] public operator != (a: cref pointer, b: __pointer): ref bool;
 #[__nanyc_builtinalias: neq, nosuggest] public operator != (a: __pointer, b: cref pointer): ref bool;
 #[__nanyc_builtinalias: neq, nosuggest] public operator != (a: __pointer, b: __pointer): __bool;
-
-
-
-
-
-
-// -*- mode: nany;-*-
-// vim: set filetype=nany:

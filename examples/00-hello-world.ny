@@ -1,4 +1,3 @@
-func main
-{
+func main {
 	console << "Hello world!\n";
 }

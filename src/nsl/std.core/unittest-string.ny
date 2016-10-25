@@ -5,7 +5,6 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 
-
 unittest std.core.string.stayempty
 {
 	var s = "";
@@ -98,7 +97,6 @@ unittest std.core.string.stayempty
 	s.append(null, 0u);
 }
 
-
 unittest std.core.string.smallstring
 {
 	var s = "hello";
@@ -133,11 +131,3 @@ unittest std.core.string.smallstring
 	assert(s.first == 'h');
 	assert(s.data != null);
 }
-
-
-
-
-
-
-// -*- mode: nany;-*-
-// vim: set filetype=nany:

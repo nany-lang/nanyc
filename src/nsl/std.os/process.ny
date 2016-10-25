@@ -10,8 +10,6 @@
 namespace std.os;
 
 
-
-
 /*!
 ** \brief Execute a command and wait for it
 **
@@ -20,7 +18,6 @@ namespace std.os;
 */
 public func execute(cref cmd: string): ref
 	-> new bool(!!__nanyc_os_execute(cmd.m_cstr, cmd.size.pod, 0__u32));
-
 
 /*!
 ** \brief Execute a command and wait for it

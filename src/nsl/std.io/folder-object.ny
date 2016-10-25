@@ -7,14 +7,9 @@
 namespace std.io;
 
 
-
-
-public class Folder
-{
-public:
+public class Folder {
 	operator new;
 	operator new(self cref path: string);
-
 
 	//! Get if the folder exists
 	var exists
@@ -33,41 +28,33 @@ public:
 	func create: bool
 		-> std.io.folder.create(path);
 
-
 	//! Create the folder if it does not exist
 	func create(recursive: bool): bool
 		-> std.io.folder.create(path, recursive);
-
 
 	//! Copy a folder and its content to another location
 	func copy(cref to: string): bool
 		-> std.io.folder.copy(path, to);
 
-
 	//! Copy the contents of a folder to another location
 	func copyContents(cref to: string): bool
 		-> std.io.folder.copyContents(path, to);
-
 
 	//! Move a folder and its content to another location
 	func move(cref to: string): bool
 		-> std.io.folder.move(path, to);
 
-
 	//! Move the contents of a folder to another location
 	func moveContents(cref to: string): bool
 		-> std.io.folder.moveContents(path, to);
-
 
 	//! Remove the folder and its content
 	func erase: bool
 		-> std.io.folder.erase(path);
 
-
 	//! Remove the contents of the folder
 	func clear: bool
 		-> std.io.folder.clear(path);
-
 
 	func read: ref string
 		-> std.io.folder.read(path);
@@ -81,30 +68,24 @@ public:
 	view recursive(ref filter)
 		-> makeViewFromFolder(filter, recursive: true, files: true, folders: true);
 
-
 	view subfolders(ref filter)
 		-> makeViewFromFolder(filter, recursive: false, files: false, folders: true);
-
 
 	view subfolders(ref filter, recursive: bool)
 		-> makeViewFromFolder(filter, recursive: recursive, files: false, folders: true);
 
-
 	view files(ref filter)
 		-> makeViewFromFolder(filter, recursive: false, files: true, folders: false);
 
-
 	view files(ref filter, recursive: bool)
 		-> makeViewFromFolder(filter, recursive: recursive, files: true, folders: false);
-
 
 	view entries(ref filter, recursive: bool, files: bool, folders: bool)
 		-> makeViewFromFolder(filter, recursive: recursive, files: files, folders: folders);
 
 
 public:
-	class Element
-	{
+	class Element {
 		//! The path of the current element
 		var filename -> m_fullname;
 		//! Name of the current element
@@ -120,8 +101,7 @@ public:
 		var isFolder -> not m_kind;
 
 	private:
-		func importFromIterator(p: __pointer)
-		{
+		func importFromIterator(p: __pointer) {
 			m_fullname.clear();
 			m_fullname.appendCString(!!__nanyc_io_folder_iterator_fullpath(p));
 			m_name.clear();
@@ -136,41 +116,33 @@ public:
 		var m_kind = true; // TODO use appropriate enum here: true: file
 	}
 
-
-	func makeViewFromFolder(cref filter, recursive: bool, files: bool, folders: bool): ref
-	{
+	func makeViewFromFolder(cref filter, recursive: bool, files: bool, folders: bool): ref {
 		ref m_parentFolder = self;
 		ref m_parentFilter = filter;
 		ref m_parentRecursive = recursive;
 		ref m_parentFiles = files;
 		ref m_parentFolders = folders;
 		return new class {
-			func cursor: ref
-			{
+			func cursor: ref {
 				ref origFolder = m_parentFolder;
 				ref accept = m_parentFilter;
 				ref recursive = m_parentRecursive;
 				ref files = m_parentFiles;
 				ref folders = m_parentFolders;
-				return new class
-				{
-					operator dispose
-					{
+				return new class {
+					operator dispose {
 						!!__nanyc_io_folder_iterator_close(m_iterator);
 					}
 
-					func findFirst: bool
-					{
+					func findFirst: bool {
 						var cn = std.io.path.canonicalize(origFolder.path);
 						m_iterator =
 							!!__nanyc_io_folder_iterate(cn.m_cstr, cn.size.pod, recursive.pod, files.pod, folders.pod);
 						return new bool(m_iterator != null) and next();
 					}
 
-					func next: bool
-					{
-						do
-						{
+					func next: bool {
+						do {
 							var hasNext =  !!__nanyc_io_folder_iterator_next(m_iterator);
 							if not hasNext then
 								return false;
@@ -194,14 +166,6 @@ public:
 		};
 	}
 
-
 private:
 	var path = "";
 }
-
-
-
-
-
-// -*- mode: nany;-*-
-// vim: set filetype=nany:

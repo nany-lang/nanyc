@@ -4,23 +4,17 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-
-
-
 unittest std.digest.md5
 {
-	var tryMD5 = func (cref text: string, cref expect: string)
-	{
+	var tryMD5 = func (cref text: string, cref expect: string) {
 		ref digest = std.digest.md5(text);
-		if digest != expect then
-		{
+		if digest != expect then {
 			printerr("error: fail '\(text)'\n");
 			printerr("       got: '\(digest)'\n");
 			printerr("    expect: '\(expect)'\n");
 		}
 		ref digest2 = std.digest.md5(text.data, 0__u64 + text.size.pod);
-		if digest2 != expect then
-		{
+		if digest2 != expect then {
 			printerr("error: fail '\(text)'\n");
 			printerr("       got: '\(digest2)'\n");
 			printerr("    expect: '\(expect)'\n");
@@ -42,10 +36,3 @@ unittest std.digest.md5
 	tryMD5("value", expect: "2063c1608d6e0baf80249c42e2be5804");
 	tryMD5("日本", expect: "4dbed2e657457884e67137d3514119b3");
 }
-
-
-
-
-
-// -*- mode: nany;-*-
-// vim: set filetype=nany:

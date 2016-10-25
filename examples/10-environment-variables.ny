@@ -1,5 +1,4 @@
-func main
-{
+func main {
 	// hard-coded env variables can directly be manipulated via the special
 	// object ‘$’, like in shell
 	// retrieve the value of the env variable “HOME”
