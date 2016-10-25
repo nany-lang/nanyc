@@ -51,7 +51,7 @@ namespace Producer
 		{
 			switch (child.rule)
 			{
-				case AST::rgCall:
+				case AST::rgCall: // typeof
 				{
 					for (auto& param: child.children)
 					{

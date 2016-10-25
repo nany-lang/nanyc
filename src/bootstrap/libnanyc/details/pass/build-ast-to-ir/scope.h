@@ -119,6 +119,7 @@ namespace Producer
 		bool visitASTExprTemplate(AST::Node&, LVID& localvar);
 		bool visitASTDeclGenericTypeParameters(AST::Node&);
 		bool visitASTUnitTest(AST::Node&);
+		bool visitASTArray(AST::Node&, uint32_t& localvar);
 		//@}
 
 		//! \name Typeinfo / variables

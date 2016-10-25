@@ -120,6 +120,7 @@ namespace Producer
 				case AST::rgObject:     success &= visitASTExprObject(child, localvar); break;
 				case AST::rgAttributes: success &= visitASTAttributes(child); break;
 				case AST::rgFunctionKindOperator: success &= visitASTExprIdOperator(child, localvar); break;
+				case AST::rgArray:      success &= visitASTArray(child, localvar); break;
 				// scope may appear in expr (when expr are actually statements)
 				case AST::rgScope:      success &= visitScope(*this, child, allowScope); break;
 				// special for internal AST manipulation

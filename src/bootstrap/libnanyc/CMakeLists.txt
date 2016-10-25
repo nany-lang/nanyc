@@ -212,6 +212,7 @@ addsrc(
 	"details/pass/build-ast-to-ir/scope.h"
 	"details/pass/build-ast-to-ir/scope.hxx"
 	"details/pass/build-ast-to-ir/scope.cpp"
+	"details/pass/build-ast-to-ir/scope-array.cpp"
 	"details/pass/build-ast-to-ir/scope-for.cpp"
 	"details/pass/build-ast-to-ir/scope-in.cpp"
 	"details/pass/build-ast-to-ir/scope-if.cpp"
