@@ -417,6 +417,21 @@ namespace complain
 	}
 
 
+	bool typesDoNotMatch(const Classdef& from, const Classdef& to)
+	{
+		auto* seq = Logs::userHandler<SequenceBuilder>();
+		auto err = error();
+		err << "type '";
+		if (seq)
+			from.print(err, seq->cdeftable);
+		err << "' do not match with '";
+		if (seq)
+			to.print(err, seq->cdeftable);
+		err << '\'';
+		return false;
+	}
+
+
 } // namespace complain
 
 

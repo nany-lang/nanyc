@@ -292,6 +292,7 @@ addsrc(
 	"details/pass/build-instanciate/instanciate-ref-unref.cpp"
 	"details/pass/build-instanciate/instanciate-assign.cpp"
 	"details/pass/build-instanciate/instanciate-typeisobject.cpp"
+	"details/pass/build-instanciate/instanciate-commontype.cpp"
 	"details/pass/build-instanciate/instanciate-member-variable-default-init.cpp"
 	"details/pass/build-instanciate/instanciate-member-variable-default-dispose.cpp"
 	"details/pass/build-instanciate/instanciate-member-variable-default-clone.cpp"

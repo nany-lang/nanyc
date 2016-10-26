@@ -15,54 +15,61 @@ namespace Producer
 {
 
 
+	namespace {
+
+
+	bool appendSingleType(Scope& scope, AST::Node& expr, IR::Sequence& out, uint32_t& previous)
+	{
+		scope.emitDebugpos(expr);
+		uint32_t lvid = 0;
+		bool ok = scope.visitASTExpr(expr, lvid);
+		if (previous != 0)
+		{
+			scope.emitDebugpos(expr);
+			out.emitCommonType(lvid, previous);
+		}
+		previous = lvid;
+		return ok;
+	}
+
+
+	} // namespace
+
+
+
+
 	bool Scope::visitASTExprTypeof(AST::Node& node, LVID& localvar)
 	{
 		assert(node.rule == AST::rgTypeof);
-		localvar = 0;
-		using TypeInfo = std::pair<std::reference_wrapper<AST::Node>, uint32_t>;
-		std::vector<TypeInfo> types;
+		uint32_t previous = 0;
+		bool success = true;
+		auto& out = sequence();
+		IR::Producer::Scope scope{*this};
+		OpcodeCodegenDisabler codegen{out};
 
 		for (auto& child: node.children)
 		{
-			if (child.rule == AST::rgCall)
+			switch (child.rule)
 			{
-				types.reserve(child.children.size());
-				for (auto& param: child.children)
+				case AST::rgCall:
 				{
-					if (param.rule == AST::rgCallParameter)
-						types.emplace_back(std::make_pair(std::ref(param.firstChild()), 0u));
+					for (auto& param: child.children)
+					{
+						if (param.rule == AST::rgCallParameter)
+						{
+							success &= appendSingleType(scope, param.firstChild(), out, previous);
+							break;
+						}
+					}
+					break;
 				}
+				default:
+					return unexpectedNode(child, "[typeof]");
 			}
 		}
-
-		uint32_t count = static_cast<uint32_t>(types.size());
-		if (unlikely(count == 0))
-			return (error(node) << "at least one type is required for 'typeof'");
-
-		auto& out = sequence();
-		bool success = true;
-
-		IR::Producer::Scope scope{*this};
-		for (auto& typeinfo: types)
-		{
-			auto& expr = typeinfo.first.get();
-			emitDebugpos(expr);
-			OpcodeCodegenDisabler codegen{out};
-			if (debugmode)
-				out.emitComment("typeof expression");
-			success &= scope.visitASTExpr(expr, typeinfo.second);
-		}
-		if (count > 1u and success)
-		{
-			uint32_t previous = 0;
-			for (auto& typeinfo: types)
-			{
-				emitDebugpos(typeinfo.first.get());
-				out.emitCommonType(typeinfo.second, previous);
-				previous = typeinfo.second;
-			}
-		}
-		localvar = types.back().second;
+		if (unlikely(previous == 0))
+			success = (error(node) << "at least one type is required for 'typeof'");
+		localvar = previous;
 		return success;
 	}
 

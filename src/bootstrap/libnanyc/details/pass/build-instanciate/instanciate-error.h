@@ -59,6 +59,8 @@ namespace complain
 	//! Multiple definitions
 	bool multipleDefinitions(const Atom&, const AnyString& deffor);
 
+	//! Types must match the previous one
+	bool typesDoNotMatch(const Classdef& from, const Classdef& to);
 
 
 
