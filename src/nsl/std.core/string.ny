@@ -324,6 +324,16 @@ public class string {
 	}
 
 
+	func join(cref list): ref {
+		ref str = "";
+		if not list.empty then {
+			for i in list do
+				str << i << self;
+			str.chop(new u32(m_size));
+		}
+		return str;
+	}
+
 	//! Get if the string contains a given ascii
 	func contains(cref ascii: std.Ascii): bool {
 		if m_size != 0__u32 then {
