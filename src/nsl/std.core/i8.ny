@@ -14,13 +14,11 @@
 
 /// \brief   Signed integer with width of exactly 8 bits
 /// \ingroup std.core
-public class i8
-{
+public class i8 {
 	//! Default constructor
 	operator new;
 
-	operator new (cref x: i8)
-	{
+	operator new (cref x: i8) {
 		pod = x.pod;
 	}
 
@@ -28,83 +26,71 @@ public class i8
 
 
 
-	operator ++self: ref i8
-	{
+	operator ++self: ref i8 {
 		pod = !!inc(pod);
 		return self;
 	}
 
-	operator self++: ref i8
-	{
+	operator self++: ref i8 {
 		ref tmp = new i8(pod);
 		pod = !!inc(pod);
 		return tmp;
 	}
 
-	operator --self: ref i8
-	{
+	operator --self: ref i8 {
 		pod = !!dec(pod);
 		return self;
 	}
 
-	operator self--: ref i8
-	{
+	operator self--: ref i8 {
 		ref tmp = new i8(pod);
 		pod = !!dec(pod);
 		return tmp;
 	}
 
 
-	operator += (cref x: i8): ref i8
-	{
+	operator += (cref x: i8): ref i8 {
 		pod = !!add(pod, x.pod);
 		return self;
 	}
 
-	#[nosuggest] operator += (x: __i8): ref i8
-	{
+	#[nosuggest] operator += (x: __i8): ref i8 {
 		pod = !!add(pod, x);
 		return self;
 	}
 
 
 
-	operator -= (cref x: i8): ref i8
-	{
+	operator -= (cref x: i8): ref i8 {
 		pod = !!sub(pod, x.pod);
 		return self;
 	}
 
-	#[nosuggest] operator -= (x: __i8): ref i8
-	{
+	#[nosuggest] operator -= (x: __i8): ref i8 {
 		pod = !!sub(pod, x);
 		return self;
 	}
 
 
 
-	operator *= (cref x: i8): ref i8
-	{
+	operator *= (cref x: i8): ref i8 {
 		pod = !!imul(pod, x.pod);
 		return self;
 	}
 
-	#[nosuggest] operator *= (x: __i8): ref i8
-	{
+	#[nosuggest] operator *= (x: __i8): ref i8 {
 		pod = !!imul(pod, x);
 		return self;
 	}
 
 
 
-	operator /= (cref x: i8): ref i8
-	{
+	operator /= (cref x: i8): ref i8 {
 		pod = !!idiv(pod, x.pod);
 		return self;
 	}
 
-	#[nosuggest] operator /= (x: __i8): ref i8
-	{
+	#[nosuggest] operator /= (x: __i8): ref i8 {
 		pod = !!idiv(pod, x);
 		return self;
 	}
@@ -115,11 +101,6 @@ private:
 	var pod = 0__i8;
 
 } // class i8
-
-
-
-
-
 
 
 
@@ -385,9 +366,3 @@ private:
 #[__nanyc_builtinalias: xor, nosuggest] public operator xor (a: __i8, b: __i8): any;
 
 
-
-
-
-
-// -*- mode: nany;-*-
-// vim: set filetype=nany:

@@ -8,8 +8,10 @@ using namespace Yuni;
 
 
 
+namespace {
 
-static void craftClassFloat(Clob& o, uint32_t bits, const AnyString& license, const AnyString& filename)
+
+void craftClassFloat(Clob& o, uint32_t bits, const AnyString& license, const AnyString& filename)
 {
 	o.clear();
 	ShortString16 suffix;
@@ -35,8 +37,7 @@ static void craftClassFloat(Clob& o, uint32_t bits, const AnyString& license, co
 	o << '\n';
 	o << "/// \\brief   " << name << '\n';
 	o << "/// \\ingroup std.core\n";
-	o << "public class " << suffix << '\n';
-	o << "{\n";
+	o << "public class " << suffix << " {\n";
 	o << "\toperator new;\n";
 	o << "\toperator new(cref x: f32)\n";
 	o << "\t{\n";
@@ -44,44 +45,38 @@ static void craftClassFloat(Clob& o, uint32_t bits, const AnyString& license, co
 	o << "\t}\n";
 	if (bits > 32)
 	{
-		o << "\toperator new(cref x: f64)\n";
-		o << "\t{\n";
+		o << "\toperator new(cref x: f64) {\n";
 		o << "\t\tpod = x.pod;\n";
 		o << "\t}\n";
 	}
+	o << "\n";
 	o << "\t#[nosuggest] operator new(self pod: __f32);\n";
 	if (bits > 32)
 		o << "\t#[nosuggest] operator new(self pod: __f64);\n";
 	o << '\n';
 	o << '\n';
-	o << "\toperator ++self: ref " << suffix << '\n';
-	o << "\t{\n";
+	o << "\toperator ++self: ref " << suffix << " {\n";
 	o << "\t\tpod = !!finc(pod);\n";
 	o << "\t\treturn self;\n";
 	o << "\t}\n";
 	o << '\n';
-	o << "\toperator self++: ref " << suffix << '\n';
-	o << "\t{\n";
+	o << "\toperator self++: ref " << suffix << " {\n";
 	o << "\t\tref tmp = new " << suffix << "(pod);\n";
 	o << "\t\tpod = !!finc(pod);\n";
 	o << "\t\treturn tmp;\n";
 	o << "\t}\n";
 	o << '\n';
-	o << "\toperator --self: ref " << suffix << '\n';
-	o << "\t{\n";
+	o << "\toperator --self: ref " << suffix << " {\n";
 	o << "\t\tpod = !!fdec(pod);\n";
 	o << "\t\treturn self;\n";
 	o << "\t}\n";
 	o << '\n';
-	o << "\toperator self--: ref " << suffix << '\n';
-	o << "\t{\n";
+	o << "\toperator self--: ref " << suffix << " {\n";
 	o << "\t\tref tmp = new " << suffix << "(pod);\n";
 	o << "\t\tpod = !!fdec(pod);\n";
 	o << "\t\treturn tmp;\n";
 	o << "\t}\n";
 	o << '\n';
-	o << '\n';
-
 
 	auto craftOperator = [&](auto callback) {
 		callback(bits, c);
@@ -92,19 +87,16 @@ static void craftClassFloat(Clob& o, uint32_t bits, const AnyString& license, co
 	{
 		craftOperator([&](uint32_t b, char targetsign)
 		{
-			o << "\toperator " << op << " (cref x: " << targetsign << b << "): ref " << suffix << '\n';
-			o << "\t{\n";
+			o << "\toperator " << op << " (cref x: " << targetsign << b << "): ref " << suffix << " {\n";
 			o << "\t\tpod = !!" << intrinsic << "(pod, x.pod);\n";
 			o << "\t\treturn self;\n";
 			o << "\t}\n\n";
 
-			o << "\t#[nosuggest] operator " << op << " (x: __" << targetsign << b << "): ref " << suffix << '\n';
-			o << "\t{\n";
+			o << "\t#[nosuggest] operator " << op << " (x: __" << targetsign << b << "): ref " << suffix << " {\n";
 			o << "\t\tpod = !!" << intrinsic << "(pod, x);\n";
 			o << "\t\treturn self;\n";
 			o << "\t}\n";
 		});
-		o << '\n';
 	};
 
 	craftMemberOperator("+=", "fadd");
@@ -112,15 +104,12 @@ static void craftClassFloat(Clob& o, uint32_t bits, const AnyString& license, co
 	craftMemberOperator("*=", "fmul");
 	craftMemberOperator("/=", "fdiv");
 
+	o.trimRight();
+	o << "\n\n";
 	o << "private:\n";
 	o << "\tvar pod = 0__" << suffix << ";\n";
 	o << '\n';
 	o << "} // class " << suffix << '\n';
-	o << '\n';
-	o << '\n';
-	o << '\n';
-	o << '\n';
-	o << '\n';
 	o << '\n';
 	o << '\n';
 	o << '\n';
@@ -157,7 +146,6 @@ static void craftClassFloat(Clob& o, uint32_t bits, const AnyString& license, co
 
 	o << '\n';
 	o << '\n';
-	o << '\n';
 
 	auto genGlobalOperator = [&](AnyString op, AnyString builtin, char sign, uint32_t b, AnyString prefixA, AnyString prefixB)
 	{
@@ -178,19 +166,12 @@ static void craftClassFloat(Clob& o, uint32_t bits, const AnyString& license, co
 	craft("/", "fdiv", genGlobalOperator);
 	craft("*", "fmul", genGlobalOperator);
 
-
-	o << '\n';
-	o << '\n';
-	o << '\n';
-	o << '\n';
-	o << "// -*- mode: nany;-*-\n";
-	o << "// vim: set filetype=nany:";
+	o.trimRight();
 	IO::File::SetContent(filename, o);
 }
 
 
-
-static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString& license, const AnyString& filename)
+void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString& license, const AnyString& filename)
 {
 	o.clear();
 	char c = (issigned) ? 'i' : 'u';
@@ -232,16 +213,14 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 	o << "/// \\brief   " << (issigned ? "Signed" : "Unsigned");
 	o << " integer with width of exactly " << bits << " bits\n";
 	o << "/// \\ingroup std.core\n";
-	o << "public class " << suffix << '\n';
-	o << "{\n";
+	o << "public class " << suffix << " {\n";
 	o << "\t//! Default constructor\n";
 	o << "\toperator new;\n\n";
 	craftOperator([&](uint32_t b, char targetsign)
 	{
 		for ( ; b >= 8; b /= 2)
 		{
-			o << "\toperator new (cref x: " << targetsign << b << ")\n";
-			o << "\t{\n";
+			o << "\toperator new (cref x: " << targetsign << b << ") {\n";
 			o << "\t\tpod = x.pod;\n";
 			o << "\t}\n";
 		}
@@ -254,34 +233,29 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 
 	o << '\n';
 	o << '\n';
-	o << "\toperator ++self: ref " << suffix << '\n';
-	o << "\t{\n";
+	o << "\toperator ++self: ref " << suffix << " {\n";
 	o << "\t\tpod = !!inc(pod);\n";
 	o << "\t\treturn self;\n";
 	o << "\t}\n";
 	o << '\n';
-	o << "\toperator self++: ref " << suffix << '\n';
-	o << "\t{\n";
+	o << "\toperator self++: ref " << suffix << " {\n";
 	o << "\t\tref tmp = new " << suffix << "(pod);\n";
 	o << "\t\tpod = !!inc(pod);\n";
 	o << "\t\treturn tmp;\n";
 	o << "\t}\n";
 	o << '\n';
-	o << "\toperator --self: ref " << suffix << '\n';
-	o << "\t{\n";
+	o << "\toperator --self: ref " << suffix << " {\n";
 	o << "\t\tpod = !!dec(pod);\n";
 	o << "\t\treturn self;\n";
 	o << "\t}\n";
 	o << '\n';
-	o << "\toperator self--: ref " << suffix << '\n';
-	o << "\t{\n";
+	o << "\toperator self--: ref " << suffix << " {\n";
 	o << "\t\tref tmp = new " << suffix << "(pod);\n";
 	o << "\t\tpod = !!dec(pod);\n";
 	o << "\t\treturn tmp;\n";
 	o << "\t}\n";
 	o << '\n';
 	o << '\n';
-
 
 	auto craftMemberOperator = [&](const AnyString& op, const AnyString& intrinsic, bool prefix)
 	{
@@ -290,14 +264,12 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 		{
 			for ( ; b >= 8; b /= 2)
 			{
-				o << "\toperator " << op << " (cref x: " << targetsign << b << "): ref " << suffix << '\n';
-				o << "\t{\n";
+				o << "\toperator " << op << " (cref x: " << targetsign << b << "): ref " << suffix << " {\n";
 				o << "\t\tpod = !!" << pr << intrinsic << "(pod, x.pod);\n";
 				o << "\t\treturn self;\n";
 				o << "\t}\n\n";
 
-				o << "\t#[nosuggest] operator " << op << " (x: __" << targetsign << b << "): ref " << suffix << '\n';
-				o << "\t{\n";
+				o << "\t#[nosuggest] operator " << op << " (x: __" << targetsign << b << "): ref " << suffix << " {\n";
 				o << "\t\tpod = !!" << pr << intrinsic << "(pod, x);\n";
 				o << "\t\treturn self;\n";
 				o << "\t}\n\n";
@@ -315,11 +287,6 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 	o << "\tvar pod = 0__" << suffix << ";\n";
 	o << '\n';
 	o << "} // class " << suffix << '\n';
-	o << '\n';
-	o << '\n';
-	o << '\n';
-	o << '\n';
-	o << '\n';
 	o << '\n';
 	o << '\n';
 	o << '\n';
@@ -393,15 +360,11 @@ static void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString
 	craft("or", "or", genGlobalOperator);
 	craft("xor", "xor", genGlobalOperator);
 
-	o << '\n';
-	o << '\n';
-	o << '\n';
-	o << '\n';
-	o << "// -*- mode: nany;-*-\n";
-	o << "// vim: set filetype=nany:";
 	IO::File::SetContent(filename, o);
 }
 
+
+} // namespace
 
 
 
@@ -413,7 +376,6 @@ int main(int argc, char** argv)
 		std::cerr << "usage: <license-header-file> <folder>\n";
 		return 1;
 	}
-
 	String license;
 	if (IO::errNone != IO::File::LoadFromFile(license, argv[1]))
 	{
@@ -422,7 +384,6 @@ int main(int argc, char** argv)
 	}
 
 	AnyString folder = argv[2];
-
 	Clob out;
 	out.reserve(1024 * 32);
 	String filename;
