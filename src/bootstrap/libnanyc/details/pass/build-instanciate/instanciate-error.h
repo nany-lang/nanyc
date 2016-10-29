@@ -32,6 +32,9 @@ namespace complain
 	//! Class not instanciated (not ready for use)
 	bool classNotInstanciated(const Atom&);
 
+	//! Object expected
+	bool classOrFuncExpected(const Classdef&);
+
 	//! A class is required
 	bool classRequired();
 
@@ -56,6 +59,8 @@ namespace complain
 	//! Multiple definitions
 	bool multipleDefinitions(const Atom&, const AnyString& deffor);
 
+	//! Types must match the previous one
+	bool typesDoNotMatch(const Classdef& from, const Classdef& to);
 
 
 

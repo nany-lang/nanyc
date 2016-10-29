@@ -6,9 +6,7 @@
 //
 //! \file    ctypes.ny
 //! \ingroup std.c
-
 namespace std.c;
-
 
 
 //! Unsigned integer with width of exactly 8 bits

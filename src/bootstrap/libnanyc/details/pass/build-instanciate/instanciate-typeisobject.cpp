@@ -17,40 +17,32 @@ namespace Instanciate
 	{
 		assert(frame != nullptr);
 
-		if (frame->verify(operands.lvid))
+		bool ok = [&]() -> bool
 		{
+			if (not frame->verify(operands.lvid))
+				return false;
 			auto& cdef = cdeftable.classdef(CLID{frame->atomid, operands.lvid});
-			do
+			if (likely(not cdef.isBuiltinOrVoid()))
 			{
-				if (likely(not cdef.isBuiltinOrVoid()))
+				auto* atom = cdeftable.findClassdefAtom(cdef);
+				if (likely(nullptr != atom))
 				{
-					auto* atom = cdeftable.findClassdefAtom(cdef);
-					if (likely(nullptr != atom))
+					if (unlikely(atom->isClass() or atom->isFunction()))
 					{
-						if (unlikely(atom->isClass() or atom->isFunction()))
+						if (canGenerateCode()) // checking for real object only when they exist
 						{
 							if (unlikely(atom->isClass() and not atom->classinfo.isInstanciated))
-							{
-								complain::classNotInstanciated(*atom);
-								break;
-							}
-							// ok the type is an object
-							return;
+							return complain::classNotInstanciated(*atom);
 						}
+						return true;
 					}
 				}
-
-				auto e = (error() << "class or function expected, got '");
-				cdef.print(e.data().message, cdeftable, false);
-				e << "' instead";
-
-				if (debugmode)
-					e << CLID{frame->atomid, operands.lvid};
 			}
-			while (false);
-		}
+			return complain::classOrFuncExpected(cdef);
+		}();
 
-		frame->invalidate(operands.lvid);
+		if (unlikely(not ok))
+			frame->invalidate(operands.lvid);
 	}
 
 

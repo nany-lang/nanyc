@@ -548,7 +548,7 @@ interval: notext
 array: notext
 	tk-bracket-open
 		(wp call-parameters? wp tk-bracket-close)
-		| error-bracket
+		| (error-bracket wp tk-bracket-close?)
 
 
 new-init: notext

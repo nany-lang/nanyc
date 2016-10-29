@@ -440,6 +440,10 @@ namespace // anonymous
 			line() << "ensure resolved %" << operands.lvid;
 		}
 
+		void print(const Operand<Op::commontype>& operands)
+		{
+			line() << '%' << operands.lvid << " = common type with %" << operands.previous;
+		}
 
 		void print(const Operand<Op::label>& operands)
 		{

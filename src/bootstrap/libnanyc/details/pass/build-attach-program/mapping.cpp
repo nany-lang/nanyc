@@ -858,6 +858,7 @@ namespace Mapping
 				case IR::ISA::Op::jz:
 				case IR::ISA::Op::jnz:
 				case IR::ISA::Op::nop:
+				case IR::ISA::Op::commontype:
 					break;
 					// error for all the other ones
 				default:

@@ -1,5 +1,4 @@
-func main: i32
-{
+func main: i32 {
 	var x = "hello world";
 	var y = z; // make a copy of x
 	ref z = x; // x and z are actually the same variable

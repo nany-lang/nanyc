@@ -78,31 +78,24 @@ namespace Producer
 		~Scope();
 		//@}
 
-
 		//! \name AST::Node visitor
 		//@{
-		//! Visit an unknown node
 		bool visitAST(AST::Node&);
-
 		bool visitASTStmt(AST::Node&);
 		bool visitASTFunc(AST::Node&);
 		bool visitASTClass(AST::Node&, LVID* localvar = nullptr);
 		bool visitASTType(AST::Node&, LVID& localvar);
 		bool visitASTTypedef(AST::Node&);
 		bool visitASTFor(AST::Node&);
-
 		bool visitASTAttributes(AST::Node&);
-
 		bool visitASTVar(AST::Node&);
 		bool visitASTVarInClass();
-
 		bool visitASTExpr(AST::Node&, LVID& localvar, bool allowScope = false);
 		bool visitASTExprIntrinsic(AST::Node&, LVID& localvar);
 		bool visitASTExprReturn(AST::Node&);
 		bool visitASTExprContinuation(AST::Node&, LVID& localvar, bool allowScope = false);
 		bool visitASTExprIdentifier(AST::Node&, LVID& localvar);
 		bool visitASTExprIdOperator(AST::Node& node, LVID& localvar);
-		bool visitASTExprRegister(AST::Node&, LVID& localvar);
 		bool visitASTExprCall(AST::Node*, LVID& localvar, AST::Node* parent = nullptr); // func call
 		bool visitASTExprCallParameters(AST::Node&, ShortcircuitUpdate* shortcircuit = nullptr); // parameters of a func call
 		bool visitASTExprSubDot(AST::Node&, LVID& localvar);
@@ -123,13 +116,11 @@ namespace Producer
 		bool visitASTExprIn(AST::Node&, LVID& localvar, Yuni::ShortString128& elementname);
 		bool visitASTExprClosure(AST::Node&, uint32_t& localvar);
 		bool visitASTExprObject(AST::Node&, uint32_t& localvar);
-
 		bool visitASTExprTemplate(AST::Node&, LVID& localvar);
 		bool visitASTDeclGenericTypeParameters(AST::Node&);
-
 		bool visitASTUnitTest(AST::Node&);
+		bool visitASTArray(AST::Node&, uint32_t& localvar);
 		//@}
-
 
 		//! \name Typeinfo / variables
 		//@{
@@ -152,7 +143,6 @@ namespace Producer
 		//! Get if the scope is inside a class
 		bool isWithinClass() const;
 		//@}
-
 
 		//! \name Debug infos
 		//@{
@@ -189,19 +179,16 @@ namespace Producer
 		void moveAttributes(Scope&);
 		//@}
 
-
 		//! \name Error management
 		//@{
 		void checkForUnknownAttributes() const;
 		//@}
-
 
 		//! \name Operators
 		//@{
 		//! assignment
 		Scope& operator = (const Scope&) = delete;
 		//@}
-
 
 	public:
 		Context& context;

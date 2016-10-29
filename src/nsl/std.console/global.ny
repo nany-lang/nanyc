@@ -9,12 +9,6 @@
 public var console
 	-> new std.console.Out;
 
-
 //! Standard console error output
 public var stderr
 	-> new std.console.Error;
-
-
-
-// -*- mode: nany;-*-
-// vim: set filetype=nany:

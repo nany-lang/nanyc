@@ -81,6 +81,8 @@ namespace Producer
 		void prepareReuseForUnittest();
 		//! re-use objects for anonymous objects
 		void prepareReuseForAnonymObjects();
+		//! re-use objects for shorthand arrays
+		void prepareReuseForShorthandArray();
 		//@}
 
 
@@ -221,6 +223,12 @@ namespace Producer
 				AST::Node* classbody = nullptr;
 			}
 			object;
+
+			struct {
+				AST::Node::Ptr node;
+				AST::Node* typeofcall = nullptr;
+			}
+			shorthandArray;
 		}
 		reuse;
 

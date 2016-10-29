@@ -11,8 +11,7 @@ working on it !
 ## The traditional Hello world
 
 ```nany
-func main
-{
+func main {
 	console << "Hello world!\n";
 }
 ```
@@ -26,9 +25,7 @@ func main
 func fibonacci(n: u32): u32
 	-> if n < 2u then n else fibonacci(n - 1u) + fibonacci(n - 2u);
 
-
-func main
-{
+func main {
 	console << fibonacci(10u) << "\n";
 }
 ```
@@ -38,8 +35,7 @@ func main
 ## Variables & References
 
 ```nany
-func main: i32
-{
+func main: i32 {
 	var x = "hello world";
 	var y = z; // make a copy of x
 	ref z = x; // x and z are actually the same variable
@@ -58,10 +54,8 @@ func main: i32
 ## Working with I/O, reading a file
 
 ```nany
-func main(args)
-{
-	for filename in args do
-	{
+func main(args) {
+	for filename in args do {
 		// read the whole content of the file
 		var content = std.io.file.read(filename);
 		console << filename << ":\n" << content << '\n';
@@ -75,12 +69,10 @@ func main(args)
 ## Working with I/O, reading a file line by line
 
 ```nany
-func main
-{
+func main {
 	// for each line, print it to the standard output
 	for line in std.io.file.open(ro: "/tmp/myfile.txt") do
 		console << line << '\n';
-
 	// the same than above, but with line numbers
 	var lineNumber = 0u;
 	for line in std.io.file.open(ro: "/tmp/myfile.txt") do
@@ -93,8 +85,7 @@ func main
 ## Scripting, interacting with environment variables
 
 ```nany
-func main
-{
+func main {
 	// hard-coded env variables can directly be manipulated via the special
 	// object ‘$’, like in shell
 	// retrieve the value of the env variable “HOME”
@@ -126,12 +117,9 @@ func main
 // with the default value), the each construct can be used in combination with += to
 // obtain a really concise and elegant syntax for a complicated task.
 
-func howManyAudioFilesAtUrl(url): u64
-{
-	switch std.io.type(url) do
-	{
-		case ntFolder:
-		{
+func howManyAudioFilesAtUrl(url): u64 {
+	switch std.io.type(url) do {
+		case ntFolder: {
 			// the given url is a folder
 			// retrieving a virtual list of all files in this folder, matching our criteria
 			var files = (entry in std.io.folder(url) :recursive) | entry.type == ntFile
@@ -146,8 +134,7 @@ func howManyAudioFilesAtUrl(url): u64
 }
 
 
-func main(args)
-{
+func main(args) {
 	// The magic happens here !
 	// Using the value for variable howManyFiles triggers a synchronization,
 	// i.e. the statement will not run until all jobs are finished and the final value computed
@@ -163,18 +150,15 @@ func main(args)
 ## Named parameters
 
 ```nany
-func load(memory)
-{
+func load(memory) {
 	console << "loading content from memory content: \(memory) \n";
 }
 
-func load(file)
-{
+func load(file) {
 	console << "loading content from file: \(url) \n";
 }
 
-func main
-{
+func main {
 	load(memory: “hello world”);
 	load(file: "/tmp/myfile.txt");
 }
@@ -185,11 +169,9 @@ func main
 ## String interpolation
 
 ```nany
-func main
-{
+func main {
 	var x = 10;
 	var y = 42;
-
 	// x = y = 10 + 42 = 52
 	console << "x + y = \(x) + \(y) = \(x + y)\n";
 }
@@ -200,8 +182,7 @@ func main
 ## Properties
 
 ```nany
-func main
-{
+func main {
 	var circle = new class {
 		var radius = 2.0;
 		var diameter -> { get: radius * 2.0, set: radius = value / 2.0 };

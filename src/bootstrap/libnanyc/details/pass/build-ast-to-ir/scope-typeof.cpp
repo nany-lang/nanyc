@@ -15,41 +15,62 @@ namespace Producer
 {
 
 
+	namespace {
+
+
+	bool appendSingleType(Scope& scope, AST::Node& expr, IR::Sequence& out, uint32_t& previous)
+	{
+		scope.emitDebugpos(expr);
+		uint32_t lvid = 0;
+		bool ok = scope.visitASTExpr(expr, lvid);
+		if (previous != 0)
+		{
+			scope.emitDebugpos(expr);
+			out.emitCommonType(lvid, previous);
+		}
+		previous = lvid;
+		return ok;
+	}
+
+
+	} // namespace
+
+
+
+
 	bool Scope::visitASTExprTypeof(AST::Node& node, LVID& localvar)
 	{
 		assert(node.rule == AST::rgTypeof);
-
-		// reset the value of the localvar, result of the expr
-		localvar = 0;
-		AST::Node* expr = nullptr;
+		uint32_t previous = 0;
+		bool success = true;
+		auto& out = sequence();
+		IR::Producer::Scope scope{*this};
+		OpcodeCodegenDisabler codegen{out};
 
 		for (auto& child: node.children)
 		{
-			if (child.rule == AST::rgCall)
+			switch (child.rule)
 			{
-				if (child.children.size() != 1)
+				case AST::rgCall: // typeof
 				{
-					error(child) << "invalid number of parameters for typeof-expression";
-					return false;
+					for (auto& param: child.children)
+					{
+						if (param.rule == AST::rgCallParameter)
+						{
+							success &= appendSingleType(scope, param.firstChild(), out, previous);
+							break;
+						}
+					}
+					break;
 				}
-				auto& parameter = child.children[0];
-				if (parameter.rule != AST::rgCallParameter or parameter.children.size() != 1)
-					return unexpectedNode(parameter, "ir/typeof/param");
-
-				expr = &(parameter.children[0]);
+				default:
+					return unexpectedNode(child, "[typeof]");
 			}
-			else
-				return unexpectedNode(child, "[ir/typeof]");
 		}
-
-		if (unlikely(nullptr == expr))
-			return (ice(node) << "invalid typeof expression");
-
-		IR::Producer::Scope scope{*this};
-		emitDebugpos(node);
-		OpcodeCodegenDisabler codegen{sequence()};
-		sequence().emitComment("typeof expression");
-		return scope.visitASTExpr(*expr, localvar);
+		if (unlikely(previous == 0))
+			success = (error(node) << "at least one type is required for 'typeof'");
+		localvar = previous;
+		return success;
 	}
 
 

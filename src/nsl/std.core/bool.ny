@@ -9,8 +9,6 @@
 // \ingroup std.core
 
 
-
-
 // \brief   Boolean datatype
 // \ingroup std.core
 class bool
@@ -20,7 +18,6 @@ class bool
 
 	var pod: __bool = __false;
 }
-
 
 
 
@@ -87,9 +84,3 @@ public operator or (cref a: bool, b: __bool): ref bool;
 
 #[__nanyc_builtinalias: not, nosuggest] public operator not (a: __bool): __bool;
 #[__nanyc_builtinalias: not] public operator not (a: cref bool): ref bool;
-
-
-
-
-// -*- mode: nany;-*-
-// vim: set filetype=nany:

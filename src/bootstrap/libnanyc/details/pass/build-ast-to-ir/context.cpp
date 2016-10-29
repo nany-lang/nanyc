@@ -576,6 +576,45 @@ namespace Producer
 	}
 
 
+	void Context::prepareReuseForShorthandArray()
+	{
+		// new (+2)
+		//     type-decl (+2)
+		//         identifier: std
+		//         type-sub-dot (+3)
+		//             identifier: Array
+		//             expr-type-template (+3)
+		//                 call-template-parameters
+		//                 |   call-template-parameter
+		//                 |       type
+		//                 |           type-decl
+		//                 |               typeof (+2)
+		//                 |                   call (+5)
+		//                 |                       call-parameter
+		//                 |                       |   expr
+		//                 |                       |       expr-value
+		//                 |                       |           identifier: <value1>
+		//                 |                       call-parameter
+		//                 |                       |   expr
+		//                 |                       |       expr-value
+		//                 |                       |           identifier: <value2>
+
+		AST::Node::Ptr newnode = new AST::Node{AST::rgNew};
+		reuse.shorthandArray.node = newnode;
+		auto& typedecl = newnode->append(AST::rgTypeDecl);
+		auto& stdname = typedecl.append(AST::rgIdentifier);
+		stdname.text = "std";
+		auto& subdot = typedecl.append(AST::rgTypeSubDot);
+		auto& arrayname = subdot.append(AST::rgIdentifier);
+		arrayname.text = "Array";
+
+		auto& callparam = subdot.append(AST::rgExprTypeTemplate, AST::rgCallTemplateParameters, AST::rgCallTemplateParameter);
+		auto& type = callparam.append(AST::rgType, AST::rgTypeDecl, AST::rgTypeof);
+		reuse.shorthandArray.typeofcall = &type.append(AST::rgCall);
+	}
+
+
+
 
 
 } // namespace Producer

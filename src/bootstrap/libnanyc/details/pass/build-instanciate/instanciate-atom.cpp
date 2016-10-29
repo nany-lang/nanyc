@@ -516,7 +516,6 @@ namespace Instanciate
 	Atom* SequenceBuilder::instanciateAtomClass(Atom& atom)
 	{
 		assert(atom.isClass());
-		assert(not signatureOnly);
 
 		// mark the atom being instanciated as 'instanciated'. For classes with gen. type parameters
 		// a new atom will be created and only this one will be marked

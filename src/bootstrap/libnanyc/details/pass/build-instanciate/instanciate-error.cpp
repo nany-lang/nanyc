@@ -46,6 +46,17 @@ namespace complain
 	}
 
 
+	bool classOrFuncExpected(const Classdef& cdef)
+	{
+		auto e = (error() << "class or function expected, got '");
+		auto* seq = Logs::userHandler<SequenceBuilder>();
+		if (seq)
+			cdef.print(e.data().message, seq->cdeftable, false);
+		e << "' instead";
+		return false;
+	}
+
+
 	bool classRequired()
 	{
 		error() << "type class required";
@@ -406,6 +417,21 @@ namespace complain
 	}
 
 
+	bool typesDoNotMatch(const Classdef& from, const Classdef& to)
+	{
+		auto* seq = Logs::userHandler<SequenceBuilder>();
+		auto err = error();
+		err << "type '";
+		if (seq)
+			from.print(err, seq->cdeftable);
+		err << "' do not match with '";
+		if (seq)
+			to.print(err, seq->cdeftable);
+		err << '\'';
+		return false;
+	}
+
+
 } // namespace complain
 
 
@@ -414,20 +440,17 @@ namespace complain
 	Logs::Report emitReportEntry(void* self, Logs::Level level)
 	{
 		auto& sb = *(reinterpret_cast<SequenceBuilder*>(self));
-
 		switch (level)
 		{
 			default:
 				break;
 			case Logs::Level::warning:
 			{
-				if (nyfalse != sb.build.cf.warnings_into_errors)
-				{
-					level = Logs::Level::error;
-					sb.success = false;
-				}
-				break;
+				if (nyfalse == sb.build.cf.warnings_into_errors)
+					break;
+				level = Logs::Level::error;
 			}
+			// [[fallthru]]
 			case Logs::Level::error:
 			case Logs::Level::ICE:
 			{
@@ -435,17 +458,20 @@ namespace complain
 				break;
 			}
 		}
-
 		auto entry = sb.report.fromErrLevel(level);
 		if (debugmode)
 		{
-			if (sb.cursor and sb.currentSequence.isCursorValid(**sb.cursor))
+			if (level == Logs::Level::error or level == Logs::Level::ICE)
 			{
-				if (level == Logs::Level::error or level == Logs::Level::ICE)
+				if (sb.cursor and sb.currentSequence.isCursorValid(**sb.cursor))
 				{
 					uint32_t offset = sb.currentSequence.offsetOf(**sb.cursor);
 					auto h = entry.hint();
-					h << "dump opcodes at +" << offset << "\n";
+					h << "dump opcodes at +" << offset << " [from SequenceBuilder ";
+					h << self;
+					if (sb.signatureOnly)
+						h << ", signature only";
+					h << "]\n";
 					auto* map = &(sb.cdeftable.originalTable().atoms);
 					IR::ISA::printExtract(h.message.message, sb.currentSequence, offset, map);
 				}

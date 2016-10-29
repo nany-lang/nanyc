@@ -7,8 +7,6 @@
 namespace std.io;
 
 
-
-
 /*!
 ** \brief Try to mount a local folder
 **
@@ -18,11 +16,3 @@ namespace std.io;
 */
 public func mount(cref path: string, cref localfolder: string): bool
 	-> new bool(!!__nanyc_io_mount_local(path.m_cstr, path.size.pod, localfolder.m_cstr, localfolder.size.pod));
-
-
-
-
-
-
-// -*- mode: nany;-*-
-// vim: set filetype=nany:

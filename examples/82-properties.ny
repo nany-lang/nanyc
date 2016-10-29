@@ -1,5 +1,4 @@
-func main
-{
+func main {
 	var circle = new class {
 		var radius = 2.0;
 		var diameter -> { get: radius * 2.0, set: radius = value / 2.0 };

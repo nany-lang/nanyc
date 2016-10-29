@@ -4,6 +4,7 @@
 #include "details/fwd.h"
 #include "opcodes.h"
 #include <iosfwd>
+#include <yuni/core/string.h>
 
 
 // forward declaration
@@ -963,6 +964,17 @@ namespace ISA
 		uint32_t lvid;
 		template<class T> void eachLVID(T& c) { c(lvid); }
 	};
+
+
+	template<> struct Operand<Nany::IR::ISA::Op::commontype> final
+	{
+		constexpr static const char* opname() { return "commontype"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		uint32_t previous;
+		template<class T> void eachLVID(T& c) { c(lvid, previous); }
+	};
+
 
 
 	template<> struct Operand<Nany::IR::ISA::Op::assign> final
