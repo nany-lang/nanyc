@@ -14,109 +14,86 @@
 
 /// \brief   double-precision floating-point number (64bits)
 /// \ingroup std.core
-public class f64
-{
+public class f64 {
 	operator new;
 	operator new(cref x: f32)
 	{
 		pod = x.pod;
 	}
-	operator new(cref x: f64)
-	{
+	operator new(cref x: f64) {
 		pod = x.pod;
 	}
+
 	#[nosuggest] operator new(self pod: __f32);
 	#[nosuggest] operator new(self pod: __f64);
 
 
-	operator ++self: ref f64
-	{
+	operator ++self: ref f64 {
 		pod = !!finc(pod);
 		return self;
 	}
 
-	operator self++: ref f64
-	{
+	operator self++: ref f64 {
 		ref tmp = new f64(pod);
 		pod = !!finc(pod);
 		return tmp;
 	}
 
-	operator --self: ref f64
-	{
+	operator --self: ref f64 {
 		pod = !!fdec(pod);
 		return self;
 	}
 
-	operator self--: ref f64
-	{
+	operator self--: ref f64 {
 		ref tmp = new f64(pod);
 		pod = !!fdec(pod);
 		return tmp;
 	}
 
-
-	operator += (cref x: f64): ref f64
-	{
+	operator += (cref x: f64): ref f64 {
 		pod = !!fadd(pod, x.pod);
 		return self;
 	}
 
-	#[nosuggest] operator += (x: __f64): ref f64
-	{
+	#[nosuggest] operator += (x: __f64): ref f64 {
 		pod = !!fadd(pod, x);
 		return self;
 	}
 
-
-	operator -= (cref x: f64): ref f64
-	{
+	operator -= (cref x: f64): ref f64 {
 		pod = !!fsub(pod, x.pod);
 		return self;
 	}
 
-	#[nosuggest] operator -= (x: __f64): ref f64
-	{
+	#[nosuggest] operator -= (x: __f64): ref f64 {
 		pod = !!fsub(pod, x);
 		return self;
 	}
 
-
-	operator *= (cref x: f64): ref f64
-	{
+	operator *= (cref x: f64): ref f64 {
 		pod = !!fmul(pod, x.pod);
 		return self;
 	}
 
-	#[nosuggest] operator *= (x: __f64): ref f64
-	{
+	#[nosuggest] operator *= (x: __f64): ref f64 {
 		pod = !!fmul(pod, x);
 		return self;
 	}
 
-
-	operator /= (cref x: f64): ref f64
-	{
+	operator /= (cref x: f64): ref f64 {
 		pod = !!fdiv(pod, x.pod);
 		return self;
 	}
 
-	#[nosuggest] operator /= (x: __f64): ref f64
-	{
+	#[nosuggest] operator /= (x: __f64): ref f64 {
 		pod = !!fdiv(pod, x);
 		return self;
 	}
-
 
 private:
 	var pod = 0__f64;
 
 } // class f64
-
-
-
-
-
 
 
 
@@ -153,7 +130,6 @@ private:
 
 
 
-
 #[__nanyc_builtinalias: fadd] public operator + (a: cref f64, b: cref f64): ref f64;
 #[__nanyc_builtinalias: fadd, nosuggest] public operator + (a: cref f64, b: __f64): ref f64;
 #[__nanyc_builtinalias: fadd, nosuggest] public operator + (a: __f64, b: cref f64): ref f64;
@@ -176,11 +152,3 @@ private:
 #[__nanyc_builtinalias: fmul, nosuggest] public operator * (a: cref f64, b: __f64): ref f64;
 #[__nanyc_builtinalias: fmul, nosuggest] public operator * (a: __f64, b: cref f64): ref f64;
 #[__nanyc_builtinalias: fmul, nosuggest] public operator * (a: __f64, b: __f64): __f64;
-
-
-
-
-
-
-// -*- mode: nany;-*-
-// vim: set filetype=nany:

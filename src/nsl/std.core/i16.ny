@@ -14,21 +14,17 @@
 
 /// \brief   Signed integer with width of exactly 16 bits
 /// \ingroup std.core
-public class i16
-{
+public class i16 {
 	//! Default constructor
 	operator new;
 
-	operator new (cref x: i16)
-	{
+	operator new (cref x: i16) {
 		pod = x.pod;
 	}
-	operator new (cref x: i8)
-	{
+	operator new (cref x: i8) {
 		pod = x.pod;
 	}
-	operator new (cref x: u8)
-	{
+	operator new (cref x: u8) {
 		pod = x.pod;
 	}
 
@@ -38,179 +34,151 @@ public class i16
 
 
 
-	operator ++self: ref i16
-	{
+	operator ++self: ref i16 {
 		pod = !!inc(pod);
 		return self;
 	}
 
-	operator self++: ref i16
-	{
+	operator self++: ref i16 {
 		ref tmp = new i16(pod);
 		pod = !!inc(pod);
 		return tmp;
 	}
 
-	operator --self: ref i16
-	{
+	operator --self: ref i16 {
 		pod = !!dec(pod);
 		return self;
 	}
 
-	operator self--: ref i16
-	{
+	operator self--: ref i16 {
 		ref tmp = new i16(pod);
 		pod = !!dec(pod);
 		return tmp;
 	}
 
 
-	operator += (cref x: i16): ref i16
-	{
+	operator += (cref x: i16): ref i16 {
 		pod = !!add(pod, x.pod);
 		return self;
 	}
 
-	#[nosuggest] operator += (x: __i16): ref i16
-	{
+	#[nosuggest] operator += (x: __i16): ref i16 {
 		pod = !!add(pod, x);
 		return self;
 	}
 
-	operator += (cref x: i8): ref i16
-	{
+	operator += (cref x: i8): ref i16 {
 		pod = !!add(pod, x.pod);
 		return self;
 	}
 
-	#[nosuggest] operator += (x: __i8): ref i16
-	{
+	#[nosuggest] operator += (x: __i8): ref i16 {
 		pod = !!add(pod, x);
 		return self;
 	}
 
-	operator += (cref x: u8): ref i16
-	{
+	operator += (cref x: u8): ref i16 {
 		pod = !!add(pod, x.pod);
 		return self;
 	}
 
-	#[nosuggest] operator += (x: __u8): ref i16
-	{
+	#[nosuggest] operator += (x: __u8): ref i16 {
 		pod = !!add(pod, x);
 		return self;
 	}
 
 
 
-	operator -= (cref x: i16): ref i16
-	{
+	operator -= (cref x: i16): ref i16 {
 		pod = !!sub(pod, x.pod);
 		return self;
 	}
 
-	#[nosuggest] operator -= (x: __i16): ref i16
-	{
+	#[nosuggest] operator -= (x: __i16): ref i16 {
 		pod = !!sub(pod, x);
 		return self;
 	}
 
-	operator -= (cref x: i8): ref i16
-	{
+	operator -= (cref x: i8): ref i16 {
 		pod = !!sub(pod, x.pod);
 		return self;
 	}
 
-	#[nosuggest] operator -= (x: __i8): ref i16
-	{
+	#[nosuggest] operator -= (x: __i8): ref i16 {
 		pod = !!sub(pod, x);
 		return self;
 	}
 
-	operator -= (cref x: u8): ref i16
-	{
+	operator -= (cref x: u8): ref i16 {
 		pod = !!sub(pod, x.pod);
 		return self;
 	}
 
-	#[nosuggest] operator -= (x: __u8): ref i16
-	{
+	#[nosuggest] operator -= (x: __u8): ref i16 {
 		pod = !!sub(pod, x);
 		return self;
 	}
 
 
 
-	operator *= (cref x: i16): ref i16
-	{
+	operator *= (cref x: i16): ref i16 {
 		pod = !!imul(pod, x.pod);
 		return self;
 	}
 
-	#[nosuggest] operator *= (x: __i16): ref i16
-	{
+	#[nosuggest] operator *= (x: __i16): ref i16 {
 		pod = !!imul(pod, x);
 		return self;
 	}
 
-	operator *= (cref x: i8): ref i16
-	{
+	operator *= (cref x: i8): ref i16 {
 		pod = !!imul(pod, x.pod);
 		return self;
 	}
 
-	#[nosuggest] operator *= (x: __i8): ref i16
-	{
+	#[nosuggest] operator *= (x: __i8): ref i16 {
 		pod = !!imul(pod, x);
 		return self;
 	}
 
-	operator *= (cref x: u8): ref i16
-	{
+	operator *= (cref x: u8): ref i16 {
 		pod = !!imul(pod, x.pod);
 		return self;
 	}
 
-	#[nosuggest] operator *= (x: __u8): ref i16
-	{
+	#[nosuggest] operator *= (x: __u8): ref i16 {
 		pod = !!imul(pod, x);
 		return self;
 	}
 
 
 
-	operator /= (cref x: i16): ref i16
-	{
+	operator /= (cref x: i16): ref i16 {
 		pod = !!idiv(pod, x.pod);
 		return self;
 	}
 
-	#[nosuggest] operator /= (x: __i16): ref i16
-	{
+	#[nosuggest] operator /= (x: __i16): ref i16 {
 		pod = !!idiv(pod, x);
 		return self;
 	}
 
-	operator /= (cref x: i8): ref i16
-	{
+	operator /= (cref x: i8): ref i16 {
 		pod = !!idiv(pod, x.pod);
 		return self;
 	}
 
-	#[nosuggest] operator /= (x: __i8): ref i16
-	{
+	#[nosuggest] operator /= (x: __i8): ref i16 {
 		pod = !!idiv(pod, x);
 		return self;
 	}
 
-	operator /= (cref x: u8): ref i16
-	{
+	operator /= (cref x: u8): ref i16 {
 		pod = !!idiv(pod, x.pod);
 		return self;
 	}
 
-	#[nosuggest] operator /= (x: __u8): ref i16
-	{
+	#[nosuggest] operator /= (x: __u8): ref i16 {
 		pod = !!idiv(pod, x);
 		return self;
 	}
@@ -221,11 +189,6 @@ private:
 	var pod = 0__i16;
 
 } // class i16
-
-
-
-
-
 
 
 
@@ -491,9 +454,3 @@ private:
 #[__nanyc_builtinalias: xor, nosuggest] public operator xor (a: __i16, b: __i8): any;
 
 
-
-
-
-
-// -*- mode: nany;-*-
-// vim: set filetype=nany:

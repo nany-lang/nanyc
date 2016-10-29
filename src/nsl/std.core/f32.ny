@@ -14,104 +14,82 @@
 
 /// \brief   single-precision floating-point number (32bits)
 /// \ingroup std.core
-public class f32
-{
+public class f32 {
 	operator new;
 	operator new(cref x: f32)
 	{
 		pod = x.pod;
 	}
+
 	#[nosuggest] operator new(self pod: __f32);
 
 
-	operator ++self: ref f32
-	{
+	operator ++self: ref f32 {
 		pod = !!finc(pod);
 		return self;
 	}
 
-	operator self++: ref f32
-	{
+	operator self++: ref f32 {
 		ref tmp = new f32(pod);
 		pod = !!finc(pod);
 		return tmp;
 	}
 
-	operator --self: ref f32
-	{
+	operator --self: ref f32 {
 		pod = !!fdec(pod);
 		return self;
 	}
 
-	operator self--: ref f32
-	{
+	operator self--: ref f32 {
 		ref tmp = new f32(pod);
 		pod = !!fdec(pod);
 		return tmp;
 	}
 
-
-	operator += (cref x: f32): ref f32
-	{
+	operator += (cref x: f32): ref f32 {
 		pod = !!fadd(pod, x.pod);
 		return self;
 	}
 
-	#[nosuggest] operator += (x: __f32): ref f32
-	{
+	#[nosuggest] operator += (x: __f32): ref f32 {
 		pod = !!fadd(pod, x);
 		return self;
 	}
 
-
-	operator -= (cref x: f32): ref f32
-	{
+	operator -= (cref x: f32): ref f32 {
 		pod = !!fsub(pod, x.pod);
 		return self;
 	}
 
-	#[nosuggest] operator -= (x: __f32): ref f32
-	{
+	#[nosuggest] operator -= (x: __f32): ref f32 {
 		pod = !!fsub(pod, x);
 		return self;
 	}
 
-
-	operator *= (cref x: f32): ref f32
-	{
+	operator *= (cref x: f32): ref f32 {
 		pod = !!fmul(pod, x.pod);
 		return self;
 	}
 
-	#[nosuggest] operator *= (x: __f32): ref f32
-	{
+	#[nosuggest] operator *= (x: __f32): ref f32 {
 		pod = !!fmul(pod, x);
 		return self;
 	}
 
-
-	operator /= (cref x: f32): ref f32
-	{
+	operator /= (cref x: f32): ref f32 {
 		pod = !!fdiv(pod, x.pod);
 		return self;
 	}
 
-	#[nosuggest] operator /= (x: __f32): ref f32
-	{
+	#[nosuggest] operator /= (x: __f32): ref f32 {
 		pod = !!fdiv(pod, x);
 		return self;
 	}
-
 
 private:
 	var pod = 0__f32;
 
 } // class f32
-
-
-
-
-
 
 
 
@@ -148,7 +126,6 @@ private:
 
 
 
-
 #[__nanyc_builtinalias: fadd] public operator + (a: cref f32, b: cref f32): ref f32;
 #[__nanyc_builtinalias: fadd, nosuggest] public operator + (a: cref f32, b: __f32): ref f32;
 #[__nanyc_builtinalias: fadd, nosuggest] public operator + (a: __f32, b: cref f32): ref f32;
@@ -171,11 +148,3 @@ private:
 #[__nanyc_builtinalias: fmul, nosuggest] public operator * (a: cref f32, b: __f32): ref f32;
 #[__nanyc_builtinalias: fmul, nosuggest] public operator * (a: __f32, b: cref f32): ref f32;
 #[__nanyc_builtinalias: fmul, nosuggest] public operator * (a: __f32, b: __f32): __f32;
-
-
-
-
-
-
-// -*- mode: nany;-*-
-// vim: set filetype=nany:
