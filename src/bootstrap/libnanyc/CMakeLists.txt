@@ -285,6 +285,7 @@ addsrc(
 	"details/pass/build-instanciate/instanciate-error-not-declared.cpp"
 	"details/pass/build-instanciate/instanciate-intrinsic.cpp"
 	"details/pass/build-instanciate/instanciate-intrinsic-builtin.cpp"
+	"details/pass/build-instanciate/instanciate-intrinsic-builtin-specific.cpp"
 	"details/pass/build-instanciate/instanciate-return.cpp"
 	"details/pass/build-instanciate/instanciate-scope.cpp"
 	"details/pass/build-instanciate/instanciate-pragma.cpp"

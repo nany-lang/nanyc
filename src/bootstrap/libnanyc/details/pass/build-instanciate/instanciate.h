@@ -207,6 +207,7 @@ namespace Instanciate
 		void instanciateInstrinsicCall();
 		bool instanciateUserDefinedIntrinsic(const IR::ISA::Operand<IR::ISA::Op::intrinsic>& operands);
 		Yuni::Tribool::Value instanciateBuiltinIntrinsic(const AnyString& name, uint32_t lvid, bool canComplain = true);
+		Yuni::Tribool::Value instanciateBuiltinIntrinsicSpecific(const AnyString& name, uint32_t lvid, bool canProduceError);
 		//@}
 
 
