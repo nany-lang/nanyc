@@ -59,7 +59,6 @@ namespace VM
 	struct Executor final
 	{
 		nyallocator_t& allocator;
-
 		DCCallVM* dyncall = nullptr;
 
 		//! For C calls
@@ -68,46 +67,35 @@ namespace VM
 		nyprogram_cf_t cf;
 		//! Current thread context
 		ThreadContext& threadContext;
-
 		//! Registers for the current stack frame
 		DataRegister* registers = nullptr;
 		//! Return value
 		uint64_t retRegister = 0;
-
 		//! Number of pushed parameters
 		uint32_t funcparamCount = 0; // parameters are 2-based
 		//! all pushed parameters
 		DataRegister funcparams[Config::maxPushedParameters];
-
 		Stack stack;
-
 		//! Stack trace
 		Stacktrace<true> stacktrace;
 		//! Memory checker
 		MemChecker<true> memchecker;
-
-		#ifndef NDEBUG
-		//! Total number of registers in the current frame
-		uint32_t registerCount = 0;
-		#endif
-
 		//! upper label id encountered so far
 		uint32_t upperLabelID = 0;
 		//! Atom collection references
 		const AtomMap& map;
-
 		//! Source sequence
 		std::reference_wrapper<const IR::Sequence> sequence;
-
 		//! All user-defined intrinsics
 		const IntrinsicTable& userDefinedIntrinsics;
-
-
 		//! Reference to the current iterator
 		const IR::Instruction** cursor = nullptr;
 		//! Jump buffer, to handle exceptions during the execution of the program
 		std::jmp_buf jump_buffer;
-
+		#ifndef NDEBUG
+		//! Total number of registers in the current frame
+		uint32_t registerCount = 0;
+		#endif
 
 	public:
 		Executor(ThreadContext& threadContext, const IR::Sequence& callee)
@@ -131,7 +119,6 @@ namespace VM
 
 		~Executor()
 		{
-			// releasing dyncall object
 			if (dyncall)
 				dcFree(dyncall);
 			// memory leaks ?
@@ -398,7 +385,6 @@ namespace VM
 					emitInvalidReturnType();
 			}
 		}
-
 
 		inline void visit(const IR::ISA::Operand<IR::ISA::Op::fadd>& opr)
 		{
@@ -990,6 +976,16 @@ namespace VM
 			size_t size = static_cast<size_t>(registers[opr.regsize].u64);
 			int cmp = memcmp(object, src, size);
 			registers[opr.regsize].u64 = (cmp == 0) ? 0 : ((cmp < 0) ? 2 : 1);
+		}
+
+		void visit(const IR::ISA::Operand<IR::ISA::Op::cstrlen>& opr)
+		{
+			VM_PRINT_OPCODE(opr);
+			ASSERT_LVID(opr.lvid);
+			ASSERT_LVID(opr.ptr);
+			auto* cstring = reinterpret_cast<const char*>(registers[opr.ptr].u64);
+			size_t clen = cstring ? strlen(cstring) : 0u;
+			registers[opr.lvid].u64 = clen;
 		}
 
 		void visit(const IR::ISA::Operand<IR::ISA::Op::load_u64>& opr)

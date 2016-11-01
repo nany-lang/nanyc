@@ -198,12 +198,7 @@ namespace Nany
 
 	inline bool Atom::hasMember(const AnyString& name) const
 	{
-		switch (type)
-		{
-			case Type::funcdef: return category(Category::functor);
-			default:            return (m_children.count(name) != 0);
-		}
-		return false;
+		return (m_children.count(name) != 0);
 	}
 
 

@@ -260,8 +260,7 @@ namespace Producer
 									nodeSet = &(child.children[1]);
 									break;
 								}
-
-								return (error(child) << "unsupported property component '" << name << '\'');
+								return (error(child) << "unsupported property component '" <<name << "' (expected: 'get' or 'set')");
 							}
 							default:
 								return unexpectedNode(child, "[property]");

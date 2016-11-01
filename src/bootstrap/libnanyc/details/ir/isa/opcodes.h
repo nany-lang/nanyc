@@ -127,6 +127,18 @@ namespace ISA //!< Instruction Set Architecture
 		//! pragma
 		pragma,
 
+		//! Read 64bits from memory
+		load_u64,
+		//! Read 32bits from emmory
+		load_u32,
+		//! Read 8bits from emmory
+		load_u8,
+		//! Write 64bits into memory
+		store_u64,
+		//! Write 32bits into memory
+		store_u32,
+		//! Write 8bits into memory
+		store_u8,
 		//! Allocate a region of memory
 		memalloc,
 		//! Free a region of memory previously allocated by 'memalloc'
@@ -141,18 +153,8 @@ namespace ISA //!< Instruction Set Architecture
 		memmove,
 		//! Memcmp
 		memcmp,
-		//! Read 64bits from memory
-		load_u64,
-		//! Read 32bits from emmory
-		load_u32,
-		//! Read 8bits from emmory
-		load_u8,
-		//! Write 64bits into memory
-		store_u64,
-		//! Write 32bits into memory
-		store_u32,
-		//! Write 8bits into memory
-		store_u8,
+		//! strlen (32/64)
+		cstrlen,
 
 		//! label
 		label,
@@ -287,6 +289,12 @@ namespace ISA //!< Instruction Set Architecture
 			\
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::stacksize) \
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::pragma) \
+			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::load_u64) \
+			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::load_u32) \
+			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::load_u8) \
+			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::store_u64) \
+			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::store_u32) \
+			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::store_u8) \
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::memalloc) \
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::memfree) \
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::memrealloc) \
@@ -294,14 +302,10 @@ namespace ISA //!< Instruction Set Architecture
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::memcopy) \
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::memmove) \
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::memcmp) \
-			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::load_u64) \
-			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::load_u32) \
-			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::load_u8) \
-			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::store_u64) \
-			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::store_u32) \
-			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::store_u8) \
+			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::cstrlen) \
 			\
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::label) \
+			\
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::opassert) \
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::memcheckhold) \
 			\

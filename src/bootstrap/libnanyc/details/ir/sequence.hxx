@@ -733,6 +733,11 @@ namespace IR
 		operands.value.f64 = value;
 	}
 
+	inline void Sequence::emitStore_bool(uint32_t lvid, bool value)
+	{
+		emitStore_u64(lvid, value ? 1 : 0);
+	}
+
 	inline uint32_t Sequence::emitStoreText(uint32_t lvid, const AnyString& text)
 	{
 		auto& operands = emit<ISA::Op::storeText>();
@@ -849,6 +854,13 @@ namespace IR
 		operands.regsize = regsize;
 	}
 
+	inline void Sequence::emitCStrlen(uint32_t lvid, uint32_t bits, uint32_t ptr)
+	{
+		auto& operands = emit<ISA::Op::cstrlen>();
+		operands.lvid  = lvid;
+		operands.bits  = bits;
+		operands.ptr   = ptr;
+	}
 
 	inline void Sequence::emitLoadU64(uint32_t lvid, uint32_t addr)
 	{
