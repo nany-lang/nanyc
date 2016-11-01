@@ -239,7 +239,6 @@ namespace Instanciate
 		bool complainCannotCall(Atom& atom, FuncOverloadMatch& overloadMatch);
 		void complainPushedSynthetic(const CLID&, uint32_t paramindex, const AnyString& paramname = nullptr);
 		void complainInvalidParametersAfterSignatureMatching(Atom&, FuncOverloadMatch& overloadMatch);
-		void complainCannotCall(const Atom&, FuncOverloadMatch& overloadMatch);
 		//@}
 
 
