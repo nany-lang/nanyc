@@ -160,6 +160,7 @@ namespace IR
 		void emitStore(uint32_t lvid, uint32_t source);
 		void emitStore_u64(uint32_t lvid, uint64_t);
 		void emitStore_f64(uint32_t lvid, double);
+		void emitStore_bool(uint32_t lvid, bool);
 		uint32_t emitStoreText(uint32_t lvid, const AnyString&);
 
 		//! Emit a memalloc opcode and get the register
