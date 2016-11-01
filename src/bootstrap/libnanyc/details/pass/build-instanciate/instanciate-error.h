@@ -62,6 +62,8 @@ namespace complain
 	//! Types must match the previous one
 	bool typesDoNotMatch(const Classdef& from, const Classdef& to);
 
+	//! Invalid self value for calling property of a class
+	bool selfMissingForPropertyCall(const Atom& property, uint32_t self);
 
 
 	//! Return type mismatch

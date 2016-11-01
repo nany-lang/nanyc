@@ -338,8 +338,8 @@ namespace Instanciate
 		bool isLocalVar = false;
 		// property call ?
 		bool isProperty = false;
-		// self for propseot
-		// getter will be directly resolved here but setter later
+		// self for caling the propget
+		// getter will be directly resolved here but done later for the setter
 		// (-1 since this special value will be user to determine if it is a propset)
 		uint32_t propself = (uint32_t) -1;
 
@@ -572,11 +572,14 @@ namespace Instanciate
 				case 1: // unique match count
 				{
 					auto& propatom = multipleResults[0].get();
-
+					if ((propself == (uint32_t) -1 or propself == 0))
+					{
+						if (unlikely(propatom.parent and propatom.parent->isClass()))
+							return complain::selfMissingForPropertyCall(propatom, propself);
+					}
 					// 'identifyset' is strictly identical to 'identify', but it indicates
 					// that we should resolve a setter and not a getter
 					bool setter = (operands.opcode == static_cast<uint32_t>(IR::ISA::Op::identifyset));
-
 					// Generate code only for getter
 					// setter will be called later, when enough information will be provided
 					// (the 'value' parameter is not available yet)
@@ -610,11 +613,10 @@ namespace Instanciate
 				}
 				default:
 				{
-					// multiple solutions are not acceptable for properties
 					complain::ambigousPropertyCall(name);
 					break;
 				}
-				case 0: // no identifier found from 'atom map'
+				case 0:
 				{
 					complain::noproperty(name);
 					break;

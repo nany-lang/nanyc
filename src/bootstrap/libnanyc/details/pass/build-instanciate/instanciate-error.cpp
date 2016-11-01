@@ -432,6 +432,23 @@ namespace complain
 	}
 
 
+	bool selfMissingForPropertyCall(const Atom& property, uint32_t self)
+	{
+		auto e = ice();
+		e << "invalid 'self' for calling property '" << property.caption() << '\'';
+		if (debugmode)
+		{
+			e << " [self: ";
+			if (self != (uint32_t) -1)
+				e << self;
+			else
+				e << "(uint32_t) -1";
+			e << ']';
+		}
+		return false;
+	}
+
+
 } // namespace complain
 
 
