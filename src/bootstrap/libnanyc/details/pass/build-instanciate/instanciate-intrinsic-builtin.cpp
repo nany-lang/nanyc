@@ -585,6 +585,24 @@ namespace Instanciate
 	}
 
 
+	template<class T>
+	bool intrinsicStrlen(SequenceBuilder& seq, uint32_t lvid)
+	{
+		seq.cdeftable.substitute(lvid).mutateToBuiltin(sizeof(T) == sizeof(uint32_t) ? nyt_u32 : nyt_u64);
+		uint32_t objlvid = seq.pushedparams.func.indexed[0].lvid;
+		auto& cdef = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, objlvid});
+		if (!cdef.isRawPointer())
+			return seq.complainIntrinsicParameter("strlen", 0, cdef, "'__ptr'");
+
+		if (seq.canGenerateCode())
+		{
+			uint32_t bits = (sizeof(T) == sizeof(uint32_t) ? 32 : 64);
+			seq.out->emitCStrlen(lvid, bits, objlvid);
+		}
+		return true;
+	}
+
+
 	bool intrinsicNOT(SequenceBuilder& seq, uint32_t lvid)
 	{
 		assert(seq.pushedparams.func.indexed.size() == 1);
@@ -1126,6 +1144,9 @@ namespace Instanciate
 		{"igte",            { 2,  &intrinsicIGTE,        }},
 		//
 		{"assert",          { 1,  &intrinsicAssert,      }},
+
+		{"strlen32",        { 1,  &intrinsicStrlen<uint32_t> }},
+		{"strlen64",        { 1,  &intrinsicStrlen<uint64_t> }},
 
 		{"os.is.linux",     { 0,  &intrinsicOSIsLinux      }},
 		{"os.is.unix",      { 0,  &intrinsicOSIsUnix       }},

@@ -176,6 +176,8 @@ namespace IR
 		void emitMemCmp(uint32_t lvid, uint32_t srclvid, uint32_t regsize);
 		//! Emit a memrealloc
 		void emitMemrealloc(uint32_t lvid, uint32_t oldsize,uint32_t newsize);
+		//! Emit cstrlen (32|64)
+		void emitCStrlen(uint32_t lvid, uint32_t bits, uint32_t ptr);
 
 		void emitLoadU64(uint32_t lvid, uint32_t addr);
 		void emitLoadU32(uint32_t lvid, uint32_t addr);

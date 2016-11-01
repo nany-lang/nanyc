@@ -793,6 +793,16 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, srclvid, regsize); }
 	};
 
+	template<> struct Operand<Nany::IR::ISA::Op::cstrlen> final
+	{
+		constexpr static const char* opname() { return "cstrlen"; }
+		uint32_t opcode;
+		uint32_t lvid;
+		uint32_t bits;
+		uint32_t ptr;
+		template<class T> void eachLVID(T& c) { c(lvid, ptr); }
+	};
+
 
 
 	template<> struct Operand<Nany::IR::ISA::Op::load_u64> final

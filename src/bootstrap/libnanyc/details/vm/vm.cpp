@@ -978,6 +978,16 @@ namespace VM
 			registers[opr.regsize].u64 = (cmp == 0) ? 0 : ((cmp < 0) ? 2 : 1);
 		}
 
+		void visit(const IR::ISA::Operand<IR::ISA::Op::cstrlen>& opr)
+		{
+			VM_PRINT_OPCODE(opr);
+			ASSERT_LVID(opr.lvid);
+			ASSERT_LVID(opr.ptr);
+			auto* cstring = reinterpret_cast<const char*>(registers[opr.ptr].u64);
+			size_t clen = cstring ? strlen(cstring) : 0u;
+			registers[opr.lvid].u64 = clen;
+		}
+
 		void visit(const IR::ISA::Operand<IR::ISA::Op::load_u64>& opr)
 		{
 			VM_PRINT_OPCODE(opr);

@@ -131,7 +131,7 @@ public class string {
 		-> append(text.m_cstr, text.m_size);
 
 	func appendCString(str: __pointer)
-		-> append(str, !!strlen(str));
+		-> append(str, !!strlen32(str));
 
 	#[nosuggest] func append(str: __pointer, size: __u32) {
 		if size != 0__u32 then {

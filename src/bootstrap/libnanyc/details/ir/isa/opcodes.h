@@ -153,6 +153,8 @@ namespace ISA //!< Instruction Set Architecture
 		memmove,
 		//! Memcmp
 		memcmp,
+		//! strlen (32/64)
+		cstrlen,
 
 		//! label
 		label,
@@ -300,8 +302,10 @@ namespace ISA //!< Instruction Set Architecture
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::memcopy) \
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::memmove) \
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::memcmp) \
+			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::cstrlen) \
 			\
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::label) \
+			\
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::opassert) \
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::memcheckhold) \
 			\
