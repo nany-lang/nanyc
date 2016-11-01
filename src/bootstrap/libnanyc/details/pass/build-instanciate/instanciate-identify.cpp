@@ -572,10 +572,14 @@ namespace Instanciate
 				case 1: // unique match count
 				{
 					auto& propatom = multipleResults[0].get();
-					if ((propself == (uint32_t) -1 or propself == 0))
+					if ((propself == (uint32_t) -1 or propself == 0)) // no 'self' ? implicit ?
 					{
 						if (unlikely(propatom.parent and propatom.parent->isClass()))
-							return complain::selfMissingForPropertyCall(propatom, propself);
+						{
+							if (frame->atom.parent != propatom.parent)
+								return complain::selfMissingForPropertyCall(propatom, propself);
+							propself = 2; // 0: invalid, 1: return value, 2: self
+						}
 					}
 					// 'identifyset' is strictly identical to 'identify', but it indicates
 					// that we should resolve a setter and not a getter
