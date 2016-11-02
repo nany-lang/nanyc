@@ -34,22 +34,19 @@ namespace Producer
 
 	void Scope::doEmitTmplParameters()
 	{
-		if (!!lastPushedTmplParams)
+		assert(lastPushedTmplParams.get());
+		if (not lastPushedTmplParams->empty())
 		{
-			if (not lastPushedTmplParams->empty())
+			auto& outIR = sequence();
+			for (auto& pair: *lastPushedTmplParams)
 			{
-				auto& outIR = sequence();
-				for (auto& pair: *lastPushedTmplParams)
-				{
-					if (pair.second.empty())
-						outIR.emitTPush(pair.first);
-					else
-						outIR.emitTPush(pair.first, pair.second);
-				}
+				if (pair.second.empty())
+					outIR.emitTPush(pair.first);
+				else
+					outIR.emitTPush(pair.first, pair.second);
 			}
-			// clear
-			lastPushedTmplParams = nullptr;
 		}
+		lastPushedTmplParams = nullptr;
 	}
 
 
