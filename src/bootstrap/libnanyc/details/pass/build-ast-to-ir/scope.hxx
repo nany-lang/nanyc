@@ -187,7 +187,7 @@ namespace Producer
 
 	inline void Scope::emitTmplParametersIfAny()
 	{
-		if (!!lastPushedTmplParams)
+		if (lastPushedTmplParams.get())
 			doEmitTmplParameters();
 	}
 
