@@ -117,7 +117,7 @@ namespace Nany
 			//! Add a new parameter
 			bool append(const CLID&, const AnyString& name);
 			//! Try to find a parameter index from its name
-			yuint32 findByName(const AnyString& name, yuint32 offset = 0) const;
+			uint32_t findByName(const AnyString& name, uint32_t offset = 0) const;
 
 			const std::pair<AnyString, Vardef>& operator [] (uint index) const;
 
@@ -138,7 +138,7 @@ namespace Nany
 
 		private:
 			struct Data final {
-				yuint32 count = 0u;
+				uint32_t count = 0u;
 				std::pair<AnyString, Vardef> params[Config::maxFuncDeclParameterCount];
 			};
 			std::unique_ptr<Data> pData;
@@ -417,7 +417,7 @@ namespace Nany
 
 	public:
 		//! Atom unique ID (32-bits only, used for classification)
-		yuint32 atomid = 0u;
+		uint32_t atomid = 0u;
 		//! Atom flags
 		Yuni::Flags<Flags> flags = {Flags::suggestInReport};
 		//! Atom Category

@@ -115,7 +115,7 @@ namespace Producer
 	}
 
 
-	bool Scope::visitASTExprString(AST::Node& node, yuint32& localvar)
+	bool Scope::visitASTExprString(AST::Node& node, uint32_t& localvar)
 	{
 		assert(node.rule == AST::rgString);
 

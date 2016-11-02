@@ -178,13 +178,12 @@ namespace Nany
 	void ClassdefTable::bulkCreate(std::vector<CLID>& out, uint32_t atomid, uint32_t count)
 	{
 		assert(atomid > 0);
-
 		++count; // 1-based
 		out.clear();
 		out.reserve(count);
 		out.push_back(CLID{});
 
-		for (yuint32 i = 1; i != count; ++i)
+		for (uint32_t i = 1; i != count; ++i)
 		{
 			// the new classid, made from the atom id
 			CLID clid{atomid, i};
