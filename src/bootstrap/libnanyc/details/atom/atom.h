@@ -144,7 +144,6 @@ namespace Nany
 			std::unique_ptr<Data> pData;
 		};
 
-
 		struct InstantiationRef final
 		{
 			InstantiationRef(const Atom& atom, uint32_t index): m_atom(atom), m_index(index) {}
@@ -282,9 +281,7 @@ namespace Nany
 		bool propertyLookupOnChildren(std::vector<std::reference_wrapper<Atom>>& list,
 			const AnyString& prefix, const AnyString& name);
 
-		/*!
-		** \brief Get if this atom has a child member
-		*/
+		//! Get if this atom has a child member
 		bool hasMember(const AnyString& name) const;
 
 		/*!
@@ -427,8 +424,7 @@ namespace Nany
 		Yuni::Flags<Category> category;
 
 		//! Various information for vardef only (class member)
-		struct
-		{
+		struct {
 			//! Field index within the class (before optimization)
 			// \note This value is used internally for mapping
 			uint16_t fieldindex = 0;
@@ -438,8 +434,7 @@ namespace Nany
 		varinfo;
 
 		//! Various information for classdef only
-		struct
-		{
+		struct {
 			//! Flag to determine whether the class has already been instanciated or not
 			bool isInstanciated = false;
 			//! Next field index for new variable members
@@ -468,20 +463,17 @@ namespace Nany
 		Atom* parent = nullptr;
 
 		//! Origins
-		struct
-		{
+		struct {
 			//! Target source
 			CTarget* target = nullptr;
 			//! File source
 			YString filename;
-
 			//! Start offset
 			uint32_t line = 0;
 			//! end offset
 			uint32_t offset = 0;
 		}
 		origin;
-
 
 		//! The return type
 		Vardef returnType;
@@ -491,25 +483,20 @@ namespace Nany
 		Parameters tmplparams;
 		//! Template parameters just for printing informations (such as errors)
 		Parameters tmplparamsForPrinting;
-
 		//! The maximum number of variables / classdefs registered for the atom
 		uint32_t localVariablesCount = 0u;
-
 		//! A different scope for name resolution, if not null (for plugs/outlets)
 		Atom* scopeForNameResolution = nullptr;
 
 		//! The original IR sequence
-		struct
-		{
+		struct {
 			//! The original IR sequence
 			IR::Sequence* sequence = nullptr;
 			//! Offset to start within this sequence
 			// \warning offset of the operands of the blueprint, not the opcode value
 			uint32_t offset = 0;
-
 			//! For capturing variables, it may be required to increase the IR stack size
 			uint32_t stackSizeExtra = 0;
-
 			//! Flag to determine whether the sequence is owned by the atom or not
 			bool owned = false;
 		}
@@ -520,7 +507,6 @@ namespace Nany
 		AnyString builtinalias;
 		//! Builtin type (!= nyt_void if this atom represents a builtin)
 		nytype_t builtinMapping = nyt_void;
-
 
 		//! List of potential candidates for being captured
 		std::unique_ptr<std::unordered_set<AnyString>> candidatesForCapture;
