@@ -208,7 +208,7 @@ namespace Producer
 
 
 
-	bool Scope::visitASTExprNumber(AST::Node& node, yuint32& localvar)
+	bool Scope::visitASTExprNumber(AST::Node& node, uint32_t& localvar)
 	{
 		assert(node.rule == AST::rgNumber);
 		assert(not node.children.empty());

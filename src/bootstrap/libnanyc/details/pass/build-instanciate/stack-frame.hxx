@@ -32,7 +32,7 @@ namespace Instanciate
 
 	inline uint32_t AtomStackFrame::localVariablesCount() const
 	{
-		return static_cast<yuint32>(lvids.size());
+		return static_cast<uint32_t>(lvids.size());
 	}
 
 

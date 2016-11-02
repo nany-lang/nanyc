@@ -826,7 +826,7 @@ namespace Nany
 					return i;
 			}
 		}
-		return static_cast<yuint32>(-1);
+		return static_cast<uint32_t>(-1);
 	}
 
 

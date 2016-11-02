@@ -76,7 +76,7 @@ namespace Nany
 
 	private:
 		std::vector<Atom*> m_byIndex;
-		yuint32 m_atomGrpID = 0;
+		uint32_t m_atomGrpID = 0;
 		friend class ClassdefTable;
 
 	}; // class AtomMap
