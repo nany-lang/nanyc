@@ -249,15 +249,18 @@ namespace Nany
 		}
 	}
 
+
 	inline uint Atom::Parameters::size() const
 	{
 		return (!!pData) ? pData.get()->count : 0;
 	}
 
+
 	inline bool Atom::Parameters::empty() const
 	{
 		return !pData;
 	}
+
 
 	inline bool Atom::Parameters::append(const CLID& clid, const AnyString& name)
 	{
@@ -273,22 +276,6 @@ namespace Nany
 			return true;
 		}
 		return false;
-	}
-
-
-	inline yuint32 Atom::Parameters::findByName(const AnyString& name, yuint32 offset) const
-	{
-		if (!!pData)
-		{
-			auto& internal = *pData.get();
-			uint32_t count = internal.count;
-			for (uint32_t i = offset; i < count; ++i)
-			{
-				if (name == internal.params[i].first)
-					return i;
-			}
-		}
-		return static_cast<yuint32>(-1);
 	}
 
 

@@ -814,6 +814,22 @@ namespace Nany
 	}
 
 
+	uint32_t Atom::Parameters::findByName(const AnyString& name, uint32_t offset) const
+	{
+		if (!!pData)
+		{
+			auto& internal = *pData.get();
+			uint32_t count = internal.count;
+			for (uint32_t i = offset; i < count; ++i)
+			{
+				if (name == internal.params[i].first)
+					return i;
+			}
+		}
+		return static_cast<yuint32>(-1);
+	}
+
+
 
 
 } // namespace Nany
