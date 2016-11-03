@@ -26,12 +26,10 @@ namespace Producer
 		// 'do' clause
 		AST::Node* forDoClause = nullptr;
 		AST::Node* forElseClause = nullptr;
-
 		if (debugmode)
 			out.emitComment("for");
 
 		OpcodeScopeLocker opscopeElse{out};
-
 		for (auto& child: node.children)
 		{
 			switch (child.rule)
@@ -44,7 +42,6 @@ namespace Producer
 					bool ok = visitASTExprIn(child, viewlvid, elementname);
 					if (unlikely(not ok))
 						return false;
-
 					if (unlikely(viewlvid == 0 or viewlvid == (uint32_t) -1))
 						return ice(child) << "invalid container lvid";
 					break;
@@ -93,9 +90,7 @@ namespace Producer
 			context.reuse.loops.elseScope->children = forElseClause->children;
 		}
 
-
 		bool success = visitASTStmt(*context.reuse.loops.node);
-
 		// cleanup
 		if (forDoClause)
 			scopeChildren.clear();
@@ -104,7 +99,6 @@ namespace Producer
 			context.reuse.loops.ifnode->children.pop_back();
 			context.reuse.loops.elseScope->children.clear();
 		}
-
 		return success;
 	}
 

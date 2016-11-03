@@ -348,8 +348,6 @@ namespace Producer
 	{
 		assert(node.rule == AST::rgVar);
 		assert(not node.children.empty());
-
-		// variable name
 		AnyString varname;
 		bool ref = false;
 		bool constant = false;
@@ -381,7 +379,6 @@ namespace Producer
 					varAssign = &child;
 					break;
 				}
-
 				case AST::rgVarType:
 				{
 					varType = &child;
@@ -391,7 +388,6 @@ namespace Producer
 						error(child) << "invalid type definition";
 					break;
 				}
-
 				case AST::rgVarByValue:
 				{
 					break; // nothing to do
@@ -414,12 +410,10 @@ namespace Producer
 					constant = true;
 					break;
 				}
-
 				case AST::rgFuncParamVariadic:
 				{
 					return (error(child) << "variadic parameter not allowed in variable definition");
 				}
-
 				default:
 					return unexpectedNode(child, "[var]");
 			}
@@ -427,10 +421,8 @@ namespace Producer
 
 		if (unlikely(varnodeDecl == nullptr))
 			return (ice() << "invalid null pointer for the var-decl node");
-
 		if (unlikely(varAssign == nullptr)) // the variable currently must have a default value
 			return (error(*varnodeDecl) << "value initialization is missing for '" << varname << '\'');
-
 
 		if (not isProperty)
 		{

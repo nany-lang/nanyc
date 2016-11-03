@@ -33,22 +33,17 @@ namespace Producer
 					IR::OpcodeScopeLocker opscope{out};
 					LVID localvar;
 					success &= visitASTExpr(child, localvar);
-
 					// generate error on the begining of the expr and not the return itself
 					emitDebugpos(child);
-
 					uint32_t tmplvid = sequence().emitStackalloc(nextvar(), nyt_any);
 					out.emitReturn(localvar, tmplvid);
-
 					hasReturnValue = true;
 					break;
 				}
-
 				default:
 					return unexpectedNode(child, "[ir/return]");
 			}
 		}
-
 		if (not hasReturnValue)
 		{
 			emitDebugpos(node);

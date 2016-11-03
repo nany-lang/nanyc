@@ -30,8 +30,6 @@ namespace Producer
 
 		bool inspect(AST::Node& node);
 
-
-	public:
 		//! Parent scope
 		Scope& scope;
 		//! Func body
@@ -43,7 +41,6 @@ namespace Producer
 		// (for 'self' parameters for example)
 		bool isNewOperator = false;
 
-
 	private:
 		bool inspectVisibility(AST::Node&);
 		bool inspectKind(AST::Node&);
@@ -52,7 +49,6 @@ namespace Producer
 		bool inspectSingleParameter(uint pindex, AST::Node&, uint32_t paramoffset);
 		bool inspectAttributes(Attributes&);
 
-	private:
 		//! Flag to determine whether the 'self' parameter is implicit
 		// (simply dictated if within a class)
 		bool hasImplicitSelf = false;
@@ -83,7 +79,6 @@ namespace Producer
 		{
 			// visibility from the node
 			nyvisibility_t visibility = nycstring_to_visibility_n(node.text.c_str(), node.text.size());
-
 			if (likely(visibility != nyv_undefined))
 			{
 				// in the global namespace, only 'public' and 'internal' are accepted
@@ -93,7 +88,6 @@ namespace Producer
 					error(node) << "invalid visibility '" << node.text << "'";
 					success = false;
 				}
-
 				// set the visibility
 				scope.emitDebugpos(node);
 				scope.sequence().emitVisibility(visibility);
@@ -170,7 +164,6 @@ namespace Producer
 					AnyString name = scope.getSymbolNameFromASTNode(symbolname);
 					if (not checkForValidIdentifierName(symbolname, name))
 						return false;
-
 					funcname.clear();
 					funcname << "^view^" << name;
 				}
@@ -227,7 +220,6 @@ namespace Producer
 					}
 					break;
 				}
-
 				case AST::rgVarType:
 				{
 					LVID paramtype = 0;
@@ -245,7 +237,6 @@ namespace Producer
 								success &= unexpectedNode(childtype, "[func/param-type]");
 						}
 					}
-
 					if (not lvidIsAny(paramtype) and paramtype != 0)
 					{
 						auto& operands    = scope.sequence().emit<ISA::Op::follow>();
@@ -255,7 +246,6 @@ namespace Producer
 					}
 					break;
 				}
-
 				case AST::rgFuncParamSelf:
 				{
 					if (likely(isNewOperator))
@@ -270,16 +260,14 @@ namespace Producer
 					}
 					break;
 				}
-
 				case AST::rgFuncParamVariadic:
 				{
 					error(child) << "variadic parameters not implemented";
 					success = false;
 					break;
 				}
-
 				default:
-				success = unexpectedNode(child, "[param]");
+					success = unexpectedNode(child, "[param]");
 			}
 		}
 
@@ -293,7 +281,6 @@ namespace Producer
 
 		// update the parameter name within the IR code (whatever previous result)
 		auto sid = scope.sequence().stringrefs.ref(paramname);
-
 		// update the parameter opcode
 		{
 			auto& opparam = scope.sequence().at<ISA::Op::blueprint>(paramoffset);
@@ -301,7 +288,6 @@ namespace Producer
 			if (autoMemberAssignment)
 				opparam.kind = (uint32_t) IR::ISA::Blueprint::paramself;
 		}
-
 		// the qualifiers may have been set by the type definition
 		// thus they must be overriden and not always reset
 		if (ref)
@@ -316,7 +302,6 @@ namespace Producer
 	{
 		// total number of parameters
 		uint32_t paramCount;
-
 		if (node != nullptr)
 		{
 			assert(node->rule == AST::rgFuncParams and "invalid func params node");
@@ -356,7 +341,6 @@ namespace Producer
 		// and variables for parameters start from 1
 		auto& out = scope.sequence();
 
-
 		// dealing first with the implicit parameter 'self'
 		if (hasImplicitSelf)
 		{
@@ -364,7 +348,6 @@ namespace Producer
 			out.emitBlueprintParam(selfid, "self");
 			out.emitSelf(selfid); // to resolve the type as 'self'
 		}
-
 		// iterating through all other user-defined parameters
 		uint32_t offset = (hasImplicitSelf) ? 1u : 0u;
 		if (paramCount - offset > 0U)
@@ -388,11 +371,9 @@ namespace Producer
 			// (especially for being able to use these types)
 			if (nodeTypeParams)
 				success &= scope.visitASTDeclGenericTypeParameters(*nodeTypeParams);
-
 			// inspecting each parameter
 			if (debugmode)
 				out.emitComment("function parameters");
-
 			// Generate IR (typing and default value) for each parameter
 			assert(node != nullptr and "should not be here if there is no real parameter");
 			for (uint32_t i = offset; i < paramCount; ++i)
@@ -417,12 +398,12 @@ namespace Producer
 			switch (child.rule)
 			{
 				case AST::rgType:
-					{
-						bool ok = scope.visitASTType(child, rettype);
-						if (unlikely(not ok))
-							return false;
-						break;
-					}
+				{
+					bool ok = scope.visitASTType(child, rettype);
+					if (unlikely(not ok))
+						return false;
+					break;
+				}
 				default:
 					return unexpectedNode(child, "[func/ret-type]");
 			}
@@ -459,7 +440,6 @@ namespace Producer
 			out.emitPragmaShortcircuit(1);
 			attrs.flags -= Attributes::Flag::shortcircuit;
 		}
-
 		if (attrs.flags(Attributes::Flag::builtinAlias))
 		{
 			assert(attrs.builtinAlias != nullptr);
@@ -470,20 +450,17 @@ namespace Producer
 			out.emitPragmaBuiltinAlias(value);
 			attrs.flags -= Attributes::Flag::builtinAlias;
 		}
-
 		if (attrs.flags(Attributes::Flag::doNotSuggest))
 		{
 			out.emitPragmaSuggest(0);
 			attrs.flags -= Attributes::Flag::doNotSuggest;
 			assert(not attrs.flags(Attributes::Flag::doNotSuggest));
 		}
-
 		if (attrs.flags(Attributes::Flag::threadproc))
 		{
 			// currently silently ignored
 			attrs.flags -= Attributes::Flag::threadproc;
 		}
-
 		return true;
 	}
 
@@ -499,11 +476,9 @@ namespace Producer
 		// the node related to the return type
 		AST::Node* nodeReturnType = nullptr;
 
-
 		// function attributes, if any
 		if (!!scope.attributes)
 			success &= inspectAttributes(*scope.attributes);
-
 		for (auto& child: node.children)
 		{
 			switch (child.rule)
@@ -521,7 +496,6 @@ namespace Producer
 
 		if (funcname.empty())
 			funcname = "<anonymous>";
-
 		// the code currently has some prerequisites:
 		// lvid %0: <invalid value>
 		// lvid %1: the return type
@@ -539,11 +513,9 @@ namespace Producer
 
 		// ...then the parameters
 		success &= inspectParameters(nodeParams, nodeGenTParams);
-
 		// generate opcodes for return type verification (after parameters)
 		if (nodeReturnType)
 			success &= inspectReturnType(*nodeReturnType);
-
 		return success;
 	}
 
@@ -580,7 +552,6 @@ namespace Producer
 		scope.addDebugCurrentFilename();
 		scope.emitDebugpos(node);
 
-
 		bool success = true;
 		bool isOperator = false;
 
@@ -604,7 +575,6 @@ namespace Producer
 		{
 			if (debugmode)
 				scope.comment("\nfunc body"); // comment for clarity in code
-
 			// continue evaluating the func body independantly of the previous data and results
 			for (auto& stmtnode: body->children)
 				success &= scope.visitASTStmt(stmtnode);

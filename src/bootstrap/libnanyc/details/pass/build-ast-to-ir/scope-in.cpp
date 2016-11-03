@@ -34,23 +34,18 @@ namespace Producer
 					auto& identifier = child.firstChild();
 					if (unlikely(identifier.rule != AST::rgIdentifier))
 						return ice(identifier) << "identifier expected";
-
 					if (unlikely(not checkForValidIdentifierName(child, identifier.text)))
 						return false;
-
 					elementname = identifier.text;
 					break;
 				}
-
 				case AST::rgInContainer:
 				{
 					if (unlikely(child.children.size() != 1))
 						return ice(child) << "invalid expression";
-
 					container = &child.firstChild();
 					break;
 				}
-
 				case AST::rgInViewName:
 				{
 					for (auto& vnnode: child.children)
@@ -60,7 +55,6 @@ namespace Producer
 							case AST::rgIdentifier:
 							{
 								requestedViewName = vnnode.text;
-
 								auto& children = vnnode.children;
 								if (not children.empty())
 								{
@@ -79,7 +73,6 @@ namespace Producer
 					}
 					break;
 				}
-
 				case AST::rgInPredicate:
 				{
 					if (unlikely(child.children.size() != 1))
@@ -87,7 +80,6 @@ namespace Producer
 					auto& expr = child.firstChild();
 					if (unlikely(expr.rule != AST::rgExpr))
 						return ice(expr) << "invalid node type for predicate";
-
 					predicate = &expr;
 					break;
 				}
@@ -126,7 +118,6 @@ namespace Producer
 		}
 		emitDebugpos(node);
 		bool success = visitASTExpr(*context.reuse.inset.node, localvar);
-
 
 		if (additionalParams) // remove the additional parameters
 		{

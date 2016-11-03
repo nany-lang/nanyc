@@ -154,10 +154,8 @@ namespace Producer
 	bool Scope::visitASTExpr(AST::Node& orignode, LVID& localvar, bool allowScope)
 	{
 		assert(not orignode.children.empty());
-
 		// reset the value of the localvar, result of the expr
 		localvar = 0;
-
 		// expr
 		// |   expr-value
 		AST::Node* nodeptr = &orignode;
@@ -201,7 +199,6 @@ namespace Producer
 		IR::Producer::Scope scope{*this};
 		if (unlikely(attrnode))
 			scope.visitASTAttributes(*attrnode);
-
 		bool r = scope.visitASTExprContinuation(node, localvar, allowScope);
 		if (r and localvar != 0 and localvar != (uint32_t) -1)
 		{

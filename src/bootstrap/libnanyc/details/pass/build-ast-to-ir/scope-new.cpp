@@ -59,14 +59,12 @@ namespace Producer
 					call = &child;
 					break;
 				}
-
 				case AST::rgNewShared:
 				{
 					error(child) << "'new shared': Distributed objects are not implemented yet";
 					success = false;
 					break;
 				}
-
 				case AST::rgNewParameters:
 				{
 					for (auto& param: child.children)
@@ -91,7 +89,6 @@ namespace Producer
 					}
 					break;
 				}
-
 				default:
 					return unexpectedNode(child, "[ir/new]");
 			}
@@ -100,13 +97,11 @@ namespace Producer
 		if (unlikely(not success))
 			return false;
 
-
 		// debug info
 		emitDebugpos((call ? *call : node));
 		auto& out = sequence();
 
 		out.emitTypeIsObject(rettype);
-
 
 		// OBJECT ALLOCATION
 		uint32_t pointer = 0;
