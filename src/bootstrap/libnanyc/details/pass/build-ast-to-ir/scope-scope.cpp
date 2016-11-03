@@ -32,11 +32,9 @@ namespace Producer
 
 		IR::OpcodeScopeLocker opscope{sequence()};
 		IR::Producer::Scope scope{*this};
-
 		bool success = true;
 		for (auto& child: node.children)
 			success &= scope.visitASTStmt(child);
-
 		return success;
 	}
 

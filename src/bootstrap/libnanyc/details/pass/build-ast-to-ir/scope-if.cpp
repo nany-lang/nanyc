@@ -67,7 +67,6 @@ namespace Producer
 
 				success &= visitASTStmt(thenNode);
 			}
-
 			// jump to the end to not execute the 'else' clause
 			if (customjmpthenOffset == nullptr)
 			{
@@ -83,7 +82,6 @@ namespace Producer
 				out.emitJmp(0); // will be filled later
 			}
 		}
-
 		// ...else
 		if (hasElseClause)
 		{
@@ -97,11 +95,9 @@ namespace Producer
 				OpcodeScopeLocker opscopeElse{out};
 				auto& elsec = *elseptr;
 				emitDebugpos(elsec);
-
 				if (unlikely(elsec.children.size() != 1))
 					return (ice(elsec) << "invalid if-then branch");
 				auto& elseNode = elsec.children[0];
-
 				success &= visitASTStmt(elseNode);
 			}
 		}
@@ -171,14 +167,12 @@ namespace Producer
 				success &= visitASTExpr(thenNode, thenlvid);
 				out.emitAssign(ifret, thenlvid, false);
 			}
-
 			if (hasElseClause)
 			{
 				opOffIntermediateEnd = out.opcodeCount();
 				out.emitJmp(labelEnd);
 			}
 		}
-
 		// ...else
 		if (hasElseClause)
 		{
@@ -239,13 +233,10 @@ namespace Producer
 	bool Scope::visitASTExprIfExpr(AST::Node& node, LVID& localvar)
 	{
 		assert(node.rule == AST::rgIf);
-
 		localvar = 0u;
-
 		AST::Node* condition = nullptr;
 		AST::Node* ifthen = nullptr;
 		AST::Node* ifelse = nullptr;
-
 		for (auto& child: node.children)
 		{
 			switch (child.rule)
@@ -256,12 +247,10 @@ namespace Producer
 				default: return unexpectedNode(child, "[if-stmt]");
 			}
 		}
-
 		if (unlikely(!condition or !ifthen))
 			return (error(node) << "invalid if-then node");
 		if (unlikely(!ifelse))
 			return (error(node) << "'else' clause is required for a conditional expression");
-
 		return generateIfExpr(localvar, *condition, *ifthen, *ifelse);
 	}
 

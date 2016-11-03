@@ -29,7 +29,6 @@ namespace Producer
 		// instanciate attributes
 		attributes = std::make_unique<Attributes>(node);
 		auto& attrs = *attributes;
-
 		// attribute name
 		ShortString32& attrname = context.reuse.attributes.attrname;
 		// temporary buffer for value interpretation
@@ -73,7 +72,6 @@ namespace Producer
 						break;
 					}
 				}
-
 				// [[fallthru]]
 				case 'p':
 				{
@@ -81,7 +79,6 @@ namespace Producer
 					{
 						if (unlikely(!nodevalue))
 							return (error(child) << "value expected for attribute '" << attrname << '\'');
-
 						AST::appendEntityAsString(value, *nodevalue);
 						if (value == "thread")
 						{
@@ -96,7 +93,6 @@ namespace Producer
 						break;
 					}
 				}
-
 				// [[fallthru]]
 				case 's':
 				{
@@ -108,7 +104,6 @@ namespace Producer
 						break;
 					}
 				}
-
 				// [[fallthru]]
 				case 't':
 				{
@@ -120,7 +115,6 @@ namespace Producer
 						break;
 					}
 				}
-
 				// [[fallthru]]
 				case '_':
 				{
@@ -128,17 +122,14 @@ namespace Producer
 					{
 						if (unlikely(!nodevalue))
 							return (error(child) << "value expected for attribute '" << attrname << '\'');
-
 						attrs.builtinAlias = nodevalue;
 						attrs.flags += Attributes::Flag::builtinAlias;
 						break;
 					}
-
 					if (attrname == "__nanyc_shortcircuit")
 					{
 						if (unlikely(!nodevalue))
 							return (error(child) << "value expected for attribute '" << attrname << '\'');
-
 						AST::appendEntityAsString(value, *nodevalue);
 						bool isTrue = (value == "__true");
 						if (not isTrue and (value.empty() or value != "__false"))
@@ -147,12 +138,10 @@ namespace Producer
 								<< value << "'";
 							return false;
 						}
-
 						if (isTrue)
 							attrs.flags += Attributes::Flag::shortcircuit;
 						break;
 					}
-
 					if (attrname == "__nanyc_synthetic")
 					{
 						attrs.flags += Attributes::Flag::pushSynthetic;
@@ -160,7 +149,6 @@ namespace Producer
 							return (error(child) << "the attribute '" << attrname << "' does not accept values");
 						break;
 					}
-
 					// [FALLBACK]
 					// ignore vendor specific attributes (starting by '__')
 					if (attrname.size() > 2 and attrname[1] == '_')
@@ -171,7 +159,6 @@ namespace Producer
 						break;
 					}
 				}
-
 				// [[fallthru]]
 				default:
 				{

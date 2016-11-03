@@ -19,7 +19,6 @@ namespace Producer
 	{
 		assert(node.rule == AST::rgIntrinsic);
 		assert(not node.children.empty());
-
 		bool success = true;
 		ShortString128 intrinsicname;
 
@@ -49,24 +48,20 @@ namespace Producer
 					}
 					break;
 				}
-
 				case AST::rgIdentifier:
 				{
 					intrinsicname = child.text;
 					break;
 				}
-
 				case AST::rgCall:
 				{
 					success &= visitASTExprCallParameters(child);
 					break;
 				}
-
 				default:
 					success = unexpectedNode(child, "[intrinsic]");
 			}
 		}
-
 		// create a value even if nothing
 		emitDebugpos(node);
 		localvar = sequence().emitStackalloc(nextvar(), nyt_any);

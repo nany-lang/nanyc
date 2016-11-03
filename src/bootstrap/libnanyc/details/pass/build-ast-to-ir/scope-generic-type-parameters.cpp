@@ -113,7 +113,6 @@ namespace Producer
 			sequence().emitComment("generic type parameters");
 
 		bool success = true;
-
 		for (auto& child: node.children)
 		{
 			switch (child.rule)
@@ -143,7 +142,6 @@ namespace Producer
 				{
 					lastPushedTmplParams = std::make_unique<std::vector<std::pair<uint32_t,AnyString>>>();
 					lastPushedTmplParams->reserve(child.children.size());
-
 					bool success = true;
 					for (auto& param: child.children)
 					{
@@ -159,7 +157,6 @@ namespace Producer
 								return unexpectedNode(param, "[expr-template-param]");
 						}
 					}
-
 					if (unlikely(not success))
 						return false;
 					break;

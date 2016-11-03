@@ -37,7 +37,6 @@ namespace Producer
 		uint32_t casecondlvid = nextvar();
 		out.emitStackalloc(casecondlvid, nyt_bool);
 
-
 		// the current implementation generates a 'if' statement for each 'case'
 		// these variables are for simulating an AST node
 		AST::Node::Ptr exprCase = new AST::Node{AST::rgExpr};
@@ -58,14 +57,12 @@ namespace Producer
 		AST::Node::Ptr rhs = new AST::Node{AST::rgCallParameter};
 		call->children.push_back(rhs);
 
-
 		// using a scope for the body to have proper variable scoping
 		AST::Node bodyScope{AST::rgScope};
 
 		//! list of labels to update (to jump at the end of the switch-case when a cond matches)
 		auto labels = std::make_unique<uint32_t[]>(node.children.size());
 		uint32_t labelCount = 0;
-
 
 		for (auto& child: node.children)
 		{
@@ -79,22 +76,18 @@ namespace Producer
 						return (ice(child) << "switch: unexpected lvid value");
 					if (unlikely(child.children.size() != 2))
 						return unexpectedNode(child, "[ir/switch/case]");
-
 					if (success)
 					{
 						OpcodeScopeLocker opscopeCase{out};
 						rhs->children.clear();
 						rhs->children.push_back(&(child.children[0]));
-
 						bodyScope.children.clear();
 						bodyScope.children.push_back(&(child.children[1]));
-
 						success &= generateIfStmt(*exprCase, bodyScope, /*else*/nullptr, &(labels[labelCount]));
 						++labelCount;
 					}
 					break;
 				}
-
 				case AST::rgSwitchExpr:
 				{
 					if (child.children.size() == 1)
@@ -102,7 +95,6 @@ namespace Producer
 						auto& condition = child.children[0];
 						emitDebugpos(condition);
 						success &= visitASTExpr(condition, valuelvid, false);
-
 						// updating lhs for operator ==
 						lvidstr = valuelvid;
 						lhsValue->text = lvidstr;
@@ -121,7 +113,6 @@ namespace Producer
 		// update all labels for jumping to the end
 		for (uint32_t i = 0 ; i != labelCount; ++i)
 			out.at<IR::ISA::Op::jmp>(labels[i]).label = labelEnd;
-
 		return success;
 	}
 

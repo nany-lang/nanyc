@@ -27,8 +27,6 @@ namespace Producer
 		bool inspect(AST::Node& node);
 		bool inspectBody(AST::Node& node);
 
-
-	public:
 		//! Parent scope
 		IR::Producer::Scope scope;
 
@@ -39,10 +37,8 @@ namespace Producer
 
 		//! Class body
 		AST::Node* body = nullptr;
-
 		//! name of the class (if any)
 		ClassnameType classname;
-
 
 	private:
 		bool inspectClassname(AST::Node&);
@@ -68,7 +64,6 @@ namespace Producer
 		scope.nextvar();
 
 		auto& out = scope.sequence();
-
 		// creating a new blueprint for the function
 		bpoffset = out.emitBlueprintClass(lvid);
 		bpoffsiz = out.emitBlueprintSize();
@@ -113,7 +108,6 @@ namespace Producer
 					success &= unexpectedNode(child, "[class]");
 			}
 		}
-
 		if (classname.empty())
 			classname = "<anonymous>";
 
@@ -127,15 +121,12 @@ namespace Producer
 			scope.context.prepareReuseForClasses();
 
 		scope.emitDebugpos(node);
-
 		// default constructor
 		reuse.operatorDefault.funcname->text = "^default-new";
 		success &= scope.visitASTFunc(*reuse.operatorDefault.node);
-
 		// destructor
 		reuse.operatorDefault.funcname->text = "^dispose";
 		success &= scope.visitASTFunc(*reuse.operatorDefault.node);
-
 		// copy constructor
 		reuse.operatorClone.funcname->text = "^obj-clone";
 		success &= scope.visitASTFunc(*(reuse.operatorClone.node));
@@ -147,24 +138,20 @@ namespace Producer
 	{
 		bool success = true;
 		auto& out = scope.sequence();
-
 		// evaluate the whole function, and grab the node body for continuing evaluation
 		{
 			success = inspect(node);
 			auto& operands = out.at<ISA::Op::blueprint>(bpoffset);
 			operands.name = out.stringrefs.ref(classname);
 		}
-
 		if (likely(body != nullptr))
 		{
 			if (debugmode)
 				scope.comment("\nclass body"); // comment for clarity in code
-
 			// continue evaluating the func body independantly of the previous data and results
 			for (auto& stmtnode: body->children)
 				success &= scope.visitASTStmt(stmtnode);
 		}
-
 
 		// end of the blueprint
 		out.emitEnd();
@@ -184,14 +171,12 @@ namespace Producer
 	{
 		assert(node.rule == AST::rgClass);
 		assert(not node.children.empty());
-
 		if (unlikely(context.ignoreAtoms))
 			return true;
 
 		uint32_t lvid = 0;
 		if (localvar) // create the lvid before the new scope
 			*localvar = (lvid = nextvar());
-
 		auto classbuilder = std::make_unique<ClassInspector>(*this, lvid);
 		return classbuilder->inspectBody(node);
 	}

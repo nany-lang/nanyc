@@ -252,7 +252,6 @@ namespace Producer
 								}
 								break;
 							}
-
 							default:
 							{
 								ice(subnode) << "[expr-number]";
@@ -262,7 +261,6 @@ namespace Producer
 					}
 					break;
 				}
-
 				case AST::rgNumberSign: // + -
 				{
 					assert(not child.text.empty() and "invalid ast");
@@ -270,7 +268,6 @@ namespace Producer
 					assert(numdef.sign == '+' or numdef.sign == '-');
 					break;
 				}
-
 				case AST::rgNumberQualifier: // unsigned / signed / float
 				{
 					for (auto& subnode: child.children)
@@ -321,10 +318,8 @@ namespace Producer
 							}
 						}
 					}
-
 					break;
 				}
-
 				default:
 				{
 					ice(child) << "[expr-number]";
@@ -332,9 +327,7 @@ namespace Producer
 				}
 			}
 		}
-
 		assert(numdef.bits == 64 or numdef.bits == 32 or numdef.bits == 16 or numdef.bits == 8);
-
 		return (not builtin)
 			? generateNumberCode<false>(*this, localvar, numdef, node)
 			: generateNumberCode<true> (*this, localvar, numdef, node);
