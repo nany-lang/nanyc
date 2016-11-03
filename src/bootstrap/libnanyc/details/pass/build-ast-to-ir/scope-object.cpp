@@ -110,8 +110,7 @@ namespace Producer
 		}
 
 		bool success = visitASTExpr(*context.reuse.object.node, localvar);
-
-		classbody.clear();
+		classbody.children.clear();
 		return success;
 	}
 
