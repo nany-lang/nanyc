@@ -5,7 +5,7 @@ using namespace Yuni;
 
 
 
-namespace Nany
+namespace ny
 {
 
 	AST::Node* ASTHelper::nodeAppend(AST::Node& parent, enum AST::Rule rule)
@@ -54,4 +54,4 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny

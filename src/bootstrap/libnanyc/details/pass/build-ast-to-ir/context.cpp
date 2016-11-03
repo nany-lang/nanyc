@@ -7,7 +7,7 @@ using namespace Yuni;
 
 
 
-namespace Nany
+namespace ny
 {
 namespace IR
 {
@@ -619,4 +619,4 @@ namespace Producer
 
 } // namespace Producer
 } // namespace IR
-} // namespace Nany
+} // namespace ny

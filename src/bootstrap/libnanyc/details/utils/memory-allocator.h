@@ -6,7 +6,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 namespace Memory
 {
@@ -92,4 +92,4 @@ namespace Memory
 
 
 } // namespace Memory
-} // namespace Nany
+} // namespace ny

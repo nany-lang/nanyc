@@ -3,7 +3,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 
 	inline bool ClassdefOverloads::empty() const
@@ -37,4 +37,4 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny

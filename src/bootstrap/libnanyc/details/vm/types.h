@@ -4,10 +4,9 @@
 #include <exception>
 
 
-
-namespace Nany
+namespace ny
 {
-namespace VM
+namespace vm
 {
 
 	union DataRegister
@@ -18,16 +17,11 @@ namespace VM
 	};
 
 
-	struct CodeAbort: public std::exception
+	struct CodeAbort final : public std::exception
 	{
 		virtual const char* what() const throw() { return ""; }
 	};
 
 
-
-
-
-
-
-} // namespace VM
-} // namespace Nany
+} // namespace vm
+} // namespace ny

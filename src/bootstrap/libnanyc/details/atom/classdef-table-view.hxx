@@ -3,7 +3,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 
 	inline ClassdefTableView::ClassdefTableView(ClassdefTable& table)
@@ -143,4 +143,4 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny

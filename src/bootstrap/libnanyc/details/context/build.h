@@ -10,7 +10,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 
 	class Build final
@@ -145,13 +145,13 @@ namespace Nany
 
 
 
-	//! Convert a nyproject_t into a Nany::Project
+	//! Convert a nyproject_t into a ny::Project
 	Build& ref(nybuild_t* const);
-	//! Convert a nyproject_t into a Nany::Project
+	//! Convert a nyproject_t into a ny::Project
 	const Build& ref(const nybuild_t* const);
 
 
 
-} // namespace Nany
+} // namespace ny
 
 #include "build.hxx"

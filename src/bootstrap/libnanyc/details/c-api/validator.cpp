@@ -13,15 +13,15 @@ using namespace Yuni;
 namespace // anonymous
 {
 
-	static inline bool tryFindErrorNode(const Nany::AST::Node& allnodes)
+	static inline bool tryFindErrorNode(const ny::AST::Node& allnodes)
 	{
-		std::vector<std::reference_wrapper<const Nany::AST::Node>> stack;
+		std::vector<std::reference_wrapper<const ny::AST::Node>> stack;
 		stack.reserve(128); // to reduce memory reallocations
 		stack.push_back(std::cref(allnodes));
 		do
 		{
 			auto& node = stack.back().get();
-			if (Nany::AST::ruleIsError(node.rule))
+			if (ny::AST::ruleIsError(node.rule))
 				return false;
 
 			stack.pop_back();
@@ -47,7 +47,7 @@ extern "C" nybool_t nytry_parse_file_n(const char* const filename, size_t length
 		{
 			String path{filename, static_cast<uint32_t>(length)};
 
-			Nany::AST::Parser parser;
+			ny::AST::Parser parser;
 			success = parser.loadFromFile(path);
 
 			if (success)

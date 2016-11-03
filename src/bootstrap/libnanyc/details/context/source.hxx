@@ -3,7 +3,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 
 	inline void Source::resetTarget(CTarget* target)
@@ -15,4 +15,4 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny

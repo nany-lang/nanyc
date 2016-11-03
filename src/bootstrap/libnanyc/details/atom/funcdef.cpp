@@ -6,7 +6,7 @@ using namespace Yuni;
 
 
 
-namespace Nany
+namespace ny
 {
 
 	void Funcdef::print(Yuni::String& out, bool clearBefore) const
@@ -64,4 +64,4 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny

@@ -10,7 +10,7 @@ using namespace Yuni;
 
 
 
-namespace Nany
+namespace ny
 {
 
 	/*static*/ const Classdef Classdef::nullcdef;
@@ -75,4 +75,4 @@ namespace Nany
 	}
 
 
-} // namespace Nany
+} // namespace ny

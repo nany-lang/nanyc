@@ -180,9 +180,9 @@ static nyio_err_t nanyc_io_fallback_file_exists(nyio_adapter_t*, const char*, ui
 
 
 
-namespace Nany
+namespace ny
 {
-namespace VM
+namespace vm
 {
 
 	void ThreadContext::initFallbackAdapter(nyio_adapter_t& adapter)
@@ -226,5 +226,5 @@ namespace VM
 
 
 
-} // namespace VM
-} // namespace Nany
+} // namespace vm
+} // namespace ny

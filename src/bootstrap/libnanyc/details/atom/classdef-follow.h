@@ -6,7 +6,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 
 	class ClassdefFollow final
@@ -36,6 +36,6 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny
 
 #include "classdef-follow.hxx"

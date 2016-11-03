@@ -6,9 +6,9 @@ using namespace Yuni;
 
 
 
-namespace Nany
+namespace ny
 {
-namespace VM
+namespace vm
 {
 
 	void Stacktrace<true>::grow()
@@ -79,9 +79,5 @@ namespace VM
 	}
 
 
-
-
-
-
-} // namespace VM
-} // namespace Nany
+} // namespace vm
+} // namespace ny

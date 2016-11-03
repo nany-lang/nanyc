@@ -31,15 +31,15 @@ extern "C" nyprogram_t* nyprogram_prepare(nybuild_t* build, const nyprogram_cf_t
 {
 	if (build)
 	{
-		Nany::VM::Program* program;
+		ny::vm::Program* program;
 		if (cf)
 		{
 			auto& allocator = const_cast<nyallocator_t&>(cf->allocator);
-			void* inplace = allocator.allocate(&allocator, sizeof(Nany::VM::Program));
+			void* inplace = allocator.allocate(&allocator, sizeof(ny::vm::Program));
 			if (unlikely(!inplace))
 				return nullptr;
 
-			program = new (inplace) Nany::VM::Program(*cf, build);
+			program = new (inplace) ny::vm::Program(*cf, build);
 		}
 		else
 		{
@@ -47,11 +47,11 @@ extern "C" nyprogram_t* nyprogram_prepare(nybuild_t* build, const nyprogram_cf_t
 			nyprogram_cf_init(&ncf, nullptr);
 
 			auto& allocator = const_cast<nyallocator_t&>(ncf.allocator);
-			void* inplace = allocator.allocate(&allocator, sizeof(Nany::VM::Program));
+			void* inplace = allocator.allocate(&allocator, sizeof(ny::vm::Program));
 			if (unlikely(!inplace))
 				return nullptr;
 
-			program = new (inplace) Nany::VM::Program(ncf, build);
+			program = new (inplace) ny::vm::Program(ncf, build);
 		}
 
 		program->addRef();
@@ -65,7 +65,7 @@ extern "C" int nyprogram_main(nyprogram_t* ptr, uint32_t argc, const char** argv
 {
 	if (ptr and argc != 0 and argv != nullptr)
 	{
-		auto& program = Nany::ref(ptr);
+		auto& program = ny::ref(ptr);
 		return program.execute(argc, argv);
 	}
 	return 1;
@@ -75,7 +75,7 @@ extern "C" int nyprogram_main(nyprogram_t* ptr, uint32_t argc, const char** argv
 extern "C" void nyprogram_ref(nyprogram_t* program)
 {
 	if (program)
-		Nany::ref(program).addRef();
+		ny::ref(program).addRef();
 }
 
 
@@ -83,7 +83,7 @@ extern "C" void nyprogram_unref(nyprogram_t* ptr)
 {
 	if (ptr)
 	{
-		auto& program = Nany::ref(ptr);
+		auto& program = ny::ref(ptr);
 		if (program.release())
 			program.destroy();
 	}

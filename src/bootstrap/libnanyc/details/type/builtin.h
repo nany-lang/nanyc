@@ -5,7 +5,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 namespace Type
 {
@@ -60,4 +60,4 @@ namespace Builtin
 
 } // namespace Builtin
 } // namespace Type
-} // namespace Nany
+} // namespace ny

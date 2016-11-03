@@ -10,7 +10,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 
 	// forward class
@@ -115,7 +115,7 @@ namespace Nany
 		//@{
 		/*!
 		** \brief Get the keyword associated to an atom (class, func, var, cref, namespace...)
-		** \see Nany::Atom::keyword()
+		** \see ny::Atom::keyword()
 		*/
 		AnyString keyword(const Atom&) const;
 
@@ -197,6 +197,6 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny
 
 #include "classdef-table.hxx"

@@ -7,7 +7,7 @@ using namespace Yuni;
 
 
 
-namespace Nany
+namespace ny
 {
 namespace Pass
 {
@@ -962,4 +962,4 @@ namespace Mapping
 
 } // namespace Mapping
 } // namespace Pass
-} // namespace Nany
+} // namespace ny

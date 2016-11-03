@@ -48,7 +48,7 @@ static bool _nanyc_console_err_has_colors(nyvm_t* vm)
 
 
 
-namespace Nany
+namespace ny
 {
 
 	void importNSLConsole(IntrinsicTable& intrinsics)
@@ -62,4 +62,4 @@ namespace Nany
 	}
 
 
-} // namespace Nany
+} // namespace ny

@@ -14,7 +14,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 
 	//! Local var ID
@@ -31,13 +31,13 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny
 
 
-namespace Nany { namespace AST { class Node; } }
+namespace ny { namespace AST { class Node; } }
 
 
-namespace Nany
+namespace ny
 {
 namespace Logs
 {
@@ -47,4 +47,4 @@ namespace Logs
 
 
 } // namespace Logs
-} // namespace Nany
+} // namespace ny

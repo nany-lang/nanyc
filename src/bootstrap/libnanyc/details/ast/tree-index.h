@@ -8,7 +8,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 
 	class ASTHelper final
@@ -57,6 +57,6 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny
 
 #include "tree-index.hxx"

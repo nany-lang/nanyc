@@ -14,7 +14,7 @@ using namespace Yuni;
 
 
 
-namespace Nany
+namespace ny
 {
 namespace Pass
 {
@@ -284,12 +284,12 @@ namespace Instanciate
 
 } // namespace Instanciate
 } // namespace Pass
-} // namespace Nany
+} // namespace ny
 
 
 
 
-namespace Nany
+namespace ny
 {
 
 
@@ -301,7 +301,7 @@ namespace Nany
 
 	bool Build::instanciate(const AnyString& entrypoint, const nytype_t* args, uint32_t& atomid, uint32_t& instanceid)
 	{
-		Nany::Logs::Report report{*messages.get()};
+		ny::Logs::Report report{*messages.get()};
 
 		if (unlikely(args))
 		{
@@ -377,4 +377,4 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny

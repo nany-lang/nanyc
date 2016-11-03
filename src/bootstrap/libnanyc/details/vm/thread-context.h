@@ -7,9 +7,9 @@
 
 
 
-namespace Nany
+namespace ny
 {
-namespace VM
+namespace vm
 {
 
 	struct Mountpoint final
@@ -103,12 +103,7 @@ namespace VM
 	}; // class ThreadContext
 
 
-
-
-
-
-
-} // namespace VM
-} // namespace Nany
+} // namespace vm
+} // namespace ny
 
 #include "thread-context.hxx"

@@ -3,10 +3,9 @@
 using namespace Yuni;
 
 
-
-namespace Nany
+namespace ny
 {
-namespace VM
+namespace vm
 {
 
 	void MemChecker<true>::releaseAll(nyallocator_t& allocator)
@@ -25,7 +24,6 @@ namespace VM
 		auto print = [&](const AnyString& msg) {
 			cf.console.write_stderr(cf.console.internal, msg.c_str(), msg.size());
 		};
-
 		ShortString128 msg;
 		print("\n\n=== nany vm: memory leaks detected in ");
 		msg << ownedPointers.size();
@@ -45,9 +43,5 @@ namespace VM
 	}
 
 
-
-
-
-
-} // namespace VM
-} // namespace Nany
+} // namespace vm
+} // namespace ny

@@ -14,7 +14,7 @@ using namespace Yuni;
 
 
 
-namespace Nany
+namespace ny
 {
 namespace Pass
 {
@@ -346,7 +346,7 @@ namespace Instanciate
 					decltype(Pass::Instanciate::FuncOverloadMatch::result.params) tmplparams;
 					Logs::Message::Ptr newReport;
 					// error reporting
-					Nany::Logs::Report report{*build.messages.get()};
+					ny::Logs::Report report{*build.messages.get()};
 
 					Pass::Instanciate::InstanciateData info {
 						newReport, atom, cdeftblView, build, params, tmplparams
@@ -867,4 +867,4 @@ namespace Instanciate
 
 } // namespace Instanciate
 } // namespace Pass
-} // namespace Nany
+} // namespace ny

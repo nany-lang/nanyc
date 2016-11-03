@@ -3,7 +3,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 
 	inline bool ClassdefInterface::hasSelf() const
@@ -60,4 +60,4 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny

@@ -8,7 +8,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 
 	// forward declaration
@@ -75,6 +75,6 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny
 
 #include "signature.hxx"

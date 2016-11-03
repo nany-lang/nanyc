@@ -15,7 +15,7 @@ using namespace Yuni;
 
 
 
-namespace Nany
+namespace ny
 {
 
 	namespace {
@@ -90,7 +90,7 @@ namespace Nany
 		assert(!!entity and "mismatch grammar");
 		nmspc.first.clear();
 		nmspc.second = const_cast<AST::Node*>(&node);
-		entity->extractChildText(nmspc.first, Nany::AST::rgIdentifier, ".");
+		entity->extractChildText(nmspc.first, ny::AST::rgIdentifier, ".");
 
 		uint32_t depth = nmspc.first.countChar('.');
 		if (depth + 1 >= Config::maxNamespaceDepth)
@@ -720,4 +720,4 @@ namespace Nany
 	}
 
 
-} // namespace Nany
+} // namespace ny

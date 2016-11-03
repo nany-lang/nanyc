@@ -13,7 +13,7 @@ using namespace Yuni;
 
 
 
-namespace Nany
+namespace ny
 {
 
 	Source::Source(CTarget* target, Source::Type type, AnyString filename, AnyString content)
@@ -170,4 +170,4 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny

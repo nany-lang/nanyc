@@ -3,7 +3,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 
 	bool Source::passASTFromSourceWL()
@@ -22,4 +22,4 @@ namespace Nany
 	}
 
 
-} // namespace Nany
+} // namespace ny

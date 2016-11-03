@@ -4,7 +4,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 
 	inline void ClassdefTable::LayerItem::swap(ClassdefTable::LayerItem& rhs)
@@ -58,4 +58,4 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny

@@ -3,7 +3,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 
 	inline Funcdef::Funcdef(const AnyString& name)
@@ -76,4 +76,4 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny

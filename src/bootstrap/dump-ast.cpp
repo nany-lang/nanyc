@@ -24,12 +24,12 @@ bool printAST(const AnyString filename, bool unixcolors)
 	if (filename.empty())
 		return false;
 
-	Nany::AST::Parser parser;
+	ny::AST::Parser parser;
 	bool success = parser.loadFromFile(filename);
 	if (parser.root != nullptr) // the AST might be empty
 	{
 		Clob out;
-		Nany::AST::Node::Export(out, *parser.root, unixcolors);
+		ny::AST::Node::Export(out, *parser.root, unixcolors);
 		std::cout.write(out.c_str(), out.size());
 	}
 	return success;

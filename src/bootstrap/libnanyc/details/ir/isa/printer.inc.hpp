@@ -7,7 +7,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 namespace IR
 {
@@ -23,7 +23,7 @@ namespace // anonymous
 		Yuni::String tmp;
 		const Sequence& sequence;
 		const Instruction** cursor = nullptr;
-		const Nany::AtomMap* atommap = nullptr;
+		const ny::AtomMap* atommap = nullptr;
 		Yuni::ShortString64 lineHeader;
 		uint32_t lastOffset = (uint32_t) -1;
 		uint32_t offset = 0;
@@ -844,7 +844,7 @@ namespace // anonymous
 
 
 
-		template<Nany::IR::ISA::Op O> inline void visit(const Operand<O>& instr)
+		template<ny::IR::ISA::Op O> inline void visit(const Operand<O>& instr)
 		{
 			print(instr);
 			printEOL();
@@ -865,4 +865,4 @@ namespace // anonymous
 } // anonymous namespace
 } // namespace ISA
 } // namespace IR
-} // namespace Nany
+} // namespace ny

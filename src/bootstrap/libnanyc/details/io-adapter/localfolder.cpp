@@ -308,7 +308,7 @@ namespace // anonymous
 		if (readsize != 0)
 		{
 			// ensuring that there is enough space
-			if (newcapacity < readsize + Nany::Config::extraObjectSize)
+			if (newcapacity < readsize + ny::Config::extraObjectSize)
 				buffer = (char*) allocator.reallocate(&allocator, buffer, newcapacity, newcapacity + fragmentSize);
 			*size = readsize;
 			*content = buffer;
@@ -368,7 +368,7 @@ static nyio_err_t nanyc_io_localfolder_file_get_contents(nyio_adapter_t* adapter
 
 	if (filesize < fragmentSize)
 	{
-		newcapacity = filesize + Nany::Config::extraObjectSize;
+		newcapacity = filesize + ny::Config::extraObjectSize;
 
 		auto& allocator = retrieveAllocator(adapter);
 		buffer = (char*) allocator.allocate(&allocator, newcapacity);
@@ -387,7 +387,7 @@ static nyio_err_t nanyc_io_localfolder_file_get_contents(nyio_adapter_t* adapter
 		// rounding the capacity to avoid any unexpected buffer overflow
 		// when reading the file
 		newcapacity = ((filesize + fragmentSize / 2) / fragmentSize) * fragmentSize;
-		if (newcapacity < filesize + Nany::Config::extraObjectSize)
+		if (newcapacity < filesize + ny::Config::extraObjectSize)
 			newcapacity += fragmentSize;
 		assert(newcapacity >= filesize);
 

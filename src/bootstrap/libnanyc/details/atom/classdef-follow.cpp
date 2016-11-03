@@ -5,7 +5,7 @@ using namespace Yuni;
 
 
 
-namespace Nany
+namespace ny
 {
 
 	void ClassdefFollow::print(Yuni::String& out, bool clearBefore) const
@@ -26,4 +26,4 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny

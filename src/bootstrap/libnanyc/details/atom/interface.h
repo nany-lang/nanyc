@@ -5,7 +5,7 @@
 #include "funcdef.h"
 
 
-namespace Nany
+namespace ny
 {
 
 	class ClassdefInterface final
@@ -51,7 +51,7 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny
 
 #include "interface.hxx"
 

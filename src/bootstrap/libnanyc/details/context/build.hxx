@@ -3,7 +3,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 
 
@@ -43,13 +43,13 @@ namespace Nany
 	inline Build& ref(nybuild_t* const ptr)
 	{
 		assert(ptr != nullptr);
-		return *(reinterpret_cast<Nany::Build*>(ptr));
+		return *(reinterpret_cast<ny::Build*>(ptr));
 	}
 
 	inline const Build& ref(const nybuild_t* const ptr)
 	{
 		assert(ptr != nullptr);
-		return *(reinterpret_cast<const Nany::Build*>(ptr));
+		return *(reinterpret_cast<const ny::Build*>(ptr));
 	}
 
 
@@ -97,4 +97,4 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny

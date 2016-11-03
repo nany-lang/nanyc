@@ -37,7 +37,7 @@ static uint32_t nanyc_string_append_ptr(nyvm_t*, void* string, void* ptr)
 
 
 
-namespace Nany
+namespace ny
 {
 
 	void importNSLCoreString(IntrinsicTable& intrinsics)
@@ -57,4 +57,4 @@ namespace Nany
 		intrinsics.add("__nanyc.cout", nanyc_cout);
 	}
 
-} // namespace Nany
+} // namespace ny

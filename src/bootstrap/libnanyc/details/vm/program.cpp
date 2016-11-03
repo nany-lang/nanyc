@@ -7,16 +7,12 @@
 using namespace Yuni;
 
 
-
-
-
-namespace Nany
+namespace ny
 {
-namespace VM
+namespace vm
 {
 
 	namespace {
-
 
 	void flushAll(nyconsole_t& console)
 	{
@@ -27,7 +23,6 @@ namespace VM
 		}
 	}
 
-
 	} // anonymous namespace
 
 
@@ -37,7 +32,7 @@ namespace VM
 	{
 		this->~Program();
 		auto& allocator = const_cast<nyallocator_t&>(cf.allocator);
-		allocator.deallocate(&allocator, this, sizeof(Nany::VM::Program));
+		allocator.deallocate(&allocator, this, sizeof(ny::vm::Program));
 	}
 
 
@@ -58,8 +53,8 @@ namespace VM
 		(void) argv;
 
 		retvalue = 1; // EXIT_FAILURE
-		uint32_t atomid = Nany::ref(build).main.atomid;
-		uint32_t instanceid = Nany::ref(build).main.instanceid;
+		uint32_t atomid = ny::ref(build).main.atomid;
+		uint32_t instanceid = ny::ref(build).main.instanceid;
 
 		auto& sequence = map.sequence(atomid, instanceid);
 		ThreadContext thrctx{*this, AnyString{cf.entrypoint.c_str, cf.entrypoint.size}};
@@ -94,7 +89,5 @@ namespace VM
 	}
 
 
-
-
-} // namespace VM
-} // namespace Nany
+} // namespace vm
+} // namespace ny

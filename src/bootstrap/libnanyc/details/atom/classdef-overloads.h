@@ -5,7 +5,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 
 	class ClassdefOverloads final
@@ -38,6 +38,6 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny
 
 #include "classdef-overloads.hxx"

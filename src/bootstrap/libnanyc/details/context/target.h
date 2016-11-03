@@ -13,7 +13,7 @@ namespace Yuni { namespace Job { class Taskgroup; }}
 
 
 
-namespace Nany
+namespace ny
 {
 
 	class Project;

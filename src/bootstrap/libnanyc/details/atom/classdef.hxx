@@ -3,7 +3,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 
 	inline Classdef::Classdef()
@@ -166,4 +166,4 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny

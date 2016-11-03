@@ -2,7 +2,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 
 	size_t BuildInfoSource::inspectMemoryUsage() const
@@ -16,4 +16,4 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny

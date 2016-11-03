@@ -2,7 +2,7 @@
 #include "target.h"
 
 
-namespace Nany
+namespace ny
 {
 
 	inline nytarget_t* CTarget::self()

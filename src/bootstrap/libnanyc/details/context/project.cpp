@@ -7,7 +7,7 @@ using namespace Yuni;
 
 
 
-namespace Nany
+namespace ny
 {
 
 	CTarget::Ptr Project::doCreateTarget(const AnyString& name)
@@ -66,9 +66,9 @@ namespace Nany
 		this->~Project();
 
 		auto& allocator = cf.allocator;
-		allocator.deallocate(&allocator, this, sizeof(Nany::Project));
+		allocator.deallocate(&allocator, this, sizeof(ny::Project));
 	}
 
 
 
-} // namespace Nany
+} // namespace ny

@@ -17,7 +17,7 @@ static T nanyc_strlen(nyvm_t*, void* string)
 
 
 
-namespace Nany
+namespace ny
 {
 
 	void importNSLMemory(IntrinsicTable& intrinsics)
@@ -27,4 +27,4 @@ namespace Nany
 	}
 
 
-} // namespace Nany
+} // namespace ny

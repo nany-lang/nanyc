@@ -51,7 +51,7 @@ namespace // anonymous
 static bool nanyc_io_set_cwd(nyvm_t* vm, void* string, uint32_t size)
 {
 	assert(vm != nullptr);
-	auto& tc = *reinterpret_cast<Nany::VM::ThreadContext*>(vm->tctx);
+	auto& tc = *reinterpret_cast<ny::vm::ThreadContext*>(vm->tctx);
 	tc.io.cwd = AnyString{reinterpret_cast<const char*>(string), size};
 	return true;
 }
@@ -60,7 +60,7 @@ static bool nanyc_io_set_cwd(nyvm_t* vm, void* string, uint32_t size)
 static const void* nanyc_io_get_cwd(nyvm_t* vm)
 {
 	assert(vm != nullptr);
-	auto& tc = *reinterpret_cast<Nany::VM::ThreadContext*>(vm->tctx);
+	auto& tc = *reinterpret_cast<ny::vm::ThreadContext*>(vm->tctx);
 	return tc.io.cwd.c_str();
 }
 
@@ -68,7 +68,7 @@ static const void* nanyc_io_get_cwd(nyvm_t* vm)
 static void* nanyc_io_folder_iterate(nyvm_t* vm, const char* path, uint32_t len,
 	bool recursive, bool files, bool folders)
 {
-	auto& tc = *reinterpret_cast<Nany::VM::ThreadContext*>(vm->tctx);
+	auto& tc = *reinterpret_cast<ny::vm::ThreadContext*>(vm->tctx);
 	AnyString adapterpath;
 	AnyString requestedPath{path, len};
 	auto& adapter = tc.io.resolve(adapterpath, requestedPath);
@@ -155,7 +155,7 @@ static bool nanyc_io_folder_iterator_next(nyvm_t*, void* ptr)
 
 static bool nanyc_io_folder_create(nyvm_t* vm, const char* path, uint32_t len)
 {
-	auto& tc = *reinterpret_cast<Nany::VM::ThreadContext*>(vm->tctx);
+	auto& tc = *reinterpret_cast<ny::vm::ThreadContext*>(vm->tctx);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
 	auto& adapter = tc.io.resolve(adapterPath, requestedPath);
@@ -166,7 +166,7 @@ static bool nanyc_io_folder_create(nyvm_t* vm, const char* path, uint32_t len)
 
 static bool nanyc_io_folder_erase(nyvm_t* vm, const char* path, uint32_t len)
 {
-	auto& tc = *reinterpret_cast<Nany::VM::ThreadContext*>(vm->tctx);
+	auto& tc = *reinterpret_cast<ny::vm::ThreadContext*>(vm->tctx);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
 	auto& adapter = tc.io.resolve(adapterPath, requestedPath);
@@ -177,7 +177,7 @@ static bool nanyc_io_folder_erase(nyvm_t* vm, const char* path, uint32_t len)
 
 static bool nanyc_io_folder_clear(nyvm_t* vm, const char* path, uint32_t len)
 {
-	auto& tc = *reinterpret_cast<Nany::VM::ThreadContext*>(vm->tctx);
+	auto& tc = *reinterpret_cast<ny::vm::ThreadContext*>(vm->tctx);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
 	auto& adapter = tc.io.resolve(adapterPath, requestedPath);
@@ -188,7 +188,7 @@ static bool nanyc_io_folder_clear(nyvm_t* vm, const char* path, uint32_t len)
 
 static uint64_t nanyc_io_folder_size(nyvm_t* vm, const char* path, uint32_t len)
 {
-	auto& tc = *reinterpret_cast<Nany::VM::ThreadContext*>(vm->tctx);
+	auto& tc = *reinterpret_cast<ny::vm::ThreadContext*>(vm->tctx);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
 	auto& adapter = tc.io.resolve(adapterPath, requestedPath);
@@ -198,7 +198,7 @@ static uint64_t nanyc_io_folder_size(nyvm_t* vm, const char* path, uint32_t len)
 
 static bool nanyc_io_folder_exists(nyvm_t* vm, const char* path, uint32_t len)
 {
-	auto& tc = *reinterpret_cast<Nany::VM::ThreadContext*>(vm->tctx);
+	auto& tc = *reinterpret_cast<ny::vm::ThreadContext*>(vm->tctx);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
 	auto& adapter = tc.io.resolve(adapterPath, requestedPath);
@@ -209,7 +209,7 @@ static bool nanyc_io_folder_exists(nyvm_t* vm, const char* path, uint32_t len)
 
 static bool nanyc_io_folder_copy(nyvm_t* vm, const char* path, uint32_t len, const char* to, uint32_t tolen)
 {
-	auto& tc = *reinterpret_cast<Nany::VM::ThreadContext*>(vm->tctx);
+	auto& tc = *reinterpret_cast<ny::vm::ThreadContext*>(vm->tctx);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
 	auto& adapter = tc.io.resolve(adapterPath, requestedPath);
@@ -235,7 +235,7 @@ static bool nanyc_io_folder_copy(nyvm_t* vm, const char* path, uint32_t len, con
 
 static bool nanyc_io_file_exists(nyvm_t* vm, const char* path, uint32_t len)
 {
-	auto& tc = *reinterpret_cast<Nany::VM::ThreadContext*>(vm->tctx);
+	auto& tc = *reinterpret_cast<ny::vm::ThreadContext*>(vm->tctx);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
 	auto& adapter = tc.io.resolve(adapterPath, requestedPath);
@@ -246,7 +246,7 @@ static bool nanyc_io_file_exists(nyvm_t* vm, const char* path, uint32_t len)
 
 static uint64_t nanyc_io_file_size(nyvm_t* vm, const char* path, uint32_t len)
 {
-	auto& tc = *reinterpret_cast<Nany::VM::ThreadContext*>(vm->tctx);
+	auto& tc = *reinterpret_cast<ny::vm::ThreadContext*>(vm->tctx);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
 	auto& adapter = tc.io.resolve(adapterPath, requestedPath);
@@ -256,7 +256,7 @@ static uint64_t nanyc_io_file_size(nyvm_t* vm, const char* path, uint32_t len)
 
 static bool nanyc_io_file_erase(nyvm_t* vm, const char* path, uint32_t len)
 {
-	auto& tc = *reinterpret_cast<Nany::VM::ThreadContext*>(vm->tctx);
+	auto& tc = *reinterpret_cast<ny::vm::ThreadContext*>(vm->tctx);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
 	auto& adapter = tc.io.resolve(adapterPath, requestedPath);
@@ -267,7 +267,7 @@ static bool nanyc_io_file_erase(nyvm_t* vm, const char* path, uint32_t len)
 
 static bool nanyc_io_file_resize(nyvm_t* vm, const char* path, uint32_t len, uint64_t newsize)
 {
-	auto& tc = *reinterpret_cast<Nany::VM::ThreadContext*>(vm->tctx);
+	auto& tc = *reinterpret_cast<ny::vm::ThreadContext*>(vm->tctx);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
 	auto& adapter = tc.io.resolve(adapterPath, requestedPath);
@@ -279,7 +279,7 @@ static bool nanyc_io_file_resize(nyvm_t* vm, const char* path, uint32_t len, uin
 static bool nanyc_io_file_set_contents(nyvm_t* vm, const char* path, uint32_t len,
 	const char* content, uint32_t clen, bool append)
 {
-	auto& tc = *reinterpret_cast<Nany::VM::ThreadContext*>(vm->tctx);
+	auto& tc = *reinterpret_cast<ny::vm::ThreadContext*>(vm->tctx);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
 	auto& adapter = tc.io.resolve(adapterPath, requestedPath);
@@ -295,7 +295,7 @@ static bool nanyc_io_file_set_contents(nyvm_t* vm, const char* path, uint32_t le
 
 static void* nanyc_io_file_get_contents(nyvm_t* vm, const char* path, uint32_t len)
 {
-	auto& tc = *reinterpret_cast<Nany::VM::ThreadContext*>(vm->tctx);
+	auto& tc = *reinterpret_cast<ny::vm::ThreadContext*>(vm->tctx);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
 	auto& adapter = tc.io.resolve(adapterPath, requestedPath);
@@ -324,7 +324,7 @@ static nyfile_t* nanyc_io_file_open(nyvm_t* vm, const char* path, uint32_t len,
 	assert(path);
 	assert(len != 0);
 	assert(readm or writem);
-	auto& tc = *reinterpret_cast<Nany::VM::ThreadContext*>(vm->tctx);
+	auto& tc = *reinterpret_cast<ny::vm::ThreadContext*>(vm->tctx);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
 	auto& adapter = tc.io.resolve(adapterPath, requestedPath);
@@ -423,7 +423,7 @@ static bool nanyc_io_mount_local(nyvm_t* vm, const char* path, uint32_t len, con
 {
 	if (path and len and local and locallen)
 	{
-		auto& tc = *reinterpret_cast<Nany::VM::ThreadContext*>(vm->tctx);
+		auto& tc = *reinterpret_cast<ny::vm::ThreadContext*>(vm->tctx);
 		nyio_adapter_t adapter;
 		nyio_adapter_create_from_local_folder(&adapter, &tc.cf.allocator, local, locallen);
 
@@ -440,7 +440,7 @@ static bool nanyc_io_mount_local(nyvm_t* vm, const char* path, uint32_t len, con
 
 
 
-namespace Nany
+namespace ny
 {
 
 	void importNSLIO(IntrinsicTable& intrinsics)
@@ -483,4 +483,4 @@ namespace Nany
 	}
 
 
-} // namespace Nany
+} // namespace ny

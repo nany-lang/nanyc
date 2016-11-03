@@ -13,7 +13,7 @@ using namespace Yuni;
 
 
 
-namespace Nany
+namespace ny
 {
 
 	static const std::unordered_set<AnyString> reservedKeywords =
@@ -215,5 +215,5 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny
 
