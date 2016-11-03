@@ -15,7 +15,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 
 	/*!
@@ -172,6 +172,6 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny
 
 #include "classdef.hxx"

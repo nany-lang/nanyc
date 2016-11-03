@@ -9,7 +9,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 
 	class IntrinsicTable final
@@ -55,6 +55,6 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny
 
 #include "intrinsic-table.hxx"

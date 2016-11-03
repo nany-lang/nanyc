@@ -18,7 +18,7 @@ using namespace Yuni;
 namespace // anonymous
 {
 
-	void printNanyVersion(String& out)
+	void printnyVersion(String& out)
 	{
 		out << "> nanyc {c++/bootstrap} v" << nylib_version();
 		if (debugmode)
@@ -38,11 +38,11 @@ namespace // anonymous
 	void printBuildFlags(String& out)
 	{
 		out << "> config: ";
-		out << "params:" << Nany::Config::maxFuncDeclParameterCount;
-		out << ", pushedparams:" << Nany::Config::maxPushedParameters;
-		out << ", nmspc depth:" << Nany::Config::maxNamespaceDepth;
-		out << ", symbol:" << Nany::Config::maxSymbolNameLength;
-		out << ", nsl:" << Nany::Config::importNSL;
+		out << "params:" << ny::Config::maxFuncDeclParameterCount;
+		out << ", pushedparams:" << ny::Config::maxPushedParameters;
+		out << ", nmspc depth:" << ny::Config::maxNamespaceDepth;
+		out << ", symbol:" << ny::Config::maxSymbolNameLength;
+		out << ", nsl:" << ny::Config::importNSL;
 		out << '\n';
 	}
 
@@ -119,7 +119,7 @@ namespace // anonymous
 	void buildBugReport(String& out)
 	{
 		out.reserve(512);
-		printNanyVersion(out);
+		printnyVersion(out);
 		printCompiler(out);
 		printBuildFlags(out);
 		printOS(out);

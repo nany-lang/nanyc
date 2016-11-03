@@ -3,7 +3,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 
 	IntrinsicTable::IntrinsicTable()
@@ -47,4 +47,4 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny

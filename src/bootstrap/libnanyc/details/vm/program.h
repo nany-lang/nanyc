@@ -9,9 +9,9 @@
 
 
 
-namespace Nany
+namespace ny
 {
-namespace VM
+namespace vm
 {
 
 	class Program final
@@ -67,19 +67,15 @@ namespace VM
 	}; // class Program
 
 
+} // namespace vm
 
 
+	//! Convert a nyproject_t into a ny::Project
+	vm::Program& ref(nyprogram_t* const);
+	//! Convert a nyproject_t into a ny::Project
+	const vm::Program& ref(const nyprogram_t* const);
 
 
-
-} // namespace VM
-
-
-	//! Convert a nyproject_t into a Nany::Project
-	VM::Program& ref(nyprogram_t* const);
-	//! Convert a nyproject_t into a Nany::Project
-	const VM::Program& ref(const nyprogram_t* const);
-
-} // namespace Nany
+} // namespace ny
 
 #include "program.hxx"

@@ -5,7 +5,7 @@ using namespace Yuni;
 
 
 
-namespace Nany
+namespace ny
 {
 namespace Pass
 {
@@ -71,4 +71,4 @@ namespace Instanciate
 
 } // namespace Instanciate
 } // namespace Pass
-} // namespace Nany
+} // namespace ny

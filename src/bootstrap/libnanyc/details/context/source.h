@@ -12,7 +12,7 @@ namespace Yuni { namespace Job { class Taskgroup; }}
 
 
 
-namespace Nany
+namespace ny
 {
 
 	class CTarget;
@@ -102,6 +102,6 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny
 
 #include "source.hxx"

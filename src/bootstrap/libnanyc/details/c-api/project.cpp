@@ -16,16 +16,16 @@ extern "C" void nyproject_cf_init(nyproject_cf_t* cf)
 
 extern "C" nyproject_t* nyproject_create(const nyproject_cf_t* cf)
 {
-	Nany::Project* project;
+	ny::Project* project;
 
 	if (cf)
 	{
 		auto& allocator = const_cast<nyallocator_t&>(cf->allocator);
-		void* inplace = allocator.allocate(&allocator, sizeof(Nany::Project));
+		void* inplace = allocator.allocate(&allocator, sizeof(ny::Project));
 		if (unlikely(!inplace))
 			return nullptr;
 
-		project = new (inplace) Nany::Project(*cf);
+		project = new (inplace) ny::Project(*cf);
 	}
 	else
 	{
@@ -33,10 +33,10 @@ extern "C" nyproject_t* nyproject_create(const nyproject_cf_t* cf)
 		nyproject_cf_init(&ncf);
 
 		auto& allocator = const_cast<nyallocator_t&>(ncf.allocator);
-		void* inplace = allocator.allocate(&allocator, sizeof(Nany::Project));
+		void* inplace = allocator.allocate(&allocator, sizeof(ny::Project));
 		if (unlikely(!inplace))
 			return nullptr;
-		project = new (inplace) Nany::Project(ncf);
+		project = new (inplace) ny::Project(ncf);
 	}
 
 	// making sure that user-events do not destroy the project by mistake
@@ -51,7 +51,7 @@ extern "C" nyproject_t* nyproject_create(const nyproject_cf_t* cf)
 extern "C" void nyproject_ref(nyproject_t* project)
 {
 	if (project)
-		Nany::ref(project).addRef();
+		ny::ref(project).addRef();
 }
 
 
@@ -59,7 +59,7 @@ extern "C" void nyproject_unref(nyproject_t* ptr)
 {
 	if (ptr)
 	{
-		auto& project = Nany::ref(ptr);
+		auto& project = ny::ref(ptr);
 		if (project.release())
 			project.destroy();
 	}
@@ -71,7 +71,7 @@ extern "C" nybool_t nyproject_add_source_from_file_n(nyproject_t* ptr, const cha
 	if (ptr and filename and len != 0 and len < 32*1024)
 	{
 		AnyString path{filename, static_cast<uint32_t>(len)};
-		Nany::ref(ptr).targets.anonym->addSourceFromFile(path);
+		ny::ref(ptr).targets.anonym->addSourceFromFile(path);
 		return nytrue;
 	}
 	return nyfalse;
@@ -94,7 +94,7 @@ extern "C" nybool_t nyproject_add_source_n(nyproject_t* ptr, const char* text, s
 	if (ptr and text and len != 0 and len < 512 * 1024*1024) // arbitrary
 	{
 		AnyString source{text, static_cast<uint32_t>(len)};
-		Nany::ref(ptr).targets.anonym->addSource("<unknown>", source);
+		ny::ref(ptr).targets.anonym->addSource("<unknown>", source);
 		return nytrue;
 	}
 	return nyfalse;
@@ -115,18 +115,18 @@ extern "C" nybool_t nyproject_add_source(nyproject_t* ptr, const char* text)
 extern "C" void nyproject_lock(const nyproject_t* ptr)
 {
 	if (ptr)
-		Nany::ref(ptr).mutex.lock();
+		ny::ref(ptr).mutex.lock();
 }
 
 
 extern "C" void nyproject_unlock(const nyproject_t* ptr)
 {
 	if (ptr)
-		Nany::ref(ptr).mutex.unlock();
+		ny::ref(ptr).mutex.unlock();
 }
 
 
 extern "C" nybool_t nyproject_trylock(const nyproject_t* ptr)
 {
-	return ((ptr) ? Nany::ref(ptr).mutex.trylock() : false) ? nytrue : nyfalse;
+	return ((ptr) ? ny::ref(ptr).mutex.trylock() : false) ? nytrue : nyfalse;
 }

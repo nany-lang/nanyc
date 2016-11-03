@@ -2,7 +2,7 @@
 #include "../reporting/report.h"
 
 
-namespace Nany
+namespace ny
 {
 
 	// forward declarations
@@ -149,4 +149,4 @@ namespace Logs
 
 
 } // namespace Logs
-} // namespace Nany
+} // namespace ny

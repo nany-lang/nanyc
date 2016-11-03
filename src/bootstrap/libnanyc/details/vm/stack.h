@@ -2,12 +2,12 @@
 #include "types.h"
 #include "nany/nany.h"
 
-#define NANY_VM_STACK_TRACES 0
+#define NANY_vm_STACK_TRACES 0
 
 
-namespace Nany
+namespace ny
 {
-namespace VM
+namespace vm
 {
 
 	/*!
@@ -64,7 +64,7 @@ namespace VM
 		Chunk* current = nullptr;
 		Chunk* reserve = nullptr;
 
-		#if NANY_VM_STACK_TRACES != 0
+		#if NANY_vm_STACK_TRACES != 0
 		uint32_t frameCount = 0u;
 		uint32_t stacksize = 0u;
 		#endif
@@ -72,7 +72,7 @@ namespace VM
 
 
 
-} // namespace VM
-} // namespace Nany
+} // namespace vm
+} // namespace ny
 
 #include "stack.hxx"

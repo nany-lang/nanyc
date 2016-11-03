@@ -7,7 +7,7 @@ using namespace Yuni;
 
 
 
-namespace Nany
+namespace ny
 {
 namespace IR
 {
@@ -15,7 +15,7 @@ namespace ISA
 {
 
 
-	String print(const Sequence& sequence, const Nany::IR::Instruction& instr, const Nany::AtomMap* atommap)
+	String print(const Sequence& sequence, const ny::IR::Instruction& instr, const ny::AtomMap* atommap)
 	{
 		String text;
 		Printer<String> printer{text, sequence};
@@ -48,4 +48,4 @@ namespace ISA
 
 } // namespace ISA
 } // namespace IR
-} // namespace Nany
+} // namespace ny

@@ -3,7 +3,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 
 	inline bool ClassdefFollow::empty() const
@@ -14,4 +14,4 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny

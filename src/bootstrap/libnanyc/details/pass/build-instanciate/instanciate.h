@@ -12,14 +12,14 @@
 
 
 
-namespace Nany
+namespace ny
 {
 	class IntrinsicTable;
 	class Build;
 }
 
 
-namespace Nany
+namespace ny
 {
 namespace Pass
 {
@@ -309,7 +309,7 @@ namespace Instanciate
 
 		// exit status
 		mutable bool success = true;
-		friend class Nany::IR::Sequence;
+		friend class ny::IR::Sequence;
 
 		//! Previous sequence builder
 		SequenceBuilder* parent = nullptr;
@@ -335,6 +335,6 @@ namespace Instanciate
 
 } // namespace Instanciate
 } // namespace Pass
-} // namespace Nany
+} // namespace ny
 
 #include "instanciate.hxx"

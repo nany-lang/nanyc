@@ -5,7 +5,7 @@ using namespace Yuni;
 
 
 
-namespace Nany
+namespace ny
 {
 
 	void ClassdefOverloads::print(String& out, const ClassdefTableView& table, bool clearBefore) const
@@ -25,4 +25,4 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny

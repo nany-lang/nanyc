@@ -18,7 +18,7 @@ static bool nanyc_os_process_execute(nyvm_t*, const char* cmd, uint32_t len, uin
 
 
 
-namespace Nany
+namespace ny
 {
 
 	void importNSLOSProcess(IntrinsicTable& intrinsics)
@@ -26,4 +26,4 @@ namespace Nany
 		intrinsics.add("__nanyc_os_execute",   nanyc_os_process_execute);
 	}
 
-} // namespace Nany
+} // namespace ny

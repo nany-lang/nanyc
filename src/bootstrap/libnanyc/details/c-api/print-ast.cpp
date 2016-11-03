@@ -29,7 +29,7 @@ namespace // anonymous
 		if (unlikely(text.empty()))
 			return false;
 
-		Nany::AST::Parser parser;
+		ny::AST::Parser parser;
 		if (not (FromFileT ? parser.loadFromFile(text) : parser.load(text)))
 			return false;
 
@@ -42,7 +42,7 @@ namespace // anonymous
 			or   (fd == STDERR_FILENO and System::Console::IsStderrTTY()));
 
 		Clob out;
-		Nany::AST::Node::Export(out, *parser.root, hasUnixColors);
+		ny::AST::Node::Export(out, *parser.root, hasUnixColors);
 
 		#ifdef YUNI_OS_MSVC
 		int w = _write(fd, out.c_str(), static_cast<unsigned int>(out.size()));

@@ -16,7 +16,7 @@ extern "C" void nybuild_cf_init(nybuild_cf_t* cf, const nyproject_t* project)
 	memset(cf, 0x0, sizeof(nybuild_cf_t));
 	if (project)
 	{
-		auto& prj = *(reinterpret_cast<const Nany::Project*>(project));
+		auto& prj = *(reinterpret_cast<const ny::Project*>(project));
 		nany_memalloc_copy(&cf->allocator, &prj.cf.allocator);
 	}
 	else
@@ -35,8 +35,8 @@ extern "C" nybuild_t* nybuild_prepare(nyproject_t* ptr, const nybuild_cf_t* cf)
 	if (ptr)
 	{
 		constexpr bool async = false;
-		auto& project = Nany::ref(ptr);
-		Nany::Build* build;
+		auto& project = ny::ref(ptr);
+		ny::Build* build;
 		try
 		{
 			if (cf)
@@ -45,10 +45,10 @@ extern "C" nybuild_t* nybuild_prepare(nyproject_t* ptr, const nybuild_cf_t* cf)
 					return nullptr;
 
 				auto& allocator = const_cast<nyallocator_t&>(cf->allocator);
-				void* inplace = allocator.allocate(&allocator, sizeof(Nany::Build));
+				void* inplace = allocator.allocate(&allocator, sizeof(ny::Build));
 				if (!inplace)
 					return nullptr;
-				build = new (inplace) Nany::Build(project, *cf, async);
+				build = new (inplace) ny::Build(project, *cf, async);
 			}
 			else
 			{
@@ -56,10 +56,10 @@ extern "C" nybuild_t* nybuild_prepare(nyproject_t* ptr, const nybuild_cf_t* cf)
 				nybuild_cf_init(&ncf, ptr);
 
 				auto& allocator = const_cast<nyallocator_t&>(ncf.allocator);
-				void* inplace = allocator.allocate(&allocator, sizeof(Nany::Build));
+				void* inplace = allocator.allocate(&allocator, sizeof(ny::Build));
 				if (!inplace)
 					return nullptr;
-				build = new (inplace) Nany::Build(project, ncf, async);
+				build = new (inplace) ny::Build(project, ncf, async);
 			}
 		}
 		catch (...)
@@ -87,7 +87,7 @@ extern "C" nybuild_t* nybuild_prepare(nyproject_t* ptr, const nybuild_cf_t* cf)
 
 extern "C" nybool_t nybuild(nybuild_t* ptr)
 {
-	return ((ptr) ? Nany::ref(ptr).compile() : false) ? nytrue : nyfalse;
+	return ((ptr) ? ny::ref(ptr).compile() : false) ? nytrue : nyfalse;
 }
 
 
@@ -96,11 +96,11 @@ extern "C" nybool_t nybuild(nybuild_t* ptr)
 namespace // anonymous
 {
 
-	inline void nybuild_print_compiler_info_to_console(Nany::Build& build)
+	inline void nybuild_print_compiler_info_to_console(ny::Build& build)
 	{
 		// nanyc {c++/bootstrap} v0.1.0-alpha+ed25d59 {debug}
 		{
-			Nany::Logs::Message msg{Nany::Logs::Level::info};
+			ny::Logs::Message msg{ny::Logs::Level::info};
 			msg.section = "comp";
 			msg.prefix = "nanyc {c++/bootstrap} ";
 			msg.message << 'v' << LIBNANYC_VERSION_STR;
@@ -117,7 +117,7 @@ extern "C" void nybuild_print_report_to_console(nybuild_t* ptr, nybool_t print_h
 {
 	if (ptr)
 	{
-		auto& build = Nany::ref(ptr);
+		auto& build = ny::ref(ptr);
 
 		try
 		{
@@ -135,7 +135,7 @@ extern "C" void nybuild_print_report_to_console(nybuild_t* ptr, nybool_t print_h
 extern "C" void nybuild_ref(nybuild_t* build)
 {
 	if (build)
-		Nany::ref(build).addRef();
+		ny::ref(build).addRef();
 }
 
 
@@ -145,7 +145,7 @@ extern "C" void nybuild_unref(nybuild_t* ptr)
 	{
 		try
 		{
-			auto& build = Nany::ref(ptr);
+			auto& build = ny::ref(ptr);
 			if (build.release())
 				build.destroy();
 		}

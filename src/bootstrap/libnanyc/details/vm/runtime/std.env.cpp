@@ -93,7 +93,7 @@ static bool _nanyc_env_exists(nyvm_t*, void* varname)
 
 
 
-namespace Nany
+namespace ny
 {
 
 	void importNSLEnv(IntrinsicTable& intrinsics)
@@ -107,4 +107,4 @@ namespace Nany
 		intrinsics.add("__nanyc_env_exists", _nanyc_env_exists);
 	}
 
-} // namespace Nany
+} // namespace ny

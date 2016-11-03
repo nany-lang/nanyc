@@ -9,9 +9,9 @@ using namespace Yuni;
 
 
 
-namespace Nany
+namespace ny
 {
-namespace VM
+namespace vm
 {
 
 	namespace {
@@ -60,7 +60,7 @@ namespace VM
 		{
 			std::cout << "== stack == " << action << count << ", current: " << (void*) current
 				<< ", remains: " << current->remains << '/' << current->capacity
-				#if NANY_VM_STACK_TRACES != 0
+				#if NANY_vm_STACK_TRACES != 0
 				<< ", " << frameCount << " frames"
 				<< ", bytes: " << stacksize
 				#endif
@@ -73,7 +73,7 @@ namespace VM
 
 	void Stack::pushNewChunk(uint32_t count)
 	{
-		#if NANY_VM_STACK_TRACES != 0
+		#if NANY_vm_STACK_TRACES != 0
 		std::cout << "== stack == requires new chunk to increase stack of "
 			<< (sizeof(DataRegister) * count) << " bytes\n";
 		#endif
@@ -94,7 +94,7 @@ namespace VM
 
 			uint32_t bytes = sizeFromCapacity<Chunk>(capacity);
 
-			#if NANY_VM_STACK_TRACES != 0
+			#if NANY_vm_STACK_TRACES != 0
 			std::cout << "== stack == allocate new chunk of " << bytes << " bytes\n";
 			stacksize += bytes;
 			#endif
@@ -122,7 +122,7 @@ namespace VM
 		}
 		else
 		{
-			#if NANY_VM_STACK_TRACES != 0
+			#if NANY_vm_STACK_TRACES != 0
 			std::cout << "== stack == release chunk\n";
 			stacksize -= sizeFromCapacity<Chunk>(current->capacity);
 			#endif
@@ -137,5 +137,5 @@ namespace VM
 
 
 
-} // namespace VM
-} // namespace Nany
+} // namespace vm
+} // namespace ny

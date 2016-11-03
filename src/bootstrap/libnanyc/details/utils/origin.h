@@ -3,7 +3,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 
 	class Origin final
@@ -20,4 +20,4 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny

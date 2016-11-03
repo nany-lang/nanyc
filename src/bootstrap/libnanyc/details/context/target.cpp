@@ -10,7 +10,7 @@ using namespace Yuni;
 
 
 
-namespace Nany
+namespace ny
 {
 
 
@@ -58,7 +58,7 @@ namespace Nany
 	{
 		if (project)
 		{
-			Nany::ref(project).unregisterTargetFromProject(*this);
+			ny::ref(project).unregisterTargetFromProject(*this);
 			project = nullptr;
 		}
 

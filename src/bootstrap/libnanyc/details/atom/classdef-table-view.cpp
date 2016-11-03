@@ -5,7 +5,7 @@ using namespace Yuni;
 
 
 
-namespace Nany
+namespace ny
 {
 
 
@@ -72,4 +72,4 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny

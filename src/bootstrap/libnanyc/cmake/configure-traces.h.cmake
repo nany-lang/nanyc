@@ -1,5 +1,5 @@
 /*
-** Nany - https://nany.io
+** ny - https://nany.io
 ** This Source Code Form is subject to the terms of the Mozilla Public
 ** License, v. 2.0. If a copy of the MPL was not distributed with this
 ** file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -10,7 +10,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 namespace Config
 {
@@ -34,15 +34,11 @@ namespace Traces
 	//! Print AST after normalization
 	static constexpr bool astAfterNormalize  = ast or false;
 
-
-
-
 	//! Print ATOM table
 	static constexpr bool atomTable = all or recommended or false;
 
 	//! Print ATOM table
 	static constexpr bool preAtomTable = all or false;
-
 
 	//! Print all types
 	static constexpr bool allTypeDefinitions = all or false;
@@ -50,13 +46,11 @@ namespace Traces
 	//! Print classdef table
 	static constexpr bool classdefTable = all or recommended or false;
 
-
 	//! Print opcodes generated from AST
 	static constexpr bool sourceOpcodeSequence = all or recommended or false;
 
 	//! Print opcodes after program instanciation
 	static constexpr bool generatedOpcodeSequence = all or recommended or false;
-
 
 	//! Print opcodes after program instanciation
 	static constexpr bool capturedVariables = all or false;
@@ -65,9 +59,7 @@ namespace Traces
 	static constexpr bool properties = all or false;
 
 
-
 } // namespace Traces
 } // namespace Config
-} // namespace Nany
-
+} // namespace ny
 // vim: set ft=cpp:

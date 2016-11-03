@@ -4,7 +4,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 
 	inline Vardef::Vardef(Vardef&& rhs)
@@ -15,4 +15,4 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny

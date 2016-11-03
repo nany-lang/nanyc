@@ -3,8 +3,7 @@
 #include <yuni/core/static/types.h>
 
 
-
-namespace Nany
+namespace ny
 {
 
 	template<class T> struct CTypeToNanyType {};
@@ -159,4 +158,4 @@ namespace Nany
 	}
 
 
-} // namespace Nany
+} // namespace ny

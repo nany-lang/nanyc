@@ -3,7 +3,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 
 	inline Project::Project(const nyproject_cf_t& cf)
@@ -37,13 +37,13 @@ namespace Nany
 	inline Project& ref(nyproject_t* const ptr)
 	{
 		assert(ptr != nullptr);
-		return *(reinterpret_cast<Nany::Project*>(ptr));
+		return *(reinterpret_cast<ny::Project*>(ptr));
 	}
 
 	inline const Project& ref(const nyproject_t* const ptr)
 	{
 		assert(ptr != nullptr);
-		return *(reinterpret_cast<const Nany::Project*>(ptr));
+		return *(reinterpret_cast<const ny::Project*>(ptr));
 	}
 
 
@@ -67,4 +67,4 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny

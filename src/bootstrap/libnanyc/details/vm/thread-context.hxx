@@ -3,12 +3,10 @@
 #include <iostream>
 
 
-
-namespace Nany
+namespace ny
 {
-namespace VM
+namespace vm
 {
-
 
 	inline nytctx_t* ThreadContext::self()
 	{
@@ -33,7 +31,5 @@ namespace VM
 	}
 
 
-
-
-} // namespace VM
-} // namespace Nany
+} // namespace vm
+} // namespace ny

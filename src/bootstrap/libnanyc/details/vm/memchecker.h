@@ -24,9 +24,9 @@
 
 
 
-namespace Nany
+namespace ny
 {
-namespace VM
+namespace vm
 {
 
 	class Program;
@@ -47,9 +47,7 @@ namespace VM
 	};
 
 
-
-	template<>
-	struct MemChecker<true> final
+	template<> struct MemChecker<true> final
 	{
 		void atomid(uint32_t atomid)
 		{
@@ -113,7 +111,6 @@ namespace VM
 			size_t objsize;
 			CLID origin;
 		};
-
 		//! All allocated pointers with their size
 		std::unordered_map<const uint64_t*, AllocInfo> ownedPointers;
 		//! Current atomid
@@ -121,8 +118,5 @@ namespace VM
 	};
 
 
-
-
-
-} // namespace VM
-} // namespace Nany
+} // namespace vm
+} // namespace ny

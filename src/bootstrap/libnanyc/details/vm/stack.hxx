@@ -4,15 +4,15 @@
 
 
 
-namespace Nany
+namespace ny
 {
-namespace VM
+namespace vm
 {
 
 
 	inline DataRegister* Stack::push(uint32_t count)
 	{
-		#if NANY_VM_STACK_TRACES != 0
+		#if NANY_vm_STACK_TRACES != 0
 		++frameCount;
 		dump("push +", count);
 		#endif
@@ -36,7 +36,7 @@ namespace VM
 
 	inline void Stack::pop(uint32_t count)
 	{
-		#if NANY_VM_STACK_TRACES != 0
+		#if NANY_vm_STACK_TRACES != 0
 		--frameCount;
 		dump("pop -", count);
 		#endif
@@ -50,7 +50,5 @@ namespace VM
 	}
 
 
-
-
-} // namespace VM
-} // namespace Nany
+} // namespace vm
+} // namespace ny

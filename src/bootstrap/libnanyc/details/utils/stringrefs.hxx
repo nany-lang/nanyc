@@ -2,7 +2,7 @@
 #include "stringrefs.h"
 
 
-namespace Nany
+namespace ny
 {
 
 	inline StringRefs::StringImmutablePointer::~StringImmutablePointer()
@@ -73,4 +73,4 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny

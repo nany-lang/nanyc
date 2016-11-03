@@ -4,7 +4,7 @@ using namespace Yuni;
 
 
 
-namespace Nany
+namespace ny
 {
 
 	YString Intrinsic::print() const
@@ -23,4 +23,4 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny

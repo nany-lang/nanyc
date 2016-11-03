@@ -5,7 +5,7 @@ using namespace Yuni;
 
 
 
-namespace Nany
+namespace ny
 {
 
 	StringRefs::StringRefs()
@@ -46,4 +46,4 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny

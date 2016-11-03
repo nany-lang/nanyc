@@ -5,7 +5,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 
 	enum class IdNameFlag
@@ -32,4 +32,4 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny

@@ -14,7 +14,7 @@ using namespace Yuni;
 
 
 
-namespace Nany
+namespace ny
 {
 
 	Build::AttachedSequenceRef::~AttachedSequenceRef()
@@ -32,7 +32,7 @@ namespace Nany
 		this->~Build();
 
 		auto& allocator = const_cast<nyallocator_t&>(cf.allocator);
-		allocator.deallocate(&allocator, this, sizeof(Nany::Build));
+		allocator.deallocate(&allocator, this, sizeof(ny::Build));
 	}
 
 
@@ -85,14 +85,14 @@ namespace Nany
 
 	static Logs::Report buildGenerateReport(void* ptr, Logs::Level level)
 	{
-		return (*((Nany::Logs::Report*) ptr)).fromErrLevel(level);
+		return (*((ny::Logs::Report*) ptr)).fromErrLevel(level);
 	}
 
 
 	bool Build::compile()
 	{
 		// preparing report
-		Nany::Logs::Report report{*messages.get()};
+		ny::Logs::Report report{*messages.get()};
 		Logs::Handler newHandler{&report, &buildGenerateReport};
 
 
@@ -149,4 +149,4 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny

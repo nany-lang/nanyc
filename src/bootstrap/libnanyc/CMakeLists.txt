@@ -107,7 +107,7 @@ foreach (element ${__nany_stdcore_unittest})
 	set(__nsl_stdcore_cpp "${__nsl_stdcore_cpp}extern \"C\" const char* ${element}(size_t*);\n")
 endforeach()
 
-set(__nsl_stdcore_cpp "${__nsl_stdcore_cpp}\n\n\nnamespace Nany\n")
+set(__nsl_stdcore_cpp "${__nsl_stdcore_cpp}\n\n\nnamespace ny\n")
 set(__nsl_stdcore_cpp "${__nsl_stdcore_cpp}{\n\n\n")
 
 # NSL files
@@ -162,7 +162,7 @@ endforeach()
 
 set(__nsl_stdcore_cpp "${__nsl_stdcore_cpp}\t}\n")
 
-set(__nsl_stdcore_cpp "${__nsl_stdcore_cpp}\n\n} // namespace Nany\n")
+set(__nsl_stdcore_cpp "${__nsl_stdcore_cpp}\n\n} // namespace ny\n")
 file(WRITE "${CMAKE_CURRENT_LIST_DIR}/details/vm/runtime/nsl2c/all.cpp" "${__nsl_stdcore_cpp}")
 list(APPEND nysrc_nsl_stdcore "${CMAKE_CURRENT_LIST_DIR}/details/vm/runtime/nsl2c/all.cpp")
 

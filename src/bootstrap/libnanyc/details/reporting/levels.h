@@ -4,7 +4,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 namespace Logs
 {
@@ -40,4 +40,4 @@ namespace Logs
 
 
 } // namespace Logs
-} // namespace Nany
+} // namespace ny

@@ -4,7 +4,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 
 	// Forward declaration
@@ -15,4 +15,4 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny

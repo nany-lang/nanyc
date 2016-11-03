@@ -4,7 +4,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 
 	inline CLID CLID::AtomMapID(uint32_t atomid)
@@ -86,16 +86,16 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny
 
 
 
 
 namespace std
 {
-	template<> struct hash<Nany::CLID> final
+	template<> struct hash<ny::CLID> final
 	{
-		inline size_t operator() (const Nany::CLID& clid) const
+		inline size_t operator() (const ny::CLID& clid) const
 		{
 			return clid.hash();
 		}
@@ -114,10 +114,10 @@ namespace CString
 {
 
 	template<class CStringT>
-	class Append<CStringT, Nany::CLID> final
+	class Append<CStringT, ny::CLID> final
 	{
 	public:
-		static void Perform(CStringT& string, const Nany::CLID& rhs)
+		static void Perform(CStringT& string, const ny::CLID& rhs)
 		{
 			string << '{' << rhs.atomid() << ':' << rhs.lvid() << '}';
 		}

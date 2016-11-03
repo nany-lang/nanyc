@@ -3,7 +3,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 
 	inline void Qualifiers::merge(const Qualifiers& rhs)
@@ -41,4 +41,4 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny

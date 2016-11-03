@@ -19,7 +19,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 
 	// forward class
@@ -405,7 +405,7 @@ namespace Nany
 		**
 		** \note The result may lack in precision, since it can depend on the current
 		**  classdef attached to it
-		** \see Nany::ClassdefTableView::keyword()
+		** \see ny::ClassdefTableView::keyword()
 		*/
 		AnyString keyword() const;
 		//@}
@@ -543,6 +543,6 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny
 
 #include "atom.hxx"

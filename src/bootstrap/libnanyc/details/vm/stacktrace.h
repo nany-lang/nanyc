@@ -7,9 +7,9 @@
 
 
 
-namespace Nany
+namespace ny
 {
-namespace VM
+namespace vm
 {
 
 	template<bool Enabled>
@@ -96,5 +96,5 @@ namespace VM
 
 
 
-} // namespace VM
-} // namespace Nany
+} // namespace vm
+} // namespace ny

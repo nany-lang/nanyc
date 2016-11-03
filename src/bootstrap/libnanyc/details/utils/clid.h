@@ -7,7 +7,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 
 	class CLID final
@@ -60,11 +60,11 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny
 
 
 
 
-std::ostream& operator << (std::ostream& out, const Nany::CLID& rhs);
+std::ostream& operator << (std::ostream& out, const ny::CLID& rhs);
 
 #include "clid.hxx"

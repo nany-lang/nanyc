@@ -6,7 +6,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 namespace AST
 {
@@ -28,6 +28,6 @@ namespace AST
 
 
 } // namespace AST
-} // namespace Nany
+} // namespace ny
 
 #include "ast.hxx"

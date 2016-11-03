@@ -17,7 +17,7 @@ namespace CString
 {
 
 	template<>
-	void Append<YString, Nany::Signature>::Perform(String& out, const Nany::Signature& rhs)
+	void Append<YString, ny::Signature>::Perform(String& out, const ny::Signature& rhs)
 	{
 		out << "signature";
 
@@ -31,7 +31,7 @@ namespace CString
 
 				auto& tmplparam = rhs.tmplparams[i];
 				if (tmplparam.atom and tmplparam.kind == nyt_any)
-					out << Nany::CLID::AtomMapID(tmplparam.atom->atomid);
+					out << ny::CLID::AtomMapID(tmplparam.atom->atomid);
 				else
 					out << nytype_to_cstring(tmplparam.kind);
 			}
@@ -46,7 +46,7 @@ namespace CString
 
 			auto& param = rhs.parameters[i];
 			if (param.atom and param.kind == nyt_any)
-				out << Nany::CLID::AtomMapID(param.atom->atomid);
+				out << ny::CLID::AtomMapID(param.atom->atomid);
 			else
 				out << nytype_to_cstring(param.kind);
 		}
@@ -62,7 +62,7 @@ namespace CString
 
 
 
-namespace Nany
+namespace ny
 {
 
 
@@ -129,14 +129,14 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny
 
 
 
 
 
 
-std::ostream& operator << (std::ostream& out, const Nany::Signature& rhs)
+std::ostream& operator << (std::ostream& out, const ny::Signature& rhs)
 {
 	String s;
 	s << rhs;

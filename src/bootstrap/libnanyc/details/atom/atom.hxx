@@ -3,7 +3,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 
 	inline Atom* Atom::parentScope()
@@ -345,4 +345,4 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny

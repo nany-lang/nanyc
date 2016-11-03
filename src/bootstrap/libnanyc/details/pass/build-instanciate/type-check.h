@@ -2,7 +2,7 @@
 #include "details/atom/classdef-table-view.h"
 
 
-namespace Nany
+namespace ny
 {
 namespace Pass
 {
@@ -44,4 +44,4 @@ namespace TypeCheck
 } // namespace TypeCheck
 } // namespace Instanciate
 } // namespace Pass
-} // namespace Nany
+} // namespace ny

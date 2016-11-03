@@ -12,7 +12,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 namespace IR
 {
@@ -339,4 +339,4 @@ namespace ISA //!< Instruction Set Architecture
 
 } // namespace ISA
 } // namespace IR
-} // namespace Nany
+} // namespace ny

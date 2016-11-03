@@ -108,7 +108,7 @@ add_custom_command(
 		"${NANY_GRAMMAR_FILE_MARKER}"
 	COMMENT "generating c++ Nany parser from grammar"
 	COMMAND ${CMAKE_COMMAND} -E make_directory "${NANY_GRAMMAR_TARGETDIR}"
-	COMMAND "$<TARGET_FILE:yuni-parser-generator>" --format=cpp -i "${NANY_YGR}" -n Nany::AST -o "${NANY_GRAMMAR_TARGETDIR}"
+	COMMAND "$<TARGET_FILE:yuni-parser-generator>" --format=cpp -i "${NANY_YGR}" -n ny::AST -o "${NANY_GRAMMAR_TARGETDIR}"
 	COMMAND "${CMAKE_COMMAND}" -E touch "${NANY_GRAMMAR_FILE_MARKER}"
 	VERBATIM
 	DEPENDS yuni-parser-generator "${NANY_YGR}")

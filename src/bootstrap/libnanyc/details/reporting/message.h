@@ -10,7 +10,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 namespace Logs
 {
@@ -68,7 +68,7 @@ namespace Logs
 			struct Location final
 			{
 				//! Reset the location from a given atom
-				void resetFromAtom(const Nany::Atom&);
+				void resetFromAtom(const ny::Atom&);
 
 				//! Current target
 				YString target;
@@ -101,4 +101,4 @@ namespace Logs
 
 
 } // namespace Logs
-} // namespace Nany
+} // namespace ny

@@ -1,5 +1,5 @@
 /*
-** Nany - https://nany.io
+** ny - https://nany.io
 ** This Source Code Form is subject to the terms of the Mozilla Public
 ** License, v. 2.0. If a copy of the MPL was not distributed with this
 ** file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -10,7 +10,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 namespace Config
 {
@@ -27,24 +27,17 @@ namespace Config
 	//! Maxmimum number of pushed parameters for calling a function
 	static constexpr uint32_t maxPushedParameters = 32;
 
-
-
 	//! Remove redundant dbg info (line,offset) in opcode programs
 	static constexpr bool removeRedundantDbgOffset = true;
 
-
-	//! Size that should be added to any Nany objects
+	//! Size that should be added to any ny objects
 	// (reference counter)
 	constexpr static const uint32_t extraObjectSize = (uint32_t) sizeof(uint64_t);
-
 
 	//! Import the NSL
 	static constexpr bool importNSL = true;
 
 
-
-
 } // namespace Config
-} // namespace Nany
-
+} // namespace ny
 /* vim: set ft=cpp: */

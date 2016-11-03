@@ -2,7 +2,7 @@
 #include "atom-map.h"
 
 
-namespace Nany
+namespace ny
 {
 
 
@@ -68,4 +68,4 @@ namespace Nany
 	}
 
 
-} // namespace Nany
+} // namespace ny

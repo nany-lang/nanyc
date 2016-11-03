@@ -9,7 +9,7 @@ using namespace Yuni;
 
 
 
-namespace Nany
+namespace ny
 {
 
 	ClassdefTable::ClassdefTable()
@@ -415,4 +415,4 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny

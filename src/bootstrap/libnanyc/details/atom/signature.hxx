@@ -3,7 +3,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 
 	inline uint Signature::Parameters::size() const
@@ -57,15 +57,15 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny
 
 
 namespace std
 {
 	template<>
-	struct hash<Nany::Signature>
+	struct hash<ny::Signature>
 	{
-		using argument_type = Nany::Signature;
+		using argument_type = ny::Signature;
 		using result_type   = std::size_t;
 
 		result_type operator() (const argument_type& signature) const
@@ -85,10 +85,10 @@ namespace CString
 {
 
 	template<class YString>
-	class Append<YString, Nany::Signature> final
+	class Append<YString, ny::Signature> final
 	{
 	public:
-		static void Perform(String& out, const Nany::Signature& rhs);
+		static void Perform(String& out, const ny::Signature& rhs);
 	};
 
 
@@ -99,4 +99,4 @@ namespace CString
 
 
 // for std::cout
-std::ostream& operator << (std::ostream& out, const Nany::Signature& rhs);
+std::ostream& operator << (std::ostream& out, const ny::Signature& rhs);

@@ -3,24 +3,23 @@
 
 
 
-namespace Nany
+namespace ny
 {
 
-	inline VM::Program& ref(nyprogram_t* const ptr)
+	inline vm::Program& ref(nyprogram_t* const ptr)
 	{
 		assert(ptr != nullptr);
-		return *(reinterpret_cast<Nany::VM::Program*>(ptr));
+		return *(reinterpret_cast<ny::vm::Program*>(ptr));
 	}
 
-	inline const VM::Program& ref(const nyprogram_t* const ptr)
+	inline const vm::Program& ref(const nyprogram_t* const ptr)
 	{
 		assert(ptr != nullptr);
-		return *(reinterpret_cast<const Nany::VM::Program*>(ptr));
+		return *(reinterpret_cast<const ny::vm::Program*>(ptr));
 	}
 
-namespace VM
+namespace vm
 {
-
 
 	inline nyprogram_t* Program::self()
 	{
@@ -57,7 +56,5 @@ namespace VM
 	}
 
 
-
-
-} // namespace VM
-} // namespace Nany
+} // namespace vm
+} // namespace ny

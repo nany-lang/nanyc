@@ -5,7 +5,7 @@
 #include <memory>
 
 
-namespace Nany
+namespace ny
 {
 
 	class Project;
@@ -13,12 +13,12 @@ namespace Nany
 
 
 	/*!
-	** \brief Nany Standard Library 'std.core'
+	** \brief ny Standard Library 'std.core'
 	*/
 	void importNSLCore(Project&);
 
 	/*!
-	** \brief Nany Standard Library 'std.core'
+	** \brief ny Standard Library 'std.core'
 	*/
 	void importNSLUnittests(Project&);
 
@@ -28,7 +28,7 @@ namespace Nany
 	void importNSLCoreString(IntrinsicTable&);
 
 	/*!
-	** \brief Nany Standard Library 'std.memory'
+	** \brief ny Standard Library 'std.memory'
 	*/
 	void importNSLMemory(IntrinsicTable&);
 
@@ -58,4 +58,4 @@ namespace Nany
 	void importNSLDigest(IntrinsicTable&);
 
 
-} // namespace Nany
+} // namespace ny

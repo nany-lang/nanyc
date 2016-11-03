@@ -4,10 +4,10 @@ using namespace Yuni;
 
 
 
-namespace Nany
+namespace ny
 {
 
 
 
 
-} // namespace Nany
+} // namespace ny

@@ -9,7 +9,7 @@
 
 
 
-namespace Nany
+namespace ny
 {
 
 
@@ -27,7 +27,7 @@ namespace Nany
 
 		struct
 		{
-			//! Nany parser for the current content
+			//! ny parser for the current content
 			AST::Parser parser;
 			//! Namespace of the file
 			std::pair<YString, AST::Node*> nmspc;
@@ -49,4 +49,4 @@ namespace Nany
 
 
 
-} // namespace Nany
+} // namespace ny
