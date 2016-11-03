@@ -188,122 +188,116 @@ addsrc(
 
 
 addsrc(
-	NAME  nysrc_details_pass_build_ast_normalize
-	GROUP "details/pass/build-ast-normalize"
+	NAME  nysrc_details_pass_build_src2ast
+	GROUP "details/pass/a-src2ast"
 	FILES
-	"details/pass/build-ast-normalize/ast-normalize.cpp")
-
-
-# pass - build - ast from source
-addsrc(
-	NAME  nysrc_details_pass_build_ast_from_source
-	GROUP "details/pass/build-ast-from=source"
-	FILES
-	"details/pass/build-ast-from-source/ast-from-source.cpp")
-
+	"details/pass/a-src2ast/ast-from-source.cpp")
 
 addsrc(
-	NAME  nysrc_details_pass_build_ast_to_ir
-	GROUP "details/pass/build-ast-to-ir"
+	NAME  nysrc_details_pass_ast_normalize
+	GROUP "details/pass/b-ast-normalize"
 	FILES
-	"details/pass/build-ast-to-ir/context.cpp"
-	"details/pass/build-ast-to-ir/context.h"
-	"details/pass/build-ast-to-ir/context.hxx"
-	"details/pass/build-ast-to-ir/scope.h"
-	"details/pass/build-ast-to-ir/scope.hxx"
-	"details/pass/build-ast-to-ir/scope.cpp"
-	"details/pass/build-ast-to-ir/scope-array.cpp"
-	"details/pass/build-ast-to-ir/scope-for.cpp"
-	"details/pass/build-ast-to-ir/scope-in.cpp"
-	"details/pass/build-ast-to-ir/scope-if.cpp"
-	"details/pass/build-ast-to-ir/scope-while.cpp"
-	"details/pass/build-ast-to-ir/scope-switch.cpp"
-	"details/pass/build-ast-to-ir/scope-func.cpp"
-	"details/pass/build-ast-to-ir/scope-closure.cpp"
-	"details/pass/build-ast-to-ir/scope-typeof.cpp"
-	"details/pass/build-ast-to-ir/scope-typedef.cpp"
-	"details/pass/build-ast-to-ir/scope-new.cpp"
-	"details/pass/build-ast-to-ir/scope-object.cpp"
-	"details/pass/build-ast-to-ir/scope-var.cpp"
-	"details/pass/build-ast-to-ir/scope-class.cpp"
-	"details/pass/build-ast-to-ir/scope-expr.cpp"
-	"details/pass/build-ast-to-ir/scope-call.cpp"
-	"details/pass/build-ast-to-ir/scope-return.cpp"
-	"details/pass/build-ast-to-ir/scope-stmt.cpp"
-	"details/pass/build-ast-to-ir/scope-scope.cpp"
-	"details/pass/build-ast-to-ir/scope-type.cpp"
-	"details/pass/build-ast-to-ir/scope-number.cpp"
-	"details/pass/build-ast-to-ir/scope-string.cpp"
-	"details/pass/build-ast-to-ir/scope-intrinsic.cpp"
-	"details/pass/build-ast-to-ir/scope-generic-type-parameters.cpp"
-	"details/pass/build-ast-to-ir/scope-attributes.cpp"
-	"details/pass/build-ast-to-ir/scope-unittest.cpp"
-	"details/pass/build-ast-to-ir/source-ast-to-ir.cpp")
+	"details/pass/b-ast-normalize/normalize.cpp")
 
+addsrc(
+	NAME  nysrc_details_pass_ast2ir
+	GROUP "details/pass/c-ast2ir"
+	FILES
+	"details/pass/c-ast2ir/context.cpp"
+	"details/pass/c-ast2ir/context.h"
+	"details/pass/c-ast2ir/context.hxx"
+	"details/pass/c-ast2ir/scope.h"
+	"details/pass/c-ast2ir/scope.hxx"
+	"details/pass/c-ast2ir/scope.cpp"
+	"details/pass/c-ast2ir/scope-array.cpp"
+	"details/pass/c-ast2ir/scope-for.cpp"
+	"details/pass/c-ast2ir/scope-in.cpp"
+	"details/pass/c-ast2ir/scope-if.cpp"
+	"details/pass/c-ast2ir/scope-while.cpp"
+	"details/pass/c-ast2ir/scope-switch.cpp"
+	"details/pass/c-ast2ir/scope-func.cpp"
+	"details/pass/c-ast2ir/scope-closure.cpp"
+	"details/pass/c-ast2ir/scope-typeof.cpp"
+	"details/pass/c-ast2ir/scope-typedef.cpp"
+	"details/pass/c-ast2ir/scope-new.cpp"
+	"details/pass/c-ast2ir/scope-object.cpp"
+	"details/pass/c-ast2ir/scope-var.cpp"
+	"details/pass/c-ast2ir/scope-class.cpp"
+	"details/pass/c-ast2ir/scope-expr.cpp"
+	"details/pass/c-ast2ir/scope-call.cpp"
+	"details/pass/c-ast2ir/scope-return.cpp"
+	"details/pass/c-ast2ir/scope-stmt.cpp"
+	"details/pass/c-ast2ir/scope-scope.cpp"
+	"details/pass/c-ast2ir/scope-type.cpp"
+	"details/pass/c-ast2ir/scope-number.cpp"
+	"details/pass/c-ast2ir/scope-string.cpp"
+	"details/pass/c-ast2ir/scope-intrinsic.cpp"
+	"details/pass/c-ast2ir/scope-generic-type-parameters.cpp"
+	"details/pass/c-ast2ir/scope-attributes.cpp"
+	"details/pass/c-ast2ir/scope-unittest.cpp"
+	"details/pass/c-ast2ir/source-ast-to-ir.cpp")
 
 addsrc(
 	NAME  nysrc_details_pass_build_attach
 	GROUP "details/pass/build-attach"
 	FILES
-	"details/pass/build-attach-program/mapping.cpp"
-	"details/pass/build-attach-program/mapping.h"
-	"details/pass/build-attach-program/attach.cpp")
-
+	"details/pass/d-object-map/mapping.cpp"
+	"details/pass/d-object-map/mapping.h"
+	"details/pass/d-object-map/attach.cpp")
 
 addsrc(
 	NAME  nysrc_details_pass_build_instanciate
-	GROUP "details/pass/build-instanciate"
+	GROUP "details/pass/e-instanciate"
 	FILES
-	"details/pass/build-instanciate/instanciate.cpp"
-	"details/pass/build-instanciate/instanciate-atom.cpp"
-	"details/pass/build-instanciate/instanciate-atom.h"
-	"details/pass/build-instanciate/instanciate.h"
-	"details/pass/build-instanciate/instanciate.hxx"
+	"details/pass/e-instanciate/instanciate.cpp"
+	"details/pass/e-instanciate/instanciate-atom.cpp"
+	"details/pass/e-instanciate/instanciate-atom.h"
+	"details/pass/e-instanciate/instanciate.h"
+	"details/pass/e-instanciate/instanciate.hxx"
 
-	"details/pass/build-instanciate/type-check.cpp"
-	"details/pass/build-instanciate/type-check.h"
-	"details/pass/build-instanciate/func-overload-match.cpp"
-	"details/pass/build-instanciate/func-overload-match.h"
+	"details/pass/e-instanciate/type-check.cpp"
+	"details/pass/e-instanciate/type-check.h"
+	"details/pass/e-instanciate/func-overload-match.cpp"
+	"details/pass/e-instanciate/func-overload-match.h"
 
-	"details/pass/build-instanciate/stack-frame.h"
-	"details/pass/build-instanciate/stack-frame.hxx"
-	"details/pass/build-instanciate/instanciate-capture-variable.cpp"
-	"details/pass/build-instanciate/instanciate-identify.cpp"
-	"details/pass/build-instanciate/instanciate-ensure-resolved.cpp"
-	"details/pass/build-instanciate/instanciate-self.cpp"
-	"details/pass/build-instanciate/instanciate-follow.cpp"
-	"details/pass/build-instanciate/instanciate-allocate.cpp"
-	"details/pass/build-instanciate/instanciate-stacksize.cpp"
-	"details/pass/build-instanciate/instanciate-alias.cpp"
-	"details/pass/build-instanciate/instanciate-store.cpp"
-	"details/pass/build-instanciate/instanciate-push.cpp"
-	"details/pass/build-instanciate/instanciate-builtin.cpp"
-	"details/pass/build-instanciate/instanciate-call.cpp"
-	"details/pass/build-instanciate/instanciate-sizeof.cpp"
-	"details/pass/build-instanciate/instanciate-error.h"
-	"details/pass/build-instanciate/instanciate-error.cpp"
-	"details/pass/build-instanciate/instanciate-error-not-declared.cpp"
-	"details/pass/build-instanciate/instanciate-intrinsic.cpp"
-	"details/pass/build-instanciate/instanciate-intrinsic-builtin.cpp"
-	"details/pass/build-instanciate/instanciate-intrinsic-builtin-specific.cpp"
-	"details/pass/build-instanciate/instanciate-return.cpp"
-	"details/pass/build-instanciate/instanciate-scope.cpp"
-	"details/pass/build-instanciate/instanciate-pragma.cpp"
-	"details/pass/build-instanciate/instanciate-blueprint.cpp"
-	"details/pass/build-instanciate/instanciate-assignment.cpp"
-	"details/pass/build-instanciate/instanciate-ref-unref.cpp"
-	"details/pass/build-instanciate/instanciate-assign.cpp"
-	"details/pass/build-instanciate/instanciate-typeisobject.cpp"
-	"details/pass/build-instanciate/instanciate-commontype.cpp"
-	"details/pass/build-instanciate/instanciate-member-variable-default-init.cpp"
-	"details/pass/build-instanciate/instanciate-member-variable-default-dispose.cpp"
-	"details/pass/build-instanciate/instanciate-member-variable-default-clone.cpp"
-	"details/pass/build-instanciate/instanciate-update-all-stackalloc.cpp"
-	"details/pass/build-instanciate/instanciate-debug.h"
-	"details/pass/build-instanciate/instanciate-debug.cpp"
-	"details/pass/build-instanciate/overloaded-func-call-resolution.cpp"
-	"details/pass/build-instanciate/overloaded-func-call-resolution.h")
-
+	"details/pass/e-instanciate/stack-frame.h"
+	"details/pass/e-instanciate/stack-frame.hxx"
+	"details/pass/e-instanciate/instanciate-capture-variable.cpp"
+	"details/pass/e-instanciate/instanciate-identify.cpp"
+	"details/pass/e-instanciate/instanciate-ensure-resolved.cpp"
+	"details/pass/e-instanciate/instanciate-self.cpp"
+	"details/pass/e-instanciate/instanciate-follow.cpp"
+	"details/pass/e-instanciate/instanciate-allocate.cpp"
+	"details/pass/e-instanciate/instanciate-stacksize.cpp"
+	"details/pass/e-instanciate/instanciate-alias.cpp"
+	"details/pass/e-instanciate/instanciate-store.cpp"
+	"details/pass/e-instanciate/instanciate-push.cpp"
+	"details/pass/e-instanciate/instanciate-builtin.cpp"
+	"details/pass/e-instanciate/instanciate-call.cpp"
+	"details/pass/e-instanciate/instanciate-sizeof.cpp"
+	"details/pass/e-instanciate/instanciate-error.h"
+	"details/pass/e-instanciate/instanciate-error.cpp"
+	"details/pass/e-instanciate/instanciate-error-not-declared.cpp"
+	"details/pass/e-instanciate/instanciate-intrinsic.cpp"
+	"details/pass/e-instanciate/instanciate-intrinsic-builtin.cpp"
+	"details/pass/e-instanciate/instanciate-intrinsic-builtin-specific.cpp"
+	"details/pass/e-instanciate/instanciate-return.cpp"
+	"details/pass/e-instanciate/instanciate-scope.cpp"
+	"details/pass/e-instanciate/instanciate-pragma.cpp"
+	"details/pass/e-instanciate/instanciate-blueprint.cpp"
+	"details/pass/e-instanciate/instanciate-assignment.cpp"
+	"details/pass/e-instanciate/instanciate-ref-unref.cpp"
+	"details/pass/e-instanciate/instanciate-assign.cpp"
+	"details/pass/e-instanciate/instanciate-typeisobject.cpp"
+	"details/pass/e-instanciate/instanciate-commontype.cpp"
+	"details/pass/e-instanciate/instanciate-member-variable-default-init.cpp"
+	"details/pass/e-instanciate/instanciate-member-variable-default-dispose.cpp"
+	"details/pass/e-instanciate/instanciate-member-variable-default-clone.cpp"
+	"details/pass/e-instanciate/instanciate-update-all-stackalloc.cpp"
+	"details/pass/e-instanciate/instanciate-debug.h"
+	"details/pass/e-instanciate/instanciate-debug.cpp"
+	"details/pass/e-instanciate/overloaded-func-call-resolution.cpp"
+	"details/pass/e-instanciate/overloaded-func-call-resolution.h")
 
 addsrc(
 	NAME  nysrc_details_vm
@@ -325,7 +319,6 @@ addsrc(
 	"details/vm/stack.hxx"
 	"details/vm/types.h")
 
-
 addsrc(
 	NAME  nysrc_details_utils
 	GROUP "details/utils"
@@ -341,7 +334,6 @@ addsrc(
 	"details/utils/clid.cpp"
 	"details/utils/clid.hxx")
 
-
 addsrc(
 	NAME  nysrc_details_ast
 	GROUP "details/ast"
@@ -352,7 +344,6 @@ addsrc(
 	"details/ast/ast.h"
 	"details/ast/ast.hxx"
 	"details/ast/ast.cpp")
-
 
 addsrc(
 	NAME  nysrc_details_ir
@@ -368,7 +359,6 @@ addsrc(
 	"details/ir/sequence.h"
 	"details/ir/sequence.hxx"
 	"details/ir/sequence.cpp")
-
 
 addsrc(
 	NAME  nysrc_details_atom_classdef
@@ -390,13 +380,11 @@ addsrc(
 	"details/atom/classdef-overloads.hxx"
 	"details/atom/classdef-overloads.cpp")
 
-
 addsrc(
 	NAME nysrc_details_type_system
 	GROUP "details/type"
 	FILES
 	"details/type/builtin.h")
-
 
 addsrc(
 	NAME  nysrc_details_atom
@@ -424,7 +412,6 @@ addsrc(
 	"details/atom/signature.cpp"
 	"details/atom/signature.hxx")
 
-
 addsrc(
 	NAME  nysrc_details_intrinsic
 	GROUP "details/intrinsic"
@@ -434,7 +421,6 @@ addsrc(
 	"details/intrinsic/intrinsic-table.h"
 	"details/intrinsic/intrinsic-table.hxx"
 	"details/intrinsic/intrinsic-table.cpp")
-
 
 addsrc(
 	NAME  nysrc_details_context
@@ -455,7 +441,6 @@ addsrc(
 	"details/context/source.hxx"
 	"details/context/source.cpp")
 
-
 addsrc(
 	NAME  nysrc_details_reporting
 	GROUP "details/reporting"
@@ -469,7 +454,6 @@ addsrc(
 	"details/errors/errors.h"
 	"details/errors/errors.cpp"
 	"details/reporting/levels.h")
-
 
 addsrc(
 	NAME  nysrc_c_api
@@ -489,7 +473,6 @@ addsrc(
 	"details/c-api/common-debuginfo.hxx"
 	"details/c-api/version.c")
 
-
 addsrc(
 	NAME  nysrc_io_adapter
 	GROUP "IO Adapter"
@@ -502,7 +485,6 @@ addsrc(
 	GROUP "public-headers"
 	FILES
 	"nany/nany.h")
-
 
 addsrc(
 	NAME  nysrc_details_vm_runtime
@@ -541,9 +523,9 @@ add_library(libnanyc ${mode_libnany}
 	${nysrc_c_api}
 	${nysrc_io_adapter}
 
-	${nysrc_details_pass_build_ast_from_source}
-	${nysrc_details_pass_build_ast_normalize}
-	${nysrc_details_pass_build_ast_to_ir}
+	${nysrc_details_pass_build_src2ast}
+	${nysrc_details_pass_ast_normalize}
+	${nysrc_details_pass_ast2ir}
 	${nysrc_details_pass_build_attach}
 	${nysrc_details_pass_build_instanciate}
 
