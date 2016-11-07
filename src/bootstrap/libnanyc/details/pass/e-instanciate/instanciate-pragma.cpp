@@ -41,11 +41,12 @@ namespace Instanciate
 			frame.lvids[lvid].synthetic = false;
 
 			// Parameters Deep copy (if required)
+			auto& cdef = seq.cdeftable.classdef(vardef.clid);
 			if (name[0] != '^')
 			{
 				// normal input parameter (not captured - does not start with '^')
 				// clone it if necessary (only non-ref parameters)
-				if (not seq.cdeftable.classdef(vardef.clid).qualifiers.ref)
+				if (not cdef.qualifiers.ref)
 				{
 					if (debugmode and generateCode)
 						seq.out->emitComment(String{"----- deep copy parameter "} << i << " aka " << name);
@@ -68,6 +69,15 @@ namespace Instanciate
 						if (debugmode)
 							seq.out->emitComment("--\n");
 					}
+				}
+			}
+			if (not cdef.isBuiltinOrVoid())
+			{
+				auto* paramatom = seq.cdeftable.findClassdefAtom(cdef);
+				if (unlikely(!paramatom))
+				{
+					frame.invalidate(lvid);
+					ice() << "invalid parameter type " << i << " for " << atom.caption(seq.cdeftable);
 				}
 			}
 		});
