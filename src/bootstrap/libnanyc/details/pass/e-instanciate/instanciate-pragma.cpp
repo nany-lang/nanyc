@@ -84,20 +84,17 @@ namespace Instanciate
 		// generating some code on the fly
 		if (atom.isSpecial() /*ctor, operators...*/ and generateCode)
 		{
-			// variables initialization (for a ctor)
-			if (seq.generateClassVarsAutoInit)
+			if (seq.generateClassVarsAutoInit) // var init (called by ctor)
 			{
 				seq.generateClassVarsAutoInit = false;
 				seq.generateMemberVarDefaultInitialization();
 			}
-			// variables destruction (for dtor)
-			if (seq.generateClassVarsAutoRelease)
+			if (seq.generateClassVarsAutoRelease) // var release (called by dtor)
 			{
 				seq.generateClassVarsAutoRelease = false;
 				seq.generateMemberVarDefaultDispose();
 			}
-			// variables cloning (copy a ctor)
-			if (seq.generateClassVarsAutoClone)
+			if (seq.generateClassVarsAutoClone) // var deep copy (copy ctor)
 			{
 				seq.generateClassVarsAutoClone = false;
 				seq.generateMemberVarDefaultClone();
