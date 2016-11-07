@@ -40,35 +40,28 @@ namespace Instanciate
 			// but real variables
 			frame.lvids[lvid].synthetic = false;
 
-			//
 			// Parameters Deep copy (if required)
-			//
 			if (name[0] != '^')
 			{
 				// normal input parameter (not captured - does not start with '^')
 				// clone it if necessary (only non-ref parameters)
-
 				if (not seq.cdeftable.classdef(vardef.clid).qualifiers.ref)
 				{
 					if (debugmode and generateCode)
 						seq.out->emitComment(String{"----- deep copy parameter "} << i << " aka " << name);
-
 					// a register has already been reserved for cloning parameters
 					uint32_t clone = 2 + count + i; // 1: return type, 2: first parameter
 					assert(clone < frame.lvids.size());
 					// the new value is not synthetic
 					frame.lvids[clone].synthetic = false;
-
 					bool r = seq.instanciateAssignment(frame, clone, lvid, false, false, true);
 					if (unlikely(not r))
 						frame.invalidate(clone);
-
 					if (seq.canBeAcquired(lvid))
 					{
 						frame.lvids[lvid].autorelease = true;
 						frame.lvids[clone].autorelease = false;
 					}
-
 					if (generateCode)
 					{
 						seq.out->emitStore(lvid, clone); // register swap
@@ -78,7 +71,6 @@ namespace Instanciate
 				}
 			}
 		});
-
 		// generating some code on the fly
 		if (atom.isSpecial() /*ctor, operators...*/ and generateCode)
 		{
@@ -88,14 +80,12 @@ namespace Instanciate
 				seq.generateClassVarsAutoInit = false;
 				seq.generateMemberVarDefaultInitialization();
 			}
-
 			// variables destruction (for dtor)
 			if (seq.generateClassVarsAutoRelease)
 			{
 				seq.generateClassVarsAutoRelease = false;
 				seq.generateMemberVarDefaultDispose();
 			}
-
 			// variables cloning (copy a ctor)
 			if (seq.generateClassVarsAutoClone)
 			{
@@ -158,7 +148,6 @@ namespace Instanciate
 			auto& opc = seq.cdeftable.substitute(lvid);
 			opc.mutateToAtom(&atombool);
 			opc.qualifiers.ref = true;
-
 			// ALLOC: memory allocation of the new temporary object
 			seq.out->emitMemalloc(lvid, sizeoflvid);
 			seq.out->emitRef(lvid);

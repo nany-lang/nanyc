@@ -55,7 +55,6 @@ namespace Instanciate
 			for (auto* f = frame; f != nullptr; f = f->previous)
 				debugPrintClassdefs(*f, cdeftable);
 		}
-
 		auto* frm = frame;
 		while (frm)
 		{
@@ -75,7 +74,6 @@ namespace Instanciate
 
 		// unref in the reverse order
 		auto i = static_cast<uint32_t>(frame->lvids.size());
-
 		if (canGenerateCode())
 		{
 			while (i-- != 0)

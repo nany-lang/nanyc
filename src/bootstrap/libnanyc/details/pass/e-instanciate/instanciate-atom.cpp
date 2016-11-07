@@ -44,7 +44,6 @@ namespace Instanciate
 				assert(param.kind != nyt_any or param.atom != nullptr);
 			}
 		}
-
 		count = static_cast<uint32_t>(info.tmplparams.size());
 		if (count != 0)
 		{
@@ -77,32 +76,26 @@ namespace Instanciate
 			// but it's required by the mapping (which must be thread-safe in the first passes - see attach)
 			// TODO remove this mutex
 			Mutex mutex;
-
 			Pass::Mapping::SequenceMapping mapper{originaltable, mutex, sequence};
 			mapper.evaluateWholeSequence = false;
 			mapper.prefixNameForFirstAtomCreated = "^";
-
 			// run the type mapping
 			mapper.map(*atom.parent, atom.opcodes.offset);
 
 			if (unlikely(!mapper.firstAtomCreated))
 				return (error() << "failed to remap atom '" << atom.caption() << "'");
-
 			assert(info.atom.get().atomid != mapper.firstAtomCreated->atomid);
 			assert(&info.atom.get() != mapper.firstAtomCreated);
 			info.atom = std::ref(*mapper.firstAtomCreated);
 		}
-
 		// the generic parameters are fully resolved now, avoid
 		// any new attempt to check them
 		auto& newAtom = info.atom.get();
 		newAtom.tmplparamsForPrinting.swap(newAtom.tmplparams);
-
 		// marking the new atom as instanciated, like any standard atom
 		newAtom.classinfo.isInstanciated = true;
 		// to keep the types for the new atoms
 		info.shouldMergeLayer = true;
-
 		// upate parameter types
 		return resolveStrictParameterTypes(info.build, newAtom, &info);
 	}
@@ -115,13 +108,10 @@ namespace Instanciate
 		// magic constant +2
 		//  * +1: all clid are 1-based (0 is reserved for the atom itself, not for an internal var)
 		//  * +1: the CLID{X, 1} is reserved for the return type
-
 		auto& cdeftable = seq.cdeftable;
 		uint32_t count = signature.parameters.size();
-
 		// unused pseudo/invalid register
 		cdeftable.addSubstitute(nyt_void, nullptr, Qualifiers()); // unused, since 1-based
-
 		// redefine return type {atomid,1}
 		auto& rettype = cdeftable.rawclassdef(CLID{atom.atomid, 1});
 		assert(atom.atomid == rettype.clid.atomid());
@@ -135,14 +125,12 @@ namespace Instanciate
 			cdeftable.addSubstitute(param.kind, param.atom, param.qualifiers);
 			assert(param.kind != nyt_any or param.atom != nullptr);
 		}
-
 		// adding reserved variables for cloning parameters (after normal parameters)
 		for (uint32_t i = 0; i != count; ++i)
 		{
 			auto& param = signature.parameters[i];
 			cdeftable.addSubstitute(param.kind, param.atom, param.qualifiers);
 		}
-
 		// template parameters
 		count = signature.tmplparams.size();
 		for (uint32_t i = 0; i != count; ++i)
@@ -156,9 +144,6 @@ namespace Instanciate
 
 	IR::Sequence* performAtomInstanciation(InstanciateData& info, Signature& signature)
 	{
-		// No IR sequence attached for the given signature,
-		// let's instanciate the function or the class !
-
 		auto& atomRequested = info.atom.get();
 		if (unlikely(!atomRequested.opcodes.sequence or !atomRequested.parent))
 		{
@@ -175,21 +160,18 @@ namespace Instanciate
 			// the atom has changed - info.atom.get() has been updated accordingly
 			assert(&info.atom.get() != &atomRequested);
 		}
-
 		// the current atom, can be different from `atomRequested`
 		auto& atom = info.atom.get();
 		// the new IR sequence for the instanciated function
 		auto* outIR = new IR::Sequence;
 		// the original IR sequence generated from the AST
 		auto& inputIR = *(atom.opcodes.sequence);
-
 		// Do some variables require capture ? (from mapping)
 		if (!!atom.candidatesForCapture)
 		{
 			if (info.parent)
 				info.parent->captureVariables(atom);
 		}
-
 		// registering the new instanciation first
 		// (required for recursive functions & classes)
 		// `atomRequested` is probably `atom` itself, but different for template classes
@@ -199,30 +181,24 @@ namespace Instanciate
 		ClassdefTableView newView{info.cdeftable, atom.atomid, signature.parameters.size()};
 		// Error reporting
 		Logs::Report report{*info.report};
-
 		// instanciate the sequence attached to the atom
 		auto builder = std::make_unique<SequenceBuilder>
 			(report.subgroup(), newView, info.build, outIR, inputIR, info.parent);
 
 		if (Config::Traces::sourceOpcodeSequence)
 			debugPrintSourceOpcodeSequence(info.cdeftable, info.atom.get(), "[ir-from-ast] ");
-
 		// transfert input parameters
 		pushSubstituteTypesFromSignatureParameters(*builder, atom, signature);
-		//if (info.parentAtom)
 		builder->layerDepthLimit = 2; // allow the first blueprint to be instanciated
-
 		// atomid mapping, usefull to keep track of the good atom id
 		builder->mappingBlueprintAtomID[0] = atomRequested.atomid; // {from}
 		builder->mappingBlueprintAtomID[1] = atom.atomid;          // {to}
-
 		// Read the input IR sequence, resolve all types, and generate
 		// a new IR sequence ready for execution ! (with or without optimization passes)
 		// (everything happens here)
 		bool success = builder->readAndInstanciate(atom.opcodes.offset);
 
 		updateTypesInAllStackallocOp(*outIR, newView, atom.atomid);
-
 		// keep all deduced types
 		if (/*likely(success) and*/ info.shouldMergeLayer)
 			newView.mergeSubstitutes();
@@ -261,7 +237,6 @@ namespace Instanciate
 						info.returnType.kind = cdefReturn.kind;
 					break;
 				}
-
 				case Atom::Type::classdef:
 				{
 					// provides the default ctor implementation if not user-defined
@@ -275,7 +250,6 @@ namespace Instanciate
 					info.returnType.mutateToVoid();
 				}
 			}
-
 			if (likely(success))
 			{
 				// registering the new instance to the atom
@@ -284,7 +258,6 @@ namespace Instanciate
 				return outIR;
 			}
 		}
-
 		// failed to instanciate the input IR sequence. This can be expected, if trying
 		// to not instanciate the appropriate function (if several overloads are present
 		// for example). Anyway, remembering this signature as a 'no-go'.
@@ -303,10 +276,8 @@ namespace Instanciate
 			ice() << "cannot mark non function '" << atom.caption() << "' as recursive";
 			return false;
 		}
-
 		bool success = (info.parent
 			and info.parent->getReturnTypeForRecursiveFunc(atom, info.returnType));
-
 		if (unlikely(not success))
 		{
 			info.returnType.mutateToAny();
@@ -839,7 +810,6 @@ namespace Instanciate
 					if (unlikely(not instanciateRecursiveAtom(info)))
 						return false;
 				}
-
 				// instance already present
 				if (unlikely(remapAtom != nullptr)) // the target atom may have changed (template class)
 					info.atom = std::ref(*remapAtom);

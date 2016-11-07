@@ -47,10 +47,8 @@ namespace Instanciate
 		//! Flag to determine whether the referer of the referer should be taken or not
 		// (used for resolving 'self')
 		bool singleHopForReferer = false;
-
 		//! Self lvid to use if call to a property setter (0 otherwise)
 		uint32_t propsetCallSelf = 0u;
-
 		//! The scope depth when the variable has been declared
 		int scope = -1; // -1: no scope, : 0 first scope
 		//! declaration offset (stackalloc) in the out IR sequence
@@ -110,16 +108,10 @@ namespace Instanciate
 	struct AtomStackFrame final
 	{
 		explicit AtomStackFrame(Atom& atom);
-
 		uint32_t localVariablesCount() const;
-
 		uint32_t findLocalVariable(const AnyString& name) const;
-
 		void resizeRegisterCount(uint32_t count, ClassdefTableView& table);
-
-		//! Check if a lvid is valid
 		bool verify(uint32_t lvid) const;
-
 		void invalidate(uint32_t lvid);
 
 
@@ -132,28 +124,21 @@ namespace Instanciate
 		int scope = 0;
 		//! Information on local registers
 		std::vector<LVIDInfo> lvids;
-
 		//! List of possible solutions per clid
 		// TODO use a more efficient container
 		std::unordered_map<CLID, std::vector<std::reference_wrapper<Atom>>> partiallyResolved;
-
 		//! Self parameters for ctors
 		// {varname/parameter} -> {lvid, used flag}
 		std::unique_ptr<std::unordered_map<AnyString, std::pair<LVID, bool>>> selfParameters;
-
 		//! list of return values
 		std::vector<ReturnValueMarker> returnValues;
-
 		//! Offset where the current blueprint is declared
 		uint32_t offsetOpcodeBlueprint = (uint32_t) -1;
 		//! Offset where the stack size is declared
 		uint32_t offsetOpcodeStacksize = (uint32_t) -1;
-
 		//! Linked list frames
 		AtomStackFrame* previous = nullptr;
 	};
-
-
 
 
 
