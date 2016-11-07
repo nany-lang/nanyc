@@ -81,10 +81,7 @@ namespace Instanciate
 	{
 		assert(lvid > 1);
 		assert(canBeAcquired(lvid));
-
 		out->emitRef(lvid);
-
-		// force unref
 		assert(lvid < frame->lvids.size());
 		frame->lvids[lvid].autorelease = true;
 	}
@@ -102,8 +99,6 @@ namespace Instanciate
 		if (canBeAcquired(type))
 			acquireObject(lvid);
 	}
-
-
 
 
 

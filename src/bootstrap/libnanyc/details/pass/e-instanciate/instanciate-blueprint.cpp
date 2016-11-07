@@ -29,7 +29,6 @@ namespace Instanciate
 
 		uint32_t atomid = operands.atomid;
 		uint32_t lvid   = operands.lvid;
-
 		// retrieving the atomid - the atomid may be different from the one requested
 		// (class with generic types parameters, anonymous classes...)
 		assert(seq.mappingBlueprintAtomID[0] != 0 and "mapping atomid not set");
@@ -57,7 +56,6 @@ namespace Instanciate
 		{
 			seq.pushNewFrame(atom);
 			seq.frame->offsetOpcodeBlueprint = currentSequence.offsetOf(**seq.cursor);
-
 			auto kind = static_cast<IR::ISA::Blueprint>(operands.kind);
 			if (kind == IR::ISA::Blueprint::funcdef)
 			{
@@ -98,7 +96,6 @@ namespace Instanciate
 				// anonymous class
 				// The flag Atom::Flags::captureVariables should already be set via 'mapping'
 				assert(atom.flags(Atom::Flags::captureVariables));
-
 				Atom* resAtom = seq.instanciateAtomClass(atom); // instanciating the class
 				if (unlikely(!resAtom))
 				{
@@ -106,8 +103,7 @@ namespace Instanciate
 						seq.frame->invalidate(lvid);
 					return;
 				}
-
-				// updating the attached lvid for automatic type declaration
+			// updating the attached lvid for automatic type declaration
 				seq.cdeftable.substitute(lvid).mutateToAtom(resAtom);
 			}
 		}
@@ -161,7 +157,6 @@ namespace Instanciate
 		// example: operator new (self varname) {}
 		assert(seq.frame != nullptr);
 		auto& frame = *seq.frame;
-
 		if (unlikely(not frame.atom.isClassMember()))
 		{
 			error() << "automatic variable assignment is only allowed in class operator 'new'";
@@ -170,7 +165,6 @@ namespace Instanciate
 
 		if (!frame.selfParameters.get())
 			frame.selfParameters = std::make_unique<decltype(frame.selfParameters)::element_type>();
-
 		uint32_t sid  = operands.name;
 		uint32_t lvid = operands.lvid;
 		AnyString varname = seq.currentSequence.stringrefs[sid];
@@ -187,7 +181,6 @@ namespace Instanciate
 			{
 				uint32_t sid  = operands.name;
 				const AnyString& varname = seq.currentSequence.stringrefs[sid];
-
 				Atom* atom = nullptr;
 				if (1 != seq.frame->atom.findVarAtom(atom, varname))
 				{
