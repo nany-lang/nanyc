@@ -278,6 +278,13 @@ namespace Instanciate
 	}
 
 
+	void SequenceBuilder::PushedParameters::clear()
+	{
+		func.indexed.clear();
+		func.named.clear();
+		gentypes.indexed.clear();
+		gentypes.named.clear();
+	}
 
 
 } // namespace Instanciate
