@@ -119,7 +119,7 @@ namespace Instanciate
 		//! The atom
 		Atom& atom;
 		//! Current atomid
-		uint32_t atomid = 0u;
+		const uint32_t atomid = 0u;
 		//! Current scope depth
 		int scope = 0;
 		//! Information on local registers
@@ -137,7 +137,7 @@ namespace Instanciate
 		//! Offset where the stack size is declared
 		uint32_t offsetOpcodeStacksize = (uint32_t) -1;
 		//! Linked list frames
-		AtomStackFrame* previous = nullptr;
+		AtomStackFrame* const previous = nullptr;
 	};
 
 
