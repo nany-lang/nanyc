@@ -70,9 +70,8 @@ namespace Instanciate
 				return false;
 
 			uint32_t count = static_cast<uint32_t>(pushedparams.func.indexed.size());
-			frame->lvids[operands.lvid].synthetic = false;
+			frame->lvids(operands.lvid).synthetic = false;
 			bool hasErrors = false;
-
 			// reset the returned type
 			cdeftable.substitute(operands.lvid).kind = intrinsic->rettype;
 
@@ -89,7 +88,6 @@ namespace Instanciate
 					complainIntrinsicParameter(name, i, cdef, "a builtin type");
 					continue;
 				}
-
 				if (canGenerateCode())
 					out->emitPush(element.lvid);
 			}
@@ -115,7 +113,6 @@ namespace Instanciate
 			frame->invalidate(operands.lvid);
 			success = false;
 		}
-
 		// always remove pushed parameters, whatever the result
 		pushedparams.clear();
 	}

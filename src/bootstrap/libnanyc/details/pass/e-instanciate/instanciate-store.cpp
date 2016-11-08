@@ -15,7 +15,7 @@ namespace Instanciate
 	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::storeConstant>& operands)
 	{
 		assert(frame != nullptr);
-		frame->lvids[operands.lvid].synthetic = false;
+		frame->lvids(operands.lvid).synthetic = false;
 		if (canGenerateCode())
 			out->emitStore_u64(operands.lvid, operands.value.u64);
 	}
@@ -24,7 +24,7 @@ namespace Instanciate
 	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::store>& operands)
 	{
 		assert(frame != nullptr);
-		frame->lvids[operands.lvid].synthetic = false;
+		frame->lvids(operands.lvid).synthetic = false;
 
 		if (not frame->verify(operands.source))
 			return frame->invalidate(operands.lvid);
@@ -47,7 +47,7 @@ namespace Instanciate
 		if (canGenerateCode())
 		{
 			uint32_t sid = out->emitStoreText(operands.lvid, currentSequence.stringrefs[operands.text]);
-			auto& lvidinfo = frame->lvids[operands.lvid];
+			auto& lvidinfo = frame->lvids(operands.lvid);
 			lvidinfo.synthetic = false;
 			lvidinfo.text_sid  = sid;
 		}

@@ -141,8 +141,7 @@ namespace Instanciate
 			if (var.clid.atomid() == frame->atomid)
 			{
 				// mark the captured variables as used to avoid spurious warnings
-				frame->lvids[var.clid.lvid()].warning.unused = false;
-
+				frame->lvids(var.clid.lvid()).warning.unused = false;
 				// reset the subtitute
 				auto& spare = cdeftable.substitute(var.clid.lvid());
 				spare.mutateToAtom(varSrcAtom);

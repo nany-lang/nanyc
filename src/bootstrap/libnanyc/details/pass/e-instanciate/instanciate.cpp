@@ -73,12 +73,12 @@ namespace Instanciate
 			return;
 
 		// unref in the reverse order
-		auto i = static_cast<uint32_t>(frame->lvids.size());
+		auto i = frame->localVariablesCount();
 		if (canGenerateCode())
 		{
 			while (i-- != 0)
 			{
-				auto& clcvr = frame->lvids[i];
+				auto& clcvr = frame->lvids(i);
 				if (not (clcvr.scope >= scope))
 					continue;
 
@@ -108,7 +108,7 @@ namespace Instanciate
 			assert(forget == true);
 			while (i-- != 0) // just invalidate everything
 			{
-				auto& clcvr = frame->lvids[i];
+				auto& clcvr = frame->lvids(i);
 				if (clcvr.scope >= scope)
 				{
 					clcvr.userDefinedName.clear();
@@ -132,17 +132,17 @@ namespace Instanciate
 
 		operands.add += count;
 		frame->resizeRegisterCount(operands.add, cdeftable);
-		assert(startOffset + count <= frame->lvids.size());
+		assert(startOffset + count <= frame->localVariablesCount());
 
 		for (uint32_t i = 0; i != count; ++i)
 		{
 			uint32_t lvid = startOffset + i;
 			cdeftable.substitute(lvid).mutateToAny();
 
-			auto& lvidinfo = frame->lvids[lvid];
-			lvidinfo.scope = scope;
-			lvidinfo.synthetic = false;
-			lvidinfo.offsetDeclOut = out->opcodeCount();
+			auto& details = frame->lvids(lvid);
+			details.scope = scope;
+			details.synthetic = false;
+			details.offsetDeclOut = out->opcodeCount();
 			out->emitStackalloc(startOffset + i, nyt_any);
 		}
 		return startOffset;

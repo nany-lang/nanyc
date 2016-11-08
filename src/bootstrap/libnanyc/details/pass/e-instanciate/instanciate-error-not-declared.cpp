@@ -181,22 +181,18 @@ namespace complain
 		if (debugmode)
 			h << " {atomid: " << atom.atomid << '}';
 
-
 		// trying local variables first
 		if (self == nullptr and not isOperator)
 		{
 			uint32_t note;
-
 			// reverse order, to get the nearest first
-			auto i = (uint32_t) seq->frame->lvids.size();
+			auto i = seq->frame->localVariablesCount();
 			while (i-- > 0)
 			{
-				auto& crlcvr = seq->frame->lvids[i];
-
+				auto& crlcvr = seq->frame->lvids(i);
 				// only take non-empty names and avoid the hidden parameter 'self'
 				if (crlcvr.userDefinedName.empty() or crlcvr.userDefinedName == "self")
 					continue;
-
 				if (not stringsAreCloseEnough(note, name, crlcvr.userDefinedName))
 					continue;
 
@@ -208,13 +204,11 @@ namespace complain
 					suggest << cdeftable.keyword(*varAtom) << ' ';
 					varAtom->retrieveCaption(suggest.data().message, cdeftable);
 				}
-
 				suggest.origins().location.pos.line   = crlcvr.file.line;
 				suggest.origins().location.pos.offset = crlcvr.file.offset;
 				suggest.origins().location.filename   = crlcvr.file.url;
 			}
 		}
-
 
 		auto* parentAtom = (self) ? self : atom.parent;
 		if (parentAtom)

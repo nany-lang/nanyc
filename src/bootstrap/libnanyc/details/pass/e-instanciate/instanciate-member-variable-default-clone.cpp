@@ -22,13 +22,9 @@ namespace Instanciate
 		// special location: in a constructor - initializing all variables with their def value
 		// note: do not keep a reference on 'out->at...', since the internal buffer might be reized
 		auto& parentAtom = *(frame->atom.parent);
-
 		// do not warn about rhs (unused). The parameter is used, but not via its name
 		// reminder: 1-based, 1: returntype, 2: self, 3: first parameter rhs
-		assert(3 < frame->lvids.size());
-		frame->lvids[3].warning.unused = false;
-
-
+		frame->lvids(3).warning.unused = false;
 		// looking for all members to clone
 		std::vector<std::reference_wrapper<Atom>> atomvars;
 		Atom* userDefinedClone = nullptr;
@@ -49,7 +45,6 @@ namespace Instanciate
 		if (atomvars.empty() and userDefinedClone == nullptr)
 			return;
 
-
 		// create new local variables for performing the cline
 		uint32_t more = (uint32_t)atomvars.size() * 2 + (userDefinedClone ? 1 : 0);
 		uint32_t lvid = createLocalVariables(more);
@@ -68,7 +63,7 @@ namespace Instanciate
 					uint32_t rhsptr = lvid++; // rhs value, from the object being cloned
 					uint32_t lhsptr = lvid++; // the target local value
 
-					auto& origin  = frame->lvids[rhsptr].origin.varMember;
+					auto& origin  = frame->lvids(rhsptr).origin.varMember;
 					origin.self   = 2;
 					origin.atomid = subatom.atomid;
 					origin.field  = subatom.varinfo.effectiveFieldIndex;
@@ -91,7 +86,7 @@ namespace Instanciate
 
 					// prevent the cloned object from being released at the end of the scope
 					assert(canBeAcquired(lhsptr));
-					frame->lvids[lhsptr].autorelease = false;
+					frame->lvids(lhsptr).autorelease = false;
 					break;
 				}
 				case nyt_void:
@@ -121,8 +116,6 @@ namespace Instanciate
 			++lvid;
 		}
 	}
-
-
 
 
 

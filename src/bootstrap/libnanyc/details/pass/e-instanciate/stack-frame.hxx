@@ -27,22 +27,22 @@ namespace Instanciate
 		, atomid(atom.atomid)
 		, previous(previous)
 	{
-		lvids.resize(atom.localVariablesCount);
+		m_locallvids.resize(atom.localVariablesCount);
 	}
 
 
 	inline uint32_t AtomStackFrame::localVariablesCount() const
 	{
-		return static_cast<uint32_t>(lvids.size());
+		return static_cast<uint32_t>(m_locallvids.size());
 	}
 
 
 	inline uint32_t AtomStackFrame::findLocalVariable(const AnyString& name) const
 	{
-		uint32_t count = static_cast<uint32_t>(lvids.size());
+		uint32_t count = localVariablesCount();
 		for (uint32_t i = count; i--; )
 		{
-			if (lvids[i].userDefinedName == name)
+			if (m_locallvids[i].userDefinedName == name)
 				return i;
 		}
 		return 0u;
@@ -51,25 +51,38 @@ namespace Instanciate
 
 	inline void AtomStackFrame::resizeRegisterCount(uint32_t count, ClassdefTableView& table)
 	{
-		if (count >= lvids.size())
-			lvids.resize(count);
+		if (count >= m_locallvids.size())
+			m_locallvids.resize(count);
 		table.substituteResize(count);
 	}
 
 
 	inline bool AtomStackFrame::verify(uint32_t lvid) const
 	{
-		assert(lvid != 0 and lvid < lvids.size());
-		return likely(not lvids[lvid].errorReported);
+		assert(lvid != 0);
+		return likely(not lvids(lvid).errorReported);
 	}
 
 
 	inline void AtomStackFrame::invalidate(uint32_t lvid)
 	{
-		assert(lvid != 0 and lvid < lvids.size());
-		lvids[lvid].errorReported = true;
+		assert(lvid != 0);
+		lvids(lvid).errorReported = true;
 	}
 
+
+	inline LVIDInfo& AtomStackFrame::lvids(uint32_t i)
+	{
+		assert(i < m_locallvids.size());
+		return m_locallvids[i];
+	}
+
+
+	inline const LVIDInfo& AtomStackFrame::lvids(uint32_t i) const
+	{
+		assert(i < m_locallvids.size());
+		return m_locallvids[i];
+	}
 
 
 

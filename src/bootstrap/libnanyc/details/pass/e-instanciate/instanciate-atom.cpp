@@ -621,16 +621,16 @@ namespace Instanciate
 				if (unlikely(not spare.isBuiltinOrVoid() and spare.atom == nullptr))
 					return (ice() << "return: invalid atom for return type");
 
-				frame->lvids[retlvid].synthetic = false;
+				frame->lvids(retlvid).synthetic = false;
 
 				// release automatically the returned value, acquired by the function
 				if (canBeAcquired(info.returnType))
-					frame->lvids[retlvid].autorelease = true;
+					frame->lvids(retlvid).autorelease = true;
 			}
 			else
 				spare.mutateToVoid();
 
-			frame->lvids[retlvid].origin.returnedValue = true;
+			frame->lvids(retlvid).origin.returnedValue = true;
 		}
 		return true;
 	}

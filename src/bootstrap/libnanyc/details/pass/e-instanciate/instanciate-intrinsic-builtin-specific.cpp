@@ -38,7 +38,7 @@ namespace Instanciate
 		if (seq.canGenerateCode())
 			seq.out->emitStore(lvid, lhs);
 
-		auto& lvidinfo = seq.frame->lvids[lvid];
+		auto& lvidinfo = seq.frame->lvids(lvid);
 		lvidinfo.synthetic = false;
 
 		if (seq.canBeAcquired(cdef) and seq.canGenerateCode()) // re-acquire the object
@@ -104,7 +104,7 @@ namespace Instanciate
 		if (unlikely(not checkForIntrinsicParamCount(name, count)))
 			return Tribool::Value::no;
 
-		frame->lvids[lvid].synthetic = false;
+		frame->lvids(lvid).synthetic = false;
 
 		// intrinsic builtin found !
 		return ((it->second.second))(*this, lvid) ? Tribool::Value::yes : Tribool::Value::no;

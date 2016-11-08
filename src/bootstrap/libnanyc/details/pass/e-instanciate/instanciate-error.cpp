@@ -291,7 +291,7 @@ namespace complain
 		auto suggest = (err.hint() << "previous declaration of '" << name << '\'');
 		if (seq)
 		{
-			auto& lr = seq->frame->lvids[previousDeclaration];
+			auto& lr = seq->frame->lvids(previousDeclaration);
 			lr.fillLogEntryWithLocation(suggest);
 		}
 		return false;
@@ -304,8 +304,8 @@ namespace complain
 		auto* frame = seq->frame;
 		assert(frame != nullptr);
 		auto err = (error() << "ambigous resolution");
-		if (not frame->lvids[lvid].resolvedName.empty())
-			err << " for '" << frame->lvids[lvid].resolvedName << "'";
+		if (not frame->lvids(lvid).resolvedName.empty())
+			err << " for '" << frame->lvids(lvid).resolvedName << "'";
 
 		CLID clid{frame->atomid, lvid};
 		if (debugmode)
@@ -344,9 +344,9 @@ namespace complain
 
 		auto* frame = seq->frame;
 		String varname;
-		for (auto l = frame->lvids[lvid].referer; l != 0; l = frame->lvids[l].referer)
+		for (auto l = frame->lvids(lvid).referer; l != 0; l = frame->lvids(l).referer)
 		{
-			auto& part = frame->lvids[l].resolvedName;
+			auto& part = frame->lvids(l).resolvedName;
 			if (not part.empty())
 			{
 				AnyString keyword;
@@ -600,17 +600,15 @@ namespace complain
 
 	void SequenceBuilder::complainUnusedVariable(const AtomStackFrame& frame, uint32_t lvid) const
 	{
-		auto& lvidinfo = frame.lvids[lvid];
+		auto& lvidinfo = frame.lvids(lvid);
 		if (not lvidinfo.errorReported)
 		{
 			auto err = warning();
-
 			lvidinfo.fillLogEntryWithLocation(err);
 			err << "unused variable '" << lvidinfo.userDefinedName << "' in '";
 			err << cdeftable.keyword(frame.atom) << ' ';
 			err << frame.atom.caption(cdeftable);
 			err << '\'';
-
 			if (debugmode)
 				err << " {atomid: " << frame.atomid << '}';
 		}

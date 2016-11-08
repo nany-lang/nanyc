@@ -42,9 +42,9 @@ namespace Instanciate
 
 		// remember that the value stored into the register comes from a memory allocation
 		// (can be used to avoid spurious object copies for example)
-		frame->lvids[operands.lvid].origin.memalloc = true;
+		frame->lvids(operands.lvid).origin.memalloc = true;
 		// not a synthetic object
-		frame->lvids[operands.lvid].synthetic = false;
+		frame->lvids(operands.lvid).synthetic = false;
 
 		if (canGenerateCode())
 		{

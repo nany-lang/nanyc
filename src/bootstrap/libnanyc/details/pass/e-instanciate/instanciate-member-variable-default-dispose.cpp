@@ -85,7 +85,7 @@ namespace Instanciate
 			// read the pointer
 			out->emitFieldget(reglvid, /*self*/ 2, subatom.varinfo.effectiveFieldIndex);
 
-			auto& origin  = frame->lvids[reglvid].origin.varMember;
+			auto& origin  = frame->lvids(reglvid).origin.varMember;
 			origin.self   = 2;
 			origin.atomid = subatom.atomid;
 			origin.field  = subatom.varinfo.effectiveFieldIndex;

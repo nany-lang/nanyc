@@ -50,7 +50,6 @@ namespace Instanciate
 	inline bool SequenceBuilder::canBeAcquired(LVID lvid) const
 	{
 		assert(frame != nullptr);
-		assert(lvid < frame->lvids.size());
 		return canBeAcquired(CLID{frame->atomid, lvid});
 	}
 
@@ -70,11 +69,10 @@ namespace Instanciate
 
 	inline void SequenceBuilder::acquireObject(LVID lvid)
 	{
-		assert(lvid > 1);
+		assert(lvid > 1 and "can not acquire the returned value");
 		assert(canBeAcquired(lvid));
 		out->emitRef(lvid);
-		assert(lvid < frame->lvids.size());
-		frame->lvids[lvid].autorelease = true;
+		frame->lvids(lvid).autorelease = true;
 	}
 
 
