@@ -16,7 +16,7 @@ namespace Instanciate
 	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::assign>& operands)
 	{
 		assert(frame != nullptr);
-		frame->lvids[operands.lhs].synthetic = false;
+		frame->lvids(operands.lhs).synthetic = false;
 
 		if (not frame->verify(operands.rhs))
 			return frame->invalidate(operands.lhs);

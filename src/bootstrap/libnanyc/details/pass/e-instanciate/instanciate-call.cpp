@@ -66,9 +66,9 @@ namespace Instanciate
 			return false;
 
 		// assignment should be handled somewhere else
-		assert(not frame.lvids[operands.ptr2func].pointerAssignment);
+		assert(not frame.lvids(operands.ptr2func).pointerAssignment);
 
-		if (unlikely(frame.lvids[operands.ptr2func].markedAsAny))
+		if (unlikely(frame.lvids(operands.ptr2func).markedAsAny))
 			return error() << "can not perform member lookup on 'any'";
 
 		auto& cdeftable = seq.cdeftable;
@@ -85,7 +85,7 @@ namespace Instanciate
 		decltype(FuncOverloadMatch::result.params) tmplparams;
 
 		// whatever the result of this func, 'lvid' is a returned value
-		frame.lvids[lvid].origin.returnedValue = true;
+		frame.lvids(lvid).origin.returnedValue = true;
 
 		// preparing the overload matcher
 		auto& overloadMatch = seq.overloadMatch;
@@ -93,7 +93,7 @@ namespace Instanciate
 		overloadMatch.input.rettype.push_back(CLID{atomid, lvid});
 
 		// inserting the 'self' variable if a referer exists
-		LVID referer = frame.lvids[operands.ptr2func].referer;
+		LVID referer = frame.lvids(operands.ptr2func).referer;
 		if (referer != 0)
 		{
 			// double indirection - TODO find a beter way
@@ -101,9 +101,8 @@ namespace Instanciate
 			//  %z = resolve %y."^()" - due to intermediate representation of func call
 			//
 			// In some other cases, only one is needed, especially for functors
-			assert(referer < frame.lvids.size());
-			if (not frame.lvids[referer].singleHopForReferer)
-				referer = frame.lvids[referer].referer;
+			if (not frame.lvids(referer).singleHopForReferer)
+				referer = frame.lvids(referer).referer;
 		}
 
 		if (referer != 0)
@@ -259,7 +258,7 @@ namespace Instanciate
 		if (not frame.verify(lvid) or not frame.verify(lvidBoolResult))
 			return false;
 
-		uint32_t offset = frame.lvids[lvid].offsetDeclOut;
+		uint32_t offset = frame.lvids(lvid).offsetDeclOut;
 		if (unlikely(not (offset > 0 and offset < out->opcodeCount())))
 			return (ice() << "invalid opcode offset for generating shortcircuit");
 
@@ -341,7 +340,7 @@ namespace Instanciate
 			return (ice() << "atom is not a property setter");
 
 		// self, if any
-		uint32_t self = frame.lvids[operands.ptr2func].propsetCallSelf;
+		uint32_t self = frame.lvids(operands.ptr2func).propsetCallSelf;
 		if (self == (uint32_t) -1) // unwanted value just for indicating propset call
 		{
 			// no self parameter, actually here, no self provided by the code
@@ -404,14 +403,14 @@ namespace Instanciate
 		// but the input parameters can be slighty different
 
 		// the result is no longer a synthetic object
-		frame->lvids[operands.lvid].synthetic = false;
+		frame->lvids(operands.lvid).synthetic = false;
 		// resul of the operation
 		bool callSuccess;
 
-		if (0 == frame->lvids[operands.ptr2func].propsetCallSelf)
+		if (0 == frame->lvids(operands.ptr2func).propsetCallSelf)
 		{
 			// normal function call, or assignment
-			callSuccess = ((not frame->lvids[operands.ptr2func].pointerAssignment)
+			callSuccess = ((not frame->lvids(operands.ptr2func).pointerAssignment)
 				? emitFuncCall(*this, operands)
 				: instanciateAssignment(operands));
 

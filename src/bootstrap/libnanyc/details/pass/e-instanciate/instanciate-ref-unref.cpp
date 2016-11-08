@@ -18,7 +18,7 @@ namespace Instanciate
 		if (not frame->verify(lvid))
 			return;
 
-		if (unlikely(frame->lvids[lvid].synthetic))
+		if (unlikely(frame->lvids(lvid).synthetic))
 		{
 			auto err = (error() << "cannot unref a synthetic object");
 			if (debugmode)
@@ -54,7 +54,7 @@ namespace Instanciate
 		if (not frame->verify(operands.lvid))
 			return;
 
-		if (unlikely(frame->lvids[operands.lvid].synthetic))
+		if (unlikely(frame->lvids(operands.lvid).synthetic))
 		{
 			error() << "cannot acquire a synthetic object";
 			return;

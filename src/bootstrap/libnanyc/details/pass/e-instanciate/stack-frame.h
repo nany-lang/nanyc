@@ -113,7 +113,8 @@ namespace Instanciate
 		void resizeRegisterCount(uint32_t count, ClassdefTableView& table);
 		bool verify(uint32_t lvid) const;
 		void invalidate(uint32_t lvid);
-
+		LVIDInfo& lvids(uint32_t);
+		const LVIDInfo& lvids(uint32_t) const;
 
 	public:
 		//! The atom
@@ -122,8 +123,6 @@ namespace Instanciate
 		const uint32_t atomid = 0u;
 		//! Current scope depth
 		int scope = 0;
-		//! Information on local registers
-		std::vector<LVIDInfo> lvids;
 		//! List of possible solutions per clid
 		// TODO use a more efficient container
 		std::unordered_map<CLID, std::vector<std::reference_wrapper<Atom>>> partiallyResolved;
@@ -138,6 +137,10 @@ namespace Instanciate
 		uint32_t offsetOpcodeStacksize = (uint32_t) -1;
 		//! Linked list frames
 		AtomStackFrame* const previous = nullptr;
+
+	private:
+		//! Information on local registers
+		std::vector<LVIDInfo> m_locallvids;
 	};
 
 

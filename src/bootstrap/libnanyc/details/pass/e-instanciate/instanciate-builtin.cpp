@@ -18,11 +18,9 @@ namespace Instanciate
 		if (not frame->verify(operands.lvid))
 			return;
 
-		auto& lvidinfo = frame->lvids[operands.lvid];
+		auto& lvidinfo = frame->lvids(operands.lvid);
 		lvidinfo.scope = frame->scope;
-
-		nytype_t type = static_cast<nytype_t>(operands.type);
-
+		nytype_t type  = static_cast<nytype_t>(operands.type);
 		// reset the underlying type, to make sure that the current layer has
 		// the accurate information
 		auto& spare = cdeftable.substitute(operands.lvid);
@@ -45,9 +43,7 @@ namespace Instanciate
 				break;
 			}
 		}
-
-		// copy only variable instances
-		if (canGenerateCode())
+		if (canGenerateCode()) // copy only variable instances
 		{
 			lvidinfo.offsetDeclOut = out->opcodeCount();
 			out->emitStackalloc(operands.lvid, type);

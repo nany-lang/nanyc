@@ -141,7 +141,7 @@ namespace Instanciate
 		seq.cdeftable.substitute(lvid).mutateToVoid();
 
 		uint32_t lvidsid = seq.pushedparams.func.indexed[1].lvid;
-		uint32_t sid = seq.frame->lvids[lvidsid].text_sid;
+		uint32_t sid = seq.frame->lvids(lvidsid).text_sid;
 		if (unlikely(sid == (uint32_t) -1))
 			return (ice() << "invalid string-id for field name (got lvid " << lvidsid << ')');
 
@@ -671,7 +671,7 @@ namespace Instanciate
 				// ALLOC: memory allocation of the new temporary object
 				seq.out->emitMemalloc(lvid, sizeoflvid);
 				seq.out->emitRef(lvid);
-				seq.frame->lvids[lvid].autorelease = true;
+				seq.frame->lvids(lvid).autorelease = true;
 				// reset the internal value of the object
 				seq.out->emitFieldset(opresult, /*self*/lvid, 0); // builtin
 			}
@@ -915,7 +915,7 @@ namespace Instanciate
 				// ALLOC: memory allocation of the new temporary object
 				seq.out->emitMemalloc(lvid, sizeoflvid);
 				seq.out->emitRef(lvid);
-				seq.frame->lvids[lvid].autorelease = true;
+				seq.frame->lvids(lvid).autorelease = true;
 				// reset the internal value of the object
 				seq.out->emitFieldset(opresult, /*self*/lvid, 0); // builtin
 			}
@@ -1177,14 +1177,12 @@ namespace Instanciate
 				complainIntrinsicWithNamedParameters(name);
 				return Tribool::Value::no;
 			}
-
 			// generic type parameters are not accepted
 			if (unlikely(not pushedparams.gentypes.indexed.empty() or not pushedparams.gentypes.named.empty()))
 			{
 				complainIntrinsicWithGenTypeParameters(name);
 				return Tribool::Value::no;
 			}
-
 			// checking if one parameter was already flag as 'error'
 			for (uint32_t i = 0u; i != pushedparams.func.indexed.size(); ++i)
 			{
@@ -1208,8 +1206,7 @@ namespace Instanciate
 			if (unlikely(not checkForIntrinsicParamCount(name, count)))
 				return Tribool::Value::no;
 
-			frame->lvids[lvid].synthetic = false;
-
+			frame->lvids(lvid).synthetic = false;
 			// intrinsic builtin found !
 			return ((it->second.second))(*this, lvid) ? Tribool::Value::yes : Tribool::Value::no;
 		}

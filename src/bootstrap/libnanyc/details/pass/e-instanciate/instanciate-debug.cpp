@@ -62,14 +62,11 @@ namespace Instanciate
 			{
 				table.printClassdef(entry.message.message, clid, table.classdef(clid));
 				entry.message.message.trimRight();
-
 				if (table.hasSubstitute(clid))
 					entry << " (local replacement)";
-
-				if (frame.lvids[i].isConstexpr)
+				if (frame.lvids(i).isConstexpr)
 					entry << " (constexpr)";
-
-				if (frame.lvids[i].errorReported)
+				if (frame.lvids(i).errorReported)
 					entry << " [ERROR]";
 			}
 			else

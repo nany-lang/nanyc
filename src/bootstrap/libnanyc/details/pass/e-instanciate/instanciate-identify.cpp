@@ -53,7 +53,7 @@ namespace Instanciate
 			if (isLocalVar)
 			{
 				// disable optimisation to avoid unwanted behavior
-				auto& lvidinfo = frame.lvids[operands.lvid];
+				auto& lvidinfo = frame.lvids(operands.lvid);
 				lvidinfo.synthetic = false;
 				lvidinfo.origin.memalloc = false;
 				lvidinfo.origin.returnedValue = false;
@@ -103,9 +103,8 @@ namespace Instanciate
 				}
 			}
 
-			auto& lvidinfo = frame.lvids[operands.lvid];
+			auto& lvidinfo = frame.lvids(operands.lvid);
 			lvidinfo.synthetic = false;
-
 			auto& origin  = lvidinfo.origin.varMember;
 			assert(atom.atomid != 0);
 			origin.self   = self;
@@ -126,15 +125,13 @@ namespace Instanciate
 			auto& spare = seq.cdeftable.substitute(operands.lvid);
 			spare.import(cdef);
 			spare.mutateToAtom(&atom);
-
 			if (isLocalVar)
 			{
 				// disable optimisation to avoid unwanted behavior
-				auto& lvidinfo = frame.lvids[operands.lvid];
+				auto& lvidinfo = frame.lvids(operands.lvid);
 				lvidinfo.synthetic = false;
 				lvidinfo.origin.memalloc = false;
 				lvidinfo.origin.returnedValue = false;
-
 				if (seq.canGenerateCode())
 					seq.acquireObject(operands.lvid);
 			}
@@ -197,16 +194,16 @@ namespace Instanciate
 			return false;
 		}
 		auto& frame = *seq.frame;
-		if (0 != frame.lvids[operands.self].propsetCallSelf)
+		if (0 != frame.lvids(operands.self).propsetCallSelf)
 		{
 			auto& cdef  = seq.cdeftable.classdef(CLID{frame.atomid, operands.self});
 			auto& spare = seq.cdeftable.substitute(operands.lvid);
 			spare.import(cdef);
-			frame.lvids[operands.lvid].propsetCallSelf =
-				frame.lvids[operands.self].propsetCallSelf;
+			frame.lvids(operands.lvid).propsetCallSelf =
+				frame.lvids(operands.self).propsetCallSelf;
 		}
 		// remember this special case
-		frame.lvids[operands.lvid].pointerAssignment = true;
+		frame.lvids(operands.lvid).pointerAssignment = true;
 		return true;
 	}
 
@@ -282,27 +279,25 @@ namespace Instanciate
 	{
 		// target lvid
 		uint32_t lvid = operands.lvid;
-
 		// keeping traces of the code logic
-		frame->lvids[lvid].resolvedName = name;
-		frame->lvids[lvid].referer = operands.self;
+		frame->lvids(lvid).resolvedName = name;
+		frame->lvids(lvid).referer = operands.self;
 
 		if (name == '=') // it is an assignment, not a real method call
 		{
 			// remember this special case
-			frame->lvids[lvid].pointerAssignment = true;
+			frame->lvids(lvid).pointerAssignment = true;
 			// for consistency checks, after transformations on the AST, '=' should be a method call
 			// we should have something like: 'foo.=(rhs)'
 			if (unlikely(0 == operands.self))
 				return complainInvalidSelfRefForVariableAssignment(lvid);
 
-			if (0 != frame->lvids[operands.self].propsetCallSelf)
+			if (0 != frame->lvids(operands.self).propsetCallSelf)
 			{
 				auto& cdef  = cdeftable.classdef(CLID{frame->atomid, operands.self});
 				auto& spare = cdeftable.substitute(lvid);
 				spare.import(cdef);
-				frame->lvids[lvid].propsetCallSelf =
-					frame->lvids[operands.self].propsetCallSelf;
+				frame->lvids(lvid).propsetCallSelf = frame->lvids(operands.self).propsetCallSelf;
 			}
 			return true;
 		}
@@ -311,7 +306,7 @@ namespace Instanciate
 		{
 			if (not frame->verify(operands.self))
 				return false;
-			if (frame->lvids[operands.self].pointerAssignment)
+			if (frame->lvids(operands.self).pointerAssignment)
 				return identifyByPointerAssignment(*this, name, operands);
 		}
 
@@ -354,7 +349,7 @@ namespace Instanciate
 				{
 					if (name == "any") // any - nothing to resolve
 					{
-						frame->lvids[lvid].markedAsAny = true;
+						frame->lvids(lvid).markedAsAny = true;
 						frame->partiallyResolved.erase(cdef.clid);
 						cdeftable.substitute(lvid).mutateToAny();
 						return true;
@@ -371,7 +366,7 @@ namespace Instanciate
 						opc.mutateToBuiltin(nyt_ptr);
 						opc.qualifiers.ref = false;
 						out->emitStore_u64(lvid, 0);
-						frame->lvids[lvid].synthetic = false;
+						frame->lvids(lvid).synthetic = false;
 						return true;
 					}
 					break;
@@ -398,7 +393,7 @@ namespace Instanciate
 							opc.mutateToBuiltin(nyt_bool);
 							opc.qualifiers.ref = false;
 							out->emitStore_u64(lvid, 0);
-							frame->lvids[lvid].synthetic = false;
+							frame->lvids(lvid).synthetic = false;
 							return true;
 						}
 						if (name == "__true")
@@ -407,7 +402,7 @@ namespace Instanciate
 							opc.mutateToBuiltin(nyt_bool);
 							opc.qualifiers.ref = false;
 							out->emitStore_u64(lvid, 1);
-							frame->lvids[lvid].synthetic = false;
+							frame->lvids(lvid).synthetic = false;
 							return true;
 						}
 
@@ -427,9 +422,9 @@ namespace Instanciate
 			if (lvidVar != 0)
 			{
 				// the variable is used, whatever it is (error or not)
-				frame->lvids[lvidVar].hasBeenUsed = true;
-				frame->lvids[lvid].alias = lvidVar;
-				frame->lvids[lvid].synthetic = false;
+				frame->lvids(lvidVar).hasBeenUsed = true;
+				frame->lvids(lvid).alias = lvidVar;
+				frame->lvids(lvid).synthetic = false;
 				if (not frame->verify(lvidVar)) // suppress spurious errors from previous ones
 					return false;
 
@@ -482,10 +477,10 @@ namespace Instanciate
 		{
 			assert(frame->verify(operands.self));
 			// self.<something to identify>
-			if (unlikely(frame->lvids[lvid].markedAsAny))
+			if (unlikely(frame->lvids(lvid).markedAsAny))
 				return (ice() << "can not perform member lookup on 'any'");
 
-			bool& singleHop = frame->lvids[operands.self].singleHopForReferer;
+			bool& singleHop = frame->lvids(operands.self).singleHopForReferer;
 			CLID selfclid{frame->atomid, operands.self};
 
 			// retrieving the self atom, if any
@@ -607,8 +602,8 @@ namespace Instanciate
 						// this lvid is a call to a property setter
 						// must adjust the code accordingly
 						// -1 'self' does not exist for this property (global property)
-						frame->lvids[lvid].propsetCallSelf = propself;
-						frame->lvids[lvid].synthetic = true; // making sure it won't be used
+						frame->lvids(lvid).propsetCallSelf = propself;
+						frame->lvids(lvid).synthetic = true; // making sure it won't be used
 
 						auto& spare = cdeftable.substitute(lvid);
 						spare.mutateToAtom(&propatom);

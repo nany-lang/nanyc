@@ -20,8 +20,7 @@ namespace Instanciate
 		if (0 == operands.name)
 		{
 			pushedparams.func.indexed.emplace_back(operands.lvid, currentLine, currentOffset);
-
-			if (verified and unlikely(frame->lvids[operands.lvid].synthetic))
+			if (verified and unlikely(frame->lvids(operands.lvid).synthetic))
 			{
 				auto pindex = static_cast<uint32_t>(pushedparams.func.indexed.size());
 				complainPushedSynthetic(CLID{frame->atomid, operands.lvid}, pindex);
@@ -31,11 +30,8 @@ namespace Instanciate
 		{
 			const auto& name = currentSequence.stringrefs[operands.name];
 			pushedparams.func.named.emplace_back(name, operands.lvid, currentLine, currentOffset);
-
-			if (verified and unlikely(frame->lvids[operands.lvid].synthetic))
-			{
+			if (verified and unlikely(frame->lvids(operands.lvid).synthetic))
 				complainPushedSynthetic(CLID{frame->atomid, operands.lvid}, 0, name);
-			}
 		}
 	}
 

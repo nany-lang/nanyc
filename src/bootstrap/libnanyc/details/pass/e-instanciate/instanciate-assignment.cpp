@@ -24,7 +24,7 @@ namespace Instanciate
 		if (unlikely(not frame.verify(lhs) or not frame.verify(rhs)))
 			return false;
 
-		if (checktype and unlikely(frame.lvids[lhs].synthetic))
+		if (checktype and unlikely(frame.lvids(lhs).synthetic))
 		{
 			if (debugmode)
 				return (error() << "synthetic objects are immutable "
@@ -33,7 +33,7 @@ namespace Instanciate
 				return (error() << "synthetic objects are immutable");
 		}
 
-		if (checktype and unlikely(frame.lvids[rhs].synthetic))
+		if (checktype and unlikely(frame.lvids(rhs).synthetic))
 		{
 			if (debugmode)
 				return (error() << "can not assign synthetic objects "
@@ -77,7 +77,7 @@ namespace Instanciate
 			{
 				// trying to assign ? this is acceptable between void values (or any)
 				cdeftable.substitute(lhs).mutateToVoid();
-				frame.lvids[lhs].autorelease = false;
+				frame.lvids(lhs).autorelease = false;
 				return true;
 			}
 
@@ -119,8 +119,7 @@ namespace Instanciate
 				}
 				else
 				{
-					assert(rhs < frame.lvids.size());
-					auto& lvidinfo = frame.lvids[rhs];
+					auto& lvidinfo = frame.lvids(rhs);
 					if (lvidinfo.origin.memalloc or lvidinfo.origin.returnedValue)
 						strategy = AssignStrategy::ref;
 				}
@@ -131,9 +130,9 @@ namespace Instanciate
 
 
 		if (lhsCanBeAcquired)
-			frame.lvids[lhs].autorelease = true;
+			frame.lvids(lhs).autorelease = true;
 
-		auto& origin = frame.lvids[lhs].origin.varMember;
+		auto& origin = frame.lvids(lhs).origin.varMember;
 		bool isMemberVariable = (origin.atomid != 0);
 
 		if (isMemberVariable and unlikely(origin.self == 0))
@@ -175,8 +174,8 @@ namespace Instanciate
 			case AssignStrategy::ref:
 			{
 				// preserve the origin of the value
-				frame.lvids[lhs].origin.memalloc = frame.lvids[rhs].origin.memalloc;
-				frame.lvids[lhs].origin.returnedValue = frame.lvids[rhs].origin.returnedValue;
+				frame.lvids(lhs).origin.memalloc = frame.lvids(rhs).origin.memalloc;
+				frame.lvids(lhs).origin.returnedValue = frame.lvids(rhs).origin.returnedValue;
 
 				if (canGenerateCode())
 				{
@@ -239,8 +238,7 @@ namespace Instanciate
 					// re-allocate some memory
 					out->emitMemalloc(lhs, rsizof);
 					out->emitRef(lhs);
-					assert(lhs < frame.lvids.size());
-					frame.lvids[lhs].origin.memalloc = true;
+					frame.lvids(lhs).origin.memalloc = true;
 
 					out->emitStackalloc(retcall, nyt_void);
 					// call operator 'clone'
@@ -284,14 +282,11 @@ namespace Instanciate
 		// note: double indirection, since assignment is like method call
 		//  %y = %x."="
 		//  %z = resolve %y."^()"
-		assert(operands.ptr2func < frame->lvids.size());
-		LVID lhs = frame->lvids[operands.ptr2func].referer;
+		LVID lhs = frame->lvids(operands.ptr2func).referer;
 		if (likely(0 != lhs))
 		{
-			assert(lhs < frame->lvids.size());
-			lhs  = frame->lvids[lhs].referer;
-
-			uint32_t alias = frame->lvids[lhs].alias;
+			lhs  = frame->lvids(lhs).referer;
+			uint32_t alias = frame->lvids(lhs).alias;
 			if (alias != 0)
 				lhs = alias;
 		}
@@ -311,7 +306,7 @@ namespace Instanciate
 		cdeftable.substitute(operands.lvid).import(cdeflhs);
 		if (canBeAcquired(cdeflhs))
 		{
-			frame->lvids[operands.lvid].autorelease = true;
+			frame->lvids(operands.lvid).autorelease = true;
 			if (canGenerateCode())
 			{
 				out->emitStore(operands.lvid, lhs);

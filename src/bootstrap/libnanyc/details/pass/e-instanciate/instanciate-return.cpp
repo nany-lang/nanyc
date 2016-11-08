@@ -178,7 +178,7 @@ namespace Instanciate
 							auto& spareTmp = cdeftable.substitute(operands.tmplvid);
 							spareTmp.import(spare);
 							spareTmp.qualifiers.merge(spare.qualifiers);
-							frame->lvids[operands.tmplvid].synthetic = false;
+							frame->lvids(operands.tmplvid).synthetic = false;
 
 							bool r = instanciateAssignment(*frame, retlvid, operands.lvid, false);
 							if (unlikely(not r))
@@ -206,9 +206,6 @@ namespace Instanciate
 			}
 		}
 	}
-
-
-
 
 
 

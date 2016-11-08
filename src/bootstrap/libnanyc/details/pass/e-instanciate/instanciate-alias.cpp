@@ -27,7 +27,7 @@ namespace Instanciate
 			return frame->invalidate(lvid);
 		}
 
-		auto& lr = frame->lvids[lvid];
+		auto& lr = frame->lvids(lvid);
 		lr.file.line   = currentLine;
 		lr.file.offset = currentOffset;
 		lr.file.url    = currentFilename;

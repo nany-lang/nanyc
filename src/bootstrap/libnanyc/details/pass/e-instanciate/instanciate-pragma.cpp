@@ -35,11 +35,8 @@ namespace Instanciate
 		{
 			// lvid for the given parameter
 			uint32_t lvid  = i + 1 + 1; // 1: return type, 2: first parameter
-			assert(lvid < frame.lvids.size());
-			// Obviously, the parameters are not synthetic objects
-			// but real variables
-			frame.lvids[lvid].synthetic = false;
-
+			// the parameters are real objects
+			frame.lvids(lvid).synthetic = false;
 			// Parameters Deep copy (if required)
 			auto& cdef = seq.cdeftable.classdef(vardef.clid);
 			if (name[0] != '^')
@@ -52,16 +49,15 @@ namespace Instanciate
 						seq.out->emitComment(String{"----- deep copy parameter "} << i << " aka " << name);
 					// a register has already been reserved for cloning parameters
 					uint32_t clone = 2 + count + i; // 1: return type, 2: first parameter
-					assert(clone < frame.lvids.size());
 					// the new value is not synthetic
-					frame.lvids[clone].synthetic = false;
+					frame.lvids(clone).synthetic = false;
 					bool r = seq.instanciateAssignment(frame, clone, lvid, false, false, true);
 					if (unlikely(not r))
 						frame.invalidate(clone);
 					if (seq.canBeAcquired(lvid))
 					{
-						frame.lvids[lvid].autorelease = true;
-						frame.lvids[clone].autorelease = false;
+						frame.lvids(lvid).autorelease = true;
+						frame.lvids(clone).autorelease = false;
 					}
 					if (generateCode)
 					{
@@ -140,8 +136,7 @@ namespace Instanciate
 		uint32_t lvid = operands.value.shortcircuitMutate.lvid;
 		uint32_t source = operands.value.shortcircuitMutate.source;
 
-		seq.frame->lvids[lvid].synthetic = false;
-
+		seq.frame->lvids(lvid).synthetic = false;
 		if (true)
 		{
 			auto& instr = *(*seq.cursor - 1);
@@ -158,7 +153,7 @@ namespace Instanciate
 			// ALLOC: memory allocation of the new temporary object
 			seq.out->emitMemalloc(lvid, sizeoflvid);
 			seq.out->emitRef(lvid);
-			seq.frame->lvids[lvid].autorelease = true;
+			seq.frame->lvids(lvid).autorelease = true;
 			// reset the internal value of the object
 			seq.out->emitFieldset(source, /*self*/lvid, 0); // builtin
 		}
@@ -217,7 +212,7 @@ namespace Instanciate
 			{
 				uint32_t lvid = operands.value.synthetic.lvid;
 				bool onoff = (operands.value.synthetic.onoff != 0);
-				frame->lvids[lvid].synthetic = onoff;
+				frame->lvids(lvid).synthetic = onoff;
 				break;
 			}
 			case IR::ISA::Pragma::suggest:
