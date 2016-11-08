@@ -26,15 +26,6 @@ namespace Instanciate
 	}
 
 
-	inline void SequenceBuilder::PushedParameters::clear()
-	{
-		func.indexed.clear();
-		func.named.clear();
-		gentypes.indexed.clear();
-		gentypes.named.clear();
-	}
-
-
 	inline bool SequenceBuilder::canBeAcquired(const Classdef& cdef) const
 	{
 		bool success = not cdef.isBuiltinOrVoid();
