@@ -22,9 +22,10 @@ namespace Instanciate
 	}
 
 
-	inline AtomStackFrame::AtomStackFrame(Atom& atom)
+	inline AtomStackFrame::AtomStackFrame(Atom& atom, AtomStackFrame* previous)
 		: atom(atom)
 		, atomid(atom.atomid)
+		, previous(previous)
 	{
 		lvids.resize(atom.localVariablesCount);
 	}

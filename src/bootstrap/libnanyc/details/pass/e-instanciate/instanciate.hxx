@@ -13,10 +13,10 @@ namespace Instanciate
 
 	inline void SequenceBuilder::pushNewFrame(Atom& atom)
 	{
-		auto* newframe = build.allocate<AtomStackFrame>(atom);
-		newframe->previous = frame;
+		auto* newframe = build.allocate<AtomStackFrame>(atom, frame);
 		frame = newframe;
 	}
+
 
 	inline void SequenceBuilder::popFrame()
 	{

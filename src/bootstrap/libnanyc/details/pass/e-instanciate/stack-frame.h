@@ -107,7 +107,7 @@ namespace Instanciate
 	//! A single element within the stack for analysing opcodes
 	struct AtomStackFrame final
 	{
-		explicit AtomStackFrame(Atom& atom);
+		explicit AtomStackFrame(Atom& atom, AtomStackFrame* previous);
 		uint32_t localVariablesCount() const;
 		uint32_t findLocalVariable(const AnyString& name) const;
 		void resizeRegisterCount(uint32_t count, ClassdefTableView& table);
