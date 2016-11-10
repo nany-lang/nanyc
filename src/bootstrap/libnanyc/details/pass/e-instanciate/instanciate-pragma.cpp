@@ -16,7 +16,7 @@ namespace Instanciate
 	namespace {
 
 
-	void pragmaBodyStart(SequenceBuilder& seq)
+	bool pragmaBodyStart(SequenceBuilder& seq)
 	{
 		assert(seq.frame != nullptr);
 		assert(not seq.signatureOnly);
@@ -26,10 +26,11 @@ namespace Instanciate
 		auto& frame = *seq.frame;
 		auto& atom = frame.atom;
 		if (not atom.isFunction())
-			return;
+			return true;
 
 		bool generateCode = seq.canGenerateCode();
 		uint32_t count = atom.parameters.size();
+		bool success = true;
 
 		atom.parameters.each([&](uint32_t i, const AnyString& name, const Vardef& vardef)
 		{
@@ -74,11 +75,12 @@ namespace Instanciate
 				{
 					frame.invalidate(lvid);
 					ice() << "invalid parameter type " << i << " for " << atom.caption(seq.cdeftable);
+					success = false;
 				}
 			}
 		});
 		// generating some code on the fly
-		if (atom.isSpecial() /*ctor, operators...*/ and generateCode)
+		if (atom.isSpecial() /*ctor, operators...*/ and generateCode and success)
 		{
 			if (seq.generateClassVarsAutoInit) // var init (called by ctor)
 			{
@@ -96,6 +98,7 @@ namespace Instanciate
 				seq.generateMemberVarDefaultClone();
 			}
 		}
+		return success;
 	}
 
 
@@ -179,11 +182,10 @@ namespace Instanciate
 			case IR::ISA::Pragma::bodystart:
 			{
 				// In 'signature only' mode, we only care about the
-				// parameter user types. Everything from this point in unrelevant
-				if (signatureOnly)
+				// parameter user types. Everything after this opcode is unrelevant
+				bool r = (!signatureOnly and pragmaBodyStart(*this)); // params deep copy, implicit var auto-init...
+				if (not r)
 					currentSequence.invalidateCursor(*cursor);
-				else
-					pragmaBodyStart(*this); // params deep copy, implicit var auto-init...
 				break;
 			}
 			case IR::ISA::Pragma::blueprintsize:
