@@ -17,7 +17,7 @@ namespace Instanciate
 	namespace {
 
 
-	void blueprintFuncOrClassOrType(SequenceBuilder& seq, const IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
+	void funcOrClassOrType(SequenceBuilder& seq, const IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
 	{
 		seq.pushedparams.clear();
 		seq.generateClassVarsAutoInit = false;
@@ -103,14 +103,14 @@ namespace Instanciate
 						seq.frame->invalidate(lvid);
 					return;
 				}
-			// updating the attached lvid for automatic type declaration
+				// updating the attached lvid for automatic type declaration
 				seq.cdeftable.substitute(lvid).mutateToAtom(resAtom);
 			}
 		}
 	}
 
 
-	void blueprintUnit(SequenceBuilder& seq, const IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
+	void unit(SequenceBuilder& seq, const IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
 	{
 		seq.pushedparams.clear();
 		seq.generateClassVarsAutoInit = false;
@@ -124,13 +124,12 @@ namespace Instanciate
 			seq.complainOperand(IR::Instruction::fromOpcode(operands), "invalid unit atom");
 			return;
 		}
-
 		seq.pushNewFrame(*atom);
 		seq.frame->offsetOpcodeBlueprint = seq.currentSequence.offsetOf(**seq.cursor);
 	}
 
 
-	void blueprintParameter(SequenceBuilder& seq, uint32_t lvid, bool isvar, uint32_t nameindex)
+	void parameter(SequenceBuilder& seq, uint32_t lvid, bool isvar, uint32_t nameindex)
 	{
 		assert(seq.frame != nullptr);
 		auto& cdef = seq.cdeftable.substitute(lvid);
@@ -147,7 +146,7 @@ namespace Instanciate
 	}
 
 
-	void blueprintParamSelf(SequenceBuilder& seq, const IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
+	void asSelf(SequenceBuilder& seq, const IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
 	{
 		// -- with automatic variable assignment for operator new
 		// example: operator new (self varname) {}
@@ -158,7 +157,6 @@ namespace Instanciate
 			error() << "automatic variable assignment is only allowed in class operator 'new'";
 			return;
 		}
-
 		if (!frame.selfParameters.get())
 			frame.selfParameters = std::make_unique<decltype(frame.selfParameters)::element_type>();
 		uint32_t sid  = operands.name;
@@ -168,14 +166,13 @@ namespace Instanciate
 	}
 
 
-	void blueprintVardef(SequenceBuilder& seq, const IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
+	void vardef(SequenceBuilder& seq, uint32_t lvid, uint32_t sid)
 	{
 		// update the type of the variable member
 		if (seq.frame != nullptr)
 		{
 			if (seq.frame->atom.isClass())
 			{
-				uint32_t sid  = operands.name;
 				const AnyString& varname = seq.currentSequence.stringrefs[sid];
 				Atom* atom = nullptr;
 				if (1 != seq.frame->atom.findVarAtom(atom, varname))
@@ -183,7 +180,7 @@ namespace Instanciate
 					ice() << "unknown variable member '" << varname << "'";
 					return;
 				}
-				atom->returnType.clid.reclass(seq.frame->atomid, operands.lvid);
+				atom->returnType.clid.reclass(seq.frame->atomid, lvid);
 			}
 		}
 		seq.pushedparams.clear();
@@ -202,29 +199,29 @@ namespace Instanciate
 		{
 			case IR::ISA::Blueprint::param: // -- function parameter
 			{
-				blueprintParameter(*this, operands.lvid, true, operands.name);
+				parameter(*this, operands.lvid, true, operands.name);
 				break;
 			}
 			case IR::ISA::Blueprint::gentypeparam:
 			{
-				blueprintParameter(*this, operands.lvid, false, operands.name);
+				parameter(*this, operands.lvid, false, operands.name);
 				break;
 			}
 			case IR::ISA::Blueprint::paramself: // -- function parameter
 			{
-				blueprintParamSelf(*this, operands);
+				asSelf(*this, operands);
 				break;
 			}
 			case IR::ISA::Blueprint::funcdef:
 			case IR::ISA::Blueprint::classdef:
 			case IR::ISA::Blueprint::typealias:
 			{
-				blueprintFuncOrClassOrType(*this, operands);
+				funcOrClassOrType(*this, operands);
 				break;
 			}
 			case IR::ISA::Blueprint::vardef:
 			{
-				blueprintVardef(*this, operands);
+				vardef(*this, operands.lvid, operands.name);
 				break;
 			}
 			case IR::ISA::Blueprint::namespacedef:
@@ -234,7 +231,7 @@ namespace Instanciate
 			}
 			case IR::ISA::Blueprint::unit:
 			{
-				blueprintUnit(*this, operands);
+				unit(*this, operands);
 				break;
 			}
 		}
