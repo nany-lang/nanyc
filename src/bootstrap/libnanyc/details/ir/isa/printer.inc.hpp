@@ -762,86 +762,81 @@ namespace // anonymous
 			}
 		}
 
+
 		void print(const Operand<Op::pragma>& operands)
 		{
-			if (static_cast<uint32_t>(operands.pragma) < IR::ISA::PragmaCount)
+			switch (operands.pragma)
 			{
-				switch ((Pragma) operands.pragma)
+				case Pragma::codegen:
 				{
-					case Pragma::codegen:
-					{
-						line() << "pragma codegen ";
-						out << ((operands.value.codegen != 0) ? "enable" : "disable");
-						break;
-					}
-					case Pragma::blueprintsize:
-					{
-						auto size = operands.value.blueprintsize;
-						line() << "// blueprint size " << size << " opcodes (";
-						out << (size * sizeof(Instruction)) << " bytes)";
-						break;
-					}
-					case Pragma::visibility:
-					{
-						auto* text = nyvisibility_to_cstring((nyvisibility_t) operands.value.visibility);
-						line() << "pragma visibility " << text;
-						break;
-					}
-					case Pragma::bodystart:
-					{
-						line() << "pragma body start";
-						break;
-					}
-					case Pragma::shortcircuit:
-					{
-						line() << "pragma shortcircuit ";
-						out << ((operands.value.shortcircuit) ? "__true" : "__false");
-						break;
-					}
-					case Pragma::shortcircuitOpNopOffset:
-					{
-						line() << "pragma shortcircuit metadata: label: ";
-						out << operands.value.shortcircuitMetadata.label;
-						out << ", tmpvar: ";
-						out << (1 + operands.value.shortcircuitMetadata.label);
-						break;
-					}
-					case Pragma::shortcircuitMutateToBool:
-					{
-						line() << "pragma shortcircuit mutate to bool: %";
-						out << operands.value.shortcircuitMutate.lvid;
-						out << " = new bool %" << operands.value.shortcircuitMutate.source;
-						break;
-					}
-					case Pragma::builtinalias:
-					{
-						line() << "pragma builtinalias ";
-						printString(operands.value.builtinalias.namesid);
-						break;
-					}
-					case Pragma::suggest:
-					{
-						line() << "pragma suggest ";
-						out << (operands.value.suggest != 0 ? "true" : "false");
-						break;
-					}
-					case Pragma::synthetic:
-					{
-						line() << "pragma synthetic %" << operands.value.synthetic.lvid << " = ";
-						out << (operands.value.synthetic.onoff != 0 ? "true" : "false");
-						break;
-					}
-					case Pragma::unknown:
-					{
-						line() << "<invalid pragma identifier>";
-						break;
-					}
+					line() << "pragma codegen ";
+					out << ((operands.value.codegen != 0) ? "enable" : "disable");
+					break;
+				}
+				case Pragma::blueprintsize:
+				{
+					auto size = operands.value.blueprintsize;
+					line() << "// blueprint size " << size << " opcodes (";
+					out << (size * sizeof(Instruction)) << " bytes)";
+					break;
+				}
+				case Pragma::visibility:
+				{
+					auto* text = nyvisibility_to_cstring((nyvisibility_t) operands.value.visibility);
+					line() << "pragma visibility " << text;
+					break;
+				}
+				case Pragma::bodystart:
+				{
+					line() << "pragma body start";
+					break;
+				}
+				case Pragma::shortcircuit:
+				{
+					line() << "pragma shortcircuit ";
+					out << ((operands.value.shortcircuit) ? "__true" : "__false");
+					break;
+				}
+				case Pragma::shortcircuitOpNopOffset:
+				{
+					line() << "pragma shortcircuit metadata: label: ";
+					out << operands.value.shortcircuitMetadata.label;
+					out << ", tmpvar: ";
+					out << (1 + operands.value.shortcircuitMetadata.label);
+					break;
+				}
+				case Pragma::shortcircuitMutateToBool:
+				{
+					line() << "pragma shortcircuit mutate to bool: %";
+					out << operands.value.shortcircuitMutate.lvid;
+					out << " = new bool %" << operands.value.shortcircuitMutate.source;
+					break;
+				}
+				case Pragma::builtinalias:
+				{
+					line() << "pragma builtinalias ";
+					printString(operands.value.builtinalias.namesid);
+					break;
+				}
+				case Pragma::suggest:
+				{
+					line() << "pragma suggest ";
+					out << (operands.value.suggest != 0 ? "true" : "false");
+					break;
+				}
+				case Pragma::synthetic:
+				{
+					line() << "pragma synthetic %" << operands.value.synthetic.lvid << " = ";
+					out << (operands.value.synthetic.onoff != 0 ? "true" : "false");
+					break;
+				}
+				case Pragma::unknown:
+				{
+					line() << "<invalid pragma identifier>";
+					break;
 				}
 			}
-			else
-				line() << "<invalid pragma identifier>";
 		}
-
 
 
 		template<ny::IR::ISA::Op O> inline void visit(const Operand<O>& instr)

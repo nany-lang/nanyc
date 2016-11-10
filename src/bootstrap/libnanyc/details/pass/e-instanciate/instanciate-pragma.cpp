@@ -169,9 +169,7 @@ namespace Instanciate
 
 	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::pragma>& operands)
 	{
-		assert(static_cast<uint32_t>(operands.pragma) < IR::ISA::PragmaCount);
-		auto pragma = static_cast<IR::ISA::Pragma>(operands.pragma);
-		switch (pragma)
+		switch (operands.pragma)
 		{
 			case IR::ISA::Pragma::codegen:
 			{
