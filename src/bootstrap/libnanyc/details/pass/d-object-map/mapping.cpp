@@ -456,8 +456,7 @@ namespace Mapping
 			if (unlikely(nullptr == atomStack))
 				return complainOperand(operands, "invalid stack for blueprint pragma");
 
-			assert(static_cast<uint32_t>(operands.pragma) < IR::ISA::PragmaCount);
-			switch ((IR::ISA::Pragma) operands.pragma)
+			switch (operands.pragma)
 			{
 				case IR::ISA::Pragma::codegen:
 					{
