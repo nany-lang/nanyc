@@ -130,23 +130,19 @@ namespace Instanciate
 	}
 
 
-	void blueprintParameter(SequenceBuilder& seq, const IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
+	void blueprintParameter(SequenceBuilder& seq, uint32_t lvid, bool isvar, uint32_t nameindex)
 	{
-		auto kind = static_cast<IR::ISA::Blueprint>(operands.kind);
 		assert(seq.frame != nullptr);
-		uint32_t lvid = operands.lvid;
 		auto& cdef = seq.cdeftable.substitute(lvid);
 		cdef.qualifiers.ref = false;
-		bool isvar = (kind == IR::ISA::Blueprint::param);
 		cdef.instance = isvar;
-		seq.frame->lvids(lvid).synthetic = (not isvar);
+		seq.frame->lvids(lvid).synthetic = not isvar;
 
 		// Do not emit warning for 'unused variable' on template parameters
-		if (kind == IR::ISA::Blueprint::gentypeparam)
+		if (not isvar)
 			seq.frame->lvids(lvid).warning.unused = false;
-
-		// declare the new name as locally accessible
-		const auto& name = seq.currentSequence.stringrefs[operands.name];
+		// parameter accessible as named variable
+		const auto& name = seq.currentSequence.stringrefs[nameindex];
 		seq.declareNamedVariable(name, lvid, false);
 	}
 
@@ -205,9 +201,13 @@ namespace Instanciate
 		switch (kind)
 		{
 			case IR::ISA::Blueprint::param: // -- function parameter
+			{
+				blueprintParameter(*this, operands.lvid, true, operands.name);
+				break;
+			}
 			case IR::ISA::Blueprint::gentypeparam:
 			{
-				blueprintParameter(*this, operands);
+				blueprintParameter(*this, operands.lvid, false, operands.name);
 				break;
 			}
 			case IR::ISA::Blueprint::paramself: // -- function parameter
