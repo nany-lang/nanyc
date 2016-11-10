@@ -102,7 +102,7 @@ namespace Instanciate
 
 
 	//! Prepare the first local registers according the given signature
-	void pushSubstituteTypesFromSignatureParameters(SequenceBuilder& seq, Atom& atom, const Signature& signature)
+	void pushParameterTypes(SequenceBuilder& seq, Atom& atom, const Signature& signature)
 	{
 		assert(seq.frame == NULL);
 		// magic constant +2
@@ -188,7 +188,7 @@ namespace Instanciate
 		if (Config::Traces::sourceOpcodeSequence)
 			debugPrintSourceOpcodeSequence(info.cdeftable, info.atom.get(), "[ir-from-ast] ");
 		// transfert input parameters
-		pushSubstituteTypesFromSignatureParameters(*builder, atom, signature);
+		pushParameterTypes(*builder, atom, signature);
 		builder->layerDepthLimit = 2; // allow the first blueprint to be instanciated
 		// atomid mapping, usefull to keep track of the good atom id
 		builder->mappingBlueprintAtomID[0] = atomRequested.atomid; // {from}
