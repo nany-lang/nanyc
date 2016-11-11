@@ -61,28 +61,27 @@ namespace CString
 
 
 
-
 namespace ny
 {
 
 
 	void Signature::Parameters::resize(uint count)
 	{
-		pParamtypes.clear();
-		pParamtypes.resize(count);
-		/*pParamtypes.reserve(count);
+		m_types.clear();
+		m_types.resize(count);
+		/*m_types.reserve(count);
 		for (uint i = 0; i != count; ++i)
-			pParamtypes.emplace_back(std::make_unique<Paramtype>());
-		pParamtypes.shrink_to_fit();*/
+			m_types.emplace_back(std::make_unique<Paramtype>());
+		m_types.shrink_to_fit();*/
 	}
 
 
 	inline void Signature::Parameters::hash(size_t& seed) const
 	{
-		uint count = (uint) pParamtypes.size();
+		uint count = (uint) m_types.size();
 		for (uint i = 0; i != count; ++i)
 		{
-			auto& element = pParamtypes[i];
+			auto& element = m_types[i];
 
 			Yuni::HashCombine(seed, reinterpret_cast<uint64_t>(element.atom));
 			Yuni::HashCombine(seed, static_cast<uint>(element.kind));
@@ -115,18 +114,17 @@ namespace ny
 
 	bool Signature::Parameters::operator == (const Signature::Parameters& rhs) const
 	{
-		uint32_t count = (uint32_t) pParamtypes.size();
-		if (count == (uint32_t) rhs.pParamtypes.size())
+		uint32_t count = (uint32_t) m_types.size();
+		if (count == (uint32_t) rhs.m_types.size())
 		{
 			for (uint32_t i = 0; i != count; ++i)
 			{
-				if (pParamtypes[i] != rhs.pParamtypes[i])
+				if (m_types[i] != rhs.m_types[i])
 					return false;
 			}
 		}
 		return true;
 	}
-
 
 
 } // namespace ny
