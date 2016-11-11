@@ -52,7 +52,7 @@ namespace ny
 			friend class Signature;
 			void hash(size_t&) const;
 			//! Each type for each parameter
-			std::vector<Paramtype> pParamtypes;
+			std::vector<Paramtype> m_types;
 		};
 
 

@@ -8,27 +8,27 @@ namespace ny
 
 	inline uint Signature::Parameters::size() const
 	{
-		return (uint) pParamtypes.size();
+		return (uint) m_types.size();
 	}
 
 
 	inline bool Signature::Parameters::empty() const
 	{
-		return pParamtypes.empty();
+		return m_types.empty();
 	}
 
 
 	inline Signature::Paramtype& Signature::Parameters::operator [] (uint index)
 	{
-		assert(index < pParamtypes.size());
-		return pParamtypes[index];
+		assert(index < m_types.size());
+		return m_types[index];
 	}
 
 
 	inline const Signature::Paramtype& Signature::Parameters::operator [] (uint index) const
 	{
-		assert(index < pParamtypes.size());
-		return pParamtypes[index];
+		assert(index < m_types.size());
+		return m_types[index];
 	}
 
 
