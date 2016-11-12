@@ -175,7 +175,8 @@ namespace Instanciate
 		// registering the new instanciation first
 		// (required for recursive functions & classes)
 		// `atomRequested` is probably `atom` itself, but different for template classes
-		info.instanceid = atomRequested.instances.create(signature, outIR, &atom);
+		auto instance = atomRequested.instances.create(signature, outIR, &atom);
+		info.instanceid = instance.id();
 
 		// new layer for the cdeftable
 		ClassdefTableView newView{info.cdeftable, atom.atomid, signature.parameters.size()};
