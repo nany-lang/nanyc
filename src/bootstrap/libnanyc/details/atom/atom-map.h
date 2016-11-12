@@ -17,9 +17,8 @@ namespace ny
 	** \brief Atoms
 	** \note This class is not thread-safe
 	*/
-	class AtomMap final
+	struct AtomMap final
 	{
-	public:
 		//! Create a new atom related to a part of a namespace
 		Atom* createNamespace(Atom& parent, const AnyString& name);
 
@@ -79,7 +78,7 @@ namespace ny
 		uint32_t m_atomGrpID = 0;
 		friend class ClassdefTable;
 
-	}; // class AtomMap
+	}; // struct AtomMap
 
 
 

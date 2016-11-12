@@ -15,7 +15,7 @@ namespace ny
 
 	// forward class
 	class ClassdefTableView;
-	class Atom;
+	struct Atom;
 
 
 

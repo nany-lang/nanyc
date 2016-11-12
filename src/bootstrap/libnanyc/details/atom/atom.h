@@ -23,7 +23,7 @@ namespace ny
 {
 
 	// forward class
-	class AtomMap;
+	struct AtomMap;
 	class ClassdefTable;
 	class ClassdefTableView;
 
@@ -33,11 +33,10 @@ namespace ny
 	/*!
 	** \brief Definition of a single class or function
 	*/
-	class Atom final
+	struct Atom final
 		: public Yuni::IIntrusiveSmartPtr<Atom, false, Yuni::Policy::SingleThreaded>
 		, Yuni::NonCopyable<Atom>
 	{
-	public:
 		//! The class ancestor
 		using Ancestor = Yuni::IIntrusiveSmartPtr<Atom, false, Yuni::Policy::SingleThreaded>;
 		//! The most suitable smart ptr for the class
@@ -530,7 +529,7 @@ namespace ny
 		//! Name of the current atom
 		AnyString m_name;
 		// nakama !
-		friend class AtomMap;
+		friend struct AtomMap;
 
 	}; // class Atom
 
