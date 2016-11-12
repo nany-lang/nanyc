@@ -213,18 +213,13 @@ namespace ny
 	}
 
 
-	void ClassdefTable::registerAtom(Atom* atom)
+	void ClassdefTable::registerAtom(Atom& atom)
 	{
-		assert(atom != nullptr and "invalid atom");
-
 		// TODO use an alternate (and more efficient) container for this special classdefs
-		if (atom)
-		{
-			const CLID& clid = CLID::AtomMapID(atom->atomid);
-			auto* newClassdef = new Classdef(clid);
-			newClassdef->mutateToAtom(atom);
-			m_classdefs.insert(std::make_pair(clid, newClassdef));
-		}
+		const CLID& clid = CLID::AtomMapID(atom.atomid);
+		auto* newClassdef = new Classdef(clid);
+		newClassdef->mutateToAtom(&atom);
+		m_classdefs.insert(std::make_pair(clid, newClassdef));
 	}
 
 

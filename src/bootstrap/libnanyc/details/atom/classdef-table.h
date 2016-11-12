@@ -107,7 +107,7 @@ namespace ny
 		/*!
 		** \brief Register an Atom (created from blueprints)
 		*/
-		void registerAtom(Atom* atom);
+		void registerAtom(Atom& atom);
 		//@}
 
 
