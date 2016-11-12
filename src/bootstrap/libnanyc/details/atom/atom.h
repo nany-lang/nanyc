@@ -374,6 +374,13 @@ namespace ny
 				AnyString symbolname() const;
 				//! Instance ID
 				uint32_t id() const;
+				//! \brief Update atom instance
+				//! \param symbol The complete symbol name (ex: "func A.foo(b: ref __i32): ref __i32")
+				//! \note The content of 'symbol' will be moved to avoid memory allocation
+				void update(YString&& symbol, const Classdef& rettype);
+				//! Mark the instantiation (and its signature) as invalid (always returns -1)
+				uint32_t invalidate(const Signature&);
+
 			private:
 				Instances& m_ref;
 				uint32_t m_index;
@@ -387,15 +394,6 @@ namespace ny
 			//! \return index of the instantiation
 			Ref create(const Signature& signature, Atom* remapAtom);
 
-			//! \brief Update atom instance
-			//! \param symbol The complete symbol name (ex: "func A.foo(b: ref __i32): ref __i32")
-			//! \note The content of 'symbol' will be moved to avoid memory allocation
-			void update(uint32_t index, Yuni::String&& symbol, const Classdef& rettype);
-
-			//! Mark the instantiation (and its signature) as invalid
-			// (always returns -1)
-			uint32_t invalidate(uint32_t index, const Signature&);
-
 			//! Fetch the sequence for a given signature (if any) and update the signature
 			Yuni::Tribool::Value isValid(const Signature& signature, uint32_t& iid, Classdef&, Atom*& remapAtom) const;
 
@@ -406,6 +404,9 @@ namespace ny
 			Ref operator [] (uint32_t index);
 
 		private:
+			void update(uint32_t index, Yuni::String&& symbol, const Classdef& rettype);
+			void invalidate(uint32_t index, const Signature&);
+
 			struct Metadata final {
 				std::unique_ptr<IR::Sequence> sequence;
 				Classdef rettype;

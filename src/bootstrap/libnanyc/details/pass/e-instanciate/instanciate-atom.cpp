@@ -253,16 +253,13 @@ namespace Instanciate
 			}
 			if (likely(success))
 			{
-				// registering the new instance to the atom
-				// `previousAtom` is probably `atom` itself, but different for template classes
-				atomRequested.instances.update(info.instanceid, std::move(symbolName), info.returnType);
+				instance.update(std::move(symbolName), info.returnType);
 				return &outIR;
 			}
 		}
 		// failed to instanciate the input IR sequence. This can be expected, if trying
-		// to not instanciate the appropriate function (if several overloads are present
-		// for example). Anyway, remembering this signature as a 'no-go'.
-		info.instanceid = atomRequested.instances.invalidate(info.instanceid, signature);
+		// to not instanciate the appropriate function (if several overloads are present for example)
+		info.instanceid = instance.invalidate(signature);
 		return nullptr;
 	}
 

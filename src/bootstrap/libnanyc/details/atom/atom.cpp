@@ -251,14 +251,13 @@ namespace ny
 	}
 
 
-	uint32_t Atom::Instances::invalidate(uint32_t index, const Signature& signature)
+	void Atom::Instances::invalidate(uint32_t index, const Signature& signature)
 	{
 		assert(index < m_instances.size());
 		m_instancesIDs[signature] = (uint32_t) -1;
 		auto& details = m_instances[index];
 		details.sequence = nullptr;
 		details.remapAtom = nullptr;
-		return (uint32_t) -1;
 	}
 
 
