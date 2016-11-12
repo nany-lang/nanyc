@@ -38,14 +38,14 @@ namespace Mapping
 			//! Get if allowed to capture variables
 			bool enabled() const { return atom != nullptr; }
 
-			void enabled(Atom* newatom)
+			void enabled(Atom& newatom)
 			{
-				atom = newatom;
+				atom = &newatom;
 				atom->flags += Atom::Flags::captureVariables;
-				if (!newatom->candidatesForCapture)
+				if (!newatom.candidatesForCapture)
 				{
-					typedef decltype(newatom->candidatesForCapture) Set;
-					newatom->candidatesForCapture = std::make_unique<Set::element_type>();
+					typedef decltype(newatom.candidatesForCapture) Set;
+					newatom.candidatesForCapture = std::make_unique<Set::element_type>();
 				}
 			}
 
@@ -205,42 +205,34 @@ namespace Mapping
 				: cdeftable.atoms.root;
 
 			MutexLocker locker{mutex};
-			// create a new atom in the global type table
-			auto* newatom = isFuncdef
+			auto& newatom = isFuncdef
 				? cdeftable.atoms.createFuncdef(parentAtom, funcname)
 				: cdeftable.atoms.createTypealias(parentAtom, funcname);
 
-			assert(newatom != nullptr);
-			newatom->opcodes.sequence = &currentSequence;
-			newatom->opcodes.offset   = currentSequence.offsetOf(operands);
-			// create a pseudo classdef to easily retrieve the real atom from a clid
+			newatom.opcodes.sequence = &currentSequence;
+			newatom.opcodes.offset   = currentSequence.offsetOf(operands);
 			cdeftable.registerAtom(newatom);
 
-			operands.atomid = newatom->atomid;
-
-			// return type
-			newatom->returnType.clid.reclass(newatom->atomid, 1);
-			// scope resolution
+			operands.atomid = newatom.atomid;
+			newatom.returnType.clid.reclass(newatom.atomid, 1);
 			if (parentAtom.atomid != atom.atomid)
-				newatom->scopeForNameResolution = &atom;
+				newatom.scopeForNameResolution = &atom;
 
-			// requires additional information
 			needAtomDbgFileReport = true;
 			needAtomDbgOffsetReport = true;
-			pushNewFrame(*newatom);
+			pushNewFrame(newatom);
 
 			// capture unknown variables ?
 			if (not isGlobalOperator)
 			{
-				if (newatom->isClassMember() and newatom->parent->flags(Atom::Flags::captureVariables))
+				if (newatom.isClassMember() and newatom.parent->flags(Atom::Flags::captureVariables))
 				{
-					atomStack->capture.enabled(newatom->parent);
-					newatom->flags += Atom::Flags::captureVariables;
+					atomStack->capture.enabled(*newatom.parent);
+					newatom.flags += Atom::Flags::captureVariables;
 				}
 			}
-
 			if (!firstAtomCreated)
-				firstAtomCreated = newatom;
+				firstAtomCreated = &newatom;
 		}
 
 
@@ -255,45 +247,39 @@ namespace Mapping
 			lastPushedIndexedParameters.clear();
 
 			AnyString classname = currentSequence.stringrefs[operands.name];
-
-			Atom* newClassAtom = nullptr;
-			// create a new atom in the global type table
-			if (prefixNameForFirstAtomCreated.empty())
-			{
-				MutexLocker locker{mutex};
-				newClassAtom = cdeftable.atoms.createClassdef(atom, classname);
-				// create a pseudo classdef to easily retrieve the real atom from a clid
-				cdeftable.registerAtom(newClassAtom);
-			}
-			else
-			{
-				String tmpname;
-				tmpname.reserve(classname.size() + prefixNameForFirstAtomCreated.size());
-				tmpname << prefixNameForFirstAtomCreated << classname;
-				prefixNameForFirstAtomCreated.clear();
-
-				MutexLocker locker{mutex};
-				newClassAtom = cdeftable.atoms.createClassdef(atom, tmpname);
-				// create a pseudo classdef to easily retrieve the real atom from a clid
-				cdeftable.registerAtom(newClassAtom);
-			}
-
-			assert(newClassAtom != nullptr);
-			newClassAtom->opcodes.sequence = &currentSequence;
-			newClassAtom->opcodes.offset   = currentSequence.offsetOf(operands);
-
+			Atom& newClassAtom = [&]() -> Atom& {
+				if (prefixNameForFirstAtomCreated.empty())
+				{
+					MutexLocker locker{mutex};
+					auto& newClassAtom = cdeftable.atoms.createClassdef(atom, classname);
+					cdeftable.registerAtom(newClassAtom);
+					return newClassAtom;
+				}
+				else
+				{
+					String tmpname;
+					tmpname.reserve(classname.size() + prefixNameForFirstAtomCreated.size());
+					tmpname << prefixNameForFirstAtomCreated << classname;
+					prefixNameForFirstAtomCreated.clear();
+					MutexLocker locker{mutex};
+					auto& newClassAtom = cdeftable.atoms.createClassdef(atom, tmpname);
+					cdeftable.registerAtom(newClassAtom);
+					return newClassAtom;
+				}
+			}();
+			newClassAtom.opcodes.sequence = &currentSequence;
+			newClassAtom.opcodes.offset   = currentSequence.offsetOf(operands);
 			// update atomid
-			operands.atomid = newClassAtom->atomid;
+			operands.atomid = newClassAtom.atomid;
 			// requires additional information
 			needAtomDbgFileReport = true;
 			needAtomDbgOffsetReport = true;
-			pushNewFrame(*newClassAtom);
+			pushNewFrame(newClassAtom);
 
 			if (operands.lvid != 0)
 				atomStack->capture.enabled(newClassAtom);
-
 			if (!firstAtomCreated)
-				firstAtomCreated = newClassAtom;
+				firstAtomCreated = &newClassAtom;
 		}
 
 
@@ -331,7 +317,6 @@ namespace Mapping
 			auto& cdef = cdeftable.classdef(clid);
 			cdef.instance = not isGenTypeParam;
 			cdef.qualifiers.ref = false; // should not be 'ref' by default, contrary to all other classdefs
-
 			// making sure the classdef is 'any'
 			assert(cdef.atom == nullptr and cdef.isAny());
 
@@ -340,11 +325,11 @@ namespace Mapping
 				// if a generic type parameter, generating an implicit typedef
 				Atom& atom = atomStack->currentAtomNotUnit();
 				auto pindex = atom.childrenCount(); // children are currently only typedefs from generic params
-				auto* newAliasAtom = cdeftable.atoms.createTypealias(atom, name);
-				newAliasAtom->classinfo.isInstanciated = true;
+				auto& newAliasAtom = cdeftable.atoms.createTypealias(atom, name);
+				newAliasAtom.classinfo.isInstanciated = true;
 				cdeftable.registerAtom(newAliasAtom);
-				newAliasAtom->returnType.clid = cdef.clid; // type of the typedef
-				newAliasAtom->classinfo.nextFieldIndex = static_cast<uint16_t>(pindex);
+				newAliasAtom.returnType.clid = cdef.clid; // type of the typedef
+				newAliasAtom.classinfo.nextFieldIndex = static_cast<uint16_t>(pindex);
 			}
 		}
 
@@ -363,14 +348,11 @@ namespace Mapping
 				atomStack->capture.knownVars[varname] = atomStack->scope;
 
 			MutexLocker locker{mutex};
-			// create a new atom in the global type table
-			auto* newVarAtom = cdeftable.atoms.createVardef(atom, varname);
-			assert(newVarAtom != nullptr);
-
+			auto& newVarAtom = cdeftable.atoms.createVardef(atom, varname);
 			cdeftable.registerAtom(newVarAtom);
-			newVarAtom->returnType.clid.reclass(atom.atomid, operands.lvid);
+			newVarAtom.returnType.clid.reclass(atom.atomid, operands.lvid);
 			if (!firstAtomCreated)
-				firstAtomCreated = newVarAtom;
+				firstAtomCreated = &newVarAtom;
 		}
 
 
@@ -378,31 +360,22 @@ namespace Mapping
 		{
 			AnyString nmname = currentSequence.stringrefs[operands.name];
 			Atom& parentAtom = atomStack->currentAtomNotUnit();
-
 			MutexLocker locker{mutex};
-			Atom* newRoot = cdeftable.atoms.createNamespace(parentAtom, nmname);
-			assert(newRoot != nullptr);
-			// create a pseudo classdef to easily retrieve the real atom from a clid
+			Atom& newRoot = cdeftable.atoms.createNamespace(parentAtom, nmname);
 			cdeftable.registerAtom(newRoot);
-			pushNewFrame(*newRoot);
+			pushNewFrame(newRoot);
 		}
 
 
 		void mapBlueprintUnit(IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
 		{
 			Atom& parentAtom = atomStack->currentAtomNotUnit();
-			Atom* newRoot;
-			{
-				MutexLocker locker{mutex};
-				newRoot = cdeftable.atoms.createUnit(parentAtom, currentFilename);
-				assert(newRoot != nullptr);
-				// create a pseudo classdef to easily retrieve the real atom from a clid
-				cdeftable.registerAtom(newRoot);
-			}
-			// update atomid
-			operands.atomid = newRoot->atomid;
-			assert(newRoot->atomid != 0);
-			pushNewFrame(*newRoot);
+			MutexLocker locker{mutex};
+			auto& newRoot = cdeftable.atoms.createUnit(parentAtom, currentFilename);
+			cdeftable.registerAtom(newRoot);
+			operands.atomid = newRoot.atomid;
+			assert(newRoot.atomid != 0);
+			pushNewFrame(newRoot);
 		}
 
 

@@ -20,22 +20,22 @@ namespace ny
 	struct AtomMap final
 	{
 		//! Create a new atom related to a part of a namespace
-		Atom* createNamespace(Atom& parent, const AnyString& name);
+		Atom& createNamespace(Atom& parent, const AnyString& name);
 
 		//! Create a new atom related to a function
-		Atom* createFuncdef(Atom& parent, const AnyString& name);
+		Atom& createFuncdef(Atom& parent, const AnyString& name);
 
 		//! Create a new atom related to a class
-		Atom* createClassdef(Atom& parent, const AnyString& name);
+		Atom& createClassdef(Atom& parent, const AnyString& name);
 
 		//! Create a new atom related to a variable
-		Atom* createVardef(Atom& parent, const AnyString& name);
+		Atom& createVardef(Atom& parent, const AnyString& name);
 
 		//! Create a new atom related to a type alias
-		Atom* createTypealias(Atom& parent, const AnyString& name);
+		Atom& createTypealias(Atom& parent, const AnyString& name);
 
 		//! Create a new atom related to an unit (source file)
-		Atom* createUnit(Atom& parent, const AnyString& name);
+		Atom& createUnit(Atom& parent, const AnyString& name);
 
 
 		//! Find the IR sequence for a given {atomid/instanceid} (null if not found)
@@ -71,7 +71,7 @@ namespace ny
 		//! Default constructor
 		explicit AtomMap(StringRefs& stringrefs);
 		//! Create a new atom
-		Atom* createNewAtom(Atom::Type type, Atom& root, const AnyString& name);
+		Atom& createNewAtom(Atom::Type type, Atom& root, const AnyString& name);
 
 	private:
 		std::vector<Atom::Ptr> m_byIndex;

@@ -62,22 +62,22 @@ namespace ny
 	}
 
 
-	Atom* AtomMap::createNewAtom(Atom::Type type, Atom& parent, const AnyString& name)
+	Atom& AtomMap::createNewAtom(Atom::Type type, Atom& parent, const AnyString& name)
 	{
-		auto* newnode   = new Atom(parent, stringrefs.refstr(name), type);
+		Atom::Ptr newnode = new Atom(parent, stringrefs.refstr(name), type);
 		newnode->atomid = ++m_atomGrpID;
 		m_byIndex.emplace_back(newnode);
-		return newnode;
+		return *newnode;
 	}
 
 
-	Atom* AtomMap::createVardef(Atom& parent, const AnyString& name)
+	Atom& AtomMap::createVardef(Atom& parent, const AnyString& name)
 	{
 		assert(not name.empty());
-		auto* atom = createNewAtom(Atom::Type::vardef, parent, name);
+		auto& atom = createNewAtom(Atom::Type::vardef, parent, name);
 		auto fieldindex = parent.classinfo.nextFieldIndex++;
-		atom->varinfo.fieldindex = fieldindex;
-		atom->varinfo.effectiveFieldIndex = fieldindex;
+		atom.varinfo.fieldindex = fieldindex;
+		atom.varinfo.effectiveFieldIndex = fieldindex;
 		return atom;
 	}
 
