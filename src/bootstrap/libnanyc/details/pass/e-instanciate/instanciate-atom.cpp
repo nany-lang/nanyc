@@ -64,7 +64,7 @@ namespace Instanciate
 	}
 
 
-	bool createSpecializedAtom(InstanciateData& info, Atom& atom)
+	bool makeNewAtomInstanciation(InstanciateData& info, Atom& atom)
 	{
 		// create a new atom with non-generic parameters / from a contextual atom
 		// (generic/anonymous class)
@@ -154,7 +154,7 @@ namespace Instanciate
 		// necessary to use new atoms (t needs a forked version to work on to have different types)
 		if (atomRequested.isContextual())
 		{
-			if (not createSpecializedAtom(info, atomRequested))
+			if (not makeNewAtomInstanciation(info, atomRequested))
 				return nullptr;
 			assert(&info.atom.get() != &atomRequested and "a new atom must be used");
 		}
