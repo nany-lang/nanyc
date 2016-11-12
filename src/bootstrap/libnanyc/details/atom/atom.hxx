@@ -328,19 +328,19 @@ namespace ny
 	}
 
 
-	inline Atom::Instances::Ref Atom::Instances::operator [] (uint32_t index) const
+	inline Atom::Instances::Ref Atom::Instances::operator [] (uint32_t index)
 	{
 		return Ref(*this, index);
 	}
 
 
-	inline const IR::Sequence* Atom::Instances::Ref::sequenceIfExists() const
+	inline IR::Sequence* Atom::Instances::Ref::sequenceIfExists()
 	{
 		return (m_index < m_ref.m_instances.size()) ? m_ref.m_instances[m_index].get() : nullptr;
 	}
 
 
-	inline const IR::Sequence& Atom::Instances::Ref::sequence() const
+	inline IR::Sequence& Atom::Instances::Ref::sequence()
 	{
 		assert(m_index < m_ref.m_instances.size());
 		return *(m_ref.m_instances[m_index].get());
