@@ -162,10 +162,6 @@ namespace Instanciate
 		}
 		// the current atom, can be different from `atomRequested`
 		auto& atom = info.atom.get();
-		// the new IR sequence for the instanciated function
-		auto* outIR = new IR::Sequence;
-		// the original IR sequence generated from the AST
-		auto& inputIR = *(atom.opcodes.sequence);
 		// Do some variables require capture ? (from mapping)
 		if (!!atom.candidatesForCapture)
 		{
@@ -175,8 +171,12 @@ namespace Instanciate
 		// registering the new instanciation first
 		// (required for recursive functions & classes)
 		// `atomRequested` is probably `atom` itself, but different for template classes
-		auto instance = atomRequested.instances.create(signature, outIR, &atom);
+		auto instance = atomRequested.instances.create(signature, &atom);
 		info.instanceid = instance.id();
+		// the original IR sequence generated from the AST
+		auto& inputIR = *(atom.opcodes.sequence);
+		// the new IR sequence for the instanciated function
+		auto& outIR = instance.sequence();
 
 		// new layer for the cdeftable
 		ClassdefTableView newView{info.cdeftable, atom.atomid, signature.parameters.size()};
@@ -184,7 +184,7 @@ namespace Instanciate
 		Logs::Report report{*info.report};
 		// instanciate the sequence attached to the atom
 		auto builder = std::make_unique<SequenceBuilder>
-			(report.subgroup(), newView, info.build, outIR, inputIR, info.parent);
+			(report.subgroup(), newView, info.build, &outIR, inputIR, info.parent);
 
 		if (Config::Traces::sourceOpcodeSequence)
 			debugPrintSourceOpcodeSequence(info.cdeftable, info.atom.get(), "[ir-from-ast] ");
@@ -199,7 +199,7 @@ namespace Instanciate
 		// (everything happens here)
 		bool success = builder->readAndInstanciate(atom.opcodes.offset);
 
-		updateTypesInAllStackallocOp(*outIR, newView, atom.atomid);
+		updateTypesInAllStackallocOp(outIR, newView, atom.atomid);
 		// keep all deduced types
 		if (/*likely(success) and*/ info.shouldMergeLayer)
 			newView.mergeSubstitutes();
@@ -215,7 +215,7 @@ namespace Instanciate
 			atom.retrieveCaption(symbolName, newView);  // ex: A.foo(...)...
 		}
 		if (Config::Traces::generatedOpcodeSequence)
-			debugPrintIRSequence(symbolName, *outIR, newView);
+			debugPrintIRSequence(symbolName, outIR, newView);
 
 		if (success)
 		{
@@ -256,7 +256,7 @@ namespace Instanciate
 				// registering the new instance to the atom
 				// `previousAtom` is probably `atom` itself, but different for template classes
 				atomRequested.instances.update(info.instanceid, std::move(symbolName), info.returnType);
-				return outIR;
+				return &outIR;
 			}
 		}
 		// failed to instanciate the input IR sequence. This can be expected, if trying

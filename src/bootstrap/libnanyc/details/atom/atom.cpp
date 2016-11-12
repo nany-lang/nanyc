@@ -229,14 +229,13 @@ namespace ny
 
 
 
-	Atom::Instances::Ref Atom::Instances::create(const Signature& signature, IR::Sequence* sequence, Atom* remapAtom)
+	Atom::Instances::Ref Atom::Instances::create(const Signature& signature, Atom* remapAtom)
 	{
-		assert(sequence != nullptr);
 		uint32_t index = size();
 		m_instances.emplace_back();
 		auto& details = m_instances[index];
 		details.remapAtom = remapAtom;
-		details.sequence  = std::unique_ptr<IR::Sequence>(sequence);
+		details.sequence  = std::make_unique<IR::Sequence>();
 		m_instancesIDs.emplace(signature, index);
 		return Ref{*this, index};
 	}
