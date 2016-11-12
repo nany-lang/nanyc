@@ -122,7 +122,7 @@ namespace Instanciate
 			auto& var = narrowedCandadiateList[i];
 
 			// new atom for the new variable member
-			auto* newVarAtom = table.atoms.createVardef(atom, var.name);
+			auto& newVarAtom = table.atoms.createVardef(atom, var.name);
 			table.registerAtom(newVarAtom);
 
 			auto& cdef = table.rawclassdef(CLID{atom.atomid, startLvid + i});
@@ -135,7 +135,7 @@ namespace Instanciate
 			cdef.mutateToAtom(varSrcAtom);
 			cdef.qualifiers.ref = true;
 
-			newVarAtom->returnType.clid = cdef.clid;
+			newVarAtom.returnType.clid = cdef.clid;
 
 			assert(var.clid.atomid() == frame->atomid);
 			if (var.clid.atomid() == frame->atomid)
