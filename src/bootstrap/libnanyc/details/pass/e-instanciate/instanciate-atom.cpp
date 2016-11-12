@@ -115,7 +115,7 @@ namespace Instanciate
 		// redefine return type {atomid,1}
 		auto& rettype = cdeftable.rawclassdef(CLID{atom.atomid, 1});
 		assert(atom.atomid == rettype.clid.atomid());
-		Atom* atomparam = likely(not rettype.isBuiltinOrVoid()) ? cdeftable.findRawClassdefAtom(rettype) : nullptr;
+		Atom* atomparam = (not rettype.isBuiltinOrVoid()) ? cdeftable.findRawClassdefAtom(rettype) : nullptr;
 		cdeftable.addSubstitute(rettype.kind, atomparam, rettype.qualifiers);
 
 		// adding parameters
