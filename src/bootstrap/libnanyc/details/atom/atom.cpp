@@ -229,6 +229,85 @@ namespace ny
 
 
 
+	uint32_t Atom::Instances::create(const Signature& signature, IR::Sequence* sequence, Atom* remapAtom)
+	{
+		assert(sequence != nullptr);
+		uint32_t index = size();
+		m_instances.emplace_back(sequence);
+		m_instancesMD.emplace_back();
+		assert(m_instances.size() == m_instancesMD.size());
+		auto& details = m_instancesMD[index];
+		details.remapAtom = remapAtom;
+		details.sequence  = sequence;
+		m_instancesIDs.emplace(signature, index);
+		assert(m_instances.size() == m_instancesMD.size());
+		return index;
+	}
+
+
+	void Atom::Instances::update(uint32_t index, String&& symbol, const Classdef& rettype)
+	{
+		assert(index < size());
+		auto& details = m_instancesMD[index];
+		details.rettype.import(rettype);
+		details.rettype.qualifiers = rettype.qualifiers;
+		details.symbol = std::move(symbol);
+	}
+
+
+	uint32_t Atom::Instances::invalidate(uint32_t index, const Signature& signature)
+	{
+		assert(index < m_instances.size());
+		assert(index < m_instancesMD.size());
+		assert(m_instances.size() == m_instancesMD.size());
+		m_instances[index].reset(nullptr);
+		m_instancesIDs[signature] = (uint32_t) -1;
+		auto& details = m_instancesMD[index];
+		details.sequence = nullptr;
+		details.remapAtom = nullptr;
+		return (uint32_t) -1;
+	}
+
+
+	Tribool::Value Atom::Instances::isValid(const Signature& signature, uint32_t& iid, Classdef& rettype, Atom*& remapAtom) const
+	{
+		auto it = m_instancesIDs.find(signature);
+		if (it != m_instancesIDs.end())
+		{
+			uint32_t id = it->second;
+			if (id != (uint32_t) -1)
+			{
+				assert(id < m_instancesMD.size());
+				auto& md  = m_instancesMD[id];
+				iid       = id;
+				remapAtom = md.remapAtom;
+				rettype.import(md.rettype);
+				rettype.qualifiers = md.rettype.qualifiers;
+				return Tribool::Value::yes;
+			}
+			return Tribool::Value::no;
+		}
+		return Tribool::Value::indeterminate;
+	}
+
+
+	String Atom::Instances::print(const AtomMap& atommap) const
+	{
+		assert(m_instances.size() == m_instancesMD.size());
+		String prgm;
+		String out;
+		for (size_t i = 0; i != m_instances.size(); ++i)
+		{
+			out << m_instancesMD[i].symbol << " // #" << i << "\n{\n";
+			m_instances[i].get()->print(prgm, &atommap);
+			prgm.replace("\n", "\n    ");
+			prgm.trimRight();
+			out << prgm << "\n}\n";
+		}
+		return out;
+	}
+
+
 	Atom::Atom(const AnyString& name, Atom::Type type)
 		: category{findCategory(nullptr, type, name)}
 		, type(type)
@@ -248,7 +327,6 @@ namespace ny
 
 	Atom::~Atom()
 	{
-		assert(instances.size() == m_instancesMD.size());
 		if (opcodes.owned)
 			delete opcodes.sequence;
 	}
@@ -487,91 +565,6 @@ namespace ny
 			return true; // let's continue
 		});
 		return success;
-	}
-
-
-	uint32_t Atom::invalidateInstantiation(uint32_t index, const Signature& signature)
-	{
-		assert(index < instances.size());
-		assert(index < m_instancesMD.size());
-		assert(instances.size() == m_instancesMD.size());
-
-		instances[index].reset(nullptr);
-		m_instancesIDs[signature] = (uint32_t) -1;
-		auto& details = m_instancesMD[index];
-		details.sequence = nullptr;
-		details.remapAtom = nullptr;
-		return (uint32_t) -1;
-	}
-
-
-	uint32_t Atom::createInstantiation(const Signature& signature, IR::Sequence* sequence, Atom* remapAtom)
-	{
-		assert(sequence != nullptr);
-		uint32_t index = static_cast<uint32_t>(instances.size());
-		instances.emplace_back(sequence);
-		m_instancesMD.emplace_back();
-		assert(instances.size() == m_instancesMD.size());
-
-		auto& details = m_instancesMD[index];
-		details.remapAtom = remapAtom;
-		details.sequence  = sequence;
-
-		m_instancesIDs.emplace(signature, index);
-		assert(instances.size() == m_instancesMD.size());
-		return index;
-	}
-
-
-	void Atom::updateInstantiation(uint32_t index, String&& symbol, const Classdef& rettype)
-	{
-		assert(index < m_instancesMD.size());
-		auto& details = m_instancesMD[index];
-		details.rettype.import(rettype);
-		details.rettype.qualifiers = rettype.qualifiers;
-		details.symbol = std::move(symbol);
-	}
-
-
-	Tribool::Value Atom::isInstantiationValid(const Signature& signature, uint32_t& iid, Classdef& rettype, Atom*& remapAtom) const
-	{
-		auto it = m_instancesIDs.find(signature);
-		if (it != m_instancesIDs.end())
-		{
-			uint32_t id = it->second;
-			if (id != (uint32_t) -1)
-			{
-				assert(id < m_instancesMD.size());
-				auto& md  = m_instancesMD[id];
-
-				iid       = id;
-				remapAtom = md.remapAtom;
-
-				rettype.import(md.rettype);
-				rettype.qualifiers = md.rettype.qualifiers;
-				return Tribool::Value::yes;
-			}
-			return Tribool::Value::no;
-		}
-		return Tribool::Value::indeterminate;
-	}
-
-
-	void Atom::printInstances(Clob& out, const AtomMap& atommap) const
-	{
-		assert(instances.size() == m_instancesMD.size());
-		String prgm;
-
-		for (size_t i = 0; i != instances.size(); ++i)
-		{
-			out << m_instancesMD[i].symbol << " // " << atomid << " #" << i << "\n{\n";
-
-			instances[i].get()->print(prgm, &atommap);
-
-			prgm.replace("\n", "\n    ");
-			prgm.trimRight();
-			out << prgm << "\n}\n";
-		}
 	}
 
 
