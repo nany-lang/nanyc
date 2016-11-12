@@ -365,17 +365,17 @@ namespace ny
 	public:
 		struct Instances final {
 			struct Ref final {
-				Ref(const Instances& ref, uint32_t index): m_ref(ref), m_index(index) {}
+				Ref(Instances& ref, uint32_t index): m_ref(ref), m_index(index) {}
 				//! Get the attached IR sequence
-				const IR::Sequence& sequence() const;
+				IR::Sequence& sequence();
 				//! Get the attached IR sequence, if any
-				const IR::Sequence* sequenceIfExists() const;
+				IR::Sequence* sequenceIfExists();
 				//! Get the symbol name of the instantiation (with fully qualified types)
 				AnyString symbolname() const;
 				//! Instance ID
 				uint32_t id() const;
 			private:
-				const Instances& m_ref;
+				Instances& m_ref;
 				uint32_t m_index;
 			};
 
@@ -404,7 +404,7 @@ namespace ny
 			uint32_t size() const;
 
 			//! Retrieve information about the Nth instantiation of this atom
-			Ref operator [] (uint32_t index) const;
+			Ref operator [] (uint32_t index);
 
 		private:
 			struct InstanceMetadata final {
