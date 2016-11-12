@@ -87,7 +87,7 @@ namespace ny
 	AnyString AtomMap::symbolname(uint32_t atomid, uint32_t index) const
 	{
 		if (atomid < m_byIndex.size())
-			return m_byIndex[atomid]->instantiation(index).symbolname();
+			return m_byIndex[atomid]->instances[index].symbolname();
 		return AnyString{};
 	}
 

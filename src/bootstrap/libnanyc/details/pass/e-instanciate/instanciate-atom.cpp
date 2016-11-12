@@ -175,7 +175,7 @@ namespace Instanciate
 		// registering the new instanciation first
 		// (required for recursive functions & classes)
 		// `atomRequested` is probably `atom` itself, but different for template classes
-		info.instanceid = atomRequested.createInstantiation(signature, outIR, &atom);
+		info.instanceid = atomRequested.instances.create(signature, outIR, &atom);
 
 		// new layer for the cdeftable
 		ClassdefTableView newView{info.cdeftable, atom.atomid, signature.parameters.size()};
@@ -254,14 +254,14 @@ namespace Instanciate
 			{
 				// registering the new instance to the atom
 				// `previousAtom` is probably `atom` itself, but different for template classes
-				atomRequested.updateInstantiation(info.instanceid, std::move(symbolName), info.returnType);
+				atomRequested.instances.update(info.instanceid, std::move(symbolName), info.returnType);
 				return outIR;
 			}
 		}
 		// failed to instanciate the input IR sequence. This can be expected, if trying
 		// to not instanciate the appropriate function (if several overloads are present
 		// for example). Anyway, remembering this signature as a 'no-go'.
-		info.instanceid = atomRequested.invalidateInstantiation(info.instanceid, signature);
+		info.instanceid = atomRequested.instances.invalidate(info.instanceid, signature);
 		return nullptr;
 	}
 
@@ -800,7 +800,7 @@ namespace Instanciate
 		// Another atom, if the target atom had changed
 		Atom* remapAtom = nullptr;
 
-		auto valid = atom.isInstantiationValid(signature, info.instanceid, info.returnType, remapAtom);
+		auto valid = atom.instances.isValid(signature, info.instanceid, info.returnType, remapAtom);
 		switch (valid)
 		{
 			case Tribool::Value::yes:

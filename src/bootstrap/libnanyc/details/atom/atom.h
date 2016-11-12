@@ -144,21 +144,6 @@ namespace ny
 			std::unique_ptr<Data> pData;
 		};
 
-		struct InstantiationRef final
-		{
-			InstantiationRef(const Atom& atom, uint32_t index): m_atom(atom), m_index(index) {}
-
-			//! Get the attached IR sequence
-			const IR::Sequence& sequence() const;
-			//! Get the attached IR sequence, if any
-			const IR::Sequence* sequenceIfExists() const;
-			//! Get the symbol name of the instantiation (with fully qualified types)
-			AnyString symbolname() const;
-
-		private:
-			const Atom& m_atom;
-			uint32_t m_index;
-		};
 
 
 	public:
@@ -346,37 +331,6 @@ namespace ny
 		uint64_t runtimeSizeof() const;
 		//@}
 
-		//! \name Instantiations
-		//@{
-		//! Retrieve information about the Nth instantiation of this atom
-		InstantiationRef instantiation(uint32_t index) const;
-
-		/*!
-		** \brief Keep an instance of the atom for a given signature
-		** \param signature The signature of the atom (parameters)
-		** \param sequence The sequence itself (must not be null)
-		** \return index of the instantiation
-		*/
-		uint32_t createInstantiation(const Signature& signature, IR::Sequence* sequence, Atom* remapAtom);
-
-		/*!
-		** \brief Update atom instance
-		** \param symbol The complete symbol name (ex: "func A.foo(b: ref __i32): ref __i32")
-		** \note The content of 'symbol' will be moved to avoid memory allocation
-		*/
-		void updateInstantiation(uint32_t index, Yuni::String&& symbol, const Classdef& rettype);
-
-		//! Mark the instantiation (and its signature) as invalid
-		// (always returns -1)
-		uint32_t invalidateInstantiation(uint32_t index, const Signature& signature);
-
-		/*!
-		** \brief Fetch the sequence for a given signature (if any) and update the signature
-		*/
-		Yuni::Tribool::Value isInstantiationValid(const Signature& signature, uint32_t& iid, Classdef&, Atom*& remapAtom) const;
-		//@}
-
-
 		//! \name Info / Debugging
 		//@{
 		//! Get the full name of the atom (without any parameters)
@@ -384,7 +338,6 @@ namespace ny
 		//! Append the full name of the atom (without any parameters)
 		void retrieveFullname(YString& out, const ClassdefTableView* table = nullptr,
 			bool parentName = true) const;
-
 
 		//! Get the full name of the atom along with its parameters
 		// \internal mainly used for convenience and debugging purposes
@@ -395,12 +348,8 @@ namespace ny
 		//! Append the full name of the atom along with its parameters
 		void retrieveCaption(YString& out, const ClassdefTableView& table) const;
 
-
 		//! Print the subtree
 		void printTree(const ClassdefTableView&) const;
-
-		//! Print all instanciated sequences for the atom
-		void printInstances(Yuni::Clob& out, const AtomMap&) const;
 
 		/*!
 		** \brief Keyword (class, func, var, namespace...)
@@ -413,11 +362,64 @@ namespace ny
 		//@}
 
 
-	private:
-		//! All instances, indexed by their internal id
-		std::vector<std::unique_ptr<IR::Sequence>> instances;
-
 	public:
+		struct Instances final {
+			struct Ref final {
+				Ref(const Instances& ref, uint32_t index): m_ref(ref), m_index(index) {}
+				//! Get the attached IR sequence
+				const IR::Sequence& sequence() const;
+				//! Get the attached IR sequence, if any
+				const IR::Sequence* sequenceIfExists() const;
+				//! Get the symbol name of the instantiation (with fully qualified types)
+				AnyString symbolname() const;
+			private:
+				const Instances& m_ref;
+				uint32_t m_index;
+			};
+
+			//! Print all instanciated sequences for the atom
+			YString print(const AtomMap&) const;
+
+			//! \brief Keep an instance of the atom for a given signature
+			//! \param signature The signature of the atom (parameters)
+			//! \param sequence The sequence itself (must not be null)
+			//! \return index of the instantiation
+			uint32_t create(const Signature& signature, IR::Sequence* sequence, Atom* remapAtom);
+
+			//! \brief Update atom instance
+			//! \param symbol The complete symbol name (ex: "func A.foo(b: ref __i32): ref __i32")
+			//! \note The content of 'symbol' will be moved to avoid memory allocation
+			void update(uint32_t index, Yuni::String&& symbol, const Classdef& rettype);
+
+			//! Mark the instantiation (and its signature) as invalid
+			// (always returns -1)
+			uint32_t invalidate(uint32_t index, const Signature&);
+
+			//! Fetch the sequence for a given signature (if any) and update the signature
+			Yuni::Tribool::Value isValid(const Signature& signature, uint32_t& iid, Classdef&, Atom*& remapAtom) const;
+
+			//! Number of instances
+			uint32_t size() const;
+
+			//! Retrieve information about the Nth instantiation of this atom
+			Ref operator [] (uint32_t index) const;
+
+		private:
+			struct InstanceMetadata final {
+				IR::Sequence* sequence = nullptr;
+				Classdef rettype;
+				Atom* remapAtom = nullptr;
+				Yuni::String symbol;
+			};
+			//! All instances, indexed by their internal id
+			std::vector<std::unique_ptr<IR::Sequence>> m_instances;
+			//! All code instances
+			std::unordered_map<Signature, uint32_t> m_instancesIDs;
+			//! Symbol names for instances in `m_instances`
+			std::vector<InstanceMetadata> m_instancesMD;
+		}
+		instances;
+
 		//! Atom unique ID (32-bits only, used for classification)
 		uint32_t atomid = 0u;
 		//! Atom flags
@@ -514,26 +516,17 @@ namespace ny
 		std::unique_ptr<std::unordered_set<AnyString>> candidatesForCapture;
 
 
+
 	private:
 		//! Default constructor
 		explicit Atom(const AnyString& name, Type type);
 		//! Default constructor, with a parent
 		explicit Atom(Atom& rootparent, const AnyString& name, Type type);
 
-		struct InstanceMetadata final {
-			IR::Sequence* sequence = nullptr;
-			Classdef rettype;
-			Atom* remapAtom = nullptr;
-			Yuni::String symbol;
-		};
 
 	private:
 		//! Atoms that belong to this atom (sub-classes, methods...)
 		std::multimap<AnyString, Ptr> m_children;
-		//! All code instances
-		std::unordered_map<Signature, uint32_t> m_instancesIDs;
-		//! Symbol names for instances in `m_instances`
-		std::vector<InstanceMetadata> m_instancesMD;
 		//! Name of the current atom
 		AnyString m_name;
 		// nakama !
