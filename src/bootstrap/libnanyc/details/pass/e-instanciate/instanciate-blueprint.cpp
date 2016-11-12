@@ -36,8 +36,8 @@ namespace Instanciate
 		if (atomid == seq.mappingBlueprintAtomID[0])
 			atomid = seq.mappingBlueprintAtomID[1];
 
-		auto* atomptr = seq.cdeftable.atoms().findAtom(atomid);
-		if (unlikely(nullptr == atomptr))
+		auto atomptr = seq.cdeftable.atoms().findAtom(atomid);
+		if (unlikely(!atomptr))
 		{
 			seq.complainOperand(IR::Instruction::fromOpcode(operands), "invalid atom");
 			return;
@@ -118,8 +118,8 @@ namespace Instanciate
 
 		uint32_t atomid = operands.atomid;
 		assert(atomid != seq.mappingBlueprintAtomID[0] and "mapping for an unit ?");
-		auto* atom = seq.cdeftable.atoms().findAtom(atomid);
-		if (unlikely(nullptr == atom))
+		auto atom = seq.cdeftable.atoms().findAtom(atomid);
+		if (unlikely(!atom))
 		{
 			seq.complainOperand(IR::Instruction::fromOpcode(operands), "invalid unit atom");
 			return;

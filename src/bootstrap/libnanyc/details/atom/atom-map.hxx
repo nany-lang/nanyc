@@ -56,13 +56,13 @@ namespace ny
 	}
 
 
-	inline const Atom* AtomMap::findAtom(uint32_t atomid) const
+	inline Atom::Ptr AtomMap::findAtom(uint32_t atomid) const
 	{
 		return atomid < m_byIndex.size() ? m_byIndex[atomid] : nullptr;
 	}
 
 
-	inline Atom* AtomMap::findAtom(uint32_t atomid)
+	inline Atom::Ptr AtomMap::findAtom(uint32_t atomid)
 	{
 		return atomid < m_byIndex.size() ? m_byIndex[atomid] : nullptr;
 	}
