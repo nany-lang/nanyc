@@ -356,18 +356,13 @@ namespace ny
 		++m_layer.count;
 		assert(m_layer.count == m_layer.flags.size());
 		assert(m_layer.count == m_layer.storage.size());
-
 		auto& ret = m_layer.storage.back();
 		switch (kind)
 		{
 			case nyt_any:  ret.mutateToAtom(atom); break;
-			case nyt_void: ret.mutateToVoid(); break;
-			default:       ret.mutateToBuiltin(kind);
+			default:       ret.mutateToBuiltinOrVoid(kind);
 		}
-
-		// preserve qualifiers
-		ret.qualifiers = qualifiers;
-		// set clid
+		ret.qualifiers = qualifiers; // preserve qualifiers
 		ret.clid.reclass(m_layer.atomid, m_layer.count - 1);
 		return ret;
 	}

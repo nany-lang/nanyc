@@ -118,27 +118,20 @@ namespace Instanciate
 		Atom* atomparam = (not rettype.isBuiltinOrVoid()) ? cdeftable.findRawClassdefAtom(rettype) : nullptr;
 		cdeftable.addSubstitute(rettype.kind, atomparam, rettype.qualifiers);
 
-		// adding parameters
+		auto substitute = [&](auto& parameter) {
+			cdeftable.addSubstitute(parameter.kind, parameter.atom, parameter.qualifiers);
+			assert(parameter.kind != nyt_any or parameter.atom != nullptr);
+		};
+		// parameters, as expected
 		for (uint32_t i = 0; i != count; ++i)
-		{
-			auto& param = signature.parameters[i];
-			cdeftable.addSubstitute(param.kind, param.atom, param.qualifiers);
-			assert(param.kind != nyt_any or param.atom != nullptr);
-		}
-		// adding reserved variables for cloning parameters (after normal parameters)
+			substitute(signature.parameters[i]);
+		// reserved variables for cloning parameters (after normal parameters)
 		for (uint32_t i = 0; i != count; ++i)
-		{
-			auto& param = signature.parameters[i];
-			cdeftable.addSubstitute(param.kind, param.atom, param.qualifiers);
-		}
+			substitute(signature.parameters[i]);
 		// template parameters
 		count = signature.tmplparams.size();
 		for (uint32_t i = 0; i != count; ++i)
-		{
-			auto& param = signature.tmplparams[i];
-			cdeftable.addSubstitute(param.kind, param.atom, param.qualifiers);
-			assert(param.kind != nyt_any or param.atom != nullptr);
-		}
+			substitute(signature.tmplparams[i]);
 	}
 
 
