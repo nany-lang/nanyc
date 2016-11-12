@@ -150,24 +150,19 @@ namespace Instanciate
 			ice() << "invalid atom";
 			return nullptr;
 		}
-		// In case or an anonymous class or a class with generic type parameters,
-		// it is necessary to use new atoms (t needs a forked version to work on
-		// to have different types)
+		// In case or an anonymous class or a class with generic type parameters, it is
+		// necessary to use new atoms (t needs a forked version to work on to have different types)
 		if (atomRequested.isContextual())
 		{
 			if (not createSpecializedAtom(info, atomRequested))
 				return nullptr;
-			// the atom has changed - info.atom.get() has been updated accordingly
-			assert(&info.atom.get() != &atomRequested);
+			assert(&info.atom.get() != &atomRequested and "a new atom must be used");
 		}
-		// the current atom, can be different from `atomRequested`
-		auto& atom = info.atom.get();
-		// Do some variables require capture ? (from mapping)
-		if (!!atom.candidatesForCapture)
-		{
-			if (info.parent)
-				info.parent->captureVariables(atom);
-		}
+
+		auto& atom = info.atom.get(); // current atom, can be different from `atomRequested`
+		if (!!atom.candidatesForCapture and info.parent)
+			info.parent->captureVariables(atom);
+
 		// registering the new instanciation first
 		// (required for recursive functions & classes)
 		// `atomRequested` is probably `atom` itself, but different for template classes
@@ -194,6 +189,7 @@ namespace Instanciate
 		// atomid mapping, usefull to keep track of the good atom id
 		builder->mappingBlueprintAtomID[0] = atomRequested.atomid; // {from}
 		builder->mappingBlueprintAtomID[1] = atom.atomid;          // {to}
+
 		// Read the input IR sequence, resolve all types, and generate
 		// a new IR sequence ready for execution ! (with or without optimization passes)
 		// (everything happens here)
