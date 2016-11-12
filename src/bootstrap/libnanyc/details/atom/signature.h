@@ -12,7 +12,7 @@ namespace ny
 {
 
 	// forward declaration
-	class Atom;
+	struct Atom;
 
 
 

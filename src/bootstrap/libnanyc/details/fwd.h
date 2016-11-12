@@ -24,7 +24,7 @@ namespace ny
 
 
 	class CTarget;
-	class Atom;
+	struct Atom;
 	class ClassdefTable;
 	class ClassdefTableView;
 	class Intrinsic;

@@ -8,7 +8,7 @@
 
 
 // forward declaration
-namespace ny { class AtomMap; namespace IR { class Sequence; struct Instruction; } }
+namespace ny { struct AtomMap; namespace IR { class Sequence; struct Instruction; } }
 
 
 namespace ny
