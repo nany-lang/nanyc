@@ -60,8 +60,8 @@ namespace vm
 
 			build.printStderr("' at '");
 
-			auto* atom = map.findAtom(frame.atomidInstance[0]);
-			if (atom)
+			auto atom = map.findAtom(frame.atomidInstance[0]);
+			if (!!atom)
 			{
 				build.printStderr(atom->origin.filename);
 				if (atom->origin.line != 0)

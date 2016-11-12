@@ -48,9 +48,9 @@ namespace ny
 		AnyString symbolname(uint32_t atomid, uint32_t index) const;
 
 		//! Retrive an Atom object from its unique id (const)
-		const Atom* findAtom(uint32_t atomid) const;
+		Atom::Ptr findAtom(uint32_t atomid) const;
 		//! Retrive an Atom object from its unique id
-		Atom* findAtom(uint32_t atomid);
+		Atom::Ptr findAtom(uint32_t atomid);
 
 		//! Try to retrieve the corresponding classes for core objects (bool, i32...)
 		bool fetchAndIndexCoreObjects();
@@ -74,7 +74,7 @@ namespace ny
 		Atom* createNewAtom(Atom::Type type, Atom& root, const AnyString& name);
 
 	private:
-		std::vector<Atom*> m_byIndex;
+		std::vector<Atom::Ptr> m_byIndex;
 		uint32_t m_atomGrpID = 0;
 		friend class ClassdefTable;
 

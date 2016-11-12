@@ -217,19 +217,18 @@ namespace vm
 		void destroy(uint64_t* object, uint32_t dtorid, uint32_t instanceid)
 		{
 			// the dtor function to call
-			const Atom* dtor = map.findAtom(dtorid);
-			assert(dtor != nullptr);
+			auto& dtor = *map.findAtom(dtorid);
 
 			if (false) // traces
 			{
 				std::cout << " .. DESTROY " << (void*) object << " aka '"
-					<< dtor->caption() << "' at opc+" << sequence.get().offsetOf(**cursor) << '\n';
+					<< dtor.caption() << "' at opc+" << sequence.get().offsetOf(**cursor) << '\n';
 				stacktrace.dump(ny::ref(threadContext.program.build), map);
 				std::cout << '\n';
 			}
 
 			// the parent class
-			const Atom* classobject = dtor->parent;
+			auto* classobject = dtor.parent;
 			assert(classobject != nullptr);
 
 			// its size
@@ -242,7 +241,7 @@ namespace vm
 				funcparamCount = 1;
 				funcparams[0].u64 = reinterpret_cast<uint64_t>(object); // self
 				// func call
-				call(0, dtor->atomid, instanceid);
+				call(0, dtor.atomid, instanceid);
 			}
 
 			if (debugmode)
