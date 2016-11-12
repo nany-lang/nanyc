@@ -815,6 +815,22 @@ namespace ny
 	}
 
 
+	bool Atom::Parameters::append(const CLID& clid, const AnyString& name)
+	{
+		if (!pData)
+			pData = std::make_unique<Data>();
+		auto& internal = *pData.get();
+		if (likely(internal.count < Config::maxPushedParameters))
+		{
+			internal.params[internal.count].first  = name;
+			internal.params[internal.count].second.clid = clid;
+			++internal.count;
+			return true;
+		}
+		return false;
+	}
+
+
 
 
 } // namespace ny
