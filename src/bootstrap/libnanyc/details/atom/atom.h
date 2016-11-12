@@ -386,7 +386,7 @@ namespace ny
 			//! \param signature The signature of the atom (parameters)
 			//! \param sequence The sequence itself (must not be null)
 			//! \return index of the instantiation
-			uint32_t create(const Signature& signature, IR::Sequence* sequence, Atom* remapAtom);
+			Ref create(const Signature& signature, IR::Sequence* sequence, Atom* remapAtom);
 
 			//! \brief Update atom instance
 			//! \param symbol The complete symbol name (ex: "func A.foo(b: ref __i32): ref __i32")

@@ -229,7 +229,7 @@ namespace ny
 
 
 
-	uint32_t Atom::Instances::create(const Signature& signature, IR::Sequence* sequence, Atom* remapAtom)
+	Atom::Instances::Ref Atom::Instances::create(const Signature& signature, IR::Sequence* sequence, Atom* remapAtom)
 	{
 		assert(sequence != nullptr);
 		uint32_t index = size();
@@ -238,7 +238,7 @@ namespace ny
 		details.remapAtom = remapAtom;
 		details.sequence  = std::unique_ptr<IR::Sequence>(sequence);
 		m_instancesIDs.emplace(signature, index);
-		return index;
+		return Ref{*this, index};
 	}
 
 
