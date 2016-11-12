@@ -407,18 +407,16 @@ namespace ny
 			Ref operator [] (uint32_t index);
 
 		private:
-			struct InstanceMetadata final {
-				IR::Sequence* sequence = nullptr;
+			struct Metadata final {
+				std::unique_ptr<IR::Sequence> sequence;
 				Classdef rettype;
 				Atom* remapAtom = nullptr;
 				Yuni::String symbol;
 			};
 			//! All instances, indexed by their internal id
-			std::vector<std::unique_ptr<IR::Sequence>> m_instances;
+			std::vector<Metadata> m_instances;
 			//! All code instances
 			std::unordered_map<Signature, uint32_t> m_instancesIDs;
-			//! Symbol names for instances in `m_instances`
-			std::vector<InstanceMetadata> m_instancesMD;
 		}
 		instances;
 

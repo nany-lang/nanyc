@@ -233,14 +233,11 @@ namespace ny
 	{
 		assert(sequence != nullptr);
 		uint32_t index = size();
-		m_instances.emplace_back(sequence);
-		m_instancesMD.emplace_back();
-		assert(m_instances.size() == m_instancesMD.size());
-		auto& details = m_instancesMD[index];
+		m_instances.emplace_back();
+		auto& details = m_instances[index];
 		details.remapAtom = remapAtom;
-		details.sequence  = sequence;
+		details.sequence  = std::unique_ptr<IR::Sequence>(sequence);
 		m_instancesIDs.emplace(signature, index);
-		assert(m_instances.size() == m_instancesMD.size());
 		return index;
 	}
 
@@ -248,7 +245,7 @@ namespace ny
 	void Atom::Instances::update(uint32_t index, String&& symbol, const Classdef& rettype)
 	{
 		assert(index < size());
-		auto& details = m_instancesMD[index];
+		auto& details = m_instances[index];
 		details.rettype.import(rettype);
 		details.rettype.qualifiers = rettype.qualifiers;
 		details.symbol = std::move(symbol);
@@ -258,11 +255,8 @@ namespace ny
 	uint32_t Atom::Instances::invalidate(uint32_t index, const Signature& signature)
 	{
 		assert(index < m_instances.size());
-		assert(index < m_instancesMD.size());
-		assert(m_instances.size() == m_instancesMD.size());
-		m_instances[index].reset(nullptr);
 		m_instancesIDs[signature] = (uint32_t) -1;
-		auto& details = m_instancesMD[index];
+		auto& details = m_instances[index];
 		details.sequence = nullptr;
 		details.remapAtom = nullptr;
 		return (uint32_t) -1;
@@ -277,12 +271,12 @@ namespace ny
 			uint32_t id = it->second;
 			if (id != (uint32_t) -1)
 			{
-				assert(id < m_instancesMD.size());
-				auto& md  = m_instancesMD[id];
-				iid       = id;
-				remapAtom = md.remapAtom;
-				rettype.import(md.rettype);
-				rettype.qualifiers = md.rettype.qualifiers;
+				assert(id < m_instances.size());
+				auto& details  = m_instances[id];
+				iid = id;
+				remapAtom = details.remapAtom;
+				rettype.import(details.rettype);
+				rettype.qualifiers = details.rettype.qualifiers;
 				return Tribool::Value::yes;
 			}
 			return Tribool::Value::no;
@@ -293,13 +287,13 @@ namespace ny
 
 	String Atom::Instances::print(const AtomMap& atommap) const
 	{
-		assert(m_instances.size() == m_instancesMD.size());
 		String prgm;
 		String out;
 		for (size_t i = 0; i != m_instances.size(); ++i)
 		{
-			out << m_instancesMD[i].symbol << " // #" << i << "\n{\n";
-			m_instances[i].get()->print(prgm, &atommap);
+			out << m_instances[i].symbol << " // #" << i << "\n{\n";
+			if (m_instances[i].sequence)
+				m_instances[i].sequence->print(prgm, &atommap);
 			prgm.replace("\n", "\n    ");
 			prgm.trimRight();
 			out << prgm << "\n}\n";

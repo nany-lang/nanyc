@@ -336,21 +336,22 @@ namespace ny
 
 	inline IR::Sequence* Atom::Instances::Ref::sequenceIfExists()
 	{
-		return (m_index < m_ref.m_instances.size()) ? m_ref.m_instances[m_index].get() : nullptr;
+		return (m_index < m_ref.m_instances.size())
+			? m_ref.m_instances[m_index].sequence.get() : nullptr;
 	}
 
 
 	inline IR::Sequence& Atom::Instances::Ref::sequence()
 	{
 		assert(m_index < m_ref.m_instances.size());
-		return *(m_ref.m_instances[m_index].get());
+		return *(m_ref.m_instances[m_index].sequence.get());
 	}
 
 
 	inline AnyString Atom::Instances::Ref::symbolname() const
 	{
 		return (m_index < m_ref.m_instances.size())
-			? AnyString{m_ref.m_instancesMD[m_index].symbol} : AnyString{};
+			? AnyString{m_ref.m_instances[m_index].symbol} : AnyString{};
 	}
 
 
