@@ -388,38 +388,38 @@ namespace Mapping
 			switch (kind)
 			{
 				case IR::ISA::Blueprint::vardef:
-					{
-						mapBlueprintVardef(operands);
-						break;
-					}
+				{
+					mapBlueprintVardef(operands);
+					break;
+				}
 				case IR::ISA::Blueprint::param:
 				case IR::ISA::Blueprint::paramself:
 				case IR::ISA::Blueprint::gentypeparam:
-					{
-						mapBlueprintParam(operands);
-						break;
-					}
+				{
+					mapBlueprintParam(operands);
+					break;
+				}
 				case IR::ISA::Blueprint::funcdef:
 				case IR::ISA::Blueprint::typealias:
-					{
-						mapBlueprintFuncdefOrTypedef(operands);
-						break;
-					}
+				{
+					mapBlueprintFuncdefOrTypedef(operands);
+					break;
+				}
 				case IR::ISA::Blueprint::classdef:
-					{
-						mapBlueprintClassdef(operands);
-						break;
-					}
+				{
+					mapBlueprintClassdef(operands);
+					break;
+				}
 				case IR::ISA::Blueprint::namespacedef:
-					{
-						mapBlueprintNamespace(operands);
-						break;
-					}
+				{
+					mapBlueprintNamespace(operands);
+					break;
+				}
 				case IR::ISA::Blueprint::unit:
-					{
-						mapBlueprintUnit(operands);
-						break;
-					}
+				{
+					mapBlueprintUnit(operands);
+					break;
+				}
 			}
 		}
 
@@ -432,30 +432,30 @@ namespace Mapping
 			switch (operands.pragma)
 			{
 				case IR::ISA::Pragma::codegen:
-					{
-						break;
-					}
+				{
+					break;
+				}
 				case IR::ISA::Pragma::builtinalias:
-					{
-						Atom& atom = atomStack->atom;
-						atom.builtinalias = currentSequence.stringrefs[operands.value.builtinalias.namesid];
-						break;
-					}
+				{
+					Atom& atom = atomStack->atom;
+					atom.builtinalias = currentSequence.stringrefs[operands.value.builtinalias.namesid];
+					break;
+				}
 				case IR::ISA::Pragma::shortcircuit:
-					{
-						bool onoff = (0 != operands.value.shortcircuit);
-						atomStack->atom.parameters.shortcircuitValue = onoff;
-						break;
-					}
+				{
+					bool onoff = (0 != operands.value.shortcircuit);
+					atomStack->atom.parameters.shortcircuitValue = onoff;
+					break;
+				}
 				case IR::ISA::Pragma::suggest:
-					{
-						bool onoff = (0 != operands.value.suggest);
-						if (not onoff)
-							atomStack->atom.flags -= Atom::Flags::suggestInReport;
-						else
-							atomStack->atom.flags += Atom::Flags::suggestInReport;
-						break;
-					}
+				{
+					bool onoff = (0 != operands.value.suggest);
+					if (not onoff)
+						atomStack->atom.flags -= Atom::Flags::suggestInReport;
+					else
+						atomStack->atom.flags += Atom::Flags::suggestInReport;
+					break;
+				}
 
 				case IR::ISA::Pragma::synthetic:
 				case IR::ISA::Pragma::blueprintsize:
@@ -490,16 +490,15 @@ namespace Mapping
 			{
 				case Atom::Type::funcdef:
 				case Atom::Type::typealias:
-					{
-						// creating all related classdefs
-						// (take max with 1 to prevent against invalid opcode)
-						if (unlikely(localvarCount == 0))
-							return complainOperand(operands, "invalid local variable count for a func blueprint");
-
-						// like parameters, the return type should not 'ref' by default
-						cdeftable.classdef(CLID{parentAtom.atomid, 1}).qualifiers.ref = false;
-						break;
-					}
+				{
+					// creating all related classdefs
+					// (take max with 1 to prevent against invalid opcode)
+					if (unlikely(localvarCount == 0))
+						return complainOperand(operands, "invalid local variable count for a func blueprint");
+					// like parameters, the return type should not 'ref' by default
+					cdeftable.classdef(CLID{parentAtom.atomid, 1}).qualifiers.ref = false;
+					break;
+				}
 				default: break;
 			}
 		}
@@ -571,11 +570,11 @@ namespace Mapping
 			switch ((nytype_t) operands.type)
 			{
 				default:
-					{
-						cdef.mutateToBuiltin((nytype_t) operands.type);
-						cdef.instance = true; // keep somewhere that this definition is a variable instance
-						break;
-					}
+				{
+					cdef.mutateToBuiltin((nytype_t) operands.type);
+					cdef.instance = true; // keep somewhere that this definition is a variable instance
+					break;
+				}
 				case nyt_void: cdef.mutateToVoid(); break;
 				case nyt_any:  cdef.mutateToAny(); break;
 			}
