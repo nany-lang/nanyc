@@ -53,130 +53,156 @@ namespace ny
 		return type == Type::namespacedef;
 	}
 
+
 	inline bool Atom::isClass() const
 	{
 		return type == Type::classdef;
 	}
+
 
 	inline bool Atom::isAnonymousClass() const
 	{
 		return type == Type::classdef and m_name.empty();
 	}
 
+
 	inline bool Atom::callable() const
 	{
 		return isFunction() or (isClass() and hasMember("^()"));
 	}
+
 
 	inline bool Atom::isCtor() const
 	{
 		return category(Category::ctor);
 	}
 
+
 	inline bool Atom::isDtor() const
 	{
 		return category(Category::dtor);
 	}
+
 
 	inline bool Atom::isCloneCtor() const
 	{
 		return category(Category::clone);
 	}
 
+
 	inline bool Atom::isUnit() const
 	{
 		return type == Type::unit;
 	}
+
 
 	inline bool Atom::isTypeAlias() const
 	{
 		return type == Type::typealias;
 	}
 
+
 	inline bool Atom::isFunction() const
 	{
 		return type == Type::funcdef;
 	}
+
 
 	inline bool Atom::isOperator() const
 	{
 		return category(Category::funcoperator);
 	}
 
+
 	inline bool Atom::isSpecial() const
 	{
 		return category(Category::special);
 	}
+
 
 	inline bool Atom::isView() const
 	{
 		return category(Category::view);
 	}
 
+
 	inline bool Atom::isFunctor() const
 	{
 		return category(Category::functor);
 	}
+
 
 	inline bool Atom::isCapturedVariable() const
 	{
 		return category(Category::capturedVar);
 	}
 
+
 	inline bool Atom::isMemberVarDefaultInit() const
 	{
 		return category(Category::defvarInit);
 	}
+
 
 	inline bool Atom::isMemberVariable() const
 	{
 		return (type == Type::vardef) and category(Category::classParent);
 	}
 
+
 	inline bool Atom::isClassMember() const
 	{
 		return (type != Type::classdef) and category(Category::classParent);
 	}
+
 
 	inline bool Atom::isPropertyGet() const
 	{
 		return category(Category::propget);
 	}
 
+
 	inline bool Atom::isPropertySet() const
 	{
 		return category(Category::propset);
 	}
+
 
 	inline bool Atom::isPropertySetCustom() const
 	{
 		return category(Category::propsetCustom);
 	}
 
+
 	inline bool Atom::isProperty() const
 	{
 		return isPropertyGet() or isPropertySet() or isPropertySetCustom();
 	}
+
 
 	inline bool Atom::isUnittest() const
 	{
 		return category(Category::unittest);
 	}
 
+
 	inline bool Atom::isPublicOrPublished() const
 	{
 		return (visibility == nyv_public) or (visibility == nyv_published);
 	}
+
 
 	inline bool Atom::hasReturnType() const
 	{
 		return not returnType.clid.isVoid();
 	}
 
+
 	inline bool Atom::hasGenericParameters() const
 	{
 		return not tmplparams.empty();
 	}
+
 
 	inline bool Atom::isContextual() const
 	{
@@ -224,6 +250,7 @@ namespace ny
 				return;
 		}
 	}
+
 
 	template<class C>
 	inline void Atom::eachChild(const AnyString& needle, const C& callback) const
@@ -273,28 +300,12 @@ namespace ny
 	}
 
 
-	inline bool Atom::Parameters::append(const CLID& clid, const AnyString& name)
-	{
-		if (!pData)
-			pData = std::make_unique<Data>();
-		auto& internal = *pData.get();
-
-		if (likely(internal.count < Config::maxPushedParameters))
-		{
-			internal.params[internal.count].first  = name;
-			internal.params[internal.count].second.clid = clid;
-			++internal.count;
-			return true;
-		}
-		return false;
-	}
-
-
 	inline const AnyString& Atom::Parameters::name(uint index) const
 	{
 		assert(!!pData and index < pData->count);
 		return pData->params[index].first;
 	}
+
 
 	inline const Vardef& Atom::Parameters::vardef(uint index) const
 	{
@@ -372,6 +383,7 @@ namespace ny
 		m_ref.invalidate(m_index, signature);
 		return (uint32_t) -1;
 	}
+
 
 
 
