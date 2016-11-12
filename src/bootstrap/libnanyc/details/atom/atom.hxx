@@ -361,4 +361,18 @@ namespace ny
 	}
 
 
+	inline void Atom::Instances::Ref::update(YString&& symbol, const Classdef& rettype)
+	{
+		m_ref.update(m_index, std::move(symbol), rettype);
+	}
+
+
+	inline uint32_t Atom::Instances::Ref::invalidate(const Signature& signature)
+	{
+		m_ref.invalidate(m_index, signature);
+		return (uint32_t) -1;
+	}
+
+
+
 } // namespace ny
