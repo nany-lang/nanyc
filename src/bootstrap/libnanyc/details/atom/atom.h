@@ -372,6 +372,8 @@ namespace ny
 				const IR::Sequence* sequenceIfExists() const;
 				//! Get the symbol name of the instantiation (with fully qualified types)
 				AnyString symbolname() const;
+				//! Instance ID
+				uint32_t id() const;
 			private:
 				const Instances& m_ref;
 				uint32_t m_index;

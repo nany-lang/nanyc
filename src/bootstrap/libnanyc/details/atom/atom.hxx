@@ -354,6 +354,10 @@ namespace ny
 	}
 
 
+	inline uint32_t Atom::Instances::Ref::id() const
+	{
+		return m_index;
+	}
 
 
 } // namespace ny
