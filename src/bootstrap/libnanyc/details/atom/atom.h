@@ -75,6 +75,12 @@ namespace ny
 			instanciating,
 		};
 
+		template<Flags F> struct FlagAutoSwitch final {
+			FlagAutoSwitch(Atom& atom) :atom(atom) { atom.flags += F; }
+			~FlagAutoSwitch() { atom.flags -= F; }
+			Atom& atom;
+		};
+
 		enum class Category: uint32_t
 		{
 			//! Not a normal func/class

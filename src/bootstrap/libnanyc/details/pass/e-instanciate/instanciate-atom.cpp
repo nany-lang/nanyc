@@ -97,7 +97,10 @@ namespace Instanciate
 		// to keep the types for the new atoms
 		info.shouldMergeLayer = true;
 		// upate parameter types
-		return resolveStrictParameterTypes(info.build, newAtom, &info);
+		bool r = resolveStrictParameterTypes(info.build, newAtom, &info);
+		warning() << ".. instanciate from '" << atom.caption(info.cdeftable) << "' to '"
+			<< newAtom.caption(info.cdeftable) << '\'';
+		return r;
 	}
 
 
@@ -155,9 +158,9 @@ namespace Instanciate
 		auto& atom = info.atom.get(); // current atom, can be different from `atomRequested`
 		if (!!atom.candidatesForCapture and info.parent)
 			info.parent->captureVariables(atom);
+		Atom::FlagAutoSwitch<Atom::Flags::instanciating> flagUpdater{atom};
 
-		// registering the new instanciation first
-		// (required for recursive functions & classes)
+		// registering the new instanciation first (required for recursive functions & classes)
 		// `atomRequested` is probably `atom` itself, but different for template classes
 		auto instance = atomRequested.instances.create(signature, &atom);
 		info.instanceid = instance.id();
@@ -804,11 +807,8 @@ namespace Instanciate
 			}
 			case Tribool::Value::indeterminate:
 			{
-				// not found, the atom should be instanciated
-				atom.flags += Atom::Flags::instanciating;
-				bool success = (nullptr != performAtomInstanciation(info, signature));
-				atom.flags -= Atom::Flags::instanciating;
-				return success;
+				// the atom must be instanciated
+				return (nullptr != performAtomInstanciation(info, signature));
 			}
 			case Tribool::Value::no:
 			{
