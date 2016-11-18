@@ -82,12 +82,6 @@ endif()
 #
 add_subdirectory("ext/dyncall")
 
-#
-# -- Google RE2 (fast, safe, thread-friendly alternative to backtracking regular expression engines)
-#
-#add_subdirectory("ext/re2")
-#set_target_properties(re2 PROPERTIES EXCLUDE_FROM_ALL true)
-
 
 
 
