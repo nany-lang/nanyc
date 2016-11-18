@@ -57,6 +57,11 @@ namespace ny
 		return type == Type::classdef and m_name.empty();
 	}
 
+	inline bool Atom::callable() const
+	{
+		return isFunction() or (isClass() and hasMember("^()"));
+	}
+
 	inline bool Atom::isCtor() const
 	{
 		return category(Category::ctor);
