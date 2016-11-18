@@ -212,6 +212,8 @@ namespace ny
 		bool isCloneCtor() const;
 		//! Get if the atom is a functor (operator ())
 		bool isFunctor() const;
+		//! Get if the atom is callable (can be called like a function)
+		bool callable() const;
 		//! Get if the atom is a captured variable
 		bool isCapturedVariable() const;
 		//! Get if the atom is a property (get or set)
