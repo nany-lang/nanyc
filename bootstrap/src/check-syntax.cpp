@@ -42,9 +42,9 @@ struct ParseVerbosity : public LeftType {
 				if (Handler::colorsAllowed)
 					System::Console::TextColor<System::Console::yellow>::Set(out);
 				#ifndef YUNI_OS_WINDOWS
-				out << "      \u2713  ";
+				out << "  \u2713  ";
 				#else
-				out << "      >  ";
+				out << "  >  ";
 				#endif
 				if (Handler::colorsAllowed)
 					System::Console::TextColor<System::Console::white>::Set(out);
