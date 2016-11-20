@@ -13,7 +13,7 @@ namespace Instanciate
 {
 
 
-	void debugPrintIRSequence(const String& symbolName, const IR::Sequence& irseq,
+	void debugPrintIRSequence(const String& symbolName, const ir::Sequence& irseq,
 		const ClassdefTableView& table, uint32_t offset)
 	{
 		String text;

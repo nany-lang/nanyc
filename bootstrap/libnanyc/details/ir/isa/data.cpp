@@ -9,13 +9,13 @@ using namespace Yuni;
 
 namespace ny
 {
-namespace IR
+namespace ir
 {
 namespace ISA
 {
 
 
-	String print(const Sequence& sequence, const ny::IR::Instruction& instr, const ny::AtomMap* atommap)
+	String print(const Sequence& sequence, const ny::ir::Instruction& instr, const ny::AtomMap* atommap)
 	{
 		String text;
 		Printer<String> printer{text, sequence};
@@ -47,5 +47,5 @@ namespace ISA
 
 
 } // namespace ISA
-} // namespace IR
+} // namespace ir
 } // namespace ny

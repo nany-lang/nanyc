@@ -19,7 +19,7 @@ namespace Instanciate
 
 
 	//! Print (to report) an IR sequence
-	void debugPrintIRSequence(const YString& symbolName, const IR::Sequence&, const ClassdefTableView&, uint32_t offset = 0);
+	void debugPrintIRSequence(const YString& symbolName, const ir::Sequence&, const ClassdefTableView&, uint32_t offset = 0);
 
 	//! Print the original opcodes sequence, produced from the AST
 	void debugPrintSourceOpcodeSequence(const ClassdefTableView&, const Atom&, const char* usertxt);

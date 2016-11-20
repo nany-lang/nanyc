@@ -80,7 +80,7 @@ namespace Mapping
 		}
 
 
-		void complainOperand(const IR::Instruction& operands, AnyString msg)
+		void complainOperand(const ir::Instruction& operands, AnyString msg)
 		{
 			// example: ICE: unknown opcode 'resolveAttribute': from 'ref %4 = resolve %3."()"'
 			auto trace = ice();
@@ -89,20 +89,20 @@ namespace Mapping
 			else
 				trace << "invalid opcode ";
 
-			trace << " '" << IR::ISA::print(currentSequence, operands) << '\'';
+			trace << " '" << ir::ISA::print(currentSequence, operands) << '\'';
 			success = false;
 		}
 
 
-		template<IR::ISA::Op O>
-		void complainOperand(const IR::ISA::Operand<O>& operands, AnyString msg)
+		template<ir::ISA::Op O>
+		void complainOperand(const ir::ISA::Operand<O>& operands, AnyString msg)
 		{
-			complainOperand(IR::Instruction::fromOpcode(operands), msg);
+			complainOperand(ir::Instruction::fromOpcode(operands), msg);
 		}
 
 
-		template<IR::ISA::Op O>
-		bool checkForLVID(const IR::ISA::Operand<O>& operands, LVID lvid)
+		template<ir::ISA::Op O>
+		bool checkForLVID(const ir::ISA::Operand<O>& operands, LVID lvid)
 		{
 			if (debugmode)
 			{
@@ -132,7 +132,7 @@ namespace Mapping
 		}
 
 
-		void attachFuncCall(const IR::ISA::Operand<IR::ISA::Op::call>& operands)
+		void attachFuncCall(const ir::ISA::Operand<ir::ISA::Op::call>& operands)
 		{
 			if (unlikely(not checkForLVID(operands, operands.ptr2func)))
 				return;
@@ -177,11 +177,11 @@ namespace Mapping
 		}
 
 
-		void mapBlueprintFuncdefOrTypedef(IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
+		void mapBlueprintFuncdefOrTypedef(ir::ISA::Operand<ir::ISA::Op::blueprint>& operands)
 		{
 			// functions and typedef are instanciated the sameway (with some minor differences)
-			auto kind = static_cast<IR::ISA::Blueprint>(operands.kind);
-			bool isFuncdef = (kind == IR::ISA::Blueprint::funcdef);
+			auto kind = static_cast<ir::ISA::Blueprint>(operands.kind);
+			bool isFuncdef = (kind == ir::ISA::Blueprint::funcdef);
 
 			// registering the blueprint into the outline...
 			Atom& atom = atomStack->currentAtomNotUnit();
@@ -236,7 +236,7 @@ namespace Mapping
 		}
 
 
-		void mapBlueprintClassdef(IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
+		void mapBlueprintClassdef(ir::ISA::Operand<ir::ISA::Op::blueprint>& operands)
 		{
 			// registering the blueprint into the outline...
 			Atom& atom = atomStack->currentAtomNotUnit();
@@ -283,7 +283,7 @@ namespace Mapping
 		}
 
 
-		void mapBlueprintParam(IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
+		void mapBlueprintParam(ir::ISA::Operand<ir::ISA::Op::blueprint>& operands)
 		{
 			auto& frame = *atomStack;
 
@@ -294,11 +294,11 @@ namespace Mapping
 			if (unlikely(not checkForLVID(operands, paramLVID)))
 				return;
 
-			auto kind = static_cast<IR::ISA::Blueprint>(operands.kind);
-			assert(kind == IR::ISA::Blueprint::param or kind == IR::ISA::Blueprint::paramself
-				   or kind == IR::ISA::Blueprint::gentypeparam);
+			auto kind = static_cast<ir::ISA::Blueprint>(operands.kind);
+			assert(kind == ir::ISA::Blueprint::param or kind == ir::ISA::Blueprint::paramself
+				   or kind == ir::ISA::Blueprint::gentypeparam);
 
-			bool isGenTypeParam = (kind == IR::ISA::Blueprint::gentypeparam);
+			bool isGenTypeParam = (kind == ir::ISA::Blueprint::gentypeparam);
 			if (unlikely(not isGenTypeParam and not frame.atom.isFunction()))
 				return complainOperand(operands, "parameter for non-function");
 
@@ -334,7 +334,7 @@ namespace Mapping
 		}
 
 
-		void mapBlueprintVardef(IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
+		void mapBlueprintVardef(ir::ISA::Operand<ir::ISA::Op::blueprint>& operands)
 		{
 			// registering the blueprint into the outline...
 			Atom& atom = atomStack->currentAtomNotUnit();
@@ -356,7 +356,7 @@ namespace Mapping
 		}
 
 
-		void mapBlueprintNamespace(IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
+		void mapBlueprintNamespace(ir::ISA::Operand<ir::ISA::Op::blueprint>& operands)
 		{
 			AnyString nmname = currentSequence.stringrefs[operands.name];
 			Atom& parentAtom = atomStack->currentAtomNotUnit();
@@ -367,7 +367,7 @@ namespace Mapping
 		}
 
 
-		void mapBlueprintUnit(IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
+		void mapBlueprintUnit(ir::ISA::Operand<ir::ISA::Op::blueprint>& operands)
 		{
 			Atom& parentAtom = atomStack->currentAtomNotUnit();
 			MutexLocker locker{mutex};
@@ -379,43 +379,43 @@ namespace Mapping
 		}
 
 
-		void visit(IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
+		void visit(ir::ISA::Operand<ir::ISA::Op::blueprint>& operands)
 		{
 			if (unlikely(nullptr == atomStack))
 				return complainOperand(operands, "invalid stack for blueprint");
 
-			auto kind = static_cast<IR::ISA::Blueprint>(operands.kind);
+			auto kind = static_cast<ir::ISA::Blueprint>(operands.kind);
 			switch (kind)
 			{
-				case IR::ISA::Blueprint::vardef:
+				case ir::ISA::Blueprint::vardef:
 				{
 					mapBlueprintVardef(operands);
 					break;
 				}
-				case IR::ISA::Blueprint::param:
-				case IR::ISA::Blueprint::paramself:
-				case IR::ISA::Blueprint::gentypeparam:
+				case ir::ISA::Blueprint::param:
+				case ir::ISA::Blueprint::paramself:
+				case ir::ISA::Blueprint::gentypeparam:
 				{
 					mapBlueprintParam(operands);
 					break;
 				}
-				case IR::ISA::Blueprint::funcdef:
-				case IR::ISA::Blueprint::typealias:
+				case ir::ISA::Blueprint::funcdef:
+				case ir::ISA::Blueprint::typealias:
 				{
 					mapBlueprintFuncdefOrTypedef(operands);
 					break;
 				}
-				case IR::ISA::Blueprint::classdef:
+				case ir::ISA::Blueprint::classdef:
 				{
 					mapBlueprintClassdef(operands);
 					break;
 				}
-				case IR::ISA::Blueprint::namespacedef:
+				case ir::ISA::Blueprint::namespacedef:
 				{
 					mapBlueprintNamespace(operands);
 					break;
 				}
-				case IR::ISA::Blueprint::unit:
+				case ir::ISA::Blueprint::unit:
 				{
 					mapBlueprintUnit(operands);
 					break;
@@ -424,30 +424,30 @@ namespace Mapping
 		}
 
 
-		void visit(IR::ISA::Operand<IR::ISA::Op::pragma>& operands)
+		void visit(ir::ISA::Operand<ir::ISA::Op::pragma>& operands)
 		{
 			if (unlikely(nullptr == atomStack))
 				return complainOperand(operands, "invalid stack for blueprint pragma");
 
 			switch (operands.pragma)
 			{
-				case IR::ISA::Pragma::codegen:
+				case ir::ISA::Pragma::codegen:
 				{
 					break;
 				}
-				case IR::ISA::Pragma::builtinalias:
+				case ir::ISA::Pragma::builtinalias:
 				{
 					Atom& atom = atomStack->atom;
 					atom.builtinalias = currentSequence.stringrefs[operands.value.builtinalias.namesid];
 					break;
 				}
-				case IR::ISA::Pragma::shortcircuit:
+				case ir::ISA::Pragma::shortcircuit:
 				{
 					bool onoff = (0 != operands.value.shortcircuit);
 					atomStack->atom.parameters.shortcircuitValue = onoff;
 					break;
 				}
-				case IR::ISA::Pragma::suggest:
+				case ir::ISA::Pragma::suggest:
 				{
 					bool onoff = (0 != operands.value.suggest);
 					if (not onoff)
@@ -457,19 +457,19 @@ namespace Mapping
 					break;
 				}
 
-				case IR::ISA::Pragma::synthetic:
-				case IR::ISA::Pragma::blueprintsize:
-				case IR::ISA::Pragma::visibility:
-				case IR::ISA::Pragma::bodystart:
-				case IR::ISA::Pragma::shortcircuitOpNopOffset:
-				case IR::ISA::Pragma::shortcircuitMutateToBool:
-				case IR::ISA::Pragma::unknown:
+				case ir::ISA::Pragma::synthetic:
+				case ir::ISA::Pragma::blueprintsize:
+				case ir::ISA::Pragma::visibility:
+				case ir::ISA::Pragma::bodystart:
+				case ir::ISA::Pragma::shortcircuitOpNopOffset:
+				case ir::ISA::Pragma::shortcircuitMutateToBool:
+				case ir::ISA::Pragma::unknown:
 					break;
 			}
 		}
 
 
-		void visit(IR::ISA::Operand<IR::ISA::Op::stacksize>& operands)
+		void visit(ir::ISA::Operand<ir::ISA::Op::stacksize>& operands)
 		{
 			if (unlikely(nullptr == atomStack))
 				return complainOperand(operands, "invalid parent atom");
@@ -504,7 +504,7 @@ namespace Mapping
 		}
 
 
-		void visit(IR::ISA::Operand<IR::ISA::Op::scope>& operands)
+		void visit(ir::ISA::Operand<ir::ISA::Op::scope>& operands)
 		{
 			if (unlikely(nullptr == atomStack))
 				return complainOperand(operands, "invalid stack");
@@ -514,7 +514,7 @@ namespace Mapping
 		}
 
 
-		void visit(IR::ISA::Operand<IR::ISA::Op::end>&)
+		void visit(ir::ISA::Operand<ir::ISA::Op::end>&)
 		{
 			// reset the last lvid
 			lastLVID = 0u;
@@ -557,7 +557,7 @@ namespace Mapping
 		}
 
 
-		void visit(IR::ISA::Operand<IR::ISA::Op::stackalloc>& operands)
+		void visit(ir::ISA::Operand<ir::ISA::Op::stackalloc>& operands)
 		{
 			if (unlikely(not checkForLVID(operands, operands.lvid)))
 				return;
@@ -581,7 +581,7 @@ namespace Mapping
 		}
 
 
-		void visit(IR::ISA::Operand<IR::ISA::Op::self>& operands)
+		void visit(ir::ISA::Operand<ir::ISA::Op::self>& operands)
 		{
 			if (unlikely(not checkForLVID(operands, operands.self)))
 				return;
@@ -614,7 +614,7 @@ namespace Mapping
 		}
 
 
-		void visit(IR::ISA::Operand<IR::ISA::Op::identify>& operands)
+		void visit(ir::ISA::Operand<ir::ISA::Op::identify>& operands)
 		{
 			if (unlikely(not checkForLVID(operands, operands.lvid)))
 				return;
@@ -675,21 +675,21 @@ namespace Mapping
 		}
 
 
-		void visit(IR::ISA::Operand<IR::ISA::Op::identifyset>& operands)
+		void visit(ir::ISA::Operand<ir::ISA::Op::identifyset>& operands)
 		{
-			auto& newopc = IR::Instruction::fromOpcode(operands).to<IR::ISA::Op::identify>();
+			auto& newopc = ir::Instruction::fromOpcode(operands).to<ir::ISA::Op::identify>();
 			visit(newopc);
 		}
 
 
-		void visit(IR::ISA::Operand<IR::ISA::Op::tpush>& operands)
+		void visit(ir::ISA::Operand<ir::ISA::Op::tpush>& operands)
 		{
 			if (unlikely(not checkForLVID(operands, operands.lvid)))
 				return;
 		}
 
 
-		void visit(IR::ISA::Operand<IR::ISA::Op::push>& operands)
+		void visit(ir::ISA::Operand<ir::ISA::Op::push>& operands)
 		{
 			if (unlikely(not checkForLVID(operands, operands.lvid)))
 				return;
@@ -708,7 +708,7 @@ namespace Mapping
 		}
 
 
-		void visit(IR::ISA::Operand<IR::ISA::Op::call>& operands)
+		void visit(ir::ISA::Operand<ir::ISA::Op::call>& operands)
 		{
 			attachFuncCall(operands);
 			lastLVID = operands.lvid;
@@ -717,7 +717,7 @@ namespace Mapping
 		}
 
 
-		void visit(IR::ISA::Operand<IR::ISA::Op::ret>& operands)
+		void visit(ir::ISA::Operand<ir::ISA::Op::ret>& operands)
 		{
 			if (operands.lvid != 0)
 			{
@@ -734,7 +734,7 @@ namespace Mapping
 		}
 
 
-		void visit(IR::ISA::Operand<IR::ISA::Op::follow>& operands)
+		void visit(ir::ISA::Operand<ir::ISA::Op::follow>& operands)
 		{
 			if (unlikely(not checkForLVID(operands, operands.lvid)))
 				return;
@@ -752,14 +752,14 @@ namespace Mapping
 		}
 
 
-		void visit(IR::ISA::Operand<IR::ISA::Op::intrinsic>& operands)
+		void visit(ir::ISA::Operand<ir::ISA::Op::intrinsic>& operands)
 		{
 			if (unlikely(not checkForLVID(operands, operands.lvid)))
 				return;
 		}
 
 
-		void visit(IR::ISA::Operand<IR::ISA::Op::debugfile>& operands)
+		void visit(ir::ISA::Operand<ir::ISA::Op::debugfile>& operands)
 		{
 			currentFilename = currentSequence.stringrefs[operands.filename].c_str();
 			if (needAtomDbgFileReport)
@@ -770,7 +770,7 @@ namespace Mapping
 		}
 
 
-		void visit(IR::ISA::Operand<IR::ISA::Op::debugpos>& operands)
+		void visit(ir::ISA::Operand<ir::ISA::Op::debugpos>& operands)
 		{
 			currentLine = operands.line;
 			currentOffset = operands.offset;
@@ -784,9 +784,9 @@ namespace Mapping
 		}
 
 
-		void visit(IR::ISA::Operand<IR::ISA::Op::qualifiers>& operands)
+		void visit(ir::ISA::Operand<ir::ISA::Op::qualifiers>& operands)
 		{
-			assert(static_cast<uint32_t>(operands.qualifier) < IR::ISA::TypeQualifierCount);
+			assert(static_cast<uint32_t>(operands.qualifier) < ir::ISA::TypeQualifierCount);
 			CLID clid {atomStack->atom.atomid, operands.lvid};
 			bool onoff = (operands.flag != 0);
 
@@ -797,39 +797,39 @@ namespace Mapping
 			auto& qualifiers = cdeftable.classdef(clid).qualifiers;
 			switch (operands.qualifier)
 			{
-				case IR::ISA::TypeQualifier::ref:      qualifiers.ref = onoff; break;
-				case IR::ISA::TypeQualifier::constant: qualifiers.constant = onoff; break;
+				case ir::ISA::TypeQualifier::ref:      qualifiers.ref = onoff; break;
+				case ir::ISA::TypeQualifier::constant: qualifiers.constant = onoff; break;
 			}
 		}
 
 
-		template<IR::ISA::Op O>
-		void visit(IR::ISA::Operand<O>& operands)
+		template<ir::ISA::Op O>
+		void visit(ir::ISA::Operand<O>& operands)
 		{
 			switch (O)
 			{
 				// all following opcodes can be safely ignored
-				case IR::ISA::Op::allocate:
-				case IR::ISA::Op::comment:
-				case IR::ISA::Op::ensureresolved:
-				case IR::ISA::Op::classdefsizeof:
-				case IR::ISA::Op::namealias:
-				case IR::ISA::Op::store:
-				case IR::ISA::Op::storeText:
-				case IR::ISA::Op::storeConstant:
-				case IR::ISA::Op::memalloc:
-				case IR::ISA::Op::memcopy:
-				case IR::ISA::Op::typeisobject:
-				case IR::ISA::Op::ref:
-				case IR::ISA::Op::unref:
-				case IR::ISA::Op::assign:
-				case IR::ISA::Op::inherit:
-				case IR::ISA::Op::label:
-				case IR::ISA::Op::jmp:
-				case IR::ISA::Op::jz:
-				case IR::ISA::Op::jnz:
-				case IR::ISA::Op::nop:
-				case IR::ISA::Op::commontype:
+				case ir::ISA::Op::allocate:
+				case ir::ISA::Op::comment:
+				case ir::ISA::Op::ensureresolved:
+				case ir::ISA::Op::classdefsizeof:
+				case ir::ISA::Op::namealias:
+				case ir::ISA::Op::store:
+				case ir::ISA::Op::storeText:
+				case ir::ISA::Op::storeConstant:
+				case ir::ISA::Op::memalloc:
+				case ir::ISA::Op::memcopy:
+				case ir::ISA::Op::typeisobject:
+				case ir::ISA::Op::ref:
+				case ir::ISA::Op::unref:
+				case ir::ISA::Op::assign:
+				case ir::ISA::Op::inherit:
+				case ir::ISA::Op::label:
+				case ir::ISA::Op::jmp:
+				case ir::ISA::Op::jz:
+				case ir::ISA::Op::jnz:
+				case ir::ISA::Op::nop:
+				case ir::ISA::Op::commontype:
 					break;
 					// error for all the other ones
 				default:
@@ -867,7 +867,7 @@ namespace Mapping
 		//! Mutex for the cdeftable
 		Yuni::Mutex& mutex;
 		//! Current sequence
-		IR::Sequence& currentSequence;
+		ir::Sequence& currentSequence;
 
 		//! Blueprint root element
 		std::unique_ptr<AtomStackFrame> atomStack;
@@ -888,7 +888,7 @@ namespace Mapping
 		bool needAtomDbgOffsetReport = false;
 
 		//! cursor for iterating through all opcocdes
-		IR::Instruction** cursor = nullptr;
+		ir::Instruction** cursor = nullptr;
 
 		const char* currentFilename = nullptr;
 		uint32_t currentLine = 0;
@@ -903,7 +903,7 @@ namespace Mapping
 
 
 
-	SequenceMapping::SequenceMapping(ClassdefTable& cdeftable, Mutex& mutex, IR::Sequence& sequence)
+	SequenceMapping::SequenceMapping(ClassdefTable& cdeftable, Mutex& mutex, ir::Sequence& sequence)
 		: cdeftable(cdeftable)
 		, mutex(mutex)
 		, currentSequence(sequence)

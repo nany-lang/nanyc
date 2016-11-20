@@ -12,7 +12,7 @@ namespace Pass
 namespace Instanciate
 {
 
-	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::storeConstant>& operands)
+	void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::storeConstant>& operands)
 	{
 		assert(frame != nullptr);
 		frame->lvids(operands.lvid).synthetic = false;
@@ -21,7 +21,7 @@ namespace Instanciate
 	}
 
 
-	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::store>& operands)
+	void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::store>& operands)
 	{
 		assert(frame != nullptr);
 		frame->lvids(operands.lvid).synthetic = false;
@@ -42,7 +42,7 @@ namespace Instanciate
 	}
 
 
-	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::storeText>& operands)
+	void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::storeText>& operands)
 	{
 		if (canGenerateCode())
 		{

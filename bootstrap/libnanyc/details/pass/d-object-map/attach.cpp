@@ -14,7 +14,7 @@ namespace ny
 {
 
 
-	bool Build::attach(IR::Sequence& sequence, bool owned)
+	bool Build::attach(ir::Sequence& sequence, bool owned)
 	{
 		// keep the sequence somewhere
 		{

@@ -134,7 +134,7 @@ namespace Instanciate
 	}
 
 
-	void pragmaShortcircuitMutateToBool(SequenceBuilder& seq, const IR::ISA::Operand<IR::ISA::Op::pragma>& operands)
+	void pragmaShortcircuitMutateToBool(SequenceBuilder& seq, const ir::ISA::Operand<ir::ISA::Op::pragma>& operands)
 	{
 		uint32_t lvid = operands.value.shortcircuitMutate.lvid;
 		uint32_t source = operands.value.shortcircuitMutate.source;
@@ -143,8 +143,8 @@ namespace Instanciate
 		if (true)
 		{
 			auto& instr = *(*seq.cursor - 1);
-			assert(instr.opcodes[0] == static_cast<uint32_t>(IR::ISA::Op::stackalloc));
-			uint32_t sizeoflvid = instr.to<IR::ISA::Op::stackalloc>().lvid;
+			assert(instr.opcodes[0] == static_cast<uint32_t>(ir::ISA::Op::stackalloc));
+			uint32_t sizeoflvid = instr.to<ir::ISA::Op::stackalloc>().lvid;
 
 			// sizeof
 			auto& atombool = *(seq.cdeftable.atoms().core.object[nyt_bool]);
@@ -170,16 +170,16 @@ namespace Instanciate
 
 
 
-	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::pragma>& operands)
+	void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::pragma>& operands)
 	{
 		switch (operands.pragma)
 		{
-			case IR::ISA::Pragma::codegen:
+			case ir::ISA::Pragma::codegen:
 			{
 				pragmaCodegen(*this, operands.value.codegen != 0);
 				break;
 			}
-			case IR::ISA::Pragma::bodystart:
+			case ir::ISA::Pragma::bodystart:
 			{
 				// In 'signature only' mode, we only care about the
 				// parameter user types. Everything after this opcode is unrelevant
@@ -188,37 +188,37 @@ namespace Instanciate
 					currentSequence.invalidateCursor(*cursor);
 				break;
 			}
-			case IR::ISA::Pragma::blueprintsize:
+			case ir::ISA::Pragma::blueprintsize:
 			{
 				pragmaBlueprintSize(*this, operands.value.blueprintsize);
 				break;
 			}
-			case IR::ISA::Pragma::visibility:
+			case ir::ISA::Pragma::visibility:
 			{
 				assert(frame != nullptr);
 				break;
 			}
-			case IR::ISA::Pragma::shortcircuitOpNopOffset:
+			case ir::ISA::Pragma::shortcircuitOpNopOffset:
 			{
 				shortcircuit.label = operands.value.shortcircuitMetadata.label;
 				break;
 			}
-			case IR::ISA::Pragma::shortcircuitMutateToBool:
+			case ir::ISA::Pragma::shortcircuitMutateToBool:
 			{
 				pragmaShortcircuitMutateToBool(*this, operands);
 				break;
 			}
-			case IR::ISA::Pragma::synthetic:
+			case ir::ISA::Pragma::synthetic:
 			{
 				uint32_t lvid = operands.value.synthetic.lvid;
 				bool onoff = (operands.value.synthetic.onoff != 0);
 				frame->lvids(lvid).synthetic = onoff;
 				break;
 			}
-			case IR::ISA::Pragma::suggest:
-			case IR::ISA::Pragma::builtinalias:
-			case IR::ISA::Pragma::shortcircuit:
-			case IR::ISA::Pragma::unknown:
+			case ir::ISA::Pragma::suggest:
+			case ir::ISA::Pragma::builtinalias:
+			case ir::ISA::Pragma::shortcircuit:
+			case ir::ISA::Pragma::unknown:
 				break;
 		}
 	}

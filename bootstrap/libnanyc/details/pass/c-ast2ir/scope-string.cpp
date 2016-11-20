@@ -11,7 +11,7 @@ using namespace Yuni;
 
 namespace ny
 {
-namespace IR
+namespace ir
 {
 namespace Producer
 {
@@ -190,7 +190,7 @@ namespace Producer
 							return unexpectedNode(expr, "[string-interpolation]");
 
 						// creating a scope for temporary expression (string interpolation)
-						IR::OpcodeScopeLocker opscope{out};
+						ir::OpcodeScopeLocker opscope{out};
 						emitDebugpos(expr);
 						uint32_t lvid;
 						if (not visitASTExpr(expr, lvid))
@@ -238,5 +238,5 @@ namespace Producer
 
 
 } // namespace Producer
-} // namespace IR
+} // namespace ir
 } // namespace ny

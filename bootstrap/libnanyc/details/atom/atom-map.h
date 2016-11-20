@@ -39,10 +39,10 @@ namespace ny
 
 
 		//! Find the IR sequence for a given {atomid/instanceid} (null if not found)
-		const IR::Sequence* sequenceIfExists(uint32_t atomid, uint32_t index) const;
+		const ir::Sequence* sequenceIfExists(uint32_t atomid, uint32_t index) const;
 
 		//! Find the IR sequence for a given {atomid/instanceid}
-		const IR::Sequence& sequence(uint32_t atomid, uint32_t index) const;
+		const ir::Sequence& sequence(uint32_t atomid, uint32_t index) const;
 
 		//! Retrieve the human readable name of an atom (empty if not found)
 		AnyString symbolname(uint32_t atomid, uint32_t index) const;

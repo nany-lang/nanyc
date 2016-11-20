@@ -9,7 +9,7 @@ using namespace Yuni;
 
 namespace ny
 {
-namespace IR
+namespace ir
 {
 namespace Producer
 {
@@ -30,8 +30,8 @@ namespace Producer
 			return false;
 		}
 
-		IR::OpcodeScopeLocker opscope{sequence()};
-		IR::Producer::Scope scope{*this};
+		ir::OpcodeScopeLocker opscope{sequence()};
+		ir::Producer::Scope scope{*this};
 		bool success = true;
 		for (auto& child: node.children)
 			success &= scope.visitASTStmt(child);
@@ -42,5 +42,5 @@ namespace Producer
 
 
 } // namespace Producer
-} // namespace IR
+} // namespace ir
 } // namespace ny

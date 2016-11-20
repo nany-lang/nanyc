@@ -9,7 +9,7 @@
 
 namespace ny
 {
-namespace IR
+namespace ir
 {
 namespace ISA
 {
@@ -233,8 +233,8 @@ namespace // anonymous
 			out << (operands.flag ? '+' : '-');
 			switch (operands.qualifier)
 			{
-				case IR::ISA::TypeQualifier::ref:      out << "ref"; break;
-				case IR::ISA::TypeQualifier::constant: out << "const"; break;
+				case ir::ISA::TypeQualifier::ref:      out << "ref"; break;
+				case ir::ISA::TypeQualifier::constant: out << "const"; break;
 			}
 		}
 
@@ -648,7 +648,7 @@ namespace // anonymous
 
 		void print(const Operand<Op::blueprint>& operands)
 		{
-			auto kind = static_cast<IR::ISA::Blueprint>(operands.kind);
+			auto kind = static_cast<ir::ISA::Blueprint>(operands.kind);
 			switch (kind)
 			{
 				case ISA::Blueprint::funcdef:
@@ -839,15 +839,15 @@ namespace // anonymous
 		}
 
 
-		template<ny::IR::ISA::Op O> inline void visit(const Operand<O>& instr)
+		template<ny::ir::ISA::Op O> inline void visit(const Operand<O>& instr)
 		{
 			print(instr);
 			printEOL();
 		}
 
-		inline void visit(const IR::Instruction& instruction)
+		inline void visit(const ir::Instruction& instruction)
 		{
-			LIBNANYC_IR_VISIT_SEQUENCE(const IR::ISA::Operand, *this, instruction);
+			LIBNANYC_IR_VISIT_SEQUENCE(const ir::ISA::Operand, *this, instruction);
 		}
 	};
 
@@ -859,5 +859,5 @@ namespace // anonymous
 
 } // anonymous namespace
 } // namespace ISA
-} // namespace IR
+} // namespace ir
 } // namespace ny

@@ -8,7 +8,7 @@ using namespace Yuni;
 
 namespace ny
 {
-namespace IR
+namespace ir
 {
 namespace Producer
 {
@@ -61,11 +61,11 @@ namespace Producer
 			// children
 			return node.children.empty() or visitASTExprContinuation(node, localvar);
 		}
-		auto& operands = out.at<IR::ISA::Op::identify>(lastIdentifyOpcOffset);
-		assert(operands.opcode == static_cast<uint32_t>(IR::ISA::Op::identify));
-		if (operands.opcode == static_cast<uint32_t>(IR::ISA::Op::identify))
+		auto& operands = out.at<ir::ISA::Op::identify>(lastIdentifyOpcOffset);
+		assert(operands.opcode == static_cast<uint32_t>(ir::ISA::Op::identify));
+		if (operands.opcode == static_cast<uint32_t>(ir::ISA::Op::identify))
 		{
-			operands.opcode = static_cast<uint32_t>(IR::ISA::Op::identifyset);
+			operands.opcode = static_cast<uint32_t>(ir::ISA::Op::identifyset);
 			lastIdentifyOpcOffset = 0;
 		}
 		assert(not node.children.empty());
@@ -196,7 +196,7 @@ namespace Producer
 		assert(not node.children.empty());
 
 		// always creating a new scope for a expr
-		IR::Producer::Scope scope{*this};
+		ir::Producer::Scope scope{*this};
 		if (unlikely(attrnode))
 			scope.visitASTAttributes(*attrnode);
 		bool r = scope.visitASTExprContinuation(node, localvar, allowScope);
@@ -223,5 +223,5 @@ namespace Producer
 
 
 } // namespace Producer
-} // namespace IR
+} // namespace ir
 } // namespace ny

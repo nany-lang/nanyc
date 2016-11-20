@@ -14,7 +14,7 @@ namespace Instanciate
 {
 
 
-	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::ret>& operands)
+	void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::ret>& operands)
 	{
 		// current frame
 		if (unlikely(frame->atom.type != Atom::Type::funcdef)) // just in case

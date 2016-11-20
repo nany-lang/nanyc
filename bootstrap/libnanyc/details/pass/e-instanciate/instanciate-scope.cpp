@@ -14,7 +14,7 @@ namespace Pass
 namespace Instanciate
 {
 
-	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::scope>& /*operands*/)
+	void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::scope>& /*operands*/)
 	{
 		if (frame != nullptr)
 			++(frame->scope);
@@ -24,7 +24,7 @@ namespace Instanciate
 	}
 
 
-	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::end>& /*operands*/)
+	void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::end>& /*operands*/)
 	{
 		if (frame != nullptr)
 		{

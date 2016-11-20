@@ -11,7 +11,7 @@ using namespace Yuni;
 
 namespace ny
 {
-namespace IR
+namespace ir
 {
 namespace Producer
 {
@@ -79,5 +79,5 @@ namespace Producer
 
 
 } // namespace Producer
-} // namespace IR
+} // namespace ir
 } // namespace ny

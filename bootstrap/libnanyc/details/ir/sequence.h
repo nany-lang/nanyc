@@ -17,7 +17,7 @@
 
 namespace ny
 {
-namespace IR
+namespace ir
 {
 
 
@@ -410,7 +410,7 @@ namespace IR
 
 
 
-} // namespace IR
+} // namespace ir
 } // namespace ny
 
 #include "sequence.hxx"

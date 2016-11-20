@@ -8,7 +8,7 @@ using namespace Yuni;
 
 namespace ny
 {
-namespace IR
+namespace ir
 {
 namespace Producer
 {
@@ -44,7 +44,7 @@ namespace Producer
 		if (success)
 		{
 			auto& out = sequence();
-			IR::OpcodeScopeLocker opscope{out};
+			ir::OpcodeScopeLocker opscope{out};
 			emitDebugpos(node);
 			uint32_t lvidappend = out.emitStackalloc(nextvar(), nyt_any);
 			out.emitIdentify(lvidappend, "append", localvar);
@@ -73,5 +73,5 @@ namespace Producer
 
 
 } // namespace Producer
-} // namespace IR
+} // namespace ir
 } // namespace ny

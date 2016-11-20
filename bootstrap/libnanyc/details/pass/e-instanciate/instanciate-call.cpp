@@ -56,7 +56,7 @@ namespace Instanciate
 	}
 
 
-	bool emitFuncCall(SequenceBuilder& seq, const IR::ISA::Operand<IR::ISA::Op::call>& operands)
+	bool emitFuncCall(SequenceBuilder& seq, const ir::ISA::Operand<ir::ISA::Op::call>& operands)
 	{
 		// alias (to make it local)
 		uint32_t lvid = operands.lvid;
@@ -165,11 +165,11 @@ namespace Instanciate
 			// (from previous call to opcode 'resolve')
 			auto it = frame.partiallyResolved.find(cdefFuncToCall.clid);
 			if (unlikely(it == frame.partiallyResolved.end()))
-				return seq.complainOperand(IR::Instruction::fromOpcode(operands), "no solution available");
+				return seq.complainOperand(ir::Instruction::fromOpcode(operands), "no solution available");
 
 			auto& solutions = it->second;
 			if (unlikely(solutions.empty()))
-				return seq.complainOperand(IR::Instruction::fromOpcode(operands), "no solution available");
+				return seq.complainOperand(ir::Instruction::fromOpcode(operands), "no solution available");
 
 			OverloadedFuncCallResolver resolver{&seq, seq.report, overloadMatch, cdeftable, seq.build};
 			if (unlikely(not resolver.resolve(solutions)))
@@ -188,7 +188,7 @@ namespace Instanciate
 
 			// no overload, the func to call is known
 			if (unlikely(not atom->isFunction()))
-				return seq.complainOperand(IR::Instruction::fromOpcode(operands), "a functor is required for func call");
+				return seq.complainOperand(ir::Instruction::fromOpcode(operands), "a functor is required for func call");
 
 			// try to validate the func call
 			// (no error reporting, since no overload is present)
@@ -263,7 +263,7 @@ namespace Instanciate
 			return (ice() << "invalid opcode offset for generating shortcircuit");
 
 		// checking if the referenced offset is really a stackalloc
-		assert(out->at(offset).opcodes[0] == static_cast<uint32_t>(IR::ISA::Op::stackalloc));
+		assert(out->at(offset).opcodes[0] == static_cast<uint32_t>(ir::ISA::Op::stackalloc));
 
 		// lvid of the first parameter
 		uint32_t lvidvalue = seq.pushedparams.func.indexed[0].lvid;
@@ -274,12 +274,12 @@ namespace Instanciate
 			if (unlikely(seq.cdeftable.atoms().core.object[nyt_bool] != atom))
 				return (error() << "boolean expected");
 
-			uint32_t newlvid = out->at<IR::ISA::Op::stackalloc>(offset).lvid;
+			uint32_t newlvid = out->at<ir::ISA::Op::stackalloc>(offset).lvid;
 			++offset;
-			assert(out->at(offset).opcodes[0] == static_cast<uint32_t>(IR::ISA::Op::nop));
+			assert(out->at(offset).opcodes[0] == static_cast<uint32_t>(ir::ISA::Op::nop));
 
-			auto& fieldget  = out->at<IR::ISA::Op::fieldget>(offset);
-			fieldget.opcode = static_cast<uint32_t>(IR::ISA::Op::fieldget);
+			auto& fieldget  = out->at<ir::ISA::Op::fieldget>(offset);
+			fieldget.opcode = static_cast<uint32_t>(ir::ISA::Op::fieldget);
 			fieldget.lvid   = newlvid;
 			fieldget.self   = lvidvalue;
 			fieldget.var    = 0;
@@ -288,20 +288,20 @@ namespace Instanciate
 
 		// go to the next nop (can be first one if the parameter was __bool)
 		++offset;
-		assert(out->at(offset).opcodes[0] == static_cast<uint32_t>(IR::ISA::Op::nop));
+		assert(out->at(offset).opcodes[0] == static_cast<uint32_t>(ir::ISA::Op::nop));
 
 		if (not seq.shortcircuit.compareTo) // if true then
 		{
-			auto& condjmp  = out->at<IR::ISA::Op::jz>(offset);
-			condjmp.opcode = static_cast<uint32_t>(IR::ISA::Op::jz); // promotion
+			auto& condjmp  = out->at<ir::ISA::Op::jz>(offset);
+			condjmp.opcode = static_cast<uint32_t>(ir::ISA::Op::jz); // promotion
 			condjmp.lvid   = lvidvalue;
 			condjmp.result = retlvid; // func return
 			condjmp.label  = label;
 		}
 		else // if false then
 		{
-			auto& condjmp  = out->at<IR::ISA::Op::jnz>(offset);
-			condjmp.opcode = static_cast<uint32_t>(IR::ISA::Op::jnz); // promotion
+			auto& condjmp  = out->at<ir::ISA::Op::jnz>(offset);
+			condjmp.opcode = static_cast<uint32_t>(ir::ISA::Op::jnz); // promotion
 			condjmp.lvid   = lvidvalue;
 			condjmp.result = retlvid; // func return
 			condjmp.label  = label;
@@ -311,7 +311,7 @@ namespace Instanciate
 	}
 
 
-	bool emitPropsetCall(SequenceBuilder& seq, const IR::ISA::Operand<IR::ISA::Op::call>& operands)
+	bool emitPropsetCall(SequenceBuilder& seq, const ir::ISA::Operand<ir::ISA::Op::call>& operands)
 	{
 		if (unlikely(seq.pushedparams.func.indexed.size() != 1))
 			return (ice() << "calling a property setter with more than one value");
@@ -392,7 +392,7 @@ namespace Instanciate
 
 
 
-	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::call>& operands)
+	void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::call>& operands)
 	{
 		// A 'call' can represent several language features.
 		// after AST transformation, assignments are method calls

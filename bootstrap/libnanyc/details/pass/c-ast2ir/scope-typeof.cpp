@@ -9,7 +9,7 @@ using namespace Yuni;
 
 namespace ny
 {
-namespace IR
+namespace ir
 {
 namespace Producer
 {
@@ -18,7 +18,7 @@ namespace Producer
 	namespace {
 
 
-	bool appendSingleType(Scope& scope, AST::Node& expr, IR::Sequence& out, uint32_t& previous)
+	bool appendSingleType(Scope& scope, AST::Node& expr, ir::Sequence& out, uint32_t& previous)
 	{
 		scope.emitDebugpos(expr);
 		uint32_t lvid = 0;
@@ -44,7 +44,7 @@ namespace Producer
 		uint32_t previous = 0;
 		bool success = true;
 		auto& out = sequence();
-		IR::Producer::Scope scope{*this};
+		ir::Producer::Scope scope{*this};
 		OpcodeCodegenDisabler codegen{out};
 
 		for (auto& child: node.children)
@@ -77,5 +77,5 @@ namespace Producer
 
 
 } // namespace Producer
-} // namespace IR
+} // namespace ir
 } // namespace ny

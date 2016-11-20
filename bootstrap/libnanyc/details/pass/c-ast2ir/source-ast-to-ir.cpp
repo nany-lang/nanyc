@@ -26,14 +26,14 @@ namespace ny
 		auto& out = buildinfo.parsing.sequence;
 
 		// helper for generating IR code
-		auto producer = std::make_unique<IR::Producer::Context>(buildinfo.cf, m_filename, out, report);
+		auto producer = std::make_unique<ir::Producer::Context>(buildinfo.cf, m_filename, out, report);
 		// generate namespace-related opcodes
 		producer->useNamespace(buildinfo.parsing.nmspc.first);
 		// map code offset (in bytes) with line numbers (from source input)
 		producer->generateLineIndexes(m_content);
 
 		// generate IR code for all AST nodes
-		IR::Producer::Scope scope{*producer};
+		ir::Producer::Scope scope{*producer};
 		scope.addDebugCurrentFilename();
 		uint32_t bpoffset = out.emitBlueprintUnit(m_filename);
 		uint32_t bpoffsiz = out.emitBlueprintSize();
@@ -45,8 +45,8 @@ namespace ny
 
 		out.emitEnd();
 		uint32_t blpsize = out.opcodeCount() - bpoffset;
-		out.at<IR::ISA::Op::pragma>(bpoffsiz).value.blueprintsize = blpsize;
-		scope.sequence().at<IR::ISA::Op::stacksize>(bpoffsck).add = scope.nextvar();
+		out.at<ir::ISA::Op::pragma>(bpoffsiz).value.blueprintsize = blpsize;
+		scope.sequence().at<ir::ISA::Op::stacksize>(bpoffsck).add = scope.nextvar();
 
 		// do not keep back information
 		buildinfo.parsing.parser.clear();

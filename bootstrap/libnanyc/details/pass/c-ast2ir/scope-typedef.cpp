@@ -9,7 +9,7 @@ using namespace Yuni;
 
 namespace ny
 {
-namespace IR
+namespace ir
 {
 namespace Producer
 {
@@ -49,7 +49,7 @@ namespace Producer
 
 		auto& out = sequence();
 
-		IR::Producer::Scope scope{*this};
+		ir::Producer::Scope scope{*this};
 		uint32_t bpoffset = out.emitBlueprintTypealias(typedefname);
 		uint32_t bpoffsiz = out.emitBlueprintSize();
 		uint32_t bpoffsck = out.emitStackSizeIncrease();
@@ -87,5 +87,5 @@ namespace Producer
 
 
 } // namespace Producer
-} // namespace IR
+} // namespace ir
 } // namespace ny

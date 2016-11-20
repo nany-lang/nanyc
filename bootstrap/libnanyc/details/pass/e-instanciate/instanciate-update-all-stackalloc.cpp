@@ -22,7 +22,7 @@ namespace Instanciate
 			, atomid(atomid)
 		{}
 
-		void visit(IR::ISA::Operand<IR::ISA::Op::stackalloc>& opc)
+		void visit(ir::ISA::Operand<ir::ISA::Op::stackalloc>& opc)
 		{
 			if (debugmode)
 			{
@@ -47,11 +47,11 @@ namespace Instanciate
 				opc.type = static_cast<uint32_t>(cdef.kind);
 		}
 
-		template<IR::ISA::Op O> void visit(const IR::ISA::Operand<O>&) {}
+		template<ir::ISA::Op O> void visit(const ir::ISA::Operand<O>&) {}
 
 		ClassdefTableView& table;
 		uint32_t atomid;
-		IR::Instruction** cursor = nullptr;
+		ir::Instruction** cursor = nullptr;
 	};
 
 
@@ -60,7 +60,7 @@ namespace Instanciate
 
 
 
-	void updateTypesInAllStackallocOp(IR::Sequence& out, ClassdefTableView& table, uint32_t atomid)
+	void updateTypesInAllStackallocOp(ir::Sequence& out, ClassdefTableView& table, uint32_t atomid)
 	{
 		PostProcessStackAllocWalker walker{table, atomid};
 		out.each(walker);

@@ -45,7 +45,7 @@ namespace vm
 		void cerrUnknownPointer(void*, uint32_t offset);
 
 
-		bool invoke(uint64_t& exitstatus, const IR::Sequence& callee, uint32_t atomid, uint32_t instanceid);
+		bool invoke(uint64_t& exitstatus, const ir::Sequence& callee, uint32_t atomid, uint32_t instanceid);
 
 		bool initializeFirstTContext();
 

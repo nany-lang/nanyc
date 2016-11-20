@@ -13,7 +13,7 @@ using namespace Yuni;
 
 namespace ny
 {
-namespace IR
+namespace ir
 {
 namespace Producer
 {
@@ -197,7 +197,7 @@ namespace Producer
 		// default value
 		{
 			LVID rhs = 0;
-			IR::OpcodeScopeLocker opscope{out};
+			ir::OpcodeScopeLocker opscope{out};
 			if (not varValueInitialization(scope, rhs, *varAssign, node, varname))
 				return false;
 
@@ -459,5 +459,5 @@ namespace Producer
 
 
 } // namespace Producer
-} // namespace IR
+} // namespace ir
 } // namespace ny

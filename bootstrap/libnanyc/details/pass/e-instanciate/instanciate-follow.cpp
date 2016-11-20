@@ -13,7 +13,7 @@ namespace Instanciate
 {
 
 
-	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::follow>& operands)
+	void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::follow>& operands)
 	{
 		// in 'signature only' mode (resolving defined parameter types), all
 		// types must be gathered

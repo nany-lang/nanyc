@@ -37,7 +37,7 @@ namespace ny
 			AST::Node::Ptr rootnode;
 
 			//! The original sequence, generated from the normalized AST
-			IR::Sequence sequence;
+			ir::Sequence sequence;
 
 			//! Parse / IR result
 			bool success = false;

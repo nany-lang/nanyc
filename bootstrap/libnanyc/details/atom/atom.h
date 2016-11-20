@@ -372,9 +372,9 @@ namespace ny
 			struct Ref final {
 				Ref(Instances& ref, uint32_t index): m_ref(ref), m_index(index) {}
 				//! Get the attached IR sequence
-				IR::Sequence& sequence();
+				ir::Sequence& sequence();
 				//! Get the attached IR sequence, if any
-				IR::Sequence* sequenceIfExists();
+				ir::Sequence* sequenceIfExists();
 				//! Get the symbol name of the instantiation (with fully qualified types)
 				AnyString symbolname() const;
 				//! Instance ID
@@ -413,7 +413,7 @@ namespace ny
 			void invalidate(uint32_t index, const Signature&);
 
 			struct Metadata final {
-				std::unique_ptr<IR::Sequence> sequence;
+				std::unique_ptr<ir::Sequence> sequence;
 				Classdef rettype;
 				Atom* remapAtom = nullptr;
 				Yuni::String symbol;
@@ -500,7 +500,7 @@ namespace ny
 		//! The original IR sequence
 		struct {
 			//! The original IR sequence
-			IR::Sequence* sequence = nullptr;
+			ir::Sequence* sequence = nullptr;
 			//! Offset to start within this sequence
 			// \warning offset of the operands of the blueprint, not the opcode value
 			uint32_t offset = 0;

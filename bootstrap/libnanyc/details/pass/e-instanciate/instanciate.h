@@ -63,7 +63,7 @@ namespace Instanciate
 		//@{
 		//! Default constructor (importSignature must be called after)
 		SequenceBuilder(Logs::Report, ClassdefTableView&, Build&,
-			IR::Sequence* out, IR::Sequence&, SequenceBuilder* parent = nullptr);
+			ir::Sequence* out, ir::Sequence&, SequenceBuilder* parent = nullptr);
 
 		//! Destructor
 		~SequenceBuilder();
@@ -72,45 +72,45 @@ namespace Instanciate
 
 		//! \name Visitors for all supported opcodes
 		//@{
-		void visit(const IR::ISA::Operand<IR::ISA::Op::scope>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::end>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::ret>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::intrinsic>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::call>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::stackalloc>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::allocate>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::push>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::tpush>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::classdefsizeof>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::follow>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::identify>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::identifyset>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::ensureresolved>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::debugfile>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::debugpos>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::pragma>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::blueprint>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::stacksize>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::namealias>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::storeConstant>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::store>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::storeText>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::typeisobject>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::ref>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::unref>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::assign>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::self>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::qualifiers>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::inherit>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::nop>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::label>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::jmp>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::jz>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::jnz>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::comment>&);
-		void visit(const IR::ISA::Operand<IR::ISA::Op::commontype>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::scope>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::end>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::ret>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::intrinsic>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::call>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::stackalloc>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::allocate>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::push>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::tpush>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::classdefsizeof>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::follow>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::identify>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::identifyset>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::ensureresolved>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::debugfile>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::debugpos>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::pragma>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::blueprint>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::stacksize>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::namealias>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::storeConstant>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::store>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::storeText>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::typeisobject>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::ref>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::unref>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::assign>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::self>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::qualifiers>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::inherit>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::nop>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::label>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::jmp>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::jz>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::jnz>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::comment>&);
+		void visit(const ir::ISA::Operand<ir::ISA::Op::commontype>&);
 		//! visitor - fallback
-		template<IR::ISA::Op O> void visit(const IR::ISA::Operand<O>&);
+		template<ir::ISA::Op O> void visit(const ir::ISA::Operand<O>&);
 
 		//! Walk through all opcodes generated from the AST
 		bool readAndInstanciate(uint32_t offset);
@@ -181,14 +181,14 @@ namespace Instanciate
 		void generateMemberVarDefaultClone();
 
 
-		bool instanciateAssignment(const IR::ISA::Operand<IR::ISA::Op::call>& operands);
+		bool instanciateAssignment(const ir::ISA::Operand<ir::ISA::Op::call>& operands);
 
 		bool instanciateAssignment(AtomStackFrame& frame, LVID lhs, LVID rhs, bool canDisposeLHS = true,
 			bool checktype = true, bool forceDeepcopy = false);
 
 		//! perform type resolution and fetch data (local variable, func...)
-		bool identify(const IR::ISA::Operand<IR::ISA::Op::identify>& operands, const AnyString& name, bool firstChance = true);
-		bool identifyCapturedVar(const IR::ISA::Operand<IR::ISA::Op::identify>& operands, const AnyString& name);
+		bool identify(const ir::ISA::Operand<ir::ISA::Op::identify>& operands, const AnyString& name, bool firstChance = true);
+		bool identifyCapturedVar(const ir::ISA::Operand<ir::ISA::Op::identify>& operands, const AnyString& name);
 
 		//! Try to capture variables from a list of potentiel candidates created by the mapping
 		void captureVariables(Atom& atom);
@@ -205,7 +205,7 @@ namespace Instanciate
 		void declareNamedVariable(const AnyString& name, LVID lvid, bool autorelease = true);
 
 		void instanciateInstrinsicCall();
-		bool instanciateUserDefinedIntrinsic(const IR::ISA::Operand<IR::ISA::Op::intrinsic>& operands);
+		bool instanciateUserDefinedIntrinsic(const ir::ISA::Operand<ir::ISA::Op::intrinsic>& operands);
 		Yuni::Tribool::Value instanciateBuiltinIntrinsic(const AnyString& name, uint32_t lvid, bool canComplain = true);
 		Yuni::Tribool::Value instanciateBuiltinIntrinsicSpecific(const AnyString& name, uint32_t lvid, bool canProduceError);
 		//@}
@@ -226,7 +226,7 @@ namespace Instanciate
 		bool complainIntrinsicParameter(const AnyString& name, uint32_t pindex, const Classdef& got,
 			const AnyString& expected = nullptr);
 		//! Emit a new error message with additional information on the given operand
-		bool complainOperand(const IR::Instruction& operands, AnyString msg = nullptr);
+		bool complainOperand(const ir::Instruction& operands, AnyString msg = nullptr);
 		//! Emit a new warning/error for an unused variable
 		void complainUnusedVariable(const AtomStackFrame&, uint32_t lvid) const;
 		//! Emit a new error on a member request on a non-class type
@@ -252,9 +252,9 @@ namespace Instanciate
 		// Isolate
 		ClassdefTableView cdeftable;
 		// New opcode sequence
-		IR::Sequence* out = nullptr;
+		ir::Sequence* out = nullptr;
 		// Current sequence
-		IR::Sequence& currentSequence;
+		ir::Sequence& currentSequence;
 		//! Flag to prevent code generation when != 0 (used for typeof for example)
 		uint32_t codeGenerationLock = 0;
 		//! Flag to prevent error generation when != 0
@@ -309,7 +309,7 @@ namespace Instanciate
 
 		// exit status
 		mutable bool success = true;
-		friend class ny::IR::Sequence;
+		friend class ny::ir::Sequence;
 
 		//! Previous sequence builder
 		SequenceBuilder* parent = nullptr;
@@ -326,7 +326,7 @@ namespace Instanciate
 		// forked atom and to avoid invalid references
 		uint32_t mappingBlueprintAtomID[2] = {0, 0};
 		//! cursor
-		IR::Instruction** cursor = nullptr;
+		ir::Instruction** cursor = nullptr;
 
 	}; // class SequenceBuilder
 

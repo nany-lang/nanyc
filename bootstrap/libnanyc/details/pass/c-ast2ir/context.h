@@ -16,7 +16,7 @@
 
 namespace ny
 {
-namespace IR
+namespace ir
 {
 namespace Producer
 {
@@ -28,7 +28,7 @@ namespace Producer
 
 
 	/*!
-	** \brief Context for IR generation
+	** \brief Context for ir generation
 	*/
 	class Context final : public Yuni::NonCopyable<Context>
 	{
@@ -40,7 +40,7 @@ namespace Producer
 		//@}
 
 
-		//! \name Utilities: IR generation
+		//! \name Utilities: ir generation
 		//@{
 		/*!
 		** \brief Generate opcode for using a namespace
@@ -90,12 +90,12 @@ namespace Producer
 
 
 	public:
-		//! Discard IR code generation for atoms
+		//! Discard ir code generation for atoms
 		bool ignoreAtoms = false;
 
 		//! Information about the current build
 		nybuild_cf_t& cf;
-		//! Linked IR sequence
+		//! Linked ir sequence
 		Sequence& sequence;
 		//! Reporting
 		Logs::Report report;
@@ -256,7 +256,7 @@ namespace Producer
 
 
 } // namespace Producer
-} // namespace IR
+} // namespace ir
 } // namespace ny
 
 #include "scope.h"

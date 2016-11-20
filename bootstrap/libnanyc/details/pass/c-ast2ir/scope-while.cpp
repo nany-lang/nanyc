@@ -9,7 +9,7 @@ using namespace Yuni;
 
 namespace ny
 {
-namespace IR
+namespace ir
 {
 namespace Producer
 {
@@ -77,7 +77,7 @@ namespace Producer
 		// end of while, if the condition evaluation failed
 		// (and update the label id in the original jump)
 		uint32_t labelEnd = out.emitLabel(nextvar());
-		out.at<IR::ISA::Op::jz>(jumpOffset).label = labelEnd;
+		out.at<ir::ISA::Op::jz>(jumpOffset).label = labelEnd;
 
 		return success;
 	}
@@ -143,5 +143,5 @@ namespace Producer
 
 
 } // namespace Producer
-} // namespace IR
+} // namespace ir
 } // namespace ny

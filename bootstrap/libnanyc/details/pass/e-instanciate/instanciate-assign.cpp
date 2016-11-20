@@ -13,7 +13,7 @@ namespace Instanciate
 {
 
 
-	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::assign>& operands)
+	void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::assign>& operands)
 	{
 		assert(frame != nullptr);
 		frame->lvids(operands.lhs).synthetic = false;

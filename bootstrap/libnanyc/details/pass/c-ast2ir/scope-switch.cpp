@@ -11,7 +11,7 @@ using namespace Yuni;
 
 namespace ny
 {
-namespace IR
+namespace ir
 {
 namespace Producer
 {
@@ -112,7 +112,7 @@ namespace Producer
 
 		// update all labels for jumping to the end
 		for (uint32_t i = 0 ; i != labelCount; ++i)
-			out.at<IR::ISA::Op::jmp>(labels[i]).label = labelEnd;
+			out.at<ir::ISA::Op::jmp>(labels[i]).label = labelEnd;
 		return success;
 	}
 
@@ -120,5 +120,5 @@ namespace Producer
 
 
 } // namespace Producer
-} // namespace IR
+} // namespace ir
 } // namespace ny

@@ -9,7 +9,7 @@ using namespace Yuni;
 
 namespace ny
 {
-namespace IR
+namespace ir
 {
 namespace Producer
 {
@@ -47,7 +47,7 @@ namespace Producer
 				}
 			}
 		}
-		IR::Producer::Scope scope{*this};
+		ir::Producer::Scope scope{*this};
 		OpcodeCodegenDisabler codegenDisabler{sequence()};
 		return scope.visitASTExpr(node, localvar);
 	}
@@ -126,5 +126,5 @@ namespace Producer
 
 
 } // namespace Producer
-} // namespace IR
+} // namespace ir
 } // namespace ny

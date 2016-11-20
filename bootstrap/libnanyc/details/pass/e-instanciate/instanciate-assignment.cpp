@@ -265,7 +265,7 @@ namespace Instanciate
 
 
 
-	bool SequenceBuilder::instanciateAssignment(const IR::ISA::Operand<IR::ISA::Op::call>& operands)
+	bool SequenceBuilder::instanciateAssignment(const ir::ISA::Operand<ir::ISA::Op::call>& operands)
 	{
 		assert(frame != nullptr);
 

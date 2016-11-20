@@ -8,7 +8,7 @@
 
 namespace ny
 {
-namespace IR
+namespace ir
 {
 namespace Producer
 {
@@ -49,7 +49,7 @@ namespace Producer
 
 
 	/*!
-	** \brief Scope for IR generation (requires a context or another scope)
+	** \brief Scope for ir generation (requires a context or another scope)
 	*/
 	class Scope final
 	{
@@ -146,9 +146,9 @@ namespace Producer
 
 		//! \name Debug infos
 		//@{
-		//! Add a comment within the IR code
+		//! Add a comment within the ir code
 		void comment(const AnyString& text);
-		//! Add an empty comment line within the IR code
+		//! Add an empty comment line within the ir code
 		void comment();
 
 		//! Emit opcode related to the current position (in the current source)
@@ -223,7 +223,7 @@ namespace Producer
 
 
 } // namespace Producer
-} // namespace IR
+} // namespace ir
 } // namespace ny
 
 #include "scope.hxx"

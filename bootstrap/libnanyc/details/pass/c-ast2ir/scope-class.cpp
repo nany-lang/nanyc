@@ -10,7 +10,7 @@ using namespace Yuni;
 
 namespace ny
 {
-namespace IR
+namespace ir
 {
 namespace Producer
 {
@@ -28,7 +28,7 @@ namespace Producer
 		bool inspectBody(AST::Node& node);
 
 		//! Parent scope
-		IR::Producer::Scope scope;
+		ir::Producer::Scope scope;
 
 		uint32_t lvid = 0;
 		uint32_t bpoffset;
@@ -185,5 +185,5 @@ namespace Producer
 
 
 } // namespace Producer
-} // namespace IR
+} // namespace ir
 } // namespace ny

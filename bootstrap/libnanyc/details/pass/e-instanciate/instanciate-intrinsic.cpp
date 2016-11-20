@@ -15,7 +15,7 @@ namespace Instanciate
 {
 
 
-	bool SequenceBuilder::instanciateUserDefinedIntrinsic(const IR::ISA::Operand<IR::ISA::Op::intrinsic>& operands)
+	bool SequenceBuilder::instanciateUserDefinedIntrinsic(const ir::ISA::Operand<ir::ISA::Op::intrinsic>& operands)
 	{
 		bool success = ([&]() -> bool
 		{
@@ -105,7 +105,7 @@ namespace Instanciate
 	}
 
 
-	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::intrinsic>& operands)
+	void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::intrinsic>& operands)
 	{
 		assert(frame != nullptr);
 		if (unlikely(not instanciateUserDefinedIntrinsic(operands)))

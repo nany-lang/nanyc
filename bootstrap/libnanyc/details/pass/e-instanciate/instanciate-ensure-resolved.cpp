@@ -14,7 +14,7 @@ namespace Instanciate
 {
 
 
-	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::ensureresolved>& operands)
+	void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::ensureresolved>& operands)
 	{
 		bool ok = [&]() -> bool
 		{

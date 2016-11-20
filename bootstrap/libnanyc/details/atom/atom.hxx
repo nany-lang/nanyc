@@ -345,14 +345,14 @@ namespace ny
 	}
 
 
-	inline IR::Sequence* Atom::Instances::Ref::sequenceIfExists()
+	inline ir::Sequence* Atom::Instances::Ref::sequenceIfExists()
 	{
 		return (m_index < m_ref.m_instances.size())
 			? m_ref.m_instances[m_index].sequence.get() : nullptr;
 	}
 
 
-	inline IR::Sequence& Atom::Instances::Ref::sequence()
+	inline ir::Sequence& Atom::Instances::Ref::sequence()
 	{
 		assert(m_index < m_ref.m_instances.size());
 		return *(m_ref.m_instances[m_index].sequence.get());

@@ -7,11 +7,11 @@
 #include <yuni/core/string.h>
 
 
-namespace ny { struct AtomMap; namespace IR { class Sequence; struct Instruction; } }
+namespace ny { struct AtomMap; namespace ir { class Sequence; struct Instruction; } }
 
 namespace ny
 {
-namespace IR
+namespace ir
 {
 namespace ISA
 {
@@ -83,10 +83,10 @@ namespace ISA
 	static const constexpr uint32_t TypeQualifierCount = 1 + (uint32_t) TypeQualifier::constant;
 
 
-	template<ny::IR::ISA::Op O> struct Operand final {};
+	template<ny::ir::ISA::Op O> struct Operand final {};
 
 
-	template<> struct Operand<ny::IR::ISA::Op::nop> final
+	template<> struct Operand<ny::ir::ISA::Op::nop> final
 	{
 		constexpr static const char* opname() { return "nop"; }
 		uint32_t opcode;
@@ -94,7 +94,7 @@ namespace ISA
 		template<class T> void eachLVID(T&) {}
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::eq> final
+	template<> struct Operand<ny::ir::ISA::Op::eq> final
 	{
 		constexpr static const char* opname() { return "eq"; }
 		uint32_t opcode;
@@ -105,7 +105,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::neq> final
+	template<> struct Operand<ny::ir::ISA::Op::neq> final
 	{
 		constexpr static const char* opname() { return "neq"; }
 		uint32_t opcode;
@@ -116,7 +116,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::flt> final
+	template<> struct Operand<ny::ir::ISA::Op::flt> final
 	{
 		constexpr static const char* opname() { return "flt"; }
 		uint32_t opcode;
@@ -127,7 +127,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::flte> final
+	template<> struct Operand<ny::ir::ISA::Op::flte> final
 	{
 		constexpr static const char* opname() { return "flte"; }
 		uint32_t opcode;
@@ -138,7 +138,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::fgt> final
+	template<> struct Operand<ny::ir::ISA::Op::fgt> final
 	{
 		constexpr static const char* opname() { return "fgt"; }
 		uint32_t opcode;
@@ -149,7 +149,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::fgte> final
+	template<> struct Operand<ny::ir::ISA::Op::fgte> final
 	{
 		constexpr static const char* opname() { return "fgte"; }
 		uint32_t opcode;
@@ -160,7 +160,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::lt> final
+	template<> struct Operand<ny::ir::ISA::Op::lt> final
 	{
 		constexpr static const char* opname() { return "lt"; }
 		uint32_t opcode;
@@ -171,7 +171,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::lte> final
+	template<> struct Operand<ny::ir::ISA::Op::lte> final
 	{
 		constexpr static const char* opname() { return "lte"; }
 		uint32_t opcode;
@@ -182,7 +182,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::ilt> final
+	template<> struct Operand<ny::ir::ISA::Op::ilt> final
 	{
 		constexpr static const char* opname() { return "ilt"; }
 		uint32_t opcode;
@@ -193,7 +193,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::ilte> final
+	template<> struct Operand<ny::ir::ISA::Op::ilte> final
 	{
 		constexpr static const char* opname() { return "ilte"; }
 		uint32_t opcode;
@@ -204,7 +204,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::gt> final
+	template<> struct Operand<ny::ir::ISA::Op::gt> final
 	{
 		constexpr static const char* opname() { return "gt"; }
 		uint32_t opcode;
@@ -215,7 +215,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::gte> final
+	template<> struct Operand<ny::ir::ISA::Op::gte> final
 	{
 		constexpr static const char* opname() { return "gte"; }
 		uint32_t opcode;
@@ -226,7 +226,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::igt> final
+	template<> struct Operand<ny::ir::ISA::Op::igt> final
 	{
 		constexpr static const char* opname() { return "igt"; }
 		uint32_t opcode;
@@ -237,7 +237,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::igte> final
+	template<> struct Operand<ny::ir::ISA::Op::igte> final
 	{
 		constexpr static const char* opname() { return "igte"; }
 		uint32_t opcode;
@@ -248,7 +248,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::opand> final
+	template<> struct Operand<ny::ir::ISA::Op::opand> final
 	{
 		constexpr static const char* opname() { return "and"; }
 		uint32_t opcode;
@@ -259,7 +259,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::opor> final
+	template<> struct Operand<ny::ir::ISA::Op::opor> final
 	{
 		constexpr static const char* opname() { return "or"; }
 		uint32_t opcode;
@@ -270,7 +270,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::opxor> final
+	template<> struct Operand<ny::ir::ISA::Op::opxor> final
 	{
 		constexpr static const char* opname() { return "xor"; }
 		uint32_t opcode;
@@ -281,7 +281,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::opmod> final
+	template<> struct Operand<ny::ir::ISA::Op::opmod> final
 	{
 		constexpr static const char* opname() { return "mod"; }
 		uint32_t opcode;
@@ -292,7 +292,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::negation> final
+	template<> struct Operand<ny::ir::ISA::Op::negation> final
 	{
 		constexpr static const char* opname() { return "negation"; }
 		uint32_t opcode;
@@ -302,7 +302,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, lhs); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::fadd> final
+	template<> struct Operand<ny::ir::ISA::Op::fadd> final
 	{
 		constexpr static const char* opname() { return "fadd"; }
 		uint32_t opcode;
@@ -312,7 +312,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::fsub> final
+	template<> struct Operand<ny::ir::ISA::Op::fsub> final
 	{
 		constexpr static const char* opname() { return "fsub"; }
 		uint32_t opcode;
@@ -323,7 +323,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::fmul> final
+	template<> struct Operand<ny::ir::ISA::Op::fmul> final
 	{
 		constexpr static const char* opname() { return "fmul"; }
 		uint32_t opcode;
@@ -334,7 +334,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::fdiv> final
+	template<> struct Operand<ny::ir::ISA::Op::fdiv> final
 	{
 		constexpr static const char* opname() { return "fdiv"; }
 		uint32_t opcode;
@@ -345,7 +345,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::add> final
+	template<> struct Operand<ny::ir::ISA::Op::add> final
 	{
 		constexpr static const char* opname() { return "add"; }
 		uint32_t opcode;
@@ -356,7 +356,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::sub> final
+	template<> struct Operand<ny::ir::ISA::Op::sub> final
 	{
 		constexpr static const char* opname() { return "sub"; }
 		uint32_t opcode;
@@ -367,7 +367,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::mul> final
+	template<> struct Operand<ny::ir::ISA::Op::mul> final
 	{
 		constexpr static const char* opname() { return "mul"; }
 		uint32_t opcode;
@@ -378,7 +378,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::div> final
+	template<> struct Operand<ny::ir::ISA::Op::div> final
 	{
 		constexpr static const char* opname() { return "div"; }
 		uint32_t opcode;
@@ -389,7 +389,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::imul> final
+	template<> struct Operand<ny::ir::ISA::Op::imul> final
 	{
 		constexpr static const char* opname() { return "imul"; }
 		uint32_t opcode;
@@ -400,7 +400,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::idiv> final
+	template<> struct Operand<ny::ir::ISA::Op::idiv> final
 	{
 		constexpr static const char* opname() { return "idiv"; }
 		uint32_t opcode;
@@ -411,7 +411,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, lhs, rhs); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::fieldget> final
+	template<> struct Operand<ny::ir::ISA::Op::fieldget> final
 	{
 		constexpr static const char* opname() { return "fieldget"; }
 		uint32_t opcode;
@@ -421,7 +421,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, self); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::fieldset> final
+	template<> struct Operand<ny::ir::ISA::Op::fieldset> final
 	{
 		constexpr static const char* opname() { return "fieldset"; }
 		uint32_t opcode;
@@ -431,7 +431,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, self); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::stacksize> final
+	template<> struct Operand<ny::ir::ISA::Op::stacksize> final
 	{
 		constexpr static const char* opname() { return "stacksize"; }
 		uint32_t opcode;
@@ -439,7 +439,7 @@ namespace ISA
 		template<class T> void eachLVID(T&) {}
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::comment> final
+	template<> struct Operand<ny::ir::ISA::Op::comment> final
 	{
 		constexpr static const char* opname() { return "comment"; }
 		uint32_t opcode;
@@ -447,7 +447,7 @@ namespace ISA
 		template<class T> void eachLVID(T&) {}
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::stackalloc> final
+	template<> struct Operand<ny::ir::ISA::Op::stackalloc> final
 	{
 		constexpr static const char* opname() { return "stackalloc"; }
 		uint32_t opcode;
@@ -457,7 +457,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::storeConstant> final
+	template<> struct Operand<ny::ir::ISA::Op::storeConstant> final
 	{
 		constexpr static const char* opname() { return "storeConstant"; }
 		uint32_t opcode;
@@ -466,7 +466,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::storeText> final
+	template<> struct Operand<ny::ir::ISA::Op::storeText> final
 	{
 		constexpr static const char* opname() { return "storeText"; }
 		uint32_t opcode;
@@ -475,7 +475,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::store> final
+	template<> struct Operand<ny::ir::ISA::Op::store> final
 	{
 		constexpr static const char* opname() { return "store"; }
 		uint32_t opcode;
@@ -484,7 +484,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::ret> final
+	template<> struct Operand<ny::ir::ISA::Op::ret> final
 	{
 		constexpr static const char* opname() { return "ret"; }
 		uint32_t opcode;
@@ -493,7 +493,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid,tmplvid); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::push> final
+	template<> struct Operand<ny::ir::ISA::Op::push> final
 	{
 		constexpr static const char* opname() { return "push"; }
 		uint32_t opcode;
@@ -502,7 +502,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::tpush> final
+	template<> struct Operand<ny::ir::ISA::Op::tpush> final
 	{
 		constexpr static const char* opname() { return "tpush"; }
 		uint32_t opcode;
@@ -511,7 +511,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::call> final
+	template<> struct Operand<ny::ir::ISA::Op::call> final
 	{
 		constexpr static const char* opname() { return "call"; }
 		uint32_t opcode;
@@ -521,7 +521,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, ptr2func); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::intrinsic> final
+	template<> struct Operand<ny::ir::ISA::Op::intrinsic> final
 	{
 		constexpr static const char* opname() { return "intrinsic"; }
 		uint32_t opcode;
@@ -533,7 +533,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::debugfile> final
+	template<> struct Operand<ny::ir::ISA::Op::debugfile> final
 	{
 		constexpr static const char* opname() { return "debugfile"; }
 		uint32_t opcode;
@@ -541,7 +541,7 @@ namespace ISA
 		template<class T> void eachLVID(T&) {}
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::namealias> final
+	template<> struct Operand<ny::ir::ISA::Op::namealias> final
 	{
 		constexpr static const char* opname() { return "namealias"; }
 		uint32_t opcode;
@@ -550,7 +550,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::debugpos> final
+	template<> struct Operand<ny::ir::ISA::Op::debugpos> final
 	{
 		constexpr static const char* opname() { return "debugpos"; }
 		uint32_t opcode;
@@ -559,21 +559,21 @@ namespace ISA
 		template<class T> void eachLVID(T&) {}
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::scope> final
+	template<> struct Operand<ny::ir::ISA::Op::scope> final
 	{
 		constexpr static const char* opname() { return "scope"; }
 		uint32_t opcode;
 		template<class T> void eachLVID(T&) {}
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::end> final
+	template<> struct Operand<ny::ir::ISA::Op::end> final
 	{
 		constexpr static const char* opname() { return "end"; }
 		uint32_t opcode;
 		template<class T> void eachLVID(T&) {}
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::qualifiers> final
+	template<> struct Operand<ny::ir::ISA::Op::qualifiers> final
 	{
 		constexpr static const char* opname() { return "qualifiers"; }
 		uint32_t opcode;
@@ -587,7 +587,7 @@ namespace ISA
 		}
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::inherit> final
+	template<> struct Operand<ny::ir::ISA::Op::inherit> final
 	{
 		constexpr static const char* opname() { return "inherit"; }
 		uint32_t opcode;
@@ -598,7 +598,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lhs, rhs); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::opassert> final
+	template<> struct Operand<ny::ir::ISA::Op::opassert> final
 	{
 		constexpr static const char* opname() { return "assert"; }
 		uint32_t opcode;
@@ -606,7 +606,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::memcheckhold> final
+	template<> struct Operand<ny::ir::ISA::Op::memcheckhold> final
 	{
 		constexpr static const char* opname() { return "memcheckhold"; }
 		uint32_t opcode;
@@ -615,7 +615,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, size); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::label> final
+	template<> struct Operand<ny::ir::ISA::Op::label> final
 	{
 		constexpr static const char* opname() { return "label"; }
 		uint32_t opcode;
@@ -623,7 +623,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(label); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::jmp> final
+	template<> struct Operand<ny::ir::ISA::Op::jmp> final
 	{
 		constexpr static const char* opname() { return "jmp"; }
 		uint32_t opcode;
@@ -631,7 +631,7 @@ namespace ISA
 		template<class T> void eachLVID(T&) {}
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::jz> final
+	template<> struct Operand<ny::ir::ISA::Op::jz> final
 	{
 		constexpr static const char* opname() { return "jz"; }
 		uint32_t opcode;
@@ -641,7 +641,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, result); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::jnz> final
+	template<> struct Operand<ny::ir::ISA::Op::jnz> final
 	{
 		constexpr static const char* opname() { return "jnz"; }
 		uint32_t opcode;
@@ -651,7 +651,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, result); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::memalloc> final
+	template<> struct Operand<ny::ir::ISA::Op::memalloc> final
 	{
 		constexpr static const char* opname() { return "memalloc"; }
 		uint32_t opcode;
@@ -660,7 +660,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, regsize); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::memfree> final
+	template<> struct Operand<ny::ir::ISA::Op::memfree> final
 	{
 		constexpr static const char* opname() { return "memfree"; }
 		uint32_t opcode;
@@ -669,7 +669,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, regsize); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::memfill> final
+	template<> struct Operand<ny::ir::ISA::Op::memfill> final
 	{
 		constexpr static const char* opname() { return "memfill"; }
 		uint32_t opcode;
@@ -679,7 +679,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, regsize); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::memcopy> final
+	template<> struct Operand<ny::ir::ISA::Op::memcopy> final
 	{
 		constexpr static const char* opname() { return "memcopy"; }
 		uint32_t opcode;
@@ -689,7 +689,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, srclvid, regsize); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::memmove> final
+	template<> struct Operand<ny::ir::ISA::Op::memmove> final
 	{
 		constexpr static const char* opname() { return "memmove"; }
 		uint32_t opcode;
@@ -699,7 +699,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, srclvid, regsize); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::memcmp> final
+	template<> struct Operand<ny::ir::ISA::Op::memcmp> final
 	{
 		constexpr static const char* opname() { return "memcmp"; }
 		uint32_t opcode;
@@ -709,7 +709,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, srclvid, regsize); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::cstrlen> final
+	template<> struct Operand<ny::ir::ISA::Op::cstrlen> final
 	{
 		constexpr static const char* opname() { return "cstrlen"; }
 		uint32_t opcode;
@@ -719,7 +719,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, ptr); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::load_u64> final
+	template<> struct Operand<ny::ir::ISA::Op::load_u64> final
 	{
 		constexpr static const char* opname() { return "load_u64"; }
 		uint32_t opcode;
@@ -727,7 +727,7 @@ namespace ISA
 		uint32_t ptrlvid;
 		template<class T> void eachLVID(T& c) { c(lvid, ptrlvid); }
 	};
-	template<> struct Operand<ny::IR::ISA::Op::load_u32> final
+	template<> struct Operand<ny::ir::ISA::Op::load_u32> final
 	{
 		constexpr static const char* opname() { return "load_u32"; }
 		uint32_t opcode;
@@ -735,7 +735,7 @@ namespace ISA
 		uint32_t ptrlvid;
 		template<class T> void eachLVID(T& c) { c(lvid, ptrlvid); }
 	};
-	template<> struct Operand<ny::IR::ISA::Op::load_u8> final
+	template<> struct Operand<ny::ir::ISA::Op::load_u8> final
 	{
 		constexpr static const char* opname() { return "load_u8"; }
 		uint32_t opcode;
@@ -744,7 +744,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, ptrlvid); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::store_u64> final
+	template<> struct Operand<ny::ir::ISA::Op::store_u64> final
 	{
 		constexpr static const char* opname() { return "store_u64"; }
 		uint32_t opcode;
@@ -752,7 +752,7 @@ namespace ISA
 		uint32_t ptrlvid;
 		template<class T> void eachLVID(T& c) { c(lvid, ptrlvid); }
 	};
-	template<> struct Operand<ny::IR::ISA::Op::store_u32> final
+	template<> struct Operand<ny::ir::ISA::Op::store_u32> final
 	{
 		constexpr static const char* opname() { return "store_u32"; }
 		uint32_t opcode;
@@ -760,7 +760,7 @@ namespace ISA
 		uint32_t ptrlvid;
 		template<class T> void eachLVID(T& c) { c(lvid, ptrlvid); }
 	};
-	template<> struct Operand<ny::IR::ISA::Op::store_u8> final
+	template<> struct Operand<ny::ir::ISA::Op::store_u8> final
 	{
 		constexpr static const char* opname() { return "store_u8"; }
 		uint32_t opcode;
@@ -769,7 +769,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, ptrlvid); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::memrealloc> final
+	template<> struct Operand<ny::ir::ISA::Op::memrealloc> final
 	{
 		constexpr static const char* opname() { return "memrealloc"; }
 		uint32_t opcode;
@@ -779,7 +779,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, oldsize, newsize); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::pragma> final
+	template<> struct Operand<ny::ir::ISA::Op::pragma> final
 	{
 		constexpr static const char* opname() { return "pragma"; }
 		uint32_t opcode;
@@ -821,13 +821,13 @@ namespace ISA
 		}
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::blueprint> final
+	template<> struct Operand<ny::ir::ISA::Op::blueprint> final
 	{
 		constexpr static const char* opname() { return "blueprint"; }
 
 		uint32_t opcode;
 		//! Kind of blueprint (classdef, vardef, funcdef...)
-		//! \see enum IR::ISA::Blueprint
+		//! \see enum ir::ISA::Blueprint
 		uint32_t kind:4;
 		//! Attached lvid (if any)
 		uint32_t lvid:28; // should be big enough even for large func
@@ -844,7 +844,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { uint32_t cplvid = lvid; c(cplvid); setLVID(cplvid); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::self> final
+	template<> struct Operand<ny::ir::ISA::Op::self> final
 	{
 		constexpr static const char* opname() { return "self"; }
 		uint32_t opcode;
@@ -852,7 +852,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(self); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::identify> final
+	template<> struct Operand<ny::ir::ISA::Op::identify> final
 	{
 		constexpr static const char* opname() { return "identify"; }
 		uint32_t opcode;
@@ -861,7 +861,7 @@ namespace ISA
 		uint32_t text;
 		template<class T> void eachLVID(T& c) { c(lvid, self); }
 	};
-	template<> struct Operand<ny::IR::ISA::Op::identifyset> final // MUST be identical to 'identify'
+	template<> struct Operand<ny::ir::ISA::Op::identifyset> final // MUST be identical to 'identify'
 	{
 		constexpr static const char* opname() { return "identifyset"; }
 		uint32_t opcode;
@@ -871,7 +871,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, self); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::ensureresolved> final
+	template<> struct Operand<ny::ir::ISA::Op::ensureresolved> final
 	{
 		constexpr static const char* opname() { return "ensureresolved"; }
 		uint32_t opcode;
@@ -879,7 +879,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::commontype> final
+	template<> struct Operand<ny::ir::ISA::Op::commontype> final
 	{
 		constexpr static const char* opname() { return "commontype"; }
 		uint32_t opcode;
@@ -888,7 +888,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, previous); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::assign> final
+	template<> struct Operand<ny::ir::ISA::Op::assign> final
 	{
 		constexpr static const char* opname() { return "assign"; }
 		uint32_t opcode;
@@ -898,7 +898,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lhs, rhs); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::follow> final
+	template<> struct Operand<ny::ir::ISA::Op::follow> final
 	{
 		constexpr static const char* opname() { return "follow"; }
 		uint32_t opcode;
@@ -908,7 +908,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, follower); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::typeisobject> final
+	template<> struct Operand<ny::ir::ISA::Op::typeisobject> final
 	{
 		constexpr static const char* opname() { return "typeisobject"; }
 		uint32_t opcode;
@@ -916,7 +916,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::classdefsizeof> final
+	template<> struct Operand<ny::ir::ISA::Op::classdefsizeof> final
 	{
 		constexpr static const char* opname() { return "classdefsizeof"; }
 		uint32_t opcode;
@@ -925,7 +925,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid, type); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::ref> final
+	template<> struct Operand<ny::ir::ISA::Op::ref> final
 	{
 		constexpr static const char* opname() { return "ref"; }
 		uint32_t opcode;
@@ -933,7 +933,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::unref> final
+	template<> struct Operand<ny::ir::ISA::Op::unref> final
 	{
 		constexpr static const char* opname() { return "unref"; }
 		uint32_t opcode;
@@ -947,7 +947,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::allocate> final
+	template<> struct Operand<ny::ir::ISA::Op::allocate> final
 	{
 		constexpr static const char* opname() { return "allocate"; }
 		uint32_t opcode;
@@ -957,7 +957,7 @@ namespace ISA
 		template<class T> void eachLVID(T& c) { c(lvid); }
 	};
 
-	template<> struct Operand<ny::IR::ISA::Op::dispose> final
+	template<> struct Operand<ny::ir::ISA::Op::dispose> final
 	{
 		constexpr static const char* opname() { return "dispose"; }
 		uint32_t opcode;
@@ -973,18 +973,18 @@ namespace ISA
 
 
 
-	Yuni::String print(const Sequence&, const ny::IR::Instruction&, const AtomMap* = nullptr);
+	Yuni::String print(const Sequence&, const ny::ir::Instruction&, const AtomMap* = nullptr);
 
-	template<ny::IR::ISA::Op O>
+	template<ny::ir::ISA::Op O>
 	inline Yuni::String
-	print(const Sequence& sequence, const ny::IR::ISA::Operand<O>& operands, const AtomMap* map = nullptr)
+	print(const Sequence& sequence, const ny::ir::ISA::Operand<O>& operands, const AtomMap* map = nullptr)
 	{
-		return print(sequence, reinterpret_cast<const ny::IR::Instruction&>(operands), map);
+		return print(sequence, reinterpret_cast<const ny::ir::Instruction&>(operands), map);
 	}
 
 	void printExtract(YString& out, const Sequence&, uint32_t offset, const AtomMap* = nullptr);
 
 
 } // namespace ISA
-} // namespace IR
+} // namespace ir
 } // namespace ny

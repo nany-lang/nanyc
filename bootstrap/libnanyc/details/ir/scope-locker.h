@@ -5,7 +5,7 @@
 
 namespace ny
 {
-namespace IR
+namespace ir
 {
 
 	struct OpcodeScopeLocker final
@@ -48,8 +48,5 @@ namespace IR
 	};
 
 
-
-
-
-} // namespace IR
+} // namespace ir
 } // namespace ny

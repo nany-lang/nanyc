@@ -58,7 +58,7 @@ namespace Instanciate
 	}
 
 
-	// inline void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::namealias>& operands)
+	// inline void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::namealias>& operands)
 	// see .h
 
 

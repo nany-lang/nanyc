@@ -490,7 +490,7 @@ namespace complain
 						h << ", signature only";
 					h << "]\n";
 					auto* map = &(sb.cdeftable.originalTable().atoms);
-					IR::ISA::printExtract(h.message.message, sb.currentSequence, offset, map);
+					ir::ISA::printExtract(h.message.message, sb.currentSequence, offset, map);
 				}
 			}
 		}
@@ -581,7 +581,7 @@ namespace complain
 	}
 
 
-	bool SequenceBuilder::complainOperand(const IR::Instruction& operands, AnyString msg)
+	bool SequenceBuilder::complainOperand(const ir::Instruction& operands, AnyString msg)
 	{
 		success = false;
 		auto message = ice();
@@ -591,7 +591,7 @@ namespace complain
 		else
 			message << "unexpected opcode";
 
-		message << ": '" << IR::ISA::print(currentSequence, operands) << '\'';
+		message << ": '" << ir::ISA::print(currentSequence, operands) << '\'';
 		// stop reading the opcodes
 		currentSequence.invalidateCursor(*cursor);
 		return false;

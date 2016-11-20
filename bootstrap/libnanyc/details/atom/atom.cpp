@@ -235,7 +235,7 @@ namespace ny
 		m_instances.emplace_back();
 		auto& details = m_instances[index];
 		details.remapAtom = remapAtom;
-		details.sequence  = std::make_unique<IR::Sequence>();
+		details.sequence  = std::make_unique<ir::Sequence>();
 		m_instancesIDs.emplace(signature, index);
 		return Ref{*this, index};
 	}

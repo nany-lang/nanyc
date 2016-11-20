@@ -10,7 +10,7 @@
 
 namespace ny
 {
-namespace IR
+namespace ir
 {
 
 
@@ -102,7 +102,7 @@ namespace IR
 	inline uint32_t Sequence::offsetOf(const ISA::Operand<O>& instr) const
 	{
 		static_assert(sizeof(Instruction) >= sizeof(ISA::Operand<O>), "m_size mismatch");
-		return offsetOf(IR::Instruction::fromOpcode(instr));
+		return offsetOf(ir::Instruction::fromOpcode(instr));
 	}
 
 
@@ -124,9 +124,9 @@ namespace IR
 		const Instruction* instr = cursor;
 		while (++instr < end)
 		{
-			if (instr->opcodes[0] == static_cast<uint32_t>(IR::ISA::Op::label))
+			if (instr->opcodes[0] == static_cast<uint32_t>(ir::ISA::Op::label))
 			{
-				auto& operands = (*instr).to<IR::ISA::Op::label>();
+				auto& operands = (*instr).to<ir::ISA::Op::label>();
 				if (operands.label == label)
 				{
 					cursor = instr;
@@ -145,9 +145,9 @@ namespace IR
 		const Instruction* instr = cursor;
 		while (instr-- > base)
 		{
-			if (instr->opcodes[0] == static_cast<uint32_t>(IR::ISA::Op::label))
+			if (instr->opcodes[0] == static_cast<uint32_t>(ir::ISA::Op::label))
 			{
-				auto& operands = (*instr).to<IR::ISA::Op::label>();
+				auto& operands = (*instr).to<ir::ISA::Op::label>();
 				if (operands.label == label)
 				{
 					cursor = instr;
@@ -171,9 +171,9 @@ namespace IR
 			{
 				#if NANY_PRINT_sequence_OPCODES != 0
 				std::cout << "== opcode == at " << (it - m_body) << "|" << (void*) it << " :: "
-					<< it->opcodes[0] << ": " << IR::ISA::print(*this, *it) << '\n';
+					<< it->opcodes[0] << ": " << ir::ISA::print(*this, *it) << '\n';
 				#endif
-				LIBNANYC_IR_VISIT_SEQUENCE(IR::ISA::Operand, visitor, *it);
+				LIBNANYC_IR_VISIT_SEQUENCE(ir::ISA::Operand, visitor, *it);
 			}
 		}
 	}
@@ -190,9 +190,9 @@ namespace IR
 			{
 				#if NANY_PRINT_sequence_OPCODES != 0
 				std::cout << "== opcode == at " << (it - m_body) << "|" << (void*) it << " :: "
-					<< it->opcodes[0] << ": " << IR::ISA::print(*this, *it) << '\n';
+					<< it->opcodes[0] << ": " << ir::ISA::print(*this, *it) << '\n';
 				#endif
-				LIBNANYC_IR_VISIT_SEQUENCE(const IR::ISA::Operand, visitor, *it);
+				LIBNANYC_IR_VISIT_SEQUENCE(const ir::ISA::Operand, visitor, *it);
 			}
 		}
 	}
@@ -510,7 +510,7 @@ namespace IR
 	inline void Sequence::emitPragmaSynthetic(uint32_t lvid, bool onoff)
 	{
 		auto& opc  = emit<ISA::Op::pragma>();
-		opc.pragma = IR::ISA::Pragma::synthetic;
+		opc.pragma = ir::ISA::Pragma::synthetic;
 		opc.value.synthetic.lvid  = lvid;
 		opc.value.synthetic.onoff = static_cast<uint32_t>(onoff);
 	}
@@ -518,35 +518,35 @@ namespace IR
 	inline void Sequence::emitPragmaSuggest(bool onoff)
 	{
 		auto& opc  = emit<ISA::Op::pragma>();
-		opc.pragma = IR::ISA::Pragma::suggest;
+		opc.pragma = ir::ISA::Pragma::suggest;
 		opc.value.suggest = static_cast<uint32_t>(onoff);
 	}
 
 	inline void Sequence::emitPragmaBuiltinAlias(const AnyString& name)
 	{
 		auto& opc  = emit<ISA::Op::pragma>();
-		opc.pragma = IR::ISA::Pragma::builtinalias;
+		opc.pragma = ir::ISA::Pragma::builtinalias;
 		opc.value.builtinalias.namesid = stringrefs.ref(name);
 	}
 
 	inline void Sequence::emitPragmaShortcircuit(bool evalvalue)
 	{
 		auto& opc  = emit<ISA::Op::pragma>();
-		opc.pragma = IR::ISA::Pragma::shortcircuit;
+		opc.pragma = ir::ISA::Pragma::shortcircuit;
 		opc.value.shortcircuit = static_cast<uint32_t>(evalvalue);
 	}
 
 	inline void Sequence::emitPragmaShortcircuitMetadata(uint32_t label)
 	{
 		auto& opc  = emit<ISA::Op::pragma>();
-		opc.pragma = IR::ISA::Pragma::shortcircuitOpNopOffset;
+		opc.pragma = ir::ISA::Pragma::shortcircuitOpNopOffset;
 		opc.value.shortcircuitMetadata.label = label;
 	}
 
 	inline void Sequence::emitPragmaShortcircuitMutateToBool(uint32_t lvid, uint32_t source)
 	{
 		auto& opc  = emit<ISA::Op::pragma>();
-		opc.pragma = IR::ISA::Pragma::shortcircuitMutateToBool;
+		opc.pragma = ir::ISA::Pragma::shortcircuitMutateToBool;
 		opc.value.shortcircuitMutate.lvid = lvid;
 		opc.value.shortcircuitMutate.source = source;
 	}
@@ -560,13 +560,13 @@ namespace IR
 
 	inline uint32_t Sequence::emitLabel(uint32_t labelid)
 	{
-		emit<IR::ISA::Op::label>().label = labelid;
+		emit<ir::ISA::Op::label>().label = labelid;
 		return labelid;
 	}
 
 	inline void Sequence::emitPragmaFuncBody()
 	{
-		emit<ISA::Op::pragma>().pragma = IR::ISA::Pragma::bodystart;
+		emit<ISA::Op::pragma>().pragma = ir::ISA::Pragma::bodystart;
 	}
 
 	inline void Sequence::emitPragmaAllowCodeGeneration(bool enabled)
@@ -608,7 +608,7 @@ namespace IR
 	{
 		uint32_t offset = m_size;
 		auto& operands  = emit<ISA::Op::blueprint>();
-		operands.kind   = (uint32_t) IR::ISA::Blueprint::typealias;
+		operands.kind   = (uint32_t) ir::ISA::Blueprint::typealias;
 		operands.name   = stringrefs.ref(name);
 		operands.atomid = atomid;
 		operands.lvid   = 0u;
@@ -619,7 +619,7 @@ namespace IR
 	{
 		uint32_t offset = m_size;
 		auto& operands  = emit<ISA::Op::blueprint>();
-		operands.kind   = (uint32_t) IR::ISA::Blueprint::unit;
+		operands.kind   = (uint32_t) ir::ISA::Blueprint::unit;
 		operands.name   = stringrefs.ref(filename);
 		operands.atomid = static_cast<uint32_t>(-1);
 		operands.lvid   = 0u;
@@ -629,7 +629,7 @@ namespace IR
 	inline void Sequence::emitBlueprintClass(const AnyString& name, uint32_t atomid)
 	{
 		auto& operands  = emit<ISA::Op::blueprint>();
-		operands.kind   = (uint32_t) IR::ISA::Blueprint::classdef;
+		operands.kind   = (uint32_t) ir::ISA::Blueprint::classdef;
 		operands.name   = stringrefs.ref(name);
 		operands.atomid = atomid;
 		operands.lvid   = 0u;
@@ -639,7 +639,7 @@ namespace IR
 	{
 		uint32_t offset = m_size;
 		auto& operands  = emit<ISA::Op::blueprint>();
-		operands.kind   = (uint32_t) IR::ISA::Blueprint::classdef;
+		operands.kind   = (uint32_t) ir::ISA::Blueprint::classdef;
 		operands.name   = 0u;
 		operands.atomid = static_cast<uint32_t>(-1);
 		operands.setLVID(lvid);
@@ -649,7 +649,7 @@ namespace IR
 	inline void Sequence::emitBlueprintFunc(const AnyString& name, uint32_t atomid)
 	{
 		auto& operands  = emit<ISA::Op::blueprint>();
-		operands.kind   = (uint32_t) IR::ISA::Blueprint::funcdef;
+		operands.kind   = (uint32_t) ir::ISA::Blueprint::funcdef;
 		operands.name   = stringrefs.ref(name);
 		operands.atomid = atomid;
 		operands.lvid   = 0u;
@@ -659,7 +659,7 @@ namespace IR
 	{
 		uint32_t offset = m_size;
 		auto& operands  = emit<ISA::Op::blueprint>();
-		operands.kind   = (uint32_t) IR::ISA::Blueprint::funcdef;
+		operands.kind   = (uint32_t) ir::ISA::Blueprint::funcdef;
 		operands.name   = 0u;
 		operands.atomid = static_cast<uint32_t>(-1);
 		operands.lvid   = 0u;
@@ -670,7 +670,7 @@ namespace IR
 	{
 		uint32_t offset = m_size;
 		auto& operands  = emit<ISA::Op::blueprint>();
-		operands.kind   = (uint32_t) IR::ISA::Blueprint::gentypeparam;
+		operands.kind   = (uint32_t) ir::ISA::Blueprint::gentypeparam;
 		operands.name   = stringrefs.ref(name);
 		operands.atomid = static_cast<uint32_t>(-1);
 		operands.setLVID(lvid);
@@ -681,7 +681,7 @@ namespace IR
 	{
 		uint32_t offset = m_size;
 		auto& operands  = emit<ISA::Op::blueprint>();
-		operands.kind   = (uint32_t) IR::ISA::Blueprint::gentypeparam;
+		operands.kind   = (uint32_t) ir::ISA::Blueprint::gentypeparam;
 		operands.name   = 0;
 		operands.atomid = static_cast<uint32_t>(-1);
 		operands.setLVID(lvid);
@@ -692,7 +692,7 @@ namespace IR
 	{
 		uint32_t offset = m_size;
 		auto& operands  = emit<ISA::Op::blueprint>();
-		operands.kind   = (uint32_t) IR::ISA::Blueprint::param;
+		operands.kind   = (uint32_t) ir::ISA::Blueprint::param;
 		operands.name   = stringrefs.ref(name);
 		operands.atomid = static_cast<uint32_t>(-1);
 		operands.setLVID(lvid);
@@ -703,7 +703,7 @@ namespace IR
 	{
 		uint32_t offset = m_size;
 		auto& operands  = emit<ISA::Op::blueprint>();
-		operands.kind   = (uint32_t) IR::ISA::Blueprint::param;
+		operands.kind   = (uint32_t) ir::ISA::Blueprint::param;
 		operands.name   = 0;
 		operands.atomid = static_cast<uint32_t>(-1);
 		operands.setLVID(lvid);
@@ -713,7 +713,7 @@ namespace IR
 	inline void Sequence::emitBlueprintVardef(LVID lvid, const AnyString& name)
 	{
 		auto& operands  = emit<ISA::Op::blueprint>();
-		operands.kind   = (uint32_t) IR::ISA::Blueprint::vardef;
+		operands.kind   = (uint32_t) ir::ISA::Blueprint::vardef;
 		operands.name   = stringrefs.ref(name);
 		operands.atomid = static_cast<uint32_t>(-1);
 		operands.setLVID(lvid);
@@ -786,7 +786,7 @@ namespace IR
 	inline void Sequence::emitNamespace(const AnyString& name)
 	{
 		auto& operands  = emit<ISA::Op::blueprint>();
-		operands.kind   = (uint32_t) IR::ISA::Blueprint::namespacedef;
+		operands.kind   = (uint32_t) ir::ISA::Blueprint::namespacedef;
 		operands.name   = stringrefs.ref(name);
 		operands.atomid = static_cast<uint32_t>(-1);
 		operands.lvid   = 0u;
@@ -1074,7 +1074,7 @@ namespace IR
 		auto& operands = emit<ISA::Op::qualifiers>();
 		operands.lvid  = lvid;
 		operands.flag  = static_cast<uint32_t>(flag);
-		operands.qualifier = IR::ISA::TypeQualifier::ref;
+		operands.qualifier = ir::ISA::TypeQualifier::ref;
 	}
 
 	inline void Sequence::emitQualifierConst(uint32_t lvid, bool flag)
@@ -1082,7 +1082,7 @@ namespace IR
 		auto& operands = emit<ISA::Op::qualifiers>();
 		operands.lvid  = lvid;
 		operands.flag  = static_cast<uint32_t>(flag);
-		operands.qualifier = IR::ISA::TypeQualifier::constant;
+		operands.qualifier = ir::ISA::TypeQualifier::constant;
 	}
 
 	inline void Sequence::emitDebugfile(const AnyString& filename)
@@ -1092,5 +1092,5 @@ namespace IR
 
 
 
-} // namespace IR
+} // namespace ir
 } // namespace ny

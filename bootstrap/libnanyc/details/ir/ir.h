@@ -6,7 +6,7 @@
 
 namespace ny
 {
-namespace IR
+namespace ir
 {
 
 	//! Operand type
@@ -17,5 +17,5 @@ namespace IR
 
 
 
-} // namespace IR
+} // namespace ir
 } // namespace ny

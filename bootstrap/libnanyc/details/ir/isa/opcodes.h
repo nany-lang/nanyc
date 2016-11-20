@@ -14,7 +14,7 @@
 
 namespace ny
 {
-namespace IR
+namespace ir
 {
 namespace ISA //!< Instruction Set Architecture
 {
@@ -338,5 +338,5 @@ namespace ISA //!< Instruction Set Architecture
 
 
 } // namespace ISA
-} // namespace IR
+} // namespace ir
 } // namespace ny

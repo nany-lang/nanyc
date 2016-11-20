@@ -10,7 +10,7 @@ using namespace Yuni;
 
 namespace ny
 {
-namespace IR
+namespace ir
 {
 namespace Producer
 {
@@ -85,8 +85,8 @@ namespace Producer
 										// (see visitASTExprCall) and can be used for reading a variable member
 										shortcircuit->offsetStackalloc = out.opcodeCount();
 										out.emitStackalloc(0 /*label + 1*/, nyt_any);
-										out.emitraw<IR::ISA::Op::nop>(); // fieldget, if not builtin type
-										out.emitraw<IR::ISA::Op::nop>(); // jump
+										out.emitraw<ir::ISA::Op::nop>(); // fieldget, if not builtin type
+										out.emitraw<ir::ISA::Op::nop>(); // jump
 									}
 									// generate scope to prevent against unwanted var release in case of jump
 									// (will be released later in `Scope::visitASTExprCall`)
@@ -180,7 +180,7 @@ namespace Producer
 			{
 				auto callret = out.emitStackalloc(nextvar(), nyt_any);
 				localvar = callret; // the new expression value
-				IR::OpcodeScopeLocker opscope{out};
+				ir::OpcodeScopeLocker opscope{out};
 				bool success = visitASTExprCallParameters(*node);
 				emitTmplParametersIfAny();
 				emitDebugpos(*node);
@@ -221,9 +221,9 @@ namespace Producer
 				// (thus the lvid for this will be exactly (shortcircuitlabel + 1))
 				nextvar(); // sclabel + 1
 				if (scupdt.offsetPragma != 0)
-					out.at<IR::ISA::Op::pragma>(scupdt.offsetPragma).value.shortcircuitMetadata.label = sclabel;
+					out.at<ir::ISA::Op::pragma>(scupdt.offsetPragma).value.shortcircuitMetadata.label = sclabel;
 				if (scupdt.offsetStackalloc != 0)
-					out.at<IR::ISA::Op::stackalloc>(scupdt.offsetStackalloc).lvid = sclabel + 1;
+					out.at<ir::ISA::Op::stackalloc>(scupdt.offsetStackalloc).lvid = sclabel + 1;
 
 				out.emitEnd();
 
@@ -240,5 +240,5 @@ namespace Producer
 
 
 } // namespace Producer
-} // namespace IR
+} // namespace ir
 } // namespace ny

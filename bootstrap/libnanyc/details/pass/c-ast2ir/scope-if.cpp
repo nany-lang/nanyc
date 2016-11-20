@@ -10,7 +10,7 @@ using namespace Yuni;
 
 namespace ny
 {
-namespace IR
+namespace ir
 {
 namespace Producer
 {
@@ -105,9 +105,9 @@ namespace Producer
 		labelEnd = out.emitLabel(nextvar());
 
 		// post-update label ids
-		out.at<IR::ISA::Op::jz>(opOffJz).label = (hasElseClause ? labelElse : labelEnd);
+		out.at<ir::ISA::Op::jz>(opOffJz).label = (hasElseClause ? labelElse : labelEnd);
 		if (opOffIntermediateEnd != 0)
-			out.at<IR::ISA::Op::jmp>(opOffIntermediateEnd).label = labelEnd;
+			out.at<ir::ISA::Op::jmp>(opOffIntermediateEnd).label = labelEnd;
 		return success;
 	}
 
@@ -197,9 +197,9 @@ namespace Producer
 		labelEnd = out.emitLabel(nextvar());
 
 		// post-update label ids
-		out.at<IR::ISA::Op::jz>(opOffJz).label = (hasElseClause ? labelElse : labelEnd);
+		out.at<ir::ISA::Op::jz>(opOffJz).label = (hasElseClause ? labelElse : labelEnd);
 		if (opOffIntermediateEnd)
-			out.at<IR::ISA::Op::jmp>(opOffIntermediateEnd).label = labelEnd;
+			out.at<ir::ISA::Op::jmp>(opOffIntermediateEnd).label = labelEnd;
 
 		return success;
 	}
@@ -258,5 +258,5 @@ namespace Producer
 
 
 } // namespace Producer
-} // namespace IR
+} // namespace ir
 } // namespace ny

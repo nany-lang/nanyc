@@ -91,22 +91,22 @@ namespace Instanciate
 		auto offset = atom.opcodes.offset;
 
 		#ifndef NDEBUG
-		auto& blueprint = sequence.at<IR::ISA::Op::blueprint>(offset);
-		assert(blueprint.opcode == (uint32_t) IR::ISA::Op::blueprint);
+		auto& blueprint = sequence.at<ir::ISA::Op::blueprint>(offset);
+		assert(blueprint.opcode == (uint32_t) ir::ISA::Op::blueprint);
 		#endif
 		// blueprint size
 		++offset;
 		#ifndef NDEBUG
-		auto& blueprintsize = sequence.at<IR::ISA::Op::pragma>(offset);
-		assert(blueprintsize.opcode == (uint32_t) IR::ISA::Op::pragma);
+		auto& blueprintsize = sequence.at<ir::ISA::Op::pragma>(offset);
+		assert(blueprintsize.opcode == (uint32_t) ir::ISA::Op::pragma);
 		#endif
 
 		// Updating the opcode stacksize
 		++offset;
-		auto& stacksize = sequence.at<IR::ISA::Op::stacksize>(offset);
-		assert(stacksize.opcode == static_cast<uint32_t>(IR::ISA::Op::stacksize));
+		auto& stacksize = sequence.at<ir::ISA::Op::stacksize>(offset);
+		assert(stacksize.opcode == static_cast<uint32_t>(ir::ISA::Op::stacksize));
 		assert(stacksize.add + 1 == startLvid);
-		if (unlikely(stacksize.opcode != static_cast<uint32_t>(IR::ISA::Op::stacksize)))
+		if (unlikely(stacksize.opcode != static_cast<uint32_t>(ir::ISA::Op::stacksize)))
 			return (void)(ice() << "capturing variable: stacksize opcode expected");
 
 		// new stack size
@@ -233,7 +233,7 @@ namespace Instanciate
 
 
 
-	bool SequenceBuilder::identifyCapturedVar(const IR::ISA::Operand<IR::ISA::Op::identify>& operands, const AnyString& name)
+	bool SequenceBuilder::identifyCapturedVar(const ir::ISA::Operand<ir::ISA::Op::identify>& operands, const AnyString& name)
 	{
 		AnyString captureName;
 		{

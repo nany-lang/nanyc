@@ -22,7 +22,7 @@ namespace Mapping
 	class SequenceMapping final
 	{
 	public:
-		SequenceMapping(ClassdefTable& cdeftable, Yuni::Mutex& mutex, IR::Sequence& sequence);
+		SequenceMapping(ClassdefTable& cdeftable, Yuni::Mutex& mutex, ir::Sequence& sequence);
 
 		bool map(Atom& parentAtom, uint32_t offset = 0);
 
@@ -33,7 +33,7 @@ namespace Mapping
 		//! Mutex for the cdeftable
 		Yuni::Mutex& mutex;
 		//! Current sequence
-		IR::Sequence& currentSequence;
+		ir::Sequence& currentSequence;
 		//! Flag to evaluate the whole sequence, or only a portion of it
 		bool evaluateWholeSequence = true;
 		//! Prefix to prepend for the first atom created by the mapping

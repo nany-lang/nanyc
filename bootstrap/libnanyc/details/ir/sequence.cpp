@@ -9,44 +9,44 @@ using namespace Yuni;
 
 namespace ny
 {
-namespace IR
+namespace ir
 {
 
 
 	void Sequence::moveCursorFromBlueprintToEnd(const Instruction*& cursor) const
 	{
-		assert((*cursor).opcodes[0] == static_cast<uint32_t>(IR::ISA::Op::blueprint));
-		if ((*cursor).opcodes[0] == static_cast<uint32_t>(IR::ISA::Op::blueprint))
+		assert((*cursor).opcodes[0] == static_cast<uint32_t>(ir::ISA::Op::blueprint));
+		if ((*cursor).opcodes[0] == static_cast<uint32_t>(ir::ISA::Op::blueprint))
 		{
 			// next opcode, which should be blueprint.size
 			(cursor)++;
 
 			// getting the size and moving the cursor
-			auto& blueprintsize = (*cursor).to<IR::ISA::Op::pragma>();
-			assert(blueprintsize.opcode == (uint32_t) IR::ISA::Op::pragma);
+			auto& blueprintsize = (*cursor).to<ir::ISA::Op::pragma>();
+			assert(blueprintsize.opcode == (uint32_t) ir::ISA::Op::pragma);
 			assert(blueprintsize.value.blueprintsize >= 2);
 
 			cursor += blueprintsize.value.blueprintsize - 2; // -2: blueprint:class+blueprint:size
-			assert((*cursor).opcodes[0] == (uint32_t) IR::ISA::Op::end);
+			assert((*cursor).opcodes[0] == (uint32_t) ir::ISA::Op::end);
 		}
 	}
 
 
 	void Sequence::moveCursorFromBlueprintToEnd(Instruction*& cursor) const
 	{
-		assert((*cursor).opcodes[0] == static_cast<uint32_t>(IR::ISA::Op::blueprint));
-		if ((*cursor).opcodes[0] == static_cast<uint32_t>(IR::ISA::Op::blueprint))
+		assert((*cursor).opcodes[0] == static_cast<uint32_t>(ir::ISA::Op::blueprint));
+		if ((*cursor).opcodes[0] == static_cast<uint32_t>(ir::ISA::Op::blueprint))
 		{
 			// next opcode, which should be blueprint.size
 			(cursor)++;
 
 			// getting the size and moving the cursor
-			auto& blueprintsize = (*cursor).to<IR::ISA::Op::pragma>();
-			assert(blueprintsize.opcode == (uint32_t) IR::ISA::Op::pragma);
+			auto& blueprintsize = (*cursor).to<ir::ISA::Op::pragma>();
+			assert(blueprintsize.opcode == (uint32_t) ir::ISA::Op::pragma);
 			assert(blueprintsize.value.blueprintsize >= 2);
 
 			cursor += blueprintsize.value.blueprintsize - 2; // -2: blueprint:class+blueprint:size
-			assert((*cursor).opcodes[0] == (uint32_t) IR::ISA::Op::end);
+			assert((*cursor).opcodes[0] == (uint32_t) ir::ISA::Op::end);
 		}
 	}
 
@@ -77,7 +77,7 @@ namespace IR
 
 	void Sequence::print(YString& out, const AtomMap* atommap, uint32_t offset) const
 	{
-		using namespace IR::ISA;
+		using namespace ir::ISA;
 		out.reserve(out.size() + (m_size * 100)); // arbitrary
 		Printer<String> printer{out, *this};
 		printer.atommap = atommap;
@@ -93,24 +93,24 @@ namespace IR
 
 		struct WalkerIncreaseLVID final
 		{
-			WalkerIncreaseLVID(IR::Sequence& sequence, uint32_t inc, uint32_t greaterThan)
+			WalkerIncreaseLVID(ir::Sequence& sequence, uint32_t inc, uint32_t greaterThan)
 				: greaterThan(greaterThan)
 				, inc(inc)
 				, sequence(sequence)
 			{}
 
-			void visit(IR::ISA::Operand<IR::ISA::Op::stacksize>& operands)
+			void visit(ir::ISA::Operand<ir::ISA::Op::stacksize>& operands)
 			{
 				operands.add += inc;
 			}
 
-			void visit(IR::ISA::Operand<IR::ISA::Op::blueprint>& operands)
+			void visit(ir::ISA::Operand<ir::ISA::Op::blueprint>& operands)
 			{
-				auto kind = static_cast<IR::ISA::Blueprint>(operands.kind);
+				auto kind = static_cast<ir::ISA::Blueprint>(operands.kind);
 				switch (kind)
 				{
-					case IR::ISA::Blueprint::funcdef:
-					case IR::ISA::Blueprint::classdef:
+					case ir::ISA::Blueprint::funcdef:
+					case ir::ISA::Blueprint::classdef:
 						sequence.moveCursorFromBlueprintToEnd(*cursor);
 						break;
 					default:
@@ -119,18 +119,18 @@ namespace IR
 				}
 			}
 
-			void visit(IR::ISA::Operand<IR::ISA::Op::scope>&)
+			void visit(ir::ISA::Operand<ir::ISA::Op::scope>&)
 			{
 				++depth;
 			}
 
-			void visit(IR::ISA::Operand<IR::ISA::Op::end>&)
+			void visit(ir::ISA::Operand<ir::ISA::Op::end>&)
 			{
 				if (depth-- == 0)
 					sequence.invalidateCursor(*cursor);
 			}
 
-			template<IR::ISA::Op O> void visit(IR::ISA::Operand<O>& operands)
+			template<ir::ISA::Op O> void visit(ir::ISA::Operand<O>& operands)
 			{
 				// ask to the opcode datatype to update its own lvid
 				// (see operator() below)
@@ -179,5 +179,5 @@ namespace IR
 
 
 
-} // namespace IR
+} // namespace ir
 } // namespace ny

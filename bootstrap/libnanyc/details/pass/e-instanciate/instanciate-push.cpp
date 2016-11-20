@@ -12,7 +12,7 @@ namespace Pass
 namespace Instanciate
 {
 
-	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::push>& operands)
+	void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::push>& operands)
 	{
 		bool verified = (frame->verify(operands.lvid));
 
@@ -36,7 +36,7 @@ namespace Instanciate
 	}
 
 
-	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::tpush>& operands)
+	void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::tpush>& operands)
 	{
 		frame->verify(operands.lvid);
 

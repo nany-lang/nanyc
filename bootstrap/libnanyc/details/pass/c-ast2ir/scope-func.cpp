@@ -13,7 +13,7 @@ using namespace Yuni;
 
 namespace ny
 {
-namespace IR
+namespace ir
 {
 namespace Producer
 {
@@ -279,14 +279,14 @@ namespace Producer
 			paramname = scope.acquireString(String() << "_p_" << (void*)(&node));
 		}
 
-		// update the parameter name within the IR code (whatever previous result)
+		// update the parameter name within the ir code (whatever previous result)
 		auto sid = scope.sequence().stringrefs.ref(paramname);
 		// update the parameter opcode
 		{
 			auto& opparam = scope.sequence().at<ISA::Op::blueprint>(paramoffset);
 			opparam.name  = sid;
 			if (autoMemberAssignment)
-				opparam.kind = (uint32_t) IR::ISA::Blueprint::paramself;
+				opparam.kind = (uint32_t) ir::ISA::Blueprint::paramself;
 		}
 		// the qualifiers may have been set by the type definition
 		// thus they must be overriden and not always reset
@@ -367,14 +367,14 @@ namespace Producer
 			for (uint32_t i = 0u; i != paramCount; ++i)
 				out.emitStackalloc(scope.nextvar(), nyt_any);
 
-			// Generating IR for template parameters before the IR code for parameters
+			// Generating ir for template parameters before the ir code for parameters
 			// (especially for being able to use these types)
 			if (nodeTypeParams)
 				success &= scope.visitASTDeclGenericTypeParameters(*nodeTypeParams);
 			// inspecting each parameter
 			if (debugmode)
 				out.emitComment("function parameters");
-			// Generate IR (typing and default value) for each parameter
+			// Generate ir (typing and default value) for each parameter
 			assert(node != nullptr and "should not be here if there is no real parameter");
 			for (uint32_t i = offset; i < paramCount; ++i)
 				success &= inspectSingleParameter(i, node->children[i - offset], paramOffsets[i - offset]);
@@ -534,7 +534,7 @@ namespace Producer
 			return true;
 
 		// new scope
-		IR::Producer::Scope scope{*this};
+		ir::Producer::Scope scope{*this};
 		scope.moveAttributes(*this);
 		// reset internal counter for generating local classdef in the current scope
 		scope.resetLocalCounters();
@@ -592,5 +592,5 @@ namespace Producer
 
 
 } // namespace Producer
-} // namespace IR
+} // namespace ir
 } // namespace ny

@@ -88,7 +88,7 @@ namespace Instanciate
 	** Those opcodes may not have the good declared type (most likely something like 'any')
 	** (always update even if sometimes not necessary, easier for debugging)
 	*/
-	void updateTypesInAllStackallocOp(IR::Sequence&, ClassdefTableView&, uint32_t atomid);
+	void updateTypesInAllStackallocOp(ir::Sequence&, ClassdefTableView&, uint32_t atomid);
 
 
 	/*!

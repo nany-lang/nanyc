@@ -764,7 +764,7 @@ namespace Instanciate
 
 
 	template<nytype_t R, bool AcceptBool, bool AcceptInt, bool AcceptFloat,
-		void (IR::Sequence::* M)(uint32_t, uint32_t, uint32_t)>
+		void (ir::Sequence::* M)(uint32_t, uint32_t, uint32_t)>
 	inline bool emitBuiltinOperator(SequenceBuilder& seq, uint32_t lvid, const char* const name)
 	{
 		assert(seq.pushedparams.func.indexed.size() == 2);
@@ -937,145 +937,145 @@ namespace Instanciate
 
 	bool intrinsicAND(SequenceBuilder& seq, uint32_t lvid)
 	{
-		return emitBuiltinOperator<nyt_any, 1, 1, 0, &IR::Sequence::emitAND>(seq, lvid, "and");
+		return emitBuiltinOperator<nyt_any, 1, 1, 0, &ir::Sequence::emitAND>(seq, lvid, "and");
 	}
 
 	bool intrinsicOR(SequenceBuilder& seq, uint32_t lvid)
 	{
-		return emitBuiltinOperator<nyt_any, 1, 1, 0, &IR::Sequence::emitOR>(seq, lvid, "or");
+		return emitBuiltinOperator<nyt_any, 1, 1, 0, &ir::Sequence::emitOR>(seq, lvid, "or");
 	}
 
 	bool intrinsicXOR(SequenceBuilder& seq, uint32_t lvid)
 	{
-		return emitBuiltinOperator<nyt_any, 1, 1, 0, &IR::Sequence::emitXOR>(seq, lvid, "xor");
+		return emitBuiltinOperator<nyt_any, 1, 1, 0, &ir::Sequence::emitXOR>(seq, lvid, "xor");
 	}
 
 	bool intrinsicMOD(SequenceBuilder& seq, uint32_t lvid)
 	{
-		return emitBuiltinOperator<nyt_any, 1, 1, 0, &IR::Sequence::emitMOD>(seq, lvid, "mod");
+		return emitBuiltinOperator<nyt_any, 1, 1, 0, &ir::Sequence::emitMOD>(seq, lvid, "mod");
 	}
 
 	bool intrinsicADD(SequenceBuilder& seq, uint32_t lvid)
 	{
-		return emitBuiltinOperator<nyt_any, 0, 1, 0, &IR::Sequence::emitADD>(seq, lvid, "add");
+		return emitBuiltinOperator<nyt_any, 0, 1, 0, &ir::Sequence::emitADD>(seq, lvid, "add");
 	}
 
 	bool intrinsicSUB(SequenceBuilder& seq, uint32_t lvid)
 	{
-		return emitBuiltinOperator<nyt_any, 0, 1, 0, &IR::Sequence::emitSUB>(seq, lvid, "sub");
+		return emitBuiltinOperator<nyt_any, 0, 1, 0, &ir::Sequence::emitSUB>(seq, lvid, "sub");
 	}
 
 	bool intrinsicDIV(SequenceBuilder& seq, uint32_t lvid)
 	{
-		return emitBuiltinOperator<nyt_any, 0, 1, 0, &IR::Sequence::emitDIV>(seq, lvid, "div");
+		return emitBuiltinOperator<nyt_any, 0, 1, 0, &ir::Sequence::emitDIV>(seq, lvid, "div");
 	}
 
 	bool intrinsicMUL(SequenceBuilder& seq, uint32_t lvid)
 	{
-		return emitBuiltinOperator<nyt_any, 0, 1, 0, &IR::Sequence::emitMUL>(seq, lvid, "mul");
+		return emitBuiltinOperator<nyt_any, 0, 1, 0, &ir::Sequence::emitMUL>(seq, lvid, "mul");
 	}
 
 	bool intrinsicIDIV(SequenceBuilder& seq, uint32_t lvid)
 	{
-		return emitBuiltinOperator<nyt_any, 0, 1, 0, &IR::Sequence::emitIDIV>(seq, lvid, "idiv");
+		return emitBuiltinOperator<nyt_any, 0, 1, 0, &ir::Sequence::emitIDIV>(seq, lvid, "idiv");
 	}
 
 	bool intrinsicIMUL(SequenceBuilder& seq, uint32_t lvid)
 	{
-		return emitBuiltinOperator<nyt_any, 0, 1, 0, &IR::Sequence::emitIMUL>(seq, lvid, "imul");
+		return emitBuiltinOperator<nyt_any, 0, 1, 0, &ir::Sequence::emitIMUL>(seq, lvid, "imul");
 	}
 
 	bool intrinsicFADD(SequenceBuilder& seq, uint32_t lvid)
 	{
-		return emitBuiltinOperator<nyt_any, 0, 0, 1, &IR::Sequence::emitFADD>(seq, lvid, "fadd");
+		return emitBuiltinOperator<nyt_any, 0, 0, 1, &ir::Sequence::emitFADD>(seq, lvid, "fadd");
 	}
 
 	bool intrinsicFSUB(SequenceBuilder& seq, uint32_t lvid)
 	{
-		return emitBuiltinOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitIGTE>(seq, lvid, "igte");
-		return emitBuiltinOperator<nyt_any, 0, 0, 1, &IR::Sequence::emitFSUB>(seq, lvid, "fsub");
+		return emitBuiltinOperator<nyt_bool, 1, 1, 1, &ir::Sequence::emitIGTE>(seq, lvid, "igte");
+		return emitBuiltinOperator<nyt_any, 0, 0, 1, &ir::Sequence::emitFSUB>(seq, lvid, "fsub");
 	}
 
 	bool intrinsicFDIV(SequenceBuilder& seq, uint32_t lvid)
 	{
-		return emitBuiltinOperator<nyt_any, 0, 0, 1, &IR::Sequence::emitFDIV>(seq, lvid, "fdiv");
+		return emitBuiltinOperator<nyt_any, 0, 0, 1, &ir::Sequence::emitFDIV>(seq, lvid, "fdiv");
 	}
 
 	bool intrinsicFMUL(SequenceBuilder& seq, uint32_t lvid)
 	{
-		return emitBuiltinOperator<nyt_any, 0, 0, 1, &IR::Sequence::emitFMUL>(seq, lvid, "fmul");
+		return emitBuiltinOperator<nyt_any, 0, 0, 1, &ir::Sequence::emitFMUL>(seq, lvid, "fmul");
 	}
 
 
 
 	bool intrinsicEQ(SequenceBuilder& seq, uint32_t lvid)
 	{
-		return emitBuiltinOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitEQ>(seq, lvid, "eq");
+		return emitBuiltinOperator<nyt_bool, 1, 1, 1, &ir::Sequence::emitEQ>(seq, lvid, "eq");
 	}
 
 	bool intrinsicNEQ(SequenceBuilder& seq, uint32_t lvid)
 	{
-		return emitBuiltinOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitNEQ>(seq, lvid, "neq");
+		return emitBuiltinOperator<nyt_bool, 1, 1, 1, &ir::Sequence::emitNEQ>(seq, lvid, "neq");
 	}
 
 	bool intrinsicFLT(SequenceBuilder& seq, uint32_t lvid)
 	{
-		return emitBuiltinOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitFLT>(seq, lvid, "flt");
+		return emitBuiltinOperator<nyt_bool, 1, 1, 1, &ir::Sequence::emitFLT>(seq, lvid, "flt");
 	}
 
 	bool intrinsicFLTE(SequenceBuilder& seq, uint32_t lvid)
 	{
-		return emitBuiltinOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitFLTE>(seq, lvid, "flte");
+		return emitBuiltinOperator<nyt_bool, 1, 1, 1, &ir::Sequence::emitFLTE>(seq, lvid, "flte");
 	}
 
 	bool intrinsicFGT(SequenceBuilder& seq, uint32_t lvid)
 	{
-		return emitBuiltinOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitFGT>(seq, lvid, "fgt");
+		return emitBuiltinOperator<nyt_bool, 1, 1, 1, &ir::Sequence::emitFGT>(seq, lvid, "fgt");
 	}
 
 	bool intrinsicFGTE(SequenceBuilder& seq, uint32_t lvid)
 	{
-		return emitBuiltinOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitFGTE>(seq, lvid, "fgte");
+		return emitBuiltinOperator<nyt_bool, 1, 1, 1, &ir::Sequence::emitFGTE>(seq, lvid, "fgte");
 	}
 
 	bool intrinsicLT(SequenceBuilder& seq, uint32_t lvid)
 	{
-		return emitBuiltinOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitLT>(seq, lvid, "lt");
+		return emitBuiltinOperator<nyt_bool, 1, 1, 1, &ir::Sequence::emitLT>(seq, lvid, "lt");
 	}
 
 	bool intrinsicLTE(SequenceBuilder& seq, uint32_t lvid)
 	{
-		return emitBuiltinOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitLTE>(seq, lvid, "lte");
+		return emitBuiltinOperator<nyt_bool, 1, 1, 1, &ir::Sequence::emitLTE>(seq, lvid, "lte");
 	}
 
 	bool intrinsicILT(SequenceBuilder& seq, uint32_t lvid)
 	{
-		return emitBuiltinOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitILT>(seq, lvid, "ilt");
+		return emitBuiltinOperator<nyt_bool, 1, 1, 1, &ir::Sequence::emitILT>(seq, lvid, "ilt");
 	}
 
 	bool intrinsicILTE(SequenceBuilder& seq, uint32_t lvid)
 	{
-		return emitBuiltinOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitILTE>(seq, lvid, "ilte");
+		return emitBuiltinOperator<nyt_bool, 1, 1, 1, &ir::Sequence::emitILTE>(seq, lvid, "ilte");
 	}
 
 	bool intrinsicGT(SequenceBuilder& seq, uint32_t lvid)
 	{
-		return emitBuiltinOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitGT>(seq, lvid, "gt");
+		return emitBuiltinOperator<nyt_bool, 1, 1, 1, &ir::Sequence::emitGT>(seq, lvid, "gt");
 	}
 
 	bool intrinsicGTE(SequenceBuilder& seq, uint32_t lvid)
 	{
-		return emitBuiltinOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitGTE>(seq, lvid, "gte");
+		return emitBuiltinOperator<nyt_bool, 1, 1, 1, &ir::Sequence::emitGTE>(seq, lvid, "gte");
 	}
 
 	bool intrinsicIGT(SequenceBuilder& seq, uint32_t lvid)
 	{
-		return emitBuiltinOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitIGT>(seq, lvid, "igt");
+		return emitBuiltinOperator<nyt_bool, 1, 1, 1, &ir::Sequence::emitIGT>(seq, lvid, "igt");
 	}
 
 	bool intrinsicIGTE(SequenceBuilder& seq, uint32_t lvid)
 	{
-		return emitBuiltinOperator<nyt_bool, 1, 1, 1, &IR::Sequence::emitIGTE>(seq, lvid, "igte");
+		return emitBuiltinOperator<nyt_bool, 1, 1, 1, &ir::Sequence::emitIGTE>(seq, lvid, "igte");
 	}
 
 

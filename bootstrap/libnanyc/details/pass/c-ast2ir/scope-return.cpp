@@ -9,7 +9,7 @@ using namespace Yuni;
 
 namespace ny
 {
-namespace IR
+namespace ir
 {
 namespace Producer
 {
@@ -30,7 +30,7 @@ namespace Producer
 			{
 				case AST::rgExpr:
 				{
-					IR::OpcodeScopeLocker opscope{out};
+					ir::OpcodeScopeLocker opscope{out};
 					LVID localvar;
 					success &= visitASTExpr(child, localvar);
 					// generate error on the begining of the expr and not the return itself
@@ -56,5 +56,5 @@ namespace Producer
 
 
 } // namespace Producer
-} // namespace IR
+} // namespace ir
 } // namespace ny

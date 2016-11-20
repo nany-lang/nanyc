@@ -13,7 +13,7 @@ namespace Pass
 namespace Instanciate
 {
 
-	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::allocate>& operands)
+	void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::allocate>& operands)
 	{
 		if (not frame->verify(operands.atomid))
 			return frame->invalidate(operands.lvid);

@@ -42,14 +42,14 @@ namespace ny
 	}
 
 
-	inline const IR::Sequence& AtomMap::sequence(uint32_t atomid, uint32_t index) const
+	inline const ir::Sequence& AtomMap::sequence(uint32_t atomid, uint32_t index) const
 	{
 		assert(atomid < m_byIndex.size());
 		return m_byIndex[atomid]->instances[index].sequence();
 	}
 
 
-	inline const IR::Sequence* AtomMap::sequenceIfExists(uint32_t atomid, uint32_t index) const
+	inline const ir::Sequence* AtomMap::sequenceIfExists(uint32_t atomid, uint32_t index) const
 	{
 		return (atomid < m_byIndex.size())
 			? m_byIndex[atomid]->instances[index].sequenceIfExists() : nullptr;

@@ -26,7 +26,7 @@ namespace ny
 	public:
 		struct AttachedSequenceRef final
 		{
-			AttachedSequenceRef(IR::Sequence* sequence, bool owned)
+			AttachedSequenceRef(ir::Sequence* sequence, bool owned)
 				: sequence(sequence)
 				, owned(owned)
 			{}
@@ -34,7 +34,7 @@ namespace ny
 			AttachedSequenceRef(const AttachedSequenceRef&) = delete;
 			~AttachedSequenceRef();
 
-			IR::Sequence* sequence = nullptr;
+			ir::Sequence* sequence = nullptr;
 			bool owned = false;
 		};
 
@@ -56,7 +56,7 @@ namespace ny
 		/*!
 		** Attach an IR sequence
 		*/
-		bool attach(IR::Sequence& sequence, bool owned = false);
+		bool attach(ir::Sequence& sequence, bool owned = false);
 
 		/*!
 		** \brief Try to resolve strict parameter types

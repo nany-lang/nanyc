@@ -14,7 +14,7 @@ namespace Pass
 namespace Instanciate
 {
 
-	void SequenceBuilder::visit(const IR::ISA::Operand<IR::ISA::Op::commontype>& operands)
+	void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::commontype>& operands)
 	{
 		assert(frame != nullptr);
 
