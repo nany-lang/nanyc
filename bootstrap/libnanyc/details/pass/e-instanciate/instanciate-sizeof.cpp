@@ -1,4 +1,5 @@
 #include "instanciate.h"
+#include "details/ir/emit.h"
 
 using namespace Yuni;
 

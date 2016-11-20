@@ -5,7 +5,6 @@
 #if NANY_PRINT_sequence_OPCODES != 0
 #include <iostream>
 #endif
-#include "emit.h"
 
 
 
@@ -726,27 +725,6 @@ namespace ir
 		operands.lvid   = lvid;
 		operands.type   = static_cast<uint32_t>(type);
 		operands.atomid = (uint32_t) -1;
-		return lvid;
-	}
-
-	inline uint32_t Sequence::emitStackalloc_u64(uint32_t lvid, nytype_t type, uint64_t value)
-	{
-		emitStackalloc(lvid, type);
-		ir::emit::constantu64(this, lvid, value);
-		return lvid;
-	}
-
-	inline uint32_t Sequence::emitStackalloc_f64(uint32_t lvid, nytype_t type, double value)
-	{
-		emitStackalloc(lvid, type);
-		ir::emit::constantf64(this, lvid, value);
-		return lvid;
-	}
-
-	inline uint32_t Sequence::emitStackallocText(uint32_t lvid, const AnyString& text)
-	{
-		emitStackalloc(lvid, nyt_ptr);
-		ir::emit::constantText(this, lvid, text);
 		return lvid;
 	}
 

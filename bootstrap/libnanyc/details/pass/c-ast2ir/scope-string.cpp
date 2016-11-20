@@ -110,7 +110,7 @@ namespace Producer
 		// when called, this rule represents an internal cstring
 		// thus, this function can not be called by an user-defined string
 		emitDebugpos(node);
-		localvar = sequence().emitStackallocText(nextvar(), node.text);
+		localvar = ir::emit::alloctext(sequence(), nextvar(), node.text);
 		return true;
 	}
 
@@ -150,8 +150,8 @@ namespace Producer
 
 		auto flush = [&]() {
 			emitDebugpos(*firstLiteralNode);
-			uint32_t sid = out.emitStackallocText(nextvar(), context.reuse.string.text);
-			uint32_t lid = out.emitStackalloc_u64(nextvar(), nyt_u32, context.reuse.string.text.size());
+			uint32_t sid = ir::emit::alloctext(out, nextvar(), context.reuse.string.text);
+			uint32_t lid = ir::emit::allocu64(out, nextvar(), nyt_u32, context.reuse.string.text.size());
 			uint32_t ret = out.emitStackalloc(nextvar(), nyt_void);
 			out.emitPush(sid); // text: __text
 			out.emitPush(lid); // size: __u64

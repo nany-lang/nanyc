@@ -149,12 +149,6 @@ namespace ir
 
 		//! Allocate a new variable on the stack and get the register
 		uint32_t emitStackalloc(uint32_t lvid, nytype_t);
-		//! Allocate a new variable on the stack and assign a value to it and get the register
-		uint32_t emitStackalloc_u64(uint32_t lvid, nytype_t, uint64_t);
-		//! Allocate a new variable on the stack and assign a value to it and get the register
-		uint32_t emitStackalloc_f64(uint32_t lvid, nytype_t, double);
-		//! Allocate a new variable on the stack and assign a text to it and get the register
-		uint32_t emitStackallocText(uint32_t lvid, const AnyString&);
 
 		//! Emit a memalloc opcode and get the register
 		uint32_t emitMemalloc(uint32_t lvid, uint32_t regsize);

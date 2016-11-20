@@ -2,8 +2,7 @@
 #include "scope.h"
 #include "details/fwd.h"
 #include "libnanyc-config.h"
-
-
+#include "details/ir/emit.h"
 
 
 namespace ny
@@ -131,14 +130,14 @@ namespace Producer
 	inline LVID Scope::createLocalBuiltinFloat(AST::Node& node, nytype_t type, double value)
 	{
 		emitDebugpos(node);
-		return context.sequence.emitStackalloc_f64(nextvar(), type, value);
+		return ir::emit::allocf64(context.sequence, nextvar(), type, value);
 	}
 
 
 	inline LVID Scope::createLocalBuiltinInt(AST::Node& node, nytype_t type, yuint64 value)
 	{
 		emitDebugpos(node);
-		return context.sequence.emitStackalloc_u64(nextvar(), type, value);
+		return ir::emit::allocu64(context.sequence, nextvar(), type, value);
 	}
 
 

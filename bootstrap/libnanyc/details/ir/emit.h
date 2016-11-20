@@ -57,6 +57,29 @@ namespace
 	}
 
 
+	//! Allocate a new variable on the stack and assign a value to it and get the register
+	inline uint32_t allocu64(SequenceRef ref, uint32_t lvid, nytype_t type, uint64_t value) {
+		ref.sequence.emitStackalloc(lvid, type);
+		ir::emit::constantu64(ref, lvid, value);
+		return lvid;
+	}
+	
+
+	//! Allocate a new variable on the stack and assign a value to it and get the register
+	inline uint32_t allocf64(SequenceRef ref, uint32_t lvid, nytype_t type, double value) {
+		ref.sequence.emitStackalloc(lvid, type);
+		ir::emit::constantf64(ref, lvid, value);
+		return lvid;
+	}
+
+
+	//! Allocate a new variable on the stack and assign a text to it and get the register
+	inline uint32_t alloctext(SequenceRef ref, uint32_t lvid, const AnyString& text) {
+		ref.sequence.emitStackalloc(lvid, nyt_ptr);
+		ir::emit::constantText(ref, lvid, text);
+		return lvid;
+	}
+
 
 } // namespace
 } // namespace emit
