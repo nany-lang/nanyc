@@ -245,44 +245,49 @@ bool batchCheckIfFilenamesConformToGrammar(Settings& settings) {
 
 int main(int argc, char** argv)
 {
-	Settings settings;
-	// parse the command
-	{
-		// The command line options parser
-		GetOpt::Parser options;
-		// Input files
-		options.add(settings.filenames, 'i', "input", "Input files (or folders)");
-		options.remainingArguments(settings.filenames);
-		// --no-color
-		options.addFlag(settings.noColors, ' ', "no-color", "Disable color output");
-		// use filename convention
-		options.addFlag(settings.useFilenameConvention, ' ', "use-filename-convention",
-			"Use the filename to determine if the test should succeed or not (should succeed if starting with 'ok-'");
-		// version
-		bool optVersion = false;
-		options.addFlag(optVersion, ' ', "version", "Display the version of the compiler and exit");
-		// Ask to the parser to parse the command line
-		if (not options(argc, argv)) {
-			// The program should not continue here
-			// The user may have requested the help or an error has happened
-			// If an error has happened, the exit status should be different from 0
-			if (options.errors()) {
-				std::cerr << "Abort due to error\n";
+	try {
+		Settings settings;
+		// parse the command
+		{
+			// The command line options parser
+			GetOpt::Parser options;
+			// Input files
+			options.add(settings.filenames, 'i', "input", "Input files (or folders)");
+			options.remainingArguments(settings.filenames);
+			// --no-color
+			options.addFlag(settings.noColors, ' ', "no-color", "Disable color output");
+			// use filename convention
+			options.addFlag(settings.useFilenameConvention, ' ', "use-filename-convention",
+				"Use the filename to determine if the test should succeed or not (should succeed if starting with 'ok-'");
+			// version
+			bool optVersion = false;
+			options.addFlag(optVersion, ' ', "version", "Display the version of the compiler and exit");
+			// Ask to the parser to parse the command line
+			if (not options(argc, argv)) {
+				// The program should not continue here
+				// The user may have requested the help or an error has happened
+				// If an error has happened, the exit status should be different from 0
+				if (options.errors()) {
+					std::cerr << "Abort due to error\n";
+					return EXIT_FAILURE;
+				}
+				return EXIT_SUCCESS;
+			}
+			if (optVersion) {
+				std::cout << "0.0\n";
+				return EXIT_SUCCESS;
+			}
+			if (settings.filenames.empty()) {
+				std::cerr << argv[0] << ": no input file\n";
 				return EXIT_FAILURE;
 			}
-			return EXIT_SUCCESS;
 		}
-
-		if (optVersion) {
-			std::cout << "0.0\n";
-			return EXIT_SUCCESS;
-		}
-		if (settings.filenames.empty()) {
-			std::cerr << argv[0] << ": no input file\n";
-			return EXIT_FAILURE;
-		}
+		// Print AST or check for Nany Grammar
+		bool success = batchCheckIfFilenamesConformToGrammar(settings);
+		return success ? EXIT_SUCCESS : EXIT_FAILURE;
 	}
-	// Print AST or check for Nany Grammar
-	bool success = batchCheckIfFilenamesConformToGrammar(settings);
-	return success ? EXIT_SUCCESS : EXIT_FAILURE;
+	catch (const std::exception& e) {
+		std::cerr << argv[0] << ": " << e.what() << '\n';
+	}
+	return EXIT_FAILURE;
 }
