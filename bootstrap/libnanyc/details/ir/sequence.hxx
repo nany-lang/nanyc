@@ -5,6 +5,7 @@
 #if NANY_PRINT_sequence_OPCODES != 0
 #include <iostream>
 #endif
+#include "emit.h"
 
 
 
@@ -719,33 +720,6 @@ namespace ir
 		operands.setLVID(lvid);
 	}
 
-	inline void Sequence::emitStore_u64(uint32_t lvid, uint64_t value)
-	{
-		auto& operands = emit<ISA::Op::storeConstant>();
-		operands.lvid  = lvid;
-		operands.value.u64 = value;
-	}
-
-	inline void Sequence::emitStore_f64(uint32_t lvid, double value)
-	{
-		auto& operands = emit<ISA::Op::storeConstant>();
-		operands.lvid  = lvid;
-		operands.value.f64 = value;
-	}
-
-	inline void Sequence::emitStore_bool(uint32_t lvid, bool value)
-	{
-		emitStore_u64(lvid, value ? 1 : 0);
-	}
-
-	inline uint32_t Sequence::emitStoreText(uint32_t lvid, const AnyString& text)
-	{
-		auto& operands = emit<ISA::Op::storeText>();
-		operands.lvid = lvid;
-		operands.text = stringrefs.ref(text);
-		return operands.text;
-	}
-
 	inline uint32_t Sequence::emitStackalloc(uint32_t lvid, nytype_t type)
 	{
 		auto& operands = emit<ISA::Op::stackalloc>();
@@ -758,21 +732,21 @@ namespace ir
 	inline uint32_t Sequence::emitStackalloc_u64(uint32_t lvid, nytype_t type, uint64_t value)
 	{
 		emitStackalloc(lvid, type);
-		emitStore_u64(lvid, value);
+		ir::emit::constantu64(this, lvid, value);
 		return lvid;
 	}
 
 	inline uint32_t Sequence::emitStackalloc_f64(uint32_t lvid, nytype_t type, double value)
 	{
 		emitStackalloc(lvid, type);
-		emitStore_f64(lvid, value);
+		ir::emit::constantf64(this, lvid, value);
 		return lvid;
 	}
 
 	inline uint32_t Sequence::emitStackallocText(uint32_t lvid, const AnyString& text)
 	{
 		emitStackalloc(lvid, nyt_ptr);
-		emitStoreText(lvid, text);
+		ir::emit::constantText(this, lvid, text);
 		return lvid;
 	}
 

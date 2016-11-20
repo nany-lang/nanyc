@@ -366,7 +366,7 @@ namespace Instanciate
 						auto& opc = cdeftable.substitute(lvid);
 						opc.mutateToBuiltin(nyt_ptr);
 						opc.qualifiers.ref = false;
-						out->emitStore_u64(lvid, 0);
+						ir::emit::constantu64(out, lvid, 0);
 						frame->lvids(lvid).synthetic = false;
 						return true;
 					}
@@ -393,7 +393,7 @@ namespace Instanciate
 							auto& opc = cdeftable.substitute(lvid);
 							opc.mutateToBuiltin(nyt_bool);
 							opc.qualifiers.ref = false;
-							out->emitStore_u64(lvid, 0);
+							ir::emit::constantu64(out, lvid, 0);
 							frame->lvids(lvid).synthetic = false;
 							return true;
 						}
@@ -402,7 +402,7 @@ namespace Instanciate
 							auto& opc = cdeftable.substitute(lvid);
 							opc.mutateToBuiltin(nyt_bool);
 							opc.qualifiers.ref = false;
-							out->emitStore_u64(lvid, 1);
+							ir::emit::constantu64(out, lvid, 1);
 							frame->lvids(lvid).synthetic = false;
 							return true;
 						}

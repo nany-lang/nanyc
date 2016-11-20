@@ -35,7 +35,7 @@ namespace Instanciate
 			else
 			{
 				uint64_t size = nytype_sizeof(cdef.kind);
-				out->emitStore_u64(operands.lvid, size);
+				ir::emit::constantu64(out, operands.lvid, size);
 			}
 		}
 	}

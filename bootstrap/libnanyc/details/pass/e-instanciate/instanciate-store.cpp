@@ -18,7 +18,7 @@ namespace Instanciate
 		assert(frame != nullptr);
 		frame->lvids(operands.lvid).synthetic = false;
 		if (canGenerateCode())
-			out->emitStore_u64(operands.lvid, operands.value.u64);
+			ir::emit::constantu64(out, operands.lvid, operands.value.u64);
 	}
 
 
@@ -47,7 +47,7 @@ namespace Instanciate
 	{
 		if (canGenerateCode())
 		{
-			uint32_t sid = out->emitStoreText(operands.lvid, currentSequence.stringrefs[operands.text]);
+			uint32_t sid = ir::emit::constantText(out, operands.lvid, currentSequence.stringrefs[operands.text]);
 			auto& lvidinfo = frame->lvids(operands.lvid);
 			lvidinfo.synthetic = false;
 			lvidinfo.text_sid  = sid;

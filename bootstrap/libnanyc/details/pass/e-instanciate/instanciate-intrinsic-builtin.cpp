@@ -27,9 +27,9 @@ namespace Instanciate
 		if (seq.canGenerateCode())
 		{
 			#ifdef YUNI_OS_UNIX
-			seq.out->emitStore_u64(lvid, 1);
+			ir::emit::constantbool(seq.out, lvid, true);
 			#else
-			seq.out->emitStore_u64(lvid, 0);
+			ir::emit::constantbool(seq.out, lvid, false);
 			#endif
 		}
 		return true;
@@ -41,9 +41,9 @@ namespace Instanciate
 		if (seq.canGenerateCode())
 		{
 			#if defined(YUNI_OS_UNIX) && defined(_POSIX_VERSION)
-			seq.out->emitStore_u64(lvid, 1);
+			ir::emit::constantbool(seq.out, lvid, true);
 			#else
-			seq.out->emitStore_u64(lvid, 0);
+			ir::emit::constantbool(seq.out, lvid, false);
 			#endif
 		}
 		return true;
@@ -56,9 +56,9 @@ namespace Instanciate
 		if (seq.canGenerateCode())
 		{
 			#ifdef YUNI_OS_LINUX
-			seq.out->emitStore_u64(lvid, 1);
+			ir::emit::constantbool(seq.out, lvid, true);
 			#else
-			seq.out->emitStore_u64(lvid, 0);
+			ir::emit::constantbool(seq.out, lvid, false);
 			#endif
 		}
 		return true;
@@ -70,9 +70,9 @@ namespace Instanciate
 		if (seq.canGenerateCode())
 		{
 			#ifdef YUNI_OS_AIX
-			seq.out->emitStore_u64(lvid, 1);
+			ir::emit::constantbool(seq.out, lvid, true);
 			#else
-			seq.out->emitStore_u64(lvid, 0);
+			ir::emit::constantbool(seq.out, lvid, false);
 			#endif
 		}
 		return true;
@@ -84,9 +84,9 @@ namespace Instanciate
 		if (seq.canGenerateCode())
 		{
 			#ifdef YUNI_OS_WINDOWS
-			seq.out->emitStore_u64(lvid, 1);
+			ir::emit::constantbool(seq.out, lvid, true);
 			#else
-			seq.out->emitStore_u64(lvid, 0);
+			ir::emit::constantbool(seq.out, lvid, false);
 			#endif
 		}
 		return true;
@@ -98,9 +98,9 @@ namespace Instanciate
 		if (seq.canGenerateCode())
 		{
 			#if defined(__CYGWIN32__) || defined(__CYGWIN__)
-			seq.out->emitStore_u64(lvid, 1);
+			ir::emit::constantbool(seq.out, lvid, true);
 			#else
-			seq.out->emitStore_u64(lvid, 0);
+			ir::emit::constantbool(seq.out, lvid, false);
 			#endif
 		}
 		return true;
@@ -112,9 +112,9 @@ namespace Instanciate
 		if (seq.canGenerateCode())
 		{
 			#ifdef YUNI_OS_MACOS
-			seq.out->emitStore_u64(lvid, 1);
+			ir::emit::constantbool(seq.out, lvid, true);
 			#else
-			seq.out->emitStore_u64(lvid, 0);
+			ir::emit::constantbool(seq.out, lvid, false);
 			#endif
 		}
 		return true;
@@ -127,9 +127,9 @@ namespace Instanciate
 		{
 			#if defined(YUNI_OS_MACOS) || defined(YUNI_OS_OPENBSD) || defined(YUNI_OS_FREEBSD) \
 				|| defined(YUNI_OS_NETBSD) || defined(YUNI_OS_DRAGONFLY)
-			seq.out->emitStore_u64(lvid, 1);
+			ir::emit::constantbool(seq.out, lvid, true);
 			#else
-			seq.out->emitStore_u64(lvid, 0);
+			ir::emit::constantbool(seq.out, lvid, false);
 			#endif
 		}
 		return true;
@@ -236,7 +236,7 @@ namespace Instanciate
 			else
 			{
 				// can not be acquired, not an object - NULL
-				seq.out->emitStore_u64(lvid, 0);
+				ir::emit::constantu64(seq.out, lvid, 0);
 			}
 		}
 		return true;
@@ -272,7 +272,7 @@ namespace Instanciate
 			else
 			{
 				uint64_t size = nytype_sizeof(cdef.kind);
-				seq.out->emitStore_u64(lvid, size);
+				ir::emit::constantu64(seq.out, lvid, size);
 			}
 		}
 		return true;
