@@ -93,7 +93,7 @@ using Logging = Logs::Logger<Logs::StdCout<>, ParseVerbosity<Logs::Message<>>>;
 static Logging logs;
 
 
-uint32_t fincCommonFolderLength(const std::vector<String>& filenames) {
+uint32_t findCommonFolderLength(const std::vector<String>& filenames) {
 	if (filenames.empty())
 		return 0;
 	uint32_t len = 0;
@@ -201,7 +201,7 @@ bool IterateThroughAllFiles(const std::vector<String>& filenames, const F& callb
 bool batchCheckIfFilenamesConformToGrammar(Settings& settings) {
 	if (not expandFilelist(settings.filenames))
 		return false;
-	auto commonFolder = (settings.filenames.size() > 1 ? fincCommonFolderLength(settings.filenames) : 0);
+	auto commonFolder = (settings.filenames.size() > 1 ? findCommonFolderLength(settings.filenames) : 0);
 	if (0 != commonFolder)
 		++commonFolder;
 	return IterateThroughAllFiles(settings.filenames, [&](const AnyString& file, int64_t& duration) -> bool {
