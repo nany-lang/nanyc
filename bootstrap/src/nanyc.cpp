@@ -7,8 +7,6 @@ using namespace Yuni;
 
 int main(int argc, const char** argv)
 {
-	const char* const argv0 = argv[0];
-
 	if (argc > 1)
 	{
 		nyrun_cf_t runcf;
@@ -38,7 +36,7 @@ int main(int argc, const char** argv)
 							runcf.verbose = nytrue;
 							continue;
 						}
-						return ny::print::unknownOption(argv0, arg);
+						return ny::print::unknownOption(argv[0], arg);
 					}
 					else
 					{
@@ -54,7 +52,7 @@ int main(int argc, const char** argv)
 						return ny::print::usage(argv[0]);
 					if (arg == "-v")
 						return ny::print::version();
-					return ny::print::unknownOption(argv0, arg);
+					return ny::print::unknownOption(argv[0], arg);
 				}
 			}
 			firstarg = i;
@@ -87,5 +85,5 @@ int main(int argc, const char** argv)
 		nyrun_cf_release(&runcf);
 		return exitstatus;
 	}
-	return ny::print::noInputScript(argv0);
+	return ny::print::noInputScript(argv[0]);
 }
