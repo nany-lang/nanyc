@@ -56,9 +56,9 @@ struct ParseVerbosity: public LeftType {
 		if (Handler::colorsAllowed)
 			System::Console::TextColor<System::Console::yellow>::Set(out);
 		#ifndef YUNI_OS_WINDOWS
-		out << "  \u2713  ";
+		out << "  \u2713   ";
 		#else
-		out << "  >  ";
+		out << " ok   ";
 		#endif
 		if (Handler::colorsAllowed) {
 			System::Console::ResetTextColor(out);
@@ -73,7 +73,7 @@ struct ParseVerbosity: public LeftType {
 	static void printError(O& out) {
 		if (Handler::colorsAllowed)
 			System::Console::TextColor<System::Console::red>::Set(out);
-		out << "  FAILED ";
+		out << " ERR  ";
 		if (Handler::colorsAllowed) {
 			System::Console::ResetTextColor(out);
 			System::Console::TextColor<System::Console::bold>::Set(out);
@@ -87,7 +87,7 @@ struct ParseVerbosity: public LeftType {
 	static void printWarning(O& out) {
 		if (Handler::colorsAllowed)
 			System::Console::TextColor<System::Console::yellow>::Set(out);
-		out << "  {warn} ";
+		out << " warn ";
 		if (Handler::colorsAllowed) {
 			System::Console::ResetTextColor(out);
 			System::Console::TextColor<System::Console::bold>::Set(out);
