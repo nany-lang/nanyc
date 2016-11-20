@@ -1,7 +1,3 @@
-#include <yuni/yuni.h>
-#include <yuni/string.h>
-#include <nany/nany.h>
-#include <cassert>
 #include "nanyc-utils.h"
 
 using namespace Yuni;
