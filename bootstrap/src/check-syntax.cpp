@@ -136,45 +136,9 @@ uint32_t findCommonFolderLength(const std::vector<String>& filenames) {
 	return len;
 }
 
-bool expandAndCanonicalizeFilenames(std::vector<String>& filenames) {
-	std::vector<String> filelist;
-	filelist.reserve(512);
-	String currentfile;
-	currentfile.reserve(4096);
-	for (auto& filename: filenames) {
-		IO::Canonicalize(currentfile, filename);
-		switch (IO::TypeOf(currentfile)) {
-			case IO::typeFile: {
-				filelist.emplace_back(currentfile);
-				break;
-			}
-			case IO::typeFolder: {
-				ShortString16 ext;
-				IO::Directory::Info info(currentfile);
-				auto end = info.recursive_file_end();
-				for (auto i = info.recursive_file_begin(); i != end; ++i)
-				{
-					IO::ExtractExtension(ext, *i);
-					if (ext == ".ny")
-						filelist.emplace_back(i.filename());
-				}
-				break;
-			}
-			default: {
-				logs.error() << "impossible to find '" << currentfile << "'";
-				return false;
-			}
-		}
-	}
-	// for beauty in singled-threaded (and to always produce the same output)
-	std::sort(filelist.begin(), filelist.end());
-	filenames.swap(filelist);
-	return true;
-}
-
 template<class F>
 bool IterateThroughAllFiles(const std::vector<String>& filenames, const F& callback) {
-	String currentfile;
+	String tmpstr;
 	uint32_t testOK = 0;
 	uint32_t testFAILED = 0;
 	int64_t maxCheckDuration = 0;
@@ -222,8 +186,6 @@ bool IterateThroughAllFiles(const std::vector<String>& filenames, const F& callb
 }
 
 bool batchCheckIfFilenamesConformToGrammar(Settings& settings) {
-	if (not expandAndCanonicalizeFilenames(settings.filenames))
-		return false;
 	auto commonFolder = (settings.filenames.size() > 1 ? findCommonFolderLength(settings.filenames) : 0);
 	if (0 != commonFolder)
 		++commonFolder;
@@ -262,10 +224,44 @@ bool batchCheckIfFilenamesConformToGrammar(Settings& settings) {
 	});
 }
 
+std::vector<String> expandAndCanonicalizeFilenames(const std::vector<String>& filenames) {
+	std::vector<String> filelist;
+	filelist.reserve(filenames.size());
+	String tmpstr;
+	tmpstr.reserve(1024);
+	for (auto& filename: filenames) {
+		IO::Canonicalize(tmpstr, filename);
+		switch (IO::TypeOf(tmpstr)) {
+			case IO::typeFile: {
+				filelist.emplace_back(tmpstr);
+				break;
+			}
+			case IO::typeFolder: {
+				ShortString16 ext;
+				IO::Directory::Info info(tmpstr);
+				auto end = info.recursive_file_end();
+				for (auto i = info.recursive_file_begin(); i != end; ++i)
+				{
+					IO::ExtractExtension(ext, *i);
+					if (ext == ".ny")
+						filelist.emplace_back(i.filename());
+				}
+				break;
+			}
+			default:
+				throw std::runtime_error((std::string("impossible to find '") += tmpstr.c_str()) += '\'');
+		}
+	}
+	// for beauty in singled-threaded (and to always produce the same output)
+	std::sort(filelist.begin(), filelist.end());
+	return filelist;
+}
+
 bool parseCommandLine(Settings& settings, int argc, char** argv) {
 	GetOpt::Parser options;
-	options.add(settings.filenames, 'i', "input", "Input files (or folders)");
-	options.remainingArguments(settings.filenames);
+	std::vector<String> filenames;
+	options.add(filenames, 'i', "input", "Input files (or folders)");
+	options.remainingArguments(filenames);
 	options.addFlag(settings.noColors, ' ', "no-color", "Disable color output");
 	options.addFlag(settings.useFilenameConvention, ' ', "use-filename-convention",
 		"Use the filename to determine if the test should succeed or not (should succeed if starting with 'ok-'");
@@ -283,8 +279,9 @@ bool parseCommandLine(Settings& settings, int argc, char** argv) {
 		std::cout << "0.0\n";
 		return false;
 	}
-	if (settings.filenames.empty())
+	if (filenames.empty())
 		throw std::runtime_error("no input file");
+	settings.filenames = expandAndCanonicalizeFilenames(filenames);
 	return true;
 }
 
