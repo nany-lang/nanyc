@@ -1,12 +1,12 @@
-[submodule "src/bootstrap/ext/yuni"]
-	path = src/bootstrap/ext/yuni
+[submodule "bootstrap/ext/yuni"]
+	path = bootstrap/ext/yuni
 	url = https://github.com/libyuni/libyuni.git
 	branch = master
 [submodule "tests"]
 	path = tests
 	url = https://github.com/nany-lang/nany-tests
 	branch = master
-[submodule "src/bootstrap/ext/dyncall"]
-	path = src/bootstrap/ext/dyncall
+[submodule "bootstrap/ext/dyncall"]
+	path = bootstrap/ext/dyncall
 	url = https://github.com/nany-lang/ext-dyncall
 	branch = master

@@ -7,6 +7,6 @@ Build a debian package
 ----------------------
 
 ```
-$ cd src/bootstrap
+$ cd bootstrap
 $ make package-deb
 ```

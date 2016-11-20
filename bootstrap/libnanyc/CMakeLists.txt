@@ -43,8 +43,8 @@ endmacro()
 #
 # generate nsl:std.core
 #
-get_filename_component(nsl_stdcore_root "${CMAKE_CURRENT_LIST_DIR}/../../nsl/std.core/" REALPATH)
-get_filename_component(nsl_root "${CMAKE_CURRENT_LIST_DIR}/../../nsl/" REALPATH)
+get_filename_component(nsl_stdcore_root "${CMAKE_CURRENT_LIST_DIR}/../../src/nsl/std.core/" REALPATH)
+get_filename_component(nsl_root "${CMAKE_CURRENT_LIST_DIR}/../../src/nsl/" REALPATH)
 set(nsl_root "${nsl_root}" CACHE INTERNEL "NSL Root path")
 
 include("${nsl_root}/nsl.cmake")
