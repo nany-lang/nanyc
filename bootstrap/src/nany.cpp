@@ -10,7 +10,6 @@ using namespace Yuni;
 
 
 static int printNoInputScript(const char* argv0)
-#include <iostream>
 {
 	std::cerr << argv0 << ": no input script file\n";
 	return EXIT_FAILURE;
