@@ -1,6 +1,5 @@
 #pragma once
 #include <nany/nany.h>
-#include <yuni/string.h>
 
 
 namespace ny {
@@ -20,7 +19,7 @@ int bugReportInfo(); // always returns EXIT_SUCCESS
 int version();
 
 //! Complain about an unknown command line option (always return EXIT_FAILURE)
-int unknownOption(const char* const argv0, const AnyString& name);
+int unknownOption(const char* const argv0, const char* const name);
 
 //! Callback to complain on missing file
 void fileAccessError(const nyproject_t*, nybuild_t*, const char* file, uint32_t length);

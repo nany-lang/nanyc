@@ -4,20 +4,20 @@
 namespace {
 
 
-int shortOption(const AnyString& name, const char* const argv0) {
-	if (name == "-h")
+int shortOption(const char* const name, const char* const argv0) {
+	if (!strcmp(name, "-h"))
 		return ny::print::usage(argv0);
-	if (name == "-v")
+	if (!strcmp(name, "-v"))
 		return ny::print::version();
 	return ny::print::unknownOption(argv0, name);
 }
 
-int longOptions(const AnyString& name, const char* const argv0) {
-	if (name == "--help")
+int longOptions(const char* const name, const char* const argv0) {
+	if (!strcmp(name, "--help"))
 		return ny::print::usage(argv0);
-	if (name == "--version")
+	if (!strcmp(name, "--version"))
 		return ny::print::version();
-	if (name == "--bugreport")
+	if (!strcmp(name, "--bugreport"))
 		return ny::print::bugReportInfo();
 	return ny::print::unknownOption(argv0, name);
 }
@@ -39,14 +39,13 @@ int main(int argc, const char** argv)
 		if (carg[0] == '-')
 		{
 			if (carg[1] != '-')
-				return shortOption(AnyString{carg}, argv[0]);
+				return shortOption(carg, argv[0]);
 			if (carg[2] != '\0') // to handle '--' option
 			{
-				AnyString name{carg};
-				if (name == "--verbose")
+				if (!strcmp(carg, "--verbose"))
 					runcf.verbose = nytrue;
 				else
-					return longOptions(name, argv[0]);
+					return longOptions(carg, argv[0]);
 			}
 			else
 			{

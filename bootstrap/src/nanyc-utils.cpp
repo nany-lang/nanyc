@@ -1,4 +1,5 @@
 #include "nanyc-utils.h"
+#include <yuni/string.h>
 #include <iostream>
 
 
@@ -31,7 +32,7 @@ int version() {
 	return EXIT_SUCCESS;
 }
 
-int unknownOption(const char* const argv0, const AnyString& name) {
+int unknownOption(const char* const argv0, const char* const name) {
 	std::cerr << argv0 << ": unknown option '" << name << "'\n";
 	return EXIT_FAILURE;
 }
