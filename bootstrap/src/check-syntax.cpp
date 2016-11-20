@@ -96,23 +96,21 @@ static Logging logs;
 uint32_t fincCommonFolderLength(const std::vector<String>& filenames) {
 	if (filenames.empty())
 		return 0;
+	uint32_t len = 0;
 	auto& firstElement = filenames[0];
 	const char sep = IO::Separator;
-	uint32_t pos = 0;
-	for (; ; ++pos) {
-		for (size_t i = 0; i < filenames.size(); ++i) {
-			auto& str = filenames[i];
-			if (pos == firstElement.size())
-				return pos;
-			if (pos < str.size() and str[pos] != '\0' and str[pos] == firstElement[pos])
+	for (; ; ++len) {
+		for (auto& filename: filenames) {
+			if (len == firstElement.size())
+				return len;
+			if (len < filename.size() and filename[len] != '\0' and filename[len] == firstElement[len])
 				continue;
-			// back to the last sep
-			while (pos > 0 && firstElement[--pos] != sep) {
+			while (len > 0 and firstElement[--len] != sep) { // back to the last sep
 			}
-			return pos;
+			return len;
 		}
 	}
-	return pos;
+	return len;
 }
 
 bool expandFilelist(std::vector<String>& list) {
