@@ -22,6 +22,11 @@ namespace
 	};
 
 
+	inline void nop(SequenceRef ref) {
+		ref.sequence.emit<ISA::Op::nop>();
+	}
+
+
 	//! Copy two register
 	inline void copy(SequenceRef ref, uint32_t lvid, uint32_t source) {
 		auto& operands = ref.sequence.emit<ISA::Op::store>();

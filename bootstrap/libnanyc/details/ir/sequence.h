@@ -78,8 +78,6 @@ namespace ir
 		//! Get the offset of an instruction within the sequence
 		uint32_t offsetOf(const Instruction& instr) const;
 
-		//! Emit a NOP instruction
-		void emitNop();
 		//! Emit assert instruction
 		void emitAssert(uint32_t lvid);
 		//! Emit opcode to hold a pointer for the MemChecker

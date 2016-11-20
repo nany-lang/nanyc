@@ -224,11 +224,6 @@ namespace ir
 	}
 
 
-	inline void Sequence::emitNop()
-	{
-		emit<ISA::Op::nop>();
-	}
-
 	inline void Sequence::emitRef(uint32_t lvid)
 	{
 		emit<ISA::Op::ref>().lvid = lvid;

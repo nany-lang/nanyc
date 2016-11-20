@@ -7,6 +7,7 @@
 #include "instanciate-atom.h"
 #include "instanciate-debug.h"
 #include "func-overload-match.h"
+#include "details/ir/emit.h"
 #include <memory>
 
 using namespace Yuni;
@@ -202,7 +203,7 @@ namespace Instanciate
 		// duplicate nop as well since they can be used to insert code
 		// (for shortcircuit for example)
 		if (canGenerateCode())
-			out->emitNop();
+			ir::emit::nop(out);
 	}
 
 
