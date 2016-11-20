@@ -68,7 +68,7 @@ bool parseCommandLine(Settings& settings, int argc, char** argv) {
 		return false;
 	}
 	if (settings.remainingArgs.empty())
-		throw std::runtime_error(std::string{argv[0]} += ": no input script file");
+		throw std::runtime_error("no input script file");
 	return true;
 }
 
@@ -372,7 +372,7 @@ int main(int argc, char** argv)
 			: runAllUnittests(runcf, settings, filelist.get(), filecount);
 	}
 	catch (const std::exception& e) {
-		std::cerr << e.what() << '\n';
+		std::cerr << argv[0] << ": " << e.what() << '\n';
 	}
 	return EXIT_FAILURE;
 }
