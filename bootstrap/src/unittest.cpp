@@ -33,16 +33,6 @@ struct Settings final {
 	colors;
 };
 
-bool printBugReportInfo() {
-	nylib_print_info_for_bugreport();
-	return false;
-}
-
-bool printVersion() {
-	std::cout << nylib_version() << '\n';
-	return false;
-}
-
 void shuffleUnittests(std::vector<String>& unittests) {
 	std::cout << "shuffling the tests...\n";
 	auto seed = std::chrono::system_clock::now().time_since_epoch().count();
@@ -69,10 +59,14 @@ bool parseCommandLine(Settings& settings, int argc, char** argv) {
 			throw std::runtime_error("Abort due to error");
 		return false;
 	}
-	if (version)
-		return printVersion();
-	if (bugreport)
-		return printBugReportInfo();
+	if (version) {
+		std::cout << nylib_version() << '\n';
+		return false;
+	}
+	if (bugreport) {
+		nylib_print_info_for_bugreport();
+		return false;
+	}
 	if (settings.remainingArgs.empty())
 		throw std::runtime_error(std::string{argv[0]} += ": no input script file");
 	return true;
