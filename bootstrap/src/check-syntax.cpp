@@ -19,15 +19,14 @@ using namespace Yuni;
 namespace {
 
 
-struct {
+struct Settings {
 	//! List of filenames to verify
 	std::vector<String> filenames;
 	// no colors
 	bool noColors = false;
 	// Result expected from filename convention
 	bool useFilenameConvention = false;
-}
-settings;
+};
 
 
 template<class LeftType = Logs::NullDecorator>
@@ -201,13 +200,13 @@ bool IterateThroughAllFiles(const std::vector<String>& filenames, const F& callb
 	return (0 == testFAILED);
 }
 
-bool batchCheckIfFilenamesConformToGrammar(std::vector<String>& filenames) {
-	if (not expandFilelist(filenames))
+bool batchCheckIfFilenamesConformToGrammar(Settings& settings) {
+	if (not expandFilelist(settings.filenames))
 		return false;
-	auto commonFolder = (filenames.size() > 1 ? fincCommonFolderLength(filenames) : 0);
+	auto commonFolder = (settings.filenames.size() > 1 ? fincCommonFolderLength(settings.filenames) : 0);
 	if (0 != commonFolder)
 		++commonFolder;
-	return IterateThroughAllFiles(filenames, [&](const AnyString& file, int64_t& duration) -> bool {
+	return IterateThroughAllFiles(settings.filenames, [&](const AnyString& file, int64_t& duration) -> bool {
 		String barefile;
 		IO::ExtractFileName(barefile, file);
 		bool expected = true;
@@ -248,6 +247,7 @@ bool batchCheckIfFilenamesConformToGrammar(std::vector<String>& filenames) {
 
 int main(int argc, char** argv)
 {
+	Settings settings;
 	// parse the command
 	{
 		// The command line options parser
@@ -285,6 +285,6 @@ int main(int argc, char** argv)
 		}
 	}
 	// Print AST or check for Nany Grammar
-	bool success = batchCheckIfFilenamesConformToGrammar(settings.filenames);
+	bool success = batchCheckIfFilenamesConformToGrammar(settings);
 	return success ? EXIT_SUCCESS : EXIT_FAILURE;
 }
