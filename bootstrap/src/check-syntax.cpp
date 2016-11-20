@@ -20,6 +20,8 @@ namespace {
 
 
 struct {
+	//! List of filenames to verify
+	std::vector<String> filenames;
 	// no colors
 	bool noColors = false;
 	// Result expected from filename convention
@@ -246,15 +248,13 @@ bool batchCheckIfFilenamesConformToGrammar(std::vector<String>& filenames) {
 
 int main(int argc, char** argv)
 {
-	// all input filenames
-	std::vector<String> filenames;
 	// parse the command
 	{
 		// The command line options parser
 		GetOpt::Parser options;
 		// Input files
-		options.add(filenames, 'i', "input", "Input files (or folders)");
-		options.remainingArguments(filenames);
+		options.add(settings.filenames, 'i', "input", "Input files (or folders)");
+		options.remainingArguments(settings.filenames);
 		// --no-color
 		options.addFlag(settings.noColors, ' ', "no-color", "Disable color output");
 		// use filename convention
@@ -279,12 +279,12 @@ int main(int argc, char** argv)
 			std::cout << "0.0\n";
 			return EXIT_SUCCESS;
 		}
-		if (filenames.empty()) {
+		if (settings.filenames.empty()) {
 			std::cerr << argv[0] << ": no input file\n";
 			return EXIT_FAILURE;
 		}
 	}
 	// Print AST or check for Nany Grammar
-	bool success = batchCheckIfFilenamesConformToGrammar(filenames);
+	bool success = batchCheckIfFilenamesConformToGrammar(settings.filenames);
 	return success ? EXIT_SUCCESS : EXIT_FAILURE;
 }
