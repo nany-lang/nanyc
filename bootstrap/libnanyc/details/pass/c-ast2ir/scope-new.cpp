@@ -113,9 +113,8 @@ namespace Producer
 			// it will be later (when instanciating the func) to put the sizeof
 			// of the object to allocate
 			out.emitStackalloc(nextvar(), nyt_u64);
-
 			pointer = out.emitStackalloc(nextvar(), nyt_any);
-			out.emitAllocate(pointer, rettype);
+			ir::emit::objectAlloc(out, pointer, rettype);
 		}
 		else
 		{

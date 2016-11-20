@@ -229,14 +229,6 @@ namespace ir
 		emit<ISA::Op::ref>().lvid = lvid;
 	}
 
-	inline uint32_t Sequence::emitAllocate(uint32_t lvid, uint32_t atomid)
-	{
-		auto& operands = emit<ISA::Op::allocate>();
-		operands.lvid = lvid;
-		operands.atomid = atomid;
-		return lvid;
-	}
-
 	inline void Sequence::emitUnref(uint32_t lvid, uint32_t atomid, uint32_t instanceid)
 	{
 		auto& operands      = emit<ISA::Op::unref>();

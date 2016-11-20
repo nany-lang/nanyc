@@ -91,6 +91,14 @@ namespace
 	}
 
 
+	inline uint32_t objectAlloc(SequenceRef ref, uint32_t lvid, uint32_t atomid) {
+		auto& operands = ref.sequence.emit<ISA::Op::allocate>();
+		operands.lvid = lvid;
+		operands.atomid = atomid;
+		return lvid;
+	}
+
+
 } // namespace
 } // namespace emit
 } // namespace ir

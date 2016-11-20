@@ -178,8 +178,6 @@ namespace ir
 		//! Emit debug position
 		void emitDebugpos(uint32_t line, uint32_t offset);
 
-		//! Emit allocate object
-		uint32_t emitAllocate(uint32_t lvid, uint32_t atomid);
 		//! Emit acquire object
 		void emitRef(uint32_t lvid);
 		//! Unref objct
