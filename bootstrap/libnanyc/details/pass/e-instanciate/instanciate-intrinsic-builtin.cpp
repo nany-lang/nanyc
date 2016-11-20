@@ -738,7 +738,7 @@ namespace Instanciate
 		}
 
 		if (seq.canGenerateCode())
-			seq.out->emitAssert(lhs);
+			ir::emit::cassert(seq.out, lhs);
 		return true;
 	}
 

@@ -86,6 +86,11 @@ namespace
 	}
 
 
+	inline void cassert(SequenceRef ref, uint32_t lvid) {
+		ref.sequence.emit<ISA::Op::opassert>().lvid = lvid;
+	}
+
+
 } // namespace
 } // namespace emit
 } // namespace ir

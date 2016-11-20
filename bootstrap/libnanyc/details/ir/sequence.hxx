@@ -252,11 +252,6 @@ namespace ir
 		opr.size = size;
 	}
 
-	inline void Sequence::emitAssert(uint32_t lvid)
-	{
-		emit<ISA::Op::opassert>().lvid = lvid;
-	}
-
 	inline void Sequence::emitNOT(uint32_t lvid, uint32_t lhs)
 	{
 		auto& operands = emit<ISA::Op::negation>();
