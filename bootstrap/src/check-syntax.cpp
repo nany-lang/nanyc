@@ -46,8 +46,10 @@ struct ParseVerbosity : public LeftType {
 				#else
 				out << "  >  ";
 				#endif
-				if (Handler::colorsAllowed)
-					System::Console::TextColor<System::Console::white>::Set(out);
+				if (Handler::colorsAllowed) {
+					System::Console::ResetTextColor(out);
+					System::Console::TextColor<System::Console::bold>::Set(out);
+				}
 				out << "parsing";
 				if (Handler::colorsAllowed)
 					System::Console::ResetTextColor(out);
@@ -56,8 +58,10 @@ struct ParseVerbosity : public LeftType {
 				if (Handler::colorsAllowed)
 					System::Console::TextColor<System::Console::red>::Set(out);
 				out << "  FAILED ";
-				if (Handler::colorsAllowed)
-					System::Console::TextColor<System::Console::white>::Set(out);
+				if (Handler::colorsAllowed) {
+					System::Console::ResetTextColor(out);
+					System::Console::TextColor<System::Console::bold>::Set(out);
+				}
 				out << "parsing";
 				if (Handler::colorsAllowed)
 					System::Console::ResetTextColor(out);
@@ -66,8 +70,10 @@ struct ParseVerbosity : public LeftType {
 				if (Handler::colorsAllowed)
 					System::Console::TextColor<System::Console::yellow>::Set(out);
 				out << "  {warn} ";
-				if (Handler::colorsAllowed)
-					System::Console::TextColor<System::Console::white>::Set(out);
+				if (Handler::colorsAllowed) {
+					System::Console::ResetTextColor(out);
+					System::Console::TextColor<System::Console::bold>::Set(out);
+				}
 				out << "parsing";
 				if (Handler::colorsAllowed)
 					System::Console::ResetTextColor(out);
