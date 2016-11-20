@@ -400,8 +400,6 @@ addsrc(
 	"details/atom/interface.cpp"
 	"details/atom/interface.hxx"
 	"details/atom/vardef.h"
-	"details/atom/vardef.hxx"
-	"details/atom/vardef.cpp"
 	"details/atom/atom.h"
 	"details/atom/atom.hxx"
 	"details/atom/atom.cpp"

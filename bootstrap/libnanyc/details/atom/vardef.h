@@ -5,8 +5,6 @@
 #include "type.h"
 
 
-
-
 namespace ny
 {
 
@@ -19,7 +17,7 @@ namespace ny
 		//! Default constructor
 		Vardef() = default;
 		//! Move constructor
-		Vardef(Vardef&&);
+		Vardef(Vardef&& other): clid{other.clid} {}
 		//@}
 
 
@@ -40,13 +38,4 @@ namespace ny
 	}; // class Vardef
 
 
-
-
-
-
-
-
 } // namespace ny
-
-#include "vardef.hxx"
-
