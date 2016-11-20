@@ -113,7 +113,7 @@ uint32_t findCommonFolderLength(const std::vector<String>& filenames) {
 	return len;
 }
 
-bool expandFilelist(std::vector<String>& list) {
+bool expandAndCanonicalizeFilenames(std::vector<String>& list) {
 	std::vector<String> filelist;
 	filelist.reserve(512);
 	String currentfile;
@@ -199,7 +199,7 @@ bool IterateThroughAllFiles(const std::vector<String>& filenames, const F& callb
 }
 
 bool batchCheckIfFilenamesConformToGrammar(Settings& settings) {
-	if (not expandFilelist(settings.filenames))
+	if (not expandAndCanonicalizeFilenames(settings.filenames))
 		return false;
 	auto commonFolder = (settings.filenames.size() > 1 ? findCommonFolderLength(settings.filenames) : 0);
 	if (0 != commonFolder)
