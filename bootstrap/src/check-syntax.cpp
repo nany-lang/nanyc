@@ -113,13 +113,13 @@ uint32_t findCommonFolderLength(const std::vector<String>& filenames) {
 	return len;
 }
 
-bool expandAndCanonicalizeFilenames(std::vector<String>& list) {
+bool expandAndCanonicalizeFilenames(std::vector<String>& filenames) {
 	std::vector<String> filelist;
 	filelist.reserve(512);
 	String currentfile;
 	currentfile.reserve(4096);
-	for (auto& element: list) {
-		IO::Canonicalize(currentfile, element);
+	for (auto& filename: filenames) {
+		IO::Canonicalize(currentfile, filename);
 		switch (IO::TypeOf(currentfile)) {
 			case IO::typeFile: {
 				filelist.emplace_back(currentfile);
@@ -145,7 +145,7 @@ bool expandAndCanonicalizeFilenames(std::vector<String>& list) {
 	}
 	// for beauty in singled-threaded (and to always produce the same output)
 	std::sort(filelist.begin(), filelist.end());
-	list.swap(filelist);
+	filenames.swap(filelist);
 	return true;
 }
 
