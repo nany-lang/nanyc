@@ -12,6 +12,16 @@ int shortOption(const AnyString& name, const char* const argv0) {
 	return ny::print::unknownOption(argv0, name);
 }
 
+int longOptions(const AnyString& name, const char* const argv0) {
+	if (name == "--help")
+		return ny::print::usage(argv0);
+	if (name == "--version")
+		return ny::print::version();
+	if (name == "--bugreport")
+		return ny::print::bugReportInfo();
+	return ny::print::unknownOption(argv0, name);
+}
+
 
 } // namespace
 
@@ -32,19 +42,11 @@ int main(int argc, const char** argv)
 				return shortOption(AnyString{carg}, argv[0]);
 			if (carg[2] != '\0') // to handle '--' option
 			{
-				AnyString arg{carg};
-				if (arg == "--help")
-					return ny::print::usage(argv[0]);
-				if (arg == "--version")
-					return ny::print::version();
-				if (arg == "--bugreport")
-					return ny::print::bugReportInfo();
-				if (arg == "--verbose")
-				{
+				AnyString name{carg};
+				if (name == "--verbose")
 					runcf.verbose = nytrue;
-					continue;
-				}
-				return ny::print::unknownOption(argv[0], arg);
+				else
+					return longOptions(name, argv[0]);
 			}
 			else
 			{
