@@ -1,6 +1,21 @@
 #include "nanyc-utils.h"
 
 
+namespace {
+
+
+int shortOption(const AnyString& name, const char* const argv0) {
+	if (name == "-h")
+		return ny::print::usage(argv0);
+	if (name == "-v")
+		return ny::print::version();
+	return ny::print::unknownOption(argv0, name);
+}
+
+
+} // namespace
+
+
 int main(int argc, const char** argv)
 {
 	if (!(argc > 1))
@@ -13,40 +28,29 @@ int main(int argc, const char** argv)
 		const char* const carg = argv[i];
 		if (carg[0] == '-')
 		{
-			if (carg[1] == '-')
+			if (carg[1] != '-')
+				return shortOption(AnyString{carg}, argv[0]);
+			if (carg[2] != '\0') // to handle '--' option
 			{
-				if (carg[2] != '\0') // to handle '--' option
+				AnyString arg{carg};
+				if (arg == "--help")
+					return ny::print::usage(argv[0]);
+				if (arg == "--version")
+					return ny::print::version();
+				if (arg == "--bugreport")
+					return ny::print::bugReportInfo();
+				if (arg == "--verbose")
 				{
-					AnyString arg{carg};
-
-					if (arg == "--help")
-						return ny::print::usage(argv[0]);
-					if (arg == "--version")
-						return ny::print::version();
-					if (arg == "--bugreport")
-						return ny::print::bugReportInfo();
-					if (arg == "--verbose")
-					{
-						runcf.verbose = nytrue;
-						continue;
-					}
-					return ny::print::unknownOption(argv[0], arg);
+					runcf.verbose = nytrue;
+					continue;
 				}
-				else
-				{
-					// nothing must interpreted after '--'
-					firstarg = i + 1;
-					break;
-				}
+				return ny::print::unknownOption(argv[0], arg);
 			}
 			else
 			{
-				AnyString arg{carg};
-				if (arg == "-h")
-					return ny::print::usage(argv[0]);
-				if (arg == "-v")
-					return ny::print::version();
-				return ny::print::unknownOption(argv[0], arg);
+				// nothing must interpreted after '--'
+				firstarg = i + 1;
+				break;
 			}
 		}
 		firstarg = i;
