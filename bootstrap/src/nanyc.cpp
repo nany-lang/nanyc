@@ -1,9 +1,5 @@
 #include "nanyc-utils.h"
 
-using namespace Yuni;
-
-
-
 
 int main(int argc, const char** argv)
 {
