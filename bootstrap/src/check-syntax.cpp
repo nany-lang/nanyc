@@ -30,7 +30,7 @@ struct Settings {
 
 
 template<class LeftType = Logs::NullDecorator>
-struct ParseVerbosity : public LeftType {
+struct ParseVerbosity: public LeftType {
 	template<class Handler, class VerbosityType, class O>
 	void internalDecoratorAddPrefix(O& out, const AnyString& s) const {
 		// Write the verbosity to the output
@@ -38,60 +38,77 @@ struct ParseVerbosity : public LeftType {
 			AnyString name{VerbosityType::Name()};
 			if (s.empty()) {
 			}
-			else if (name == "info") {
-				if (Handler::colorsAllowed)
-					System::Console::TextColor<System::Console::yellow>::Set(out);
-				#ifndef YUNI_OS_WINDOWS
-				out << "  \u2713  ";
-				#else
-				out << "  >  ";
-				#endif
-				if (Handler::colorsAllowed) {
-					System::Console::ResetTextColor(out);
-					System::Console::TextColor<System::Console::bold>::Set(out);
-				}
-				out << "parsing";
-				if (Handler::colorsAllowed)
-					System::Console::ResetTextColor(out);
-			}
-			else if (name == "error") {
-				if (Handler::colorsAllowed)
-					System::Console::TextColor<System::Console::red>::Set(out);
-				out << "  FAILED ";
-				if (Handler::colorsAllowed) {
-					System::Console::ResetTextColor(out);
-					System::Console::TextColor<System::Console::bold>::Set(out);
-				}
-				out << "parsing";
-				if (Handler::colorsAllowed)
-					System::Console::ResetTextColor(out);
-			}
-			else if (name == "warning") {
-				if (Handler::colorsAllowed)
-					System::Console::TextColor<System::Console::yellow>::Set(out);
-				out << "  {warn} ";
-				if (Handler::colorsAllowed) {
-					System::Console::ResetTextColor(out);
-					System::Console::TextColor<System::Console::bold>::Set(out);
-				}
-				out << "parsing";
-				if (Handler::colorsAllowed)
-					System::Console::ResetTextColor(out);
-			}
-			else {
-				// Set Color
-				if (Handler::colorsAllowed && VerbosityType::color != System::Console::none)
-					System::Console::TextColor<VerbosityType::color>::Set(out);
-				// The verbosity
-				VerbosityType::AppendName(out);
-				// Reset Color
-				if (Handler::colorsAllowed && VerbosityType::color != System::Console::none)
-					System::Console::ResetTextColor(out);
-			}
+			else if (name == "info")
+				printInfo<Handler>(out);
+			else if (name == "error")
+				printError<Handler>(out);
+			else if (name == "warning")
+				printWarning<Handler>(out);
+			else
+				printOtherVerbosity<Handler, VerbosityType>(out);
 		}
 		// Transmit the message to the next decorator
 		LeftType::template internalDecoratorAddPrefix<Handler, VerbosityType,O>(out, s);
 	}
+
+	template<class Handler, class O>
+	static void printInfo(O& out) {
+		if (Handler::colorsAllowed)
+			System::Console::TextColor<System::Console::yellow>::Set(out);
+		#ifndef YUNI_OS_WINDOWS
+		out << "  \u2713  ";
+		#else
+		out << "  >  ";
+		#endif
+		if (Handler::colorsAllowed) {
+			System::Console::ResetTextColor(out);
+			System::Console::TextColor<System::Console::bold>::Set(out);
+		}
+		out << "parsing";
+		if (Handler::colorsAllowed)
+			System::Console::ResetTextColor(out);
+	}
+
+	template<class Handler, class O>
+	static void printError(O& out) {
+		if (Handler::colorsAllowed)
+			System::Console::TextColor<System::Console::red>::Set(out);
+		out << "  FAILED ";
+		if (Handler::colorsAllowed) {
+			System::Console::ResetTextColor(out);
+			System::Console::TextColor<System::Console::bold>::Set(out);
+		}
+		out << "parsing";
+		if (Handler::colorsAllowed)
+			System::Console::ResetTextColor(out);
+	}
+
+	template<class Handler, class O>
+	static void printWarning(O& out) {
+		if (Handler::colorsAllowed)
+			System::Console::TextColor<System::Console::yellow>::Set(out);
+		out << "  {warn} ";
+		if (Handler::colorsAllowed) {
+			System::Console::ResetTextColor(out);
+			System::Console::TextColor<System::Console::bold>::Set(out);
+		}
+		out << "parsing";
+		if (Handler::colorsAllowed)
+			System::Console::ResetTextColor(out);
+	}
+
+	template<class Handler, class VerbosityType, class O>
+	static void printOtherVerbosity(O& out) {
+		// Set Color
+		if (Handler::colorsAllowed && VerbosityType::color != System::Console::none)
+			System::Console::TextColor<VerbosityType::color>::Set(out);
+		// The verbosity
+		VerbosityType::AppendName(out);
+		// Reset Color
+		if (Handler::colorsAllowed && VerbosityType::color != System::Console::none)
+			System::Console::ResetTextColor(out);
+	}
+
 }; // struct VerbosityLevel
 
 
