@@ -2,6 +2,7 @@
 #include "scope.h"
 #include "details/ast/ast.h"
 #include "details/grammar/nany.h"
+#include "details/ir/emit.h"
 
 using namespace Yuni;
 
@@ -126,7 +127,7 @@ namespace Producer
 			out.emitAssign(tmpptr, inplaceExpr, false);
 			// promoting the given __pointer to T
 			pointer = out.emitStackalloc(nextvar(), nyt_any);
-			out.emitStore(pointer, tmpptr);
+			ir::emit::copy(out, pointer, tmpptr);
 		}
 
 		// type propagation

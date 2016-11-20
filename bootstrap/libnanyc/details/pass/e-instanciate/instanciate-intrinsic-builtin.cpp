@@ -4,6 +4,7 @@
 #ifdef YUNI_OS_UNIX
 #include <unistd.h>
 #endif
+#include "details/ir/emit.h"
 
 using namespace Yuni;
 
@@ -230,7 +231,7 @@ namespace Instanciate
 			{
 				// retrieving the pointer address of the object in input
 				// the objlvid representing the object is already the address
-				seq.out->emitStore(lvid, objlvid);
+				ir::emit::copy(seq.out, lvid, objlvid);
 			}
 			else
 			{
@@ -314,7 +315,7 @@ namespace Instanciate
 
 		if (seq.canGenerateCode())
 		{
-			seq.out->emitStore(lvid, ptrlvid);
+			ir::emit::copy(seq.out, lvid, ptrlvid);
 			seq.out->emitMemrealloc(lvid, oldsizelvid, newsizelvid);
 		}
 		return true;
@@ -434,7 +435,7 @@ namespace Instanciate
 
 		if (seq.canGenerateCode())
 		{
-			seq.out->emitStore(lvid, size);
+			ir::emit::copy(seq.out, lvid, size);
 			seq.out->emitMemCmp(objlvid, src, lvid);
 		}
 		return true;

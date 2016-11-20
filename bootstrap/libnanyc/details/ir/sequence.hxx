@@ -776,13 +776,6 @@ namespace ir
 		return lvid;
 	}
 
-	inline void Sequence::emitStore(uint32_t lvid, uint32_t source)
-	{
-		auto& operands  = emit<ISA::Op::store>();
-		operands.lvid   = lvid;
-		operands.source = source;
-	}
-
 	inline void Sequence::emitNamespace(const AnyString& name)
 	{
 		auto& operands  = emit<ISA::Op::blueprint>();

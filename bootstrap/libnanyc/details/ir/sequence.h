@@ -156,8 +156,6 @@ namespace ir
 		//! Allocate a new variable on the stack and assign a text to it and get the register
 		uint32_t emitStackallocText(uint32_t lvid, const AnyString&);
 
-		//! Copy two register
-		void emitStore(uint32_t lvid, uint32_t source);
 		void emitStore_u64(uint32_t lvid, uint64_t);
 		void emitStore_f64(uint32_t lvid, double);
 		void emitStore_bool(uint32_t lvid, bool);

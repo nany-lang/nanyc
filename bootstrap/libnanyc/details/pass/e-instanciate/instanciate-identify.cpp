@@ -2,6 +2,7 @@
 #include "instanciate-error.h"
 #include "instanciate-atom.h"
 #include "libnanyc-traces.h"
+#include "details/ir/emit.h"
 
 using namespace Yuni;
 
@@ -430,7 +431,7 @@ namespace Instanciate
 
 				// acquire the variable
 				if (canGenerateCode())
-					out->emitStore(lvid, lvidVar);
+					ir::emit::copy(out, lvid, lvidVar);
 
 				auto& varcdef = cdeftable.classdef(CLID{frame->atomid, lvidVar});
 				if (not varcdef.isBuiltin())

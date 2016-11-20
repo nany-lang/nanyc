@@ -4,6 +4,7 @@
 #include "details/utils/check-for-valid-identifier-name.h"
 #include "details/ast/ast.h"
 #include "details/ir/scope-locker.h"
+#include "details/ir/emit.h"
 
 using namespace Yuni;
 
@@ -208,7 +209,7 @@ namespace Producer
 			}
 			else
 			{
-				out.emitStore(varlvid, rhs); // re-acquire to keep the value alive
+				ir::emit::copy(out, varlvid, rhs); // re-acquire to keep the value alive
 				out.emitRef(varlvid);
 			}
 		}

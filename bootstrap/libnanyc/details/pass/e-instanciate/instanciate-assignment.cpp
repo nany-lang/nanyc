@@ -1,4 +1,5 @@
 #include "instanciate.h"
+#include "details/ir/emit.h"
 
 using namespace Yuni;
 
@@ -164,7 +165,7 @@ namespace Instanciate
 			{
 				if (canGenerateCode())
 				{
-					out->emitStore(lhs, rhs);
+					ir::emit::copy(out, lhs, rhs);
 					if (isMemberVariable)
 						out->emitFieldset(lhs, origin.self, origin.field);
 				}
@@ -191,7 +192,7 @@ namespace Instanciate
 					}
 
 					// copy the pointer
-					out->emitStore(lhs, rhs);
+					ir::emit::copy(out, lhs, rhs);
 
 					if (isMemberVariable)
 					{
@@ -309,7 +310,7 @@ namespace Instanciate
 			frame->lvids(operands.lvid).autorelease = true;
 			if (canGenerateCode())
 			{
-				out->emitStore(operands.lvid, lhs);
+				ir::emit::copy(out, operands.lvid, lhs);
 				out->emitRef(operands.lvid);
 			}
 		}

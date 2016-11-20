@@ -1,4 +1,5 @@
 #include "instanciate.h"
+#include "details/ir/emit.h"
 
 using namespace Yuni;
 
@@ -62,7 +63,7 @@ namespace Instanciate
 					}
 					if (generateCode)
 					{
-						seq.out->emitStore(lvid, clone); // register swap
+						ir::emit::copy(seq.out, lvid, clone); // register swap
 						if (debugmode)
 							seq.out->emitComment("--\n");
 					}
@@ -161,7 +162,7 @@ namespace Instanciate
 			seq.out->emitFieldset(source, /*self*/lvid, 0); // builtin
 		}
 		else
-			seq.out->emitStore(lvid, source);
+			ir::emit::copy(seq.out, lvid, source);
 	}
 
 

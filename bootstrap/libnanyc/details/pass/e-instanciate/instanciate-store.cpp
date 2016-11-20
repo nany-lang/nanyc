@@ -1,4 +1,5 @@
 #include "instanciate.h"
+#include "details/ir/emit.h"
 
 using namespace Yuni;
 
@@ -38,7 +39,7 @@ namespace Instanciate
 			spare.import(cdefsrc);
 		}
 		if (canGenerateCode())
-			out->emitStore(operands.lvid, operands.source);
+			ir::emit::copy(out, operands.lvid, operands.source);
 	}
 
 

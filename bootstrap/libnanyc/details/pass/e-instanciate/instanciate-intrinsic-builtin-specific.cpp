@@ -4,6 +4,7 @@
 #ifdef YUNI_OS_UNIX
 #include <unistd.h>
 #endif
+#include "details/ir/emit.h"
 
 using namespace Yuni;
 
@@ -36,7 +37,7 @@ namespace Instanciate
 		spare.qualifiers = cdef.qualifiers;
 
 		if (seq.canGenerateCode())
-			seq.out->emitStore(lvid, lhs);
+			ir::emit::copy(seq.out, lvid, lhs);
 
 		auto& lvidinfo = seq.frame->lvids(lvid);
 		lvidinfo.synthetic = false;
