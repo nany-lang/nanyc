@@ -1,5 +1,5 @@
 ### nanyc
-add_executable(nanyc "nany.cpp")
+add_executable(nanyc "nanyc.cpp")
 target_link_libraries(nanyc PRIVATE libnanyc yuni-static-core)
 set_target_properties(nanyc PROPERTIES
 	VERSION "${nany_version_major}.${nany_version_minor}.${nany_version_patch}")
