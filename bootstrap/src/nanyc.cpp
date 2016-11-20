@@ -33,22 +33,18 @@ int main(int argc, const char** argv)
 	nyrun_cf_t runcf;
 	nyrun_cf_init(&runcf);
 	int firstarg = argc; // end of the list
-	for (int i = 1; i < argc; ++i)
-	{
+	for (int i = 1; i < argc; ++i) {
 		const char* const carg = argv[i];
-		if (carg[0] == '-')
-		{
+		if (carg[0] == '-') {
 			if (carg[1] != '-')
 				return shortOption(carg, argv[0]);
-			if (carg[2] != '\0') // to handle '--' option
-			{
+			if (carg[2] != '\0') { // to handle '--' option
 				if (!strcmp(carg, "--verbose"))
 					runcf.verbose = nytrue;
 				else
 					return longOptions(carg, argv[0]);
 			}
-			else
-			{
+			else {
 				// nothing must interpreted after '--'
 				firstarg = i + 1;
 				break;
@@ -59,8 +55,7 @@ int main(int argc, const char** argv)
 	}
 	// execute the script
 	int exitstatus = -1;
-	if (firstarg < argc)
-	{
+	if (firstarg < argc) {
 		runcf.build.on_error_file_eacces = &ny::print::fileAccessError;
 		// the new arguments, after removing all command line arguments
 		int nargc = argc - firstarg;
