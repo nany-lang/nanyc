@@ -4,41 +4,43 @@
 using namespace Yuni;
 
 
-
-
-
 extern "C" nyvisibility_t  nycstring_to_visibility_n(const char* const text, size_t length)
 {
-	try
+	// published  9
+	// public     6
+	// protected  9
+	// private    7
+	// internal   8
+	AnyString str{text, (length < 10) ? static_cast<uint32_t>(length) : 0};
+	str.trimRight();
+	switch (str.size())
 	{
-		AnyString s{text, (uint32_t)length};
-		s.trim();
-		if (YUNI_UNLIKELY(s.empty()))
-			return nyv_default;
-
-		switch (s[0])
+		case 6:
 		{
-			case 'p':
-			{
-				if (s.equalsInsensitive("published"))
-					return nyv_published;
-				if (s.equalsInsensitive("public"))
-					return nyv_public;
-				if (s.equalsInsensitive("protected"))
-					return nyv_protected;
-				if (s.equalsInsensitive("private"))
-					return nyv_private;
-				break;
-			}
-			case 'i':
-			{
-				if (s.equalsInsensitive("internal"))
-					return nyv_internal;
-				break;
-			}
+			if (str == "public")
+				return nyv_public;
+			break;
+		}
+		case 7:
+		{
+			if (str == "private")
+				return nyv_private;
+			break;
+		}
+		case 8:
+		{
+			if (str == "internal")
+				return nyv_internal;
+			break;
+		}
+		case 9:
+		{
+			if (str == "published")
+				return nyv_published;
+			if (str == "protected")
+				return nyv_protected;
 		}
 	}
-	catch (...) {}
 	return nyv_undefined;
 }
 
