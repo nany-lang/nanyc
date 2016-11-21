@@ -1,4 +1,5 @@
 #include "instanciate.h"
+#include "details/ir/emit.h"
 
 using namespace Yuni;
 
@@ -45,7 +46,7 @@ namespace Instanciate
 		}
 
 		if (canGenerateCode())
-			out->emitUnref(lvid, atom->classinfo.dtor.atomid, atom->classinfo.dtor.instanceid);
+			ir::emit::unref(out, lvid, atom->classinfo.dtor.atomid, atom->classinfo.dtor.instanceid);
 	}
 
 
@@ -63,7 +64,7 @@ namespace Instanciate
 		if (canGenerateCode())
 		{
 			if (canBeAcquired(operands.lvid))
-				out->emitRef(operands.lvid); // manual var acquisition
+				ir::emit::ref(out, operands.lvid); // manual var acquisition
 		}
 	}
 

@@ -44,7 +44,7 @@ namespace Instanciate
 
 		if (seq.canBeAcquired(cdef) and seq.canGenerateCode()) // re-acquire the object
 		{
-			seq.out->emitRef(lvid);
+			ir::emit::ref(seq.out, lvid);
 			lvidinfo.autorelease = true;
 			lvidinfo.scope = seq.frame->scope;
 		}

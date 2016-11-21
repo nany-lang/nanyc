@@ -58,7 +58,7 @@ namespace Instanciate
 
 					// acquire 'lvid' to keep it alive
 					if (canBeAcquired(cdef))
-						out->emitRef(lvid);
+						ir::emit::ref(out, lvid);
 				}
 			});
 		}
@@ -175,7 +175,7 @@ namespace Instanciate
 
 						// acquire 'lvid' to keep it alive
 						if (canBeAcquired(cdef))
-							out->emitRef(lvid);
+							ir::emit::ref(out, lvid);
 					}
 
 					// mark it as 'used' to suppress spurious error reporting

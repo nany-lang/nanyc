@@ -210,7 +210,7 @@ namespace Producer
 			else
 			{
 				ir::emit::copy(out, varlvid, rhs); // re-acquire to keep the value alive
-				out.emitRef(varlvid);
+				ir::emit::ref(out, varlvid);
 			}
 		}
 

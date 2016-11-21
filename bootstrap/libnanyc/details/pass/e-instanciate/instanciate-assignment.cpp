@@ -182,7 +182,7 @@ namespace Instanciate
 				{
 					// acquire first the right value to make sure that all data are alive
 					// example: a = a
-					out->emitRef(rhs);
+					ir::emit::ref(out, rhs);
 					// release the old left value
 					if (canDisposeLHS)
 					{
@@ -196,7 +196,7 @@ namespace Instanciate
 
 					if (isMemberVariable)
 					{
-						out->emitRef(lhs); // re-acquire for the object
+						ir::emit::ref(out, lhs); // re-acquire for the object
 						out->emitFieldset(lhs, origin.self, origin.field);
 					}
 				}
@@ -220,7 +220,7 @@ namespace Instanciate
 				{
 					// acquire first the right value to make sure that all data are alive
 					// example: a = a
-					out->emitRef(rhs);
+					ir::emit::ref(out, rhs);
 					// release the old left value
 					if (canDisposeLHS)
 					{
@@ -238,7 +238,7 @@ namespace Instanciate
 
 					// re-allocate some memory
 					out->emitMemalloc(lhs, rsizof);
-					out->emitRef(lhs);
+					ir::emit::ref(out, lhs);
 					frame.lvids(lhs).origin.memalloc = true;
 
 					out->emitStackalloc(retcall, nyt_void);
@@ -252,7 +252,7 @@ namespace Instanciate
 
 					if (isMemberVariable)
 					{
-						out->emitRef(lhs);
+						ir::emit::ref(out, lhs);
 						out->emitFieldset(lhs, origin.self, origin.field);
 					}
 				}
@@ -311,7 +311,7 @@ namespace Instanciate
 			if (canGenerateCode())
 			{
 				ir::emit::copy(out, operands.lvid, lhs);
-				out->emitRef(operands.lvid);
+				ir::emit::ref(out, operands.lvid);
 			}
 		}
 		return true;

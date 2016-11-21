@@ -178,10 +178,6 @@ namespace ir
 		//! Emit debug position
 		void emitDebugpos(uint32_t line, uint32_t offset);
 
-		//! Emit acquire object
-		void emitRef(uint32_t lvid);
-		//! Unref objct
-		void emitUnref(uint32_t lvid, uint32_t atomid, uint32_t instanceid);
 
 		//! emit Assign variable
 		void emitAssign(uint32_t lhs, uint32_t rhs, bool canDisposeLHS = true);

@@ -224,19 +224,6 @@ namespace ir
 	}
 
 
-	inline void Sequence::emitRef(uint32_t lvid)
-	{
-		emit<ISA::Op::ref>().lvid = lvid;
-	}
-
-	inline void Sequence::emitUnref(uint32_t lvid, uint32_t atomid, uint32_t instanceid)
-	{
-		auto& operands      = emit<ISA::Op::unref>();
-		operands.lvid       = lvid;
-		operands.atomid     = atomid;
-		operands.instanceid = instanceid;
-	}
-
 	inline void Sequence::emitMemcheckhold(uint32_t lvid, uint32_t size)
 	{
 		auto& opr = emit<ISA::Op::memcheckhold>();

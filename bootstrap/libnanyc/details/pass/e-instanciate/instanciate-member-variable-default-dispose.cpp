@@ -107,7 +107,7 @@ namespace Instanciate
 			}
 
 			auto& classinfo = typeAtom->classinfo;
-			out->emitUnref(reglvid, classinfo.dtor.atomid, classinfo.dtor.instanceid);
+			ir::emit::unref(out, reglvid, classinfo.dtor.atomid, classinfo.dtor.instanceid);
 		}
 	}
 

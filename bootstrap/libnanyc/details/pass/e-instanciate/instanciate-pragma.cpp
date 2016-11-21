@@ -156,7 +156,7 @@ namespace Instanciate
 			opc.qualifiers.ref = true;
 			// ALLOC: memory allocation of the new temporary object
 			seq.out->emitMemalloc(lvid, sizeoflvid);
-			seq.out->emitRef(lvid);
+			ir::emit::ref(seq.out, lvid);
 			seq.frame->lvids(lvid).autorelease = true;
 			// reset the internal value of the object
 			seq.out->emitFieldset(source, /*self*/lvid, 0); // builtin

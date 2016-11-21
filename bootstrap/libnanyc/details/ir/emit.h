@@ -99,6 +99,19 @@ namespace
 	}
 
 
+	inline void ref(SequenceRef ref, uint32_t lvid) {
+		ref.sequence.emit<ISA::Op::ref>().lvid = lvid;
+	}
+
+
+	inline void unref(SequenceRef ref, uint32_t lvid, uint32_t atomid, uint32_t instanceid) {
+		auto& operands = ref.sequence.emit<ISA::Op::unref>();
+		operands.lvid = lvid;
+		operands.atomid = atomid;
+		operands.instanceid = instanceid;
+	}
+
+
 } // namespace
 } // namespace emit
 } // namespace ir

@@ -1,5 +1,6 @@
 #pragma once
 #include "instanciate.h"
+#include "details/ir/emit.h"
 
 
 
@@ -71,7 +72,7 @@ namespace Instanciate
 	{
 		assert(lvid > 1 and "can not acquire the returned value");
 		assert(canBeAcquired(lvid));
-		out->emitRef(lvid);
+		ir::emit::ref(out, lvid);
 		frame->lvids(lvid).autorelease = true;
 	}
 
