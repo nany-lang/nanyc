@@ -138,6 +138,15 @@ namespace
 	}
 
 
+	inline void identify(SequenceRef ref, uint32_t lvid, const AnyString& name, uint32_t self) {
+		auto& sequence = ref.sequence;
+		auto& operands = sequence.emit<ISA::Op::identify>();
+		operands.lvid  = lvid;
+		operands.self  = self;
+		operands.text  = sequence.stringrefs.ref(name);
+	}
+
+
 	template<class T> struct TraceWriter final {
 		static void emit(SequenceRef ref, const T& value) {
 			auto& sequence = ref.sequence;

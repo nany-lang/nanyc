@@ -189,8 +189,6 @@ namespace ir
 		void emitIntrinsic(uint32_t lvid, const AnyString& name, uint32_t id = (uint32_t) -1);
 
 		//! Emit a identify opcode
-		void emitIdentify(uint32_t lvid, const AnyString& name, uint32_t self);
-		//! Emit a identify opcode
 		void emitEnsureTypeResolved(uint32_t lvid);
 		//! Emit a self opcode
 		void emitSelf(uint32_t self);

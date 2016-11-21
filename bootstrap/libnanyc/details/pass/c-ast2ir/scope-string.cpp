@@ -141,9 +141,9 @@ namespace Producer
 		auto& out = sequence();
 
 		uint32_t idlvid = ir::emit::alloc(out, nextvar());
-		out.emitIdentify(idlvid, "append", localvar);
+		ir::emit::identify(out, idlvid, "append", localvar);
 		uint32_t calllvid = ir::emit::alloc(out, nextvar());
-		out.emitIdentify(calllvid, "^()", idlvid); // functor
+		ir::emit::identify(out, calllvid, "^()", idlvid); // functor
 
 		context.reuse.string.text.clear();
 		AST::Node* firstLiteralNode = nullptr;

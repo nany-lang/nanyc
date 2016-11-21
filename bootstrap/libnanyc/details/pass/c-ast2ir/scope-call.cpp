@@ -153,7 +153,7 @@ namespace Producer
 		auto& out = sequence();
 		// ask to resolve the call to operator ()
 		auto func = ir::emit::alloc(out, nextvar());
-		out.emitIdentify(func, "^()", localvar);
+		ir::emit::identify(out, func, "^()", localvar);
 
 		if (!node or node->children.empty())
 		{

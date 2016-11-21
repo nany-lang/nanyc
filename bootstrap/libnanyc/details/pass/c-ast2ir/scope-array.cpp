@@ -47,10 +47,9 @@ namespace Producer
 			ir::OpcodeScopeLocker opscope{out};
 			emitDebugpos(node);
 			uint32_t lvidappend = ir::emit::alloc(out, nextvar());
-			out.emitIdentify(lvidappend, "append", localvar);
+			ir::emit::identify(out, lvidappend, "append", localvar);
 			uint32_t func = ir::emit::alloc(out, nextvar());
-			out.emitIdentify(func, "^()", lvidappend);
-
+			ir::emit::identify(out, func, "^()", lvidappend);
 			for (auto& child: node.children)
 			{
 				if (child.rule == AST::rgCallParameter)

@@ -139,7 +139,7 @@ namespace Producer
 
 		// CONSTRUCTOR CALL
 		uint32_t lvidcall = ir::emit::alloc(out, nextvar());
-		out.emitIdentify(lvidcall, "^new", pointer);
+		ir::emit::identify(out, lvidcall, "^new", pointer);
 		return visitASTExprCall(call, lvidcall);
 	}
 

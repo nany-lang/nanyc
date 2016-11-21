@@ -45,7 +45,7 @@ namespace Producer
 		// allocate a local variable to receive information about the current identifier
 		uint32_t rid = ir::emit::alloc(out, nextvar());
 		uint32_t offset = out.opcodeCount();
-		out.emitIdentify(rid, node.text, localvar);
+		ir::emit::identify(out, rid, node.text, localvar);
 		// the result of the current expression is now the new allocated local variable
 		localvar = rid;
 		// promotion to identify:set
@@ -82,7 +82,7 @@ namespace Producer
 		uint32_t rid = ir::emit::alloc(out, nextvar());
 		ShortString64 idname;
 		idname << '^' << node.children[0].text;
-		out.emitIdentify(rid, idname, localvar);
+		ir::emit::identify(out, rid, idname, localvar);
 		localvar = rid;
 		return true;
 	}
