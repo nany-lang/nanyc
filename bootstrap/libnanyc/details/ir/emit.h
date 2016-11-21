@@ -147,6 +147,11 @@ namespace
 	}
 
 
+	inline void ensureResolvedType(SequenceRef ref, uint32_t lvid) {
+		ref.sequence.emit<ISA::Op::ensureresolved>().lvid = lvid;
+	}
+
+
 	template<class T> struct TraceWriter final {
 		static void emit(SequenceRef ref, const T& value) {
 			auto& sequence = ref.sequence;

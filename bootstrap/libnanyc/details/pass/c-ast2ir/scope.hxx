@@ -155,7 +155,7 @@ namespace Producer
 	inline bool Scope::visitASTExprSubDot(AST::Node& node, LVID& localvar)
 	{
 		emitTmplParametersIfAny();
-		context.sequence.emitEnsureTypeResolved(localvar);
+		ir::emit::ensureResolvedType(context.sequence, localvar);
 		return visitASTExprContinuation(node, localvar);
 	}
 

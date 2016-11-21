@@ -833,11 +833,6 @@ namespace ir
 		operands.disposelhs = canDisposeLHS;
 	}
 
-	inline void Sequence::emitEnsureTypeResolved(uint32_t lvid)
-	{
-		emit<ISA::Op::ensureresolved>().lvid = lvid;
-	}
-
 	inline void Sequence::emitPush(uint32_t lvid)
 	{
 		auto& operands = emit<ISA::Op::push>();
