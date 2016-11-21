@@ -410,7 +410,7 @@ namespace Instanciate
 			return seq.complainIntrinsicParameter("memory.move", 2, cdef, "'__u64'");
 
 		if (seq.canGenerateCode())
-			seq.out->emitMemMove(objlvid, src, size);
+			ir::emit::memory::copy(seq.out, objlvid, src, size);
 		return true;
 	}
 

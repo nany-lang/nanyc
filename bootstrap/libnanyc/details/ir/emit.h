@@ -299,6 +299,13 @@ namespace
 	}
 
 
+	inline void copy(SequenceRef ref, uint32_t lvid, uint32_t srclvid, uint32_t regsize) {
+		auto& operands   = ref.sequence.emit<ISA::Op::memmove>();
+		operands.lvid    = lvid;
+		operands.srclvid = srclvid;
+		operands.regsize = regsize;
+	}
+
 
 } // namespace
 } // namespace memory
