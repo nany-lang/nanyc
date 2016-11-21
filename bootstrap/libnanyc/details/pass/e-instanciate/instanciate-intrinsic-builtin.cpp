@@ -289,7 +289,7 @@ namespace Instanciate
 			return seq.complainIntrinsicParameter("memory.allocate", 0, cdef, "'__u64'");
 
 		if (seq.canGenerateCode())
-			seq.out->emitMemalloc(lvid, objlvid);
+			ir::emit::memory::allocate(seq.out, lvid, objlvid);
 		return true;
 	}
 
@@ -669,7 +669,7 @@ namespace Instanciate
 				seq.out->emitSizeof(sizeoflvid, atomBuiltinCast->atomid);
 
 				// ALLOC: memory allocation of the new temporary object
-				seq.out->emitMemalloc(lvid, sizeoflvid);
+				ir::emit::memory::allocate(seq.out, lvid, sizeoflvid);
 				ir::emit::ref(seq.out, lvid);
 				seq.frame->lvids(lvid).autorelease = true;
 				// reset the internal value of the object
@@ -909,7 +909,7 @@ namespace Instanciate
 				seq.out->emitSizeof(sizeoflvid, atomBuiltinCast->atomid);
 
 				// ALLOC: memory allocation of the new temporary object
-				seq.out->emitMemalloc(lvid, sizeoflvid);
+				ir::emit::memory::allocate(seq.out, lvid, sizeoflvid);
 				ir::emit::ref(seq.out, lvid);
 				seq.frame->lvids(lvid).autorelease = true;
 				// reset the internal value of the object

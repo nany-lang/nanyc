@@ -143,8 +143,6 @@ namespace ir
 		//! Emit * (signed)
 		void emitFDIV(uint32_t lvid, uint32_t lhs, uint32_t rhs);
 
-		//! Emit a memalloc opcode and get the register
-		uint32_t emitMemalloc(uint32_t lvid, uint32_t regsize);
 		//! Emit a memfree opcode and get the register
 		void emitMemFree(uint32_t lvid, uint32_t regsize);
 		//! Emit a memfill

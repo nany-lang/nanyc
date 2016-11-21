@@ -155,7 +155,7 @@ namespace Instanciate
 			opc.mutateToAtom(&atombool);
 			opc.qualifiers.ref = true;
 			// ALLOC: memory allocation of the new temporary object
-			seq.out->emitMemalloc(lvid, sizeoflvid);
+			ir::emit::memory::allocate(seq.out, lvid, sizeoflvid);
 			ir::emit::ref(seq.out, lvid);
 			seq.frame->lvids(lvid).autorelease = true;
 			// reset the internal value of the object

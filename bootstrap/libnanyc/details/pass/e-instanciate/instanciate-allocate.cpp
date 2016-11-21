@@ -51,7 +51,7 @@ namespace Instanciate
 			// trick: when generating the opcode, a register has already been allocated
 			// for storing the size of the object
 			out->emitSizeof(operands.lvid - 1, atom->atomid);
-			out->emitMemalloc(operands.lvid, operands.lvid - 1);
+			ir::emit::memory::allocate(out, operands.lvid, operands.lvid - 1);
 			acquireObject(operands.lvid);
 		}
 	}

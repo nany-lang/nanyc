@@ -234,7 +234,7 @@ namespace Instanciate
 					out->emitSizeof(rsizof, rhsAtom->atomid);
 
 					// re-allocate some memory
-					out->emitMemalloc(lhs, rsizof);
+					ir::emit::memory::allocate(out, lhs, rsizof);
 					ir::emit::ref(out, lhs);
 					frame.lvids(lhs).origin.memalloc = true;
 

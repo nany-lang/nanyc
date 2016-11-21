@@ -254,6 +254,33 @@ namespace ir
 {
 namespace emit
 {
+namespace memory
+{
+namespace
+{
+
+
+	inline uint32_t allocate(SequenceRef ref, uint32_t lvid, uint32_t regsize) {
+		auto& operands   = ref.sequence.emit<ISA::Op::memalloc>();
+		operands.lvid    = lvid;
+		operands.regsize = regsize;
+		return lvid;
+	}
+
+
+} // namespace
+} // namespace memory
+} // namespace emit
+} // namespace ir
+} // namespace ny
+
+
+namespace ny
+{
+namespace ir
+{
+namespace emit
+{
 namespace dbginfo
 {
 namespace
