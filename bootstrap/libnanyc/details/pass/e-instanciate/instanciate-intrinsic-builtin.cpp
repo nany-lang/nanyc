@@ -436,7 +436,7 @@ namespace Instanciate
 		if (seq.canGenerateCode())
 		{
 			ir::emit::copy(seq.out, lvid, size);
-			seq.out->emitMemCmp(objlvid, src, lvid);
+			ir::emit::memory::compare(seq.out, objlvid, src, lvid);
 		}
 		return true;
 	}

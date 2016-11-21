@@ -143,8 +143,6 @@ namespace ir
 		//! Emit * (signed)
 		void emitFDIV(uint32_t lvid, uint32_t lhs, uint32_t rhs);
 
-		//! Emit a memcmp
-		void emitMemCmp(uint32_t lvid, uint32_t srclvid, uint32_t regsize);
 		//! Emit cstrlen (32|64)
 		void emitCStrlen(uint32_t lvid, uint32_t bits, uint32_t ptr);
 
