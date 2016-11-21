@@ -276,6 +276,14 @@ namespace
 	}
 
 
+	inline void dispose(SequenceRef ref, uint32_t lvid, uint32_t regsize) {
+		auto& operands   = ref.sequence.emit<ISA::Op::memfree>();
+		operands.lvid    = lvid;
+		operands.regsize = regsize;
+	}
+
+
+
 } // namespace
 } // namespace memory
 } // namespace emit

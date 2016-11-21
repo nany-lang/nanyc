@@ -691,13 +691,6 @@ namespace ir
 		operands.lvid   = 0u;
 	}
 
-	inline void Sequence::emitMemFree(uint32_t lvid, uint32_t regsize)
-	{
-		auto& operands   = emit<ISA::Op::memfree>();
-		operands.lvid    = lvid;
-		operands.regsize = regsize;
-	}
-
 	inline void Sequence::emitMemFill(uint32_t lvid, uint32_t regsize, uint32_t pattern)
 	{
 		auto& operands   = emit<ISA::Op::memfill>();

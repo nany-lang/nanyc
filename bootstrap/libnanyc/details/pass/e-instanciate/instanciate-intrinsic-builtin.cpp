@@ -337,7 +337,7 @@ namespace Instanciate
 			return seq.complainIntrinsicParameter("memory.dispose", 1, cdef, "'__u64'");
 
 		if (seq.canGenerateCode())
-			seq.out->emitMemFree(objlvid, size);
+			ir::emit::memory::dispose(seq.out, objlvid, size);
 		return true;
 	}
 
