@@ -92,14 +92,14 @@ namespace Producer
 	inline LVID Scope::createLocalBuiltinVoid(AST::Node& node)
 	{
 		emitDebugpos(node);
-		return context.sequence.emitStackalloc(nextvar(), nyt_void);
+		return ir::emit::alloc(context.sequence, nextvar(), nyt_void);
 	}
 
 
 	inline LVID Scope::createLocalBuiltinAny(AST::Node& node)
 	{
 		emitDebugpos(node);
-		return context.sequence.emitStackalloc(nextvar(), nyt_any);
+		return ir::emit::alloc(context.sequence, nextvar());
 	}
 
 

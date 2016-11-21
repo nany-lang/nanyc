@@ -33,7 +33,7 @@ namespace Producer
 		// a temporary variable to compute if a 'case' value matches or not
 		// this variable is reused for each 'case'
 		uint32_t casecondlvid = nextvar();
-		out.emitStackalloc(casecondlvid, nyt_bool);
+		ir::emit::alloc(out, casecondlvid, nyt_bool);
 
 		// the current implementation generates a 'if' statement for each 'case'
 		// these variables are for simulating an AST node

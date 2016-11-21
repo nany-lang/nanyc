@@ -230,7 +230,7 @@ namespace Instanciate
 					uint32_t lvid = createLocalVariables(/*count*/ 2);
 					uint32_t retcall = lvid + 1;
 
-					uint32_t rsizof  = out->emitStackalloc(lvid, nyt_u64);
+					uint32_t rsizof = ir::emit::alloc(out, lvid, nyt_u64);
 					out->emitSizeof(rsizof, rhsAtom->atomid);
 
 					// re-allocate some memory
@@ -238,7 +238,7 @@ namespace Instanciate
 					ir::emit::ref(out, lhs);
 					frame.lvids(lhs).origin.memalloc = true;
 
-					out->emitStackalloc(retcall, nyt_void);
+					ir::emit::alloc(out, retcall, nyt_void);
 					// call operator 'clone'
 					out->emitPush(lhs); // self
 					out->emitPush(rhs); // rhs, the object to copy

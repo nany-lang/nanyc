@@ -28,7 +28,7 @@ namespace Producer
 
 		// expression
 		// evalation of the condition
-		uint32_t condlvid = out.emitStackalloc(nextvar(), nyt_bool);
+		uint32_t condlvid = ir::emit::alloc(out, nextvar(), nyt_bool);
 		{
 			ir::emit::trace(out, "if-cond-stmt");
 			OpcodeScopeLocker opscopeCond{out};
@@ -114,7 +114,7 @@ namespace Producer
 		emitDebugpos(expr);
 
 		// result of the expression
-		ifret = out.emitStackalloc(nextvar(), nyt_any);
+		ifret = ir::emit::alloc(out, nextvar());
 		out.emitQualifierRef(ifret, true);
 
 		bool hasElseClause = true;
@@ -122,7 +122,7 @@ namespace Producer
 
 		// expression
 		// evalation of the condition
-		uint32_t condlvid = out.emitStackalloc(nextvar(), nyt_bool);
+		uint32_t condlvid = ir::emit::alloc(out, nextvar(), nyt_bool);
 		{
 			ir::emit::trace(out, "if-cond-expr");
 			OpcodeScopeLocker opscopeCond{out};

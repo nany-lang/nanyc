@@ -365,7 +365,7 @@ namespace Producer
 
 			// reserve registers (as many as parameters) for cloning parameters
 			for (uint32_t i = 0u; i != paramCount; ++i)
-				out.emitStackalloc(scope.nextvar(), nyt_any);
+				ir::emit::alloc(out, scope.nextvar());
 
 			// Generating ir for template parameters before the ir code for parameters
 			// (especially for being able to use these types)

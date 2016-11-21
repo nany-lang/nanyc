@@ -112,8 +112,8 @@ namespace Producer
 			// trick: a register will be allocated even if unused for now
 			// it will be later (when instanciating the func) to put the sizeof
 			// of the object to allocate
-			out.emitStackalloc(nextvar(), nyt_u64);
-			pointer = out.emitStackalloc(nextvar(), nyt_any);
+			ir::emit::alloc(out, nextvar(), nyt_u64);
+			pointer = ir::emit::alloc(out, nextvar());
 			ir::emit::objectAlloc(out, pointer, rettype);
 		}
 		else
@@ -122,10 +122,10 @@ namespace Producer
 			if (not visitASTExpr(*inplace, inplaceExpr))
 				return false;
 			// intermediate pointer to force type __pointer
-			uint32_t tmpptr = out.emitStackalloc(nextvar(), nyt_ptr);
+			uint32_t tmpptr = ir::emit::alloc(out, nextvar(), nyt_ptr);
 			out.emitAssign(tmpptr, inplaceExpr, false);
 			// promoting the given __pointer to T
-			pointer = out.emitStackalloc(nextvar(), nyt_any);
+			pointer = ir::emit::alloc(out, nextvar());
 			ir::emit::copy(out, pointer, tmpptr);
 		}
 
@@ -138,7 +138,7 @@ namespace Producer
 		localvar = pointer;
 
 		// CONSTRUCTOR CALL
-		uint32_t lvidcall = out.emitStackalloc(nextvar(), nyt_any);
+		uint32_t lvidcall = ir::emit::alloc(out, nextvar());
 		out.emitIdentify(lvidcall, "^new", pointer);
 		return visitASTExprCall(call, lvidcall);
 	}

@@ -140,9 +140,9 @@ namespace Producer
 		// sequence output
 		auto& out = sequence();
 
-		uint32_t idlvid = out.emitStackalloc(nextvar(), nyt_any);
+		uint32_t idlvid = ir::emit::alloc(out, nextvar());
 		out.emitIdentify(idlvid, "append", localvar);
-		uint32_t calllvid = out.emitStackalloc(nextvar(), nyt_any);
+		uint32_t calllvid = ir::emit::alloc(out, nextvar());
 		out.emitIdentify(calllvid, "^()", idlvid); // functor
 
 		context.reuse.string.text.clear();
@@ -152,7 +152,7 @@ namespace Producer
 			emitDebugpos(*firstLiteralNode);
 			uint32_t sid = ir::emit::alloctext(out, nextvar(), context.reuse.string.text);
 			uint32_t lid = ir::emit::allocu64(out, nextvar(), nyt_u32, context.reuse.string.text.size());
-			uint32_t ret = out.emitStackalloc(nextvar(), nyt_void);
+			uint32_t ret = ir::emit::alloc(out, nextvar(), nyt_void);
 			out.emitPush(sid); // text: __text
 			out.emitPush(lid); // size: __u64
 			out.emitCall(ret, calllvid);
@@ -197,7 +197,7 @@ namespace Producer
 							return false;
 
 						emitDebugpos(expr);
-						uint32_t ret = out.emitStackalloc(nextvar(), nyt_void);
+						uint32_t ret = ir::emit::alloc(out, nextvar(), nyt_void);
 						out.emitPush(lvid);
 						out.emitCall(ret, calllvid);
 					}

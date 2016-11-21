@@ -64,8 +64,9 @@ namespace Producer
 		}
 		// create a value even if nothing
 		emitDebugpos(node);
-		localvar = sequence().emitStackalloc(nextvar(), nyt_any);
-		sequence().emitIntrinsic(localvar, intrinsicname);
+		auto& out = sequence();
+		localvar = ir::emit::alloc(out, nextvar());
+		out.emitIntrinsic(localvar, intrinsicname);
 		return success;
 	}
 

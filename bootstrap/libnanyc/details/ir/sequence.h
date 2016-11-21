@@ -143,9 +143,6 @@ namespace ir
 		//! Emit * (signed)
 		void emitFDIV(uint32_t lvid, uint32_t lhs, uint32_t rhs);
 
-		//! Allocate a new variable on the stack and get the register
-		uint32_t emitStackalloc(uint32_t lvid, nytype_t);
-
 		//! Emit a memalloc opcode and get the register
 		uint32_t emitMemalloc(uint32_t lvid, uint32_t regsize);
 		//! Emit a memfree opcode and get the register

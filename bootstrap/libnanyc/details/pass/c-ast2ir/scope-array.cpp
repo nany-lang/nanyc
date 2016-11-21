@@ -46,9 +46,9 @@ namespace Producer
 			auto& out = sequence();
 			ir::OpcodeScopeLocker opscope{out};
 			emitDebugpos(node);
-			uint32_t lvidappend = out.emitStackalloc(nextvar(), nyt_any);
+			uint32_t lvidappend = ir::emit::alloc(out, nextvar());
 			out.emitIdentify(lvidappend, "append", localvar);
-			uint32_t func = out.emitStackalloc(nextvar(), nyt_any);
+			uint32_t func = ir::emit::alloc(out, nextvar());
 			out.emitIdentify(func, "^()", lvidappend);
 
 			for (auto& child: node.children)
@@ -59,7 +59,7 @@ namespace Producer
 					success &= visitASTExpr(child.firstChild(), lvid);
 					if (success)
 					{
-						auto callret = out.emitStackalloc(nextvar(), nyt_any);
+						auto callret = ir::emit::alloc(out, nextvar());
 						out.emitPush(lvid);
 						out.emitCall(callret, func);
 					}

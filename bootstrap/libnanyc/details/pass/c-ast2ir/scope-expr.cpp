@@ -43,7 +43,7 @@ namespace Producer
 		emitDebugpos(node);
 		auto& out = sequence();
 		// allocate a local variable to receive information about the current identifier
-		uint32_t rid = out.emitStackalloc(nextvar(), nyt_any);
+		uint32_t rid = ir::emit::alloc(out, nextvar());
 		uint32_t offset = out.opcodeCount();
 		out.emitIdentify(rid, node.text, localvar);
 		// the result of the current expression is now the new allocated local variable
@@ -79,7 +79,7 @@ namespace Producer
 			return unexpectedNode(node, "[expr/operator]");
 		emitDebugpos(node);
 		auto& out = sequence();
-		uint32_t rid = out.emitStackalloc(nextvar(), nyt_any);
+		uint32_t rid = ir::emit::alloc(out, nextvar());
 		ShortString64 idname;
 		idname << '^' << node.children[0].text;
 		out.emitIdentify(rid, idname, localvar);

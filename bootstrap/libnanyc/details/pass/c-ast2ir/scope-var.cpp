@@ -130,7 +130,7 @@ namespace Producer
 		}
 		// the new member variable
 		auto mbvar = scope.nextvar();
-		out.emitStackalloc(mbvar, nyt_any);
+		ir::emit::alloc(out, mbvar);
 
 		// the type of the expression
 		LVID lvid = 0;
@@ -175,7 +175,7 @@ namespace Producer
 	{
 		auto& out = scope.sequence();
 		// create the variable itself
-		uint32_t varlvid  = out.emitStackalloc(scope.nextvar(), nyt_any);
+		uint32_t varlvid = ir::emit::alloc(out, scope.nextvar());
 
 		if (varType != nullptr)
 		{

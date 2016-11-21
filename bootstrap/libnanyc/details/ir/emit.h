@@ -62,9 +62,19 @@ namespace
 	}
 
 
+	//! Allocate a new variable on the stack and get the register
+	inline uint32_t alloc(SequenceRef ref, uint32_t lvid, nytype_t type = nyt_any) {
+		auto& operands  = ref.sequence.emit<ISA::Op::stackalloc>();
+		operands.lvid   = lvid;
+		operands.type   = static_cast<uint32_t>(type);
+		operands.atomid = (uint32_t) -1;
+		return lvid;
+	}
+
+
 	//! Allocate a new variable on the stack and assign a value to it and get the register
 	inline uint32_t allocu64(SequenceRef ref, uint32_t lvid, nytype_t type, uint64_t value) {
-		ref.sequence.emitStackalloc(lvid, type);
+		ir::emit::alloc(ref, lvid, type);
 		ir::emit::constantu64(ref, lvid, value);
 		return lvid;
 	}
@@ -72,7 +82,7 @@ namespace
 
 	//! Allocate a new variable on the stack and assign a value to it and get the register
 	inline uint32_t allocf64(SequenceRef ref, uint32_t lvid, nytype_t type, double value) {
-		ref.sequence.emitStackalloc(lvid, type);
+		ir::emit::alloc(ref, lvid, type);
 		ir::emit::constantf64(ref, lvid, value);
 		return lvid;
 	}
@@ -80,7 +90,7 @@ namespace
 
 	//! Allocate a new variable on the stack and assign a text to it and get the register
 	inline uint32_t alloctext(SequenceRef ref, uint32_t lvid, const AnyString& text) {
-		ref.sequence.emitStackalloc(lvid, nyt_ptr);
+		ir::emit::alloc(ref, lvid, nyt_ptr);
 		ir::emit::constantText(ref, lvid, text);
 		return lvid;
 	}

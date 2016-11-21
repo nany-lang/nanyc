@@ -43,7 +43,7 @@ namespace Producer
 
 		// a temporary variable for the result of the condition evaluation
 		uint32_t condlvid = nextvar();
-		out.emitStackalloc(condlvid, nyt_bool);
+		ir::emit::alloc(out, condlvid, nyt_bool);
 		// generating the code for the condition itself
 		{
 			OpcodeScopeLocker opscopeCond{out};
@@ -112,7 +112,7 @@ namespace Producer
 
 		// a temporary variable for the result of the condition evaluation
 		uint32_t condlvid = nextvar();
-		out.emitStackalloc(condlvid, nyt_bool);
+		ir::emit::alloc(out, condlvid, nyt_bool);
 		// generating the code for the condition itself
 		{
 			OpcodeScopeLocker opscopeCond{out};

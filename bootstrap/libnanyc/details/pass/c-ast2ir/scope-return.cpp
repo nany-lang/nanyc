@@ -35,8 +35,7 @@ namespace Producer
 					success &= visitASTExpr(child, localvar);
 					// generate error on the begining of the expr and not the return itself
 					emitDebugpos(child);
-					uint32_t tmplvid = sequence().emitStackalloc(nextvar(), nyt_any);
-					out.emitReturn(localvar, tmplvid);
+					out.emitReturn(localvar, ir::emit::alloc(out, nextvar()));
 					hasReturnValue = true;
 					break;
 				}

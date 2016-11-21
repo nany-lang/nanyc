@@ -144,7 +144,7 @@ namespace Instanciate
 			details.scope = scope;
 			details.synthetic = false;
 			details.offsetDeclOut = out->opcodeCount();
-			out->emitStackalloc(startOffset + i, nyt_any);
+			ir::emit::alloc(out, startOffset + i);
 		}
 		return startOffset;
 	}

@@ -688,15 +688,6 @@ namespace ir
 		operands.setLVID(lvid);
 	}
 
-	inline uint32_t Sequence::emitStackalloc(uint32_t lvid, nytype_t type)
-	{
-		auto& operands = emit<ISA::Op::stackalloc>();
-		operands.lvid   = lvid;
-		operands.type   = static_cast<uint32_t>(type);
-		operands.atomid = (uint32_t) -1;
-		return lvid;
-	}
-
 	inline void Sequence::emitNamespace(const AnyString& name)
 	{
 		auto& operands  = emit<ISA::Op::blueprint>();

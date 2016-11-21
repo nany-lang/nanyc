@@ -46,7 +46,7 @@ namespace Instanciate
 		if (canGenerateCode()) // copy only variable instances
 		{
 			lvidinfo.offsetDeclOut = out->opcodeCount();
-			out->emitStackalloc(operands.lvid, type);
+			ir::emit::alloc(out, operands.lvid, type);
 		}
 	}
 
