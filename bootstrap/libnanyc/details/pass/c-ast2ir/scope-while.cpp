@@ -55,8 +55,7 @@ namespace Producer
 
 		// jump at the end of the 'while' statement if false
 		uint32_t jumpOffset = out.opcodeCount();
-		// the label value will be set later, to preserve strict ordering
-		out.emitJz(condlvid, 0, /*labelEnd*/ 0);
+		ir::emit::jz(out, condlvid, 0, /*labelEnd*/ 0); // set later, to preserve strict ordering
 
 		// 'while' body
 		{
@@ -67,7 +66,7 @@ namespace Producer
 
 		emitDebugpos(node);
 		// loop back to the condition evaluation
-		out.emitJmp(labelWhile);
+		ir::emit::jmp(out, labelWhile);
 
 		// end of while, if the condition evaluation failed
 		// (and update the label id in the original jump)
@@ -123,7 +122,7 @@ namespace Producer
 
 		emitDebugpos(node);
 		// jump to the begining if true (non zero)
-		out.emitJnz(condlvid, 0, labelWhile);
+		ir::emit::jnz(out, condlvid, 0, labelWhile);
 		return success;
 	}
 

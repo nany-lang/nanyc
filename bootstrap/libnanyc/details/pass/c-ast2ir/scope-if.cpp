@@ -43,7 +43,7 @@ namespace Producer
 
 		// jump to the 'else' clause if false (or end) (label updated later)
 		uint32_t opOffJz = out.opcodeCount();
-		out.emitJz(condlvid, 0, (hasElseClause ? labelElse : labelEnd));
+		ir::emit::jz(out, condlvid, 0, (hasElseClause ? labelElse : labelEnd));
 
 		// opcode offset for jumping to label 'end' after 'then' stmt
 		uint32_t opOffIntermediateEnd = 0u;
@@ -68,13 +68,13 @@ namespace Producer
 				if (hasElseClause)
 				{
 					opOffIntermediateEnd = out.opcodeCount();
-					out.emitJmp(labelEnd);
+					ir::emit::jmp(out, labelEnd);
 				}
 			}
 			else
 			{
 				*customjmpthenOffset = out.opcodeCount();
-				out.emitJmp(0); // will be filled later
+				ir::emit::jmp(out, 0); // will be filled later
 			}
 		}
 		// ...else
@@ -136,7 +136,7 @@ namespace Producer
 
 		// jump to the 'else' clause if false (or end)
 		uint32_t opOffJz = out.opcodeCount();
-		out.emitJz(condlvid, 0, (hasElseClause ? labelElse : labelEnd));
+		ir::emit::jz(out, condlvid, 0, (hasElseClause ? labelElse : labelEnd));
 
 		// opcode offset for jumping to label 'end' after 'then' stmt
 		uint32_t opOffIntermediateEnd = 0u;
@@ -159,7 +159,7 @@ namespace Producer
 			if (hasElseClause)
 			{
 				opOffIntermediateEnd = out.opcodeCount();
-				out.emitJmp(labelEnd);
+				ir::emit::jmp(out, labelEnd);
 			}
 		}
 		// ...else

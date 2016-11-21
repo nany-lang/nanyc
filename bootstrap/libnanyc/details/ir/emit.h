@@ -138,6 +138,30 @@ namespace
 	}
 
 
+	//! Unconditional jump
+	inline void jmp(SequenceRef ref, uint32_t label) {
+		ref.sequence.emit<ISA::Op::jmp>().label = label;
+	}
+
+
+	//! jump if zero
+	inline void jz(SequenceRef ref, uint32_t lvid, uint32_t result, uint32_t label) {
+		auto& opc  = ref.sequence.emit<ISA::Op::jz>();
+		opc.lvid   = lvid;
+		opc.result = result;
+		opc.label  = label;
+	}
+
+
+	//! jump if not zero
+	inline void jnz(SequenceRef ref, uint32_t lvid, uint32_t result, uint32_t label) {
+		auto& opc  = ref.sequence.emit<ISA::Op::jnz>();
+		opc.lvid   = lvid;
+		opc.result = result;
+		opc.label  = label;
+	}
+
+
 	inline void identify(SequenceRef ref, uint32_t lvid, const AnyString& name, uint32_t self) {
 		auto& sequence = ref.sequence;
 		auto& operands = sequence.emit<ISA::Op::identify>();

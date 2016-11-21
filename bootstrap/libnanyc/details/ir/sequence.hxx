@@ -885,27 +885,6 @@ namespace ir
 		operands.var   = varid;
 	}
 
-	inline void Sequence::emitJmp(uint32_t label)
-	{
-		emit<ISA::Op::jmp>().label = label;
-	}
-
-	inline void Sequence::emitJz(uint32_t lvid, uint32_t result, uint32_t label)
-	{
-		auto& opc  = emit<ISA::Op::jz>();
-		opc.lvid   = lvid;
-		opc.result = result;
-		opc.label  = label;
-	}
-
-	inline void Sequence::emitJnz(uint32_t lvid, uint32_t result, uint32_t label)
-	{
-		auto& opc  = emit<ISA::Op::jnz>();
-		opc.lvid   = lvid;
-		opc.result = result;
-		opc.label  = label;
-	}
-
 	inline void Sequence::emitQualifierRef(uint32_t lvid, bool flag)
 	{
 		auto& operands = emit<ISA::Op::qualifiers>();
