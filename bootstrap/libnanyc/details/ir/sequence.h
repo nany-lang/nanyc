@@ -268,11 +268,6 @@ namespace ir
 		//! Write a field
 		void emitFieldset(uint32_t lvid, uint32_t self, uint32_t varid);
 
-		//! Emit a return opcode with no return value
-		void emitReturn();
-		//! Emit a return opcode
-		void emitReturn(uint32_t lvid, uint32_t tmplvid);
-
 		//! Emit an unconditional jump
 		void emitJmp(uint32_t label);
 		//! Emit jump if zero

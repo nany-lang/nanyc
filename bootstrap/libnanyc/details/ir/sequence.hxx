@@ -799,20 +799,6 @@ namespace ir
 		operands.type  = type;
 	}
 
-	inline void Sequence::emitReturn()
-	{
-		auto& operands   = emit<ISA::Op::ret>();
-		operands.lvid    = 0;
-		operands.tmplvid = 0;
-	}
-
-	inline void Sequence::emitReturn(uint32_t lvid, uint32_t tmplvid)
-	{
-		auto& operands   = emit<ISA::Op::ret>();
-		operands.lvid    = lvid;
-		operands.tmplvid = tmplvid;
-	}
-
 	inline void Sequence::emitSelf(uint32_t self)
 	{
 		emit<ISA::Op::self>().self = self;

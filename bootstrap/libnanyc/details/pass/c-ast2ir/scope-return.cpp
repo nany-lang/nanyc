@@ -35,7 +35,7 @@ namespace Producer
 					success &= visitASTExpr(child, localvar);
 					// generate error on the begining of the expr and not the return itself
 					emitDebugpos(child);
-					out.emitReturn(localvar, ir::emit::alloc(out, nextvar()));
+					ir::emit::ret(out, localvar, ir::emit::alloc(out, nextvar()));
 					hasReturnValue = true;
 					break;
 				}
@@ -46,7 +46,7 @@ namespace Producer
 		if (not hasReturnValue)
 		{
 			emitDebugpos(node);
-			out.emitReturn();
+			ir::emit::ret(out);
 		}
 		return success;
 	}

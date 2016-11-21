@@ -160,6 +160,22 @@ namespace
 	}
 
 
+	//! Return with no value
+	inline void ret(SequenceRef ref) {
+		auto& operands   = ref.sequence.emit<ISA::Op::ret>();
+		operands.lvid    = 0;
+		operands.tmplvid = 0;
+	}
+
+
+	//! Return from value
+	inline void ret(SequenceRef ref, uint32_t lvid, uint32_t tmplvid) {
+		auto& operands   = ref.sequence.emit<ISA::Op::ret>();
+		operands.lvid    = lvid;
+		operands.tmplvid = tmplvid;
+	}
+
+
 	template<class T> struct TraceWriter final {
 		static void emit(SequenceRef ref, const T& value) {
 			auto& sequence = ref.sequence;

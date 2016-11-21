@@ -182,19 +182,14 @@ namespace Instanciate
 							if (unlikely(not r))
 								return frame->invalidate(retlvid);
 						}
-
-						// acquiring it first before deleting everything
 						tryToAcquireObject(retlvid, spare);
-						// release all variables declared in the function
 						releaseScopedVariables(0 /*all scopes*/);
-						// the return value
-						out->emitReturn(retlvid, 0);
+						ir::emit::ret(out, retlvid, 0);
 					}
 					else
 					{
 						releaseScopedVariables(0 /*all scopes*/);
-						// the return value
-						out->emitReturn();
+						ir::emit::ret(out);
 					}
 					break;
 				}
