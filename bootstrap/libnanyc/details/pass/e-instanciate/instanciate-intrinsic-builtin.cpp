@@ -386,7 +386,7 @@ namespace Instanciate
 			return seq.complainIntrinsicParameter("memory.copy", 2, cdef, "'__u64'");
 
 		if (seq.canGenerateCode())
-			seq.out->emitMemCopy(objlvid, src, size);
+			ir::emit::memory::copyNoOverlap(seq.out, objlvid, src, size);
 		return true;
 	}
 
