@@ -978,12 +978,6 @@ namespace ir
 		operands.qualifier = ir::ISA::TypeQualifier::constant;
 	}
 
-	inline void Sequence::emitDebugfile(const AnyString& filename)
-	{
-		emit<ISA::Op::debugfile>().filename = stringrefs.ref(filename);
-	}
-
-
 
 } // namespace ir
 } // namespace ny

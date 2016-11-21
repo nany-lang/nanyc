@@ -68,18 +68,6 @@ namespace Producer
 	}
 
 
-	inline void Scope::addDebugCurrentFilename(const AnyString& filename)
-	{
-		context.sequence.emitDebugfile(filename);
-	}
-
-
-	inline void Scope::addDebugCurrentFilename()
-	{
-		addDebugCurrentFilename(context.dbgSourceFilename);
-	}
-
-
 	inline void Scope::resetLocalCounters(LVID localvarStart)
 	{
 		// 0: null

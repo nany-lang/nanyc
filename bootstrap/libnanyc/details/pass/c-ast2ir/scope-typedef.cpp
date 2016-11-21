@@ -56,7 +56,7 @@ namespace Producer
 
 		// making sure that debug info are available
 		context.pPreviousDbgLine = (uint32_t) -1; // forcing debug infos
-		scope.addDebugCurrentFilename();
+		ir::emit::dbginfo::filename(out, context.dbgSourceFilename);
 		scope.emitDebugpos(node);
 
 		uint32_t returntype = 1u; // already allocated

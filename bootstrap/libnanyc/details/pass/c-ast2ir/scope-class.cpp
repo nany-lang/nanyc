@@ -71,7 +71,7 @@ namespace Producer
 
 		// making sure that debug info are available
 		scope.context.invalidateLastDebugLine();
-		scope.addDebugCurrentFilename();
+		ir::emit::dbginfo::filename(out, scope.context.dbgSourceFilename);
 	}
 
 

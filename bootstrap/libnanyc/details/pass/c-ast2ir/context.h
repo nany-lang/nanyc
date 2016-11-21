@@ -232,6 +232,9 @@ namespace Producer
 		}
 		reuse;
 
+		//! Debug current source filename
+		AnyString dbgSourceFilename;
+
 	private:
 		friend class Scope;
 		static Logs::Report emitReportEntry(void*, Logs::Level level);
@@ -240,9 +243,6 @@ namespace Producer
 	private:
 		uint32_t pPreviousDbgOffset = 0;
 		uint32_t pPreviousDbgLine = 0;
-		//! Debug source filename
-		AnyString dbgSourceFilename;
-
 		//! Error reporting
 		Logs::Handler localErrorHandler;
 		Logs::MetadataHandler localMetadataHandler;

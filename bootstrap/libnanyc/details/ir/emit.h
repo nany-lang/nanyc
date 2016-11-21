@@ -168,3 +168,29 @@ namespace
 } // namespace emit
 } // namespace ir
 } // namespace ny
+
+
+namespace ny
+{
+namespace ir
+{
+namespace emit
+{
+namespace dbginfo
+{
+namespace
+{
+
+
+	//! Emit a debug filename opcode
+	inline void filename(SequenceRef ref, const AnyString& path) {
+		auto& sequence = ref.sequence;
+		sequence.emit<ISA::Op::debugfile>().filename = sequence.stringrefs.ref(path);
+	}
+
+
+} // namespace
+} // namespace dbginfo
+} // namespace emit
+} // namespace ir
+} // namespace ny

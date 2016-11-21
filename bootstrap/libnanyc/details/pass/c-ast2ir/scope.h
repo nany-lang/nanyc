@@ -149,8 +149,6 @@ namespace Producer
 		//! Emit opcode related to the current position (in the current source)
 		void emitDebugpos(AST::Node& node);
 		void emitDebugpos(AST::Node* node);
-		void addDebugCurrentFilename();
-		void addDebugCurrentFilename(const AnyString& filename);
 		void addDebugCurrentPosition(uint line, uint offset);
 
 		bool generateIfStmt(AST::Node& expr, AST::Node& thenc, AST::Node* elsec = nullptr, uint32_t* customjmpthenOffset = nullptr);

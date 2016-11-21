@@ -173,8 +173,6 @@ namespace ir
 		//! Enter a namespace def
 		void emitNamespace(const AnyString& name);
 
-		//! Emit a debug filename opcode
-		void emitDebugfile(const AnyString& filename);
 		//! Emit debug position
 		void emitDebugpos(uint32_t line, uint32_t offset);
 
