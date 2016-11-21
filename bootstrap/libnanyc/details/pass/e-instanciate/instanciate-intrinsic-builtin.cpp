@@ -598,7 +598,7 @@ namespace Instanciate
 		if (seq.canGenerateCode())
 		{
 			uint32_t bits = (sizeof(T) == sizeof(uint32_t) ? 32 : 64);
-			seq.out->emitCStrlen(lvid, bits, objlvid);
+			ir::emit::memory::cstrlen(seq.out, lvid, bits, objlvid);
 		}
 		return true;
 	}

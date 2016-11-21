@@ -315,6 +315,14 @@ namespace
 	}
 
 
+	inline void cstrlen(SequenceRef ref, uint32_t lvid, uint32_t bits, uint32_t ptr) {
+		auto& operands = ref.sequence.emit<ISA::Op::cstrlen>();
+		operands.lvid  = lvid;
+		operands.bits  = bits;
+		operands.ptr   = ptr;
+	}
+
+
 } // namespace
 } // namespace memory
 } // namespace emit

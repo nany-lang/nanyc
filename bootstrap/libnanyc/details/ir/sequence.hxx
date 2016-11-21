@@ -691,14 +691,6 @@ namespace ir
 		operands.lvid   = 0u;
 	}
 
-	inline void Sequence::emitCStrlen(uint32_t lvid, uint32_t bits, uint32_t ptr)
-	{
-		auto& operands = emit<ISA::Op::cstrlen>();
-		operands.lvid  = lvid;
-		operands.bits  = bits;
-		operands.ptr   = ptr;
-	}
-
 	inline void Sequence::emitLoadU64(uint32_t lvid, uint32_t addr)
 	{
 		auto& opr   = emit<ISA::Op::load_u64>();
