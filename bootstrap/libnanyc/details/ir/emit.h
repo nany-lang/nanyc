@@ -268,6 +268,14 @@ namespace
 	}
 
 
+	inline void reallocate(SequenceRef ref, uint32_t lvid, uint32_t oldsize, uint32_t newsize) {
+		auto& operands   = ref.sequence.emit<ISA::Op::memrealloc>();
+		operands.lvid    = lvid;
+		operands.oldsize = oldsize;
+		operands.newsize = newsize;
+	}
+
+
 } // namespace
 } // namespace memory
 } // namespace emit

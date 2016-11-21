@@ -691,14 +691,6 @@ namespace ir
 		operands.lvid   = 0u;
 	}
 
-	inline void Sequence::emitMemrealloc(uint32_t lvid, uint32_t oldsize, uint32_t newsize)
-	{
-		auto& operands   = emit<ISA::Op::memrealloc>();
-		operands.lvid    = lvid;
-		operands.oldsize = oldsize;
-		operands.newsize = newsize;
-	}
-
 	inline void Sequence::emitMemFree(uint32_t lvid, uint32_t regsize)
 	{
 		auto& operands   = emit<ISA::Op::memfree>();

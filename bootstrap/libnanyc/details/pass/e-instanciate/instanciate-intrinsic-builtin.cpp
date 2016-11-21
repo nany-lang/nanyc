@@ -316,7 +316,7 @@ namespace Instanciate
 		if (seq.canGenerateCode())
 		{
 			ir::emit::copy(seq.out, lvid, ptrlvid);
-			seq.out->emitMemrealloc(lvid, oldsizelvid, newsizelvid);
+			ir::emit::memory::reallocate(seq.out, lvid, oldsizelvid, newsizelvid);
 		}
 		return true;
 	}
