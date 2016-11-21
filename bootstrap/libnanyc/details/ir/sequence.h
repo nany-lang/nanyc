@@ -210,11 +210,6 @@ namespace ir
 		//! Emit an opcode to create a name alias
 		void emitNameAlias(uint32_t lvid, const AnyString& name);
 
-		//! Add a new comment
-		void emitComment(const AnyString& text);
-		//! Add a new empty line
-		void emitComment();
-
 		//! Emit opcode for type checking
 		void emitTypeIsObject(uint32_t lvid);
 

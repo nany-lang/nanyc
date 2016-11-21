@@ -157,9 +157,7 @@ namespace Instanciate
 				}
 				case TypeCheck::Match::strictEqual:
 				{
-					if (debugmode)
-						out->emitComment("return from func");
-
+					ir::emit::trace(out, "return from func");
 					if (not retIsVoid)
 					{
 						uint32_t retlvid;

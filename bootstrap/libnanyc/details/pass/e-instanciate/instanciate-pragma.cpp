@@ -47,8 +47,9 @@ namespace Instanciate
 				// clone it if necessary (only non-ref parameters)
 				if (not cdef.qualifiers.ref)
 				{
-					if (debugmode and generateCode)
-						seq.out->emitComment(String{"----- deep copy parameter "} << i << " aka " << name);
+					ir::emit::trace(seq.out, generateCode, [&]() {
+						return String{"----- deep copy parameter "} << i << " aka " << name;
+					});
 					// a register has already been reserved for cloning parameters
 					uint32_t clone = 2 + count + i; // 1: return type, 2: first parameter
 					// the new value is not synthetic
@@ -64,8 +65,7 @@ namespace Instanciate
 					if (generateCode)
 					{
 						ir::emit::copy(seq.out, lvid, clone); // register swap
-						if (debugmode)
-							seq.out->emitComment("--\n");
+						ir::emit::trace(seq.out, "--\n");
 					}
 				}
 			}

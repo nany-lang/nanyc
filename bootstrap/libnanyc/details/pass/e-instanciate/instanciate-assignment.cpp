@@ -111,9 +111,9 @@ namespace Instanciate
 			{
 				// NOTE: the qualifiers from `cdeflhs` are not valid and correspond to nothing
 				auto& originalcdef = cdeftable.classdef(CLID{atomid, lhs});
-				if (debugmode and canGenerateCode())
-					out->emitComment(originalcdef.print(cdeftable) << originalcdef.clid);
-
+				ir::emit::trace(out, canGenerateCode(), [&]() {
+					return originalcdef.print(cdeftable) << originalcdef.clid;
+				});
 				if (originalcdef.qualifiers.ref)
 				{
 					strategy = AssignStrategy::ref;
@@ -143,9 +143,7 @@ namespace Instanciate
 				ce << " (as %" << cdeflhs.clid << " = %" << cdefrhs.clid << ')';
 			return false;
 		}
-
-		if (debugmode and canGenerateCode())
-		{
+		ir::emit::trace(out, canGenerateCode(), [&]() {
 			String comment;
 			switch (strategy)
 			{
@@ -156,9 +154,8 @@ namespace Instanciate
 			comment << "%" << lhs << " = %" << rhs << " aka '";
 			cdeflhs.print(comment, cdeftable, false);
 			comment << '\'';
-			out->emitComment(comment);
-		}
-
+			return comment;
+		});
 		switch (strategy)
 		{
 			case AssignStrategy::rawregister:

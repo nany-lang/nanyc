@@ -146,11 +146,6 @@ namespace Producer
 
 		//! \name Debug infos
 		//@{
-		//! Add a comment within the ir code
-		void comment(const AnyString& text);
-		//! Add an empty comment line within the ir code
-		void comment();
-
 		//! Emit opcode related to the current position (in the current source)
 		void emitDebugpos(AST::Node& node);
 		void emitDebugpos(AST::Node* node);

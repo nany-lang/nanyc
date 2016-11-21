@@ -86,7 +86,7 @@ namespace Instanciate
 				if (clcvr.autorelease)
 				{
 					//if (not clcvr.userDefinedName.empty())
-					//	out->emitComment(String{"unref var "} << clcvr.userDefinedName << " -> %" << i);
+					//	ir::emit::trace(out, [&](){return String{"unref var "} << clcvr.userDefinedName << " -> %" << i;});
 					tryUnrefObject(i);
 				}
 
@@ -255,7 +255,7 @@ namespace Instanciate
 	inline void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::comment>& opc)
 	{
 		if (debugmode and canGenerateCode())
-			out->emitComment(currentSequence.stringrefs[opc.text]);
+			ir::emit::trace(out, [&](){return currentSequence.stringrefs[opc.text];});
 	}
 
 

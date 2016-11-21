@@ -21,11 +21,9 @@ namespace Producer
 	{
 		assert(node.rule == AST::rgSwitch);
 		bool success = true;
-
-		if (debugmode)
-			sequence().emitComment("switch");
-
 		auto& out = sequence();
+		ir::emit::trace(out, "switch");
+
 		OpcodeScopeLocker opscopeSwitch{out};
 		emitDebugpos(node);
 
@@ -70,8 +68,7 @@ namespace Producer
 			{
 				case AST::rgSwitchCase:
 				{
-					if (debugmode)
-						out.emitComment("case");
+					ir::emit::trace(out, "case");
 					if (unlikely(valuelvid == 0))
 						return (ice(child) << "switch: unexpected lvid value");
 					if (unlikely(child.children.size() != 2))

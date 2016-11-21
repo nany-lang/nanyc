@@ -50,8 +50,7 @@ namespace Instanciate
 		// call to user-defined operator dispose
 		if (userDefinedDispose)
 		{
-			if (debugmode)
-				out->emitComment("calling user destructor");
+			ir::emit::trace(out, "calling user destructor");
 			out->emitPush(2); // self
 			out->emitCall(lvid, userDefinedDispose->atomid, 0);
 			cdeftable.substitute(lvid).mutateToVoid();
@@ -59,7 +58,6 @@ namespace Instanciate
 		}
 
 		bool commentAdded = false;
-
 		// ... then release all variables !
 		for (auto& subatomref: atomvars)
 		{
@@ -70,18 +68,14 @@ namespace Instanciate
 			if (cdef.isBuiltinOrVoid())
 				continue;
 
-			if (debugmode and not commentAdded)
-			{
-				out->emitComment("releasing variable members");
-				commentAdded = true;
-			}
-
+			ir::emit::trace(out, (not commentAdded), "releasing variable members");
+			commentAdded = true;
 			// current lvig, previously allocated to release variable members
 			uint32_t reglvid = lvid++;
 
 			// type propagation
 			cdeftable.substitute(reglvid).import(cdef);
-			// out->emitComment(String() << "dispose for " << subatom.name);
+			// ir::emit::trace(out, [&](){ return String("dispose for ") << subatom.name;});
 			// read the pointer
 			out->emitFieldget(reglvid, /*self*/ 2, subatom.varinfo.effectiveFieldIndex);
 

@@ -842,17 +842,6 @@ namespace ir
 		operands.tmplvid = tmplvid;
 	}
 
-	inline void Sequence::emitComment(const AnyString& text)
-	{
-		emit<ISA::Op::comment>().text = stringrefs.ref(text);
-	}
-
-
-	inline void Sequence::emitComment()
-	{
-		emit<ISA::Op::comment>().text = 0;
-	}
-
 	inline void Sequence::emitSelf(uint32_t self)
 	{
 		emit<ISA::Op::self>().self = self;

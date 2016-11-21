@@ -109,9 +109,7 @@ namespace Producer
 		if (unlikely(node.children.empty()))
 			return true;
 
-		if (debugmode)
-			sequence().emitComment("generic type parameters");
-
+		ir::emit::trace(sequence(), "generic type parameters");
 		bool success = true;
 		for (auto& child: node.children)
 		{

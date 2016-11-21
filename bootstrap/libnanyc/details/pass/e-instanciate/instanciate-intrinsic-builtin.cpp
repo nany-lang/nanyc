@@ -623,8 +623,7 @@ namespace Instanciate
 				uint32_t newlvid = seq.createLocalVariables();
 				if (seq.canGenerateCode())
 				{
-					if (debugmode)
-						seq.out->emitComment("reading inner 'pod' variable");
+					ir::emit::trace(seq.out, "reading inner 'pod' variable");
 					seq.out->emitFieldget(newlvid, lhs, 0);
 				}
 				lhs = newlvid;
@@ -707,7 +706,7 @@ namespace Instanciate
 			if (atom != nullptr and atom->builtinMapping != nyt_void)
 			{
 				if (debugmode and seq.canGenerateCode())
-					seq.out->emitComment("reading inner 'pod' variable");
+					ir::emit::trace(seq.out, "reading inner 'pod' variable");
 				atomBuiltinCast = atom;
 				builtinlhs = atom->builtinMapping;
 
@@ -786,8 +785,7 @@ namespace Instanciate
 				if (seq.canGenerateCode())
 				{
 					uint32_t newlvid = seq.createLocalVariables();
-					if (debugmode)
-						seq.out->emitComment("reading inner 'pod' variable");
+					ir::emit::trace(seq.out, "reading inner 'pod' variable");
 					seq.out->emitFieldget(newlvid, lhs, 0);
 					lhs = newlvid;
 				}
@@ -811,8 +809,7 @@ namespace Instanciate
 				if (seq.canGenerateCode())
 				{
 					uint32_t newlvid = seq.createLocalVariables();
-					if (debugmode)
-						seq.out->emitComment("reading inner 'pod' variable");
+					ir::emit::trace(seq.out, "reading inner 'pod' variable");
 					seq.out->emitFieldget(newlvid, rhs, 0);
 					rhs = newlvid;
 				}
@@ -897,9 +894,7 @@ namespace Instanciate
 
 			if (seq.canGenerateCode())
 			{
-				if (debugmode)
-					seq.out->emitComment(ShortString32() << "builtin " << name);
-
+				ir::emit::trace(seq.out, [&](){return String("builtin ") << name;});
 				// creating two variables on the stack
 				uint32_t opresult   = seq.createLocalVariables(2);
 				uint32_t sizeoflvid = opresult + 1;
@@ -927,8 +922,7 @@ namespace Instanciate
 			seq.cdeftable.substitute(lvid).mutateToBuiltin(rettype);
 			if (seq.canGenerateCode())
 			{
-				if (debugmode)
-					seq.out->emitComment(ShortString32() << "builtin " << name);
+				ir::emit::trace(seq.out, [&](){return String("builtin ") << name;});
 				(seq.out->*M)(lvid, lhs, rhs);
 			}
 		}

@@ -20,9 +20,7 @@ namespace Producer
 	{
 		// output sequence
 		auto& out = sequence();
-
-		if (debugmode)
-			out.emitComment("*** if-stmt");
+		ir::emit::trace(out, "*** if-stmt");
 		emitDebugpos(expr);
 
 		bool hasElseClause = (elseptr != nullptr);
@@ -32,8 +30,7 @@ namespace Producer
 		// evalation of the condition
 		uint32_t condlvid = out.emitStackalloc(nextvar(), nyt_bool);
 		{
-			if (debugmode)
-				out.emitComment("if-cond-stmt");
+			ir::emit::trace(out, "if-cond-stmt");
 			OpcodeScopeLocker opscopeCond{out};
 			uint32_t exprEval = 0;
 			emitDebugpos(expr);
@@ -53,9 +50,7 @@ namespace Producer
 
 		// if-then...
 		{
-			if (debugmode)
-				out.emitComment("then-stmt");
-
+			ir::emit::trace(out, "then-stmt");
 			// stmt
 			{
 				OpcodeScopeLocker opscopeThen{out};
@@ -86,8 +81,7 @@ namespace Producer
 		if (hasElseClause)
 		{
 			assert(elseptr != nullptr);
-			if (debugmode)
-				out.emitComment("else-stmt");
+			ir::emit::trace(out, "else-stmt");
 
 			// stmt
 			{
@@ -116,9 +110,7 @@ namespace Producer
 	{
 		// output sequence
 		auto& out = sequence();
-
-		if (debugmode)
-			out.emitComment("*** if-expr");
+		ir::emit::trace(out, "*** if-expr");
 		emitDebugpos(expr);
 
 		// result of the expression
@@ -132,8 +124,7 @@ namespace Producer
 		// evalation of the condition
 		uint32_t condlvid = out.emitStackalloc(nextvar(), nyt_bool);
 		{
-			if (debugmode)
-				out.emitComment("if-cond-expr");
+			ir::emit::trace(out, "if-cond-expr");
 			OpcodeScopeLocker opscopeCond{out};
 			uint32_t exprEval = 0;
 			success &= visitASTExpr(expr, exprEval, false);
@@ -152,9 +143,7 @@ namespace Producer
 
 		// if-then...
 		{
-			if (debugmode)
-				out.emitComment("then-expr");
-
+			ir::emit::trace(out, "then-expr");
 			{
 				OpcodeScopeLocker opscopeThen{out};
 				emitDebugpos(thenc);
@@ -176,9 +165,7 @@ namespace Producer
 		// ...else
 		if (hasElseClause)
 		{
-			if (debugmode)
-				out.emitComment("else-expr");
-
+			ir::emit::trace(out, "else-expr");
 			{
 				labelElse = out.emitLabel(nextvar());
 				OpcodeScopeLocker opscopeElse{out};

@@ -56,18 +56,6 @@ namespace Producer
 	}
 
 
-	inline void Scope::comment(const AnyString& text)
-	{
-		context.sequence.emitComment(text);
-	}
-
-
-	inline void Scope::comment()
-	{
-		context.sequence.emitComment();
-	}
-
-
 	inline void Scope::addDebugCurrentPosition(uint line, uint offset)
 	{
 		if (context.debuginfo and

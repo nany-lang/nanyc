@@ -125,8 +125,8 @@ namespace Producer
 		auto& out = scope.sequence();
 		if (debugmode)
 		{
-			out.emitComment();
-			out.emitComment(String{"class var "} << varname);
+			ir::emit::trace(out);
+			ir::emit::trace(out, [&](){ return String{"class var "} << varname;});
 		}
 		// the new member variable
 		auto mbvar = scope.nextvar();

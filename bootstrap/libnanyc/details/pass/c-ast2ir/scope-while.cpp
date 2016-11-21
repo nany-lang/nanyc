@@ -30,8 +30,7 @@ namespace Producer
 		auto& out = sequence();
 		bool success = true;
 
-		if (debugmode)
-			out.emitComment("while-do");
+		ir::emit::trace(out, "while-do");
 
 		// new scope for the 'while' statement
 		OpcodeScopeLocker opscopeWhile{out};
@@ -40,8 +39,7 @@ namespace Producer
 		// the label at the very begining, to loop back
 		uint32_t labelWhile = out.emitLabel(nextvar());
 
-		if (debugmode)
-			out.emitComment("while-condition");
+		ir::emit::trace(out, "while-condition");
 
 		// a temporary variable for the result of the condition evaluation
 		uint32_t condlvid = nextvar();
@@ -63,9 +61,7 @@ namespace Producer
 
 		// 'while' body
 		{
-			if (debugmode)
-				out.emitComment("while-body");
-
+			ir::emit::trace(out, "while-body");
 			OpcodeScopeLocker opscopeBody{out};
 			success &= visitASTStmt(node.children[1]);
 		}
@@ -97,9 +93,7 @@ namespace Producer
 
 		auto& out = sequence();
 		bool success = true;
-
-		if (debugmode)
-			out.emitComment("do-while");
+		ir::emit::trace(out, "do-whilte");
 
 		// new scope for the 'while' statement
 		OpcodeScopeLocker opscopeWhile{out};
@@ -110,15 +104,11 @@ namespace Producer
 
 		// 'while' body
 		{
-			if (debugmode)
-				out.emitComment("do-while-body");
-
+			ir::emit::trace(out, "do-whilte-body");
 			OpcodeScopeLocker opscopeBody{out};
 			success &= visitASTStmt(node.children[0]);
 		}
-
-		if (debugmode)
-			out.emitComment("do-while-condition");
+		ir::emit::trace(out, "do-whilte-condition");
 
 		// a temporary variable for the result of the condition evaluation
 		uint32_t condlvid = nextvar();

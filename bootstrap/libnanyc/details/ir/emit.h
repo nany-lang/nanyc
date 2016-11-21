@@ -122,6 +122,48 @@ namespace
 	}
 
 
+	template<class T> struct TraceWriter final {
+		static void emit(SequenceRef ref, const T& value) {
+			auto& sequence = ref.sequence;
+			sequence.emit<ISA::Op::comment>().text = sequence.stringrefs.ref(value());
+		}
+	};
+
+
+	template<uint32_t N>
+	struct TraceWriter<char[N]> final {
+		static void emit(SequenceRef ref, const char* value) {
+			auto& sequence = ref.sequence;
+			sequence.emit<ISA::Op::comment>().text = sequence.stringrefs.ref(AnyString{value, N});
+		}
+	};
+
+
+	//! Insert a comment in the IR code
+	template<class T>
+	inline void trace(SequenceRef ref, const T& value) {
+		//! ir::emit::trace(out, [](){return "some comments here";});
+		if (yuni::debugmode)
+			TraceWriter<T>::emit(std::move(ref), value);
+	}
+
+
+	//! Insert a comment in the IR code
+	template<class T>
+	inline void trace(SequenceRef ref, bool condition, const T& value) {
+		//! ir::emit::trace(out, [](){return "some comments here";});
+		if (yuni::debugmode and condition)
+			TraceWriter<T>::emit(std::move(ref), value);
+	}
+
+
+	//! Insert empty comment line in the IR code
+	inline void trace(SequenceRef ref) {
+		if (yuni::debugmode)
+			ref.sequence.emit<ISA::Op::comment>().text = 0;
+	}
+
+
 } // namespace
 } // namespace emit
 } // namespace ir

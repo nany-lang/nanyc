@@ -144,8 +144,8 @@ namespace Producer
 		{
 			// do not report errors
 			attrs.flags -= Attributes::Flag::pushSynthetic;
-			if (debugmode)
-				sequence().emitComment(String("#[__nanyc_synthetic: %") << localvar << ']');
+			auto& out = sequence();
+			ir::emit::trace(out, [&](){return String("#[__nanyc_synthetic: %") << localvar << ']';});
 			sequence().emitPragmaSynthetic(localvar, false);
 		}
 	}

@@ -53,8 +53,7 @@ namespace Instanciate
 		{
 			auto& subatom = subatomref.get();
 			auto& cdef    = cdeftable.classdef(subatom.returnType.clid); // type of the var member
-			if (debugmode)
-				out->emitComment(String{"\nCLONE for '"} << subatom.name() << '\'');
+			ir::emit::trace(out, [&](){return String{"\nCLONE for '"} << subatom.name() << '\'';});
 
 			switch (cdef.kind)
 			{
@@ -108,8 +107,7 @@ namespace Instanciate
 		// call to user-defined operator dispose
 		if (userDefinedClone)
 		{
-			if (debugmode)
-				out->emitComment("\nuser's defined clone method");
+			ir::emit::trace(out, "\nuser's defined clone method");
 			out->emitPush(2); // self
 			out->emitPush(3); // rhs
 			out->emitCall(lvid, userDefinedClone->atomid, 0);

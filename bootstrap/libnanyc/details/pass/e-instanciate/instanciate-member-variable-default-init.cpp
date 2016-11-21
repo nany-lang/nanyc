@@ -94,9 +94,9 @@ namespace Instanciate
 			for (auto& subatomref: atomvars)
 			{
 				auto& subatom = subatomref.get();
-				if (debugmode)
-					out->emitComment(String() << "initialization for " << subatom.name() << " via default-init");
-
+				ir::emit::trace(out, [&]() {
+					return String() << "initialization for " << subatom.name() << " via default-init";
+				});
 				uint32_t instanceid = static_cast<uint32_t>(-1);
 				bool localSuccess = instanciateAtomFunc(instanceid, subatom, /*ret*/ 0, /*self*/ 2);
 
@@ -112,9 +112,9 @@ namespace Instanciate
 		{
 			auto& selfParameters = *(frame->selfParameters.get());
 			auto selfparamlistEnd = selfParameters.end();
-			if (debugmode)
-				out->emitComment(String() << "initialization with " << selfParameters.size() << " self-parameter(s)");
-
+			ir::emit::trace(out, [&]() {
+				return String() << "initialization with " << selfParameters.size() << " self-parameter(s)";
+			});
 			for (auto& subatomref: atomvars)
 			{
 				auto& subatom = subatomref.get();
@@ -132,9 +132,9 @@ namespace Instanciate
 				auto selfIT = selfParameters.find(varname);
 				if (selfIT == selfparamlistEnd)
 				{
-					if (debugmode)
-						out->emitComment(String() << "initialization for " << subatomname << " via default-init");
-
+					ir::emit::trace(out, [&]() {
+						return String() << "initialization for " << subatomname << " via default-init";
+					});
 					if (localSuccess)
 					{
 						out->emitPush(2); // %2 -> self
@@ -143,9 +143,9 @@ namespace Instanciate
 				}
 				else
 				{
-					if (debugmode)
-						out->emitComment(String() << "initialization for " << subatomname << " via self-parameter");
-
+					ir::emit::trace(out, [&]() {
+						return String() << "initialization for " << subatomname << " via self-parameter";
+					});
 					if (localSuccess)
 					{
 						// lvid of the parameter value

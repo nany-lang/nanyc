@@ -146,8 +146,7 @@ namespace Producer
 		}
 		if (likely(body != nullptr))
 		{
-			if (debugmode)
-				scope.comment("\nclass body"); // comment for clarity in code
+			ir::emit::trace(out, "\nclass body");
 			// continue evaluating the func body independantly of the previous data and results
 			for (auto& stmtnode: body->children)
 				success &= scope.visitASTStmt(stmtnode);

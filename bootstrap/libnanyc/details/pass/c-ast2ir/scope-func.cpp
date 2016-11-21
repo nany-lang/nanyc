@@ -372,8 +372,7 @@ namespace Producer
 			if (nodeTypeParams)
 				success &= scope.visitASTDeclGenericTypeParameters(*nodeTypeParams);
 			// inspecting each parameter
-			if (debugmode)
-				out.emitComment("function parameters");
+			ir::emit::trace(out, "function parameters");
 			// Generate ir (typing and default value) for each parameter
 			assert(node != nullptr and "should not be here if there is no real parameter");
 			for (uint32_t i = offset; i < paramCount; ++i)
@@ -387,9 +386,8 @@ namespace Producer
 	{
 		assert(node.rule == AST::rgFuncReturnType and "invalid return type node");
 		assert(not node.children.empty() and " should been tested already");
-
-		if (debugmode)
-			scope.comment("return type"); // comment for clarity in code
+		auto& out = scope.sequence();
+		ir::emit::trace(out, "return type");
 
 		LVID rettype = 0;
 
@@ -419,14 +417,12 @@ namespace Producer
 			}
 
 			assert(rettype != 0);
-			auto& operands    = scope.sequence().emit<ISA::Op::follow>();
+			auto& operands    = out.emit<ISA::Op::follow>();
 			operands.follower = 1; // params are 2-based (1 is the return type)
 			operands.lvid     = rettype;
 			operands.symlink  = 0;
 		}
-
-		if (debugmode)
-			scope.comment("end return type"); // comment for clarity in code
+		ir::emit::trace(out, "end return type");
 		return true;
 	}
 
@@ -573,8 +569,7 @@ namespace Producer
 
 		if (likely(body != nullptr))
 		{
-			if (debugmode)
-				scope.comment("\nfunc body"); // comment for clarity in code
+			ir::emit::trace(out, "\nfunc body");
 			// continue evaluating the func body independantly of the previous data and results
 			for (auto& stmtnode: body->children)
 				success &= scope.visitASTStmt(stmtnode);

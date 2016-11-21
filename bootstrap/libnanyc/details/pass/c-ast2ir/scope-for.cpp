@@ -26,8 +26,7 @@ namespace Producer
 		// 'do' clause
 		AST::Node* forDoClause = nullptr;
 		AST::Node* forElseClause = nullptr;
-		if (debugmode)
-			out.emitComment("for");
+		ir::emit::trace(out, "for");
 
 		OpcodeScopeLocker opscopeElse{out};
 		for (auto& child: node.children)
