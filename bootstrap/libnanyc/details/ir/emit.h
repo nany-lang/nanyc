@@ -323,6 +323,27 @@ namespace
 	}
 
 
+	inline void loadu64(SequenceRef ref, uint32_t lvid, uint32_t addr) {
+		auto& opr   = ref.sequence.emit<ISA::Op::load_u64>();
+		opr.lvid    = lvid;
+		opr.ptrlvid = addr;
+	}
+
+
+	inline void loadu32(SequenceRef ref, uint32_t lvid, uint32_t addr) {
+		auto& opr   = ref.sequence.emit<ISA::Op::load_u32>();
+		opr.lvid    = lvid;
+		opr.ptrlvid = addr;
+	}
+
+
+	inline void loadu8(SequenceRef ref, uint32_t lvid, uint32_t addr) {
+		auto& opr   = ref.sequence.emit<ISA::Op::load_u8>();
+		opr.lvid    = lvid;
+		opr.ptrlvid = addr;
+	}
+
+
 } // namespace
 } // namespace memory
 } // namespace emit

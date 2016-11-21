@@ -143,9 +143,6 @@ namespace ir
 		//! Emit * (signed)
 		void emitFDIV(uint32_t lvid, uint32_t lhs, uint32_t rhs);
 
-		void emitLoadU64(uint32_t lvid, uint32_t addr);
-		void emitLoadU32(uint32_t lvid, uint32_t addr);
-		void emitLoadU8(uint32_t lvid, uint32_t addr);
 		void emitStoreU64(uint32_t lvid, uint32_t addr);
 		void emitStoreU32(uint32_t lvid, uint32_t addr);
 		void emitStoreU8(uint32_t lvid, uint32_t addr);

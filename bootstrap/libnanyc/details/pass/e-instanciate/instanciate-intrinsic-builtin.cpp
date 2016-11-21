@@ -452,7 +452,7 @@ namespace Instanciate
 			return seq.complainIntrinsicParameter("load.u64", 0, cdef, "'__pointer'");
 
 		if (seq.canGenerateCode())
-			seq.out->emitLoadU64(lvid, ptrlvid);
+			ir::emit::memory::loadu64(seq.out, lvid, ptrlvid);
 		return true;
 	}
 
@@ -466,7 +466,7 @@ namespace Instanciate
 			return seq.complainIntrinsicParameter("load.u32", 0, cdef, "'__pointer'");
 
 		if (seq.canGenerateCode())
-			seq.out->emitLoadU32(lvid, ptrlvid);
+			ir::emit::memory::loadu32(seq.out, lvid, ptrlvid);
 		return true;
 	}
 
@@ -480,7 +480,7 @@ namespace Instanciate
 			return seq.complainIntrinsicParameter("load.u8", 0, cdef, "'__pointer'");
 
 		if (seq.canGenerateCode())
-			seq.out->emitLoadU8(lvid, ptrlvid);
+			ir::emit::memory::loadu8(seq.out, lvid, ptrlvid);
 		return true;
 	}
 
@@ -496,9 +496,9 @@ namespace Instanciate
 		if (seq.canGenerateCode())
 		{
 			if (sizeof(uint64_t) == sizeof(void*))
-				seq.out->emitLoadU64(lvid, ptrlvid);
+				ir::emit::memory::loadu64(seq.out, lvid, ptrlvid);
 			else
-				seq.out->emitLoadU32(lvid, ptrlvid);
+				ir::emit::memory::loadu32(seq.out, lvid, ptrlvid);
 		}
 		return true;
 	}

@@ -691,25 +691,6 @@ namespace ir
 		operands.lvid   = 0u;
 	}
 
-	inline void Sequence::emitLoadU64(uint32_t lvid, uint32_t addr)
-	{
-		auto& opr   = emit<ISA::Op::load_u64>();
-		opr.lvid    = lvid;
-		opr.ptrlvid = addr;
-	}
-	inline void Sequence::emitLoadU32(uint32_t lvid, uint32_t addr)
-	{
-		auto& opr   = emit<ISA::Op::load_u32>();
-		opr.lvid    = lvid;
-		opr.ptrlvid = addr;
-	}
-	inline void Sequence::emitLoadU8(uint32_t lvid, uint32_t addr)
-	{
-		auto& opr   = emit<ISA::Op::load_u8>();
-		opr.lvid    = lvid;
-		opr.ptrlvid = addr;
-	}
-
 	inline void Sequence::emitStoreU64(uint32_t lvid, uint32_t addr)
 	{
 		auto& opr   = emit<ISA::Op::store_u64>();
