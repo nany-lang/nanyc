@@ -343,6 +343,27 @@ namespace
 		opr.ptrlvid = addr;
 	}
 
+	
+	inline void storeu64(SequenceRef ref, uint32_t lvid, uint32_t addr) {
+		auto& opr   = ref.sequence.emit<ISA::Op::store_u64>();
+		opr.lvid    = lvid;
+		opr.ptrlvid = addr;
+	}
+
+
+	inline void storeu32(SequenceRef ref, uint32_t lvid, uint32_t addr) {
+		auto& opr   = ref.sequence.emit<ISA::Op::store_u32>();
+		opr.lvid    = lvid;
+		opr.ptrlvid = addr;
+	}
+
+
+	inline void storeu8(SequenceRef ref, uint32_t lvid, uint32_t addr) {
+		auto& opr   = ref.sequence.emit<ISA::Op::store_u8>();
+		opr.lvid    = lvid;
+		opr.ptrlvid = addr;
+	}
+
 
 } // namespace
 } // namespace memory

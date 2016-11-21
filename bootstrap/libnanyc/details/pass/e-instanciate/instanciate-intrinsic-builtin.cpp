@@ -518,7 +518,7 @@ namespace Instanciate
 			return seq.complainIntrinsicParameter("store.u64", 1, cdefvalue, "'__u64'");
 
 		if (seq.canGenerateCode())
-			seq.out->emitStoreU64(value, ptrlvid);
+			ir::emit::memory::storeu64(seq.out, value, ptrlvid);
 		return true;
 	}
 
@@ -537,7 +537,7 @@ namespace Instanciate
 			return seq.complainIntrinsicParameter("store.u32", 1, cdefvalue, "'__u32'");
 
 		if (seq.canGenerateCode())
-			seq.out->emitStoreU32(value, ptrlvid);
+			ir::emit::memory::storeu32(seq.out, value, ptrlvid);
 		return true;
 	}
 
@@ -556,7 +556,7 @@ namespace Instanciate
 			return seq.complainIntrinsicParameter("store.u8", 1, cdefvalue, "'__u8'");
 
 		if (seq.canGenerateCode())
-			seq.out->emitStoreU8(value, ptrlvid);
+			ir::emit::memory::storeu8(seq.out, value, ptrlvid);
 		return true;
 	}
 
@@ -578,9 +578,9 @@ namespace Instanciate
 		if (seq.canGenerateCode())
 		{
 			if (sizeof(uint64_t) == sizeof(void*))
-				seq.out->emitStoreU64(value, ptrlvid);
+				ir::emit::memory::storeu64(seq.out, value, ptrlvid);
 			else
-				seq.out->emitStoreU32(value, ptrlvid);
+				ir::emit::memory::storeu32(seq.out, value, ptrlvid);
 		}
 		return true;
 	}
