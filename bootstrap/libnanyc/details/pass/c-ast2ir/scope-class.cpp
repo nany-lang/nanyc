@@ -153,8 +153,7 @@ namespace Producer
 				success &= scope.visitASTStmt(stmtnode);
 		}
 
-		// end of the blueprint
-		out.emitEnd();
+		ir::emit::scopeEnd(out);
 		uint32_t blpsize = out.opcodeCount() - bpoffset;
 		out.at<ISA::Op::pragma>(bpoffsiz).value.blueprintsize = blpsize;
 		out.at<ISA::Op::stacksize>(bpoffsck).add = scope.nextVarID + 1u;

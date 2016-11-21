@@ -20,7 +20,7 @@ namespace Instanciate
 			++(frame->scope);
 
 		if (canGenerateCode())
-			out->emitScope();
+			ir::emit::scopeBegin(out);
 	}
 
 
@@ -34,7 +34,7 @@ namespace Instanciate
 			if (frame->scope > 0)
 			{
 				if (canGenerateCode())
-					out->emitEnd();
+					ir::emit::scopeEnd(out);
 				--frame->scope;
 			}
 			else
@@ -48,7 +48,7 @@ namespace Instanciate
 
 					++layerDepthLimit;
 					if (canGenerateCode())
-						out->emitEnd();
+						ir::emit::scopeEnd(out);
 				}
 				else
 					currentSequence.invalidateCursor(*cursor); // end-of-code

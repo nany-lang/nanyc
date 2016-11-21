@@ -952,16 +952,6 @@ namespace ir
 		operands.var   = varid;
 	}
 
-	inline void Sequence::emitScope()
-	{
-		emit<ISA::Op::scope>();
-	}
-
-	inline void Sequence::emitEnd()
-	{
-		emit<ISA::Op::end>();
-	}
-
 	inline void Sequence::emitJmp(uint32_t label)
 	{
 		emit<ISA::Op::jmp>().label = label;

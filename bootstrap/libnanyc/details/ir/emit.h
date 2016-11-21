@@ -112,6 +112,16 @@ namespace
 	}
 
 
+	inline void scopeBegin(SequenceRef ref) {
+		ref.sequence.emit<ISA::Op::scope>();
+	}
+
+
+	inline void scopeEnd(SequenceRef ref) {
+		ref.sequence.emit<ISA::Op::end>();
+	}
+
+
 } // namespace
 } // namespace emit
 } // namespace ir

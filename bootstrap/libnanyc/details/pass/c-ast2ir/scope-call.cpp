@@ -90,7 +90,7 @@ namespace Producer
 									}
 									// generate scope to prevent against unwanted var release in case of jump
 									// (will be released later in `Scope::visitASTExprCall`)
-									out.emitScope();
+									ir::emit::scopeBegin(out);
 								}
 								// visit the parameter
 								bool visited = visitASTExpr(paramchild, paraminfo.localvar);
@@ -212,7 +212,7 @@ namespace Producer
 				out.emitCall(ret__bool, func);
 				// end of scope for 2nd parameter
 				// this way, a jump just after the first one will not try to release the second one
-				out.emitEnd();
+				ir::emit::scopeEnd(out);
 
 				// Shortcircuit label
 				uint32_t sclabel = out.emitLabel(nextvar());
@@ -225,7 +225,7 @@ namespace Producer
 				if (scupdt.offsetStackalloc != 0)
 					out.at<ir::ISA::Op::stackalloc>(scupdt.offsetStackalloc).lvid = sclabel + 1;
 
-				out.emitEnd();
+				ir::emit::scopeEnd(out);
 
 				// reserving variable for sizeof
 				out.emitStackalloc(nextvar(), nyt_u64);

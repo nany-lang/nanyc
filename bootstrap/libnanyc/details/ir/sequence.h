@@ -287,11 +287,6 @@ namespace ir
 		//! Emit a label
 		YUNI_ATTR_NODISCARD uint32_t emitLabel(uint32_t labelid);
 
-		//! Emit a new scope
-		void emitScope();
-		//! Emit the end of a scope
-		void emitEnd();
-
 		//! Read a field
 		void emitFieldget(uint32_t lvid, uint32_t self, uint32_t varid);
 		//! Write a field

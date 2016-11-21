@@ -2,6 +2,7 @@
 #include "details/context/build-info.h"
 #include "details/reporting/report.h"
 #include "scope.h"
+#include "details/ir/emit.h"
 
 using namespace Yuni;
 
@@ -43,7 +44,7 @@ namespace ny
 		for (uint32_t i = 0; i != astnodes.size(); ++i)
 			success &= scope.visitAST(astnodes[i]);
 
-		out.emitEnd();
+		ir::emit::scopeEnd(out);
 		uint32_t blpsize = out.opcodeCount() - bpoffset;
 		out.at<ir::ISA::Op::pragma>(bpoffsiz).value.blueprintsize = blpsize;
 		scope.sequence().at<ir::ISA::Op::stacksize>(bpoffsck).add = scope.nextvar();

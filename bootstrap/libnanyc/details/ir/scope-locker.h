@@ -1,5 +1,5 @@
 #pragma once
-#include "sequence.h"
+#include "emit.h"
 
 
 
@@ -13,12 +13,12 @@ namespace ir
 		OpcodeScopeLocker(Sequence& sequence)
 			: sequence(sequence)
 		{
-			sequence.emitScope();
+			ir::emit::scopeBegin(sequence);
 		}
 
 		~OpcodeScopeLocker()
 		{
-			sequence.emitEnd();
+			ir::emit::scopeEnd(sequence);
 		}
 
 		OpcodeScopeLocker(const OpcodeScopeLocker&) = delete;
