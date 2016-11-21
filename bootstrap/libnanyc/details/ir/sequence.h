@@ -270,9 +270,6 @@ namespace ir
 		//! Emit qualifiers copy
 		void emitInheritQualifiers(uint32_t lhs, uint32_t rhs);
 
-		//! Emit a label
-		YUNI_ATTR_NODISCARD uint32_t emitLabel(uint32_t labelid);
-
 		//! Read a field
 		void emitFieldget(uint32_t lvid, uint32_t self, uint32_t varid);
 		//! Write a field

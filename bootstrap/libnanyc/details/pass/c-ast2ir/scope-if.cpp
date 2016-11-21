@@ -85,7 +85,7 @@ namespace Producer
 
 			// stmt
 			{
-				labelElse = out.emitLabel(nextvar());
+				labelElse = ir::emit::label(out, nextvar());
 				OpcodeScopeLocker opscopeElse{out};
 				auto& elsec = *elseptr;
 				emitDebugpos(elsec);
@@ -96,7 +96,7 @@ namespace Producer
 			}
 		}
 
-		labelEnd = out.emitLabel(nextvar());
+		labelEnd = ir::emit::label(out, nextvar());
 
 		// post-update label ids
 		out.at<ir::ISA::Op::jz>(opOffJz).label = (hasElseClause ? labelElse : labelEnd);
@@ -167,7 +167,7 @@ namespace Producer
 		{
 			ir::emit::trace(out, "else-expr");
 			{
-				labelElse = out.emitLabel(nextvar());
+				labelElse = ir::emit::label(out, nextvar());
 				OpcodeScopeLocker opscopeElse{out};
 				emitDebugpos(elsec);
 
@@ -181,7 +181,7 @@ namespace Producer
 			}
 		}
 
-		labelEnd = out.emitLabel(nextvar());
+		labelEnd = ir::emit::label(out, nextvar());
 
 		// post-update label ids
 		out.at<ir::ISA::Op::jz>(opOffJz).label = (hasElseClause ? labelElse : labelEnd);

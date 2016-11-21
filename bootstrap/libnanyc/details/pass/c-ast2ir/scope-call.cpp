@@ -214,7 +214,7 @@ namespace Producer
 				ir::emit::scopeEnd(out);
 
 				// Shortcircuit label
-				uint32_t sclabel = out.emitLabel(nextvar());
+				uint32_t sclabel = ir::emit::label(out, nextvar());
 				// instanciate a temporary variable, if needed for reading a variable
 				// member (from the class 'bool' for example)
 				// (thus the lvid for this will be exactly (shortcircuitlabel + 1))

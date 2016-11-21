@@ -105,8 +105,7 @@ namespace Producer
 		}
 
 		emitDebugpos(node);
-		uint32_t labelEnd = out.emitLabel(nextvar());
-
+		uint32_t labelEnd = ir::emit::label(out, nextvar());
 		// update all labels for jumping to the end
 		for (uint32_t i = 0 ; i != labelCount; ++i)
 			out.at<ir::ISA::Op::jmp>(labels[i]).label = labelEnd;

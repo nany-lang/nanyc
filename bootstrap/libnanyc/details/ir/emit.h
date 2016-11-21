@@ -132,6 +132,12 @@ namespace
 	}
 
 
+	inline uint32_t label(SequenceRef ref, uint32_t labelid) {
+		ref.sequence.emit<ISA::Op::label>().label = labelid;
+		return labelid;
+	}
+
+
 	template<class T> struct TraceWriter final {
 		static void emit(SequenceRef ref, const T& value) {
 			auto& sequence = ref.sequence;

@@ -527,12 +527,6 @@ namespace ir
 		opc.previous = previous;
 	}
 
-	inline uint32_t Sequence::emitLabel(uint32_t labelid)
-	{
-		emit<ir::ISA::Op::label>().label = labelid;
-		return labelid;
-	}
-
 	inline void Sequence::emitPragmaFuncBody()
 	{
 		emit<ISA::Op::pragma>().pragma = ir::ISA::Pragma::bodystart;

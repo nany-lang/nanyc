@@ -210,10 +210,7 @@ namespace Instanciate
 	inline void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::label>& operands)
 	{
 		if (canGenerateCode())
-		{
-			uint32_t lbl = out->emitLabel(operands.label);
-			(void) lbl; // avoid compiler warning for `emitLabel`
-		}
+			/*uint32_t lbl =*/ ir::emit::label(out, operands.label);
 	}
 
 
