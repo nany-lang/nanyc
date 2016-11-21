@@ -60,7 +60,7 @@ env
 
 
 title "CLEANUP"
-cd src/bootstrap
+cd bootstrap
 echo " - delete CMakeCache.txt" && rm -f CMakeCache.txt
 echo " - delete CMakeFiles" && rm -rf CMakeFiles
 
