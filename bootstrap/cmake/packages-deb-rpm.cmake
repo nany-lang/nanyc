@@ -30,7 +30,7 @@ macro(create_rules_for_packages output)
 				--license "${nany_license}"
 				--maintainer "${nany_contact}"
 				--verbose
-				-p "../../distrib/"
+				-p "../distrib/"
 				-C "${destdir}/libnanyc"
 
 			COMMAND "DESTDIR=${destdir}/nany" "${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=nanyc"
@@ -45,7 +45,7 @@ macro(create_rules_for_packages output)
 				--maintainer "${nany_contact}"
 				--depends libnanyc
 				--verbose
-				-p "../../distrib/"
+				-p "../distrib/"
 				-C "${destdir}/nany"
 
 			COMMAND "DESTDIR=${destdir}/dev" "${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=libnanyc-dev"
@@ -61,7 +61,7 @@ macro(create_rules_for_packages output)
 				--maintainer "${nany_contact}"
 				--depends libnanyc
 				--verbose
-				-p "../../distrib/"
+				-p "../distrib/"
 				-C "${destdir}/dev"
 
 			COMMAND "DESTDIR=${destdir}/dev-tools" "${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=libnanyc-dev-tools"
@@ -77,7 +77,7 @@ macro(create_rules_for_packages output)
 				--maintainer "${nany_contact}"
 				--depends libnanyc
 				--verbose
-				-p "../../distrib/"
+				-p "../distrib/"
 				-C "${destdir}/dev-tools"
 
 			COMMAND rm -rf "${destdir}")

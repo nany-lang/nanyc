@@ -21,7 +21,7 @@ macro(create_rules_for_package_msi)
 
 	add_custom_target(package-msi
 		DEPENDS libnanyc nany nanyc-check-syntax nanyc-dump-ast
-		WORKING_DIRECTORY "../../distrib"
+		WORKING_DIRECTORY "../distrib"
 		COMMAND "${CMAKE_COMMAND}" "-E" echo "-- wix candle ${wix_wxs}.wxs" 
 		COMMAND "C:\\Program Files (x86)\\WiX Toolset v${wix_ver}\\bin\\candle.exe" "${wix_wxs}.wxs"
 
