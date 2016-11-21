@@ -799,13 +799,6 @@ namespace ir
 		operands.type  = type;
 	}
 
-	inline void Sequence::emitNameAlias(uint32_t lvid, const AnyString& name)
-	{
-		auto& operands = emit<ISA::Op::namealias>();
-		operands.lvid  = lvid;
-		operands.name  = stringrefs.ref(name);
-	}
-
 	inline void Sequence::emitReturn()
 	{
 		auto& operands   = emit<ISA::Op::ret>();

@@ -152,6 +152,14 @@ namespace
 	}
 
 
+	inline void namealias(SequenceRef ref, uint32_t lvid, const AnyString& name) {
+		auto& sequence = ref.sequence;
+		auto& operands = sequence.emit<ISA::Op::namealias>();
+		operands.lvid  = lvid;
+		operands.name  = sequence.stringrefs.ref(name);
+	}
+
+
 	template<class T> struct TraceWriter final {
 		static void emit(SequenceRef ref, const T& value) {
 			auto& sequence = ref.sequence;

@@ -194,9 +194,6 @@ namespace ir
 		//! Emit a sizeof opcode
 		void emitSizeof(uint32_t lvid, uint32_t type);
 
-		//! Emit an opcode to create a name alias
-		void emitNameAlias(uint32_t lvid, const AnyString& name);
-
 		//! Emit opcode for type checking
 		void emitTypeIsObject(uint32_t lvid);
 

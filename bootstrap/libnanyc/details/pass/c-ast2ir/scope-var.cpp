@@ -217,7 +217,7 @@ namespace Producer
 		// important: the alias must be declared *after* the right value
 		// (otherwise it may be used by the code)
 		scope.emitDebugpos(node); // reset the debug position
-		out.emitNameAlias(varlvid, varname);
+		ir::emit::namealias(out, varlvid, varname);
 		return true;
 	}
 
