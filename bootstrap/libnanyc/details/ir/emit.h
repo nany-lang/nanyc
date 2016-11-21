@@ -283,6 +283,14 @@ namespace
 	}
 
 
+	inline void fill(SequenceRef ref, uint32_t lvid, uint32_t regsize, uint32_t pattern) {
+		auto& operands   = ref.sequence.emit<ISA::Op::memfill>();
+		operands.lvid    = lvid;
+		operands.regsize = regsize;
+		operands.pattern = pattern;
+	}
+
+
 
 } // namespace
 } // namespace memory

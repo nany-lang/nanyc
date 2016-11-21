@@ -143,8 +143,6 @@ namespace ir
 		//! Emit * (signed)
 		void emitFDIV(uint32_t lvid, uint32_t lhs, uint32_t rhs);
 
-		//! Emit a memfill
-		void emitMemFill(uint32_t lvid, uint32_t regsize, uint32_t pattern);
 		//! Emit a memcopy
 		void emitMemCopy(uint32_t lvid, uint32_t srclvid, uint32_t regsize);
 		//! Emit a memmove

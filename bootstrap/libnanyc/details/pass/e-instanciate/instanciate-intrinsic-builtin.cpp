@@ -362,7 +362,7 @@ namespace Instanciate
 			return seq.complainIntrinsicParameter("memory.memset", 2, cdef, "'__u32'");
 
 		if (seq.canGenerateCode())
-			seq.out->emitMemFill(objlvid, size, patternlvid);
+			ir::emit::memory::fill(seq.out, objlvid, size, patternlvid);
 		return true;
 	}
 
