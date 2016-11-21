@@ -706,13 +706,6 @@ namespace ir
 		operands.lvid   = 0u;
 	}
 
-	inline void Sequence::emitDebugpos(uint32_t line, uint32_t offset)
-	{
-		auto& operands  = emit<ISA::Op::debugpos>();
-		operands.line   = line;
-		operands.offset = offset;
-	}
-
 	inline uint32_t Sequence::emitMemalloc(uint32_t lvid, uint32_t regsize)
 	{
 		auto& operands   = emit<ISA::Op::memalloc>();

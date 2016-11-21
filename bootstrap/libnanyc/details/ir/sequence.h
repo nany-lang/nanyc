@@ -173,10 +173,6 @@ namespace ir
 		//! Enter a namespace def
 		void emitNamespace(const AnyString& name);
 
-		//! Emit debug position
-		void emitDebugpos(uint32_t line, uint32_t offset);
-
-
 		//! emit Assign variable
 		void emitAssign(uint32_t lhs, uint32_t rhs, bool canDisposeLHS = true);
 

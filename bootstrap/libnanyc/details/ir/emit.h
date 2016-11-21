@@ -189,6 +189,13 @@ namespace
 	}
 
 
+	inline void position(SequenceRef ref, uint32_t line, uint32_t offset) {
+		auto& operands  = ref.sequence.emit<ISA::Op::debugpos>();
+		operands.line   = line;
+		operands.offset = offset;
+	}
+
+
 } // namespace
 } // namespace dbginfo
 } // namespace emit

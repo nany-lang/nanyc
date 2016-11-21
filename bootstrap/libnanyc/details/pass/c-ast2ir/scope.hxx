@@ -61,7 +61,7 @@ namespace Producer
 		if (context.debuginfo and
 			(not Config::removeRedundantDbgOffset or offset != context.pPreviousDbgOffset or line != context.pPreviousDbgLine))
 		{
-			context.sequence.emitDebugpos(line, offset);
+			ir::emit::dbginfo::position(context.sequence, line, offset);
 			context.pPreviousDbgOffset = offset;
 			context.pPreviousDbgLine = line;
 		}
