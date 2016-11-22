@@ -13,6 +13,12 @@ namespace ir
 {
 
 
+	Sequence::~Sequence()
+	{
+		free(m_body);
+	}
+
+
 	void Sequence::moveCursorFromBlueprintToEnd(const Instruction*& cursor) const
 	{
 		assert((*cursor).opcodes[0] == static_cast<uint32_t>(ir::ISA::Op::blueprint));

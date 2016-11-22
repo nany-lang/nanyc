@@ -14,12 +14,6 @@ namespace ir
 {
 
 
-	inline Sequence::~Sequence()
-	{
-		free(m_body);
-	}
-
-
 	inline size_t Sequence::sizeInBytes() const
 	{
 		return m_capacity * sizeof(Instruction) + stringrefs.sizeInBytes();
