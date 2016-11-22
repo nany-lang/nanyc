@@ -76,8 +76,7 @@ namespace Instanciate
 					cdefrhs.qualifiers = cdef.qualifiers;
 
 					// fetching the rhs value, from the object being copied
-					out->emitFieldget(rhsptr, /*rhs*/ 3, subatom.varinfo.effectiveFieldIndex);
-
+					ir::emit::fieldget(out, rhsptr, /*rhs*/ 3, subatom.varinfo.effectiveFieldIndex);
 					// perform a deep copy to the local variable
 					instanciateAssignment(*frame, lhsptr, rhsptr, false);
 					// .. copied to the member
@@ -96,7 +95,7 @@ namespace Instanciate
 				default:
 				{
 					// rhs value, from the object being clone
-					out->emitFieldget(lvid, /*rhs*/  3, subatom.varinfo.effectiveFieldIndex);
+					ir::emit::fieldget(out, lvid, /*rhs*/  3, subatom.varinfo.effectiveFieldIndex);
 					// .. copied directly into the local member
 					out->emitFieldset(lvid, /*self*/ 2, subatom.varinfo.effectiveFieldIndex);
 					++lvid;

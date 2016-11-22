@@ -194,7 +194,7 @@ namespace Instanciate
 			else
 			{
 				uint32_t lvidvalue = seq.createLocalVariables();
-				seq.out->emitFieldget(lvidvalue, objlvid, 0);
+				ir::emit::fieldget(seq.out, lvidvalue, objlvid, 0);
 				seq.out->emitFieldset(lvidvalue, /*self*/ 2, varatom->varinfo.effectiveFieldIndex);
 			}
 		}
@@ -624,7 +624,7 @@ namespace Instanciate
 				if (seq.canGenerateCode())
 				{
 					ir::emit::trace(seq.out, "reading inner 'pod' variable");
-					seq.out->emitFieldget(newlvid, lhs, 0);
+					ir::emit::fieldget(seq.out, newlvid, lhs, 0);
 				}
 				lhs = newlvid;
 
@@ -713,7 +713,7 @@ namespace Instanciate
 				if (seq.canGenerateCode())
 				{
 					uint32_t newlvid = seq.createLocalVariables();
-					seq.out->emitFieldget(newlvid, lhs, 0);
+					ir::emit::fieldget(seq.out, newlvid, lhs, 0);
 					lhs = newlvid;
 				}
 			}
@@ -786,7 +786,7 @@ namespace Instanciate
 				{
 					uint32_t newlvid = seq.createLocalVariables();
 					ir::emit::trace(seq.out, "reading inner 'pod' variable");
-					seq.out->emitFieldget(newlvid, lhs, 0);
+					ir::emit::fieldget(seq.out, newlvid, lhs, 0);
 					lhs = newlvid;
 				}
 				else
@@ -810,7 +810,7 @@ namespace Instanciate
 				{
 					uint32_t newlvid = seq.createLocalVariables();
 					ir::emit::trace(seq.out, "reading inner 'pod' variable");
-					seq.out->emitFieldget(newlvid, rhs, 0);
+					ir::emit::fieldget(seq.out, newlvid, rhs, 0);
 					rhs = newlvid;
 				}
 				else

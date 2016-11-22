@@ -679,15 +679,6 @@ namespace ir
 		operands.disposelhs = canDisposeLHS;
 	}
 
-	inline void Sequence::emitFieldget(uint32_t lvid, uint32_t self, uint32_t fieldindex)
-	{
-		assert(lvid != 0 and self != 0);
-		auto& operands = emit<ISA::Op::fieldget>();
-		operands.lvid  = lvid;
-		operands.self  = self;
-		operands.var   = fieldindex;
-	}
-
 	inline void Sequence::emitFieldset(uint32_t lvid, uint32_t self, uint32_t varid)
 	{
 		assert(lvid != 0 and self != 0);

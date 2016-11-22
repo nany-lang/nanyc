@@ -77,7 +77,7 @@ namespace Instanciate
 			cdeftable.substitute(reglvid).import(cdef);
 			// ir::emit::trace(out, [&](){ return String("dispose for ") << subatom.name;});
 			// read the pointer
-			out->emitFieldget(reglvid, /*self*/ 2, subatom.varinfo.effectiveFieldIndex);
+			ir::emit::fieldget(out, reglvid, /*self*/ 2, subatom.varinfo.effectiveFieldIndex);
 
 			auto& origin  = frame->lvids(reglvid).origin.varMember;
 			origin.self   = 2;

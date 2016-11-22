@@ -116,7 +116,7 @@ namespace Instanciate
 			{
 				// read the address
 				assert(self != 0 and "'self can be null only for type resolution'");
-				seq.out->emitFieldget(operands.lvid, self, atom.varinfo.effectiveFieldIndex);
+				ir::emit::fieldget(seq.out, operands.lvid, self, atom.varinfo.effectiveFieldIndex);
 				seq.tryToAcquireObject(operands.lvid, cdefvar);
 			}
 		}

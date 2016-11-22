@@ -60,7 +60,7 @@ namespace Instanciate
 			{
 				// read the first field, assuming that the first one if actually the same type
 				if (canGenerateCode())
-					out->emitFieldget(lhs, rhs, 0);
+					ir::emit::fieldget(out, lhs, rhs, 0);
 				return true;
 			}
 		}

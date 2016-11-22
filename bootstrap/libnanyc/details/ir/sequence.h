@@ -204,8 +204,6 @@ namespace ir
 		//! Emit visibility opcode
 		void emitVisibility(nyvisibility_t);
 
-		//! Read a field
-		void emitFieldget(uint32_t lvid, uint32_t self, uint32_t varid);
 		//! Write a field
 		void emitFieldset(uint32_t lvid, uint32_t self, uint32_t varid);
 		//@}
