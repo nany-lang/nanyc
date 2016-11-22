@@ -26,12 +26,10 @@ namespace ir
 		{
 			// next opcode, which should be blueprint.size
 			(cursor)++;
-
 			// getting the size and moving the cursor
 			auto& blueprintsize = (*cursor).to<ir::ISA::Op::pragma>();
 			assert(blueprintsize.opcode == (uint32_t) ir::ISA::Op::pragma);
 			assert(blueprintsize.value.blueprintsize >= 2);
-
 			cursor += blueprintsize.value.blueprintsize - 2; // -2: blueprint:class+blueprint:size
 			assert((*cursor).opcodes[0] == (uint32_t) ir::ISA::Op::end);
 		}
@@ -45,12 +43,10 @@ namespace ir
 		{
 			// next opcode, which should be blueprint.size
 			(cursor)++;
-
 			// getting the size and moving the cursor
 			auto& blueprintsize = (*cursor).to<ir::ISA::Op::pragma>();
 			assert(blueprintsize.opcode == (uint32_t) ir::ISA::Op::pragma);
 			assert(blueprintsize.value.blueprintsize >= 2);
-
 			cursor += blueprintsize.value.blueprintsize - 2; // -2: blueprint:class+blueprint:size
 			assert((*cursor).opcodes[0] == (uint32_t) ir::ISA::Op::end);
 		}
@@ -72,7 +68,6 @@ namespace ir
 		assert(count > 0);
 		auto newcapa = m_capacity;
 		do { newcapa += 1000u; } while (newcapa < count);
-
 		auto* newbody = (Instruction*) realloc(m_body, sizeof(Instruction) * newcapa);
 		if (unlikely(nullptr == newbody))
 			throw std::bad_alloc();
@@ -90,8 +85,6 @@ namespace ir
 		printer.offset = offset;
 		each(printer, offset);
 	}
-
-
 
 
 	namespace // anonymous
@@ -177,12 +170,9 @@ namespace ir
 	void Sequence::increaseAllLVID(uint32_t inc, uint32_t greaterThan, uint32_t offset)
 	{
 		assert(inc > 0 and "this method should not be called if nothing to do");
-
 		WalkerIncreaseLVID walker{*this, inc, greaterThan};
 		each(walker, offset);
 	}
-
-
 
 
 } // namespace ir

@@ -34,7 +34,6 @@ namespace ir
 		~Sequence();
 		//@}
 
-
 		//! \name Cursor manipulation
 		//@{
 		//! Get if a cursor is valid
@@ -55,7 +54,6 @@ namespace ir
 		//! Move the cursor at the end of the blueprint
 		void moveCursorFromBlueprintToEnd(const Instruction*& cursor) const;
 		//@}
-
 
 		//! \name Opcodes
 		//@{
@@ -79,7 +77,6 @@ namespace ir
 		uint32_t offsetOf(const Instruction& instr) const;
 		//@}
 
-
 		//! \name Iteration
 		//@{
 		//! Visit each instruction
@@ -87,7 +84,6 @@ namespace ir
 		//! Visit each instruction (const)
 		template<class T> void each(T& visitor, uint32_t offset = 0) const;
 		//@}
-
 
 		//! \name Opcode utils
 		//@{
@@ -101,7 +97,6 @@ namespace ir
 		*/
 		void increaseAllLVID(uint32_t inc, uint32_t greaterThan, uint32_t offset = 0);
 		//@}
-
 
 		//! \name Memory Management
 		//@{
@@ -118,13 +113,11 @@ namespace ir
 		void reserve(uint32_t count);
 		//@}
 
-
 		//! \name Debug
 		//@{
 		//! Print the sequence to a string
 		void print(Yuni::String& out, const AtomMap* = nullptr, uint32_t offset = 0) const;
 		//@}
-
 
 		//! \name Operators
 		//@{
@@ -132,11 +125,9 @@ namespace ir
 		Sequence& operator = (const Sequence&) = delete;
 		//@}
 
-
 	public:
 		//! All strings
 		StringRefs stringrefs;
-
 
 	private:
 		//! grow to accept N instructions
@@ -151,9 +142,6 @@ namespace ir
 		Instruction* m_body = nullptr;
 
 	}; // class Sequence
-
-
-
 
 
 } // namespace ir

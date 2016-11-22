@@ -84,6 +84,7 @@ namespace ir
 		return r;
 	}
 
+
 	inline bool Sequence::isCursorValid(const Instruction& instr) const
 	{
 		return (m_size > 0 and m_capacity > 0)
@@ -190,9 +191,6 @@ namespace ir
 			}
 		}
 	}
-
-
-
 
 
 	template<ISA::Op O> inline ISA::Operand<O>& Sequence::emitraw()
