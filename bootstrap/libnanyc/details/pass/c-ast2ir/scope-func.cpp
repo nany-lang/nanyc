@@ -541,7 +541,7 @@ namespace Producer
 		auto& out = sequence();
 
 		// creating a new blueprint for the function
-		uint32_t bpoffset = out.emitBlueprintFunc();
+		uint32_t bpoffset = ir::emit::blueprint::func(out);
 		uint32_t bpoffsiz = ir::emit::pragma::blueprintSize(out);
 		uint32_t bpoffsck = ir::emit::increaseStacksize(out);
 
