@@ -3,7 +3,6 @@
 #include "scope.h"
 #include "details/utils/check-for-valid-identifier-name.h"
 #include "details/ast/ast.h"
-#include "details/ir/scope-locker.h"
 #include "details/ir/emit.h"
 
 using namespace Yuni;
@@ -194,7 +193,7 @@ namespace Producer
 		// default value
 		{
 			LVID rhs = 0;
-			ir::OpcodeScopeLocker opscope{out};
+			ir::emit::ScopeLocker opscope{out};
 			if (not varValueInitialization(scope, rhs, *varAssign, node, varname))
 				return false;
 

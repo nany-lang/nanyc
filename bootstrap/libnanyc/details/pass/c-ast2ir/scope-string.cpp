@@ -1,7 +1,7 @@
 #include "scope.h"
 #include "details/grammar/nany.h"
 #include "details/ast/ast.h"
-#include "details/ir/scope-locker.h"
+#include "details/ir/emit.h"
 #include <limits>
 
 using namespace Yuni;
@@ -190,7 +190,7 @@ namespace Producer
 							return unexpectedNode(expr, "[string-interpolation]");
 
 						// creating a scope for temporary expression (string interpolation)
-						ir::OpcodeScopeLocker opscope{out};
+						ir::emit::ScopeLocker opscope{out};
 						emitDebugpos(expr);
 						uint32_t lvid;
 						if (not visitASTExpr(expr, lvid))

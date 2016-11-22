@@ -1,6 +1,6 @@
 #include "scope.h"
 #include "details/grammar/nany.h"
-#include "details/ir/scope-locker.h"
+#include "details/ir/emit.h"
 
 using namespace Yuni;
 
@@ -48,7 +48,7 @@ namespace Producer
 			}
 		}
 		ir::Producer::Scope scope{*this};
-		OpcodeCodegenDisabler codegenDisabler{sequence()};
+		ir::emit::CodegenLocker codegenDisabler{sequence()};
 		return scope.visitASTExpr(node, localvar);
 	}
 

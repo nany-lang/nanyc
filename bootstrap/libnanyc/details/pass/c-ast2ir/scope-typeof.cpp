@@ -1,6 +1,6 @@
 #include <yuni/yuni.h>
 #include "scope.h"
-#include "details/ir/scope-locker.h"
+#include "details/ir/emit.h"
 
 using namespace Yuni;
 
@@ -45,7 +45,7 @@ namespace Producer
 		bool success = true;
 		auto& out = sequence();
 		ir::Producer::Scope scope{*this};
-		OpcodeCodegenDisabler codegen{out};
+		ir::emit::CodegenLocker codegen{out};
 
 		for (auto& child: node.children)
 		{

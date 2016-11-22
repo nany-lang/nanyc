@@ -354,7 +354,6 @@ addsrc(
 	"details/ir/isa/data.h"
 	"details/ir/isa/data.cpp"
 	"details/ir/isa/printer.inc.hpp"
-	"details/ir/scope-locker.h"
 	"details/ir/instruction.h"
 	"details/ir/emit.h"
 	"details/ir/sequence.h"

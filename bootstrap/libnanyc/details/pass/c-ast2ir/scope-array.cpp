@@ -1,6 +1,6 @@
 #include <yuni/yuni.h>
 #include "scope.h"
-#include "details/ir/scope-locker.h"
+#include "details/ir/emit.h"
 
 using namespace Yuni;
 
@@ -44,7 +44,7 @@ namespace Producer
 		if (success)
 		{
 			auto& out = sequence();
-			ir::OpcodeScopeLocker opscope{out};
+			ir::emit::ScopeLocker opscope{out};
 			emitDebugpos(node);
 			uint32_t lvidappend = ir::emit::alloc(out, nextvar());
 			ir::emit::identify(out, lvidappend, "append", localvar);

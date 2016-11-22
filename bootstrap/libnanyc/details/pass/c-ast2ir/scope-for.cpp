@@ -1,6 +1,6 @@
 #include <yuni/yuni.h>
 #include "scope.h"
-#include "details/ir/scope-locker.h"
+#include "details/ir/emit.h"
 
 using namespace Yuni;
 
@@ -27,8 +27,7 @@ namespace Producer
 		AST::Node* forDoClause = nullptr;
 		AST::Node* forElseClause = nullptr;
 		ir::emit::trace(out, "for");
-
-		OpcodeScopeLocker opscopeElse{out};
+		ir::emit::ScopeLocker opscopeElse{out};
 		for (auto& child: node.children)
 		{
 			switch (child.rule)

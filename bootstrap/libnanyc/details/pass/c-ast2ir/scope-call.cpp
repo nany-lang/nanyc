@@ -1,7 +1,7 @@
 #include <yuni/yuni.h>
 #include "scope.h"
 #include "details/utils/check-for-valid-identifier-name.h"
-#include "details/ir/scope-locker.h"
+#include "details/ir/emit.h"
 
 using namespace Yuni;
 
@@ -177,7 +177,7 @@ namespace Producer
 			{
 				auto callret = ir::emit::alloc(out, nextvar());
 				localvar = callret; // the new expression value
-				ir::OpcodeScopeLocker opscope{out};
+				ir::emit::ScopeLocker opscope{out};
 				bool success = visitASTExprCallParameters(*node);
 				emitTmplParametersIfAny();
 				emitDebugpos(*node);

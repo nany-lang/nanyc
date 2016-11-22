@@ -1,7 +1,7 @@
 #include "scope.h"
 #include "details/grammar/nany.h"
 #include "details/ast/ast.h"
-#include "details/ir/scope-locker.h"
+#include "details/ir/emit.h"
 
 using namespace Yuni;
 
@@ -24,7 +24,7 @@ namespace Producer
 		auto& out = sequence();
 		ir::emit::trace(out, "switch");
 
-		OpcodeScopeLocker opscopeSwitch{out};
+		ir::emit::ScopeLocker opscopeSwitch{out};
 		emitDebugpos(node);
 
 		// the variable id of the initial condition
@@ -75,7 +75,7 @@ namespace Producer
 						return unexpectedNode(child, "[ir/switch/case]");
 					if (success)
 					{
-						OpcodeScopeLocker opscopeCase{out};
+						ir::emit::ScopeLocker opscopeCase{out};
 						rhs->children.clear();
 						rhs->children.push_back(&(child.children[0]));
 						bodyScope.children.clear();

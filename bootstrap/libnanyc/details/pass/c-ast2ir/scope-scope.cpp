@@ -1,6 +1,6 @@
 #include "scope.h"
 #include "details/grammar/nany.h"
-#include "details/ir/scope-locker.h"
+#include "details/ir/emit.h"
 
 using namespace Yuni;
 
@@ -30,7 +30,7 @@ namespace Producer
 			return false;
 		}
 
-		ir::OpcodeScopeLocker opscope{sequence()};
+		ir::emit::ScopeLocker opscope{sequence()};
 		ir::Producer::Scope scope{*this};
 		bool success = true;
 		for (auto& child: node.children)

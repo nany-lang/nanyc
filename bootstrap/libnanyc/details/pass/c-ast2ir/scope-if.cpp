@@ -1,6 +1,6 @@
 #include "scope.h"
 #include "details/grammar/nany.h"
-#include "details/ir/scope-locker.h"
+#include "details/ir/emit.h"
 
 using namespace Yuni;
 
@@ -31,7 +31,7 @@ namespace Producer
 		uint32_t condlvid = ir::emit::alloc(out, nextvar(), nyt_bool);
 		{
 			ir::emit::trace(out, "if-cond-stmt");
-			OpcodeScopeLocker opscopeCond{out};
+			ir::emit::ScopeLocker opscopeCond{out};
 			uint32_t exprEval = 0;
 			emitDebugpos(expr);
 			success &= visitASTExpr(expr, exprEval, false);
@@ -53,7 +53,7 @@ namespace Producer
 			ir::emit::trace(out, "then-stmt");
 			// stmt
 			{
-				OpcodeScopeLocker opscopeThen{out};
+				ir::emit::ScopeLocker opscopeThen{out};
 				emitDebugpos(thenc);
 
 				if (unlikely(thenc.children.size() != 1))
@@ -86,7 +86,7 @@ namespace Producer
 			// stmt
 			{
 				labelElse = ir::emit::label(out, nextvar());
-				OpcodeScopeLocker opscopeElse{out};
+				ir::emit::ScopeLocker opscopeElse{out};
 				auto& elsec = *elseptr;
 				emitDebugpos(elsec);
 				if (unlikely(elsec.children.size() != 1))
@@ -125,7 +125,7 @@ namespace Producer
 		uint32_t condlvid = ir::emit::alloc(out, nextvar(), nyt_bool);
 		{
 			ir::emit::trace(out, "if-cond-expr");
-			OpcodeScopeLocker opscopeCond{out};
+			ir::emit::ScopeLocker opscopeCond{out};
 			uint32_t exprEval = 0;
 			success &= visitASTExpr(expr, exprEval, false);
 			ir::emit::assign(out, condlvid, exprEval, false);
@@ -145,7 +145,7 @@ namespace Producer
 		{
 			ir::emit::trace(out, "then-expr");
 			{
-				OpcodeScopeLocker opscopeThen{out};
+				ir::emit::ScopeLocker opscopeThen{out};
 				emitDebugpos(thenc);
 
 				if (unlikely(thenc.children.size() != 1))
@@ -168,7 +168,7 @@ namespace Producer
 			ir::emit::trace(out, "else-expr");
 			{
 				labelElse = ir::emit::label(out, nextvar());
-				OpcodeScopeLocker opscopeElse{out};
+				ir::emit::ScopeLocker opscopeElse{out};
 				emitDebugpos(elsec);
 
 				if (unlikely(elsec.children.size() != 1))

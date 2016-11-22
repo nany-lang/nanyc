@@ -1013,3 +1013,45 @@ namespace
 } // namespace emit
 } // namespace ir
 } // namespace ny
+
+
+namespace ny
+{
+namespace ir
+{
+namespace emit
+{
+namespace
+{
+
+
+	struct ScopeLocker final {
+		ScopeLocker(Sequence& sequence): sequence(sequence) {
+			ir::emit::scopeBegin(sequence);
+		}
+		~ScopeLocker() {
+			ir::emit::scopeEnd(sequence);
+		}
+		ScopeLocker(const ScopeLocker&) = delete;
+		ScopeLocker(ScopeLocker&&) = default;
+		Sequence& sequence;
+	};
+
+
+	struct CodegenLocker final {
+		CodegenLocker(Sequence& sequence): sequence(sequence) {
+			ir::emit::pragma::codegen(sequence, false);
+		}
+		~CodegenLocker() {
+			ir::emit::pragma::codegen(sequence, true);
+		}
+		CodegenLocker(const CodegenLocker&) = delete;
+		CodegenLocker(CodegenLocker&&) = default;
+		Sequence& sequence;
+	};
+
+
+} // namespace
+} // namespace emit
+} // namespace ir
+} // namespace ny

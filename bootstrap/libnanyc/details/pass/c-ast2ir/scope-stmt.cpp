@@ -1,6 +1,6 @@
 #include "scope.h"
 #include "details/grammar/nany.h"
-#include "details/ir/scope-locker.h"
+#include "details/ir/emit.h"
 
 using namespace Yuni;
 
@@ -82,7 +82,7 @@ namespace Producer
 			}
 			case AST::rgExprGroup:
 			{
-				ir::OpcodeScopeLocker opscope{sequence()};
+				ir::emit::ScopeLocker opscope{sequence()};
 				LVID localvar;
 				return visitASTExpr(node, localvar, /*allowScope:*/true);
 			}

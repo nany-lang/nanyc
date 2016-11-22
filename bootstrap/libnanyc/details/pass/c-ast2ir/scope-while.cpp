@@ -1,6 +1,6 @@
 #include "scope.h"
 #include "details/grammar/nany.h"
-#include "details/ir/scope-locker.h"
+#include "details/ir/emit.h"
 
 using namespace Yuni;
 
@@ -33,7 +33,7 @@ namespace Producer
 		ir::emit::trace(out, "while-do");
 
 		// new scope for the 'while' statement
-		OpcodeScopeLocker opscopeWhile{out};
+		ir::emit::ScopeLocker opscopeWhile{out};
 		emitDebugpos(node);
 
 		// the label at the very begining, to loop back
@@ -45,7 +45,7 @@ namespace Producer
 		ir::emit::alloc(out, condlvid, nyt_bool);
 		// generating the code for the condition itself
 		{
-			OpcodeScopeLocker opscopeCond{out};
+			ir::emit::ScopeLocker opscopeCond{out};
 			auto& condition = node.children[0];
 			emitDebugpos(condition);
 			uint32_t exprEval = 0;
@@ -60,7 +60,7 @@ namespace Producer
 		// 'while' body
 		{
 			ir::emit::trace(out, "while-body");
-			OpcodeScopeLocker opscopeBody{out};
+			ir::emit::ScopeLocker opscopeBody{out};
 			success &= visitASTStmt(node.children[1]);
 		}
 
@@ -93,7 +93,7 @@ namespace Producer
 		ir::emit::trace(out, "do-whilte");
 
 		// new scope for the 'while' statement
-		OpcodeScopeLocker opscopeWhile{out};
+		ir::emit::ScopeLocker opscopeWhile{out};
 
 		// the label at the very begining, to loop back
 		uint32_t labelWhile = ir::emit::label(out, nextvar());
@@ -102,7 +102,7 @@ namespace Producer
 		// 'while' body
 		{
 			ir::emit::trace(out, "do-whilte-body");
-			OpcodeScopeLocker opscopeBody{out};
+			ir::emit::ScopeLocker opscopeBody{out};
 			success &= visitASTStmt(node.children[0]);
 		}
 		ir::emit::trace(out, "do-whilte-condition");
@@ -112,7 +112,7 @@ namespace Producer
 		ir::emit::alloc(out, condlvid, nyt_bool);
 		// generating the code for the condition itself
 		{
-			OpcodeScopeLocker opscopeCond{out};
+			ir::emit::ScopeLocker opscopeCond{out};
 			auto& condition = node.children[1];
 			uint32_t exprEval = 0;
 			emitDebugpos(condition);
