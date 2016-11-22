@@ -224,14 +224,6 @@ namespace ir
 	}
 
 
-	inline void Sequence::emitPragmaSynthetic(uint32_t lvid, bool onoff)
-	{
-		auto& opc  = emit<ISA::Op::pragma>();
-		opc.pragma = ir::ISA::Pragma::synthetic;
-		opc.value.synthetic.lvid  = lvid;
-		opc.value.synthetic.onoff = static_cast<uint32_t>(onoff);
-	}
-
 	inline void Sequence::emitPragmaSuggest(bool onoff)
 	{
 		auto& opc  = emit<ISA::Op::pragma>();

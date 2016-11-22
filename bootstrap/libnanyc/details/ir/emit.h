@@ -773,6 +773,13 @@ namespace
 	}
 
 
+	inline void synthetic(SequenceRef ref, uint32_t lvid, bool onoff) {
+		auto& operands = pragma::make(ref, ir::ISA::Pragma::synthetic);
+		operands.value.synthetic.lvid  = lvid;
+		operands.value.synthetic.onoff = static_cast<uint32_t>(onoff);
+	}
+
+
 } // namespace
 } // namespace pragma
 } // namespace emit

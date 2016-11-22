@@ -126,8 +126,6 @@ namespace ir
 		void emitPragmaBuiltinAlias(const AnyString& name);
 		//! Emit pragma suggest
 		void emitPragmaSuggest(bool onoff);
-		//! Emit pragma synthetic
-		void emitPragmaSynthetic(uint32_t lvid, bool onoff = false);
 
 		//! Emit visibility opcode
 		void emitVisibility(nyvisibility_t);

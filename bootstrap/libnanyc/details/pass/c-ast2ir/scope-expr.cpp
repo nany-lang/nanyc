@@ -146,7 +146,7 @@ namespace Producer
 			attrs.flags -= Attributes::Flag::pushSynthetic;
 			auto& out = sequence();
 			ir::emit::trace(out, [&](){return String("#[__nanyc_synthetic: %") << localvar << ']';});
-			sequence().emitPragmaSynthetic(localvar, false);
+			ir::emit::pragma::synthetic(out, localvar, false);
 		}
 	}
 
