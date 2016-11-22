@@ -617,6 +617,41 @@ namespace
 } // namespace ny
 
 
+namespace ny
+{
+namespace ir
+{
+namespace emit
+{
+namespace blueprint
+{
+namespace
+{
+
+
+	inline auto& make(SequenceRef& ref, ir::ISA::Blueprint kind) {
+		auto& operands = ref.sequence.emit<ir::ISA::Op::blueprint>();
+		operands.kind = static_cast<uint8_t>(kind);
+		return operands;
+	}
+
+
+	inline uint32_t unit(SequenceRef ref, const AnyString& filename) {
+		uint32_t offset = ref.sequence.opcodeCount();
+		auto& operands  = blueprint::make(ref, ir::ISA::Blueprint::unit);
+		operands.name   = ref.sequence.stringrefs.ref(filename);
+		operands.atomid = (uint32_t) -1;
+		operands.lvid   = 0u;
+		return offset;
+	}
+
+
+} // namespace
+} // namespace blueprint
+} // namespace emit
+} // namespace ir
+} // namespace ny
+
 
 namespace ny
 {

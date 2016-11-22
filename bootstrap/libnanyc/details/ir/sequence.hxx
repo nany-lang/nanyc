@@ -235,17 +235,6 @@ namespace ir
 		return offset;
 	}
 
-	inline uint32_t Sequence::emitBlueprintUnit(const AnyString& filename)
-	{
-		uint32_t offset = m_size;
-		auto& operands  = emit<ISA::Op::blueprint>();
-		operands.kind   = (uint32_t) ir::ISA::Blueprint::unit;
-		operands.name   = stringrefs.ref(filename);
-		operands.atomid = static_cast<uint32_t>(-1);
-		operands.lvid   = 0u;
-		return offset;
-	}
-
 	inline void Sequence::emitBlueprintClass(const AnyString& name, uint32_t atomid)
 	{
 		auto& operands  = emit<ISA::Op::blueprint>();

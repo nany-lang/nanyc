@@ -36,7 +36,7 @@ namespace ny
 		// generate IR code for all AST nodes
 		ir::Producer::Scope scope{*producer};
 		ir::emit::dbginfo::filename(out, scope.context.dbgSourceFilename);
-		uint32_t bpoffset = out.emitBlueprintUnit(m_filename);
+		uint32_t bpoffset = ir::emit::blueprint::unit(out, m_filename);
 		uint32_t bpoffsiz = ir::emit::pragma::blueprintSize(out);
 		uint32_t bpoffsck = ir::emit::increaseStacksize(out);
 
