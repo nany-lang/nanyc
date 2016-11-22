@@ -566,9 +566,7 @@ namespace Producer
 			return inspector.body;
 		})();
 
-		// body start (for auto generation)
-		out.emitPragmaFuncBody();
-
+		ir::emit::pragma::funcbody(out);
 		if (likely(body != nullptr))
 		{
 			ir::emit::trace(out, "\nfunc body");

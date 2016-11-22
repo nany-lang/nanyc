@@ -268,11 +268,6 @@ namespace ir
 		opc.value.shortcircuitMutate.source = source;
 	}
 
-	inline void Sequence::emitPragmaFuncBody()
-	{
-		emit<ISA::Op::pragma>().pragma = ir::ISA::Pragma::bodystart;
-	}
-
 	inline void Sequence::emitPragmaAllowCodeGeneration(bool enabled)
 	{
 		auto& operands  = emit<ISA::Op::pragma>();

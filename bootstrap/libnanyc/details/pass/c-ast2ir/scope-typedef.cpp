@@ -75,7 +75,7 @@ namespace Producer
 			operands.symlink  = 0;
 		}
 
-		out.emitPragmaFuncBody(); // to mimic other blueprints
+		ir::emit::pragma::funcbody(out); // to mimic other blueprints
 		ir::emit::scopeEnd(out);
 		uint32_t blpsize = out.opcodeCount() - bpoffset;
 		out.at<ISA::Op::pragma>(bpoffsiz).value.blueprintsize = blpsize;

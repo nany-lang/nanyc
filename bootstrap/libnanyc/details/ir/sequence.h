@@ -114,8 +114,6 @@ namespace ir
 
 		//! Emit opcode to disable code generation
 		void emitPragmaAllowCodeGeneration(bool enabled);
-		//! Emit opcode that indicates the begining of a func body
-		void emitPragmaFuncBody();
 
 		//! Emit pragma shortcircuit
 		void emitPragmaShortcircuit(bool evalvalue);

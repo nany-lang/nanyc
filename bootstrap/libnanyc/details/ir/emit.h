@@ -755,6 +755,35 @@ namespace ir
 {
 namespace emit
 {
+namespace pragma
+{
+namespace
+{
+
+	inline auto& make(SequenceRef& ref, ir::ISA::Pragma value) {
+		auto& operands = ref.sequence.emit<ISA::Op::pragma>();
+		operands.pragma = value;
+		return operands;
+	}
+
+
+	//! Emit opcode that indicates the begining of a func body
+	inline void funcbody(SequenceRef ref) {
+		pragma::make(ref, ir::ISA::Pragma::bodystart);
+	}
+
+
+} // namespace
+} // namespace pragma
+} // namespace emit
+} // namespace ir
+} // namespace ny
+namespace ny
+{
+namespace ir
+{
+namespace emit
+{
 namespace dbginfo
 {
 namespace
