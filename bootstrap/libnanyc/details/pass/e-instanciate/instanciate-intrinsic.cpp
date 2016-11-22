@@ -95,7 +95,7 @@ namespace Instanciate
 				return false;
 
 			if (canGenerateCode())
-				out->emitIntrinsic(operands.lvid, nullptr, intrinsic->id);
+				ir::emit::intrinsic(out, operands.lvid, nullptr, intrinsic->id);
 			return true;
 		})();
 

@@ -149,9 +149,6 @@ namespace ir
 		//! emit Assign variable
 		void emitAssign(uint32_t lhs, uint32_t rhs, bool canDisposeLHS = true);
 
-		//! Emit intrinsic call
-		void emitIntrinsic(uint32_t lvid, const AnyString& name, uint32_t id = (uint32_t) -1);
-
 		//! Emit a blueprint unit opcode and give the offset of the instruction in the sequence
 		uint32_t emitBlueprintUnit(const AnyString& filename);
 

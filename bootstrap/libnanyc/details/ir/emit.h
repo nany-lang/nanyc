@@ -225,6 +225,14 @@ namespace
 	}
 
 
+	inline void intrinsic(SequenceRef ref, uint32_t lvid, const AnyString& name, uint32_t id = (uint32_t) -1) {
+		auto& operands     = ref.sequence.emit<ISA::Op::intrinsic>();
+		operands.lvid      = lvid;
+		operands.intrinsic = ref.sequence.stringrefs.ref(name);
+		operands.iid       = id;
+	}
+
+
 	//! Return with no value
 	inline void ret(SequenceRef ref) {
 		auto& operands   = ref.sequence.emit<ISA::Op::ret>();

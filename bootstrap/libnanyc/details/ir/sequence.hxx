@@ -679,14 +679,6 @@ namespace ir
 		operands.disposelhs = canDisposeLHS;
 	}
 
-	inline void Sequence::emitIntrinsic(uint32_t lvid, const AnyString& name, uint32_t id)
-	{
-		auto& operands     = emit<ISA::Op::intrinsic>();
-		operands.lvid      = lvid;
-		operands.intrinsic = stringrefs.ref(name);
-		operands.iid       = id;
-	}
-
 	inline void Sequence::emitFieldget(uint32_t lvid, uint32_t self, uint32_t fieldindex)
 	{
 		assert(lvid != 0 and self != 0);

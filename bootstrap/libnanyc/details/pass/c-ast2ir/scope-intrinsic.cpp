@@ -66,7 +66,7 @@ namespace Producer
 		emitDebugpos(node);
 		auto& out = sequence();
 		localvar = ir::emit::alloc(out, nextvar());
-		out.emitIntrinsic(localvar, intrinsicname);
+		ir::emit::intrinsic(out, localvar, intrinsicname);
 		return success;
 	}
 
