@@ -38,7 +38,7 @@ namespace ny
 		ir::emit::dbginfo::filename(out, scope.context.dbgSourceFilename);
 		uint32_t bpoffset = out.emitBlueprintUnit(m_filename);
 		uint32_t bpoffsiz = out.emitBlueprintSize();
-		uint32_t bpoffsck = out.emitStackSizeIncrease();
+		uint32_t bpoffsck = ir::emit::increaseStacksize(out);
 
 		bool success = true;
 		for (uint32_t i = 0; i != astnodes.size(); ++i)

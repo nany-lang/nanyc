@@ -96,6 +96,13 @@ namespace
 	}
 
 
+	inline uint32_t increaseStacksize(SequenceRef ref, uint32_t size = 0) {
+		uint32_t offset = ref.sequence.opcodeCount();
+		ref.sequence.emit<ISA::Op::stacksize>().add = size;
+		return offset;
+	}
+
+
 	inline void cassert(SequenceRef ref, uint32_t lvid) {
 		ref.sequence.emit<ISA::Op::opassert>().lvid = lvid;
 	}

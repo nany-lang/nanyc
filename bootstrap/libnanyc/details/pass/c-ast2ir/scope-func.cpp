@@ -543,7 +543,7 @@ namespace Producer
 		// creating a new blueprint for the function
 		uint32_t bpoffset = out.emitBlueprintFunc();
 		uint32_t bpoffsiz = out.emitBlueprintSize();
-		uint32_t bpoffsck = out.emitStackSizeIncrease();
+		uint32_t bpoffsck = ir::emit::increaseStacksize(out);
 
 		// making sure that debug info are available
 		context.pPreviousDbgLine = (uint32_t) -1; // forcing debug infos

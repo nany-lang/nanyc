@@ -67,8 +67,7 @@ namespace Producer
 		// creating a new blueprint for the function
 		bpoffset = out.emitBlueprintClass(lvid);
 		bpoffsiz = out.emitBlueprintSize();
-		bpoffsck = out.emitStackSizeIncrease();
-
+		bpoffsck = ir::emit::increaseStacksize(out);
 		// making sure that debug info are available
 		scope.context.invalidateLastDebugLine();
 		ir::emit::dbginfo::filename(out, scope.context.dbgSourceFilename);

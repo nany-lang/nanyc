@@ -526,18 +526,6 @@ namespace ir
 		operands.value.visibility = static_cast<uint32_t>(visibility);
 	}
 
-	inline uint32_t Sequence::emitStackSizeIncrease(uint32_t size)
-	{
-		uint32_t offset = m_size;
-		emit<ISA::Op::stacksize>().add = size;
-		return offset;
-	}
-
-	inline uint32_t Sequence::emitStackSizeIncrease()
-	{
-		return emitStackSizeIncrease(0);
-	}
-
 	inline uint32_t Sequence::emitBlueprintSize()
 	{
 		uint32_t offset = m_size;

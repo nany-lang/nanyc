@@ -177,11 +177,6 @@ namespace ir
 		//! Emit a blueprint vardef opcode
 		void emitBlueprintVardef(LVID, const AnyString& name);
 
-		//! Emit a stack size increase opcode and give the offset of the instruction in the sequence
-		uint32_t emitStackSizeIncrease();
-		//! Emit a stack size increase opcode
-		uint32_t emitStackSizeIncrease(uint32_t size);
-
 		//! Emit opcode to disable code generation
 		void emitPragmaAllowCodeGeneration(bool enabled);
 		//! Emit opcode that indicates the begining of a func body
