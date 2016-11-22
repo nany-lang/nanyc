@@ -346,7 +346,7 @@ namespace Producer
 		{
 			uint32_t selfid = scope.nextvar();
 			out.emitBlueprintParam(selfid, "self");
-			out.emitSelf(selfid); // to resolve the type as 'self'
+			ir::emit::type::isself(out, selfid);
 		}
 		// iterating through all other user-defined parameters
 		uint32_t offset = (hasImplicitSelf) ? 1u : 0u;

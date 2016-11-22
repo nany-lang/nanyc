@@ -164,9 +164,6 @@ namespace ir
 		//! Emit intrinsic call
 		void emitIntrinsic(uint32_t lvid, const AnyString& name, uint32_t id = (uint32_t) -1);
 
-		//! Emit a self opcode
-		void emitSelf(uint32_t self);
-
 		//! Emit a sizeof opcode
 		void emitSizeof(uint32_t lvid, uint32_t type);
 

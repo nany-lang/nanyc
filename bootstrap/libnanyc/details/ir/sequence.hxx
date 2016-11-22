@@ -698,11 +698,6 @@ namespace ir
 		operands.type  = type;
 	}
 
-	inline void Sequence::emitSelf(uint32_t self)
-	{
-		emit<ISA::Op::self>().self = self;
-	}
-
 	inline void Sequence::emitAssign(uint32_t lhs, uint32_t rhs, bool canDisposeLHS)
 	{
 		auto& operands = emit<ISA::Op::assign>();

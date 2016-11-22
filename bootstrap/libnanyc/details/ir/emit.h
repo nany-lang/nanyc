@@ -254,6 +254,30 @@ namespace ir
 {
 namespace emit
 {
+namespace type
+{
+namespace
+{
+
+	inline void isself(SequenceRef ref, uint32_t lvid) {
+		ref.sequence.emit<ISA::Op::self>().self = lvid;
+	}
+
+
+} // namespace
+} // namespace type
+} // namespace emit
+} // namespace ir
+} // namespace ny
+
+
+
+namespace ny
+{
+namespace ir
+{
+namespace emit
+{
 namespace memory
 {
 namespace
