@@ -189,13 +189,13 @@ namespace Instanciate
 			if (not implicitBuiltin)
 			{
 				seq.tryToAcquireObject(objlvid);
-				seq.out->emitFieldset(objlvid, /*self*/ 2, varatom->varinfo.effectiveFieldIndex);
+				ir::emit::fieldset(seq.out, objlvid, /*self*/ 2, varatom->varinfo.effectiveFieldIndex);
 			}
 			else
 			{
 				uint32_t lvidvalue = seq.createLocalVariables();
 				ir::emit::fieldget(seq.out, lvidvalue, objlvid, 0);
-				seq.out->emitFieldset(lvidvalue, /*self*/ 2, varatom->varinfo.effectiveFieldIndex);
+				ir::emit::fieldset(seq.out, lvidvalue, /*self*/ 2, varatom->varinfo.effectiveFieldIndex);
 			}
 		}
 		return true;
@@ -673,7 +673,7 @@ namespace Instanciate
 				ir::emit::ref(seq.out, lvid);
 				seq.frame->lvids(lvid).autorelease = true;
 				// reset the internal value of the object
-				seq.out->emitFieldset(opresult, /*self*/lvid, 0); // builtin
+				ir::emit::fieldset(seq.out, opresult, /*self*/lvid, 0); // builtin
 			}
 		}
 		else
@@ -912,7 +912,7 @@ namespace Instanciate
 				ir::emit::ref(seq.out, lvid);
 				seq.frame->lvids(lvid).autorelease = true;
 				// reset the internal value of the object
-				seq.out->emitFieldset(opresult, /*self*/lvid, 0); // builtin
+				ir::emit::fieldset(seq.out, opresult, /*self*/lvid, 0); // builtin
 			}
 		}
 		else

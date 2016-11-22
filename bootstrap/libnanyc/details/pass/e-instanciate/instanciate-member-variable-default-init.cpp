@@ -54,8 +54,7 @@ namespace Instanciate
 					if (unlikely(!varatom))
 						return (void)(ice() << "invalid atom for automatic initialization of captured variable '" << name << '\'');
 
-					out->emitFieldset(lvid, /*self*/ 2, varatom->varinfo.effectiveFieldIndex);
-
+					ir::emit::fieldset(out, lvid, /*self*/ 2, varatom->varinfo.effectiveFieldIndex);
 					// acquire 'lvid' to keep it alive
 					if (canBeAcquired(cdef))
 						ir::emit::ref(out, lvid);
@@ -171,8 +170,7 @@ namespace Instanciate
 							return;
 						}
 
-						out->emitFieldset(lvid, /*self*/ 2, varatom->varinfo.effectiveFieldIndex);
-
+						ir::emit::fieldset(out, lvid, /*self*/ 2, varatom->varinfo.effectiveFieldIndex);
 						// acquire 'lvid' to keep it alive
 						if (canBeAcquired(cdef))
 							ir::emit::ref(out, lvid);

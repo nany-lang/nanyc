@@ -80,8 +80,7 @@ namespace Instanciate
 					// perform a deep copy to the local variable
 					instanciateAssignment(*frame, lhsptr, rhsptr, false);
 					// .. copied to the member
-					out->emitFieldset(lhsptr, /*self*/ 2, subatom.varinfo.effectiveFieldIndex);
-
+					ir::emit::fieldset(out, lhsptr, /*self*/ 2, subatom.varinfo.effectiveFieldIndex);
 					// prevent the cloned object from being released at the end of the scope
 					assert(canBeAcquired(lhsptr));
 					frame->lvids(lhsptr).autorelease = false;
@@ -97,7 +96,7 @@ namespace Instanciate
 					// rhs value, from the object being clone
 					ir::emit::fieldget(out, lvid, /*rhs*/  3, subatom.varinfo.effectiveFieldIndex);
 					// .. copied directly into the local member
-					out->emitFieldset(lvid, /*self*/ 2, subatom.varinfo.effectiveFieldIndex);
+					ir::emit::fieldset(out, lvid, /*self*/ 2, subatom.varinfo.effectiveFieldIndex);
 					++lvid;
 				}
 			}

@@ -164,7 +164,7 @@ namespace Instanciate
 				{
 					ir::emit::copy(out, lhs, rhs);
 					if (isMemberVariable)
-						out->emitFieldset(lhs, origin.self, origin.field);
+						ir::emit::fieldset(out, lhs, origin.self, origin.field);
 				}
 				break;
 			}
@@ -194,7 +194,7 @@ namespace Instanciate
 					if (isMemberVariable)
 					{
 						ir::emit::ref(out, lhs); // re-acquire for the object
-						out->emitFieldset(lhs, origin.self, origin.field);
+						ir::emit::fieldset(out, lhs, origin.self, origin.field);
 					}
 				}
 				break;
@@ -249,7 +249,7 @@ namespace Instanciate
 					if (isMemberVariable)
 					{
 						ir::emit::ref(out, lhs);
-						out->emitFieldset(lhs, origin.self, origin.field);
+						ir::emit::fieldset(out, lhs, origin.self, origin.field);
 					}
 				}
 				break;

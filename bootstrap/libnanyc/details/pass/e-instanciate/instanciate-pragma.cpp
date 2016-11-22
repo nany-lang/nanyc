@@ -159,7 +159,7 @@ namespace Instanciate
 			ir::emit::ref(seq.out, lvid);
 			seq.frame->lvids(lvid).autorelease = true;
 			// reset the internal value of the object
-			seq.out->emitFieldset(source, /*self*/lvid, 0); // builtin
+			ir::emit::fieldset(seq.out, source, /*self*/lvid, 0); // builtin
 		}
 		else
 			ir::emit::copy(seq.out, lvid, source);

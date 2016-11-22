@@ -258,6 +258,15 @@ namespace
 	}
 
 
+	inline void fieldset(SequenceRef ref, uint32_t lvid, uint32_t self, uint32_t varid) {
+		assert(lvid != 0 and self != 0);
+		auto& operands = ref.sequence.emit<ISA::Op::fieldset>();
+		operands.lvid  = lvid;
+		operands.self  = self;
+		operands.var   = varid;
+	}
+
+
 	template<class T> struct TraceWriter final {
 		static void emit(SequenceRef ref, const T& value) {
 			auto& sequence = ref.sequence;
