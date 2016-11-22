@@ -112,13 +112,6 @@ namespace ir
 		//! Emit a blueprint vardef opcode
 		void emitBlueprintVardef(LVID, const AnyString& name);
 
-		//! Emit pragma shortcircuit
-		void emitPragmaShortcircuit(bool evalvalue);
-		//! Emit pragma shortcircuit opcode 'nop' offset
-		void emitPragmaShortcircuitMetadata(uint32_t label);
-		//! Emit pragma shortcircuit opcode
-		void emitPragmaShortcircuitMutateToBool(uint32_t lvid, uint32_t  source);
-
 		//! Emit visibility opcode
 		void emitVisibility(nyvisibility_t);
 		//@}

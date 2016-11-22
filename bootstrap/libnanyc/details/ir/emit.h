@@ -799,6 +799,25 @@ namespace
 	}
 
 
+	inline void shortcircuit(SequenceRef ref, bool evalvalue) {
+		auto& operands = pragma::make(ref, ir::ISA::Pragma::shortcircuit);
+		operands.value.shortcircuit = static_cast<uint32_t>(evalvalue);
+	}
+
+
+	inline void shortcircuitMetadata(SequenceRef ref, uint32_t label) {
+		auto& operands = pragma::make(ref, ir::ISA::Pragma::shortcircuitOpNopOffset);
+		operands.value.shortcircuitMetadata.label = label;
+	}
+
+
+	inline void shortcircuitMutateToBool(SequenceRef ref, uint32_t lvid, uint32_t source) {
+		auto& operands = pragma::make(ref, ir::ISA::Pragma::shortcircuitMutateToBool);
+		operands.value.shortcircuitMutate.lvid = lvid;
+		operands.value.shortcircuitMutate.source = source;
+	}
+
+
 } // namespace
 } // namespace pragma
 } // namespace emit

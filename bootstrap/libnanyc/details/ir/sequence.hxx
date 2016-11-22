@@ -224,28 +224,6 @@ namespace ir
 	}
 
 
-	inline void Sequence::emitPragmaShortcircuit(bool evalvalue)
-	{
-		auto& opc  = emit<ISA::Op::pragma>();
-		opc.pragma = ir::ISA::Pragma::shortcircuit;
-		opc.value.shortcircuit = static_cast<uint32_t>(evalvalue);
-	}
-
-	inline void Sequence::emitPragmaShortcircuitMetadata(uint32_t label)
-	{
-		auto& opc  = emit<ISA::Op::pragma>();
-		opc.pragma = ir::ISA::Pragma::shortcircuitOpNopOffset;
-		opc.value.shortcircuitMetadata.label = label;
-	}
-
-	inline void Sequence::emitPragmaShortcircuitMutateToBool(uint32_t lvid, uint32_t source)
-	{
-		auto& opc  = emit<ISA::Op::pragma>();
-		opc.pragma = ir::ISA::Pragma::shortcircuitMutateToBool;
-		opc.value.shortcircuitMutate.lvid = lvid;
-		opc.value.shortcircuitMutate.source = source;
-	}
-
 	inline void Sequence::emitVisibility(nyvisibility_t visibility)
 	{
 		auto& operands  = emit<ISA::Op::pragma>();

@@ -435,7 +435,7 @@ namespace Producer
 
 		if (attrs.flags(Attributes::Flag::shortcircuit))
 		{
-			out.emitPragmaShortcircuit(1);
+			ir::emit::pragma::shortcircuit(out, true);
 			attrs.flags -= Attributes::Flag::shortcircuit;
 		}
 		if (attrs.flags(Attributes::Flag::builtinAlias))

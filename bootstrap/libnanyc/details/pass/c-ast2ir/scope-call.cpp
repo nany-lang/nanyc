@@ -127,7 +127,7 @@ namespace Producer
 		if (shortcircuit)
 		{
 			shortcircuit->offsetPragma = out.opcodeCount();
-			out.emitPragmaShortcircuitMetadata(0 /*label*/);
+			ir::emit::pragma::shortcircuitMetadata(out, 0 /*label*/);
 			if (unlikely(paramCount != 2))
 				ice(node) << "invalid number of parameters for shortcircuit";
 		}
@@ -222,9 +222,8 @@ namespace Producer
 					out.at<ir::ISA::Op::stackalloc>(scupdt.offsetStackalloc).lvid = sclabel + 1;
 
 				ir::emit::scopeEnd(out);
-				// reserving variable for sizeof
-				ir::emit::alloc(out, nextvar(), nyt_u64);
-				out.emitPragmaShortcircuitMutateToBool(callret, ret__bool);
+				ir::emit::alloc(out, nextvar(), nyt_u64); // allocating for sizeof
+				ir::emit::pragma::shortcircuitMutateToBool(out, callret, ret__bool);
 				return success;
 			}
 		}
