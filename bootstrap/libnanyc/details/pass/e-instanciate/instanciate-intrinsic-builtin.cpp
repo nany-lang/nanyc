@@ -267,7 +267,7 @@ namespace Instanciate
 			if (not isBuiltinOrVoid)
 			{
 				assert(atom != nullptr);
-				seq.out->emitSizeof(lvid, atom->atomid);
+				ir::emit::type::objectSizeof(seq.out, lvid, atom->atomid);
 			}
 			else
 			{
@@ -666,7 +666,7 @@ namespace Instanciate
 				// SIZEOF: the second variable on the stack is `sizeof(<object>)`
 				// (sizeof the object to allocate)
 				seq.cdeftable.substitute(sizeoflvid).mutateToBuiltin(nyt_u64);
-				seq.out->emitSizeof(sizeoflvid, atomBuiltinCast->atomid);
+				ir::emit::type::objectSizeof(seq.out, sizeoflvid, atomBuiltinCast->atomid);
 
 				// ALLOC: memory allocation of the new temporary object
 				ir::emit::memory::allocate(seq.out, lvid, sizeoflvid);
@@ -906,8 +906,7 @@ namespace Instanciate
 				// SIZEOF: the second variable on the stack is `sizeof(<object>)`
 				// (sizeof the object to allocate)
 				seq.cdeftable.substitute(sizeoflvid).mutateToBuiltin(nyt_u64);
-				seq.out->emitSizeof(sizeoflvid, atomBuiltinCast->atomid);
-
+				ir::emit::type::objectSizeof(seq.out, sizeoflvid, atomBuiltinCast->atomid);
 				// ALLOC: memory allocation of the new temporary object
 				ir::emit::memory::allocate(seq.out, lvid, sizeoflvid);
 				ir::emit::ref(seq.out, lvid);

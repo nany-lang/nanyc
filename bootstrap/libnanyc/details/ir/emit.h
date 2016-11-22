@@ -276,6 +276,13 @@ namespace
 	}
 
 
+	inline void objectSizeof(SequenceRef ref, uint32_t lvid, uint32_t type) {
+		auto& operands = ref.sequence.emit<ISA::Op::classdefsizeof>();
+		operands.lvid  = lvid;
+		operands.type  = type;
+	}
+
+
 } // namespace
 } // namespace type
 } // namespace emit

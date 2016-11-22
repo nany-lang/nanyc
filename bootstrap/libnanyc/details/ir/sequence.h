@@ -164,9 +164,6 @@ namespace ir
 		//! Emit intrinsic call
 		void emitIntrinsic(uint32_t lvid, const AnyString& name, uint32_t id = (uint32_t) -1);
 
-		//! Emit a sizeof opcode
-		void emitSizeof(uint32_t lvid, uint32_t type);
-
 		//! Emit opcode for adding/removing ref qualifier
 		void emitQualifierRef(uint32_t lvid, bool flag);
 		//! Emit opcode for adding/removing const qualifier

@@ -149,7 +149,7 @@ namespace Instanciate
 
 			// sizeof
 			auto& atombool = *(seq.cdeftable.atoms().core.object[nyt_bool]);
-			seq.out->emitSizeof(sizeoflvid, atombool.atomid);
+			ir::emit::type::objectSizeof(seq.out, sizeoflvid, atombool.atomid);
 
 			auto& opc = seq.cdeftable.substitute(lvid);
 			opc.mutateToAtom(&atombool);

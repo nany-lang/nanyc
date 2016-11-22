@@ -231,7 +231,7 @@ namespace Instanciate
 					uint32_t retcall = lvid + 1;
 
 					uint32_t rsizof = ir::emit::alloc(out, lvid, nyt_u64);
-					out->emitSizeof(rsizof, rhsAtom->atomid);
+					ir::emit::type::objectSizeof(out, rsizof, rhsAtom->atomid);
 
 					// re-allocate some memory
 					ir::emit::memory::allocate(out, lhs, rsizof);

@@ -679,13 +679,6 @@ namespace ir
 		operands.lvid   = 0u;
 	}
 
-	inline void Sequence::emitSizeof(uint32_t lvid, uint32_t type)
-	{
-		auto& operands = emit<ISA::Op::classdefsizeof>();
-		operands.lvid  = lvid;
-		operands.type  = type;
-	}
-
 	inline void Sequence::emitAssign(uint32_t lhs, uint32_t rhs, bool canDisposeLHS)
 	{
 		auto& operands = emit<ISA::Op::assign>();

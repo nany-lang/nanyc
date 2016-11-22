@@ -30,8 +30,7 @@ namespace Instanciate
 					ice() << "invalid atom for sizeof operator";
 					return;
 				}
-
-				out->emitSizeof(operands.lvid, atom->atomid);
+				ir::emit::type::objectSizeof(out, operands.lvid, atom->atomid);
 			}
 			else
 			{
