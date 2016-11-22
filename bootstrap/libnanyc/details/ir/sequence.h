@@ -81,10 +81,6 @@ namespace ir
 		//! emit Assign variable
 		void emitAssign(uint32_t lhs, uint32_t rhs, bool canDisposeLHS = true);
 
-		//! Emit a blueprint class opcode
-		void emitBlueprintClass(const AnyString& name, uint32_t atomid);
-		//! Emit a blueprint class opcode and give the offset of the instruction in the sequence
-		uint32_t emitBlueprintClass(uint32_t lvid = 0);
 		//! Emit a blueprint typealias opcode
 		uint32_t emitBlueprintTypealias(const AnyString& name, uint32_t atomid = static_cast<uint32_t>(-1));
 

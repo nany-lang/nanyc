@@ -654,6 +654,24 @@ namespace
 	}
 
 
+	inline void classdef(SequenceRef ref, const AnyString& name, uint32_t atomid) {
+		auto& operands  = blueprint::make(ref, ir::ISA::Blueprint::classdef);
+		operands.name   = ref.sequence.stringrefs.ref(name);
+		operands.atomid = atomid;
+		operands.lvid   = 0u;
+	}
+
+
+	inline uint32_t classdef(SequenceRef ref, uint32_t lvid) {
+		uint32_t offset = ref.sequence.opcodeCount();
+		auto& operands  = blueprint::make(ref, ir::ISA::Blueprint::classdef);
+		operands.name   = 0u;
+		operands.atomid = (uint32_t) -1;
+		operands.setLVID(lvid);
+		return offset;
+	}
+
+
 } // namespace
 } // namespace blueprint
 } // namespace emit
