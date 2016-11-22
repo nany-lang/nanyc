@@ -698,6 +698,16 @@ namespace
 	}
 
 
+	inline uint32_t typealias(SequenceRef ref, const AnyString& name, uint32_t atomid = (uint32_t) -1) {
+		uint32_t offset = ref.sequence.opcodeCount();
+		auto& operands  = blueprint::make(ref, ir::ISA::Blueprint::typealias);
+		operands.name   = ref.sequence.stringrefs.ref(name);
+		operands.atomid = atomid;
+		operands.lvid   = 0u;
+		return offset;
+	}
+
+
 } // namespace
 } // namespace blueprint
 } // namespace emit
