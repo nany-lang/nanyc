@@ -101,8 +101,7 @@ namespace Producer
 		// debug info
 		emitDebugpos((call ? *call : node));
 		auto& out = sequence();
-
-		out.emitTypeIsObject(rettype);
+		ir::emit::type::isobject(out, rettype);
 
 		// OBJECT ALLOCATION
 		uint32_t pointer = 0;

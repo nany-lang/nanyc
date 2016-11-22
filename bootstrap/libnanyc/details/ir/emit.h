@@ -264,6 +264,18 @@ namespace
 	}
 
 
+	inline void isobject(SequenceRef ref, uint32_t lvid) {
+		ref.sequence.emit<ISA::Op::typeisobject>().lvid = lvid;
+	}
+
+
+	inline void common(SequenceRef ref, uint32_t lvid, uint32_t previous) {
+		auto& operands = ref.sequence.emit<ISA::Op::commontype>();
+		operands.lvid = lvid;
+		operands.previous = previous;
+	}
+
+
 } // namespace
 } // namespace type
 } // namespace emit

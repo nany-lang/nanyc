@@ -463,11 +463,6 @@ namespace ir
 		operands.rhs   = rhs;
 	}
 
-	inline void Sequence::emitTypeIsObject(uint32_t lvid)
-	{
-		emit<ISA::Op::typeisobject>().lvid = lvid;
-	}
-
 	inline void Sequence::emitInheritQualifiers(uint32_t lhs, uint32_t rhs)
 	{
 		auto& operands   = emit<ISA::Op::inherit>();
@@ -518,13 +513,6 @@ namespace ir
 		opc.pragma = ir::ISA::Pragma::shortcircuitMutateToBool;
 		opc.value.shortcircuitMutate.lvid = lvid;
 		opc.value.shortcircuitMutate.source = source;
-	}
-
-	inline void Sequence::emitCommonType(uint32_t lvid, uint32_t previous)
-	{
-		auto& opc = emit<ISA::Op::commontype>();
-		opc.lvid = lvid;
-		opc.previous = previous;
 	}
 
 	inline void Sequence::emitPragmaFuncBody()

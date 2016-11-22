@@ -26,7 +26,7 @@ namespace Producer
 		if (previous != 0)
 		{
 			scope.emitDebugpos(expr);
-			out.emitCommonType(lvid, previous);
+			ir::emit::type::common(out, lvid, previous);
 		}
 		previous = lvid;
 		return ok;

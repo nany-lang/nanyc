@@ -167,16 +167,10 @@ namespace ir
 		//! Emit a sizeof opcode
 		void emitSizeof(uint32_t lvid, uint32_t type);
 
-		//! Emit opcode for type checking
-		void emitTypeIsObject(uint32_t lvid);
-
 		//! Emit opcode for adding/removing ref qualifier
 		void emitQualifierRef(uint32_t lvid, bool flag);
 		//! Emit opcode for adding/removing const qualifier
 		void emitQualifierConst(uint32_t lvid, bool flag);
-
-		//! Emit common type
-		void emitCommonType(uint32_t lvid, uint32_t previous);
 
 		//! Emit a blueprint unit opcode and give the offset of the instruction in the sequence
 		uint32_t emitBlueprintUnit(const AnyString& filename);
