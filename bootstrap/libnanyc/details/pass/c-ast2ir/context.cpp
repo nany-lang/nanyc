@@ -77,9 +77,8 @@ namespace Producer
 	{
 		if (not nmspc.empty())
 		{
-			nmspc.words(".", [&](const AnyString& part) -> bool
-			{
-				sequence.emitNamespace(part);
+			nmspc.words(".", [&](const AnyString& part) -> bool {
+				ir::emit::blueprint::namespacedef(sequence, part);
 				return true;
 			});
 		}

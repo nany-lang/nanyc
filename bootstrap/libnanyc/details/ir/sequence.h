@@ -78,9 +78,6 @@ namespace ir
 		//! Get the offset of an instruction within the sequence
 		uint32_t offsetOf(const Instruction& instr) const;
 
-		//! Enter a namespace def
-		void emitNamespace(const AnyString& name);
-
 		//! emit Assign variable
 		void emitAssign(uint32_t lhs, uint32_t rhs, bool canDisposeLHS = true);
 

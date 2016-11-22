@@ -328,15 +328,6 @@ namespace ir
 		operands.setLVID(lvid);
 	}
 
-	inline void Sequence::emitNamespace(const AnyString& name)
-	{
-		auto& operands  = emit<ISA::Op::blueprint>();
-		operands.kind   = (uint32_t) ir::ISA::Blueprint::namespacedef;
-		operands.name   = stringrefs.ref(name);
-		operands.atomid = static_cast<uint32_t>(-1);
-		operands.lvid   = 0u;
-	}
-
 	inline void Sequence::emitAssign(uint32_t lhs, uint32_t rhs, bool canDisposeLHS)
 	{
 		auto& operands = emit<ISA::Op::assign>();

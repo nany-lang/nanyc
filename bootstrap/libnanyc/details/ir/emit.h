@@ -646,6 +646,14 @@ namespace
 	}
 
 
+	inline void namespacedef(SequenceRef ref, const AnyString& name) {
+		auto& operands  = blueprint::make(ref, ir::ISA::Blueprint::namespacedef);
+		operands.name   = ref.sequence.stringrefs.ref(name);
+		operands.atomid = (uint32_t) -1;
+		operands.lvid   = 0u;
+	}
+
+
 } // namespace
 } // namespace blueprint
 } // namespace emit
