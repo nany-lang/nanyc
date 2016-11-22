@@ -253,13 +253,6 @@ namespace ir
 		opc.value.shortcircuitMutate.source = source;
 	}
 
-	inline void Sequence::emitPragmaAllowCodeGeneration(bool enabled)
-	{
-		auto& operands  = emit<ISA::Op::pragma>();
-		operands.pragma = ISA::Pragma::codegen;
-		operands.value.codegen = static_cast<uint32_t>(enabled);
-	}
-
 	inline void Sequence::emitVisibility(nyvisibility_t visibility)
 	{
 		auto& operands  = emit<ISA::Op::pragma>();

@@ -33,12 +33,12 @@ namespace ir
 		OpcodeCodegenDisabler(Sequence& sequence)
 			: sequence(sequence)
 		{
-			sequence.emitPragmaAllowCodeGeneration(false);
+			ir::emit::pragma::codegen(sequence, false);
 		}
 
 		~OpcodeCodegenDisabler()
 		{
-			sequence.emitPragmaAllowCodeGeneration(true);
+			ir::emit::pragma::codegen(sequence, true);
 		}
 
 		OpcodeCodegenDisabler(const OpcodeCodegenDisabler&) = delete;

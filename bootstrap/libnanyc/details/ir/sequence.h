@@ -112,9 +112,6 @@ namespace ir
 		//! Emit a blueprint vardef opcode
 		void emitBlueprintVardef(LVID, const AnyString& name);
 
-		//! Emit opcode to disable code generation
-		void emitPragmaAllowCodeGeneration(bool enabled);
-
 		//! Emit pragma shortcircuit
 		void emitPragmaShortcircuit(bool evalvalue);
 		//! Emit pragma shortcircuit opcode 'nop' offset

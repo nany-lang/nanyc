@@ -786,6 +786,13 @@ namespace
 	}
 
 
+	//! Emit opcode to disable code generation
+	inline void codegen(SequenceRef ref, bool enabled) {
+		auto& operands = pragma::make(ref, ir::ISA::Pragma::codegen);
+		operands.value.codegen = static_cast<uint32_t>(enabled);
+	}
+
+
 } // namespace
 } // namespace pragma
 } // namespace emit
