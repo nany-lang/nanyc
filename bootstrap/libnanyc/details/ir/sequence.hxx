@@ -224,13 +224,6 @@ namespace ir
 	}
 
 
-	inline void Sequence::emitPragmaSuggest(bool onoff)
-	{
-		auto& opc  = emit<ISA::Op::pragma>();
-		opc.pragma = ir::ISA::Pragma::suggest;
-		opc.value.suggest = static_cast<uint32_t>(onoff);
-	}
-
 	inline void Sequence::emitPragmaBuiltinAlias(const AnyString& name)
 	{
 		auto& opc  = emit<ISA::Op::pragma>();

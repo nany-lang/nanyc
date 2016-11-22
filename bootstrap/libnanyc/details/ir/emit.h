@@ -780,6 +780,12 @@ namespace
 	}
 
 
+	inline void suggest(SequenceRef ref, bool onoff) {
+		auto& operands = pragma::make(ref, ir::ISA::Pragma::suggest);
+		operands.value.suggest = static_cast<uint32_t>(onoff);
+	}
+
+
 } // namespace
 } // namespace pragma
 } // namespace emit

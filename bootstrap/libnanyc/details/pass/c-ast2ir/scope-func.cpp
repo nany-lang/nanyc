@@ -450,7 +450,7 @@ namespace Producer
 		}
 		if (attrs.flags(Attributes::Flag::doNotSuggest))
 		{
-			out.emitPragmaSuggest(0);
+			ir::emit::pragma::suggest(out, false);
 			attrs.flags -= Attributes::Flag::doNotSuggest;
 			assert(not attrs.flags(Attributes::Flag::doNotSuggest));
 		}
