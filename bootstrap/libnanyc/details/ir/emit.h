@@ -22,6 +22,238 @@ namespace
 	};
 
 
+	inline void opnot(SequenceRef ref, uint32_t lvid, uint32_t lhs)
+	{
+		auto& operands = ref.sequence.emit<ISA::Op::negation>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+	}
+
+
+	inline void opfadd(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+		auto& operands = ref.sequence.emit<ISA::Op::fadd>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+
+	inline void opfsub(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+		auto& operands = ref.sequence.emit<ISA::Op::fsub>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+
+	inline void opfdiv(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+		auto& operands = ref.sequence.emit<ISA::Op::fdiv>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+
+	inline void opfmul(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+		auto& operands = ref.sequence.emit<ISA::Op::fmul>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+
+	inline void opadd(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+		auto& operands = ref.sequence.emit<ISA::Op::add>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+
+	inline void opsub(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+		auto& operands = ref.sequence.emit<ISA::Op::sub>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+
+	inline void opdiv(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+		auto& operands = ref.sequence.emit<ISA::Op::div>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+
+	inline void opmul(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+		auto& operands = ref.sequence.emit<ISA::Op::mul>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+
+	inline void opimul(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+		auto& operands = ref.sequence.emit<ISA::Op::imul>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+
+	inline void opidiv(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+		auto& operands = ref.sequence.emit<ISA::Op::idiv>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+
+	inline void opeq(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+		auto& operands = ref.sequence.emit<ISA::Op::eq>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+
+	inline void opneq(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+		auto& operands = ref.sequence.emit<ISA::Op::neq>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+
+	inline void opflt(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+		auto& operands = ref.sequence.emit<ISA::Op::flt>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+
+	inline void opflte(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+		auto& operands = ref.sequence.emit<ISA::Op::flte>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+
+	inline void opfgt(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+		auto& operands = ref.sequence.emit<ISA::Op::fgt>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+
+	inline void opfgte(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+		auto& operands = ref.sequence.emit<ISA::Op::fgte>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+
+	inline void oplt(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+		auto& operands = ref.sequence.emit<ISA::Op::lt>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+
+	inline void oplte(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+		auto& operands = ref.sequence.emit<ISA::Op::lte>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+
+	inline void opilt(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+		auto& operands = ref.sequence.emit<ISA::Op::ilt>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+
+	inline void opilte(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+		auto& operands = ref.sequence.emit<ISA::Op::ilte>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+
+	inline void opgt(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+		auto& operands = ref.sequence.emit<ISA::Op::gt>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+
+	inline void opgte(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+		auto& operands = ref.sequence.emit<ISA::Op::gte>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+
+	inline void opigt(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+		auto& operands = ref.sequence.emit<ISA::Op::igt>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+
+	inline void opigte(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+		auto& operands = ref.sequence.emit<ISA::Op::igte>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+
+	inline void opand(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+		auto& operands = ref.sequence.emit<ISA::Op::opand>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+
+	inline void opor(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+		auto& operands = ref.sequence.emit<ISA::Op::opor>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+
+	inline void opxor(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+		auto& operands = ref.sequence.emit<ISA::Op::opxor>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+
+	inline void opmod(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+		auto& operands = ref.sequence.emit<ISA::Op::opmod>();
+		operands.lvid  = lvid;
+		operands.lhs   = lhs;
+		operands.rhs   = rhs;
+	}
+
+
 	inline void nop(SequenceRef ref) {
 		ref.sequence.emit<ISA::Op::nop>();
 	}

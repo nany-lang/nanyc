@@ -78,68 +78,6 @@ namespace ir
 		//! Get the offset of an instruction within the sequence
 		uint32_t offsetOf(const Instruction& instr) const;
 
-		//! Emit equal
-		void emitEQ(uint32_t lvid, uint32_t lhs, uint32_t rhs);
-		//! Emit not equal
-		void emitNEQ(uint32_t lvid, uint32_t lhs, uint32_t rhs);
-		//! Emit LT
-		void emitLT(uint32_t lvid, uint32_t lhs, uint32_t rhs);
-		//! Emit LTE
-		void emitLTE(uint32_t lvid, uint32_t lhs, uint32_t rhs);
-		//! Emit LT
-		void emitILT(uint32_t lvid, uint32_t lhs, uint32_t rhs);
-		//! Emit LTE
-		void emitILTE(uint32_t lvid, uint32_t lhs, uint32_t rhs);
-		//! Emit GT
-		void emitGT(uint32_t lvid, uint32_t lhs, uint32_t rhs);
-		//! Emit GTE
-		void emitGTE(uint32_t lvid, uint32_t lhs, uint32_t rhs);
-		//! Emit GT
-		void emitIGT(uint32_t lvid, uint32_t lhs, uint32_t rhs);
-		//! Emit GTE
-		void emitIGTE(uint32_t lvid, uint32_t lhs, uint32_t rhs);
-		//! Emit FLT
-		void emitFLT(uint32_t lvid, uint32_t lhs, uint32_t rhs);
-		//! Emit FLTE
-		void emitFLTE(uint32_t lvid, uint32_t lhs, uint32_t rhs);
-		//! Emit FGT
-		void emitFGT(uint32_t lvid, uint32_t lhs, uint32_t rhs);
-		//! Emit FGTE
-		void emitFGTE(uint32_t lvid, uint32_t lhs, uint32_t rhs);
-
-		//! Emit AND
-		void emitAND(uint32_t lvid, uint32_t lhs, uint32_t rhs);
-		//! Emit AND
-		void emitOR(uint32_t lvid, uint32_t lhs, uint32_t rhs);
-		//! Emit AND
-		void emitXOR(uint32_t lvid, uint32_t lhs, uint32_t rhs);
-		//! Emit AND
-		void emitMOD(uint32_t lvid, uint32_t lhs, uint32_t rhs);
-
-		//! Emit not
-		void emitNOT(uint32_t lvid, uint32_t lhs);
-
-		//! Emit +
-		void emitADD(uint32_t lvid, uint32_t lhs, uint32_t rhs);
-		//! Emit -
-		void emitSUB(uint32_t lvid, uint32_t lhs, uint32_t rhs);
-		//! Emit *
-		void emitMUL(uint32_t lvid, uint32_t lhs, uint32_t rhs);
-		//! Emit * (signed)
-		void emitIMUL(uint32_t lvid, uint32_t lhs, uint32_t rhs);
-		//! Emit /
-		void emitDIV(uint32_t lvid, uint32_t lhs, uint32_t rhs);
-		//! Emit / (signed)
-		void emitIDIV(uint32_t lvid, uint32_t lhs, uint32_t rhs);
-		//! Emit +
-		void emitFADD(uint32_t lvid, uint32_t lhs, uint32_t rhs);
-		//! Emit -
-		void emitFSUB(uint32_t lvid, uint32_t lhs, uint32_t rhs);
-		//! Emit *
-		void emitFMUL(uint32_t lvid, uint32_t lhs, uint32_t rhs);
-		//! Emit * (signed)
-		void emitFDIV(uint32_t lvid, uint32_t lhs, uint32_t rhs);
-
 		//! Enter a namespace def
 		void emitNamespace(const AnyString& name);
 
