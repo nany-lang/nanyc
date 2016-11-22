@@ -503,6 +503,13 @@ namespace
 	}
 
 
+	inline void hold(SequenceRef ref, uint32_t lvid, uint32_t size) {
+		auto& opr = ref.sequence.emit<ISA::Op::memcheckhold>();
+		opr.lvid = lvid;
+		opr.size = size;
+	}
+
+
 } // namespace
 } // namespace memory
 } // namespace emit

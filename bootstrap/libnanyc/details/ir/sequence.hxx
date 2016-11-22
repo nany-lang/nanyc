@@ -223,14 +223,6 @@ namespace ir
 		return result;
 	}
 
-
-	inline void Sequence::emitMemcheckhold(uint32_t lvid, uint32_t size)
-	{
-		auto& opr = emit<ISA::Op::memcheckhold>();
-		opr.lvid = lvid;
-		opr.size = size;
-	}
-
 	inline void Sequence::emitNOT(uint32_t lvid, uint32_t lhs)
 	{
 		auto& operands = emit<ISA::Op::negation>();

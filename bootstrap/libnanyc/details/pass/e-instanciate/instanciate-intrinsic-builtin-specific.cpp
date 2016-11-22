@@ -67,7 +67,7 @@ namespace Instanciate
 			return seq.complainIntrinsicParameter("__nanyc_memchecker_hold", 0, cdefsize, "'__u64'");
 
 		if (seq.canGenerateCode())
-			seq.out->emitMemcheckhold(ptrlvid, sizelvid);
+			ir::emit::memory::hold(seq.out, ptrlvid, sizelvid);
 		return true;
 	}
 
