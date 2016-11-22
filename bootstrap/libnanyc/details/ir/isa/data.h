@@ -7,7 +7,7 @@
 #include <yuni/core/string.h>
 
 
-namespace ny { struct AtomMap; namespace ir { class Sequence; struct Instruction; } }
+namespace ny { struct AtomMap; namespace ir { struct Sequence; struct Instruction; } }
 
 namespace ny
 {

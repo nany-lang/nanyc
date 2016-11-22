@@ -21,7 +21,6 @@ namespace ir
 
 
 
-	class Sequence;
 	class ClassdefRef;
 
 

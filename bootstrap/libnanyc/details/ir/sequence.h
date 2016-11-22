@@ -21,9 +21,8 @@ namespace ir
 {
 
 
-	class Sequence final
+	struct Sequence final
 	{
-	public:
 		//! \name Constructors & Destructor
 		//@{
 		//! Default constructor
@@ -141,7 +140,7 @@ namespace ir
 		//! m_body of the sequence
 		Instruction* m_body = nullptr;
 
-	}; // class Sequence
+	}; // Sequence
 
 
 } // namespace ir

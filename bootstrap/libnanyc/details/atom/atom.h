@@ -26,8 +26,7 @@ namespace ny
 	struct AtomMap;
 	class ClassdefTable;
 	class ClassdefTableView;
-
-
+	namespace ir { struct Sequence; }
 
 
 	/*!

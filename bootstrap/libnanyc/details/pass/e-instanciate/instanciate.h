@@ -308,7 +308,6 @@ namespace Instanciate
 
 		// exit status
 		mutable bool success = true;
-		friend class ny::ir::Sequence;
 
 		//! Previous sequence builder
 		SequenceBuilder* parent = nullptr;
