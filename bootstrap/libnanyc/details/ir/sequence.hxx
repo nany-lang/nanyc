@@ -760,22 +760,6 @@ namespace ir
 		operands.var   = varid;
 	}
 
-	inline void Sequence::emitQualifierRef(uint32_t lvid, bool flag)
-	{
-		auto& operands = emit<ISA::Op::qualifiers>();
-		operands.lvid  = lvid;
-		operands.flag  = static_cast<uint32_t>(flag);
-		operands.qualifier = ir::ISA::TypeQualifier::ref;
-	}
-
-	inline void Sequence::emitQualifierConst(uint32_t lvid, bool flag)
-	{
-		auto& operands = emit<ISA::Op::qualifiers>();
-		operands.lvid  = lvid;
-		operands.flag  = static_cast<uint32_t>(flag);
-		operands.qualifier = ir::ISA::TypeQualifier::constant;
-	}
-
 
 } // namespace ir
 } // namespace ny

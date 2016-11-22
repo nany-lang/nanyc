@@ -115,7 +115,7 @@ namespace Producer
 
 		// result of the expression
 		ifret = ir::emit::alloc(out, nextvar());
-		out.emitQualifierRef(ifret, true);
+		ir::emit::type::qualifierRef(out, ifret, true);
 
 		bool hasElseClause = true;
 		bool success = true;

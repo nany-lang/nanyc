@@ -115,9 +115,8 @@ namespace Producer
 		{
 			if (localvar == (uint32_t) -1)
 				localvar = ir::emit::alloc(out, reserveLocalVariable());
-
-			out.emitQualifierRef(localvar, isRef);
-			out.emitQualifierConst(localvar, isConst);
+			ir::emit::type::qualifierRef(out, localvar, isRef);
+			ir::emit::type::qualifierConst(out, localvar, isConst);
 		}
 		return success;
 	}

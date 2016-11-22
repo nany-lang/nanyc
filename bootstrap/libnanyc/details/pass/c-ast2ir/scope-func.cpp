@@ -293,9 +293,9 @@ namespace Producer
 		// the qualifiers may have been set by the type definition
 		// thus they must be overriden and not always reset
 		if (ref)
-			out.emitQualifierRef(lvid, true);
+			ir::emit::type::qualifierRef(out, lvid, true);
 		if (constant)
-			out.emitQualifierConst(lvid, true);
+			ir::emit::type::qualifierConst(out, lvid, true);
 		return success;
 	}
 

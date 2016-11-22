@@ -157,10 +157,9 @@ namespace Producer
 			operands.symlink  = 0;
 		}
 		// preserve var / ref / const
-		out.emitQualifierRef(mbvar, ref);
+		ir::emit::type::qualifierRef(out, mbvar, ref);
 		if (constant)
-			out.emitQualifierConst(mbvar, true);
-
+			ir::emit::type::qualifierConst(out, mbvar, true);
 		// variable definition
 		scope.emitDebugpos(node);
 		out.emitBlueprintVardef(mbvar, varname);
@@ -189,12 +188,10 @@ namespace Producer
 			operands.lvid	  = lvidtype;
 			operands.symlink  = 0;
 		}
-
 		// preserve var / ref / const
-		out.emitQualifierRef(varlvid, ref);
+		ir::emit::type::qualifierRef(out, varlvid, ref);
 		if (constant)
-			out.emitQualifierConst(varlvid, true);
-
+			ir::emit::type::qualifierConst(out, varlvid, true);
 		// default value
 		{
 			LVID rhs = 0;
