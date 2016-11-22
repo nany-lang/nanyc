@@ -81,10 +81,6 @@ namespace ir
 		//! emit Assign variable
 		void emitAssign(uint32_t lhs, uint32_t rhs, bool canDisposeLHS = true);
 
-		//! Emit a blueprint param opcode and give the offset of the instruction in the sequence
-		uint32_t emitBlueprintParam(LVID, const AnyString&);
-		//! Emit a blueprint param opcode and give the offset of the instruction in the sequence
-		uint32_t emitBlueprintParam(LVID);
 		//! Emit a blueprint template param opcode and give the offset of the instruction in the sequence
 		uint32_t emitBlueprintGenericTypeParam(LVID, const AnyString&);
 		//! Emit a blueprint template param opcode and give the offset of the instruction in the sequence

@@ -347,7 +347,7 @@ namespace Producer
 		if (hasImplicitSelf)
 		{
 			uint32_t selfid = scope.nextvar();
-			out.emitBlueprintParam(selfid, "self");
+			ir::emit::blueprint::param(out, selfid, "self");
 			ir::emit::type::isself(out, selfid);
 		}
 		// iterating through all other user-defined parameters
@@ -361,7 +361,7 @@ namespace Producer
 			uint32_t paramOffsets[Config::maxPushedParameters];
 			for (uint32_t i = offset; i < paramCount; ++i) // reserving lvid for each parameter
 			{
-				uint32_t opaddr = out.emitBlueprintParam(scope.nextvar(), nullptr);
+				uint32_t opaddr = ir::emit::blueprint::param(out, scope.nextvar(), nullptr);
 				paramOffsets[i - offset] = opaddr;
 			}
 
