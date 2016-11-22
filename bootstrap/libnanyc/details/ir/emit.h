@@ -824,6 +824,14 @@ namespace
 	}
 
 
+	inline uint32_t blueprintSize(SequenceRef ref) {
+		uint32_t offset = ref.sequence.opcodeCount();
+		auto& operands = pragma::make(ref, ir::ISA::Pragma::blueprintsize);
+		operands.value.blueprintsize = 0;
+		return offset;
+	}
+
+
 } // namespace
 } // namespace pragma
 } // namespace emit

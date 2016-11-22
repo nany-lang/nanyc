@@ -98,8 +98,6 @@ namespace ir
 		void emitBlueprintFunc(const AnyString& name, uint32_t atomid);
 		//! Emit a blueprint func opcode and give the offset of the instruction in the sequence
 		uint32_t emitBlueprintFunc();
-		//! Emit a blueprint size opcode and give the offset of the instruction in the sequence
-		uint32_t emitBlueprintSize();
 		//! Emit a blueprint param opcode and give the offset of the instruction in the sequence
 		uint32_t emitBlueprintParam(LVID, const AnyString&);
 		//! Emit a blueprint param opcode and give the offset of the instruction in the sequence

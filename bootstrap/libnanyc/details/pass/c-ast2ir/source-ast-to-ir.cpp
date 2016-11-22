@@ -37,7 +37,7 @@ namespace ny
 		ir::Producer::Scope scope{*producer};
 		ir::emit::dbginfo::filename(out, scope.context.dbgSourceFilename);
 		uint32_t bpoffset = out.emitBlueprintUnit(m_filename);
-		uint32_t bpoffsiz = out.emitBlueprintSize();
+		uint32_t bpoffsiz = ir::emit::pragma::blueprintSize(out);
 		uint32_t bpoffsck = ir::emit::increaseStacksize(out);
 
 		bool success = true;

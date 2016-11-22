@@ -66,7 +66,7 @@ namespace Producer
 		auto& out = scope.sequence();
 		// creating a new blueprint for the function
 		bpoffset = out.emitBlueprintClass(lvid);
-		bpoffsiz = out.emitBlueprintSize();
+		bpoffsiz = ir::emit::pragma::blueprintSize(out);
 		bpoffsck = ir::emit::increaseStacksize(out);
 		// making sure that debug info are available
 		scope.context.invalidateLastDebugLine();

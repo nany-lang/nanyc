@@ -224,15 +224,6 @@ namespace ir
 	}
 
 
-	inline uint32_t Sequence::emitBlueprintSize()
-	{
-		uint32_t offset = m_size;
-		auto& operands = emit<ISA::Op::pragma>();
-		operands.pragma = ISA::Pragma::blueprintsize;
-		operands.value.blueprintsize = 0;
-		return offset;
-	}
-
 	inline uint32_t Sequence::emitBlueprintTypealias(const AnyString& name, uint32_t atomid)
 	{
 		uint32_t offset = m_size;

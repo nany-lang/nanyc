@@ -51,7 +51,7 @@ namespace Producer
 
 		ir::Producer::Scope scope{*this};
 		uint32_t bpoffset = out.emitBlueprintTypealias(typedefname);
-		uint32_t bpoffsiz = out.emitBlueprintSize();
+		uint32_t bpoffsiz = ir::emit::pragma::blueprintSize(out);
 		uint32_t bpoffsck = ir::emit::increaseStacksize(out);
 
 		// making sure that debug info are available
