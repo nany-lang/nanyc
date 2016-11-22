@@ -1,3 +1,4 @@
+
 #include <yuni/yuni.h>
 #include <yuni/core/noncopyable.h>
 #include "scope.h"
@@ -188,6 +189,7 @@ namespace Producer
 		bool success = true;
 		// operator new (self x)
 		bool autoMemberAssignment = false;
+		auto& out = scope.sequence();
 
 		// we can have the following pattern: ref a: sometype
 		// the qualifiers will be reset by the type definition (if any)
@@ -239,7 +241,7 @@ namespace Producer
 					}
 					if (not lvidIsAny(paramtype) and paramtype != 0)
 					{
-						auto& operands    = scope.sequence().emit<ISA::Op::follow>();
+						auto& operands    = out.emit<ISA::Op::follow>();
 						operands.follower = lvid;
 						operands.lvid     = paramtype;
 						operands.symlink  = 1;
@@ -280,10 +282,10 @@ namespace Producer
 		}
 
 		// update the parameter name within the ir code (whatever previous result)
-		auto sid = scope.sequence().stringrefs.ref(paramname);
+		auto sid = out.stringrefs.ref(paramname);
 		// update the parameter opcode
 		{
-			auto& opparam = scope.sequence().at<ISA::Op::blueprint>(paramoffset);
+			auto& opparam = out.at<ISA::Op::blueprint>(paramoffset);
 			opparam.name  = sid;
 			if (autoMemberAssignment)
 				opparam.kind = (uint32_t) ir::ISA::Blueprint::paramself;
@@ -291,9 +293,9 @@ namespace Producer
 		// the qualifiers may have been set by the type definition
 		// thus they must be overriden and not always reset
 		if (ref)
-			scope.sequence().emitQualifierRef(lvid, true);
+			out.emitQualifierRef(lvid, true);
 		if (constant)
-			scope.sequence().emitQualifierConst(lvid, true);
+			out.emitQualifierConst(lvid, true);
 		return success;
 	}
 
