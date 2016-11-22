@@ -818,6 +818,12 @@ namespace
 	}
 
 
+	inline void visibility(SequenceRef ref, nyvisibility_t visibility) {
+		auto& operands = pragma::make(ref, ir::ISA::Pragma::visibility);
+		operands.value.visibility = static_cast<uint32_t>(visibility);
+	}
+
+
 } // namespace
 } // namespace pragma
 } // namespace emit

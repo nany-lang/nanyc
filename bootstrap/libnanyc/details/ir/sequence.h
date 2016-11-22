@@ -111,9 +111,6 @@ namespace ir
 
 		//! Emit a blueprint vardef opcode
 		void emitBlueprintVardef(LVID, const AnyString& name);
-
-		//! Emit visibility opcode
-		void emitVisibility(nyvisibility_t);
 		//@}
 
 

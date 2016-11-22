@@ -224,13 +224,6 @@ namespace ir
 	}
 
 
-	inline void Sequence::emitVisibility(nyvisibility_t visibility)
-	{
-		auto& operands  = emit<ISA::Op::pragma>();
-		operands.pragma = ISA::Pragma::visibility;
-		operands.value.visibility = static_cast<uint32_t>(visibility);
-	}
-
 	inline uint32_t Sequence::emitBlueprintSize()
 	{
 		uint32_t offset = m_size;

@@ -91,7 +91,7 @@ namespace Producer
 				}
 				// set the visibility
 				scope.emitDebugpos(node);
-				scope.sequence().emitVisibility(visibility);
+				ir::emit::pragma::visibility(scope.sequence(), visibility);
 			}
 			else
 			{
