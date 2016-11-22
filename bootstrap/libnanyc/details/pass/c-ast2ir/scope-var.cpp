@@ -162,8 +162,7 @@ namespace Producer
 			ir::emit::type::qualifierConst(out, mbvar, true);
 		// variable definition
 		scope.emitDebugpos(node);
-		out.emitBlueprintVardef(mbvar, varname);
-
+		ir::emit::blueprint::var(out, mbvar, varname);
 		// generating an INIT func for the variable
 		return generateInitFuncForClassVar(scope, varname, mbvar, *varAssign);
 	}

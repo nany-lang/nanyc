@@ -92,9 +92,6 @@ namespace ir
 		uint32_t emitBlueprintGenericTypeParam(LVID, const AnyString&);
 		//! Emit a blueprint template param opcode and give the offset of the instruction in the sequence
 		uint32_t emitBlueprintGenericTypeParam(LVID);
-
-		//! Emit a blueprint vardef opcode
-		void emitBlueprintVardef(LVID, const AnyString& name);
 		//@}
 
 

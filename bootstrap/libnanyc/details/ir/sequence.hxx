@@ -279,15 +279,6 @@ namespace ir
 		return offset;
 	}
 
-	inline void Sequence::emitBlueprintVardef(LVID lvid, const AnyString& name)
-	{
-		auto& operands  = emit<ISA::Op::blueprint>();
-		operands.kind   = (uint32_t) ir::ISA::Blueprint::vardef;
-		operands.name   = stringrefs.ref(name);
-		operands.atomid = static_cast<uint32_t>(-1);
-		operands.setLVID(lvid);
-	}
-
 	inline void Sequence::emitAssign(uint32_t lhs, uint32_t rhs, bool canDisposeLHS)
 	{
 		auto& operands = emit<ISA::Op::assign>();

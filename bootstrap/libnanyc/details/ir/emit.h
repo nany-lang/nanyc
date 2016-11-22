@@ -690,6 +690,14 @@ namespace
 	}
 
 
+	inline void var(SequenceRef ref, uint32_t lvid, const AnyString& name) {
+		auto& operands  = blueprint::make(ref, ir::ISA::Blueprint::vardef);
+		operands.name   = ref.sequence.stringrefs.ref(name);
+		operands.atomid = (uint32_t) -1;
+		operands.setLVID(lvid);
+	}
+
+
 } // namespace
 } // namespace blueprint
 } // namespace emit
