@@ -2,7 +2,6 @@
 #include "details/grammar/nany.h"
 #include "details/ir/emit.h"
 #include "details/ast/ast.h"
-#include <iostream>
 
 using namespace Yuni;
 
