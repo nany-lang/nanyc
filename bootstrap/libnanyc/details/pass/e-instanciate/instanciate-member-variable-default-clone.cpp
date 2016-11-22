@@ -108,8 +108,8 @@ namespace Instanciate
 		if (userDefinedClone)
 		{
 			ir::emit::trace(out, "\nuser's defined clone method");
-			out->emitPush(2); // self
-			out->emitPush(3); // rhs
+			ir::emit::push(out, 2); // self
+			ir::emit::push(out, 3); // rhs
 			out->emitCall(lvid, userDefinedClone->atomid, 0);
 			++lvid;
 		}

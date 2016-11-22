@@ -150,10 +150,6 @@ namespace ir
 		void emitAssign(uint32_t lhs, uint32_t rhs, bool canDisposeLHS = true);
 
 		//! Emit a push parameter
-		void emitPush(uint32_t lvid);
-		//! Emit a named parameter
-		void emitPush(uint32_t lvid, const AnyString& name);
-		//! Emit a push parameter
 		void emitTPush(uint32_t lvid);
 		//! Emit a named parameter
 		void emitTPush(uint32_t lvid, const AnyString& name);

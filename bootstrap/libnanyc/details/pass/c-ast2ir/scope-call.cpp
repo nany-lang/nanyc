@@ -136,10 +136,7 @@ namespace Producer
 		for (uint32_t i = 0; i != paramCount; ++i)
 		{
 			const auto& info = pushedIndexedParam[i];
-			if (info.name.empty())
-				out.emitPush(info.localvar);
-			else
-				out.emitPush(info.localvar, info.name);
+			ir::emit::push(out, info.localvar, info.name);
 		}
 		return true;
 	}

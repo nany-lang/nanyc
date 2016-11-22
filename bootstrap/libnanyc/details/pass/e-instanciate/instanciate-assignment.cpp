@@ -240,10 +240,9 @@ namespace Instanciate
 
 					ir::emit::alloc(out, retcall, nyt_void);
 					// call operator 'clone'
-					out->emitPush(lhs); // self
-					out->emitPush(rhs); // rhs, the object to copy
+					ir::emit::push(out, lhs); // self
+					ir::emit::push(out, rhs); // the object to copy
 					out->emitCall(retcall, rhsAtom->classinfo.clone.atomid, rhsAtom->classinfo.clone.instanceid);
-
 					// release rhs - copy is done
 					tryUnrefObject(rhs);
 

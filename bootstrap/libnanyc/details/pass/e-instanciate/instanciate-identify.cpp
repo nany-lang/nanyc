@@ -178,8 +178,7 @@ namespace Instanciate
 		if (seq.canGenerateCode())
 		{
 			for (auto& param: params)
-				seq.out->emitPush(param.clid.lvid());
-
+				ir::emit::push(seq.out, param.clid.lvid());
 			seq.out->emitCall(lvid, propatom.atomid, info.instanceid);
 		}
 		return true;

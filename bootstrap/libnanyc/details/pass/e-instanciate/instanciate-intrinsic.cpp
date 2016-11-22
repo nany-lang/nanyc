@@ -89,7 +89,7 @@ namespace Instanciate
 					continue;
 				}
 				if (canGenerateCode())
-					out->emitPush(element.lvid);
+					ir::emit::push(out, element.lvid);
 			}
 			if (unlikely(hasErrors))
 				return false;

@@ -153,8 +153,8 @@ namespace Producer
 			uint32_t sid = ir::emit::alloctext(out, nextvar(), context.reuse.string.text);
 			uint32_t lid = ir::emit::allocu64(out, nextvar(), nyt_u32, context.reuse.string.text.size());
 			uint32_t ret = ir::emit::alloc(out, nextvar(), nyt_void);
-			out.emitPush(sid); // text: __text
-			out.emitPush(lid); // size: __u64
+			ir::emit::push(out, sid); // text: __text
+			ir::emit::push(out, lid); // size: __u64
 			out.emitCall(ret, calllvid);
 		};
 
@@ -198,7 +198,7 @@ namespace Producer
 
 						emitDebugpos(expr);
 						uint32_t ret = ir::emit::alloc(out, nextvar(), nyt_void);
-						out.emitPush(lvid);
+						ir::emit::push(out, lvid);
 						out.emitCall(ret, calllvid);
 					}
 					break;

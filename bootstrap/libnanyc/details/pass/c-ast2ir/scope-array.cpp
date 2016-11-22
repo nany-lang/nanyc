@@ -59,7 +59,7 @@ namespace Producer
 					if (success)
 					{
 						auto callret = ir::emit::alloc(out, nextvar());
-						out.emitPush(lvid);
+						ir::emit::push(out, lvid);
 						out.emitCall(callret, func);
 					}
 				}
