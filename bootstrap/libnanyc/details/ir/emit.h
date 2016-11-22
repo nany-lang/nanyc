@@ -488,6 +488,14 @@ namespace
 	}
 
 
+	inline void assign(SequenceRef ref, uint32_t lhs, uint32_t rhs, bool canDisposeLHS) {
+		auto& operands = ref.sequence.emit<ISA::Op::assign>();
+		operands.lhs = lhs;
+		operands.rhs = rhs;
+		operands.disposelhs = canDisposeLHS;
+	}
+
+
 	inline void fieldget(SequenceRef ref, uint32_t lvid, uint32_t self, uint32_t fieldindex) {
 		assert(lvid != 0 and self != 0);
 		auto& operands = ref.sequence.emit<ISA::Op::fieldget>();

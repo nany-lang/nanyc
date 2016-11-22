@@ -122,7 +122,7 @@ namespace Producer
 				return false;
 			// intermediate pointer to force type __pointer
 			uint32_t tmpptr = ir::emit::alloc(out, nextvar(), nyt_ptr);
-			out.emitAssign(tmpptr, inplaceExpr, false);
+			ir::emit::assign(out, tmpptr, inplaceExpr, false);
 			// promoting the given __pointer to T
 			pointer = ir::emit::alloc(out, nextvar());
 			ir::emit::copy(out, pointer, tmpptr);

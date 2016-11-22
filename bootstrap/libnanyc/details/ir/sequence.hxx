@@ -224,14 +224,5 @@ namespace ir
 	}
 
 
-	inline void Sequence::emitAssign(uint32_t lhs, uint32_t rhs, bool canDisposeLHS)
-	{
-		auto& operands = emit<ISA::Op::assign>();
-		operands.lhs = lhs;
-		operands.rhs = rhs;
-		operands.disposelhs = canDisposeLHS;
-	}
-
-
 } // namespace ir
 } // namespace ny

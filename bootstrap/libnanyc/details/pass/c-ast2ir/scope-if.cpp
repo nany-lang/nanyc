@@ -35,7 +35,7 @@ namespace Producer
 			uint32_t exprEval = 0;
 			emitDebugpos(expr);
 			success &= visitASTExpr(expr, exprEval, false);
-			out.emitAssign(condlvid, exprEval, false);
+			ir::emit::assign(out, condlvid, exprEval, false);
 		}
 
 		uint32_t labelElse = 0; // (hasElseClause ? nextvar() : 0);
@@ -128,7 +128,7 @@ namespace Producer
 			OpcodeScopeLocker opscopeCond{out};
 			uint32_t exprEval = 0;
 			success &= visitASTExpr(expr, exprEval, false);
-			out.emitAssign(condlvid, exprEval, false);
+			ir::emit::assign(out, condlvid, exprEval, false);
 		}
 
 		uint32_t labelElse = 0; // (hasElseClause ? nextvar() : 0);
@@ -154,7 +154,7 @@ namespace Producer
 
 				uint32_t thenlvid;
 				success &= visitASTExpr(thenNode, thenlvid);
-				out.emitAssign(ifret, thenlvid, false);
+				ir::emit::assign(out, ifret, thenlvid, false);
 			}
 			if (hasElseClause)
 			{
@@ -177,7 +177,7 @@ namespace Producer
 
 				uint32_t elselvid;
 				success &= visitASTExpr(elseNode, elselvid);
-				out.emitAssign(ifret, elselvid, false);
+				ir::emit::assign(out, ifret, elselvid, false);
 			}
 		}
 

@@ -77,9 +77,6 @@ namespace ir
 		template<ISA::Op O> uint32_t offsetOf(const ISA::Operand<O>& instr) const;
 		//! Get the offset of an instruction within the sequence
 		uint32_t offsetOf(const Instruction& instr) const;
-
-		//! emit Assign variable
-		void emitAssign(uint32_t lhs, uint32_t rhs, bool canDisposeLHS = true);
 		//@}
 
 

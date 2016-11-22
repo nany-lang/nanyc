@@ -50,7 +50,7 @@ namespace Producer
 			emitDebugpos(condition);
 			uint32_t exprEval = 0;
 			success &= visitASTExpr(condition, exprEval, false);
-			out.emitAssign(condlvid, exprEval, false);
+			ir::emit::assign(out, condlvid, exprEval, false);
 		}
 
 		// jump at the end of the 'while' statement if false
@@ -117,7 +117,7 @@ namespace Producer
 			uint32_t exprEval = 0;
 			emitDebugpos(condition);
 			success &= visitASTExpr(condition, exprEval, false);
-			out.emitAssign(condlvid, exprEval, false);
+			ir::emit::assign(out, condlvid, exprEval, false);
 		}
 
 		emitDebugpos(node);

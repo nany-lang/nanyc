@@ -201,7 +201,7 @@ namespace Producer
 			assert(rhs != 0);
 			if (not ref)
 			{
-				out.emitAssign(varlvid, rhs, false);
+				ir::emit::assign(out, varlvid, rhs, false);
 			}
 			else
 			{
