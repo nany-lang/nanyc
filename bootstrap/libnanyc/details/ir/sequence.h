@@ -149,10 +149,6 @@ namespace ir
 		//! emit Assign variable
 		void emitAssign(uint32_t lhs, uint32_t rhs, bool canDisposeLHS = true);
 
-		//! Emit a push parameter
-		void emitTPush(uint32_t lvid);
-		//! Emit a named parameter
-		void emitTPush(uint32_t lvid, const AnyString& name);
 		//! Emit a call opcode
 		void emitCall(uint32_t lvid, uint32_t ptr2func);
 		//! Emit a call opcode for atom

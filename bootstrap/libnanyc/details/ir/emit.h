@@ -194,6 +194,20 @@ namespace
 	}
 
 
+	inline void tpush(SequenceRef ref, uint32_t lvid) {
+		auto& operands = ref.sequence.emit<ISA::Op::tpush>();
+		operands.lvid  = lvid;
+		operands.name  = 0;
+	}
+
+
+	inline void tpush(SequenceRef ref, uint32_t lvid, const AnyString& name) {
+		auto& operands = ref.sequence.emit<ISA::Op::tpush>();
+		operands.lvid  = lvid;
+		operands.name  = (not name.empty()) ? ref.sequence.stringrefs.ref(name) : 0;
+	}
+
+
 	//! Return with no value
 	inline void ret(SequenceRef ref) {
 		auto& operands   = ref.sequence.emit<ISA::Op::ret>();

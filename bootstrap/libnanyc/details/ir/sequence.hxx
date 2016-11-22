@@ -679,21 +679,6 @@ namespace ir
 		operands.disposelhs = canDisposeLHS;
 	}
 
-	inline void Sequence::emitTPush(uint32_t lvid)
-	{
-		auto& operands = emit<ISA::Op::tpush>();
-		operands.lvid  = lvid;
-		operands.name  = 0;
-	}
-
-	inline void Sequence::emitTPush(uint32_t lvid, const AnyString& name)
-	{
-		assert(not name.empty());
-		auto& operands = emit<ISA::Op::tpush>();
-		operands.lvid  = lvid;
-		operands.name  = stringrefs.ref(name);
-	}
-
 	inline void Sequence::emitCall(uint32_t lvid, uint32_t ptr2func)
 	{
 		auto& operands = emit<ISA::Op::call>();

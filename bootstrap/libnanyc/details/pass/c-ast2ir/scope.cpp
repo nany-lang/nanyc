@@ -41,9 +41,9 @@ namespace Producer
 			for (auto& pair: *lastPushedTmplParams)
 			{
 				if (pair.second.empty())
-					outIR.emitTPush(pair.first);
+					ir::emit::tpush(outIR, pair.first);
 				else
-					outIR.emitTPush(pair.first, pair.second);
+					ir::emit::tpush(outIR, pair.first, pair.second);
 			}
 		}
 		lastPushedTmplParams = nullptr;
