@@ -728,6 +728,26 @@ namespace
 	}
 
 
+	inline uint32_t tparam(SequenceRef ref, uint32_t lvid, const AnyString& name) {
+		uint32_t offset = ref.sequence.opcodeCount();
+		auto& operands  = blueprint::make(ref, ir::ISA::Blueprint::gentypeparam);
+		operands.name   = ref.sequence.stringrefs.ref(name);
+		operands.atomid = (uint32_t) -1;
+		operands.setLVID(lvid);
+		return offset;
+	}
+
+
+	inline uint32_t tparam(SequenceRef ref, uint32_t lvid) {
+		uint32_t offset = ref.sequence.opcodeCount();
+		auto& operands  = blueprint::make(ref, ir::ISA::Blueprint::gentypeparam);
+		operands.name   = 0;
+		operands.atomid = (uint32_t) -1;
+		operands.setLVID(lvid);
+		return offset;
+	}
+
+
 } // namespace
 } // namespace blueprint
 } // namespace emit

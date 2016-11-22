@@ -34,7 +34,7 @@ namespace Producer
 					if (not checkForValidIdentifierName(child, name))
 						return false;
 					scope.emitDebugpos(child);
-					scope.sequence().emitBlueprintGenericTypeParam(scope.nextvar(), name);
+					ir::emit::blueprint::tparam(scope.sequence(), scope.nextvar(), name);
 					break;
 				}
 				case AST::rgVarType:
