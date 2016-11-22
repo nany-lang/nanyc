@@ -204,7 +204,7 @@ namespace Producer
 		{
 			scope.emitTmplParametersIfAny();
 			scope.emitDebugpos(node);
-			ir::emit::ensureResolvedType(scope.sequence(), localvar);
+			ir::emit::type::ensureResolved(scope.sequence(), localvar);
 
 			if (unlikely(!!scope.attributes))
 				scope.emitExprAttributes(localvar);

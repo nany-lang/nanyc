@@ -171,11 +171,6 @@ namespace
 	}
 
 
-	inline void ensureResolvedType(SequenceRef ref, uint32_t lvid) {
-		ref.sequence.emit<ISA::Op::ensureresolved>().lvid = lvid;
-	}
-
-
 	inline void namealias(SequenceRef ref, uint32_t lvid, const AnyString& name) {
 		auto& sequence = ref.sequence;
 		auto& operands = sequence.emit<ISA::Op::namealias>();
@@ -296,6 +291,11 @@ namespace
 		operands.lvid  = lvid;
 		operands.flag  = static_cast<uint32_t>(flag);
 		operands.qualifier = ir::ISA::TypeQualifier::constant;
+	}
+
+
+	inline void ensureResolved(SequenceRef ref, uint32_t lvid) {
+		ref.sequence.emit<ISA::Op::ensureresolved>().lvid = lvid;
 	}
 
 
