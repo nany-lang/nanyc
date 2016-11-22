@@ -119,9 +119,6 @@ namespace ir
 		//! Emit pragma shortcircuit opcode
 		void emitPragmaShortcircuitMutateToBool(uint32_t lvid, uint32_t  source);
 
-		//! Emit pragma builtinalias
-		void emitPragmaBuiltinAlias(const AnyString& name);
-
 		//! Emit visibility opcode
 		void emitVisibility(nyvisibility_t);
 		//@}

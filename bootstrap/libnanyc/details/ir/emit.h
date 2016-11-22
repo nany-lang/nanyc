@@ -793,6 +793,12 @@ namespace
 	}
 
 
+	inline void builtinAlias(SequenceRef ref, const AnyString& name) {
+		auto& operands = pragma::make(ref, ir::ISA::Pragma::builtinalias);
+		operands.value.builtinalias.namesid = ref.sequence.stringrefs.ref(name);
+	}
+
+
 } // namespace
 } // namespace pragma
 } // namespace emit

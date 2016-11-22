@@ -445,7 +445,7 @@ namespace Producer
 			if (not AST::appendEntityAsString(value, *attrs.builtinAlias))
 				return error(*attrs.builtinAlias) << "invalid builtinalias attribute";
 
-			out.emitPragmaBuiltinAlias(value);
+			ir::emit::pragma::builtinAlias(out, value);
 			attrs.flags -= Attributes::Flag::builtinAlias;
 		}
 		if (attrs.flags(Attributes::Flag::doNotSuggest))

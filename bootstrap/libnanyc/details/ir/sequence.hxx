@@ -224,13 +224,6 @@ namespace ir
 	}
 
 
-	inline void Sequence::emitPragmaBuiltinAlias(const AnyString& name)
-	{
-		auto& opc  = emit<ISA::Op::pragma>();
-		opc.pragma = ir::ISA::Pragma::builtinalias;
-		opc.value.builtinalias.namesid = stringrefs.ref(name);
-	}
-
 	inline void Sequence::emitPragmaShortcircuit(bool evalvalue)
 	{
 		auto& opc  = emit<ISA::Op::pragma>();
