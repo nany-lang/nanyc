@@ -679,23 +679,6 @@ namespace ir
 		operands.disposelhs = canDisposeLHS;
 	}
 
-	inline void Sequence::emitCall(uint32_t lvid, uint32_t ptr2func)
-	{
-		auto& operands = emit<ISA::Op::call>();
-		operands.lvid  = lvid;
-		operands.ptr2func = ptr2func;
-		operands.instanceid = (uint32_t) -1;
-	}
-
-	inline void Sequence::emitCall(uint32_t lvid, uint32_t atomid, uint32_t instanceid)
-	{
-		assert(instanceid != (uint32_t) -1);
-		auto& operands = emit<ISA::Op::call>();
-		operands.lvid  = lvid;
-		operands.ptr2func = atomid;
-		operands.instanceid = instanceid;
-	}
-
 	inline void Sequence::emitIntrinsic(uint32_t lvid, const AnyString& name, uint32_t id)
 	{
 		auto& operands     = emit<ISA::Op::intrinsic>();

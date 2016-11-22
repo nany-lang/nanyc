@@ -159,7 +159,7 @@ namespace Producer
 			// no pushed parameter - direct call - no need for scopes or something else
 			// ... but template parameters if any
 			emitTmplParametersIfAny();
-			out.emitCall(callret, func);
+			ir::emit::call(out, callret, func);
 			return true;
 		}
 		else
@@ -181,7 +181,7 @@ namespace Producer
 				bool success = visitASTExprCallParameters(*node);
 				emitTmplParametersIfAny();
 				emitDebugpos(*node);
-				out.emitCall(callret, func);
+				ir::emit::call(out, callret, func);
 				return success;
 			}
 			else
@@ -205,7 +205,7 @@ namespace Producer
 					success = false;
 				}
 				emitDebugpos(*node);
-				out.emitCall(ret__bool, func);
+				ir::emit::call(out, ret__bool, func);
 				// end of scope for 2nd parameter
 				// this way, a jump just after the first one will not try to release the second one
 				ir::emit::scopeEnd(out);

@@ -52,7 +52,7 @@ namespace Instanciate
 		{
 			ir::emit::trace(out, "calling user destructor");
 			ir::emit::push(out, 2); // self
-			out->emitCall(lvid, userDefinedDispose->atomid, 0);
+			ir::emit::call(out, lvid, userDefinedDispose->atomid, 0);
 			cdeftable.substitute(lvid).mutateToVoid();
 			++lvid;
 		}

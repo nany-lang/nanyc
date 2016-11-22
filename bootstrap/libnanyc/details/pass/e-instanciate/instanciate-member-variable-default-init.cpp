@@ -103,7 +103,7 @@ namespace Instanciate
 				if (likely(localSuccess))
 				{
 					ir::emit::push(out, 2); // %2 -> self
-					out->emitCall(lvid, subatom.atomid, instanceid);
+					ir::emit::call(out, lvid, subatom.atomid, instanceid);
 				}
 				++lvid; // always increment it to ease debugging
 			}
@@ -138,7 +138,7 @@ namespace Instanciate
 					if (localSuccess)
 					{
 						ir::emit::push(out, 2); // %2 -> self
-						out->emitCall(lvid, subatom.atomid, instanceid);
+						ir::emit::call(out, lvid, subatom.atomid, instanceid);
 					}
 				}
 				else

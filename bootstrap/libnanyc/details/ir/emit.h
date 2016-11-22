@@ -208,6 +208,23 @@ namespace
 	}
 
 
+	inline void call(SequenceRef ref, uint32_t lvid, uint32_t ptr2func) {
+		auto& operands = ref.sequence.emit<ISA::Op::call>();
+		operands.lvid  = lvid;
+		operands.ptr2func = ptr2func;
+		operands.instanceid = (uint32_t) -1;
+	}
+
+
+	inline void call(SequenceRef ref, uint32_t lvid, uint32_t atomid, uint32_t instanceid) {
+		assert(instanceid != (uint32_t) -1);
+		auto& operands = ref.sequence.emit<ISA::Op::call>();
+		operands.lvid  = lvid;
+		operands.ptr2func = atomid;
+		operands.instanceid = instanceid;
+	}
+
+
 	//! Return with no value
 	inline void ret(SequenceRef ref) {
 		auto& operands   = ref.sequence.emit<ISA::Op::ret>();

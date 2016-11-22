@@ -211,7 +211,7 @@ namespace Instanciate
 			{
 				for (auto& element: params) // push all parameters
 					ir::emit::push(seq.out, element.clid.lvid());
-				seq.out->emitCall(lvid, atom->atomid, info.instanceid);
+				ir::emit::call(seq.out, lvid, atom->atomid, info.instanceid);
 			}
 			return true;
 		}
@@ -381,7 +381,7 @@ namespace Instanciate
 		{
 			for (auto& param: params)
 				ir::emit::push(seq.out, param.clid.lvid());
-			seq.out->emitCall(lvid, atom->atomid, info.instanceid);
+			ir::emit::call(seq.out, lvid, atom->atomid, info.instanceid);
 		}
 		return true;
 	}

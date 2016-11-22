@@ -179,7 +179,7 @@ namespace Instanciate
 		{
 			for (auto& param: params)
 				ir::emit::push(seq.out, param.clid.lvid());
-			seq.out->emitCall(lvid, propatom.atomid, info.instanceid);
+			ir::emit::call(seq.out, lvid, propatom.atomid, info.instanceid);
 		}
 		return true;
 	}

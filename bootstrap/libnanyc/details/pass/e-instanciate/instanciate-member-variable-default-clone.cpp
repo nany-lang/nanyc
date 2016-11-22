@@ -110,7 +110,7 @@ namespace Instanciate
 			ir::emit::trace(out, "\nuser's defined clone method");
 			ir::emit::push(out, 2); // self
 			ir::emit::push(out, 3); // rhs
-			out->emitCall(lvid, userDefinedClone->atomid, 0);
+			ir::emit::call(out, lvid, userDefinedClone->atomid, 0);
 			++lvid;
 		}
 	}
