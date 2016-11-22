@@ -150,28 +150,6 @@ namespace Instanciate
 	}
 
 
-	inline void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::inherit>& operands)
-	{
-		assert(frame != nullptr);
-		if (not frame->verify(operands.lhs))
-			return;
-
-		switch (operands.inherit)
-		{
-			case 2: // qualifiers
-			{
-				auto& spare = cdeftable.substitute(operands.lhs);
-				spare.qualifiers = cdeftable.classdef(CLID{frame->atomid, operands.rhs}).qualifiers;
-				break;
-			}
-			default:
-			{
-				ice() << "invalid inherit value " << operands.inherit;
-			}
-		}
-	}
-
-
 	inline void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::namealias>& operands)
 	{
 		const auto& name = currentSequence.stringrefs[operands.name];

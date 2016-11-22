@@ -219,9 +219,6 @@ namespace ir
 		//! Emit visibility opcode
 		void emitVisibility(nyvisibility_t);
 
-		//! Emit qualifiers copy
-		void emitInheritQualifiers(uint32_t lhs, uint32_t rhs);
-
 		//! Read a field
 		void emitFieldget(uint32_t lvid, uint32_t self, uint32_t varid);
 		//! Write a field

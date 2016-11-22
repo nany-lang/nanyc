@@ -618,22 +618,6 @@ namespace // anonymous
 		}
 
 
-		void print(const Operand<Op::inherit>& operands)
-		{
-			line() << '%' << operands.lhs << " inherits ";
-			switch (operands.inherit)
-			{
-				case 2:
-				{
-					out << "qualifiers from %" << operands.rhs;
-					break;
-				}
-				default:
-					out << "<unknown>";
-			}
-		}
-
-
 		void print(const Operand<Op::memcheckhold>& operands)
 		{
 			line() << "memchecker.hold %" << operands.lvid << ", size: %" << operands.size;

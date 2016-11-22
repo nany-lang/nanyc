@@ -587,17 +587,6 @@ namespace ISA
 		}
 	};
 
-	template<> struct Operand<ny::ir::ISA::Op::inherit> final
-	{
-		constexpr static const char* opname() { return "inherit"; }
-		uint32_t opcode;
-		//! 1: type (unused), 2: qualifiers
-		uint32_t inherit;
-		uint32_t lhs;
-		uint32_t rhs;
-		template<class T> void eachLVID(T& c) { c(lhs, rhs); }
-	};
-
 	template<> struct Operand<ny::ir::ISA::Op::opassert> final
 	{
 		constexpr static const char* opname() { return "assert"; }

@@ -101,7 +101,6 @@ namespace Instanciate
 		void visit(const ir::ISA::Operand<ir::ISA::Op::assign>&);
 		void visit(const ir::ISA::Operand<ir::ISA::Op::self>&);
 		void visit(const ir::ISA::Operand<ir::ISA::Op::qualifiers>&);
-		void visit(const ir::ISA::Operand<ir::ISA::Op::inherit>&);
 		void visit(const ir::ISA::Operand<ir::ISA::Op::nop>&);
 		void visit(const ir::ISA::Operand<ir::ISA::Op::label>&);
 		void visit(const ir::ISA::Operand<ir::ISA::Op::jmp>&);

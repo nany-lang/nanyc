@@ -823,7 +823,6 @@ namespace Mapping
 				case ir::ISA::Op::ref:
 				case ir::ISA::Op::unref:
 				case ir::ISA::Op::assign:
-				case ir::ISA::Op::inherit:
 				case ir::ISA::Op::label:
 				case ir::ISA::Op::jmp:
 				case ir::ISA::Op::jz:

@@ -207,8 +207,6 @@ namespace ISA //!< Instruction Set Architecture
 		typeisobject,
 		//! Qualifiers
 		qualifiers,
-		//! inherit
-		inherit,
 		//! end of a scope
 		end,
 	};
@@ -328,7 +326,6 @@ namespace ISA //!< Instruction Set Architecture
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::scope) \
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::typeisobject) \
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::qualifiers) \
-			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::inherit) \
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::end) \
 			\
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, ISA::Op::nop) \

@@ -463,14 +463,6 @@ namespace ir
 		operands.rhs   = rhs;
 	}
 
-	inline void Sequence::emitInheritQualifiers(uint32_t lhs, uint32_t rhs)
-	{
-		auto& operands   = emit<ISA::Op::inherit>();
-		operands.inherit = 2;
-		operands.lhs     = lhs;
-		operands.rhs     = rhs;
-	}
-
 	inline void Sequence::emitPragmaSynthetic(uint32_t lvid, bool onoff)
 	{
 		auto& opc  = emit<ISA::Op::pragma>();
