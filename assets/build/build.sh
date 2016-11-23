@@ -49,8 +49,8 @@ if [ "${TRAVIS_OS_NAME}" != "" -a $platform == linux ]; then
 	if [ "$CC"  == "gcc" ]; then export CC="gcc-4.9"; fi
 	if [ "$CXX" == "g++" ]; then export CXX="g++-4.9"; fi
 fi
-if [ "$CC"  == "" ];    then export CC="gcc"; fi
-if [ "$CXX" == "" ];    then export CXX="g++"; fi
+[ "$CC"  == "" ] && export CC="gcc";
+[ "$CXX" == "" ] && export CXX="g++";
 
 
 title "ENVIRONMENT"
@@ -75,11 +75,12 @@ echo "# make -j ${NPROC}"
 make -j ${NPROC} || (title "MAKE ERROR"; make VERBOSE=1 ; exit 1) || die "build failed"
 make check || die "check failed"
 
+
 if [ $platform == linux ]; then
+	title "PACKAGE DEB"
 	make package-deb || die "package deb failed";
 fi
 
 
 title "OUTPUT"
-cd "${root}/../../"
-ls -lh ./distrib
+ls -lh "${root}/../../distrib"
