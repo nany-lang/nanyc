@@ -8,87 +8,89 @@
 #include <unordered_set>
 
 // forward declaration
-namespace Yuni { namespace Job { class Taskgroup; }}
+namespace Yuni {
+namespace Job {
+class Taskgroup;
+}
+}
 
 
 
 
-namespace ny
-{
+namespace ny {
 
-	class Project;
-	class BuildInfoContext;
-
+class Project;
+class BuildInfoContext;
 
 
-	class CTarget final
-		: public Yuni::IIntrusiveSmartPtr<CTarget, false, Yuni::Policy::SingleThreaded>
-	{
-	public:
-		//! The class ancestor
-		using Ancestor = Yuni::IIntrusiveSmartPtr<CTarget, false, Yuni::Policy::SingleThreaded>;
-		//! The most suitable smart ptr for the class
-		using Ptr = Ancestor::SmartPtrType<CTarget>::Ptr;
-		//! Threading policy
-		using ThreadingPolicy = Ancestor::ThreadingPolicy;
+
+class CTarget final
+	: public Yuni::IIntrusiveSmartPtr<CTarget, false, Yuni::Policy::SingleThreaded> {
+public:
+	//! The class ancestor
+	using Ancestor = Yuni::IIntrusiveSmartPtr<CTarget, false, Yuni::Policy::SingleThreaded>;
+	//! The most suitable smart ptr for the class
+	using Ptr = Ancestor::SmartPtrType<CTarget>::Ptr;
+	//! Threading policy
+	using ThreadingPolicy = Ancestor::ThreadingPolicy;
 
 
-	public:
-		//! Get if a string is a valid target name
-		static bool IsNameValid(const AnyString& name) noexcept;
+public:
+	//! Get if a string is a valid target name
+	static bool IsNameValid(const AnyString& name) noexcept;
 
 
-	public:
-		//! \name Constructor & Destructor
-		//@{
-		//! Default constructor
-		explicit CTarget(nyproject_t*, const AnyString& name);
-		//! Copy constructor
-		CTarget(nyproject_t*, const CTarget&);
+public:
+	//! \name Constructor & Destructor
+	//@{
+	//! Default constructor
+	explicit CTarget(nyproject_t*, const AnyString& name);
+	//! Copy constructor
+	CTarget(nyproject_t*, const CTarget&);
 
-		//! Destructor
-		~CTarget();
-		//@}
+	//! Destructor
+	~CTarget();
+	//@}
 
-		//! Target name
-		AnyString name() const;
+	//! Target name
+	AnyString name() const;
 
-		nytarget_t* self();
-		const nytarget_t* self() const;
+	nytarget_t* self();
+	const nytarget_t* self() const;
 
-		void addSource(const AnyString& name, const AnyString& content);
-		void addSourceFromFile(const AnyString& filename);
-
-
-		void build(BuildInfoContext&, Yuni::Job::Taskgroup& task, Logs::Report& report);
-
-		template<class T> void eachSource(const T& callback);
+	void addSource(const AnyString& name, const AnyString& content);
+	void addSourceFromFile(const AnyString& filename);
 
 
-		//! \name Operators
-		//@{
-		//! Assignment
-		CTarget& operator = (const CTarget&) = delete;
-		//@}
+	void build(BuildInfoContext&, Yuni::Job::Taskgroup& task, Logs::Report& report);
+
+	template<class T> void eachSource(const T& callback);
 
 
-	private:
-		//! Attached project
-		nyproject_t* project = nullptr;
+	//! \name Operators
+	//@{
+	//! Assignment
+	CTarget& operator = (const CTarget&) = delete;
+	//@}
 
-		//! Name of the target
-		Yuni::ShortString64 pName;
-		//! All sources attached to the target
-		std::vector<Source::Ptr> pSources;
-		//! All sources ordered by their filename
-		std::unordered_map<AnyString, std::reference_wrapper<Source>> pSourcesByFilename;
-		//! All sources ordered by their name
-		std::unordered_map<AnyString, std::reference_wrapper<Source>> pSourcesByName;
 
-		// friends
-		friend class Context;
+private:
+	//! Attached project
+	nyproject_t* project = nullptr;
 
-	}; // class Target
+	//! Name of the target
+	Yuni::ShortString64 pName;
+	//! All sources attached to the target
+	std::vector<Source::Ptr> pSources;
+	//! All sources ordered by their filename
+	std::unordered_map<AnyString, std::reference_wrapper<Source>> pSourcesByFilename;
+	//! All sources ordered by their name
+	std::unordered_map<AnyString, std::reference_wrapper<Source>> pSourcesByName;
+
+	// friends
+	friend class Context;
+
+}; // class Target
 
 
 

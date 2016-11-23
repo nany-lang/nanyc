@@ -9,42 +9,39 @@
 
 
 
-namespace ny
-{
+namespace ny {
 
 
-	class BuildInfoSource final
-	{
-	public:
-		BuildInfoSource(nybuild_cf_t& cf)
-			: cf(cf)
-		{}
+class BuildInfoSource final {
+public:
+	BuildInfoSource(nybuild_cf_t& cf)
+		: cf(cf) {
+	}
 
-		size_t inspectMemoryUsage() const;
+	size_t inspectMemoryUsage() const;
 
-	public:
-		nybuild_cf_t& cf;
+public:
+	nybuild_cf_t& cf;
 
-		struct
-		{
-			//! ny parser for the current content
-			AST::Parser parser;
-			//! Namespace of the file
-			std::pair<YString, AST::Node*> nmspc;
-			//! AST manipulation
-			ASTHelper ast;
-			//! Root node
-			AST::Node::Ptr rootnode;
+	struct {
+		//! ny parser for the current content
+		AST::Parser parser;
+		//! Namespace of the file
+		std::pair<YString, AST::Node*> nmspc;
+		//! AST manipulation
+		ASTHelper ast;
+		//! Root node
+		AST::Node::Ptr rootnode;
 
-			//! The original sequence, generated from the normalized AST
-			ir::Sequence sequence;
+		//! The original sequence, generated from the normalized AST
+		ir::Sequence sequence;
 
-			//! Parse / IR result
-			bool success = false;
-		}
-		parsing;
+		//! Parse / IR result
+		bool success = false;
+	}
+	parsing;
 
-	}; // class BuildInfo
+}; // class BuildInfo
 
 
 
