@@ -1,13 +1,11 @@
 #pragma once
 
 
-namespace ny
-{
+namespace ny {
 
-	// Forward declaration
-	class ClassdefTable;
-	class Classdef;
-	class ClassdefInterface;
-	class Funcdef;
+class ClassdefTable;
+class Classdef;
+class ClassdefInterface;
+class Funcdef;
 
 } // namespace ny

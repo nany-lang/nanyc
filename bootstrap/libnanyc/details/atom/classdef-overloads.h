@@ -5,37 +5,28 @@
 
 namespace ny { class ClassdefTableView; struct Atom; }
 
-namespace ny
-{
 
-	class ClassdefOverloads final
-	{
-	public:
-		//! Default constructor
-		ClassdefOverloads() = default;
+namespace ny {
 
 
-		bool empty() const;
+class ClassdefOverloads final {
+public:
+	//! Default constructor
+	ClassdefOverloads() = default;
 
-		uint size() const;
+	bool empty() const;
+	uint size() const;
+	void print(Yuni::String& out, const ClassdefTableView& table, bool clearBefore = true) const;
+	void clear();
 
-		void print(Yuni::String& out, const ClassdefTableView& table, bool clearBefore = true) const;
+	std::vector<std::reference_wrapper<Atom>>&  getList();
+	const std::vector<std::reference_wrapper<Atom>>&  getList() const;
 
-		void clear();
+private:
+	//! Follow some indexed parameter (atomid/parameter index type)
+	std::vector<std::reference_wrapper<Atom>> m_overloads;
 
-		std::vector<std::reference_wrapper<Atom>>&  getList();
-		const std::vector<std::reference_wrapper<Atom>>&  getList() const;
-
-
-	private:
-		//! Follow some indexed parameter (atomid/parameter index type)
-		std::vector<std::reference_wrapper<Atom>> m_overloads;
-
-	}; // class ClassdefFollow
-
-
-
-
+}; // class ClassdefFollow
 
 
 } // namespace ny

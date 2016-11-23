@@ -5,37 +5,35 @@
 #include "type.h"
 
 
-namespace ny
-{
+namespace ny {
 
 
-	class Vardef final : public Yuni::NonCopyable<Vardef>
-	{
-	public:
-		//! \name Constructors
-		//@{
-		//! Default constructor
-		Vardef() = default;
-		//! Move constructor
-		Vardef(Vardef&& other): clid{other.clid} {}
-		//@}
+class Vardef final : public Yuni::NonCopyable<Vardef> {
+public:
+	//! \name Constructors
+	//@{
+	//! Default constructor
+	Vardef() = default;
+	//! Move constructor
+	Vardef(Vardef&& other): clid{other.clid} {}
+	//@}
 
 
-		//! \name Operators
-		//@{
-		//! Copy operator
-		Vardef& operator = (const Vardef&) = default;
-		//! Move operator
-		Vardef& operator = (Vardef&&) = default;
-		//@}
+	//! \name Operators
+	//@{
+	//! Copy operator
+	Vardef& operator = (const Vardef&) = default;
+	//! Move operator
+	Vardef& operator = (Vardef&&) = default;
+	//@}
 
 
-	public:
-		//! Attached type (class id)
-		// (this value may be changed)
-		CLID clid;
+public:
+	//! Attached type (class id)
+	// (this value may be changed)
+	CLID clid;
 
-	}; // class Vardef
+}; // class Vardef
 
 
 } // namespace ny
