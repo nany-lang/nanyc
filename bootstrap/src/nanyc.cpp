@@ -12,6 +12,7 @@ int shortOption(const char* const name, const char* const argv0) {
 	return ny::print::unknownOption(argv0, name);
 }
 
+
 int longOptions(const char* const name, const char* const argv0) {
 	if (!strcmp(name, "--help"))
 		return ny::print::usage(argv0);
@@ -26,8 +27,7 @@ int longOptions(const char* const name, const char* const argv0) {
 } // namespace
 
 
-int main(int argc, const char** argv)
-{
+int main(int argc, const char** argv) {
 	if (!(argc > 1))
 		return ny::print::noInputScript(argv[0]);
 	nyrun_cf_t runcf;
