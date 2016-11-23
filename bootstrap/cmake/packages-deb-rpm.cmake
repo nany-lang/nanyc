@@ -7,7 +7,7 @@ macro(create_rules_for_packages output)
 		endif()
 
 		add_custom_target(package-${output}
-			DEPENDS libnanyc nany nanyc-check-syntax nanyc-dump-ast
+			DEPENDS libnanyc nanyc nanyc-check-syntax nanyc-dump-ast
 			COMMAND rm -rf "${destdir}"
 
 			COMMAND "${CMAKE_COMMAND}" "-E" echo ""
