@@ -16,8 +16,8 @@ namespace ny {
 namespace Pass {
 namespace Instanciate {
 
-class SequenceBuilder;
 
+struct SequenceBuilder;
 
 
 /*!

@@ -12,13 +12,11 @@
 namespace ny {
 
 
-// forward class
-class ClassdefTableView;
+struct ClassdefTableView;
 struct Atom;
 
 
-class ClassdefTable final {
-public:
+struct ClassdefTable final {
 	//! \name Constructor & Destructor
 	//@{
 	//! Default constructor
@@ -183,9 +181,9 @@ private:
 	//! The current layer
 	mutable LayerItem m_layer;
 
-	friend class ClassdefTableView;
+	friend struct ClassdefTableView;
 
-}; // class ClassdefTable
+}; // struct ClassdefTable
 
 
 } // namespace ny

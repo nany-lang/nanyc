@@ -7,8 +7,7 @@
 namespace ny {
 
 
-// forward declaration
-class ClassdefTable;
+struct ClassdefTable;
 
 
 /*!
@@ -73,7 +72,7 @@ private:
 private:
 	std::vector<Atom::Ptr> m_byIndex;
 	uint32_t m_atomGrpID = 0;
-	friend class ClassdefTable;
+	friend struct ClassdefTable;
 
 }; // struct AtomMap
 

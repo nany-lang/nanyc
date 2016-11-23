@@ -11,7 +11,8 @@ namespace ny {
 namespace Pass {
 namespace Instanciate {
 
-class SequenceBuilder;
+
+struct SequenceBuilder;
 
 
 struct InstanciateData final {
@@ -67,8 +68,6 @@ struct InstanciateData final {
 }; // class InstanciateData
 
 
-
-
 /*!
 ** \brief Instanciate atom
 */
@@ -94,8 +93,6 @@ void updateTypesInAllStackallocOp(ir::Sequence&, ClassdefTableView&, uint32_t at
 ** This is required for func overloading deduction
 */
 bool resolveStrictParameterTypes(Build&, Atom& atom, InstanciateData* = nullptr);
-
-
 
 
 } // namespace Instanciate

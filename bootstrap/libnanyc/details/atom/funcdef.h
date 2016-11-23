@@ -12,9 +12,8 @@ namespace ny {
 
 
 //! Function definition
-class Funcdef final
+struct Funcdef final
 	: public Yuni::IIntrusiveSmartPtr<Funcdef, false, Yuni::Policy::SingleThreaded> {
-public:
 	//! The class ancestor
 	using Ancestor = Yuni::IIntrusiveSmartPtr<Funcdef, false, Yuni::Policy::SingleThreaded>;
 	//! The most suitable smart ptr for the class
@@ -79,11 +78,11 @@ public:
 
 
 private:
-	friend class ClassdefTable;
+	friend struct ClassdefTable;
 	//! Default constructor
 	explicit Funcdef(const AnyString& name);
 
-}; // class Funcdef
+}; // struct Funcdef
 
 
 } // namespace ny

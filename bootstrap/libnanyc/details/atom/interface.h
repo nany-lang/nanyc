@@ -8,8 +8,7 @@
 namespace ny {
 
 
-class ClassdefInterface final {
-public:
+struct ClassdefInterface final {
 	/*!
 	** \brief Get if the container is empty
 	*/
@@ -40,9 +39,9 @@ private:
 	std::vector<Funcdef::Ptr> pInterface;
 	//! Self
 	Funcdef::Ptr pSelf;
-	friend class ClassdefTable;
+	friend struct ClassdefTable;
 
-}; // class ClassdefInterface
+}; // struct ClassdefInterface
 
 
 } // namespace ny

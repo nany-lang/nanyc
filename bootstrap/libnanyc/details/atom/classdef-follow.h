@@ -8,14 +8,10 @@
 namespace ny {
 
 
-class ClassdefFollow final {
-public:
-	//! Default constructor
+struct ClassdefFollow final {
 	ClassdefFollow() = default;
 
-
 	bool empty() const;
-
 	void print(Yuni::String& out, bool clearBefore = true) const;
 
 public:
@@ -26,7 +22,7 @@ public:
 	//! Follow some named parameters (atomid / name)
 	std::vector<std::pair<CLID, AnyString>> pushedNamedParams;
 
-}; // class ClassdefFollow
+}; // struct ClassdefFollow
 
 
 } // namespace ny

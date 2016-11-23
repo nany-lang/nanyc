@@ -50,18 +50,16 @@ struct NamedParameter final {
 
 
 
-class SequenceBuilder final {
-public:
+struct SequenceBuilder final {
 	//! \name Constructor & Destructor
 	//@{
 	//! Default constructor (importSignature must be called after)
 	SequenceBuilder(Logs::Report, ClassdefTableView&, Build&,
-					ir::Sequence* out, ir::Sequence&, SequenceBuilder* parent = nullptr);
+		ir::Sequence* out, ir::Sequence&, SequenceBuilder* parent = nullptr);
 
 	//! Destructor
 	~SequenceBuilder();
 	//@}
-
 
 	//! \name Visitors for all supported opcodes
 	//@{
@@ -327,9 +325,7 @@ public:
 	//! cursor
 	ir::Instruction** cursor = nullptr;
 
-}; // class SequenceBuilder
-
-
+}; // struct SequenceBuilder
 
 
 } // namespace Instanciate

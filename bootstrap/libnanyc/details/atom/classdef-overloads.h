@@ -3,17 +3,14 @@
 #include <vector>
 
 
-namespace ny { class ClassdefTableView; struct Atom; }
-
-
 namespace ny {
 
 
-class ClassdefOverloads final {
-public:
-	//! Default constructor
-	ClassdefOverloads() = default;
+struct ClassdefTableView;
+struct Atom;
 
+
+struct ClassdefOverloads final {
 	bool empty() const;
 	uint size() const;
 	void print(Yuni::String& out, const ClassdefTableView& table, bool clearBefore = true) const;

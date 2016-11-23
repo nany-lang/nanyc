@@ -21,9 +21,8 @@ struct Atom;
 
 
 //! Class definition
-class Classdef final
+struct Classdef final
 	: public Yuni::IIntrusiveSmartPtr<Classdef, false, Yuni::Policy::SingleThreaded> {
-public:
 	//! The class ancestor
 	typedef Yuni::IIntrusiveSmartPtr<Classdef, false, Yuni::Policy::SingleThreaded>  Ancestor;
 	//! The most suitable smart ptr for the class
@@ -31,7 +30,6 @@ public:
 
 	//! Null cdef
 	static const Classdef nullcdef;
-
 
 public:
 	//! \name Constructor
@@ -161,7 +159,7 @@ public:
 private:
 	template<class T, class TableT> void doPrint(T& out, const TableT& table) const;
 
-}; // class Classdef
+}; // struct Classdef
 
 
 } // namespace ny

@@ -15,10 +15,9 @@ namespace ny {
 namespace Logs {
 
 
-class Message final
+struct Message final
 	: public Yuni::IIntrusiveSmartPtr<Message, false, Yuni::Policy::ObjectLevelLockable>
 	, Yuni::NonCopyable<Message> {
-public:
 	//! The class ancestor
 	using Ancestor = Yuni::IIntrusiveSmartPtr<Message, false, Yuni::Policy::ObjectLevelLockable>;
 	//! The most suitable smart ptr for the class
@@ -88,7 +87,7 @@ public:
 	//! Flag to remember if some errors or warning have occured or not
 	bool hasErrors = false;
 
-}; // class Message
+}; // struct Message
 
 
 } // namespace Logs

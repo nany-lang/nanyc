@@ -3,9 +3,9 @@
 
 namespace ny {
 
-class ClassdefTable;
-class Classdef;
-class ClassdefInterface;
-class Funcdef;
+struct ClassdefTable;
+struct Classdef;
+struct ClassdefInterface;
+struct Funcdef;
 
 } // namespace ny

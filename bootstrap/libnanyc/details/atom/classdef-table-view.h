@@ -6,13 +6,11 @@
 namespace ny {
 
 
-class ClassdefTableView final {
-public:
+struct ClassdefTableView final {
 	ClassdefTableView(ClassdefTable&);
 	ClassdefTableView(ClassdefTableView&);
 	ClassdefTableView(ClassdefTableView&, uint32_t atomid, uint count);
 	~ClassdefTableView();
-
 
 	const Classdef& classdef(const CLID&) const;
 	const Classdef& classdefFollowClassMember(const CLID&) const;
