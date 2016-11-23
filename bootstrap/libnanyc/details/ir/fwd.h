@@ -18,12 +18,6 @@ static constexpr yuint64 kClassdefHasOverloads = (yuint64) - 1;
 static constexpr yuint64 blueprintMagicDust = 0x123456789ABCDEF;
 
 
-
-class ClassdefRef;
-
-
-
-
 } // namespace ir
 } // namespace ny
 
