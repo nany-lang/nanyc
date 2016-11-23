@@ -2,38 +2,30 @@
 #include "ast.h"
 
 
-
-namespace ny
-{
-namespace AST
-{
-
-	inline Node* createNodeIdentifier(const AnyString& name)
-	{
-		return new Node{rgIdentifier, name};
-	}
+namespace ny {
+namespace AST {
 
 
-	template<class S> bool appendEntityAsString(S& out, const Node& node)
-	{
-		assert(node.rule == rgEntity);
-		assert(node.children.size() > 0);
+inline Node* createNodeIdentifier(const AnyString& name) {
+	return new Node{rgIdentifier, name};
+}
 
-		out += node.children.front().text;
-		if (node.children.size() != 1)
-		{
-			for (uint32_t i = 1; i != node.children.size(); ++i)
-			{
-				auto& child = node.children[i];
-				if (YUNI_UNLIKELY(child.rule != rgIdentifier))
-					return false;
-				out += '.';
-				out += child.text;
-			}
+
+template<class S> bool appendEntityAsString(S& out, const Node& node) {
+	assert(node.rule == rgEntity);
+	assert(node.children.size() > 0);
+	out += node.children.front().text;
+	if (node.children.size() != 1) {
+		for (uint32_t i = 1; i != node.children.size(); ++i) {
+			auto& child = node.children[i];
+			if (YUNI_UNLIKELY(child.rule != rgIdentifier))
+				return false;
+			out += '.';
+			out += child.text;
 		}
-		return true;
 	}
-
+	return true;
+}
 
 
 } // namespace AST
