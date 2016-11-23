@@ -4,6 +4,7 @@
 #include "details/fwd.h"
 #include "classdef.h"
 #include "details/utils/stringrefs.h"
+#include "nany/nany.h"
 #include "atom-map.h"
 #include <unordered_map>
 #include <vector>
