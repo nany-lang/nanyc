@@ -4,15 +4,13 @@
 
 
 
-namespace ny
-{
-namespace ir
-{
+namespace ny {
+namespace ir {
 
-	//! Operand type
-	using Operand = uint64_t;
+//! Operand type
+using Operand = uint64_t;
 
-	using Offset = uint32_t;
+using Offset = uint32_t;
 
 
 
