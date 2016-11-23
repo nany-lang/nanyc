@@ -8,5 +8,5 @@ Build a debian package
 
 ```
 $ cd bootstrap
-$ make package-deb
+$ make -j $(nproc) package-deb
 ```
