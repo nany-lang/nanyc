@@ -25,10 +25,10 @@
 					<Directory Id='INSTALLDIR' Name='$(var.ProductVersion)'>
 
 						<Component Id='MainExecutable' Guid='752A018E-ED34-45CB-911B-DC7E6C174E9E'>
-						<File Id='nanycEXE' Name='nanyc.exe' DiskId='1' Source='..\src\bootstrap\$(var.ConfigMode)\nanyc.exe' KeyPath='yes'>
+						<File Id='nanycEXE' Name='nanyc.exe' DiskId='1' Source='..\bootstrap\$(var.ConfigMode)\nanyc.exe' KeyPath='yes'>
 								<Shortcut Id="startmenuNanyEXE" Directory="ProgramMenuDir" Name="Nany $(var.ProductVersion)" WorkingDirectory='INSTALLDIR' Advertise="yes" />
 							</File>
-							<File Id='libnanyc' Name='libnanyc.dll' DiskId='1' Source='..\src\bootstrap\$(var.ConfigMode)\libnanyc.dll' />
+							<File Id='libnanyc' Name='libnanyc.dll' DiskId='1' Source='..\bootstrap\$(var.ConfigMode)\libnanyc.dll' />
 						</Component>
 						<Directory Id='Examples' Name='Examples'>
 							<Component Id='Examples' Guid='7991DA11-8AFF-48A1-A2F8-95B7A8CA31CD'>
@@ -69,8 +69,8 @@
 		<!--<UIRef Id="WixUI_Mondo" />
 		<UIRef Id="WixUI_ErrorProgressText" />-->
 		<WixVariable Id="WixUILicenseRtf" Value="../assets/license/license.rtf" />
-		<WixVariable Id="WixUIBannerBmp"  Value="../assets/package-wix/blank.bmp" />
-		<WixVariable Id="WixUIDialogBmp"  Value="../assets/package-wix/dialog.bmp" />
+		<WixVariable Id="WixUIBannerBmp"  Value="../distrib/wix/blank.bmp" />
+		<WixVariable Id="WixUIDialogBmp"  Value="../distrib/wix/dialog.bmp" />
 		<Property Id="WixAppFolder" Value="WixPerMachineFolder" />
 		<Property Id="ApplicationFolderName" Value="Nany" />
 
