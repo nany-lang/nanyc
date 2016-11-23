@@ -10,94 +10,85 @@
 
 namespace ny { struct Atom; }
 
-namespace ny
-{
-namespace Logs
-{
 
-	class Message final
-		: public Yuni::IIntrusiveSmartPtr<Message, false, Yuni::Policy::ObjectLevelLockable>
-		, Yuni::NonCopyable<Message>
-	{
-	public:
-		//! The class ancestor
-		using Ancestor = Yuni::IIntrusiveSmartPtr<Message, false, Yuni::Policy::ObjectLevelLockable>;
-		//! The most suitable smart ptr for the class
-		using Ptr = Ancestor::SmartPtrType<Message>::Ptr;
-		//! Threading policy
-		using ThreadingPolicy = Ancestor::ThreadingPolicy;
+namespace ny {
+namespace Logs {
 
 
-	public:
-		Message(Level level)
-			: level(level)
-		{}
+class Message final
+	: public Yuni::IIntrusiveSmartPtr<Message, false, Yuni::Policy::ObjectLevelLockable>
+	, Yuni::NonCopyable<Message> {
+public:
+	//! The class ancestor
+	using Ancestor = Yuni::IIntrusiveSmartPtr<Message, false, Yuni::Policy::ObjectLevelLockable>;
+	//! The most suitable smart ptr for the class
+	using Ptr = Ancestor::SmartPtrType<Message>::Ptr;
+	//! Threading policy
+	using ThreadingPolicy = Ancestor::ThreadingPolicy;
 
-		//! Create a new sub-entry
-		Message& createEntry(Level level);
+public:
+	Message(Level level)
+		: level(level) {
+	}
 
-		void appendEntry(const Message::Ptr& message);
+	//! Create a new sub-entry
+	Message& createEntry(Level level);
 
-		void print(nyconsole_t&, bool unify = false);
+	void appendEntry(const Message::Ptr& message);
 
-		bool isClassifiedAsError() const
-		{
-			return static_cast<uint>(level) > static_cast<uint>(Level::warning);
-		}
+	void print(nyconsole_t&, bool unify = false);
+
+	bool isClassifiedAsError() const {
+		return static_cast<uint>(level) > static_cast<uint>(Level::warning);
+	}
 
 
-	public:
-		//! Error level
-		Level level = Level::error;
-		//! Section
-		Yuni::ShortString16 section;
-		//! prefix to highlight
-		YString prefix;
-		//! The message itself
-		YString message;
+public:
+	//! Error level
+	Level level = Level::error;
+	//! Section
+	Yuni::ShortString16 section;
+	//! prefix to highlight
+	YString prefix;
+	//! The message itself
+	YString message;
 
-		//! Sub-entries
-		std::vector<Message::Ptr> entries;
+	//! Sub-entries
+	std::vector<Message::Ptr> entries;
 
-		/*!
-		** \internal Default value means 'like previously'
-		*/
-		struct Origin final
-		{
-			//! Current filename (if any)
-			struct Location final
-			{
-				//! Reset the location from a given atom
-				void resetFromAtom(const ny::Atom&);
+	/*!
+	** \internal Default value means 'like previously'
+	*/
+	struct Origin final {
+		//! Current filename (if any)
+		struct Location final {
+			//! Reset the location from a given atom
+			void resetFromAtom(const ny::Atom&);
 
-				//! Current target
-				YString target;
-				//! Current filename
-				YString filename;
+			//! Current target
+			YString target;
+			//! Current filename
+			YString filename;
 
-				//! Current position
-				struct
-				{
-					//! Current line (1-based, otherwise disabled)
-					uint line = 0;
-					//! Current offset (1-based, otherwise disabled)
-					uint offset = 0;
-					//! Current offset (1-based, otherwise disabled)
-					uint offsetEnd = 0;
-				}
-				pos;
+			//! Current position
+			struct {
+				//! Current line (1-based, otherwise disabled)
+				uint line = 0;
+				//! Current offset (1-based, otherwise disabled)
+				uint offset = 0;
+				//! Current offset (1-based, otherwise disabled)
+				uint offsetEnd = 0;
 			}
-			location;
+			pos;
 		}
-		origins;
+		location;
+	}
+	origins;
 
-		//! Flag to remember if some errors or warning have occured or not
-		bool hasErrors = false;
+	//! Flag to remember if some errors or warning have occured or not
+	bool hasErrors = false;
 
-	}; // class Message
-
-
-
+}; // class Message
 
 
 } // namespace Logs

@@ -2,86 +2,76 @@
 #include "report.h"
 
 
-
-namespace ny
-{
-namespace Logs
-{
-
-	inline Report::Report(Message& message)
-		: message(message)
-	{}
-
-	inline Report::Report(Report& report)
-		: message(report.message)
-	{}
-
-	inline Report::Report(Report&& report)
-		: message(report.message)
-	{}
+namespace ny {
+namespace Logs {
 
 
-	template<class T>
-	inline Report& Report::operator << (const T& value)
-	{
-		message.message.append(value);
-		return *this;
-	}
+inline Report::Report(Message& message)
+	: message(message) {
+}
 
 
-	inline YString& Report::text()
-	{
-		return message.message;
-	}
-
-	inline const YString& Report::text() const
-	{
-		return message.message;
-	}
+inline Report::Report(Report& report)
+	: message(report.message) {
+}
 
 
-	inline bool Report::hasErrors() const
-	{
-		return message.hasErrors;
-	}
+inline Report::Report(Report&& report)
+	: message(report.message) {
+}
 
 
-	inline Message& Report::data()
-	{
-		return message;
-	}
+template<class T>
+inline Report& Report::operator << (const T& value) {
+	message.message.append(value);
+	return *this;
+}
 
 
-	inline Message::Origin& Report::origins()
-	{
-		return message.origins;
-	}
+inline YString& Report::text() {
+	return message.message;
+}
 
 
-	template<class T>
-	inline EmptyReport& EmptyReport::operator << (const T&)
-	{
-		return *this;
-	}
+inline const YString& Report::text() const {
+	return message.message;
+}
 
 
-	inline bool EmptyReport::hasErrors() const
-	{
-		return false;
-	}
+inline bool Report::hasErrors() const {
+	return message.hasErrors;
+}
 
 
-	inline void Report::appendEntry(const Message::Ptr& entry)
-	{
-		message.appendEntry(entry);
-	}
+inline Message& Report::data() {
+	return message;
+}
 
 
-	inline Report::operator bool () const
-	{
-		return message.level >= Level::warning;
-	}
+inline Message::Origin& Report::origins() {
+	return message.origins;
+}
 
+
+template<class T>
+inline EmptyReport& EmptyReport::operator << (const T&) {
+	return *this;
+}
+
+
+inline bool EmptyReport::hasErrors() const {
+	return false;
+}
+
+
+inline void Report::appendEntry(const Message::Ptr& entry) {
+	message.appendEntry(entry);
+}
+
+
+inline Report::operator bool () const {
+	return message.level >= Level::warning;
+}
 
 
 } // namespace Logs

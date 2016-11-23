@@ -2,12 +2,10 @@
 
 
 
-namespace ny
-{
-namespace Logs
-{
+namespace ny {
+namespace Logs {
 
-	class Report;
+class Report;
 
 
 
