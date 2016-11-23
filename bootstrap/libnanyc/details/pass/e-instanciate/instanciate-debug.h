@@ -10,22 +10,20 @@
 
 
 
-namespace ny
-{
-namespace Pass
-{
-namespace Instanciate
-{
+namespace ny {
+namespace Pass {
+namespace Instanciate {
 
 
-	//! Print (to report) an IR sequence
-	void debugPrintIRSequence(const YString& symbolName, const ir::Sequence&, const ClassdefTableView&, uint32_t offset = 0);
+//! Print (to report) an IR sequence
+void debugPrintIRSequence(const YString& symbolName, const ir::Sequence&, const ClassdefTableView&,
+						  uint32_t offset = 0);
 
-	//! Print the original opcodes sequence, produced from the AST
-	void debugPrintSourceOpcodeSequence(const ClassdefTableView&, const Atom&, const char* usertxt);
+//! Print the original opcodes sequence, produced from the AST
+void debugPrintSourceOpcodeSequence(const ClassdefTableView&, const Atom&, const char* usertxt);
 
-	//! Print all type defintions (classdef) available in the current frame
-	void debugPrintClassdefs(const AtomStackFrame&, const ClassdefTableView&);
+//! Print all type defintions (classdef) available in the current frame
+void debugPrintClassdefs(const AtomStackFrame&, const ClassdefTableView&);
 
 
 
