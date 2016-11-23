@@ -48,7 +48,7 @@ struct ParseVerbosity: public LeftType {
 				printOtherVerbosity<Handler, VerbosityType>(out);
 		}
 		// Transmit the message to the next decorator
-		LeftType::template internalDecoratorAddPrefix<Handler, VerbosityType,O>(out, s);
+		LeftType::template internalDecoratorAddPrefix<Handler, VerbosityType, O>(out, s);
 	}
 
 	template<class Handler, class O>
@@ -123,7 +123,7 @@ uint32_t findCommonFolderLength(const std::vector<String>& filenames) {
 	auto& firstElement = filenames[0];
 	const char sep = IO::Separator;
 	for (; ; ++len) {
-		for (auto& filename: filenames) {
+		for (auto& filename : filenames) {
 			if (len == firstElement.size())
 				return len;
 			if (len < filename.size() and filename[len] != '\0' and filename[len] == firstElement[len])
@@ -136,6 +136,7 @@ uint32_t findCommonFolderLength(const std::vector<String>& filenames) {
 	return len;
 }
 
+
 template<class F>
 bool IterateThroughAllFiles(const std::vector<String>& filenames, const F& callback) {
 	String tmpstr;
@@ -143,7 +144,7 @@ bool IterateThroughAllFiles(const std::vector<String>& filenames, const F& callb
 	uint32_t testFAILED = 0;
 	int64_t maxCheckDuration = 0;
 	int64_t startTime = DateTime::NowMilliSeconds();
-	for (auto& filename: filenames) {
+	for (auto& filename : filenames) {
 		int64_t duration = 0;
 		if (callback(filename, duration))
 			++testOK;
@@ -168,8 +169,7 @@ bool IterateThroughAllFiles(const std::vector<String>& filenames, const F& callb
 						logs.warning() << "-- FAILED -- " << total << " files, +" << testOK << ", -" << testFAILED << durationStr;
 				}
 			}
-			else
-			{
+			else {
 				switch (total) {
 					case 1:
 						logs.info() << "success: 1 file, +" << testOK << ", -0" << durationStr;
@@ -185,17 +185,17 @@ bool IterateThroughAllFiles(const std::vector<String>& filenames, const F& callb
 	return (0 == testFAILED);
 }
 
+
 bool batchCheckIfFilenamesConformToGrammar(Settings& settings) {
 	auto commonFolder = (settings.filenames.size() > 1 ? findCommonFolderLength(settings.filenames) : 0);
 	if (0 != commonFolder)
 		++commonFolder;
-	return IterateThroughAllFiles(settings.filenames, [&](const AnyString& file, int64_t& duration) -> bool {
+	return IterateThroughAllFiles(settings.filenames, [&](const AnyString & file, int64_t& duration) -> bool {
 		String barefile;
 		IO::ExtractFileName(barefile, file);
 		bool expected = true;
 		bool canfail = false;
-		if (settings.useFilenameConvention)
-		{
+		if (settings.useFilenameConvention) {
 			if (barefile.startsWith("ko-"))
 				expected = false;
 			if (barefile.find("-canfail-") < barefile.size())
@@ -224,12 +224,13 @@ bool batchCheckIfFilenamesConformToGrammar(Settings& settings) {
 	});
 }
 
+
 std::vector<String> expandAndCanonicalizeFilenames(const std::vector<String>& filenames) {
 	std::vector<String> filelist;
 	filelist.reserve(filenames.size());
 	String tmpstr;
 	tmpstr.reserve(1024);
-	for (auto& filename: filenames) {
+	for (auto& filename : filenames) {
 		IO::Canonicalize(tmpstr, filename);
 		switch (IO::TypeOf(tmpstr)) {
 			case IO::typeFile: {
@@ -240,8 +241,7 @@ std::vector<String> expandAndCanonicalizeFilenames(const std::vector<String>& fi
 				ShortString16 ext;
 				IO::Directory::Info info(tmpstr);
 				auto end = info.recursive_file_end();
-				for (auto i = info.recursive_file_begin(); i != end; ++i)
-				{
+				for (auto i = info.recursive_file_begin(); i != end; ++i) {
 					IO::ExtractExtension(ext, *i);
 					if (ext == ".ny")
 						filelist.emplace_back(i.filename());
@@ -257,6 +257,7 @@ std::vector<String> expandAndCanonicalizeFilenames(const std::vector<String>& fi
 	return filelist;
 }
 
+
 bool parseCommandLine(Settings& settings, int argc, char** argv) {
 	GetOpt::Parser options;
 	std::vector<String> filenames;
@@ -264,7 +265,7 @@ bool parseCommandLine(Settings& settings, int argc, char** argv) {
 	options.remainingArguments(filenames);
 	options.addFlag(settings.noColors, ' ', "no-color", "Disable color output");
 	options.addFlag(settings.useFilenameConvention, ' ', "use-filename-convention",
-		"Use the filename to determine if the test should succeed or not (should succeed if starting with 'ok-'");
+					"Use the filename to determine if the test should succeed or not (should succeed if starting with 'ok-'");
 	bool optVersion = false;
 	options.addFlag(optVersion, ' ', "version", "Display the version of the compiler and exit");
 	if (not options(argc, argv)) {
@@ -285,11 +286,11 @@ bool parseCommandLine(Settings& settings, int argc, char** argv) {
 	return true;
 }
 
+
 } // namespace
 
 
-int main(int argc, char** argv)
-{
+int main(int argc, char** argv) {
 	try {
 		Settings settings;
 		if (not parseCommandLine(settings, argc, argv))
