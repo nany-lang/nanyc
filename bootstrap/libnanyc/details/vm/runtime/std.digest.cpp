@@ -7,20 +7,15 @@
 using namespace Yuni;
 
 
-
-
-static void* nanyc_digest_md5(nyvm_t* vm, const char* string, uint64_t length)
-{
+static void* nanyc_digest_md5(nyvm_t* vm, const char* string, uint64_t length) {
 	auto& tc = *reinterpret_cast<ny::vm::ThreadContext*>(vm->tctx);
 	Hash::Checksum::MD5 md5;
 	md5.fromRawData(string, length);
-	if (not md5.value().empty())
-	{
+	if (not md5.value().empty()) {
 		uint32_t size = md5.value().size();
 		uint32_t capacity = size + ny::Config::extraObjectSize;
 		char* cstr = (char*) vm->allocator->allocate(vm->allocator, capacity);
-		if (cstr)
-		{
+		if (cstr) {
 			const char* src = md5.value().c_str();
 			for (uint32_t i = 0; i != size; ++i)
 				cstr[i] = src[i];
@@ -34,12 +29,12 @@ static void* nanyc_digest_md5(nyvm_t* vm, const char* string, uint64_t length)
 }
 
 
-namespace ny
-{
+namespace ny {
 
-	void importNSLDigest(IntrinsicTable& intrinsics)
-	{
-		intrinsics.add("__nanyc_digest_md5",   nanyc_digest_md5);
-	}
+
+void importNSLDigest(IntrinsicTable& intrinsics) {
+	intrinsics.add("__nanyc_digest_md5",   nanyc_digest_md5);
+}
+
 
 } // namespace ny

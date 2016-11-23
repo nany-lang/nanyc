@@ -5,70 +5,66 @@
 #define NANY_vm_STACK_TRACES 0
 
 
-namespace ny
-{
-namespace vm
-{
+namespace ny {
+namespace vm {
+
+/*!
+** \brief Stack implementation
+*/
+class Stack final {
+public:
+	Stack();
+	Stack(const Stack&) = delete;
+	~Stack();
 
 	/*!
-	** \brief Stack implementation
+	** \brief Push a new frame and allocates registers
 	*/
-	class Stack final
-	{
-	public:
-		Stack();
-		Stack(const Stack&) = delete;
-		~Stack();
+	DataRegister* push(uint32_t count);
 
-		/*!
-		** \brief Push a new frame and allocates registers
-		*/
-		DataRegister* push(uint32_t count);
+	/*!
+	** \brief Remove the last frame
+	*/
+	void pop(uint32_t count);
 
-		/*!
-		** \brief Remove the last frame
-		*/
-		void pop(uint32_t count);
-
-		//! Operator =
-		Stack& operator = (const Stack&) = delete;
+	//! Operator =
+	Stack& operator = (const Stack&) = delete;
 
 
-	private:
-		void pushNewChunk(uint32_t count);
-		void popChunk();
-		void dump(const AnyString& action, uint32_t count) const;
+private:
+	void pushNewChunk(uint32_t count);
+	void popChunk();
+	void dump(const AnyString& action, uint32_t count) const;
 
-	private:
-		static_assert(sizeof(DataRegister) == sizeof(uint64_t), "invalid register size");
+private:
+	static_assert(sizeof(DataRegister) == sizeof(uint64_t), "invalid register size");
 
-		struct Chunk
-		{
-			static constexpr uint32_t blockSizeWanted = 8192u;
+	struct Chunk {
+		static constexpr uint32_t blockSizeWanted = 8192u;
 
-			//! The maximum number of bytes that would fit in 2 pages block
-			static constexpr uint32_t blockmax =
-				static_cast<uint32_t>((blockSizeWanted - sizeof(void*) * 4) / sizeof(DataRegister));
+		//! The maximum number of bytes that would fit in 2 pages block
+		static constexpr uint32_t blockmax =
+			static_cast<uint32_t>((blockSizeWanted - sizeof(void*) * 4) / sizeof(DataRegister));
 
-			uint32_t remains;
-			uint32_t capacity;
-			Chunk* previous;
-			DataRegister* cursor;
+		uint32_t remains;
+		uint32_t capacity;
+		Chunk* previous;
+		DataRegister* cursor;
 
-			DataRegister block[blockmax]; // [capacity]
-			// warning: the size of this struct might be bigger than expected
-			// the real size of 'block' is 'capacity', which can be greater than 'blockmax'
-			// to accept legit big stack requests
-		};
-
-		Chunk* current = nullptr;
-		Chunk* reserve = nullptr;
-
-		#if NANY_vm_STACK_TRACES != 0
-		uint32_t frameCount = 0u;
-		uint32_t stacksize = 0u;
-		#endif
+		DataRegister block[blockmax]; // [capacity]
+		// warning: the size of this struct might be bigger than expected
+		// the real size of 'block' is 'capacity', which can be greater than 'blockmax'
+		// to accept legit big stack requests
 	};
+
+	Chunk* current = nullptr;
+	Chunk* reserve = nullptr;
+
+#if NANY_vm_STACK_TRACES != 0
+	uint32_t frameCount = 0u;
+	uint32_t stacksize = 0u;
+#endif
+};
 
 
 

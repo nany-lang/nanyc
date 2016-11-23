@@ -7,134 +7,104 @@
 using namespace Yuni;
 
 
+namespace ny {
+namespace vm {
+namespace {
 
 
-namespace ny
-{
-namespace vm
-{
+template<class T> uint32_t sizeFromCapacity(uint32_t capacity) {
+	uint32_t bytes = static_cast<uint32_t>(sizeof(T)); // the Chunk itself
+	bytes -= static_cast<uint32_t>(sizeof(T::block));  // minus the pseudo field 'block'
+	bytes += static_cast<uint32_t>(capacity * sizeof(DataRegister));
+	return bytes;
+}
 
-	namespace {
+
+} // anonymous namespace
 
 
-	template<class T> uint32_t sizeFromCapacity(uint32_t capacity)
-	{
-		uint32_t bytes = static_cast<uint32_t>(sizeof(T)); // the Chunk itself
-		bytes -= static_cast<uint32_t>(sizeof(T::block));  // minus the pseudo field 'block'
-		bytes += static_cast<uint32_t>(capacity * sizeof(DataRegister));
-		return bytes;
+Stack::Stack() {
+	pushNewChunk(1); // not null for boundaries checking
+	current->remains -= 1u;
+}
+
+
+Stack::~Stack() {
+	free(reserve);
+	auto* c = current;
+	assert(c != nullptr);
+	do {
+		auto* previous = c->previous;
+		free(c);
+		c = previous;
 	}
+	while (c);
+}
 
 
-	} // anonymous namespace
-
-
-
-
-	Stack::Stack()
-	{
-		pushNewChunk(1); // not null for boundaries checking
-		current->remains -= 1u;
-	}
-
-
-	Stack::~Stack()
-	{
-		free(reserve);
-
-		auto* c = current;
-		assert(c != nullptr);
-		do
-		{
-			auto* previous = c->previous;
-			free(c);
-			c = previous;
-		}
-		while (c);
-	}
-
-
-	void Stack::dump(const AnyString& action, uint32_t count) const
-	{
-		if (current)
-		{
-			std::cout << "== stack == " << action << count << ", current: " << (void*) current
-				<< ", remains: " << current->remains << '/' << current->capacity
-				#if NANY_vm_STACK_TRACES != 0
-				<< ", " << frameCount << " frames"
-				<< ", bytes: " << stacksize
-				#endif
-				<< '\n';
-		}
-		else
-			std::cout << "== stack == <null>\n";
-	}
-
-
-	void Stack::pushNewChunk(uint32_t count)
-	{
+void Stack::dump(const AnyString& action, uint32_t count) const {
+	if (current) {
+		std::cout << "== stack == " << action << count << ", current: " << (void*) current;
+		std::cout << ", remains: " << current->remains << '/' << current->capacity;
 		#if NANY_vm_STACK_TRACES != 0
-		std::cout << "== stack == requires new chunk to increase stack of "
-			<< (sizeof(DataRegister) * count) << " bytes\n";
+		std::cout << ", " << frameCount << " frames";
+		std::cout << ", bytes: " << stacksize;
 		#endif
-
-		Chunk* chunk;
-
-		if (reserve and count <= reserve->capacity)
-		{
-			chunk = reserve;
-			reserve = nullptr;
-			assert(chunk->remains == chunk->capacity);
-		}
-		else
-		{
-			uint32_t capacity = Chunk::blockmax;
-			while (capacity < count)
-				capacity += Chunk::blockSizeWanted;
-
-			uint32_t bytes = sizeFromCapacity<Chunk>(capacity);
-
-			#if NANY_vm_STACK_TRACES != 0
-			std::cout << "== stack == allocate new chunk of " << bytes << " bytes\n";
-			stacksize += bytes;
-			#endif
-
-			chunk = (Chunk*) malloc(bytes);
-			chunk->capacity = capacity;
-			chunk->remains  = capacity;
-			assert(chunk != nullptr);
-		}
-
-		chunk->cursor   = chunk->block;
-		chunk->previous = current;
-		current = chunk;
-		assert(count <= chunk->remains);
+		std::cout << '\n';
 	}
+	else
+		std::cout << "== stack == <null>\n";
+}
 
 
-	void Stack::popChunk()
-	{
-		auto* previous = current->previous;
-		if (!reserve)
-		{
-			// keep at least one chunk in reserve for next time
-			reserve = current;
-		}
-		else
-		{
-			#if NANY_vm_STACK_TRACES != 0
-			std::cout << "== stack == release chunk\n";
-			stacksize -= sizeFromCapacity<Chunk>(current->capacity);
-			#endif
-
-			free(current);
-		}
-
-		current = previous;
-		// 'current' may be null here at the very last scope, when the program stops
+void Stack::pushNewChunk(uint32_t count) {
+	#if NANY_vm_STACK_TRACES != 0
+	std::cout << "== stack == requires new chunk to increase stack of ";
+	std::cout << (sizeof(DataRegister) * count) << " bytes\n";
+	#endif
+	Chunk* chunk;
+	if (reserve and count <= reserve->capacity) {
+		chunk = reserve;
+		reserve = nullptr;
+		assert(chunk->remains == chunk->capacity);
 	}
+	else {
+		uint32_t capacity = Chunk::blockmax;
+		while (capacity < count)
+			capacity += Chunk::blockSizeWanted;
+		uint32_t bytes = sizeFromCapacity<Chunk>(capacity);
+		#if NANY_vm_STACK_TRACES != 0
+		std::cout << "== stack == allocate new chunk of " << bytes << " bytes\n";
+		stacksize += bytes;
+		#endif
+		chunk = (Chunk*) malloc(bytes);
+		chunk->capacity = capacity;
+		chunk->remains  = capacity;
+		assert(chunk != nullptr);
+	}
+	chunk->cursor   = chunk->block;
+	chunk->previous = current;
+	current = chunk;
+	assert(count <= chunk->remains);
+}
 
 
+void Stack::popChunk() {
+	auto* previous = current->previous;
+	if (!reserve) {
+		// keep at least one chunk in reserve for next time
+		reserve = current;
+	}
+	else {
+		#if NANY_vm_STACK_TRACES != 0
+		std::cout << "== stack == release chunk\n";
+		stacksize -= sizeFromCapacity<Chunk>(current->capacity);
+		#endif
+		free(current);
+	}
+	current = previous;
+	// 'current' may be null here at the very last scope, when the program stops
+}
 
 
 } // namespace vm
