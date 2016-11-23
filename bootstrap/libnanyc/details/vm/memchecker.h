@@ -1,5 +1,5 @@
 #pragma once
-#include <yuni/yuni.h>
+#include "libnanyc.h"
 #include <yuni/string.h>
 #include <vector>
 #include "details/atom/atom-map.h"

@@ -5,7 +5,6 @@
 #include <memory>
 
 
-
 namespace // anonymous
 {
 

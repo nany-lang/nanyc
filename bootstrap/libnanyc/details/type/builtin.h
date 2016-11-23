@@ -1,6 +1,6 @@
 #pragma once
 #include <yuni/yuni.h>
-#include <yuni/core/string.h>
+#include <yuni/string.h>
 #include <nany/nany.h>
 
 

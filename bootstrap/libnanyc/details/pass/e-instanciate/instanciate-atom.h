@@ -1,5 +1,5 @@
 #pragma once
-#include <yuni/yuni.h>
+#include "libnanyc.h"
 #include "details/context/build.h"
 #include "details/reporting/report.h"
 #include "details/atom/atom.h"

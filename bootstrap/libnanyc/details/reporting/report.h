@@ -1,5 +1,5 @@
 #pragma once
-#include <yuni/yuni.h>
+#include "libnanyc.h"
 #include "fwd.h"
 #include "message.h"
 #include "levels.h"

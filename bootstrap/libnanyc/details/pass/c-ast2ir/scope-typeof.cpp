@@ -1,4 +1,3 @@
-#include <yuni/yuni.h>
 #include "scope.h"
 #include "details/ir/emit.h"
 

@@ -1,5 +1,4 @@
 #pragma once
-#include <yuni/yuni.h>
 #include "program.h"
 #include "details/ir/sequence.h"
 #include <array>

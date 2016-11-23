@@ -1,7 +1,5 @@
 #include "std.core.h"
 #include "details/intrinsic/intrinsic-table.h"
-#include <yuni/yuni.h>
-#include <yuni/core/string.h>
 #include <yuni/core/process/program.h>
 
 using namespace Yuni;

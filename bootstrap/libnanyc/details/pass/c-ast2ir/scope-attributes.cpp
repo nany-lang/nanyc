@@ -1,6 +1,5 @@
-#include <yuni/yuni.h>
-#include <yuni/core/noncopyable.h>
 #include "scope.h"
+#include <yuni/core/noncopyable.h>
 #include "details/utils/check-for-valid-identifier-name.h"
 #include "details/grammar/nany.h"
 #include "details/ast/ast.h"

@@ -1,6 +1,6 @@
 #pragma once
-#include <yuni/yuni.h>
-#include <yuni/core/string.h>
+#include "libnanyc.h"
+#include <yuni/string.h>
 #include "details/reporting/report.h"
 #include "details/atom/atom.h"
 #include <cassert>
