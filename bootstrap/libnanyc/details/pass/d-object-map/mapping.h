@@ -11,39 +11,35 @@
 
 
 
-namespace ny
-{
-namespace Pass
-{
-namespace Mapping
-{
+namespace ny {
+namespace Pass {
+namespace Mapping {
 
 
-	class SequenceMapping final
-	{
-	public:
-		SequenceMapping(ClassdefTable& cdeftable, Yuni::Mutex& mutex, ir::Sequence& sequence);
+class SequenceMapping final {
+public:
+	SequenceMapping(ClassdefTable& cdeftable, Yuni::Mutex& mutex, ir::Sequence& sequence);
 
-		bool map(Atom& parentAtom, uint32_t offset = 0);
+	bool map(Atom& parentAtom, uint32_t offset = 0);
 
 
-	public:
-		//! The classdef table (must be protected by 'mutex' in some passes)
-		ClassdefTable& cdeftable;
-		//! Mutex for the cdeftable
-		Yuni::Mutex& mutex;
-		//! Current sequence
-		ir::Sequence& currentSequence;
-		//! Flag to evaluate the whole sequence, or only a portion of it
-		bool evaluateWholeSequence = true;
-		//! Prefix to prepend for the first atom created by the mapping
-		AnyString prefixNameForFirstAtomCreated;
-		//! The first atom created by the mapping
-		// This value might be used when a mapping is done on the fly
-		// (while instanciating code for example)
-		Atom* firstAtomCreated = nullptr;
+public:
+	//! The classdef table (must be protected by 'mutex' in some passes)
+	ClassdefTable& cdeftable;
+	//! Mutex for the cdeftable
+	Yuni::Mutex& mutex;
+	//! Current sequence
+	ir::Sequence& currentSequence;
+	//! Flag to evaluate the whole sequence, or only a portion of it
+	bool evaluateWholeSequence = true;
+	//! Prefix to prepend for the first atom created by the mapping
+	AnyString prefixNameForFirstAtomCreated;
+	//! The first atom created by the mapping
+	// This value might be used when a mapping is done on the fly
+	// (while instanciating code for example)
+	Atom* firstAtomCreated = nullptr;
 
-	}; // class SequenceMapping
+}; // class SequenceMapping
 
 
 

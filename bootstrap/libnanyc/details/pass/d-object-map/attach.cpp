@@ -7,27 +7,18 @@
 using namespace Yuni;
 
 
+namespace ny {
 
 
-
-namespace ny
-{
-
-
-	bool Build::attach(ir::Sequence& sequence, bool owned)
+bool Build::attach(ir::Sequence& sequence, bool owned) {
+	// keep the sequence somewhere
 	{
-		// keep the sequence somewhere
-		{
-			MutexLocker locker{mutex};
-			m_attachedSequences.push_back(AttachedSequenceRef{&sequence, owned});
-		}
-
-		Pass::Mapping::SequenceMapping mapper{cdeftable, mutex, sequence};
-		return mapper.map(cdeftable.atoms.root);
+		MutexLocker locker{mutex};
+		m_attachedSequences.push_back(AttachedSequenceRef{&sequence, owned});
 	}
-
-
-
+	Pass::Mapping::SequenceMapping mapper{cdeftable, mutex, sequence};
+	return mapper.map(cdeftable.atoms.root);
+}
 
 
 } // namespace ny
