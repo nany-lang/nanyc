@@ -7,6 +7,6 @@ Build a debian package
 ----------------------
 
 ```
-$ cd src/bootstrap
-$ make package-deb
+$ cd bootstrap
+$ make -j $(nproc) package-deb
 ```

@@ -21,7 +21,7 @@ $ git submodule update --init --recursive
 
 Generate the makefiles:
 ```
-$ cd src/bootstrap
+$ cd bootstrap
 $ cmake .
 
 ```
@@ -37,7 +37,7 @@ $ make -j $(nproc)
 
 Generate the MS Projects:
 ```
-$ cd src/bootstrap
+$ cd bootstrap
 $ cmake . -G "Visual Studio 14 2015 Win64"
 ```
 
@@ -72,7 +72,7 @@ $ gem install fpm
 ```
 
 ```
-$ cd src/bootstrap
+$ cd bootstrap
 $ make package-deb
 ```
 
@@ -85,6 +85,6 @@ $ gem install fpm
 ```
 
 ```
-$ cd src/bootstrap
+$ cd bootstrap
 $ make package-rpm
 ```
