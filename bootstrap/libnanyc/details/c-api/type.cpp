@@ -6,10 +6,7 @@
 using namespace Yuni;
 
 
-
-
-static const std::unordered_map<AnyString, nytype_t> translationStringToDef
-{
+static const std::unordered_map<AnyString, nytype_t> translationStringToDef {
 	{ "__bool",    nyt_bool },
 	{ "__pointer", nyt_ptr  },
 	{ "__u8",      nyt_u8   },
@@ -25,10 +22,8 @@ static const std::unordered_map<AnyString, nytype_t> translationStringToDef
 };
 
 
-extern "C" nytype_t nycstring_to_type_n(const char* const text, size_t length)
-{
-	if (length > 3 and length < 16 and text)
-	{
+extern "C" nytype_t nycstring_to_type_n(const char* const text, size_t length) {
+	if (length > 3 and length < 16 and text) {
 		auto it = translationStringToDef.find(AnyString{text, static_cast<uint32_t>(length)});
 		return (it != translationStringToDef.cend()) ? it->second : nyt_void;
 	}
@@ -36,11 +31,9 @@ extern "C" nytype_t nycstring_to_type_n(const char* const text, size_t length)
 }
 
 
-extern "C" nytype_t nycstring_to_type(const char* const text)
-{
+extern "C" nytype_t nycstring_to_type(const char* const text) {
 	size_t length = (text ? strlen(text) : 0u);
-	if (length > 3 and length < 16)
-	{
+	if (length > 3 and length < 16) {
 		auto it = translationStringToDef.find(AnyString{text, static_cast<uint32_t>(length)});
 		return (it != translationStringToDef.cend()) ? it->second : nyt_void;
 	}
@@ -48,10 +41,7 @@ extern "C" nytype_t nycstring_to_type(const char* const text)
 }
 
 
-
-
-static constexpr const char* const type2cstring[nyt_count] =
-{
+static constexpr const char* const type2cstring[nyt_count] = {
 	"void",
 	"any",
 	"__pointer",
@@ -69,16 +59,14 @@ static constexpr const char* const type2cstring[nyt_count] =
 };
 
 
-extern "C" const char* nytype_to_cstring(nytype_t type)
-{
+extern "C" const char* nytype_to_cstring(nytype_t type) {
 	return (static_cast<uint32_t>(type) < nyt_count)
-		? type2cstring[static_cast<uint32_t>(type)]
-		: "<unknown>";
+		   ? type2cstring[static_cast<uint32_t>(type)]
+		   : "<unknown>";
 }
 
 
-static constexpr const uint32_t type2size[] =
-{
+static constexpr const uint32_t type2size[] = {
 	0,
 	0,
 	(uint32_t) sizeof(void*),
@@ -98,9 +86,8 @@ static constexpr const uint32_t type2size[] =
 };
 
 
-extern "C" uint32_t nytype_sizeof(nytype_t type)
-{
+extern "C" uint32_t nytype_sizeof(nytype_t type) {
 	return (static_cast<uint32_t>(type) < nyt_count)
-		? type2size[static_cast<uint32_t>(type)]
-		: 0;
+		   ? type2size[static_cast<uint32_t>(type)]
+		   : 0;
 }

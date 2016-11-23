@@ -30,8 +30,7 @@ typedef int (*nyextman_each_t)(nyextman_t*, nyext_t*);
 
 
 /*! Extension State */
-enum nyext_state_t
-{
+enum nyext_state_t {
 	/*! No state */
 	nyest_none       = 0,
 	/*! Ready to run and waiting for requests */
@@ -53,8 +52,7 @@ enum nyext_state_t
 
 
 
-typedef struct nyextman_cf_t
-{
+typedef struct nyextman_cf_t {
 	/*! Maximum number of threads (0: automatic) */
 	uint32_t max_threads;
 
@@ -109,8 +107,7 @@ NY_EXPORT void nany_ext_get_description(nyext_t*, nyext_description_t*);
 
 
 
-typedef struct nyextmonitor_cf_t
-{
+typedef struct nyextmonitor_cf_t {
 	/*! An extension entered into a new state */
 	void (*on_ext_state)(nyextman_t*, nyext_t*, nyext_state_t);
 	/*! An extension has been registered */

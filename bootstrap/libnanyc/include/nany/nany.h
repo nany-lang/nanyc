@@ -32,9 +32,9 @@
 ** \brief Export / import a libnany symbol (function)
 */
 #if defined(LIBNANYC_DLL_EXPORT)
-#	define NY_EXPORT LIBNANYC_VISIBILITY_EXPORT
+#   define NY_EXPORT LIBNANYC_VISIBILITY_EXPORT
 #else
-#	define NY_EXPORT LIBNANYC_VISIBILITY_IMPORT
+#   define NY_EXPORT LIBNANYC_VISIBILITY_IMPORT
 #endif
 
 
@@ -134,13 +134,13 @@ static inline nyanystr_t nyanystr_ex(const char* const text, uint32_t len) {
 
 /*! Create an nyanystr_t from a reallocated c-string */
 static inline void nyanystr_duplicate(nyanystr_t* const out, const nyanystr_t* const src) {
-    uint32_t len = src->size;
-    const char* srcstr = src->c_str;
-    char* str = (char*) malloc(sizeof(char) * (len + 1));
-    memcpy(str, srcstr, len);
-    str[len] = '\0';
-    out->c_str = str;
-    out->size = len;
+	uint32_t len = src->size;
+	const char* srcstr = src->c_str;
+	char* str = (char*) malloc(sizeof(char) * (len + 1));
+	memcpy(str, srcstr, len);
+	str[len] = '\0';
+	out->c_str = str;
+	out->size = len;
 }
 #endif
 
@@ -443,7 +443,8 @@ typedef struct nybuild_cf_t {
 	void (*on_begin)(const nyproject_t*, nybuild_t*);
 
 	/*! Progress report */
-	nybool_t (*on_progress)(const nyproject_t*, nybuild_t*, const char* id, const char* element, uint32_t percent);
+	nybool_t (*on_progress)(const nyproject_t*, nybuild_t*, const char* id, const char* element,
+							uint32_t percent);
 	/*! Try to discover a new binding */
 	nybool_t (*on_binding_discovery)(nybuild_t*, const char* name, uint32_t size);
 
@@ -525,7 +526,7 @@ nyio_err_t;
 
 typedef enum nyio_automout_flag_t {
 	/*! Automount all */
-	nyioaf_all   = (uint32_t) -1,
+	nyioaf_all   = (uint32_t) - 1,
 	/*! No automount */
 	nyioaf_none  = 0,
 
@@ -544,8 +545,8 @@ nyio_automout_flag_t;
 
 
 /*! Callback for iterating through the list of opened files */
-typedef nybool_t (*nyio_opened_files_it_t)(const char* vpath, uint32_t len,
-	const char* localpath, uint32_t lplen);
+typedef nybool_t (*nyio_opened_files_it_t)(const char* vpath, uint32_t len, const char* localpath,
+		uint32_t lplen);
 
 
 /*! IO Adapter */
@@ -577,7 +578,7 @@ struct nyio_adapter_t {
 	uint64_t (*file_write)(void*, const void* buffer, uint64_t bufsize);
 	/*! Open a local file for the current thread */
 	void* (*file_open)(nyio_adapter_t*, const char* path, uint32_t len,
-		nybool_t readm, nybool_t writem, nybool_t appendm, nybool_t truncm);
+					   nybool_t readm, nybool_t writem, nybool_t appendm, nybool_t truncm);
 	/*! Close a file */
 	void (*file_close)(void*);
 	/*! End of file */
@@ -606,11 +607,13 @@ struct nyio_adapter_t {
 
 	/*! Retrieve the content of a file */
 	nyio_err_t (*file_get_contents)(nyio_adapter_t*, char** content, uint64_t* size, uint64_t* capacity,
-		const char* path, uint32_t len);
+									const char* path, uint32_t len);
 	/*! Set the content of a file */
-	nyio_err_t (*file_set_contents)(nyio_adapter_t*, const char* path, uint32_t len, const char* content, uint32_t ctlen);
+	nyio_err_t (*file_set_contents)(nyio_adapter_t*, const char* path, uint32_t len, const char* content,
+									uint32_t ctlen);
 	/*! Append the content to a file */
-	nyio_err_t (*file_append_contents)(nyio_adapter_t*, const char* path, uint32_t len, const char* content, uint32_t ctlen);
+	nyio_err_t (*file_append_contents)(nyio_adapter_t*, const char* path, uint32_t len, const char* content,
+									   uint32_t ctlen);
 
 
 	/*! Create a new folder */
@@ -626,7 +629,7 @@ struct nyio_adapter_t {
 
 	/*! Iterate through folder */
 	nyio_iterator_t* (*folder_iterate)(nyio_adapter_t*, const char* path, uint32_t len,
-		nybool_t recursive, nybool_t files, nybool_t folders);
+									   nybool_t recursive, nybool_t files, nybool_t folders);
 	/*! Go to the next element */
 	nyio_iterator_t* (*folder_next)(nyio_iterator_t*);
 	/*! Get the full path (i.e. /baz/foo,txt) of the current element */
@@ -651,7 +654,8 @@ typedef struct nyio_cf_t {
 	/*! event: an url has been mounted */
 	nyio_err_t (*on_mount_query)(nyprogram_t*, nytctx_t*, const char* url, const char* path, uint32_t len);
 	/*! event: create an adapter from an url */
-	nyio_err_t (*on_adapter_create)(nyprogram_t*, nytctx_t*, nyio_adapter_t**, const char* url, nyio_adapter_t* parent);
+	nyio_err_t (*on_adapter_create)(nyprogram_t*, nytctx_t*, nyio_adapter_t**, const char* url,
+									nyio_adapter_t* parent);
 
 	/*! Flag to automatically mount some standard paths */
 	/*! \see nyio_automout_flag_t */
@@ -663,7 +667,7 @@ nyio_cf_t;
 ** \brief Create an adapter to access to a local folder
 */
 NY_EXPORT void nyio_adapter_create_from_local_folder(nyio_adapter_t*, nyallocator_t*,
-	const char* localfolder, size_t len);
+		const char* localfolder, size_t len);
 /*@}*/
 
 
@@ -812,7 +816,8 @@ NY_EXPORT nybool_t nyprint_ast_from_memory(const char* content, int fd, nybool_t
 ** \warning Writing to the same FD by multiple threads is not thread-safe on all platforms
 ** \param content Arbitrary utf-8 content (c-string)
 */
-NY_EXPORT  nybool_t nyprint_ast_from_memory_n(const char* content, size_t length, int fd, nybool_t unixcolors);
+NY_EXPORT  nybool_t nyprint_ast_from_memory_n(const char* content, size_t length, int fd,
+		nybool_t unixcolors);
 
 /*!
 ** \brief Check if a filename is a valid nany source code
@@ -923,7 +928,8 @@ NY_EXPORT int nyrun(const nyrun_cf_t* cf, const char* source, uint32_t argc, con
 ** \param argv Input arguments (ignored if null)
 ** \return Exit status code
 */
-NY_EXPORT int nyrun_n(const nyrun_cf_t* cf, const char* source, size_t length, uint32_t argc, const char** argv);
+NY_EXPORT int nyrun_n(const nyrun_cf_t* cf, const char* source, size_t length, uint32_t argc,
+					  const char** argv);
 
 
 /*!
@@ -947,9 +953,11 @@ NY_EXPORT int nyrun_file(const nyrun_cf_t* cf, const char* file, uint32_t argc, 
 ** \param argv Input arguments (ignored if null)
 ** \return Exit status code
 */
-NY_EXPORT int nyrun_file_n(const nyrun_cf_t* cf, const char* file, size_t length, uint32_t argc, const char** argv);
+NY_EXPORT int nyrun_file_n(const nyrun_cf_t* cf, const char* file, size_t length, uint32_t argc,
+						   const char** argv);
 
-NY_EXPORT int nyrun_filelist(const nyrun_cf_t* cf, const char** files, uint32_t file_count, uint32_t argc, const char** argv);
+NY_EXPORT int nyrun_filelist(const nyrun_cf_t* cf, const char** files, uint32_t file_count, uint32_t argc,
+							 const char** argv);
 /*@}*/
 
 

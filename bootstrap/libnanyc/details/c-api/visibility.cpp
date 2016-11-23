@@ -4,8 +4,7 @@
 using namespace Yuni;
 
 
-extern "C" nyvisibility_t  nycstring_to_visibility_n(const char* const text, size_t length)
-{
+extern "C" nyvisibility_t  nycstring_to_visibility_n(const char* const text, size_t length) {
 	// published  9
 	// public     6
 	// protected  9
@@ -13,28 +12,23 @@ extern "C" nyvisibility_t  nycstring_to_visibility_n(const char* const text, siz
 	// internal   8
 	AnyString str{text, (length < 10) ? static_cast<uint32_t>(length) : 0};
 	str.trimRight();
-	switch (str.size())
-	{
-		case 6:
-		{
+	switch (str.size()) {
+		case 6: {
 			if (str == "public")
 				return nyv_public;
 			break;
 		}
-		case 7:
-		{
+		case 7: {
 			if (str == "private")
 				return nyv_private;
 			break;
 		}
-		case 8:
-		{
+		case 8: {
 			if (str == "internal")
 				return nyv_internal;
 			break;
 		}
-		case 9:
-		{
+		case 9: {
 			if (str == "published")
 				return nyv_published;
 			if (str == "protected")
@@ -45,10 +39,8 @@ extern "C" nyvisibility_t  nycstring_to_visibility_n(const char* const text, siz
 }
 
 
-extern "C" const char* nyvisibility_to_cstring(nyvisibility_t visibility)
-{
-	static constexpr const char* const values[(uint32_t) nyv_count] =
-	{
+extern "C" const char* nyvisibility_to_cstring(nyvisibility_t visibility) {
+	static constexpr const char* const values[(uint32_t) nyv_count] = {
 		"undefined",
 		"default",
 		"private",
@@ -62,8 +54,7 @@ extern "C" const char* nyvisibility_to_cstring(nyvisibility_t visibility)
 }
 
 
-extern "C" nyvisibility_t nycstring_to_visibility(const char* const text)
-{
+extern "C" nyvisibility_t nycstring_to_visibility(const char* const text) {
 	size_t length = (text ? strlen(text) : 0u);
 	return nycstring_to_visibility_n(text, length);
 }

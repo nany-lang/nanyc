@@ -5,40 +5,31 @@
 using namespace Yuni;
 
 
-
-extern "C" void nyproject_cf_init(nyproject_cf_t* cf)
-{
+extern "C" void nyproject_cf_init(nyproject_cf_t* cf) {
 	assert(cf != NULL);
 	memset(cf, 0x0, sizeof(nyproject_cf_t));
 	nany_memalloc_set_default(&(cf->allocator));
 }
 
 
-extern "C" nyproject_t* nyproject_create(const nyproject_cf_t* cf)
-{
+extern "C" nyproject_t* nyproject_create(const nyproject_cf_t* cf) {
 	ny::Project* project;
-
-	if (cf)
-	{
+	if (cf) {
 		auto& allocator = const_cast<nyallocator_t&>(cf->allocator);
 		void* inplace = allocator.allocate(&allocator, sizeof(ny::Project));
 		if (unlikely(!inplace))
 			return nullptr;
-
 		project = new (inplace) ny::Project(*cf);
 	}
-	else
-	{
+	else {
 		nyproject_cf_t ncf;
 		nyproject_cf_init(&ncf);
-
 		auto& allocator = const_cast<nyallocator_t&>(ncf.allocator);
 		void* inplace = allocator.allocate(&allocator, sizeof(ny::Project));
 		if (unlikely(!inplace))
 			return nullptr;
 		project = new (inplace) ny::Project(ncf);
 	}
-
 	// making sure that user-events do not destroy the project by mistake
 	project->addRef();
 	// initialize the project after incrementing the ref count
@@ -48,17 +39,14 @@ extern "C" nyproject_t* nyproject_create(const nyproject_cf_t* cf)
 }
 
 
-extern "C" void nyproject_ref(nyproject_t* project)
-{
+extern "C" void nyproject_ref(nyproject_t* project) {
 	if (project)
 		ny::ref(project).addRef();
 }
 
 
-extern "C" void nyproject_unref(nyproject_t* ptr)
-{
-	if (ptr)
-	{
+extern "C" void nyproject_unref(nyproject_t* ptr) {
+	if (ptr) {
 		auto& project = ny::ref(ptr);
 		if (project.release())
 			project.destroy();
@@ -66,10 +54,8 @@ extern "C" void nyproject_unref(nyproject_t* ptr)
 }
 
 
-extern "C" nybool_t nyproject_add_source_from_file_n(nyproject_t* ptr, const char* filename, size_t len)
-{
-	if (ptr and filename and len != 0 and len < 32*1024)
-	{
+extern "C" nybool_t nyproject_add_source_from_file_n(nyproject_t* ptr, const char* filename, size_t len) {
+	if (ptr and filename and len != 0 and len < 32 * 1024) {
 		AnyString path{filename, static_cast<uint32_t>(len)};
 		ny::ref(ptr).targets.anonym->addSourceFromFile(path);
 		return nytrue;
@@ -78,10 +64,8 @@ extern "C" nybool_t nyproject_add_source_from_file_n(nyproject_t* ptr, const cha
 }
 
 
-extern "C" nybool_t nyproject_add_source_from_file(nyproject_t* ptr, const char* filename)
-{
-	if (filename != nullptr)
-	{
+extern "C" nybool_t nyproject_add_source_from_file(nyproject_t* ptr, const char* filename) {
+	if (filename != nullptr) {
 		size_t length = strlen(filename);
 		return nyproject_add_source_from_file_n(ptr, filename, length);
 	}
@@ -89,10 +73,8 @@ extern "C" nybool_t nyproject_add_source_from_file(nyproject_t* ptr, const char*
 }
 
 
-extern "C" nybool_t nyproject_add_source_n(nyproject_t* ptr, const char* text, size_t len)
-{
-	if (ptr and text and len != 0 and len < 512 * 1024*1024) // arbitrary
-	{
+extern "C" nybool_t nyproject_add_source_n(nyproject_t* ptr, const char* text, size_t len) {
+	if (ptr and text and len != 0 and len < 512 * 1024 * 1024) { // arbitrary
 		AnyString source{text, static_cast<uint32_t>(len)};
 		ny::ref(ptr).targets.anonym->addSource("<unknown>", source);
 		return nytrue;
@@ -101,10 +83,8 @@ extern "C" nybool_t nyproject_add_source_n(nyproject_t* ptr, const char* text, s
 }
 
 
-extern "C" nybool_t nyproject_add_source(nyproject_t* ptr, const char* text)
-{
-	if (text != nullptr)
-	{
+extern "C" nybool_t nyproject_add_source(nyproject_t* ptr, const char* text) {
+	if (text != nullptr) {
 		size_t length = strlen(text);
 		return nyproject_add_source_n(ptr, text, length);
 	}
@@ -112,21 +92,18 @@ extern "C" nybool_t nyproject_add_source(nyproject_t* ptr, const char* text)
 }
 
 
-extern "C" void nyproject_lock(const nyproject_t* ptr)
-{
+extern "C" void nyproject_lock(const nyproject_t* ptr) {
 	if (ptr)
 		ny::ref(ptr).mutex.lock();
 }
 
 
-extern "C" void nyproject_unlock(const nyproject_t* ptr)
-{
+extern "C" void nyproject_unlock(const nyproject_t* ptr) {
 	if (ptr)
 		ny::ref(ptr).mutex.unlock();
 }
 
 
-extern "C" nybool_t nyproject_trylock(const nyproject_t* ptr)
-{
+extern "C" nybool_t nyproject_trylock(const nyproject_t* ptr) {
 	return ((ptr) ? ny::ref(ptr).mutex.trylock() : false) ? nytrue : nyfalse;
 }
