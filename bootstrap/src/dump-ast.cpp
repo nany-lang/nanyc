@@ -32,6 +32,7 @@ bool printAST(const AnyString filename, bool unixcolors) {
 	return success;
 }
 
+
 int printVersion() {
 	assert(strlen(YUNI_STRINGIZE(NANY_VERSION)) >= 5 and "empty version");
 	std::cout << YUNI_STRINGIZE(NANY_VERSION) << '\n';
@@ -85,7 +86,7 @@ int main(int argc, char** argv) {
 	// colors
 	bool withColors = ((not noColors) and System::Console::IsStdoutTTY());
 	bool success = true;
-	for (auto& path: filenames)
+	for (auto& path : filenames)
 		success &= printAST(path, withColors);
 	return success ? EXIT_SUCCESS : EXIT_FAILURE;
 }
