@@ -715,7 +715,7 @@ template<> struct Operand<ny::ir::ISA::Op::qualifiers> final {
 	uint32_t flag;
 
 	template<class T> void eachLVID(T& c) {
-		static_assert(sizeof(qualifier) == sizeof(uint32_t), "alignment required");
+		static_assert(sizeof(Operand<ny::ir::ISA::Op::qualifiers>) <= sizeof(uint32_t) * 4, "alignment required");
 		c(lvid);
 	}
 };
@@ -991,7 +991,7 @@ template<> struct Operand<ny::ir::ISA::Op::pragma> final {
 	value;
 
 	template<class T> void eachLVID(T& c) {
-		static_assert(sizeof(pragma) == sizeof(uint32_t), "alignment required");
+		static_assert(sizeof(Operand<ny::ir::ISA::Op::pragma>) <= sizeof(uint32_t) * 4, "alignment required");
 		switch (pragma) {
 			case Pragma::synthetic:                {
 				c(value.synthetic.lvid);
@@ -1042,6 +1042,7 @@ template<> struct Operand<ny::ir::ISA::Op::blueprint> final {
 		lvid = converter.lvid;
 	}
 	template<class T> void eachLVID(T& c) {
+		static_assert(sizeof(Operand<ny::ir::ISA::Op::blueprint>) <= sizeof(uint32_t) * 4, "alignment required");
 		uint32_t cplvid = lvid;
 		c(cplvid);
 		setLVID(cplvid);
