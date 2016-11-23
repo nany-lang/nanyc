@@ -114,30 +114,26 @@ typedef enum nybool_t {nyfalse = 0, nytrue} nybool_t;
 
 #ifndef LIBNANYC_NYANYSTR_T
 #define LIBNANYC_NYANYSTR_T
-typedef struct
-{
+typedef struct {
 	uint32_t size;
 	const char* c_str;
 }
 nyanystr_t;
 
 /*! Create an nyanystr_t from a c-string */
-static inline nyanystr_t nyanystr(const char* const text)
-{
+static inline nyanystr_t nyanystr(const char* const text) {
 	nyanystr_t s = {((text) ? (uint32_t) strlen(text) : 0), text};
 	return s;
 }
 
 /*! Create an nyanystr_t from a c-string and a given length */
-static inline nyanystr_t nyanystr_ex(const char* const text, uint32_t len)
-{
+static inline nyanystr_t nyanystr_ex(const char* const text, uint32_t len) {
 	nyanystr_t s = {len, text};
 	return s;
 }
 
 /*! Create an nyanystr_t from a reallocated c-string */
-static inline void nyanystr_duplicate(nyanystr_t* const out, const nyanystr_t* const src)
-{
+static inline void nyanystr_duplicate(nyanystr_t* const out, const nyanystr_t* const src) {
     uint32_t len = src->size;
     const char* srcstr = src->c_str;
     char* str = (char*) malloc(sizeof(char) * (len + 1));
@@ -150,8 +146,7 @@ static inline void nyanystr_duplicate(nyanystr_t* const out, const nyanystr_t* c
 
 
 /*! Nany Language builtin types */
-typedef enum /* nytype_t */
-{
+typedef enum { /* nytype_t */
 	/*! No type */
 	nyt_void = 0,
 	/*! Custom user type */
@@ -179,9 +174,9 @@ typedef enum /* nytype_t */
 	/*! Floating-point number 32 bits */
 	nyt_f32,
 	/*! Floating-point number 64 bits */
-	nyt_f64,
-
-} nytype_t;
+	nyt_f64
+}
+nytype_t;
 
 enum {
 	/*! The total number of intrinsic types */
@@ -194,8 +189,7 @@ enum {
 **
 ** \internal All values are strictly ordered
 */
-typedef enum /* nyvisibility_t */
-{
+typedef enum { /* nyvisibility_t */
 	/*! no valid visibility */
 	nyv_undefined,
 	/*! default: public or internal, according the context */
@@ -209,16 +203,14 @@ typedef enum /* nyvisibility_t */
 	/*! public: accessible by everyone */
 	nyv_public,
 	/*! published: same as public, but accessible from an IDE */
-	nyv_published,
-
-} nyvisibility_t;
+	nyv_published
+}
+nyvisibility_t;
 
 enum {
 	/*! The total number of visibility types */
 	nyv_count = nyv_published + 1,
 };
-
-
 
 
 /*! Opaque Thread Object */
@@ -240,11 +232,9 @@ typedef struct nythread_t nytctx_t;
 /*@}*/
 
 
-
 /*! \name Memory allocator */
 /*@{*/
-typedef struct nyallocator_t
-{
+typedef struct nyallocator_t {
 	/*! Allocates some memory */
 	void* (*allocate)(struct nyallocator_t*, size_t);
 	/*! Re-allocate */
@@ -259,7 +249,6 @@ typedef struct nyallocator_t
 
 	/*! event: not enough memory */
 	void (*on_not_enough_memory)(struct nyallocator_t*, nybool_t limit_reached);
-
 	/*! Flush STDERR */
 	void (*release)(const struct nyallocator_t*);
 }
@@ -277,12 +266,9 @@ void nany_memalloc_copy(nyallocator_t* out, const nyallocator_t* const src);
 
 
 
-
-
 /*! \name Console */
 /*@{*/
-typedef enum nyconsole_output_t
-{
+typedef enum nyconsole_output_t {
 	/*! Print to the cout */
 	nycout = 1,
 	/*! Print to the cerr */
@@ -292,8 +278,7 @@ nyconsole_output_t;
 
 
 /*! Color constants */
-typedef enum nycolor_t
-{
+typedef enum nycolor_t {
 	/*! None / reset */
 	nyc_none = 0,
 	/*! Black */
@@ -323,8 +308,7 @@ enum {
 };
 
 
-typedef struct nyconsole_t
-{
+typedef struct nyconsole_t {
 	/*! Write some data to STDOUT */
 	void (*write_stdout)(void*, const char* text, size_t length);
 	/*! Write some data to STDERR */
@@ -357,8 +341,7 @@ void nyconsole_cf_copy(nyconsole_t* out, const nyconsole_t* const src);
 /*! \name Project management */
 /*@{*/
 /*! Project Configuration */
-typedef struct nyproject_cf_t
-{
+typedef struct nyproject_cf_t {
 	/*! Memory allocator */
 	nyallocator_t allocator;
 
@@ -366,7 +349,6 @@ typedef struct nyproject_cf_t
 	void (*on_create)(nyproject_t*);
 	/*! A project has been destroyed */
 	void (*on_destroy)(nyproject_t*);
-
 	/*! A new target has been added */
 	void (*on_target_added)(nyproject_t*, nytarget_t*, const char* name, uint32_t len);
 	/*! A target has been removed */
@@ -430,8 +412,7 @@ NY_EXPORT nybool_t nyproject_trylock(const nyproject_t*);
 /*! \name Build */
 /*@{*/
 /*! Project Configuration */
-typedef struct nybuild_cf_t
-{
+typedef struct nybuild_cf_t {
 	/*! Memory allocator */
 	nyallocator_t allocator;
 	/*! Console output */
@@ -468,7 +449,6 @@ typedef struct nybuild_cf_t
 
 	/*! A build has terminated */
 	void (*on_end)(const nyproject_t*, nybuild_t*, nybool_t success);
-
 	void (*on_error_file_eacces)(const nyproject_t*, nybuild_t*, const char* filename, uint32_t length);
 }
 nybuild_cf_t;
@@ -518,8 +498,7 @@ NY_EXPORT void nybuild_cf_init(nybuild_cf_t* cf, const nyproject_t* project);
 typedef struct nyfile_t nyfile_t;
 
 
-typedef enum nyio_type_t
-{
+typedef enum nyio_type_t {
 	nyiot_failed = 0,
 	nyiot_file,
 	nyiot_folder,
@@ -527,8 +506,7 @@ typedef enum nyio_type_t
 nyio_type_t;
 
 
-typedef enum nyio_err_t
-{
+typedef enum nyio_err_t {
 	/*! Success */
 	nyioe_ok = 0,
 	/*! Generic unknown error */
@@ -545,8 +523,7 @@ typedef enum nyio_err_t
 nyio_err_t;
 
 
-typedef enum nyio_automout_flag_t
-{
+typedef enum nyio_automout_flag_t {
 	/*! Automount all */
 	nyioaf_all   = (uint32_t) -1,
 	/*! No automount */
@@ -582,8 +559,7 @@ typedef struct nyio_iterator_t nyio_iterator_t;
 **
 ** \warning The implementation MUST consider that input strings are NOT zero-terminated
 */
-struct nyio_adapter_t
-{
+struct nyio_adapter_t {
 	/*! Internal opaque pointer */
 	void* internal;
 	/*! Value considered as invalid file descriptor */
@@ -671,8 +647,7 @@ struct nyio_adapter_t
 };
 
 
-typedef struct nyio_cf_t
-{
+typedef struct nyio_cf_t {
 	/*! event: an url has been mounted */
 	nyio_err_t (*on_mount_query)(nyprogram_t*, nytctx_t*, const char* url, const char* path, uint32_t len);
 	/*! event: create an adapter from an url */
@@ -697,18 +672,15 @@ NY_EXPORT void nyio_adapter_create_from_local_folder(nyio_adapter_t*, nyallocato
 
 /*! \name Program */
 /*@{*/
-typedef struct nybacktrace_entry_t
-{
+typedef struct nybacktrace_entry_t {
 	/*! Atom name (e.g. `func mynamespace.MyClass.foo(p1: Type1, p2: Type2): RetType`)*/
 	const char* atom;
 	/*! Source filename (utf8 - can be null) */
 	const char* filename;
-
 	/*! Length in bytes of the atom name (can be null) */
 	uint32_t atom_size;
 	/*! Length in bytes of the source filename (can be null) */
 	uint32_t filename_size;
-
 	/*! Line index (1-based, 0 if unknown) within the source file */
 	uint32_t line;
 	/*! Column index (1-based, 0 if unknown) within the source file for the given line */
@@ -718,8 +690,7 @@ nybacktrace_entry_t;
 
 
 /*! Program Configuration */
-typedef struct nyprogram_cf_t
-{
+typedef struct nyprogram_cf_t {
 	/*! Memory allocator */
 	nyallocator_t allocator;
 	/*! Console output */
@@ -760,8 +731,7 @@ nyprogram_cf_t;
 
 
 /*! Context at runtime for native C calls */
-typedef struct nyvm_t
-{
+typedef struct nyvm_t {
 	/*! Allocator */
 	nyallocator_t* allocator;
 	/*! Current program */
@@ -910,13 +880,11 @@ NY_EXPORT uint32_t nytype_sizeof(nytype_t);
 
 /*! \name Convenient wrappers */
 /*@{*/
-typedef struct nyrun_cf_t
-{
+typedef struct nyrun_cf_t {
 	/*! Memory allocator */
 	nyallocator_t allocator;
 	/*! Console */
 	nyconsole_t console;
-
 	/*! Default prject settings */
 	nyproject_cf_t project;
 	/*! Default build settings */
