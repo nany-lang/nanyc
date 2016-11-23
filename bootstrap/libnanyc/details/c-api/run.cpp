@@ -41,6 +41,14 @@ template<> struct default_delete<nyprogram_t> final {
 namespace { // anonymous
 
 
+template<class T>
+inline std::unique_ptr<T> make_unique_from_ptr(T* pointer) {
+	if (unlikely(!pointer))
+		throw std::runtime_error("failed");
+	return std::unique_ptr<T>{pointer};
+}
+
+
 //! Create a new nany project
 std::unique_ptr<nyproject_t> createProject(const nyrun_cf_t* const runcf) {
 	nyproject_cf_t cf;
@@ -50,11 +58,11 @@ std::unique_ptr<nyproject_t> createProject(const nyrun_cf_t* const runcf) {
 	}
 	else
 		nyproject_cf_init(&cf);
-	return std::unique_ptr<nyproject_t> {nyproject_create(&cf)};
+	return make_unique_from_ptr<nyproject_t>(nyproject_create(&cf));
 }
 
 
-std::unique_ptr<nyprogram_t> build(const nyrun_cf_t* const runcf, nyproject_t* project) {
+std::unique_ptr<nyprogram_t> build(const nyrun_cf_t* const runcf, std::unique_ptr<nyproject_t> project) {
 	if (unlikely(!project))
 		return nullptr;
 	nybuild_cf_t cf;
@@ -67,18 +75,17 @@ std::unique_ptr<nyprogram_t> build(const nyrun_cf_t* const runcf, nyproject_t* p
 	}
 	else {
 		verbose = false;
-		nybuild_cf_init(&cf, project);
+		nybuild_cf_init(&cf, project.get());
 	}
-	auto build = std::unique_ptr<nybuild_t> {nybuild_prepare(project, &cf)};
-	auto bStatus = nybuild(build.get());
-	if (bStatus == nyfalse) {
-		// an error has occured
+	auto buildinfo = make_unique_from_ptr<nybuild_t>(nybuild_prepare(project.get(), &cf));
+	auto bStatus = nybuild(buildinfo.get());
+	if (unlikely(bStatus == nyfalse)) {
 		nybool_t addHeader = (verbose) ? nytrue : nyfalse;
-		nybuild_print_report_to_console(build.get(), addHeader);
-		return nullptr;
+		nybuild_print_report_to_console(buildinfo.get(), addHeader);
+		throw std::runtime_error("failed to build");
 	}
 	if (unlikely(verbose))
-		nybuild_print_report_to_console(build.get(), nytrue);
+		nybuild_print_report_to_console(buildinfo.get(), nytrue);
 	nyprogram_cf_t pcf;
 	if (runcf) {
 		memcpy(&(pcf),           &(runcf->program),   sizeof(nyprogram_cf_t));
@@ -87,49 +94,43 @@ std::unique_ptr<nyprogram_t> build(const nyrun_cf_t* const runcf, nyproject_t* p
 	}
 	else
 		nyprogram_cf_init(&pcf, &cf);
-	return std::unique_ptr<nyprogram_t>(nyprogram_prepare(build.get(), &pcf));
+	return make_unique_from_ptr<nyprogram_t>(nyprogram_prepare(buildinfo.get(), &pcf));
 }
 
 
 //! Try to compile the input script filename
 std::unique_ptr<nyprogram_t> compileFile(const nyrun_cf_t* cf, const AnyString& argv0, String& file) {
 	auto project = createProject(cf);
-	if (!project)
-		return nullptr;
 	IO::Canonicalize(file, argv0);
 	auto r = nyproject_add_source_from_file_n(project.get(), file.c_str(), file.size());
-	if (r != nyfalse)
-		return build(cf, project.get());
-	return nullptr;
+	if (r == nyfalse)
+		throw std::runtime_error("failed to add source");
+	return build(cf, std::move(project));
 }
 
 
 //! Try to compile a list of input files
 std::unique_ptr<nyprogram_t> compileFilelist(const nyrun_cf_t* cf, const char** list, uint32_t count) {
 	auto project = createProject(cf);
-	if (!project)
-		return nullptr;
 	String filename;
 	filename.reserve(1024);
 	for (uint32_t i = 0; i != count; ++i) {
 		IO::Canonicalize(filename, list[i]);
 		auto r = nyproject_add_source_from_file_n(project.get(), filename.c_str(), filename.size());
 		if (YUNI_UNLIKELY(r == nyfalse))
-			return nullptr;
+			throw std::runtime_error("failed to add source");
 	}
-	return build(cf, project.get());
+	return build(cf, std::move(project));
 }
 
 
 //! Try to compile the input source
 std::unique_ptr<nyprogram_t> compileSource(const nyrun_cf_t* cf, const AnyString& source) {
 	auto project = createProject(cf);
-	if (!project)
-		return nullptr;
 	auto r = nyproject_add_source_n(project.get(), source.c_str(), source.size());
-	if (r != nyfalse)
-		return build(cf, project.get());
-	return nullptr;
+	if (r == nyfalse)
+		throw std::runtime_error("failed to add source");
+	return build(cf, std::move(project));
 }
 
 
@@ -160,9 +161,12 @@ int run(nyprogram_t* const program, const char* argv0, uint32_t argc, const char
 extern "C" int nyrun_n(const nyrun_cf_t* cf, const char* source, size_t length, uint32_t argc,
 					   const char** argv) {
 	if (source and length != 0 and length < sourceMaxLength) { // arbitrary
-		auto program = compileSource(cf, AnyString{source, (uint32_t) length});
-		if (!!program)
-			return run(program.get(), "a.out", argc, argv);
+		try {
+			auto program = compileSource(cf, AnyString{source, (uint32_t) length});
+			if (!!program)
+				return run(program.get(), "a.out", argc, argv);
+		}
+		catch (...) {}
 	}
 	return exitFailure;
 }
@@ -171,9 +175,12 @@ extern "C" int nyrun_n(const nyrun_cf_t* cf, const char* source, size_t length, 
 extern "C" int nyrun(const nyrun_cf_t* cf, const char* source, uint32_t argc, const char** argv) {
 	size_t length = (source) ? strlen(source) : 0;
 	if (source and length != 0 and length < sourceMaxLength) { // arbitrary
-		auto program = compileSource(cf, AnyString{source, (uint32_t) length});
-		if (!!program)
-			return run(program.get(), "a.out", argc, argv);
+		try {
+			auto program = compileSource(cf, AnyString{source, (uint32_t) length});
+			if (!!program)
+				return run(program.get(), "a.out", argc, argv);
+		}
+		catch (...) {}
 	}
 	return exitFailure;
 }
@@ -182,10 +189,13 @@ extern "C" int nyrun(const nyrun_cf_t* cf, const char* source, uint32_t argc, co
 extern "C" int nyrun_file_n(const nyrun_cf_t* cf, const char* file, size_t length, uint32_t argc,
 							const char** argv) {
 	if (file and length != 0 and length < 32768) {
-		String filename;
-		auto program = compileFile(cf, AnyString{file, static_cast<uint32_t>(length)}, filename);
-		if (!!program)
-			return run(program.get(), filename.c_str(), argc, argv);
+		try {
+			String filename;
+			auto program = compileFile(cf, AnyString{file, static_cast<uint32_t>(length)}, filename);
+			if (!!program)
+				return run(program.get(), filename.c_str(), argc, argv);
+		}
+		catch (...) {}
 	}
 	return exitFailure;
 }
@@ -194,10 +204,13 @@ extern "C" int nyrun_file_n(const nyrun_cf_t* cf, const char* file, size_t lengt
 extern "C" int nyrun_file(const nyrun_cf_t* cf, const char* file, uint32_t argc, const char** argv) {
 	size_t length = (file) ? strlen(file) : 0;
 	if (file and length != 0 and length < 32768) {
-		String filename;
-		auto program = compileFile(cf, AnyString{file, static_cast<uint32_t>(length)}, filename);
-		if (!!program)
-			return run(program.get(), filename.c_str(), argc, argv);
+		try {
+			String filename;
+			auto program = compileFile(cf, AnyString{file, static_cast<uint32_t>(length)}, filename);
+			if (!!program)
+				return run(program.get(), filename.c_str(), argc, argv);
+		}
+		catch (...) {}
 	}
 	return exitFailure;
 }
@@ -206,9 +219,12 @@ extern "C" int nyrun_file(const nyrun_cf_t* cf, const char* file, uint32_t argc,
 extern "C" int nyrun_filelist(const nyrun_cf_t* cf, const char** files, uint32_t file_count, uint32_t argc,
 							  const char** argv) {
 	if (files and file_count != 0) {
-		auto program = compileFilelist(cf, files, file_count);
-		if (!!program)
-			return run(program.get(), "a,out", argc, argv);
+		try {
+			auto program = compileFilelist(cf, files, file_count);
+			if (!!program)
+				return run(program.get(), "a,out", argc, argv);
+		}
+		catch (...) {}
 	}
 	return exitFailure;
 }
