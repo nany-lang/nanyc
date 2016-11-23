@@ -1,7 +1,6 @@
 #pragma once
-#include <yuni/yuni.h>
+#include "libnanyc.h"
 #include <yuni/core/string.h>
-#include "details/fwd.h"
 #include <functional> // std::hash
 
 

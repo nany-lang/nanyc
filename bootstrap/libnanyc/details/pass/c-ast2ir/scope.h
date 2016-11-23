@@ -1,5 +1,5 @@
 #pragma once
-#include <yuni/yuni.h>
+#include "libnanyc.h"
 #include "context.h"
 #include "details/ir/fwd.h"
 #include <yuni/core/flags.h>

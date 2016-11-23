@@ -1,7 +1,6 @@
 #include "check-for-valid-identifier-name.h"
 #include "details/ast/ast.h"
 #include "details/errors/errors.h"
-#include "details/fwd.h"
 #include "libnanyc-config.h"
 #include <yuni/io/file.h>
 #include <unordered_set>

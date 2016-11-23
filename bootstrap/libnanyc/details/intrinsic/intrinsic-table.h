@@ -1,5 +1,5 @@
 #pragma once
-#include <yuni/yuni.h>
+#include "libnanyc.h"
 #include <yuni/core/bind.h>
 #include "details/intrinsic/intrinsic.h"
 #include <unordered_map>

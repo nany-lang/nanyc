@@ -1,5 +1,5 @@
 #pragma once
-#include <yuni/yuni.h>
+#include "libnanyc.h"
 #include <yuni/core/string/string.h>
 #include "details/context/build.h"
 #include "details/atom/classdef-table-view.h"

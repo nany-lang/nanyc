@@ -1,7 +1,6 @@
 #pragma once
-#include <yuni/yuni.h>
+#include "libnanyc.h"
 #include <vector>
-#include "details/fwd.h"
 
 
 

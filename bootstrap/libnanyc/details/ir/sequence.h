@@ -1,5 +1,5 @@
 #pragma once
-#include "../fwd.h"
+#include "libnanyc.h"
 #include <yuni/core/string.h>
 #include "details/ir/isa/opcodes.h"
 #include "details/ir/isa/data.h"

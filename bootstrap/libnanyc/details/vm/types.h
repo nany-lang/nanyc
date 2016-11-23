@@ -1,6 +1,5 @@
 #pragma once
-#include <yuni/yuni.h>
-#include "../fwd.h"
+#include "libnanyc.h"
 #include <exception>
 
 

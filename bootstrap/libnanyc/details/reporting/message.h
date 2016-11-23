@@ -1,9 +1,8 @@
 #pragma once
-#include <yuni/yuni.h>
+#include "libnanyc.h"
 #include <yuni/core/smartptr/intrusive.h>
 #include <yuni/core/string.h>
 #include <yuni/core/noncopyable.h>
-#include "details/fwd.h"
 #include "levels.h"
 #include "nany/nany.h"
 #include <iosfwd>

@@ -516,6 +516,8 @@ add_dependencies(libnanyc-grammar nanyc-grammar-cpp)
 
 
 add_library(libnanyc ${mode_libnany}
+	"libnanyc.h"
+
 	# public headers
 	${nysrc_public_headers}
 
@@ -541,9 +543,6 @@ add_library(libnanyc ${mode_libnany}
 	${nysrc_details_intrinsic}
 	${nysrc_details_context}
 	${nysrc_details_reporting}
-
-	# implementation - misc
-	"details/fwd.h"
 
 	# misc
 	"${libnany_config_folder}/libnanyc-config.h"

@@ -1,7 +1,4 @@
 #pragma once
-#include <yuni/yuni.h>
-#include "details/fwd.h"
-
 
 
 namespace ny
@@ -12,7 +9,5 @@ namespace ny
 	class Classdef;
 	class ClassdefInterface;
 	class Funcdef;
-
-
 
 } // namespace ny

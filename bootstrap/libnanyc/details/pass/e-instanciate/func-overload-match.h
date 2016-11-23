@@ -1,6 +1,5 @@
 #pragma once
-#include <yuni/yuni.h>
-#include "details/fwd.h"
+#include "libnanyc.h"
 #include "details/atom/classdef.h"
 #include "details/atom/classdef-table.h"
 #include "type-check.h"

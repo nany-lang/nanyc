@@ -4,7 +4,6 @@
 #include <yuni/core/math.h>
 #include <vector>
 #include <set>
-#include "details/fwd.h"
 
 using namespace Yuni;
 

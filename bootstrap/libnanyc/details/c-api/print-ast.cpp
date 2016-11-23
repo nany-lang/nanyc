@@ -1,5 +1,5 @@
+#include "libnanyc.h"
 #include "nany/nany.h"
-#include "details/fwd.h"
 #include <yuni/core/system/console.h>
 #include "details/grammar/nany.h"
 #include <stdio.h>

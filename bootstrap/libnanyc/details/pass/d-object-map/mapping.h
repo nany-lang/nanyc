@@ -1,5 +1,5 @@
 #pragma once
-#include "../../fwd.h"
+#include "libnanyc.h"
 #include <yuni/thread/mutex.h>
 #include <vector>
 #include <utility>

@@ -1,5 +1,5 @@
 #pragma once
-#include <yuni/yuni.h>
+#include "libnanyc.h"
 #include <yuni/core/smartptr/intrusive.h>
 #include <yuni/string.h>
 #include <nany/nany.h>

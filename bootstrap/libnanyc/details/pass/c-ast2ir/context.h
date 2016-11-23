@@ -1,7 +1,6 @@
 #pragma once
-#include <yuni/yuni.h>
+#include "libnanyc.h"
 #include <yuni/core/noncopyable.h>
-#include "details/fwd.h"
 #include "details/ir/sequence.h"
 #include "details/reporting/report.h"
 #include "details/grammar/nany.h"

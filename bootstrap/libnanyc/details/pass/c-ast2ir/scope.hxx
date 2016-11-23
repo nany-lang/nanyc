@@ -1,6 +1,5 @@
 #pragma once
 #include "scope.h"
-#include "details/fwd.h"
 #include "libnanyc-config.h"
 #include "details/ir/emit.h"
 

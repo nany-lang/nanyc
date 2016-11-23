@@ -1,9 +1,7 @@
-#include <yuni/yuni.h>
+#include "details/context/target.h"
 #include <yuni/job/queue/service.h>
 #include "details/context/project.h"
-#include "details/context/target.h"
 #include "details/context/build-info.h"
-#include "details/fwd.h"
 #include <memory>
 using namespace Yuni;
 

@@ -1,6 +1,6 @@
 #pragma once
+#include "libnanyc.h"
 #include "details/grammar/nany.h"
-#include "details/fwd.h"
 #include <yuni/core/flags.h>
 
 

@@ -1,11 +1,10 @@
 #pragma once
-#include <yuni/yuni.h>
+#include "libnanyc.h"
 #include <yuni/core/smartptr/intrusive.h>
 #include <yuni/core/string.h>
 #include <yuni/core/noncopyable.h>
 #include <yuni/core/flags.h>
 #include <yuni/core/tribool.h>
-#include "details/fwd.h"
 #include "details/utils/clid.h"
 #include "vardef.h"
 #include "nany/nany.h"

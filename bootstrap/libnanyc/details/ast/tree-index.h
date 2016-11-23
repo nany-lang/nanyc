@@ -1,7 +1,6 @@
 #pragma once
-#include <yuni/yuni.h>
+#include "libnanyc.h"
 #include "ast.h"
-#include "details/fwd.h"
 #include "details/grammar/nany.h"
 #include <array>
 

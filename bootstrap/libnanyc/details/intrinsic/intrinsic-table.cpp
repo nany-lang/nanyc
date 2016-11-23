@@ -1,6 +1,4 @@
 #include "intrinsic-table.h"
-#include "details/fwd.h"
-
 
 
 namespace ny
