@@ -623,16 +623,17 @@ namespace blueprint {
 namespace {
 
 
-inline auto& make(SequenceRef& ref, ir::ISA::Blueprint kind) {
+template<ir::ISA::Blueprint KindT>
+inline auto& make(SequenceRef& ref) {
 	auto& operands = ref.sequence.emit<ir::ISA::Op::blueprint>();
-	operands.kind = static_cast<uint8_t>(kind);
+	operands.kind = (decltype(operands.kind)) KindT;
 	return operands;
 }
 
 
 inline uint32_t unit(SequenceRef ref, const AnyString& filename) {
 	uint32_t offset = ref.sequence.opcodeCount();
-	auto& operands  = blueprint::make(ref, ir::ISA::Blueprint::unit);
+	auto& operands  = blueprint::make<ir::ISA::Blueprint::unit>(ref);
 	operands.name   = ref.sequence.stringrefs.ref(filename);
 	operands.atomid = (uint32_t) - 1;
 	operands.lvid   = 0u;
@@ -641,7 +642,7 @@ inline uint32_t unit(SequenceRef ref, const AnyString& filename) {
 
 
 inline void namespacedef(SequenceRef ref, const AnyString& name) {
-	auto& operands  = blueprint::make(ref, ir::ISA::Blueprint::namespacedef);
+	auto& operands  = blueprint::make<ir::ISA::Blueprint::namespacedef>(ref);
 	operands.name   = ref.sequence.stringrefs.ref(name);
 	operands.atomid = (uint32_t) - 1;
 	operands.lvid   = 0u;
@@ -649,7 +650,7 @@ inline void namespacedef(SequenceRef ref, const AnyString& name) {
 
 
 inline void classdef(SequenceRef ref, const AnyString& name, uint32_t atomid) {
-	auto& operands  = blueprint::make(ref, ir::ISA::Blueprint::classdef);
+	auto& operands  = blueprint::make<ir::ISA::Blueprint::classdef>(ref);
 	operands.name   = ref.sequence.stringrefs.ref(name);
 	operands.atomid = atomid;
 	operands.lvid   = 0u;
@@ -658,7 +659,7 @@ inline void classdef(SequenceRef ref, const AnyString& name, uint32_t atomid) {
 
 inline uint32_t classdef(SequenceRef ref, uint32_t lvid) {
 	uint32_t offset = ref.sequence.opcodeCount();
-	auto& operands  = blueprint::make(ref, ir::ISA::Blueprint::classdef);
+	auto& operands  = blueprint::make<ir::ISA::Blueprint::classdef>(ref);
 	operands.name   = 0u;
 	operands.atomid = (uint32_t) - 1;
 	operands.setLVID(lvid);
@@ -667,7 +668,7 @@ inline uint32_t classdef(SequenceRef ref, uint32_t lvid) {
 
 
 inline void func(SequenceRef ref, const AnyString& name, uint32_t atomid) {
-	auto& operands  = blueprint::make(ref, ir::ISA::Blueprint::funcdef);
+	auto& operands  = blueprint::make<ir::ISA::Blueprint::funcdef>(ref);
 	operands.name   = ref.sequence.stringrefs.ref(name);
 	operands.atomid = atomid;
 	operands.lvid   = 0u;
@@ -676,7 +677,7 @@ inline void func(SequenceRef ref, const AnyString& name, uint32_t atomid) {
 
 inline uint32_t func(SequenceRef ref) {
 	uint32_t offset = ref.sequence.opcodeCount();
-	auto& operands  = blueprint::make(ref, ir::ISA::Blueprint::funcdef);
+	auto& operands  = blueprint::make<ir::ISA::Blueprint::funcdef>(ref);
 	operands.name   = 0u;
 	operands.atomid = (uint32_t) - 1;
 	operands.lvid   = 0u;
@@ -685,7 +686,7 @@ inline uint32_t func(SequenceRef ref) {
 
 
 inline void var(SequenceRef ref, uint32_t lvid, const AnyString& name) {
-	auto& operands  = blueprint::make(ref, ir::ISA::Blueprint::vardef);
+	auto& operands  = blueprint::make<ir::ISA::Blueprint::vardef>(ref);
 	operands.name   = ref.sequence.stringrefs.ref(name);
 	operands.atomid = (uint32_t) - 1;
 	operands.setLVID(lvid);
@@ -694,7 +695,7 @@ inline void var(SequenceRef ref, uint32_t lvid, const AnyString& name) {
 
 inline uint32_t typealias(SequenceRef ref, const AnyString& name, uint32_t atomid = (uint32_t) - 1) {
 	uint32_t offset = ref.sequence.opcodeCount();
-	auto& operands  = blueprint::make(ref, ir::ISA::Blueprint::typealias);
+	auto& operands  = blueprint::make<ir::ISA::Blueprint::typealias>(ref);
 	operands.name   = ref.sequence.stringrefs.ref(name);
 	operands.atomid = atomid;
 	operands.lvid   = 0u;
@@ -704,7 +705,7 @@ inline uint32_t typealias(SequenceRef ref, const AnyString& name, uint32_t atomi
 
 inline uint32_t param(SequenceRef ref, uint32_t lvid, const AnyString& name) {
 	uint32_t offset = ref.sequence.opcodeCount();
-	auto& operands  = blueprint::make(ref, ir::ISA::Blueprint::param);
+	auto& operands  = blueprint::make<ir::ISA::Blueprint::param>(ref);
 	operands.name   = ref.sequence.stringrefs.ref(name);
 	operands.atomid = (uint32_t) - 1;
 	operands.setLVID(lvid);
@@ -714,7 +715,7 @@ inline uint32_t param(SequenceRef ref, uint32_t lvid, const AnyString& name) {
 
 inline uint32_t param(SequenceRef ref, uint32_t lvid) {
 	uint32_t offset = ref.sequence.opcodeCount();
-	auto& operands  = blueprint::make(ref, ir::ISA::Blueprint::param);
+	auto& operands  = blueprint::make<ir::ISA::Blueprint::param>(ref);
 	operands.name   = 0;
 	operands.atomid = (uint32_t) - 1;
 	operands.setLVID(lvid);
@@ -724,7 +725,7 @@ inline uint32_t param(SequenceRef ref, uint32_t lvid) {
 
 inline uint32_t tparam(SequenceRef ref, uint32_t lvid, const AnyString& name) {
 	uint32_t offset = ref.sequence.opcodeCount();
-	auto& operands  = blueprint::make(ref, ir::ISA::Blueprint::gentypeparam);
+	auto& operands  = blueprint::make<ir::ISA::Blueprint::gentypeparam>(ref);
 	operands.name   = ref.sequence.stringrefs.ref(name);
 	operands.atomid = (uint32_t) - 1;
 	operands.setLVID(lvid);
@@ -734,7 +735,7 @@ inline uint32_t tparam(SequenceRef ref, uint32_t lvid, const AnyString& name) {
 
 inline uint32_t tparam(SequenceRef ref, uint32_t lvid) {
 	uint32_t offset = ref.sequence.opcodeCount();
-	auto& operands  = blueprint::make(ref, ir::ISA::Blueprint::gentypeparam);
+	auto& operands  = blueprint::make<ir::ISA::Blueprint::gentypeparam>(ref);
 	operands.name   = 0;
 	operands.atomid = (uint32_t) - 1;
 	operands.setLVID(lvid);
