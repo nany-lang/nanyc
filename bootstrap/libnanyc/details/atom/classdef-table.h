@@ -133,13 +133,13 @@ namespace ny
 		//! Get if the current layer has a substitute for a given CLID
 		bool hasSubstitute(CLID) const;
 		//! Get the substiture for the current atomid in the current layer
-		Classdef& substitute(LVID) const;
+		Classdef& substitute(uint32_t) const;
 
 		//! Append a new substitute
 		Classdef& addSubstitute(nytype_t kind, Atom* atom, const Qualifiers&) const;
 
 		//! Get the atom id of the current layer
-		LVID substituteAtomID() const;
+		uint32_t substituteAtomID() const;
 
 		//! Resize the substitutes for the current layer
 		void substituteResize(uint32_t count);

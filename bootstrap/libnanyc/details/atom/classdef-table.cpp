@@ -313,7 +313,7 @@ namespace ny
 	void ClassdefTable::mergeSubstitutes()
 	{
 		auto atomid = m_layer.atomid;
-		if (unlikely(atomid == (LVID) -1))
+		if (unlikely(atomid == (uint32_t) -1))
 			throw "invalid atom id for merging substitutions";
 
 		for (uint32_t i = 0; i != m_layer.count; ++i)
@@ -327,7 +327,7 @@ namespace ny
 	}
 
 
-	Classdef& ClassdefTable::substitute(LVID lvid) const
+	Classdef& ClassdefTable::substitute(uint32_t lvid) const
 	{
 		assert(lvid < m_layer.count);
 		if (not m_layer.flags[lvid])

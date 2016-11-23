@@ -26,7 +26,7 @@ namespace Producer
 
 		// information related to all pushed parameters
 		struct {
-			LVID localvar = 0;
+			uint32_t localvar = 0;
 			AnyString name; // acquired named
 		}
 		pushedIndexedParam[Config::maxPushedParameters];
@@ -142,7 +142,7 @@ namespace Producer
 	}
 
 
-	bool Scope::visitASTExprCall(AST::Node* node, LVID& localvar, AST::Node* parent)
+	bool Scope::visitASTExprCall(AST::Node* node, uint32_t& localvar, AST::Node* parent)
 	{
 		assert(!node or node->rule == AST::rgCall);
 

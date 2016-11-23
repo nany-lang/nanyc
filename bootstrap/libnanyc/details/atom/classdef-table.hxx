@@ -51,7 +51,7 @@ namespace ny
 	}
 
 
-	inline LVID ClassdefTable::substituteAtomID() const
+	inline uint32_t ClassdefTable::substituteAtomID() const
 	{
 		return m_layer.atomid;
 	}

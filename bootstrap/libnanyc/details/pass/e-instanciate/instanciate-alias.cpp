@@ -14,7 +14,7 @@ namespace Instanciate
 {
 
 
-	void SequenceBuilder::declareNamedVariable(const AnyString& name, LVID lvid, bool autoreleased)
+	void SequenceBuilder::declareNamedVariable(const AnyString& name, uint32_t lvid, bool autoreleased)
 	{
 		assert(frame != nullptr);
 
@@ -31,8 +31,7 @@ namespace Instanciate
 		lr.file.line   = currentLine;
 		lr.file.offset = currentOffset;
 		lr.file.url    = currentFilename;
-
-		LVID previousDecl = frame->findLocalVariable(name);
+		uint32_t previousDecl = frame->findLocalVariable(name);
 		if (likely(0 == previousDecl)) // not found
 		{
 			lr.scope           = frame->scope;

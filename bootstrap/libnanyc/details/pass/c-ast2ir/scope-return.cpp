@@ -31,7 +31,7 @@ namespace Producer
 				case AST::rgExpr:
 				{
 					ir::emit::ScopeLocker opscope{out};
-					LVID localvar;
+					uint32_t localvar = 0;
 					success &= visitASTExpr(child, localvar);
 					// generate error on the begining of the expr and not the return itself
 					emitDebugpos(child);

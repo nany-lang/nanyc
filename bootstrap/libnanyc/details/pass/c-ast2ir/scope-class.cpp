@@ -164,7 +164,7 @@ namespace Producer
 
 
 
-	bool Scope::visitASTClass(AST::Node& node, LVID* localvar)
+	bool Scope::visitASTClass(AST::Node& node, uint32_t* localvar)
 	{
 		assert(node.rule == AST::rgClass);
 		assert(not node.children.empty());

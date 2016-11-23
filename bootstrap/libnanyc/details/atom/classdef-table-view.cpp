@@ -46,7 +46,7 @@ namespace ny
 			out.clear();
 
 		out << "CLASSDEF TABLE\n";
-		std::map<uint32_t, std::map<LVID, Classdef*>> orderedlist;
+		std::map<uint32_t, std::map<uint32_t, Classdef*>> orderedlist;
 		for (auto& pair: table.m_classdefs)
 			orderedlist[pair.first.atomid()][pair.first.lvid()] = Classdef::Ptr::WeakPointer(pair.second);
 
@@ -60,10 +60,10 @@ namespace ny
 			out << "    ----------------------------------------------------[ atom " << pairAtomID.first << " ]---\n";
 			firstAtom = false;
 
-			for (auto& pairLVID: pairAtomID.second)
+			for (auto& pairuint32_t: pairAtomID.second)
 			{
-				CLID clid{pairAtomID.first, pairLVID.first};
-				printClassdef(out, clid, *(pairLVID.second));
+				CLID clid{pairAtomID.first, pairuint32_t.first};
+				printClassdef(out, clid, *(pairuint32_t.second));
 			}
 		}
 	}

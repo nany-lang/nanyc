@@ -23,7 +23,7 @@ namespace Producer
 	}
 
 
-	bool visitASTExprRegister(Scope& scope, AST::Node& node, LVID& localvar)
+	bool visitASTExprRegister(Scope& scope, AST::Node& node, uint32_t& localvar)
 	{
 		assert(not node.text.empty());
 		localvar = node.text.to<uint32_t>();
@@ -37,7 +37,7 @@ namespace Producer
 
 
 
-	bool Scope::visitASTExprIdentifier(AST::Node& node, LVID& localvar)
+	bool Scope::visitASTExprIdentifier(AST::Node& node, uint32_t& localvar)
 	{
 		// value fetching
 		emitDebugpos(node);
@@ -73,7 +73,7 @@ namespace Producer
 	}
 
 
-	bool Scope::visitASTExprIdOperator(AST::Node& node, LVID& localvar)
+	bool Scope::visitASTExprIdOperator(AST::Node& node, uint32_t& localvar)
 	{
 		if (unlikely((node.children.size() != 1) or (node.children[0].rule != AST::rgFunctionKindOpname)))
 			return unexpectedNode(node, "[expr/operator]");
@@ -88,7 +88,7 @@ namespace Producer
 	}
 
 
-	bool Scope::visitASTExprContinuation(AST::Node& node, LVID& localvar, bool allowScope)
+	bool Scope::visitASTExprContinuation(AST::Node& node, uint32_t& localvar, bool allowScope)
 	{
 		bool success = true;
 		for (auto& child: node.children)
@@ -151,7 +151,7 @@ namespace Producer
 	}
 
 
-	bool Scope::visitASTExpr(AST::Node& orignode, LVID& localvar, bool allowScope)
+	bool Scope::visitASTExpr(AST::Node& orignode, uint32_t& localvar, bool allowScope)
 	{
 		assert(not orignode.children.empty());
 		// reset the value of the localvar, result of the expr

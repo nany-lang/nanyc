@@ -1,10 +1,10 @@
-
 #include <yuni/yuni.h>
 #include <yuni/core/noncopyable.h>
 #include "scope.h"
 #include "details/utils/check-for-valid-identifier-name.h"
 #include "details/grammar/nany.h"
 #include "details/ast/ast.h"
+#include "details/utils/dataregister.h"
 
 using namespace Yuni;
 
@@ -224,7 +224,7 @@ namespace Producer
 				}
 				case AST::rgVarType:
 				{
-					LVID paramtype = 0;
+					uint32_t paramtype = 0;
 
 					for (auto& childtype: child.children)
 					{
@@ -239,7 +239,7 @@ namespace Producer
 								success &= unexpectedNode(childtype, "[func/param-type]");
 						}
 					}
-					if (not lvidIsAny(paramtype) and paramtype != 0)
+					if (isValidLocalvar(paramtype))
 					{
 						auto& operands    = out.emit<ISA::Op::follow>();
 						operands.follower = lvid;
@@ -391,7 +391,7 @@ namespace Producer
 		auto& out = scope.sequence();
 		ir::emit::trace(out, "return type");
 
-		LVID rettype = 0;
+		uint32_t rettype = 0;
 
 		for (auto& child: node.children)
 		{
@@ -409,7 +409,7 @@ namespace Producer
 			}
 		}
 
-		if (not lvidIsAny(rettype))
+		if (not isAny(rettype))
 		{
 			scope.emitDebugpos(node);
 			if (rettype == 0)

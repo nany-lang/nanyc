@@ -22,7 +22,7 @@ namespace Producer
 	namespace {
 
 
-	bool varValueInitialization(Scope& scope, LVID& localvar, AST::Node& varAssign,
+	bool varValueInitialization(Scope& scope, uint32_t& localvar, AST::Node& varAssign,
 		AST::Node& varnodeDecl, const AnyString& varname)
 	{
 		for (auto& assignChild: varAssign.children)
@@ -51,7 +51,7 @@ namespace Producer
 	}
 
 
-	bool generateTypeofForClassVar(Scope& scope, LVID& lvid, AST::Node& varAssign)
+	bool generateTypeofForClassVar(Scope& scope, uint32_t& lvid, AST::Node& varAssign)
 	{
 		// typeof (+2)
 		//	 tk-typeof, typeof
@@ -82,7 +82,7 @@ namespace Producer
 	}
 
 
-	bool generateInitFuncForClassVar(Scope& scope, const AnyString& varname, LVID lvid, AST::Node& varAssign)
+	bool generateInitFuncForClassVar(Scope& scope, const AnyString& varname, uint32_t lvid, AST::Node& varAssign)
 	{
 		// name of the generated func for initialize the class variable
 		ShortString64 funcName;
@@ -132,7 +132,7 @@ namespace Producer
 		ir::emit::alloc(out, mbvar);
 
 		// the type of the expression
-		LVID lvid = 0;
+		uint32_t lvid = 0;
 
 		if (varType != nullptr)
 		{
@@ -192,7 +192,7 @@ namespace Producer
 			ir::emit::type::qualifierConst(out, varlvid, true);
 		// default value
 		{
-			LVID rhs = 0;
+			uint32_t rhs = 0;
 			ir::emit::ScopeLocker opscope{out};
 			if (not varValueInitialization(scope, rhs, *varAssign, node, varname))
 				return false;

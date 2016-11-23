@@ -94,9 +94,9 @@ namespace complain
 	//! Already declared
 	bool redeclared(const AnyString& name, uint32_t previousDeclaration);
 
-	bool multipleOverloads(LVID lvid);
+	bool multipleOverloads(uint32_t lvid);
 
-	bool multipleOverloads(LVID lvid, const std::vector<std::reference_wrapper<Atom>>& solutions
+	bool multipleOverloads(uint32_t lvid, const std::vector<std::reference_wrapper<Atom>>& solutions
 	   , const OverloadedFuncCallResolver& resolver);
 
 

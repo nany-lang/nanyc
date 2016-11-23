@@ -15,7 +15,7 @@ namespace Producer
 {
 
 
-	bool Scope::visitASTExprIn(AST::Node& node, LVID& localvar, ShortString128& elementname)
+	bool Scope::visitASTExprIn(AST::Node& node, uint32_t& localvar, ShortString128& elementname)
 	{
 		// lvid representing the input container
 		AST::Node* container = nullptr;
@@ -133,7 +133,7 @@ namespace Producer
 	}
 
 
-	bool Scope::visitASTExprIn(AST::Node& node, LVID& localvar)
+	bool Scope::visitASTExprIn(AST::Node& node, uint32_t& localvar)
 	{
 		// Name of the target ref for each element in the container (ignored here)
 		ShortString128 elementname;

@@ -128,7 +128,7 @@ namespace Producer
 	}
 
 
-	bool Scope::visitASTExprTemplate(AST::Node& node, LVID& localvar)
+	bool Scope::visitASTExprTemplate(AST::Node& node, uint32_t& localvar)
 	{
 		assert(node.rule == AST::rgExprTemplate or node.rule == AST::rgExprTypeTemplate);
 

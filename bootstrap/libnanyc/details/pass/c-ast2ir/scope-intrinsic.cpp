@@ -15,7 +15,7 @@ namespace Producer
 {
 
 
-	bool Scope::visitASTExprIntrinsic(AST::Node& node, LVID& localvar)
+	bool Scope::visitASTExprIntrinsic(AST::Node& node, uint32_t& localvar)
 	{
 		assert(node.rule == AST::rgIntrinsic);
 		assert(not node.children.empty());

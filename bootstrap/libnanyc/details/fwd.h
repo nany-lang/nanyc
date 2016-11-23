@@ -17,12 +17,6 @@
 namespace ny
 {
 
-	//! Local var ID
-	using LVID = uint32_t;
-
-	static inline constexpr bool lvidIsAny(LVID lvid) { return lvid == (LVID) -1; }
-
-
 	class CTarget;
 	struct Atom;
 	class ClassdefTable;

@@ -298,7 +298,7 @@ namespace complain
 	}
 
 
-	bool multipleOverloads(LVID lvid)
+	bool multipleOverloads(uint32_t lvid)
 	{
 		auto* seq = Logs::userHandler<SequenceBuilder>();
 		auto* frame = seq->frame;
@@ -336,7 +336,7 @@ namespace complain
 	}
 
 
-	bool multipleOverloads(LVID lvid, const std::vector<std::reference_wrapper<Atom>>& solutions
+	bool multipleOverloads(uint32_t lvid, const std::vector<std::reference_wrapper<Atom>>& solutions
 	   , const OverloadedFuncCallResolver& resolver)
 	{
 		assert(solutions.size() == resolver.suitable.size());

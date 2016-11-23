@@ -128,7 +128,7 @@ namespace Instanciate
 		std::unordered_map<CLID, std::vector<std::reference_wrapper<Atom>>> partiallyResolved;
 		//! Self parameters for ctors
 		// {varname/parameter} -> {lvid, used flag}
-		std::unique_ptr<std::unordered_map<AnyString, std::pair<LVID, bool>>> selfParameters;
+		std::unique_ptr<std::unordered_map<AnyString, std::pair<uint32_t, bool>>> selfParameters;
 		//! list of return values
 		std::vector<ReturnValueMarker> returnValues;
 		//! Offset where the current blueprint is declared

@@ -11,7 +11,7 @@ namespace ny
 	public:
 		ClassdefTableView(ClassdefTable&);
 		ClassdefTableView(ClassdefTableView&);
-		ClassdefTableView(ClassdefTableView&, LVID atomid, uint count);
+		ClassdefTableView(ClassdefTableView&, uint32_t atomid, uint count);
 		~ClassdefTableView();
 
 
@@ -33,12 +33,12 @@ namespace ny
 		//! Get if the current view has a substitute for a given CLID
 		bool hasSubstitute(const CLID&) const;
 		//! Create a new substiture in the current layer
-		Classdef& substitute(LVID);
+		Classdef& substitute(uint32_t);
 		//! Append a new substitute
 		Classdef& addSubstitute(nytype_t kind, Atom* atom, const Qualifiers& qualifiers);
 
 		//! Get the atom id of the current layer
-		LVID substituteAtomID() const;
+		uint32_t substituteAtomID() const;
 
 		//! Resize the substitutes for the current layer
 		void substituteResize(uint count);

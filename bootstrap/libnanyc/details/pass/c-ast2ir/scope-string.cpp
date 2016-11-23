@@ -105,7 +105,7 @@ namespace Producer
 	}
 
 
-	bool Scope::visitASTExprStringLiteral(AST::Node& node, LVID& localvar)
+	bool Scope::visitASTExprStringLiteral(AST::Node& node, uint32_t& localvar)
 	{
 		// when called, this rule represents an internal cstring
 		// thus, this function can not be called by an user-defined string

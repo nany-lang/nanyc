@@ -83,40 +83,40 @@ namespace Producer
 		bool visitAST(AST::Node&);
 		bool visitASTStmt(AST::Node&);
 		bool visitASTFunc(AST::Node&);
-		bool visitASTClass(AST::Node&, LVID* localvar = nullptr);
-		bool visitASTType(AST::Node&, LVID& localvar);
+		bool visitASTClass(AST::Node&, uint32_t* localvar = nullptr);
+		bool visitASTType(AST::Node&, uint32_t& localvar);
 		bool visitASTTypedef(AST::Node&);
 		bool visitASTFor(AST::Node&);
 		bool visitASTAttributes(AST::Node&);
 		bool visitASTVar(AST::Node&);
 		bool visitASTVarInClass();
-		bool visitASTExpr(AST::Node&, LVID& localvar, bool allowScope = false);
-		bool visitASTExprIntrinsic(AST::Node&, LVID& localvar);
+		bool visitASTExpr(AST::Node&, uint32_t& localvar, bool allowScope = false);
+		bool visitASTExprIntrinsic(AST::Node&, uint32_t& localvar);
 		bool visitASTExprReturn(AST::Node&);
-		bool visitASTExprContinuation(AST::Node&, LVID& localvar, bool allowScope = false);
-		bool visitASTExprIdentifier(AST::Node&, LVID& localvar);
-		bool visitASTExprIdOperator(AST::Node& node, LVID& localvar);
-		bool visitASTExprCall(AST::Node*, LVID& localvar, AST::Node* parent = nullptr); // func call
+		bool visitASTExprContinuation(AST::Node&, uint32_t& localvar, bool allowScope = false);
+		bool visitASTExprIdentifier(AST::Node&, uint32_t& localvar);
+		bool visitASTExprIdOperator(AST::Node& node, uint32_t& localvar);
+		bool visitASTExprCall(AST::Node*, uint32_t& localvar, AST::Node* parent = nullptr); // func call
 		bool visitASTExprCallParameters(AST::Node&, ShortcircuitUpdate* shortcircuit = nullptr); // parameters of a func call
-		bool visitASTExprSubDot(AST::Node&, LVID& localvar);
+		bool visitASTExprSubDot(AST::Node&, uint32_t& localvar);
 		bool visitASTExprScope(AST::Node&);
-		bool visitASTExprNumber(AST::Node&, LVID& localvar);
-		bool visitASTExprString(AST::Node&, LVID& localvar);
-		bool visitASTExprStringLiteral(AST::Node&, LVID& localvar);
-		bool visitASTExprChar(AST::Node&, LVID& localvar);
-		bool visitASTExprNew(AST::Node&, LVID& localvar);
-		bool visitASTExprTypeDecl(AST::Node&, LVID& localvar);
-		bool visitASTExprTypeof(AST::Node&, LVID& localvar);
+		bool visitASTExprNumber(AST::Node&, uint32_t& localvar);
+		bool visitASTExprString(AST::Node&, uint32_t& localvar);
+		bool visitASTExprStringLiteral(AST::Node&, uint32_t& localvar);
+		bool visitASTExprChar(AST::Node&, uint32_t& localvar);
+		bool visitASTExprNew(AST::Node&, uint32_t& localvar);
+		bool visitASTExprTypeDecl(AST::Node&, uint32_t& localvar);
+		bool visitASTExprTypeof(AST::Node&, uint32_t& localvar);
 		bool visitASTExprIfStmt(AST::Node&);
-		bool visitASTExprIfExpr(AST::Node&, LVID& localvar);
+		bool visitASTExprIfExpr(AST::Node&, uint32_t& localvar);
 		bool visitASTExprWhile(AST::Node&);
 		bool visitASTExprDoWhile(AST::Node&);
 		bool visitASTExprSwitch(AST::Node&);
-		bool visitASTExprIn(AST::Node&, LVID& localvar);
-		bool visitASTExprIn(AST::Node&, LVID& localvar, Yuni::ShortString128& elementname);
+		bool visitASTExprIn(AST::Node&, uint32_t& localvar);
+		bool visitASTExprIn(AST::Node&, uint32_t& localvar, Yuni::ShortString128& elementname);
 		bool visitASTExprClosure(AST::Node&, uint32_t& localvar);
 		bool visitASTExprObject(AST::Node&, uint32_t& localvar);
-		bool visitASTExprTemplate(AST::Node&, LVID& localvar);
+		bool visitASTExprTemplate(AST::Node&, uint32_t& localvar);
 		bool visitASTDeclGenericTypeParameters(AST::Node&);
 		bool visitASTUnitTest(AST::Node&);
 		bool visitASTArray(AST::Node&, uint32_t& localvar);
@@ -125,20 +125,20 @@ namespace Producer
 		//! \name Typeinfo / variables
 		//@{
 		//! Create a new local builtin float
-		LVID createLocalBuiltinFloat(AST::Node&, nytype_t, double value);
+		uint32_t createLocalBuiltinFloat(AST::Node&, nytype_t, double value);
 		//! Create a new local builtin integer
-		LVID createLocalBuiltinInt(AST::Node&, nytype_t, yuint64 value);
+		uint32_t createLocalBuiltinInt(AST::Node&, nytype_t, yuint64 value);
 		//! Create a new local builtin 'void'
-		LVID createLocalBuiltinVoid(AST::Node&);
+		uint32_t createLocalBuiltinVoid(AST::Node&);
 		//! Create a new local variable 'any'
-		LVID createLocalBuiltinAny(AST::Node&);
+		uint32_t createLocalBuiltinAny(AST::Node&);
 
 		//! Reserve a new variable id
-		LVID reserveLocalVariable();
+		uint32_t reserveLocalVariable();
 		uint32_t nextvar();
 
 		//! Reset the internal counter for creating local classdef and local variables
-		void resetLocalCounters(LVID localvarStart = 0u);
+		void resetLocalCounters(uint32_t localvarStart = 0u);
 
 		//! Get if the scope is inside a class
 		bool isWithinClass() const;
@@ -186,7 +186,7 @@ namespace Producer
 	public:
 		Context& context;
 		//! Next local variable
-		LVID nextVarID = 0u;
+		uint32_t nextVarID = 0;
 		//! Kind
 		Kind kind = Kind::undefined;
 		//! Opcode offset of the last identify opcode

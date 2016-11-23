@@ -15,7 +15,7 @@ namespace Producer
 {
 
 
-	bool Scope::visitASTExprTypeDecl(AST::Node& node, LVID& localvar)
+	bool Scope::visitASTExprTypeDecl(AST::Node& node, uint32_t& localvar)
 	{
 		assert(node.rule == AST::rgTypeDecl);
 		localvar = 0;
@@ -27,7 +27,7 @@ namespace Producer
 			{
 				if (identifier.text == "any") // no real information, already 'any'
 				{
-					localvar = LVID(-1);
+					localvar = uint32_t(-1);
 					return true;
 				}
 				if (identifier.text == "void")
@@ -53,7 +53,7 @@ namespace Producer
 	}
 
 
-	bool Scope::visitASTType(AST::Node& node, LVID& localvar)
+	bool Scope::visitASTType(AST::Node& node, uint32_t& localvar)
 	{
 		assert(node.rule == AST::rgType);
 		assert(not node.children.empty());

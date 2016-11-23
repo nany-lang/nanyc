@@ -217,7 +217,7 @@ namespace Producer
 	}
 
 
-	bool Scope::visitASTExprIfExpr(AST::Node& node, LVID& localvar)
+	bool Scope::visitASTExprIfExpr(AST::Node& node, uint32_t& localvar)
 	{
 		assert(node.rule == AST::rgIf);
 		localvar = 0u;

@@ -16,7 +16,7 @@ namespace ny
 	{}
 
 
-	inline ClassdefTableView::ClassdefTableView(ClassdefTableView& view, LVID atomid, uint count)
+	inline ClassdefTableView::ClassdefTableView(ClassdefTableView& view, uint32_t atomid, uint count)
 		: table(view.table)
 	{
 		// preparing the new layer via the local data, then swapping
@@ -88,7 +88,7 @@ namespace ny
 	}
 
 
-	inline Classdef& ClassdefTableView::substitute(LVID lvid)
+	inline Classdef& ClassdefTableView::substitute(uint32_t lvid)
 	{
 		return table.substitute(lvid);
 	}
@@ -101,7 +101,7 @@ namespace ny
 	}
 
 
-	inline LVID ClassdefTableView::substituteAtomID() const
+	inline uint32_t ClassdefTableView::substituteAtomID() const
 	{
 		return table.substituteAtomID();
 	}

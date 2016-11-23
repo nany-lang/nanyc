@@ -330,6 +330,7 @@ addsrc(
 	"details/utils/memory-allocator.h"
 	"details/utils/check-for-valid-identifier-name.cpp"
 	"details/utils/check-for-valid-identifier-name.h"
+	"details/utils/dataregister.h"
 	"details/utils/clid.h"
 	"details/utils/clid.cpp"
 	"details/utils/clid.hxx")

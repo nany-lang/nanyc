@@ -93,7 +93,7 @@ namespace Instanciate
 		overloadMatch.input.rettype.push_back(CLID{atomid, lvid});
 
 		// inserting the 'self' variable if a referer exists
-		LVID referer = frame.lvids(operands.ptr2func).referer;
+		uint32_t referer = frame.lvids(operands.ptr2func).referer;
 		if (referer != 0)
 		{
 			// double indirection - TODO find a beter way

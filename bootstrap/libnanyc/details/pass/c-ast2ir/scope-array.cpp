@@ -14,7 +14,7 @@ namespace Producer
 {
 
 
-	bool Scope::visitASTArray(AST::Node& node, LVID& localvar)
+	bool Scope::visitASTArray(AST::Node& node, uint32_t& localvar)
 	{
 		assert(node.rule == AST::rgArray);
 		if (unlikely(!context.reuse.shorthandArray.node))

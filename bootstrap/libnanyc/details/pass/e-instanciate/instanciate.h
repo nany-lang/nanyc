@@ -32,7 +32,7 @@ namespace Instanciate
 
 	struct IndexedParameter final
 	{
-		IndexedParameter(LVID lvid, uint line, uint offset)
+		IndexedParameter(uint32_t lvid, uint line, uint offset)
 			: lvid(lvid), line(line), offset(offset)
 		{}
 		uint32_t lvid;
@@ -42,7 +42,7 @@ namespace Instanciate
 
 	struct NamedParameter final
 	{
-		NamedParameter(const AnyString& name, LVID lvid, uint line, uint offset)
+		NamedParameter(const AnyString& name, uint32_t lvid, uint line, uint offset)
 			: name(name), lvid(lvid), line(line), offset(offset)
 		{}
 		AnyString name;
@@ -127,7 +127,7 @@ namespace Instanciate
 		Atom& resolveTypeAlias(Atom& atom, const Classdef*& cdefout);
 
 		//! Get if a value from a register can be acquired (ref counting)
-		bool canBeAcquired(LVID lvid) const;
+		bool canBeAcquired(uint32_t lvid) const;
 		//! Get if a type definition can be acquired (ref. counting)
 		bool canBeAcquired(const CLID& clid) const;
 		//! Get if a type definition can be acquired (ref. counting)
@@ -146,11 +146,11 @@ namespace Instanciate
 		//! \name Helpers for propgram memory management
 		//@{
 		//! Emit 'ref' opcode if 'type' can be acquired (e.g. is not a builtin type)
-		template<class T> void tryToAcquireObject(LVID lvid, const T& type);
+		template<class T> void tryToAcquireObject(uint32_t lvid, const T& type);
 		//! Emit 'ref' opcode if 'lvid' can be acquired (e.g. is not a builtin type)
-		void tryToAcquireObject(LVID lvid);
+		void tryToAcquireObject(uint32_t lvid);
 		//! Emit 'ref' opcode whether 'lvid' can be acquired or not (no check)
-		void acquireObject(LVID lvid);
+		void acquireObject(uint32_t lvid);
 		//! Emit 'unref' opcode if 'lvid' can be acquired
 		void tryUnrefObject(uint32_t lvid);
 
@@ -182,7 +182,7 @@ namespace Instanciate
 
 		bool instanciateAssignment(const ir::ISA::Operand<ir::ISA::Op::call>& operands);
 
-		bool instanciateAssignment(AtomStackFrame& frame, LVID lhs, LVID rhs, bool canDisposeLHS = true,
+		bool instanciateAssignment(AtomStackFrame& frame, uint32_t lhs, uint32_t rhs, bool canDisposeLHS = true,
 			bool checktype = true, bool forceDeepcopy = false);
 
 		//! perform type resolution and fetch data (local variable, func...)
@@ -201,7 +201,7 @@ namespace Instanciate
 		bool pushCapturedVarsAsParameters(const Atom& atomclass);
 
 		//! Declare a named variable (and checks for multiple declarations)
-		void declareNamedVariable(const AnyString& name, LVID lvid, bool autorelease = true);
+		void declareNamedVariable(const AnyString& name, uint32_t lvid, bool autorelease = true);
 
 		void instanciateInstrinsicCall();
 		bool instanciateUserDefinedIntrinsic(const ir::ISA::Operand<ir::ISA::Op::intrinsic>& operands);

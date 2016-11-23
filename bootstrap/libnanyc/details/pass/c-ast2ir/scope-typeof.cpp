@@ -38,7 +38,7 @@ namespace Producer
 
 
 
-	bool Scope::visitASTExprTypeof(AST::Node& node, LVID& localvar)
+	bool Scope::visitASTExprTypeof(AST::Node& node, uint32_t& localvar)
 	{
 		assert(node.rule == AST::rgTypeof);
 		uint32_t previous = 0;

@@ -48,7 +48,7 @@ namespace Instanciate
 	}
 
 
-	inline bool SequenceBuilder::canBeAcquired(LVID lvid) const
+	inline bool SequenceBuilder::canBeAcquired(uint32_t lvid) const
 	{
 		assert(frame != nullptr);
 		return canBeAcquired(CLID{frame->atomid, lvid});
@@ -68,7 +68,7 @@ namespace Instanciate
 	}
 
 
-	inline void SequenceBuilder::acquireObject(LVID lvid)
+	inline void SequenceBuilder::acquireObject(uint32_t lvid)
 	{
 		assert(lvid > 1 and "can not acquire the returned value");
 		assert(canBeAcquired(lvid));
@@ -77,14 +77,14 @@ namespace Instanciate
 	}
 
 
-	inline void SequenceBuilder::tryToAcquireObject(LVID lvid)
+	inline void SequenceBuilder::tryToAcquireObject(uint32_t lvid)
 	{
 		if (canBeAcquired(lvid))
 			acquireObject(lvid);
 	}
 
 
-	template<class T> inline void SequenceBuilder::tryToAcquireObject(LVID lvid, const T& type)
+	template<class T> inline void SequenceBuilder::tryToAcquireObject(uint32_t lvid, const T& type)
 	{
 		if (canBeAcquired(type))
 			acquireObject(lvid);

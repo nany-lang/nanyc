@@ -418,7 +418,7 @@ namespace Instanciate
 			}
 
 			// trying for local variables first
-			LVID lvidVar = frame->findLocalVariable(name);
+			uint32_t lvidVar = frame->findLocalVariable(name);
 			if (lvidVar != 0)
 			{
 				// the variable is used, whatever it is (error or not)

@@ -68,7 +68,7 @@ namespace Producer
 	}
 
 
-	inline void Scope::resetLocalCounters(LVID localvarStart)
+	inline void Scope::resetLocalCounters(uint32_t localvarStart)
 	{
 		// 0: null
 		// 1: reserved for namespace lookup
@@ -89,28 +89,28 @@ namespace Producer
 		return ++nextVarID;
 	}
 
-	inline LVID Scope::createLocalBuiltinVoid(AST::Node& node)
+	inline uint32_t Scope::createLocalBuiltinVoid(AST::Node& node)
 	{
 		emitDebugpos(node);
 		return ir::emit::alloc(context.sequence, nextvar(), nyt_void);
 	}
 
 
-	inline LVID Scope::createLocalBuiltinAny(AST::Node& node)
+	inline uint32_t Scope::createLocalBuiltinAny(AST::Node& node)
 	{
 		emitDebugpos(node);
 		return ir::emit::alloc(context.sequence, nextvar());
 	}
 
 
-	inline LVID Scope::createLocalBuiltinFloat(AST::Node& node, nytype_t type, double value)
+	inline uint32_t Scope::createLocalBuiltinFloat(AST::Node& node, nytype_t type, double value)
 	{
 		emitDebugpos(node);
 		return ir::emit::allocf64(context.sequence, nextvar(), type, value);
 	}
 
 
-	inline LVID Scope::createLocalBuiltinInt(AST::Node& node, nytype_t type, yuint64 value)
+	inline uint32_t Scope::createLocalBuiltinInt(AST::Node& node, nytype_t type, yuint64 value)
 	{
 		emitDebugpos(node);
 		return ir::emit::allocu64(context.sequence, nextvar(), type, value);
@@ -152,7 +152,7 @@ namespace Producer
 	}
 
 
-	inline bool Scope::visitASTExprSubDot(AST::Node& node, LVID& localvar)
+	inline bool Scope::visitASTExprSubDot(AST::Node& node, uint32_t& localvar)
 	{
 		emitTmplParametersIfAny();
 		ir::emit::type::ensureResolved(context.sequence, localvar);

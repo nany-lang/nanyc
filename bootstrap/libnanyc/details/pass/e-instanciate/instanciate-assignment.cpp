@@ -14,7 +14,7 @@ namespace Instanciate
 {
 
 
-	bool SequenceBuilder::instanciateAssignment(AtomStackFrame& frame, LVID lhs, LVID rhs, bool canDisposeLHS,
+	bool SequenceBuilder::instanciateAssignment(AtomStackFrame& frame, uint32_t lhs, uint32_t rhs, bool canDisposeLHS,
 		bool checktype, bool forceDeepcopy)
 	{
 		// lhs and rhs can not be null, but they can be identical, to force a clone
@@ -279,7 +279,7 @@ namespace Instanciate
 		// note: double indirection, since assignment is like method call
 		//  %y = %x."="
 		//  %z = resolve %y."^()"
-		LVID lhs = frame->lvids(operands.ptr2func).referer;
+		uint32_t lhs = frame->lvids(operands.ptr2func).referer;
 		if (likely(0 != lhs))
 		{
 			lhs  = frame->lvids(lhs).referer;
@@ -289,7 +289,7 @@ namespace Instanciate
 		}
 
 		// -- RHS
-		LVID rhs = pushedparams.func.indexed[0].lvid;
+		uint32_t rhs = pushedparams.func.indexed[0].lvid;
 		pushedparams.func.indexed.clear();
 
 		bool assigned = instanciateAssignment(*frame, lhs, rhs);

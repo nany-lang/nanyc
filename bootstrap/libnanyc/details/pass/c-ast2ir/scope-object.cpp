@@ -16,7 +16,7 @@ namespace Producer
 {
 
 
-	bool Scope::visitASTExprObject(AST::Node& node, LVID& localvar)
+	bool Scope::visitASTExprObject(AST::Node& node, uint32_t& localvar)
 	{
 		assert(node.rule == AST::rgObject);
 		// Converting the object into an anonymous class

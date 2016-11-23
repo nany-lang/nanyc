@@ -3,6 +3,7 @@
 #include "details/ast/ast.h"
 #include "details/grammar/nany.h"
 #include "details/ir/emit.h"
+#include "details/utils/dataregister.h"
 
 using namespace Yuni;
 
@@ -17,7 +18,7 @@ namespace Producer
 {
 
 
-	bool Scope::visitASTExprNew(AST::Node& node, LVID& localvar)
+	bool Scope::visitASTExprNew(AST::Node& node, uint32_t& localvar)
 	{
 		assert(node.rule == AST::rgNew);
 		if (unlikely(node.children.empty()))
@@ -26,7 +27,7 @@ namespace Producer
 		bool success = true;
 
 		// create a new variable for the result
-		LVID rettype = 0;
+		uint32_t rettype = 0;
 		AST::Node* call = nullptr;
 		AST::Node* inplace = nullptr;
 
@@ -40,18 +41,11 @@ namespace Producer
 						return unexpectedNode(child, "[ir/new/several calls]");
 
 					success &= visitASTExprTypeDecl(child, rettype);
-					if (success)
-					{
-						if (unlikely(lvidIsAny(rettype)))
-						{
-							error(child) << "the pseudo type 'any' can not be instanciated";
-							return false;
-						}
-						if (unlikely(rettype == 0))
-						{
-							error(child) << "the pseudo type 'void' can not be instanciated";
-							return false;
-						}
+					if (success and unlikely(not isValidLocalvar(rettype))) {
+						if (isAny(rettype))
+							return (error(child) << "the pseudo type 'any' can not be instanciated");
+						if (isVoid(rettype))
+							return (error(child) << "the pseudo type 'void' can not be instanciated");
 					}
 					break;
 				}

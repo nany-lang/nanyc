@@ -102,7 +102,7 @@ namespace Mapping
 
 
 		template<ir::ISA::Op O>
-		bool checkForLVID(const ir::ISA::Operand<O>& operands, LVID lvid)
+		bool checkForuint32_t(const ir::ISA::Operand<O>& operands, uint32_t lvid)
 		{
 			if (debugmode)
 			{
@@ -134,9 +134,9 @@ namespace Mapping
 
 		void attachFuncCall(const ir::ISA::Operand<ir::ISA::Op::call>& operands)
 		{
-			if (unlikely(not checkForLVID(operands, operands.ptr2func)))
+			if (unlikely(not checkForuint32_t(operands, operands.ptr2func)))
 				return;
-			if (unlikely(not checkForLVID(operands, operands.lvid)))
+			if (unlikely(not checkForuint32_t(operands, operands.lvid)))
 				return;
 
 			auto& stackframe     = *atomStack;
@@ -190,7 +190,7 @@ namespace Mapping
 				return complainOperand(operands, (isFuncdef) ? "invalid func name" : "invalid typedef name");
 
 			// reset last lvid and parameters
-			lastLVID = 0;
+			lastuint32_t = 0;
 			lastPushedNamedParameters.clear();
 			lastPushedIndexedParameters.clear();
 
@@ -242,7 +242,7 @@ namespace Mapping
 			Atom& atom = atomStack->currentAtomNotUnit();
 
 			// reset last lvid and parameters
-			lastLVID = 0;
+			lastuint32_t = 0;
 			lastPushedNamedParameters.clear();
 			lastPushedIndexedParameters.clear();
 
@@ -289,9 +289,9 @@ namespace Mapping
 
 			// calculating the lvid for the current parameter
 			// (+1 since %1 is the return value/type)
-			uint paramLVID = (++frame.parameterIndex) + 1;
+			uint paramuint32_t = (++frame.parameterIndex) + 1;
 
-			if (unlikely(not checkForLVID(operands, paramLVID)))
+			if (unlikely(not checkForuint32_t(operands, paramuint32_t)))
 				return;
 
 			auto kind = static_cast<ir::ISA::Blueprint>(operands.kind);
@@ -302,7 +302,7 @@ namespace Mapping
 			if (unlikely(not isGenTypeParam and not frame.atom.isFunction()))
 				return complainOperand(operands, "parameter for non-function");
 
-			CLID clid{frame.atom.atomid, paramLVID};
+			CLID clid{frame.atom.atomid, paramuint32_t};
 			AnyString name = currentSequence.stringrefs[operands.name];
 
 			auto& parameters = (not isGenTypeParam)
@@ -510,14 +510,14 @@ namespace Mapping
 				return complainOperand(operands, "invalid stack");
 
 			++(atomStack->scope);
-			lastLVID = 0;
+			lastuint32_t = 0;
 		}
 
 
 		void visit(ir::ISA::Operand<ir::ISA::Op::end>&)
 		{
 			// reset the last lvid
-			lastLVID = 0u;
+			lastuint32_t = 0u;
 
 			if (likely(atomStack))
 			{
@@ -559,9 +559,9 @@ namespace Mapping
 
 		void visit(ir::ISA::Operand<ir::ISA::Op::stackalloc>& operands)
 		{
-			if (unlikely(not checkForLVID(operands, operands.lvid)))
+			if (unlikely(not checkForuint32_t(operands, operands.lvid)))
 				return;
-			lastLVID = operands.lvid;
+			lastuint32_t = operands.lvid;
 			auto clid = atomStack->classdefs[operands.lvid];
 
 			MutexLocker locker{mutex};
@@ -583,7 +583,7 @@ namespace Mapping
 
 		void visit(ir::ISA::Operand<ir::ISA::Op::self>& operands)
 		{
-			if (unlikely(not checkForLVID(operands, operands.self)))
+			if (unlikely(not checkForuint32_t(operands, operands.self)))
 				return;
 			if (unlikely(nullptr == atomStack))
 				return complainOperand(operands, "invalid atom stack for 'resolveAsSelf'");
@@ -616,7 +616,7 @@ namespace Mapping
 
 		void visit(ir::ISA::Operand<ir::ISA::Op::identify>& operands)
 		{
-			if (unlikely(not checkForLVID(operands, operands.lvid)))
+			if (unlikely(not checkForuint32_t(operands, operands.lvid)))
 				return;
 
 			if (unlikely(operands.text == 0))
@@ -625,7 +625,7 @@ namespace Mapping
 			if (unlikely(name.empty()))
 				return complainOperand(operands, "invalid empty identifier");
 
-			lastLVID = operands.lvid;
+			lastuint32_t = operands.lvid;
 			auto& atomFrame = *atomStack;
 			auto& localClassdefs = atomFrame.classdefs;
 
@@ -656,7 +656,7 @@ namespace Mapping
 			{
 				// trying to resolve an attribute
 				// (aka `parent.current`)
-				if (not checkForLVID(operands, operands.self))
+				if (not checkForuint32_t(operands, operands.self))
 					return;
 
 				// the type is currently unknown
@@ -684,14 +684,14 @@ namespace Mapping
 
 		void visit(ir::ISA::Operand<ir::ISA::Op::tpush>& operands)
 		{
-			if (unlikely(not checkForLVID(operands, operands.lvid)))
+			if (unlikely(not checkForuint32_t(operands, operands.lvid)))
 				return;
 		}
 
 
 		void visit(ir::ISA::Operand<ir::ISA::Op::push>& operands)
 		{
-			if (unlikely(not checkForLVID(operands, operands.lvid)))
+			if (unlikely(not checkForuint32_t(operands, operands.lvid)))
 				return;
 
 			if (operands.name != 0) // named parameter
@@ -711,7 +711,7 @@ namespace Mapping
 		void visit(ir::ISA::Operand<ir::ISA::Op::call>& operands)
 		{
 			attachFuncCall(operands);
-			lastLVID = operands.lvid;
+			lastuint32_t = operands.lvid;
 			lastPushedIndexedParameters.clear();
 			lastPushedNamedParameters.clear();
 		}
@@ -721,7 +721,7 @@ namespace Mapping
 		{
 			if (operands.lvid != 0)
 			{
-				if (unlikely(not checkForLVID(operands, operands.lvid)))
+				if (unlikely(not checkForuint32_t(operands, operands.lvid)))
 					return;
 
 				auto& classdefRetValue = atomStack->classdefs[1]; // 1 is the return value
@@ -736,9 +736,9 @@ namespace Mapping
 
 		void visit(ir::ISA::Operand<ir::ISA::Op::follow>& operands)
 		{
-			if (unlikely(not checkForLVID(operands, operands.lvid)))
+			if (unlikely(not checkForuint32_t(operands, operands.lvid)))
 				return;
-			if (unlikely(not checkForLVID(operands, operands.follower)))
+			if (unlikely(not checkForuint32_t(operands, operands.follower)))
 				return;
 
 			auto& clidFollower = atomStack->classdefs[operands.follower];
@@ -754,7 +754,7 @@ namespace Mapping
 
 		void visit(ir::ISA::Operand<ir::ISA::Op::intrinsic>& operands)
 		{
-			if (unlikely(not checkForLVID(operands, operands.lvid)))
+			if (unlikely(not checkForuint32_t(operands, operands.lvid)))
 				return;
 		}
 
@@ -844,7 +844,7 @@ namespace Mapping
 			assert(not atomStack);
 			pushNewFrame(parentAtom);
 
-			lastLVID = 0u;
+			lastuint32_t = 0u;
 			lastPushedNamedParameters.clear();
 			lastPushedIndexedParameters.clear();
 
@@ -871,13 +871,13 @@ namespace Mapping
 		//! Blueprint root element
 		std::unique_ptr<AtomStackFrame> atomStack;
 		//! Last lvid (for pushed parameters)
-		LVID lastLVID = 0;
+		uint32_t lastuint32_t = 0;
 		//! The first atom created by the mapping
 		Atom*& firstAtomCreated;
 		//! Last pushed indexed parameters
-		std::vector<LVID> lastPushedIndexedParameters;
+		std::vector<uint32_t> lastPushedIndexedParameters;
 		//! Last pushed named parameters
-		std::vector<std::pair<AnyString, LVID>> lastPushedNamedParameters;
+		std::vector<std::pair<AnyString, uint32_t>> lastPushedNamedParameters;
 		//! Prefix to prepend for the first atom created by the mapping
 		AnyString prefixNameForFirstAtomCreated;
 		//! Flag to evaluate the whole sequence, or only a portion of it
