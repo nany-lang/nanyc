@@ -3,6 +3,7 @@
 #include <vector>
 
 
+namespace ny { class ClassdefTableView; struct Atom; }
 
 namespace ny
 {

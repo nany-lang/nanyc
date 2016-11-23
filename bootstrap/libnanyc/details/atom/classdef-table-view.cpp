@@ -9,6 +9,12 @@ namespace ny
 {
 
 
+	void ClassdefTableView::mergeSubstitutes()
+	{
+		table.mergeSubstitutes();
+	}
+
+
 	void ClassdefTableView::printClassdef(Yuni::String& out, const CLID& clid, const Classdef& cdef) const
 	{
 		out.write("    ", 4);

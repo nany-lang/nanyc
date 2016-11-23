@@ -335,18 +335,19 @@ namespace ny
 		if (parent and parent == atom.parent and isClassMember())
 			return true;
 
+		return true;
 		// get if the targets are identical
-		if (origin.target == atom.origin.target)
-		{
-			// determining whether the current atom is an ancestor of the provided one
-			// TODO fix accessibility (with visibility)
-			return true;
-		}
-		else
-		{
-			// not on the same target ? Only public elements are accessible
-			return atom.isPublicOrPublished();
-		}
+		//if (origin.target == atom.origin.target)
+		//{
+		//	// determining whether the current atom is an ancestor of the provided one
+		//	// TODO fix accessibility (with visibility)
+		//	return true;
+		//}
+		//else
+		//{
+		//	// not on the same target ? Only public elements are accessible
+		//	return atom.isPublicOrPublished();
+		//}
 	}
 
 

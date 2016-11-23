@@ -11,9 +11,11 @@
 #include "interface.h"
 #include "funcdef.h"
 #include "classdef-follow.h"
+#include "details/reporting/report.h"
 
 
 
+namespace ny { struct Atom; }
 
 namespace ny
 {

@@ -17,6 +17,7 @@ namespace ny
 	class CTarget;
 	class BuildInfoSource;
 	class Build;
+	namespace Logs { class Report; }
 
 
 

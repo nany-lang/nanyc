@@ -8,6 +8,7 @@
 #include <iosfwd>
 
 
+namespace ny { struct Atom; }
 
 namespace ny
 {

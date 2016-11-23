@@ -1,5 +1,6 @@
 #pragma once
 #include "classdef-table.h"
+#include "details/atom/atom-map.h"
 
 
 

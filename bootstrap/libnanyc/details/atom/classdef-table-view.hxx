@@ -124,12 +124,6 @@ namespace ny
 	}
 
 
-	inline void ClassdefTableView::mergeSubstitutes()
-	{
-		table.mergeSubstitutes();
-	}
-
-
 	inline ClassdefTable& ClassdefTableView::originalTable()
 	{
 		return table;

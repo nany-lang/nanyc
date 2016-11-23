@@ -14,19 +14,19 @@
 #include <unordered_set>
 #include <map>
 #include "libnanyc-config.h"
+#include "details/atom/classdef.h"
 
 
 
-
-namespace ny
-{
-
-	// forward class
+namespace ny {
 	struct AtomMap;
 	class ClassdefTable;
 	class ClassdefTableView;
 	namespace ir { struct Sequence; }
+}
 
+namespace ny
+{
 
 	/*!
 	** \brief Definition of a single class or function
@@ -471,8 +471,6 @@ namespace ny
 
 		//! Origins
 		struct {
-			//! Target source
-			CTarget* target = nullptr;
 			//! File source
 			YString filename;
 			//! Start offset
