@@ -322,6 +322,11 @@ public:
 	// This mapping is required instnaciating the code from a
 	// forked atom and to avoid invalid references
 	uint32_t mappingBlueprintAtomID[2] = {0, 0};
+	struct {
+		//! Current atom to consider for reflection
+		Atom* atom = nullptr;
+	}
+	reflect;
 	//! cursor
 	ir::Instruction** cursor = nullptr;
 

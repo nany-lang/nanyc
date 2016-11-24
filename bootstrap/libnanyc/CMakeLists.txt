@@ -255,7 +255,8 @@ addsrc(
 	"details/pass/e-instanciate/instanciate-atom.h"
 	"details/pass/e-instanciate/instanciate.h"
 	"details/pass/e-instanciate/instanciate.hxx"
-
+	"details/pass/e-instanciate/reflection.cpp"
+	"details/pass/e-instanciate/reflection.h"
 	"details/pass/e-instanciate/type-check.cpp"
 	"details/pass/e-instanciate/type-check.h"
 	"details/pass/e-instanciate/func-overload-match.cpp"
