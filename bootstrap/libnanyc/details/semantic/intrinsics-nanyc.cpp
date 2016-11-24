@@ -6,6 +6,7 @@
 #endif
 #include "details/ir/emit.h"
 #include "ref-unref.h"
+#include "intrinsics-nanyc-reflection.h"
 
 using namespace Yuni;
 
@@ -58,8 +59,30 @@ bool intrinsicMemcheckerHold(Analyzer& seq, uint32_t lvid) {
 using BuiltinIntrinsic = bool (*)(Analyzer&, uint32_t);
 
 static const std::unordered_map<AnyString, std::pair<uint32_t, BuiltinIntrinsic>> builtinDispatch = {
-	{"__reinterpret",            { 2,  &intrinsicReinterpret, }},
-	{"__nanyc_memchecker_hold",  { 2,  &intrinsicMemcheckerHold, }},
+	{"__reinterpret",               { 2,  &intrinsicReinterpret, }},
+	{"__nanyc_memchecker_hold",     { 2,  &intrinsicMemcheckerHold, }},
+	// reflect
+	{"__nanyc_reflect_name",        { 1, &reflect::name }},
+	{"__nanyc_reflect_classname",   { 1, &reflect::classname }},
+	{"__nanyc_reflect_keyword",     { 1, &reflect::keyword }},
+	{"__nanyc_reflect_filename",    { 1, &reflect::filename }},
+	{"__nanyc_reflect_column",      { 1, &reflect::column }},
+	{"__nanyc_reflect_line",        { 1, &reflect::line }},
+	{"__nanyc_reflect_is_class",    { 1, &reflect::isClass }},
+	{"__nanyc_reflect_is_func",     { 1, &reflect::isFunc }},
+	{"__nanyc_reflect_is_var",      { 1, &reflect::isVar }},
+	{"__nanyc_reflect_is_typedef",  { 1, &reflect::isTypedef }},
+	{"__nanyc_reflect_is_view",     { 1, &reflect::isView }},
+	{"__nanyc_reflect_is_operator", { 1, &reflect::isOperator }},
+	{"__nanyc_reflect_is_ctor",     { 1, &reflect::ctor }},
+	{"__nanyc_reflect_is_dtor",     { 1, &reflect::dtor }},
+	{"__nanyc_reflect_callable",    { 1, &reflect::callable }},
+	{"__nanyc_reflect_anonymous",   { 1, &reflect::anonymous }},
+	{"__nanyc_reflect_sizeof",      { 1, &reflect::bytes }},
+	{"__nanyc_reflect_foreach",     { 2, &reflect::foreach }},
+	{"__nanyc_reflect_props_count", { 1, &reflect::props::count }},
+	{"__nanyc_reflect_vars_count",  { 1, &reflect::funcs::count }},
+	{"__nanyc_reflect_funcs_count", { 1, &reflect::vars::count }},
 };
 
 
