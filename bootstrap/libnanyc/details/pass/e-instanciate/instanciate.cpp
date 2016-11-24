@@ -245,33 +245,24 @@ bool Build::instanciate(const AnyString& entrypoint, const nytype_t* args, uint3
 		report.error() << "arguments for atom instanciation is not supported yet";
 		return false;
 	}
-	// lock the isolate
 	MutexLocker locker{mutex};
-	// try to find the entrypoint
 	Atom* entrypointAtom = nullptr;
-	{
-		bool canContinue = true;
+	try {
 		cdeftable.atoms.root.eachChild(entrypoint, [&](Atom & child) -> bool {
-			if (entrypointAtom != nullptr) {
-				canContinue = false;
-				report.error() << "failed to instanciate '" << entrypoint << "': multiple entry points found";
-				return false;
-			}
+			if (unlikely(entrypointAtom != nullptr))
+				throw std::runtime_error("': multiple entry points found");
 			entrypointAtom = &child;
 			return true;
 		});
-		if (not canContinue)
-			return false;
+		if (unlikely(!entrypointAtom))
+			throw std::runtime_error("()': function not found");
+		if (unlikely(not entrypointAtom->isFunction() or entrypointAtom->isClassMember()))
+			throw std::runtime_error("': the atom is not a function");
 	}
-	if (unlikely(nullptr == entrypointAtom)) {
-		report.ice() << "failed to instanciate '" << entrypoint << "()': function not found";
+	catch (const std::exception& e) {
+		report.error() << "failed to instanciate '" << entrypoint << e.what();
 		return false;
 	}
-	if (unlikely(entrypointAtom->type != Atom::Type::funcdef)) {
-		report.ice() << "failed to instanciate '" << entrypoint << "': the atom is not a function";
-		return false;
-	}
-	// parameters for the signature
 	decltype(Pass::Instanciate::FuncOverloadMatch::result.params) params;
 	decltype(Pass::Instanciate::FuncOverloadMatch::result.params) tmplparams;
 	Logs::Message::Ptr newReport;
