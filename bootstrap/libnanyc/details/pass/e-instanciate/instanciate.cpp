@@ -274,16 +274,14 @@ bool Build::instanciate(const AnyString& entrypoint, const nytype_t* args, uint3
 	report.appendEntry(newReport);
 	if (Config::Traces::atomTable)
 		cdeftable.atoms.root.printTree(cdeftable);
-	if (instanciated) {
-		atomid = entrypointAtom->atomid;
-		instanceid = info.instanceid;
-		return true;
-	}
-	else {
+	if (not instanciated) {
 		atomid = (uint32_t) - 1;
 		instanceid = (uint32_t) - 1;
 		return false;
 	}
+	atomid = entrypointAtom->atomid;
+	instanceid = info.instanceid;
+	return true;
 }
 
 
