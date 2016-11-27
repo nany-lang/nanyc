@@ -80,18 +80,4 @@ void CTarget::addSourceFromFile(const AnyString& filename) {
 }
 
 
-bool CTarget::IsNameValid(const AnyString& name) noexcept {
-	if (unlikely(name.size() < 2 or not (name.size() < decltype(m_name)::chunkSize)))
-		return false;
-	if (unlikely(not AnyString::IsAlpha(name[0])))
-		return false;
-	for (size_t i = 1; i < name.size(); ++i) {
-		auto c = name[(uint)i];
-		if (not AnyString::IsAlpha(c) and not AnyString::IsDigit(c) and c != '-')
-			return false;
-	}
-	return true;
-}
-
-
 } // namespace nany
