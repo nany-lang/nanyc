@@ -97,9 +97,9 @@ bool Source::build(Build& build) {
 			report.data().origins.location.target.clear();
 			if (success) {
 				m_details = std::make_unique<BuildInfoSource>(build.cf);
-				success &= passASTFromSourceWL();
-				success &= passDuplicateAndNormalizeASTWL(report);
-				success &= passTransformASTToIRWL(report);
+				success &= passASTFromSource();
+				success &= passDuplicateAndNormalizeAST(report);
+				success &= passTransformASTToIR(report);
 				success = success and build.attach(m_details->parsing.sequence);
 				m_details->parsing.success = success;
 			}

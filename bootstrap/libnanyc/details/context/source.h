@@ -57,11 +57,11 @@ private:
 	void resetTarget(CTarget* target);
 	//! build - parse and launch an AST normalization
 	// \see duplicateAndNormalizeASTWL()
-	bool passASTFromSourceWL();
+	bool passASTFromSource();
 	//! build - clone and normalize the AST
-	bool passDuplicateAndNormalizeASTWL(Logs::Report& report);
+	bool passDuplicateAndNormalizeAST(Logs::Report& report);
 	//! build - AST to IR
-	bool passTransformASTToIRWL(Logs::Report& report);
+	bool passTransformASTToIR(Logs::Report& report);
 	void complainEAccess(Build&) const;
 
 private:

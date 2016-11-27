@@ -558,7 +558,7 @@ void dumpAST(Logs::Report& report, const AST::Node& node, const char* text) {
 } // anonymous namespace
 
 
-bool Source::passDuplicateAndNormalizeASTWL(Logs::Report& report) {
+bool Source::passDuplicateAndNormalizeAST(Logs::Report& report) {
 	auto& buildinfo = *m_details;
 	auto& parser    = buildinfo.parsing.parser;
 	auto& ast       = buildinfo.parsing.ast;
