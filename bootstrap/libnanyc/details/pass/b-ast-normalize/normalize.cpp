@@ -559,7 +559,7 @@ void dumpAST(Logs::Report& report, const AST::Node& node, const char* text) {
 
 
 bool Source::passDuplicateAndNormalizeASTWL(Logs::Report& report) {
-	auto& buildinfo = *pBuildInfo;
+	auto& buildinfo = *m_details;
 	auto& parser    = buildinfo.parsing.parser;
 	auto& ast       = buildinfo.parsing.ast;
 	//! Reset the root node

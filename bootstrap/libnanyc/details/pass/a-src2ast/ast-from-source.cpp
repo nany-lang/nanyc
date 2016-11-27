@@ -6,7 +6,7 @@ namespace ny {
 
 
 bool Source::passASTFromSourceWL() {
-	auto& parser = pBuildInfo->parsing.parser;
+	auto& parser = m_details->parsing.parser;
 	switch (m_type) {
 		case Type::file:
 			return parser.loadFromFile(m_filename) and parser.root;
