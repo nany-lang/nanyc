@@ -96,10 +96,7 @@ bool Source::build(Build& build) {
 				success &= passASTFromSourceWL();
 				success &= passDuplicateAndNormalizeASTWL(report);
 				success &= passTransformASTToIRWL(report);
-				if (success) {
-					auto& sequence = pBuildInfo->parsing.sequence;
-					success &= build.attach(sequence);
-				}
+				success = success and build.attach(pBuildInfo->parsing.sequence);
 			}
 			pBuildInfo->parsing.success = success;
 		}
