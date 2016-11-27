@@ -76,16 +76,15 @@ public:
 
 private:
 	//! Attached project
-	nyproject_t* project = nullptr;
-
+	nyproject_t* m_project = nullptr;
 	//! Name of the target
-	Yuni::ShortString64 pName;
+	Yuni::ShortString64 m_name;
 	//! All sources attached to the target
-	std::vector<Source::Ptr> pSources;
+	std::vector<Source::Ptr> m_sources;
 	//! All sources ordered by their filename
-	std::unordered_map<AnyString, std::reference_wrapper<Source>> pSourcesByFilename;
+	std::unordered_map<AnyString, std::reference_wrapper<Source>> m_sourcesByFilename;
 	//! All sources ordered by their name
-	std::unordered_map<AnyString, std::reference_wrapper<Source>> pSourcesByName;
+	std::unordered_map<AnyString, std::reference_wrapper<Source>> m_sourcesByName;
 
 	// friends
 	friend class Context;
