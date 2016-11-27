@@ -73,6 +73,7 @@ bool Source::build(Build& build) {
 				auto entry = (info() << "building " << m_filename);
 				entry.message.prefix = arrow;
 			}
+			m_details.reset(nullptr); // release memory first
 			if (m_type == Type::file) {
 				m_content.clear();
 				m_content.shrink();
@@ -86,7 +87,6 @@ bool Source::build(Build& build) {
 			auto report = Logs::Report{*build.messages} .subgroup();
 			report.data().origins.location.filename = m_filename;
 			report.data().origins.location.target.clear();
-			m_details.reset(nullptr); // making sure that the memory is released first
 			m_details = std::make_unique<BuildInfoSource>(build.cf);
 			if (success) {
 				success &= passASTFromSourceWL();
