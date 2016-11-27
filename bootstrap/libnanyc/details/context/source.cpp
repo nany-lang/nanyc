@@ -43,6 +43,13 @@ Source::~Source() {
 }
 
 
+void Source::complainEAccess(Build& build) const {
+	auto func = build.cf.on_error_file_eacces;
+	if (func)
+		func(build.project.self(), build.self(), m_filename.c_str(), m_filename.size());
+}
+
+
 bool Source::isOutdated(yint64& lastModified) const {
 	if (m_type == Type::file) {
 		auto lmt = IO::File::LastModificationTime(m_filename);
@@ -76,23 +83,20 @@ bool Source::build(Build& build) {
 			m_details.reset(nullptr); // release memory first
 			if (m_type == Type::file) {
 				success = (IO::errNone == IO::File::LoadFromFile(m_content, m_filename));
-				if (unlikely(not success and m_target)) {
-					auto f = build.cf.on_error_file_eacces;
-					if (f)
-						f(build.project.self(), build.self(), m_filename.c_str(), m_filename.size());
-				}
+				if (unlikely(not success))
+					complainEAccess(build);
 			}
 			auto report = Logs::Report{*build.messages} .subgroup();
 			report.data().origins.location.filename = m_filename;
 			report.data().origins.location.target.clear();
-			m_details = std::make_unique<BuildInfoSource>(build.cf);
 			if (success) {
+				m_details = std::make_unique<BuildInfoSource>(build.cf);
 				success &= passASTFromSourceWL();
 				success &= passDuplicateAndNormalizeASTWL(report);
 				success &= passTransformASTToIRWL(report);
 				success = success and build.attach(m_details->parsing.sequence);
+				m_details->parsing.success = success;
 			}
-			m_details->parsing.success = success;
 		}
 	}
 	catch (std::bad_alloc&) {

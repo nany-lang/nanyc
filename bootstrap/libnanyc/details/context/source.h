@@ -62,6 +62,7 @@ private:
 	bool passDuplicateAndNormalizeASTWL(Logs::Report& report);
 	//! build - AST to IR
 	bool passTransformASTToIRWL(Logs::Report& report);
+	void complainEAccess(Build&) const;
 
 private:
 	//! Type of the source
