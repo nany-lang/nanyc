@@ -43,7 +43,7 @@ Source::~Source() {
 }
 
 
-inline bool Source::isOutdatedWL(yint64& lastModified) const {
+bool Source::isOutdated(yint64& lastModified) const {
 	if (m_type == Type::file) {
 		auto lmt = IO::File::LastModificationTime(m_filename);
 		if (lmt != m_lastCompiled) {
@@ -57,16 +57,11 @@ inline bool Source::isOutdatedWL(yint64& lastModified) const {
 }
 
 
-bool Source::isOutdated(yint64& lastModified) const {
-	return isOutdatedWL(lastModified);
-}
-
-
 bool Source::build(Build& build) {
 	bool success = false;
 	yint64 modified = build.buildtime;
 	try {
-		if (not isOutdatedWL(modified)) {
+		if (not isOutdated(modified)) {
 			success = true; // not modified
 		}
 		else {

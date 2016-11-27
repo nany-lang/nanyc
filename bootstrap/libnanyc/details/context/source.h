@@ -55,8 +55,6 @@ public:
 
 private:
 	void resetTarget(CTarget* target);
-	//! determine whether the source is outdated or not
-	bool isOutdatedWL(yint64& lastModified) const;
 	//! build - parse and launch an AST normalization
 	// \see duplicateAndNormalizeASTWL()
 	bool passASTFromSourceWL();
