@@ -5,7 +5,7 @@
 namespace ny {
 
 
-bool Source::passASTFromSourceWL() {
+bool Source::passASTFromSource() {
 	assert(m_details != nullptr);
 	auto& parser = m_details->parsing.parser;
 	switch (m_type) {

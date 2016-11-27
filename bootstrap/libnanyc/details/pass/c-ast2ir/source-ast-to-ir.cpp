@@ -9,7 +9,7 @@ using namespace Yuni;
 
 namespace ny {
 
-bool Source::passTransformASTToIRWL(Logs::Report& report) {
+bool Source::passTransformASTToIR(Logs::Report& report) {
 	auto& buildinfo = *m_details;
 	if (nullptr == buildinfo.parsing.rootnode)
 		return false;
