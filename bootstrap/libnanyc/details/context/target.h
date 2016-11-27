@@ -34,12 +34,6 @@ public:
 	//! Threading policy
 	using ThreadingPolicy = Ancestor::ThreadingPolicy;
 
-
-public:
-	//! Get if a string is a valid target name
-	static bool IsNameValid(const AnyString& name) noexcept;
-
-
 public:
 	//! \name Constructor & Destructor
 	//@{
