@@ -6,6 +6,7 @@ namespace ny {
 
 
 bool Source::passASTFromSourceWL() {
+	assert(m_details != nullptr);
 	auto& parser = m_details->parsing.parser;
 	switch (m_type) {
 		case Type::file:
