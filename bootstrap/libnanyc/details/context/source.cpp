@@ -58,13 +58,10 @@ bool Source::isOutdated(yint64& lastModified) const {
 
 
 bool Source::build(Build& build) {
-	bool success = false;
+	bool success = true;
 	yint64 modified = build.buildtime;
 	try {
-		if (not isOutdated(modified)) {
-			success = true; // not modified
-		}
-		else {
+		if (isOutdated(modified)) {
 			if (modified <= 0)
 				modified = build.buildtime;
 			if (m_filename.first() != '{') {
@@ -76,7 +73,6 @@ bool Source::build(Build& build) {
 				auto entry = (info() << "building " << m_filename);
 				entry.message.prefix = arrow;
 			}
-			success = true;
 			if (m_type == Type::file) {
 				m_content.clear();
 				m_content.shrink();
@@ -109,12 +105,8 @@ bool Source::build(Build& build) {
 		ice() << "uncaught exception when building '" << m_filename << "'";
 		success = false;
 	}
-	if (not success) {
-		m_lastCompiled = 0; // error
-		build.success = false;
-	}
-	else
-		m_lastCompiled = modified;
+	build.success = success;
+	m_lastCompiled = success ? modified : 0;
 	return success;
 }
 
