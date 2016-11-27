@@ -75,8 +75,6 @@ bool Source::build(Build& build) {
 			}
 			m_details.reset(nullptr); // release memory first
 			if (m_type == Type::file) {
-				m_content.clear();
-				m_content.shrink();
 				success = (IO::errNone == IO::File::LoadFromFile(m_content, m_filename));
 				if (unlikely(not success and m_target)) {
 					auto f = build.cf.on_error_file_eacces;
