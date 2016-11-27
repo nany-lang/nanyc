@@ -62,10 +62,9 @@ void SequenceBuilder::releaseScopedVariables(int scope, bool forget) {
 		return;
 	if (not forget and (not canGenerateCode()))
 		return;
-	// unref in the reverse order
 	auto i = frame->localVariablesCount();
 	if (canGenerateCode()) {
-		while (i-- != 0) {
+		while (i-- != 0) { // unref in the reverse order
 			auto& clcvr = frame->lvids(i);
 			if (not (clcvr.scope >= scope))
 				continue;

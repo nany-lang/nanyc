@@ -16,8 +16,8 @@ namespace {
 
 
 bool tryFindProperties(const ir::ISA::Operand<ir::ISA::Op::identify>& operands,
-					   std::vector<std::reference_wrapper<Atom>>& multipleResults,
-					   Atom& atom, const AnyString& name) {
+		std::vector<std::reference_wrapper<Atom>>& multipleResults,
+		Atom& atom, const AnyString& name) {
 	// 'identifyset' is strictly identical to 'identify', but it indicates
 	// that we should resolve a setter and not a getter
 	bool setter = (operands.opcode == static_cast<uint32_t>(ir::ISA::Op::identifyset));
@@ -28,13 +28,13 @@ bool tryFindProperties(const ir::ISA::Operand<ir::ISA::Op::identify>& operands,
 
 
 bool emitIdentifyForSingleResult(SequenceBuilder& seq, bool isLocalVar, const Classdef& cdef,
-								 const ir::ISA::Operand<ir::ISA::Op::identify>& operands, const AnyString& name) {
+		const ir::ISA::Operand<ir::ISA::Op::identify>& operands, const AnyString& name) {
 	auto& resultAtom = seq.multipleResults[0].get();
 	const Classdef* cdefTypedef = nullptr;
 	bool mustResolveATypedef = resultAtom.isTypeAlias();
 	auto& atom = (not mustResolveATypedef)
-				 ? resultAtom
-				 : seq.resolveTypeAlias(resultAtom, cdefTypedef);
+		? resultAtom
+		: seq.resolveTypeAlias(resultAtom, cdefTypedef);
 	auto& frame = *seq.frame;
 	if (unlikely((mustResolveATypedef and !cdefTypedef) or atom.flags(Atom::Flags::error)))
 		return false;
@@ -117,7 +117,7 @@ bool emitIdentifyForSingleResult(SequenceBuilder& seq, bool isLocalVar, const Cl
 
 
 bool emitIdentifyForProperty(SequenceBuilder& seq, const ir::ISA::Operand<ir::ISA::Op::identify>& operands,
-							 Atom& propatom, uint32_t self) {
+		Atom& propatom, uint32_t self) {
 	// report for instanciation
 	Logs::Message::Ptr subreport;
 	// all pushed parameters
@@ -154,7 +154,7 @@ bool emitIdentifyForProperty(SequenceBuilder& seq, const ir::ISA::Operand<ir::IS
 
 
 bool identifyByPointerAssignment(SequenceBuilder& seq, const AnyString& name,
-								 const ir::ISA::Operand<ir::ISA::Op::identify>& operands) {
+		const ir::ISA::Operand<ir::ISA::Op::identify>& operands) {
 	// since self was marked as an 'assignment', we're trying to resolve here '^()'
 	if (unlikely(name != "^()")) {
 		ice() << "invalid resolve name for assignment (got '" << name << "')";
@@ -225,7 +225,7 @@ Atom& SequenceBuilder::resolveTypeAlias(Atom& original, const Classdef*& resultc
 
 
 bool SequenceBuilder::identify(const ir::ISA::Operand<ir::ISA::Op::identify>& operands,
-							   const AnyString& name, bool firstChance) {
+		const AnyString& name, bool firstChance) {
 	// target lvid
 	uint32_t lvid = operands.lvid;
 	// keeping traces of the code logic
@@ -357,7 +357,7 @@ bool SequenceBuilder::identify(const ir::ISA::Operand<ir::ISA::Op::identify>& op
 						return true;
 					}
 					ice() << "invalid atom for local scope variable. clid: " << CLID{frame->atomid, lvidVar}
-						  << ", " << (uint32_t) varcdef.kind;
+						<< ", " << (uint32_t) varcdef.kind;
 					return false;
 				}
 				multipleResults.emplace_back(std::ref(*varAtom));
@@ -443,8 +443,8 @@ bool SequenceBuilder::identify(const ir::ISA::Operand<ir::ISA::Op::identify>& op
 				if (firstChance) {
 					bool captured = frame->atom.canCaptureVariabes() and identifyCapturedVar(operands, name);
 					return (likely(captured))
-						   ? true
-						   : complain::notDeclaredInThisScope(selfAtom, frame->atom, name);
+						? true
+						: complain::notDeclaredInThisScope(selfAtom, frame->atom, name);
 				}
 				break;
 			}
@@ -470,14 +470,14 @@ bool SequenceBuilder::identify(const ir::ISA::Operand<ir::ISA::Op::identify>& op
 				if (not setter) {
 					if (Config::Traces::properties) {
 						trace() << "property: resolved '" << name << "' from '"
-								<< frame->atom.caption() << "' as getter " << cdef.clid;
+							<< frame->atom.caption() << "' as getter " << cdef.clid;
 					}
 					return emitIdentifyForProperty(*this, operands, propatom, propself);
 				}
 				else {
 					if (Config::Traces::properties) {
 						trace() << "property: resolved '" << name << "' from '"
-								<< frame->atom.caption() << "' as setter " << cdef.clid;
+							<< frame->atom.caption() << "' as setter " << cdef.clid;
 					}
 					// this lvid is a call to a property setter
 					// must adjust the code accordingly
