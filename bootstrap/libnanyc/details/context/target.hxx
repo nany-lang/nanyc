@@ -16,13 +16,13 @@ inline const nytarget_t* CTarget::self() const {
 
 
 inline AnyString CTarget::name() const {
-	return pName;
+	return m_name;
 }
 
 
 template<class T>
 inline void CTarget::eachSource(const T& callback) {
-	for (auto& ptr : pSources)
+	for (auto& ptr : m_sources)
 		callback(*ptr);
 }
 
