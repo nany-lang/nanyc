@@ -10,7 +10,7 @@ using namespace Yuni;
 namespace ny {
 
 bool Source::passTransformASTToIRWL(Logs::Report& report) {
-	auto& buildinfo = *pBuildInfo;
+	auto& buildinfo = *m_details;
 	if (nullptr == buildinfo.parsing.rootnode)
 		return false;
 	auto& astnodes = buildinfo.parsing.rootnode->children;

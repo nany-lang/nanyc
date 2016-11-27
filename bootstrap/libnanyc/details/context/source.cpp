@@ -86,15 +86,15 @@ bool Source::build(Build& build) {
 			auto report = Logs::Report{*build.messages} .subgroup();
 			report.data().origins.location.filename = m_filename;
 			report.data().origins.location.target.clear();
-			pBuildInfo.reset(nullptr); // making sure that the memory is released first
-			pBuildInfo = std::make_unique<BuildInfoSource>(build.cf);
+			m_details.reset(nullptr); // making sure that the memory is released first
+			m_details = std::make_unique<BuildInfoSource>(build.cf);
 			if (success) {
 				success &= passASTFromSourceWL();
 				success &= passDuplicateAndNormalizeASTWL(report);
 				success &= passTransformASTToIRWL(report);
-				success = success and build.attach(pBuildInfo->parsing.sequence);
+				success = success and build.attach(m_details->parsing.sequence);
 			}
-			pBuildInfo->parsing.success = success;
+			m_details->parsing.success = success;
 		}
 	}
 	catch (std::bad_alloc&) {

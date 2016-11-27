@@ -75,7 +75,7 @@ private:
 	//! Date of the last modified
 	yint64 m_lastCompiled = 0;
 	//! Build-related info
-	std::unique_ptr<BuildInfoSource> pBuildInfo;
+	std::unique_ptr<BuildInfoSource> m_details;
 
 private:
 	friend class CTarget;
