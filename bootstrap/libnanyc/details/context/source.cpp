@@ -43,6 +43,12 @@ Source::~Source() {
 }
 
 
+void Source::resetTarget(CTarget* target) {
+	ThreadingPolicy::MutexLocker locker{*this};
+	m_target = target;
+}
+
+
 void Source::complainEAccess(Build& build) const {
 	auto func = build.cf.on_error_file_eacces;
 	if (func)

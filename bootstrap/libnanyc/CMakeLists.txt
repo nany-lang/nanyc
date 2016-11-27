@@ -437,7 +437,6 @@ addsrc(
 	"details/context/target.hxx"
 	"details/context/target.cpp"
 	"details/context/source.h"
-	"details/context/source.hxx"
 	"details/context/source.cpp")
 
 addsrc(

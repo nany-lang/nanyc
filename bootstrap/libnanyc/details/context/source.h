@@ -85,5 +85,3 @@ private:
 
 
 } // namespace ny
-
-#include "source.hxx"
