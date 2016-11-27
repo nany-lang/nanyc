@@ -67,7 +67,6 @@ bool Source::build(Build& build) {
 		else {
 			if (modified <= 0)
 				modified = build.buildtime;
-			// reporting
 			if (m_filename.first() != '{') {
 				#ifndef YUNI_OS_WINDOWS
 				AnyString arrow {"\u2192 "};
@@ -77,7 +76,6 @@ bool Source::build(Build& build) {
 				auto entry = (info() << "building " << m_filename);
 				entry.message.prefix = arrow;
 			}
-			// assuming it will succeed, will be reverted to false as soon as something goes wrong
 			success = true;
 			if (m_type == Type::file) {
 				m_content.clear();
@@ -89,27 +87,20 @@ bool Source::build(Build& build) {
 						f(build.project.self(), build.self(), m_filename.c_str(), m_filename.size());
 				}
 			}
-			// create a new report entry
 			auto report = Logs::Report{*build.messages} .subgroup();
-			// reset build-info
 			report.data().origins.location.filename = m_filename;
 			report.data().origins.location.target.clear();
 			pBuildInfo.reset(nullptr); // making sure that the memory is released first
 			pBuildInfo = std::make_unique<BuildInfoSource>(build.cf);
-			if (success) { // file not opened
-				// creates an AST from source code
+			if (success) {
 				success &= passASTFromSourceWL();
-				// duplicates the AST and normalize it on-the-fly
 				success &= passDuplicateAndNormalizeASTWL(report);
-				// uses the normalized AST to generate high-level nany-IR
 				success &= passTransformASTToIRWL(report);
-				// attach the new sequence to the execution context
 				if (success) {
 					auto& sequence = pBuildInfo->parsing.sequence;
 					success &= build.attach(sequence);
 				}
 			}
-			// keep the result of the process somewhere
 			pBuildInfo->parsing.success = success;
 		}
 	}
@@ -123,7 +114,6 @@ bool Source::build(Build& build) {
 	}
 	if (not success) {
 		m_lastCompiled = 0; // error
-		// update the global status
 		build.success = false;
 	}
 	else
