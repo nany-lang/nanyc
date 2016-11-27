@@ -82,10 +82,7 @@ bool makeNewAtomInstanciation(InstanciateData& info, Atom& atom) {
 	// to keep the types for the new atoms
 	info.shouldMergeLayer = true;
 	// upate parameter types
-	bool r = resolveStrictParameterTypes(info.build, newAtom, &info);
-	warning() << ".. instanciate from '" << atom.caption(info.cdeftable) << "' to '"
-			  << newAtom.caption(info.cdeftable) << '\'';
-	return r;
+	return resolveStrictParameterTypes(info.build, newAtom, &info);
 }
 
 
