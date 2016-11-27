@@ -49,6 +49,7 @@ int main(int argc, const char** argv) {
 				firstarg = i + 1;
 				break;
 			}
+			continue;
 		}
 		firstarg = i;
 		break;
