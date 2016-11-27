@@ -5,14 +5,8 @@
 #include <yuni/core/noncopyable.h>
 #include <memory>
 
-// forward declaration
-namespace Yuni {
-namespace Job {
-class Taskgroup;
-}
-}
 
-
+namespace Yuni { namespace Job { class Taskgroup; } }
 
 
 namespace ny {
@@ -20,9 +14,7 @@ namespace ny {
 class CTarget;
 class BuildInfoSource;
 class Build;
-namespace Logs {
-class Report;
-}
+namespace Logs { class Report; }
 
 
 
@@ -53,14 +45,9 @@ public:
 	~Source();
 	//@}
 
-	/*!
-	** \brief Get if the source is outdated
-	*/
+	//! Get if the source is outdated
 	bool isOutdated(yint64& lastModified) const;
-
-	/*!
-	** \brief Build this source
-	*/
+	//! Build this source
 	bool build(Build&);
 
 	Source& operator = (const Source&) = delete;
@@ -70,7 +57,6 @@ private:
 	void resetTarget(CTarget* target);
 	//! determine whether the source is outdated or not
 	bool isOutdatedWL(yint64& lastModified) const;
-
 	//! build - parse and launch an AST normalization
 	// \see duplicateAndNormalizeASTWL()
 	bool passASTFromSourceWL();
@@ -78,7 +64,6 @@ private:
 	bool passDuplicateAndNormalizeASTWL(Logs::Report& report);
 	//! build - AST to IR
 	bool passTransformASTToIRWL(Logs::Report& report);
-
 
 private:
 	//! Type of the source
@@ -89,20 +74,15 @@ private:
 	Yuni::String m_content;
 	//! Parent target
 	CTarget* m_target = nullptr;
-
 	//! Date of the last modified
 	yint64 m_lastCompiled = 0;
 	//! Build-related info
 	std::unique_ptr<BuildInfoSource> pBuildInfo;
 
-
 private:
 	friend class CTarget;
 
 }; // class Source
-
-
-
 
 
 } // namespace ny
