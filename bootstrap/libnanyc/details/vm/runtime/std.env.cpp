@@ -78,9 +78,11 @@ static bool _nanyc_env_exists(nyvm_t*, void* varname) {
 
 
 namespace ny {
+namespace nsl {
+namespace import {
 
 
-void importNSLEnv(IntrinsicTable& intrinsics) {
+void env(IntrinsicTable& intrinsics) {
 	intrinsics.add("__nanyc_env_set",    _nanyc_env_set);
 	intrinsics.add("__nanyc_env_unset",  _nanyc_env_unset);
 	intrinsics.add("__nanyc_env_read",   _nanyc_env_read);
@@ -91,4 +93,6 @@ void importNSLEnv(IntrinsicTable& intrinsics) {
 }
 
 
+} // namespace import
+} // namespace nsl
 } // namespace ny

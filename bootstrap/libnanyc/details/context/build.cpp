@@ -64,13 +64,13 @@ void Build::init() {
 		m_targets.emplace_back(newtarget);
 	}
 	if (Config::importNSL) {
-		importNSLCoreString(intrinsics);
-		importNSLOSProcess(intrinsics);
-		importNSLEnv(intrinsics);
-		importNSLIO(intrinsics);
-		importNSLMemory(intrinsics);
-		importNSLConsole(intrinsics);
-		importNSLDigest(intrinsics);
+		nsl::import::string(intrinsics);
+		nsl::import::process(intrinsics);
+		nsl::import::env(intrinsics);
+		nsl::import::io(intrinsics);
+		nsl::import::memory(intrinsics);
+		nsl::import::console(intrinsics);
+		nsl::import::digest(intrinsics);
 	}
 	if (cf.on_create)
 		cf.on_create(self(), project.self());

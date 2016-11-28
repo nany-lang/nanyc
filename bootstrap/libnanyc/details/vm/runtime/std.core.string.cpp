@@ -34,9 +34,11 @@ static uint32_t nanyc_string_append_ptr(nyvm_t*, void* string, void* ptr) {
 
 
 namespace ny {
+namespace nsl {
+namespace import {
 
 
-void importNSLCoreString(IntrinsicTable& intrinsics) {
+void string(IntrinsicTable& intrinsics) {
 	intrinsics.add("__nanyc.string.append.u8",   nanyc_string_append<uint8_t>);
 	intrinsics.add("__nanyc.string.append.u16",  nanyc_string_append<uint16_t>);
 	intrinsics.add("__nanyc.string.append.u32",  nanyc_string_append<uint32_t>);
@@ -52,4 +54,6 @@ void importNSLCoreString(IntrinsicTable& intrinsics) {
 }
 
 
+} // namespace import
+} // namespace nsl
 } // namespace ny

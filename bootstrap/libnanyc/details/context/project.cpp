@@ -38,9 +38,9 @@ void Project::init(bool unittests) {
 	targets.anonym = doCreateTarget("{default}");
 	targets.nsl    = doCreateTarget("{nsl}");
 	if (Config::importNSL) {
-		importNSLCore(*this);
+		nsl::import::core(*this);
 		if (unittests)
-			importNSLUnittests(*this);
+			nsl::import::unittests(*this);
 	}
 	if (cf.on_create)
 		cf.on_create(self());
