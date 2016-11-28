@@ -13,8 +13,6 @@ using namespace Yuni;
 
 
 namespace ny {
-
-
 namespace {
 
 Logs::Report buildGenerateReport(void* ptr, Logs::Level level) {
@@ -80,43 +78,36 @@ void Build::init() {
 
 
 bool Build::compile() {
-	// preparing report
 	ny::Logs::Report report{*messages.get()};
 	Logs::Handler newHandler{&report, &buildGenerateReport};
+	success = true;
 	buildtime = DateTime::NowMilliSeconds();
-	if (unlikely(m_sources.empty()))
-		report.error() << "no target to build";
-	else {
-		success = true;
-		// build each source
+	if (not m_sources.empty()) {
 		for (auto& src : m_sources)
 			success &= src.get().build(*this);
-		if (unlikely(cf.ignore_atoms != nyfalse))
-			return true;
-		// Indexing Core Objects (bool, u32, u64, f32, ...)
-		success = success and cdeftable.atoms.fetchAndIndexCoreObjects();
-		// Resolve strict parameter types
-		// ex: func foo(p1, p2: TypeP2) // Here TypeP2 must be resolved
-		// This will be used for deduce func overloading
-		success = success and resolveStrictParameterTypes(cdeftable.atoms.root);
-		if (Config::Traces::preAtomTable)
-			cdeftable.atoms.root.printTree(ClassdefTableView{cdeftable});
-		//
-		// -- instanciate
-		//
-		const nytype_t* argtypes = nullptr;
-		AnyString entrypoint{cf.entrypoint.c_str, cf.entrypoint.size};
-		if (not entrypoint.empty())
-			success = success and instanciate(entrypoint, argtypes, main.atomid, main.instanceid);
-		// end
-		duration += DateTime::NowMilliSeconds() - buildtime;
-		if (debugmode and unlikely(not success))
-			report.error() << "debug: failed to compile";
-		return success;
+		if (cf.ignore_atoms == nyfalse) {
+			// Indexing Core Objects (bool, u32, u64, f32, ...)
+			success = success and cdeftable.atoms.fetchAndIndexCoreObjects();
+			// Resolve strict parameter types
+			// ex: func foo(p1, p2: TypeP2) // Here TypeP2 must be resolved
+			// This will be used for deduce func overloading
+			success = success and resolveStrictParameterTypes(cdeftable.atoms.root);
+			if (Config::Traces::preAtomTable)
+				cdeftable.atoms.root.printTree(ClassdefTableView{cdeftable});
+			const nytype_t* argtypes = nullptr;
+			AnyString entrypoint{cf.entrypoint.c_str, cf.entrypoint.size};
+			if (not entrypoint.empty())
+				success = success and instanciate(entrypoint, argtypes, main.atomid, main.instanceid);
+		}
 	}
-	success = false;
+	else {
+		report.error() << "no target to build";
+		success = false;
+	}
 	duration += DateTime::NowMilliSeconds() - buildtime;
-	return false;
+	if (debugmode and unlikely(not success))
+		report.error() << "debug: failed to compile";
+	return success;
 }
 
 
