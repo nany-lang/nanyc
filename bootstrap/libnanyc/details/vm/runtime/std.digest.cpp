@@ -30,11 +30,15 @@ static void* nanyc_digest_md5(nyvm_t* vm, const char* string, uint64_t length) {
 
 
 namespace ny {
+namespace nsl {
+namespace import {
 
 
-void importNSLDigest(IntrinsicTable& intrinsics) {
+void digest(IntrinsicTable& intrinsics) {
 	intrinsics.add("__nanyc_digest_md5",   nanyc_digest_md5);
 }
 
 
+} // namespace import
+} // namespace nsl
 } // namespace ny

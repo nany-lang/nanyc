@@ -13,12 +13,16 @@ static T nanyc_strlen(nyvm_t*, void* string) {
 
 
 namespace ny {
+namespace nsl {
+namespace import {
 
 
-void importNSLMemory(IntrinsicTable& intrinsics) {
+void memory(IntrinsicTable& intrinsics) {
 	intrinsics.add("strlen32",  nanyc_strlen<uint32_t>);
 	intrinsics.add("strlen64",  nanyc_strlen<uint64_t>);
 }
 
 
+} // namespace import
+} // namespace nsl
 } // namespace ny

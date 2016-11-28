@@ -39,9 +39,11 @@ static bool _nanyc_console_err_has_colors(nyvm_t* vm) {
 
 
 namespace ny {
+namespace nsl {
+namespace import {
 
 
-void importNSLConsole(IntrinsicTable& intrinsics) {
+void console(IntrinsicTable& intrinsics) {
 	intrinsics.add("__nanyc_console_out",  _nanyc_console_out);
 	intrinsics.add("__nanyc_console_err",  _nanyc_console_err);
 	intrinsics.add("__nanyc_console_out_flush",  _nanyc_console_out_flush);
@@ -51,4 +53,6 @@ void importNSLConsole(IntrinsicTable& intrinsics) {
 }
 
 
+} // namespace import
+} // namespace nsl
 } // namespace ny

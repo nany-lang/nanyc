@@ -385,9 +385,11 @@ static bool nanyc_io_mount_local(nyvm_t* vm, const char* path, uint32_t len, con
 
 
 namespace ny {
+namespace nsl {
+namespace import {
 
 
-void importNSLIO(IntrinsicTable& intrinsics) {
+void io(IntrinsicTable& intrinsics) {
 	intrinsics.add("__nanyc_io_set_cwd",  nanyc_io_set_cwd);
 	intrinsics.add("__nanyc_io_get_cwd",  nanyc_io_get_cwd);
 	intrinsics.add("__nanyc_io_folder_create",  nanyc_io_folder_create);
@@ -422,4 +424,6 @@ void importNSLIO(IntrinsicTable& intrinsics) {
 }
 
 
+} // namespace import
+} // namespace nsl
 } // namespace ny
