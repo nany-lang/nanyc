@@ -236,6 +236,38 @@ bool instanciateRecursiveAtom(InstanciateData& info) {
 }
 
 
+bool resolveTypesBeforeBodyStart(Build& build, Atom& atom, InstanciateData* originalInfo) {
+	ClassdefTableView cdeftblView{build.cdeftable};
+	if (not (originalInfo and atom.isTypeAlias())) {
+		using ParamList = decltype(Pass::Instanciate::FuncOverloadMatch::result.params);
+		ParamList params; // input parameters (won't be used)
+		ParamList tmplparams;
+		Logs::Message::Ptr newReport;
+		ny::Logs::Report report{*build.messages.get()};
+		Pass::Instanciate::InstanciateData info {
+			newReport, atom, cdeftblView, build, params, tmplparams
+		};
+		bool success = Pass::Instanciate::instanciateAtomParameterTypes(info);
+		if (not success)
+			report.appendEntry(newReport);
+		return success;
+	}
+	else {
+		// import generic type parameter from instanciation info
+		auto& tmplparams = originalInfo->tmplparams;
+		auto pindex = atom.classinfo.nextFieldIndex;
+		if (unlikely(not (pindex < tmplparams.size())))
+			return (ice() << "gen type invalid index");
+		atom.returnType.clid = CLID::AtomMapID(atom.atomid);
+		auto& srccdef = build.cdeftable.classdef(tmplparams[pindex].clid);
+		auto& rawcdef = build.cdeftable.rawclassdef(CLID::AtomMapID(atom.atomid));
+		rawcdef.import(srccdef);
+		rawcdef.qualifiers.merge(srccdef.qualifiers);
+		return true;
+	}
+}
+
+
 } // anonymous namespace
 
 
@@ -243,40 +275,11 @@ bool resolveStrictParameterTypes(Build& build, Atom& atom, InstanciateData* orig
 	switch (atom.type) {
 		case Atom::Type::funcdef:
 		case Atom::Type::typealias: {
-			// this pass intends to resolve the given types for parameters
-			// (to be able to deduce overload later).
-			// or typealias for the same reason (they can used by parameters)
-			bool needPartialInstanciation = not atom.parameters.empty() or atom.isTypeAlias();
-			if (not needPartialInstanciation)
-				break;
-			ClassdefTableView cdeftblView{build.cdeftable};
-			if (not (originalInfo and atom.isTypeAlias())) {
-				using ParamList = decltype(Pass::Instanciate::FuncOverloadMatch::result.params);
-				ParamList params; // input parameters (won't be used)
-				ParamList tmplparams;
-				Logs::Message::Ptr newReport;
-				ny::Logs::Report report{*build.messages.get()};
-				Pass::Instanciate::InstanciateData info {
-					newReport, atom, cdeftblView, build, params, tmplparams
-				};
-				bool success = Pass::Instanciate::instanciateAtomParameterTypes(info);
-				if (not success)
-					report.appendEntry(newReport);
-				return success;
-			}
-			else {
-				// import generic type parameter from instanciation info
-				auto& tmplparams = originalInfo->tmplparams;
-				auto pindex = atom.classinfo.nextFieldIndex;
-				if (unlikely(not (pindex < tmplparams.size())))
-					return (ice() << "gen type invalid index");
-				atom.returnType.clid = CLID::AtomMapID(atom.atomid);
-				auto& srccdef = build.cdeftable.classdef(tmplparams[pindex].clid);
-				auto& rawcdef = build.cdeftable.rawclassdef(CLID::AtomMapID(atom.atomid));
-				rawcdef.import(srccdef);
-				rawcdef.qualifiers.merge(srccdef.qualifiers);
-				return true;
-			}
+			// resolve func parameter types (for overload deduction) or
+			// typedef (since can be used as parameter type)
+			bool resolveTypes = not atom.parameters.empty() or atom.isTypeAlias();
+			if (resolveTypes)
+				return resolveTypesBeforeBodyStart(build, atom, originalInfo);
 			break;
 		}
 		case Atom::Type::classdef: {
