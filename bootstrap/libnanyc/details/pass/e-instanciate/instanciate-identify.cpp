@@ -468,14 +468,14 @@ bool SequenceBuilder::identify(const ir::ISA::Operand<ir::ISA::Op::identify>& op
 				// setter will be called later, when enough information will be provided
 				// (the 'value' parameter is not available yet)
 				if (not setter) {
-					if (Config::Traces::properties) {
+					if (config::traces::properties) {
 						trace() << "property: resolved '" << name << "' from '"
 							<< frame->atom.caption() << "' as getter " << cdef.clid;
 					}
 					return emitIdentifyForProperty(*this, operands, propatom, propself);
 				}
 				else {
-					if (Config::Traces::properties) {
+					if (config::traces::properties) {
 						trace() << "property: resolved '" << name << "' from '"
 							<< frame->atom.caption() << "' as setter " << cdef.clid;
 					}

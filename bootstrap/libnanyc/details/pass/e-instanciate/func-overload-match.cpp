@@ -18,9 +18,9 @@ namespace Instanciate {
 FuncOverloadMatch::FuncOverloadMatch(SequenceBuilder* seq)
 	: seq(seq) {
 	input.rettype.reserve(1); // currently, only 1 return value is allowed
-	input.params.indexed.reserve(Config::maxPushedParameters);
-	input.params.named.reserve(Config::maxPushedParameters);
-	result.params.reserve(Config::maxPushedParameters);
+	input.params.indexed.reserve(config::maxPushedParameters);
+	input.params.named.reserve(config::maxPushedParameters);
+	result.params.reserve(config::maxPushedParameters);
 }
 
 

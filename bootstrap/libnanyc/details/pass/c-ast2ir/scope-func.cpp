@@ -16,7 +16,7 @@ namespace {
 
 
 struct FuncInspector final : public Yuni::NonCopyable<FuncInspector> {
-	using FuncnameType = CString<Config::maxSymbolNameLength, false>;
+	using FuncnameType = CString<config::maxSymbolNameLength, false>;
 
 	//! Default
 	FuncInspector(Scope& scope);
@@ -271,12 +271,12 @@ bool FuncInspector::inspectParameters(AST::Node* node, AST::Node* nodeTypeParams
 	}
 	scope.emitDebugpos(node);
 	bool success = true;
-	if (unlikely(paramCount > Config::maxFuncDeclParameterCount - 1)) { // too many parameters ?
+	if (unlikely(paramCount > config::maxFuncDeclParameterCount - 1)) { // too many parameters ?
 		assert(node != nullptr);
 		error(*node) << "hard limit: too many parameters. Got "
-					 << paramCount << ", expected: " << (Config::maxFuncDeclParameterCount - 1);
+					 << paramCount << ", expected: " << (config::maxFuncDeclParameterCount - 1);
 		success = false;
-		paramCount = Config::maxFuncDeclParameterCount - 1;
+		paramCount = config::maxFuncDeclParameterCount - 1;
 	}
 	// creating all blueprint parameters first to have their 'lvid' predictible
 	// as a consequence, classdef for parameters start from 2 (0: null, 1: return type)
@@ -292,9 +292,9 @@ bool FuncInspector::inspectParameters(AST::Node* node, AST::Node* nodeTypeParams
 	uint32_t offset = (hasImplicitSelf) ? 1u : 0u;
 	if (paramCount - offset > 0U) {
 		// already checked before
-		assert(paramCount - offset < Config::maxPushedParameters);
+		assert(paramCount - offset < config::maxPushedParameters);
 		// declare all parameters first
-		uint32_t paramOffsets[Config::maxPushedParameters];
+		uint32_t paramOffsets[config::maxPushedParameters];
 		for (uint32_t i = offset; i < paramCount; ++i) { // reserving lvid for each parameter
 			uint32_t opaddr = ir::emit::blueprint::param(out, scope.nextvar(), nullptr);
 			paramOffsets[i - offset] = opaddr;

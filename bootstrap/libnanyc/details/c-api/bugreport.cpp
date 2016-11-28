@@ -34,11 +34,11 @@ void printCompiler(String& out) {
 
 void printBuildFlags(String& out) {
 	out << "> config: ";
-	out << "params:" << ny::Config::maxFuncDeclParameterCount;
-	out << ", pushedparams:" << ny::Config::maxPushedParameters;
-	out << ", nmspc depth:" << ny::Config::maxNamespaceDepth;
-	out << ", symbol:" << ny::Config::maxSymbolNameLength;
-	out << ", nsl:" << ny::Config::importNSL;
+	out << "params:" << ny::config::maxFuncDeclParameterCount;
+	out << ", pushedparams:" << ny::config::maxPushedParameters;
+	out << ", nmspc depth:" << ny::config::maxNamespaceDepth;
+	out << ", symbol:" << ny::config::maxSymbolNameLength;
+	out << ", nsl:" << ny::config::importNSL;
 	out << '\n';
 }
 

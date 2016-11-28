@@ -74,7 +74,7 @@ void ASTReplicator::collectNamespace(const AST::Node& node) {
 	nmspc.second = const_cast<AST::Node*>(&node);
 	entity->extractChildText(nmspc.first, ny::AST::rgIdentifier, ".");
 	uint32_t depth = nmspc.first.countChar('.');
-	if (depth + 1 >= Config::maxNamespaceDepth) {
+	if (depth + 1 >= config::maxNamespaceDepth) {
 		report.error() << "too many namespaces";
 		pDuplicationSuccess = false;
 		nmspc.first = "__error__";
@@ -566,13 +566,13 @@ bool Source::passDuplicateAndNormalizeAST(Logs::Report& report) {
 	buildinfo.parsing.rootnode = ast.nodeCreate(AST::rgStart);
 	if (!parser.root or (parser.root->rule != AST::rgStart))
 		return false;
-	if (Config::Traces::astBeforeNormalize)
+	if (config::traces::astBeforeNormalize)
 		dumpAST(report, *parser.root, "before normalization");
 	ASTReplicator cloner(ast, report);
 	bool success = cloner.run(*parser.root, *(buildinfo.parsing.rootnode));
 	// retrieve data
 	buildinfo.parsing.nmspc.swap(cloner.nmspc);
-	if (Config::Traces::astAfterNormalize)
+	if (config::traces::astAfterNormalize)
 		dumpAST(report, *(buildinfo.parsing.rootnode), "after normalization");
 	return success;
 }

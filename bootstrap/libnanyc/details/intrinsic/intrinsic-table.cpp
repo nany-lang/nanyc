@@ -22,7 +22,7 @@ bool IntrinsicTable::add(const AnyString& name, void* callback, nytype_t ret, va
 		int i = va_arg(argp, int);
 		if (i == 0)
 			break;
-		if (unlikely(count >= Config::maxPushedParameters or i >= static_cast<int>(nyt_count)))
+		if (unlikely(count >= config::maxPushedParameters or i >= static_cast<int>(nyt_count)))
 			return false;
 		intrinsic->params[count] = static_cast<nytype_t>(i);
 		++count;

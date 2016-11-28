@@ -85,7 +85,7 @@ inline bool IntrinsicTable::add(const AnyString& name, T callback) {
 	if (YUNI_UNLIKELY(name.empty() or (0 != pByNames.count(name))))
 		return false;
 	using B = Yuni::Bind<T>;
-	static_assert(B::argumentCount < Config::maxPushedParameters, "too many params");
+	static_assert(B::argumentCount < config::maxPushedParameters, "too many params");
 	Intrinsic::Ptr ptr = new Intrinsic(name, reinterpret_cast<void*>(callback));
 	pIntrinsics.emplace_back(ptr);
 	auto& intrinsic = *ptr;

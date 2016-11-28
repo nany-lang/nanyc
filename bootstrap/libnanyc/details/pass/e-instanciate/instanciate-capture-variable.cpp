@@ -31,7 +31,7 @@ void SequenceBuilder::captureVariables(Atom& atom) {
 	//
 	uint32_t count = 0;
 	{
-		if (Config::Traces::capturedVariables)
+		if (config::traces::capturedVariables)
 			trace() << "capturing variables in '" << frame->atom.caption() << '\'';
 		ShortString128 newVarname;
 		for (auto& varname : candidates) {
@@ -44,18 +44,18 @@ void SequenceBuilder::captureVariables(Atom& atom) {
 				// the new name must be stored somewhere
 				element.name = currentSequence.stringrefs.refstr(newVarname);
 				element.clid.reclass(frame->atomid, lvid);
-				if (Config::Traces::capturedVariables) {
+				if (config::traces::capturedVariables) {
 					trace() << ".. keepiing candidate for capture: '" << varname << "', " << element.clid
 							<< " aka "
 							<< cdeftable.classdef(element.clid).print(cdeftable);
 				}
 			}
 			else {
-				if (Config::Traces::capturedVariables)
+				if (config::traces::capturedVariables)
 					trace() << ".. rejecting candidate for capture: '" << varname << "' (non local var)";
 			}
 		}
-		if (Config::Traces::capturedVariables)
+		if (config::traces::capturedVariables)
 			trace() << ".. " << count << " captured variables";
 	}
 	if (count == 0) // nothing to capture
@@ -90,7 +90,7 @@ void SequenceBuilder::captureVariables(Atom& atom) {
 	stacksize.add += count;
 	atom.localVariablesCount += count;
 	table.bulkAppend(atom.atomid, startLvid, count);
-	if (Config::Traces::capturedVariables)
+	if (config::traces::capturedVariables)
 		trace() << ".. creating new local variables from {" << atom.atomid << ',' << startLvid << '}';
 	for (uint32_t i = 0; i != count; ++i) {
 		auto& var = narrowedCandadiateList[i];
@@ -116,7 +116,7 @@ void SequenceBuilder::captureVariables(Atom& atom) {
 			spare.mutateToAtom(varSrcAtom);
 			spare.qualifiers.ref = true;
 		}
-		if (Config::Traces::capturedVariables) {
+		if (config::traces::capturedVariables) {
 			auto& sp = cdeftable.classdef(cdef.clid);
 			trace() << ".. '" << var.name << "': creating local stack variables "
 					<< sp.clid << " as '" << sp.print(cdeftable) << '\'';
@@ -127,7 +127,7 @@ void SequenceBuilder::captureVariables(Atom& atom) {
 	// adding parameters to all constructors
 	atom.eachChild([&](Atom & child) -> bool {
 		if (child.isCtor()) {
-			if (Config::Traces::capturedVariables)
+			if (config::traces::capturedVariables)
 				trace() << ".. appending " << count << " params to ctor " << child.caption();
 			for (uint32_t i = 0; i != count; ++i) {
 				auto& var = narrowedCandadiateList[i];
@@ -163,7 +163,7 @@ bool SequenceBuilder::pushCapturedVarsAsParameters(const Atom& atomclass) {
 				return true;
 			CLID clid{frame->atomid, varlvid};
 			overloadMatch.input.params.named.emplace_back(std::make_pair(child.name(), clid));
-			if (Config::Traces::capturedVariables) {
+			if (config::traces::capturedVariables) {
 				trace() << ".. added named parameter from captured var '" << child.caption() << "' as " << clid
 						<< " from self '" << atomclass.caption() << '\'';
 			}

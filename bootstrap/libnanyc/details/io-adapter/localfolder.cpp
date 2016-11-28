@@ -260,7 +260,7 @@ nyio_err_t get_contents_by_small_chunks(IO::File::Stream& f, nyio_adapter_t* ada
 	while (true);
 	if (readsize != 0) {
 		// ensuring that there is enough space
-		if (newcapacity < readsize + ny::Config::extraObjectSize)
+		if (newcapacity < readsize + ny::config::extraObjectSize)
 			buffer = (char*) allocator.reallocate(&allocator, buffer, newcapacity, newcapacity + fragmentSize);
 		*size = readsize;
 		*content = buffer;
@@ -308,7 +308,7 @@ static nyio_err_t nanyc_io_localfolder_file_get_contents(nyio_adapter_t* adapter
 	uint64_t newcapacity;
 	char* buffer;
 	if (filesize < fragmentSize) {
-		newcapacity = filesize + ny::Config::extraObjectSize;
+		newcapacity = filesize + ny::config::extraObjectSize;
 		auto& allocator = retrieveAllocator(adapter);
 		buffer = (char*) allocator.allocate(&allocator, newcapacity);
 		if (YUNI_UNLIKELY(!buffer))
@@ -323,7 +323,7 @@ static nyio_err_t nanyc_io_localfolder_file_get_contents(nyio_adapter_t* adapter
 		// rounding the capacity to avoid any unexpected buffer overflow
 		// when reading the file
 		newcapacity = ((filesize + fragmentSize / 2) / fragmentSize) * fragmentSize;
-		if (newcapacity < filesize + ny::Config::extraObjectSize)
+		if (newcapacity < filesize + ny::config::extraObjectSize)
 			newcapacity += fragmentSize;
 		assert(newcapacity >= filesize);
 		auto& allocator = retrieveAllocator(adapter);

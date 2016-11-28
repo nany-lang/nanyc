@@ -62,7 +62,7 @@ struct Executor final {
 	//! Number of pushed parameters
 	uint32_t funcparamCount = 0; // parameters are 2-based
 	//! all pushed parameters
-	DataRegister funcparams[Config::maxPushedParameters];
+	DataRegister funcparams[config::maxPushedParameters];
 	Stack stack;
 	//! Stack trace
 	Stacktrace<true> stacktrace;
@@ -212,7 +212,7 @@ public:
 		assert(classobject != nullptr);
 		// its size
 		uint64_t classsizeof = classobject->runtimeSizeof();
-		classsizeof += Config::extraObjectSize;
+		classsizeof += config::extraObjectSize;
 		if (instanceid != (uint32_t) - 1) {
 			// reset parameters for func call
 			funcparamCount = 1;
@@ -762,7 +762,7 @@ public:
 			// 64bits platform
 			size = static_cast<size_t>(registers[opr.regsize].u64);
 		}
-		size += Config::extraObjectSize;
+		size += config::extraObjectSize;
 		uint64_t* pointer = allocateraw<uint64_t>(size);
 		if (YUNI_UNLIKELY(!pointer))
 			return emitBadAlloc();
@@ -782,8 +782,8 @@ public:
 		uint64_t* object = reinterpret_cast<uint64_t*>(registers[opr.lvid].u64);
 		size_t oldsize = static_cast<size_t>(registers[opr.oldsize].u64);
 		size_t newsize = static_cast<size_t>(registers[opr.newsize].u64);
-		oldsize += Config::extraObjectSize;
-		newsize += Config::extraObjectSize;
+		oldsize += config::extraObjectSize;
+		newsize += config::extraObjectSize;
 		if (object) {
 			// checking the input pointer
 			vm_CHECK_POINTER(object, opr);
@@ -808,7 +808,7 @@ public:
 
 	void visit(const ir::ISA::Operand<ir::ISA::Op::memcheckhold>& opr) noexcept {
 		uint64_t* ptr = reinterpret_cast<uint64_t*>(registers[opr.lvid].u64);
-		uint64_t size = registers[opr.size].u64 + Config::extraObjectSize;
+		uint64_t size = registers[opr.size].u64 + config::extraObjectSize;
 		memchecker.hold(ptr, size, opr.lvid);
 	}
 
@@ -821,7 +821,7 @@ public:
 		if (object) {
 			vm_CHECK_POINTER(object, opr);
 			size_t size = static_cast<size_t>(registers[opr.regsize].u64);
-			size += Config::extraObjectSize;
+			size += config::extraObjectSize;
 			if (YUNI_UNLIKELY(not memchecker.checkObjectSize(object, static_cast<size_t>(size))))
 				return emitPointerSizeMismatch(object, size);
 			if (debugmode)
@@ -840,7 +840,7 @@ public:
 		uint64_t* object = reinterpret_cast<uint64_t*>(registers[opr.lvid].u64);
 		vm_CHECK_POINTER(object, opr);
 		size_t size = static_cast<size_t>(registers[opr.regsize].u64);
-		size += Config::extraObjectSize;
+		size += config::extraObjectSize;
 		uint8_t pattern = static_cast<uint8_t>(registers[opr.pattern].u64);
 		if (YUNI_UNLIKELY(not memchecker.checkObjectSize(object, static_cast<size_t>(size))))
 			return emitPointerSizeMismatch(object, size);
