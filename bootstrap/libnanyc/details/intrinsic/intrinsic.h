@@ -45,7 +45,7 @@ public:
 	//! The total number of parameters
 	uint32_t paramcount = 0;
 	//! All parameter types
-	std::array<nytype_t, Config::maxPushedParameters> params;
+	std::array<nytype_t, config::maxPushedParameters> params;
 	//! Intrinsic ID
 	uint32_t id = (uint32_t) - 1;
 

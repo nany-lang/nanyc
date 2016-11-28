@@ -22,14 +22,14 @@ bool Scope::visitASTExprCallParameters(AST::Node& node, ShortcircuitUpdate* shor
 		uint32_t localvar = 0;
 		AnyString name; // acquired named
 	}
-	pushedIndexedParam[Config::maxPushedParameters];
+	pushedIndexedParam[config::maxPushedParameters];
 	// the sequence
 	auto& out = sequence();
 	for (auto& child : node.children) {
 		switch (child.rule) {
 			case AST::rgCallParameter:
 			case AST::rgCallNamedParameter: {
-				if (unlikely(paramCount >= Config::maxPushedParameters)) {
+				if (unlikely(paramCount >= config::maxPushedParameters)) {
 					error(child) << "too many pushed parameters";
 					return false;
 				}

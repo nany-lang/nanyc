@@ -44,7 +44,7 @@ SequenceBuilder::SequenceBuilder(Logs::Report report, ClassdefTableView& cdeftab
 
 
 SequenceBuilder::~SequenceBuilder() {
-	if (Config::Traces::allTypeDefinitions) {
+	if (config::traces::allTypeDefinitions) {
 		for (auto* f = frame; f != nullptr; f = f->previous)
 			debugPrintClassdefs(*f, cdeftable);
 	}
@@ -271,7 +271,7 @@ bool Build::instanciate(const AnyString& entrypoint, const nytype_t* args, uint3
 	};
 	bool instanciated = Pass::Instanciate::instanciateAtom(info);
 	report.appendEntry(newReport);
-	if (Config::Traces::atomTable)
+	if (config::traces::atomTable)
 		cdeftable.atoms.root.printTree(cdeftable);
 	if (not instanciated) {
 		atomid = (uint32_t) - 1;

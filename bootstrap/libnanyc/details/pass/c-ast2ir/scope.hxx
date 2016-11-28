@@ -50,7 +50,7 @@ inline bool Scope::visitAST(AST::Node& node) {
 
 inline void Scope::addDebugCurrentPosition(uint line, uint offset) {
 	if (context.debuginfo and
-		(not Config::removeRedundantDbgOffset or offset != context.pPreviousDbgOffset
+		(not config::removeRedundantDbgOffset or offset != context.pPreviousDbgOffset
 		 or line != context.pPreviousDbgLine)) {
 		ir::emit::dbginfo::position(context.sequence, line, offset);
 		context.pPreviousDbgOffset = offset;

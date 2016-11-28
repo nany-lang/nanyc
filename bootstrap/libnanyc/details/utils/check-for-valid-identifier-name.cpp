@@ -137,7 +137,7 @@ bool checkForValidIdentifierName(const AST::Node& node, const AnyString& name, F
 	uint32_t size = name.size();
 	if (unlikely(0 == size))
 		return complainEmptyNode(node);
-	if (unlikely(size > Config::maxSymbolNameLength))
+	if (unlikely(size > config::maxSymbolNameLength))
 		return complainIdentifierTooLong(node, name);
 	if (YUNI_LIKELY(not flags(IdNameFlag::isOperator))) {
 		// names with '_' as prefix are for internal uses only

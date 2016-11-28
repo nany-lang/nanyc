@@ -28,7 +28,7 @@ void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::end>& /*operands
 		}
 		else {
 			if (frame->previous != nullptr) {
-				if (Config::Traces::classdefTable)
+				if (config::traces::classdefTable)
 					debugPrintClassdefs(*frame, cdeftable);
 				popFrame();
 				++layerDepthLimit;

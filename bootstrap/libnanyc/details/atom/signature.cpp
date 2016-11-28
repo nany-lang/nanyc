@@ -74,8 +74,8 @@ inline void Signature::Parameters::hash(size_t& seed) const {
 
 size_t Signature::hash() const {
 	size_t seed = 0;
-	assert(static_cast<size_t>(Config::maxPushedParameters) > parameters.size());
-	assert(static_cast<size_t>(Config::maxPushedParameters) > tmplparams.size());
+	assert(static_cast<size_t>(config::maxPushedParameters) > parameters.size());
+	assert(static_cast<size_t>(config::maxPushedParameters) > tmplparams.size());
 	parameters.hash(seed);
 	if (not tmplparams.empty()) {
 		// adding an arbitrary value, to avoid collision some other functios

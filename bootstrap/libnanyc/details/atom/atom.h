@@ -144,7 +144,7 @@ struct Atom final
 	private:
 		struct Data final {
 			uint32_t count = 0u;
-			std::pair<AnyString, Vardef> params[Config::maxFuncDeclParameterCount];
+			std::pair<AnyString, Vardef> params[config::maxFuncDeclParameterCount];
 		};
 		std::unique_ptr<Data> pData;
 	};

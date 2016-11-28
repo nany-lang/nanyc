@@ -150,7 +150,7 @@ ir::Sequence* performAtomInstanciation(InstanciateData& info, Signature& signatu
 	// instanciate the sequence attached to the atom
 	auto builder = std::make_unique<SequenceBuilder>
 				   (report.subgroup(), newView, info.build, &outIR, inputIR, info.parent);
-	if (Config::Traces::sourceOpcodeSequence)
+	if (config::traces::sourceOpcodeSequence)
 		debugPrintSourceOpcodeSequence(info.cdeftable, info.atom.get(), "[ir-from-ast] ");
 	// transfert input parameters
 	pushParameterTypes(*builder, atom, signature);
@@ -171,11 +171,11 @@ ir::Sequence* performAtomInstanciation(InstanciateData& info, Signature& signatu
 	// (example: "func A.foo(b: cref __i32): ref __i32")
 	// note: the content of the string will be moved to avoid memory allocation
 	String symbolName;
-	if (success or Config::Traces::generatedOpcodeSequence) {
+	if (success or config::traces::generatedOpcodeSequence) {
 		symbolName << newView.keyword(info.atom) << ' '; // ex: func
 		atom.retrieveCaption(symbolName, newView);  // ex: A.foo(...)...
 	}
-	if (Config::Traces::generatedOpcodeSequence)
+	if (config::traces::generatedOpcodeSequence)
 		debugPrintIRSequence(symbolName, outIR, newView);
 	if (success) {
 		switch (atom.type) {
@@ -415,7 +415,7 @@ Atom* SequenceBuilder::instanciateAtomClass(Atom& atom) {
 		error("named generic type parameters not implemented yet");
 	TypeCheck::Match match = overloadMatch.validate(atom);
 	if (unlikely(TypeCheck::Match::none == match)) {
-		if (Config::Traces::sourceOpcodeSequence)
+		if (config::traces::sourceOpcodeSequence)
 			debugPrintSourceOpcodeSequence(cdeftable, atom, "[FAIL-IR] ");
 		// fail - try again to produce error message, hint, and any suggestion
 		complainInvalidParametersAfterSignatureMatching(atom, overloadMatch);

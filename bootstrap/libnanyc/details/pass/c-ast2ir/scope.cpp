@@ -47,7 +47,7 @@ AnyString Scope::getSymbolNameFromASTNode(AST::Node& node) {
 		unexpectedNode(node, "expected identifier");
 		return AnyString{};
 	}
-	if (unlikely(identifier.text.size() > Config::maxSymbolNameLength)) {
+	if (unlikely(identifier.text.size() > config::maxSymbolNameLength)) {
 		auto err = error(node) << "identifier name too long";
 		err.message.origins.location.pos.offsetEnd = err.message.origins.location.pos.offset + identifier.text.size();
 		return AnyString{};

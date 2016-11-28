@@ -18,7 +18,7 @@ bool createDummyAtom(Atom::Ptr& out) {
 
 
 bool findCoreObject(Atom::Ptr& out, nytype_t kind, const AnyString& name, Atom& root) {
-	if (not Config::importNSL)
+	if (not config::importNSL)
 		return createDummyAtom(out);
 	Atom* atom = nullptr;
 	switch (root.findClassAtom(atom, name)) {
@@ -77,19 +77,19 @@ AnyString AtomMap::symbolname(uint32_t atomid, uint32_t index) const {
 
 bool AtomMap::fetchAndIndexCoreObjects() {
 	bool success = (core.object[nyt_bool] != nullptr) // quick & arbitrary check
-				   or
-				   (findCoreObject(core.object[nyt_bool],   nyt_bool, "bool", root)
-					and findCoreObject(core.object[nyt_i8],  nyt_i8,   "i8",  root)
-					and findCoreObject(core.object[nyt_i16], nyt_i16,  "i16", root)
-					and findCoreObject(core.object[nyt_i32], nyt_i32,  "i32", root)
-					and findCoreObject(core.object[nyt_i64], nyt_i64,  "i64", root)
-					and findCoreObject(core.object[nyt_u8],  nyt_u8,   "u8",  root)
-					and findCoreObject(core.object[nyt_u16], nyt_u16,  "u16", root)
-					and findCoreObject(core.object[nyt_u32], nyt_u32,  "u32", root)
-					and findCoreObject(core.object[nyt_u64], nyt_u64,  "u64", root)
-					and findCoreObject(core.object[nyt_f32], nyt_f32,  "f32", root)
-					and findCoreObject(core.object[nyt_f64], nyt_f64,  "f64", root)
-					and findCoreObject(core.object[nyt_ptr], nyt_ptr,  "pointer", root));
+		or
+		(findCoreObject(core.object[nyt_bool],   nyt_bool, "bool", root)
+		and findCoreObject(core.object[nyt_i8],  nyt_i8,   "i8",  root)
+		and findCoreObject(core.object[nyt_i16], nyt_i16,  "i16", root)
+		and findCoreObject(core.object[nyt_i32], nyt_i32,  "i32", root)
+		and findCoreObject(core.object[nyt_i64], nyt_i64,  "i64", root)
+		and findCoreObject(core.object[nyt_u8],  nyt_u8,   "u8",  root)
+		and findCoreObject(core.object[nyt_u16], nyt_u16,  "u16", root)
+		and findCoreObject(core.object[nyt_u32], nyt_u32,  "u32", root)
+		and findCoreObject(core.object[nyt_u64], nyt_u64,  "u64", root)
+		and findCoreObject(core.object[nyt_f32], nyt_f32,  "f32", root)
+		and findCoreObject(core.object[nyt_f64], nyt_f64,  "f64", root)
+		and findCoreObject(core.object[nyt_ptr], nyt_ptr,  "pointer", root));
 	if (unlikely(not success))
 		core.object[nyt_bool] = nullptr;
 	return success;

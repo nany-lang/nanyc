@@ -37,7 +37,7 @@ void Project::unregisterTargetFromProject(CTarget& target) {
 void Project::init(bool unittests) {
 	targets.anonym = doCreateTarget("{default}");
 	targets.nsl    = doCreateTarget("{nsl}");
-	if (Config::importNSL) {
+	if (config::importNSL) {
 		nsl::import::core(*this);
 		if (unittests)
 			nsl::import::unittests(*this);

@@ -13,7 +13,7 @@ static void* nanyc_digest_md5(nyvm_t* vm, const char* string, uint64_t length) {
 	md5.fromRawData(string, length);
 	if (not md5.value().empty()) {
 		uint32_t size = md5.value().size();
-		uint32_t capacity = size + ny::Config::extraObjectSize;
+		uint32_t capacity = size + ny::config::extraObjectSize;
 		char* cstr = (char*) vm->allocator->allocate(vm->allocator, capacity);
 		if (cstr) {
 			const char* src = md5.value().c_str();

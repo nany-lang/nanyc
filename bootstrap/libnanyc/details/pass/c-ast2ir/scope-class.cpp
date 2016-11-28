@@ -12,7 +12,7 @@ namespace {
 
 
 struct ClassInspector final {
-	using ClassnameType = CString<Config::maxSymbolNameLength, false>;
+	using ClassnameType = CString<config::maxSymbolNameLength, false>;
 
 	ClassInspector(Scope& parentscope, uint32_t lvid);
 

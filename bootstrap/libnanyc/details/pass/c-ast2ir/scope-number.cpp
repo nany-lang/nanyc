@@ -217,7 +217,7 @@ bool Scope::visitASTExprNumber(AST::Node& node, uint32_t& localvar) {
 	NumberDef numdef;
 	// is a builtin ? (__i32, __f64...)
 	// (always generate builtin types when not importing the NSL)
-	bool builtin = (not Config::importNSL);
+	bool builtin = (not config::importNSL);
 	emitDebugpos(node);
 	for (auto& child : node.children) {
 		switch (child.rule) {

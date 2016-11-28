@@ -63,7 +63,7 @@ void Build::init() {
 		});
 		m_targets.emplace_back(newtarget);
 	}
-	if (Config::importNSL) {
+	if (config::importNSL) {
 		nsl::import::string(intrinsics);
 		nsl::import::process(intrinsics);
 		nsl::import::env(intrinsics);
@@ -92,7 +92,7 @@ bool Build::compile() {
 			// ex: func foo(p1, p2: TypeP2) // Here TypeP2 must be resolved
 			// This will be used for deduce func overloading
 			success = success and resolveStrictParameterTypes(cdeftable.atoms.root);
-			if (Config::Traces::preAtomTable)
+			if (config::traces::preAtomTable)
 				cdeftable.atoms.root.printTree(ClassdefTableView{cdeftable});
 			const nytype_t* argtypes = nullptr;
 			AnyString entrypoint{cf.entrypoint.c_str, cf.entrypoint.size};
