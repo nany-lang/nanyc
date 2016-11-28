@@ -249,14 +249,12 @@ bool resolveStrictParameterTypes(Build& build, Atom& atom, InstanciateData* orig
 			bool needPartialInstanciation = not atom.parameters.empty() or atom.isTypeAlias();
 			if (not needPartialInstanciation)
 				break;
-			// Classdef table layer
 			ClassdefTableView cdeftblView{build.cdeftable};
 			if (not (originalInfo and atom.isTypeAlias())) {
-				// input parameters (won't be used)
-				decltype(Pass::Instanciate::FuncOverloadMatch::result.params) params;
-				decltype(Pass::Instanciate::FuncOverloadMatch::result.params) tmplparams;
+				using ParamList = decltype(Pass::Instanciate::FuncOverloadMatch::result.params);
+				ParamList params; // input parameters (won't be used)
+				ParamList tmplparams;
 				Logs::Message::Ptr newReport;
-				// error reporting
 				ny::Logs::Report report{*build.messages.get()};
 				Pass::Instanciate::InstanciateData info {
 					newReport, atom, cdeftblView, build, params, tmplparams
