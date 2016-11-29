@@ -113,11 +113,9 @@ void parameter(SequenceBuilder& seq, uint32_t lvid, bool isvar, uint32_t nameind
 	auto& cdef = seq.cdeftable.substitute(lvid);
 	cdef.qualifiers.ref = false;
 	cdef.instance = isvar;
-	seq.frame->lvids(lvid).synthetic = not isvar;
-	// Do not emit warning for 'unused variable' on template parameters
-	if (not isvar)
-		seq.frame->lvids(lvid).warning.unused = false;
-	// parameter accessible as named variable
+	auto& details = seq.frame->lvids(lvid);
+	details.synthetic = not isvar;
+	details.warning.unused = isvar;
 	const auto& name = seq.currentSequence.stringrefs[nameindex];
 	seq.declareNamedVariable(name, lvid, false);
 }
