@@ -377,6 +377,15 @@ bool selfMissingForPropertyCall(const Atom& property, uint32_t self) {
 }
 
 
+bool parameterTypeHasVanished(const SequenceBuilder& seq, uint32_t i) {
+	auto& frame = *seq.frame;
+	auto e = ice();
+	e << "type has vanished for parameter " << i;
+	e << " for " << frame.atom.caption(seq.cdeftable);
+	return false;
+}
+
+
 } // namespace complain
 
 

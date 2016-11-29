@@ -1,5 +1,6 @@
 #include "instanciate.h"
 #include "details/ir/emit.h"
+#include "instanciate-error.h"
 
 using namespace Yuni;
 
@@ -24,7 +25,7 @@ bool pragmaBodyStart(SequenceBuilder& seq) {
 	bool generateCode = seq.canGenerateCode();
 	uint32_t count = atom.parameters.size();
 	bool success = true;
-	atom.parameters.each([&](uint32_t i, const AnyString & name, const Vardef & vardef) {
+	atom.parameters.each([&](uint32_t i, const AnyString& name, const Vardef & vardef) {
 		// lvid for the given parameter
 		uint32_t lvid  = i + 1 + 1; // 1: return type, 2: first parameter
 		// the parameters are real objects
@@ -56,11 +57,9 @@ bool pragmaBodyStart(SequenceBuilder& seq) {
 			}
 		}
 		if (not cdef.isBuiltinOrVoid()) {
-			auto* paramatom = seq.cdeftable.findClassdefAtom(cdef);
-			if (unlikely(!paramatom)) {
+			if (unlikely(!seq.cdeftable.findClassdefAtom(cdef))) {
 				frame.invalidate(lvid);
-				ice() << "invalid parameter type " << i << " for " << atom.caption(seq.cdeftable);
-				success = false;
+				success = complain::parameterTypeHasVanished(seq, i);
 			}
 		}
 	});
