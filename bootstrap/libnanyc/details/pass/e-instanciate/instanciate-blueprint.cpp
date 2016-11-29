@@ -92,6 +92,7 @@ void funcOrClassOrType(SequenceBuilder& seq, const ir::ISA::Operand<ir::ISA::Op:
 
 
 void unit(SequenceBuilder& seq, const ir::ISA::Operand<ir::ISA::Op::blueprint>& operands) {
+	assert(seq.frame != nullptr);
 	seq.pushedparams.clear();
 	seq.generateClassVarsAutoInit = false;
 	seq.generateClassVarsAutoRelease = false;
