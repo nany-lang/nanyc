@@ -12,7 +12,7 @@ namespace Instanciate {
 namespace {
 
 
-void funcOrClassOrType(SequenceBuilder& seq, const ir::ISA::Operand<ir::ISA::Op::blueprint>& operands) {
+void funcOrClassOrType(SequenceBuilder& seq, const ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
 	seq.pushedparams.clear();
 	seq.generateClassVarsAutoInit = false;
 	seq.generateClassVarsAutoRelease = false;
@@ -44,8 +44,8 @@ void funcOrClassOrType(SequenceBuilder& seq, const ir::ISA::Operand<ir::ISA::Op:
 	if (lvid == 0 or seq.frame == nullptr) {
 		seq.pushNewFrame(atom);
 		seq.frame->offsetOpcodeBlueprint = currentSequence.offsetOf(**seq.cursor);
-		auto kind = static_cast<ir::ISA::Blueprint>(operands.kind);
-		if (kind == ir::ISA::Blueprint::funcdef) {
+		auto kind = static_cast<ir::isa::Blueprint>(operands.kind);
+		if (kind == ir::isa::Blueprint::funcdef) {
 			// some special actions must be triggered according the operator name
 			AnyString atomname = currentSequence.stringrefs[operands.name];
 			if (atomname.first() == '^') { // operator spotted
@@ -91,7 +91,7 @@ void funcOrClassOrType(SequenceBuilder& seq, const ir::ISA::Operand<ir::ISA::Op:
 }
 
 
-void unit(SequenceBuilder& seq, const ir::ISA::Operand<ir::ISA::Op::blueprint>& operands) {
+void unit(SequenceBuilder& seq, const ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
 	assert(seq.frame != nullptr);
 	seq.pushedparams.clear();
 	seq.generateClassVarsAutoInit = false;
@@ -121,7 +121,7 @@ void parameter(SequenceBuilder& seq, uint32_t lvid, bool isvar, uint32_t nameind
 }
 
 
-void asSelf(SequenceBuilder& seq, const ir::ISA::Operand<ir::ISA::Op::blueprint>& operands) {
+void asSelf(SequenceBuilder& seq, const ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
 	// -- with automatic variable assignment for operator new
 	// example: operator new (self varname) {}
 	assert(seq.frame != nullptr);
@@ -159,36 +159,36 @@ void vardef(SequenceBuilder& seq, uint32_t lvid, uint32_t sid) {
 } // anonymous namespace
 
 
-void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::blueprint>& operands) {
-	auto kind = static_cast<ir::ISA::Blueprint>(operands.kind);
+void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
+	auto kind = static_cast<ir::isa::Blueprint>(operands.kind);
 	switch (kind) {
-		case ir::ISA::Blueprint::param: { // -- function parameter
+		case ir::isa::Blueprint::param: { // -- function parameter
 			parameter(*this, operands.lvid, true, operands.name);
 			break;
 		}
-		case ir::ISA::Blueprint::gentypeparam: {
+		case ir::isa::Blueprint::gentypeparam: {
 			parameter(*this, operands.lvid, false, operands.name);
 			break;
 		}
-		case ir::ISA::Blueprint::paramself: { // -- function parameter
+		case ir::isa::Blueprint::paramself: { // -- function parameter
 			asSelf(*this, operands);
 			break;
 		}
-		case ir::ISA::Blueprint::funcdef:
-		case ir::ISA::Blueprint::classdef:
-		case ir::ISA::Blueprint::typealias: {
+		case ir::isa::Blueprint::funcdef:
+		case ir::isa::Blueprint::classdef:
+		case ir::isa::Blueprint::typealias: {
 			funcOrClassOrType(*this, operands);
 			break;
 		}
-		case ir::ISA::Blueprint::vardef: {
+		case ir::isa::Blueprint::vardef: {
 			vardef(*this, operands.lvid, operands.name);
 			break;
 		}
-		case ir::ISA::Blueprint::namespacedef: {
+		case ir::isa::Blueprint::namespacedef: {
 			// see mapping instead
 			break;
 		}
-		case ir::ISA::Blueprint::unit: {
+		case ir::isa::Blueprint::unit: {
 			unit(*this, operands);
 			break;
 		}

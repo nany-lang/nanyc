@@ -48,7 +48,7 @@ bool Scope::visitASTTypedef(AST::Node& node) {
 	success &= (localvar > returntype);
 	scope.emitDebugpos(node);
 	if (success) {
-		auto& operands    = scope.sequence().emit<ISA::Op::follow>();
+		auto& operands    = scope.sequence().emit<isa::Op::follow>();
 		operands.follower = returntype;
 		operands.lvid     = localvar;
 		operands.symlink  = 0;
@@ -56,8 +56,8 @@ bool Scope::visitASTTypedef(AST::Node& node) {
 	ir::emit::pragma::funcbody(out); // to mimic other blueprints
 	ir::emit::scopeEnd(out);
 	uint32_t blpsize = out.opcodeCount() - bpoffset;
-	out.at<ISA::Op::pragma>(bpoffsiz).value.blueprintsize = blpsize;
-	out.at<ISA::Op::stacksize>(bpoffsck).add = scope.nextVarID + 1u;
+	out.at<isa::Op::pragma>(bpoffsiz).value.blueprintsize = blpsize;
+	out.at<isa::Op::stacksize>(bpoffsck).add = scope.nextVarID + 1u;
 	return success;
 }
 

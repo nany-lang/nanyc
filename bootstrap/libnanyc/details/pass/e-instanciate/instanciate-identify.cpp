@@ -15,12 +15,12 @@ namespace Instanciate {
 namespace {
 
 
-bool tryFindProperties(const ir::ISA::Operand<ir::ISA::Op::identify>& operands,
+bool tryFindProperties(const ir::isa::Operand<ir::isa::Op::identify>& operands,
 		std::vector<std::reference_wrapper<Atom>>& multipleResults,
 		Atom& atom, const AnyString& name) {
 	// 'identifyset' is strictly identical to 'identify', but it indicates
 	// that we should resolve a setter and not a getter
-	bool setter = (operands.opcode == static_cast<uint32_t>(ir::ISA::Op::identifyset));
+	bool setter = (operands.opcode == static_cast<uint32_t>(ir::isa::Op::identifyset));
 	return (not setter)
 		   ? atom.propertyLookupOnChildren(multipleResults, "^propget^", name)
 		   : atom.propertyLookupOnChildren(multipleResults, "^propset^", name);
@@ -28,7 +28,7 @@ bool tryFindProperties(const ir::ISA::Operand<ir::ISA::Op::identify>& operands,
 
 
 bool emitIdentifyForSingleResult(SequenceBuilder& seq, bool isLocalVar, const Classdef& cdef,
-		const ir::ISA::Operand<ir::ISA::Op::identify>& operands, const AnyString& name) {
+		const ir::isa::Operand<ir::isa::Op::identify>& operands, const AnyString& name) {
 	auto& resultAtom = seq.multipleResults[0].get();
 	const Classdef* cdefTypedef = nullptr;
 	bool mustResolveATypedef = resultAtom.isTypeAlias();
@@ -116,7 +116,7 @@ bool emitIdentifyForSingleResult(SequenceBuilder& seq, bool isLocalVar, const Cl
 }
 
 
-bool emitIdentifyForProperty(SequenceBuilder& seq, const ir::ISA::Operand<ir::ISA::Op::identify>& operands,
+bool emitIdentifyForProperty(SequenceBuilder& seq, const ir::isa::Operand<ir::isa::Op::identify>& operands,
 		Atom& propatom, uint32_t self) {
 	// report for instanciation
 	Logs::Message::Ptr subreport;
@@ -154,7 +154,7 @@ bool emitIdentifyForProperty(SequenceBuilder& seq, const ir::ISA::Operand<ir::IS
 
 
 bool identifyByPointerAssignment(SequenceBuilder& seq, const AnyString& name,
-		const ir::ISA::Operand<ir::ISA::Op::identify>& operands) {
+		const ir::isa::Operand<ir::isa::Op::identify>& operands) {
 	// since self was marked as an 'assignment', we're trying to resolve here '^()'
 	if (unlikely(name != "^()")) {
 		ice() << "invalid resolve name for assignment (got '" << name << "')";
@@ -224,7 +224,7 @@ Atom& SequenceBuilder::resolveTypeAlias(Atom& original, const Classdef*& resultc
 }
 
 
-bool SequenceBuilder::identify(const ir::ISA::Operand<ir::ISA::Op::identify>& operands,
+bool SequenceBuilder::identify(const ir::isa::Operand<ir::isa::Op::identify>& operands,
 		const AnyString& name, bool firstChance) {
 	// target lvid
 	uint32_t lvid = operands.lvid;
@@ -463,7 +463,7 @@ bool SequenceBuilder::identify(const ir::ISA::Operand<ir::ISA::Op::identify>& op
 				}
 				// 'identifyset' is strictly identical to 'identify', but it indicates
 				// that we should resolve a setter and not a getter
-				bool setter = (operands.opcode == static_cast<uint32_t>(ir::ISA::Op::identifyset));
+				bool setter = (operands.opcode == static_cast<uint32_t>(ir::isa::Op::identifyset));
 				// Generate code only for getter
 				// setter will be called later, when enough information will be provided
 				// (the 'value' parameter is not available yet)
@@ -503,7 +503,7 @@ bool SequenceBuilder::identify(const ir::ISA::Operand<ir::ISA::Op::identify>& op
 }
 
 
-void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::identify>& operands) {
+void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::identify>& operands) {
 	assert(frame != nullptr);
 	AnyString name = currentSequence.stringrefs[operands.text];
 	bool ok = identify(operands, name);
@@ -513,8 +513,8 @@ void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::identify>& opera
 }
 
 
-void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::identifyset>& operands) {
-	auto& newopc = ir::Instruction::fromOpcode(operands).to<ir::ISA::Op::identify>();
+void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::identifyset>& operands) {
+	auto& newopc = ir::Instruction::fromOpcode(operands).to<ir::isa::Op::identify>();
 	visit(newopc);
 }
 

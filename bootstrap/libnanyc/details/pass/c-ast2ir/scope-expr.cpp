@@ -50,10 +50,10 @@ bool Scope::visitASTExprIdentifier(AST::Node& node, uint32_t& localvar) {
 		// children
 		return node.children.empty() or visitASTExprContinuation(node, localvar);
 	}
-	auto& operands = out.at<ir::ISA::Op::identify>(lastIdentifyOpcOffset);
-	assert(operands.opcode == static_cast<uint32_t>(ir::ISA::Op::identify));
-	if (operands.opcode == static_cast<uint32_t>(ir::ISA::Op::identify)) {
-		operands.opcode = static_cast<uint32_t>(ir::ISA::Op::identifyset);
+	auto& operands = out.at<ir::isa::Op::identify>(lastIdentifyOpcOffset);
+	assert(operands.opcode == static_cast<uint32_t>(ir::isa::Op::identify));
+	if (operands.opcode == static_cast<uint32_t>(ir::isa::Op::identify)) {
+		operands.opcode = static_cast<uint32_t>(ir::isa::Op::identifyset);
 		lastIdentifyOpcOffset = 0;
 	}
 	assert(not node.children.empty());

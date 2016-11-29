@@ -198,7 +198,7 @@ bool FuncInspector::inspectSingleParameter(uint pindex, AST::Node& node, uint32_
 					}
 				}
 				if (isValidLocalvar(paramtype)) {
-					auto& operands    = out.emit<ISA::Op::follow>();
+					auto& operands    = out.emit<isa::Op::follow>();
 					operands.follower = lvid;
 					operands.lvid     = paramtype;
 					operands.symlink  = 1;
@@ -234,10 +234,10 @@ bool FuncInspector::inspectSingleParameter(uint pindex, AST::Node& node, uint32_
 	auto sid = out.stringrefs.ref(paramname);
 	// update the parameter opcode
 	{
-		auto& opparam = out.at<ISA::Op::blueprint>(paramoffset);
+		auto& opparam = out.at<isa::Op::blueprint>(paramoffset);
 		opparam.name  = sid;
 		if (autoMemberAssignment)
-			opparam.kind = (uint32_t) ir::ISA::Blueprint::paramself;
+			opparam.kind = (uint32_t) ir::isa::Blueprint::paramself;
 	}
 	// the qualifiers may have been set by the type definition
 	// thus they must be overriden and not always reset
@@ -342,7 +342,7 @@ bool FuncInspector::inspectReturnType(AST::Node& node) {
 			assert(rettype != 0);
 		}
 		assert(rettype != 0);
-		auto& operands    = out.emit<ISA::Op::follow>();
+		auto& operands    = out.emit<isa::Op::follow>();
 		operands.follower = 1; // params are 2-based (1 is the return type)
 		operands.lvid     = rettype;
 		operands.symlink  = 0;
@@ -479,7 +479,7 @@ bool Scope::visitASTFunc(AST::Node& node) {
 		isOperator = (inspector.funcname.first() == '^');
 		// update the func name
 		auto sid = out.stringrefs.ref(inspector.funcname);
-		out.at<ISA::Op::blueprint>(bpoffset).name = sid;
+		out.at<isa::Op::blueprint>(bpoffset).name = sid;
 		return inspector.body;
 	})();
 	ir::emit::pragma::funcbody(out);
@@ -492,8 +492,8 @@ bool Scope::visitASTFunc(AST::Node& node) {
 	// end of the blueprint
 	ir::emit::scopeEnd(out);
 	uint32_t blpsize = out.opcodeCount() - bpoffset;
-	out.at<ISA::Op::pragma>(bpoffsiz).value.blueprintsize = blpsize;
-	out.at<ISA::Op::stacksize>(bpoffsck).add = scope.nextVarID + 1u;
+	out.at<isa::Op::pragma>(bpoffsiz).value.blueprintsize = blpsize;
+	out.at<isa::Op::stacksize>(bpoffsck).add = scope.nextVarID + 1u;
 	return success;
 }
 

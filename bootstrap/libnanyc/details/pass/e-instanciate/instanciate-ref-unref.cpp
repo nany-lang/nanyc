@@ -36,7 +36,7 @@ void SequenceBuilder::tryUnrefObject(uint32_t lvid) {
 }
 
 
-void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::ref>& operands) {
+void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::ref>& operands) {
 	if (not frame->verify(operands.lvid))
 		return;
 	if (unlikely(frame->lvids(operands.lvid).synthetic)) {

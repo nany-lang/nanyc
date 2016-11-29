@@ -94,7 +94,7 @@ bool Scope::visitASTExprNew(AST::Node& node, uint32_t& localvar) {
 		ir::emit::copy(out, pointer, tmpptr);
 	}
 	// type propagation
-	auto& operands    = out.emit<ISA::Op::follow>();
+	auto& operands    = out.emit<isa::Op::follow>();
 	operands.follower = pointer;
 	operands.lvid     = rettype;
 	operands.symlink  = 0;

@@ -9,7 +9,7 @@ namespace ny {
 namespace Pass {
 namespace Instanciate {
 
-void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::scope>& /*operands*/) {
+void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::scope>& /*operands*/) {
 	if (frame != nullptr)
 		++(frame->scope);
 	if (canGenerateCode())
@@ -17,7 +17,7 @@ void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::scope>& /*operan
 }
 
 
-void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::end>& /*operands*/) {
+void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::end>& /*operands*/) {
 	if (frame != nullptr) {
 		releaseScopedVariables(frame->scope, /*forget*/ true);
 		// the scope might be zero if the opcode 'end' comes from a class or a func

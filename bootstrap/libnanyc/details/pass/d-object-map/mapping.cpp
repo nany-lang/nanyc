@@ -80,19 +80,19 @@ struct OpcodeReader final {
 			trace << msg << ':';
 		else
 			trace << "invalid opcode ";
-		trace << " '" << ir::ISA::print(currentSequence, operands) << '\'';
+		trace << " '" << ir::isa::print(currentSequence, operands) << '\'';
 		success = false;
 	}
 
 
-	template<ir::ISA::Op O>
-	void complainOperand(const ir::ISA::Operand<O>& operands, AnyString msg) {
+	template<ir::isa::Op O>
+	void complainOperand(const ir::isa::Operand<O>& operands, AnyString msg) {
 		complainOperand(ir::Instruction::fromOpcode(operands), msg);
 	}
 
 
-	template<ir::ISA::Op O>
-	bool checkForuint32_t(const ir::ISA::Operand<O>& operands, uint32_t lvid) {
+	template<ir::isa::Op O>
+	bool checkForuint32_t(const ir::isa::Operand<O>& operands, uint32_t lvid) {
 		if (debugmode) {
 			if (unlikely(lvid == 0 or not (lvid < atomStack->classdefs.size()))) {
 				complainOperand(operands, String{"mapping: invalid lvid %"} << lvid
@@ -117,7 +117,7 @@ struct OpcodeReader final {
 	}
 
 
-	void attachFuncCall(const ir::ISA::Operand<ir::ISA::Op::call>& operands) {
+	void attachFuncCall(const ir::isa::Operand<ir::isa::Op::call>& operands) {
 		if (unlikely(not checkForuint32_t(operands, operands.ptr2func)))
 			return;
 		if (unlikely(not checkForuint32_t(operands, operands.lvid)))
@@ -151,10 +151,10 @@ struct OpcodeReader final {
 	}
 
 
-	void mapBlueprintFuncdefOrTypedef(ir::ISA::Operand<ir::ISA::Op::blueprint>& operands) {
+	void mapBlueprintFuncdefOrTypedef(ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
 		// functions and typedef are instanciated the sameway (with some minor differences)
-		auto kind = static_cast<ir::ISA::Blueprint>(operands.kind);
-		bool isFuncdef = (kind == ir::ISA::Blueprint::funcdef);
+		auto kind = static_cast<ir::isa::Blueprint>(operands.kind);
+		bool isFuncdef = (kind == ir::isa::Blueprint::funcdef);
 		// registering the blueprint into the outline...
 		Atom& atom = atomStack->currentAtomNotUnit();
 		AnyString funcname = currentSequence.stringrefs[operands.name];
@@ -198,7 +198,7 @@ struct OpcodeReader final {
 	}
 
 
-	void mapBlueprintClassdef(ir::ISA::Operand<ir::ISA::Op::blueprint>& operands) {
+	void mapBlueprintClassdef(ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
 		// registering the blueprint into the outline...
 		Atom& atom = atomStack->currentAtomNotUnit();
 		// reset last lvid and parameters
@@ -240,17 +240,17 @@ struct OpcodeReader final {
 	}
 
 
-	void mapBlueprintParam(ir::ISA::Operand<ir::ISA::Op::blueprint>& operands) {
+	void mapBlueprintParam(ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
 		auto& frame = *atomStack;
 		// calculating the lvid for the current parameter
 		// (+1 since %1 is the return value/type)
 		uint paramuint32_t = (++frame.parameterIndex) + 1;
 		if (unlikely(not checkForuint32_t(operands, paramuint32_t)))
 			return;
-		auto kind = static_cast<ir::ISA::Blueprint>(operands.kind);
-		assert(kind == ir::ISA::Blueprint::param or kind == ir::ISA::Blueprint::paramself
-			   or kind == ir::ISA::Blueprint::gentypeparam);
-		bool isGenTypeParam = (kind == ir::ISA::Blueprint::gentypeparam);
+		auto kind = static_cast<ir::isa::Blueprint>(operands.kind);
+		assert(kind == ir::isa::Blueprint::param or kind == ir::isa::Blueprint::paramself
+			   or kind == ir::isa::Blueprint::gentypeparam);
+		bool isGenTypeParam = (kind == ir::isa::Blueprint::gentypeparam);
 		if (unlikely(not isGenTypeParam and not frame.atom.isFunction()))
 			return complainOperand(operands, "parameter for non-function");
 		CLID clid{frame.atom.atomid, paramuint32_t};
@@ -280,7 +280,7 @@ struct OpcodeReader final {
 	}
 
 
-	void mapBlueprintVardef(ir::ISA::Operand<ir::ISA::Op::blueprint>& operands) {
+	void mapBlueprintVardef(ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
 		// registering the blueprint into the outline...
 		Atom& atom = atomStack->currentAtomNotUnit();
 		AnyString varname = currentSequence.stringrefs[operands.name];
@@ -299,7 +299,7 @@ struct OpcodeReader final {
 	}
 
 
-	void mapBlueprintNamespace(ir::ISA::Operand<ir::ISA::Op::blueprint>& operands) {
+	void mapBlueprintNamespace(ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
 		AnyString nmname = currentSequence.stringrefs[operands.name];
 		Atom& parentAtom = atomStack->currentAtomNotUnit();
 		MutexLocker locker{mutex};
@@ -309,7 +309,7 @@ struct OpcodeReader final {
 	}
 
 
-	void mapBlueprintUnit(ir::ISA::Operand<ir::ISA::Op::blueprint>& operands) {
+	void mapBlueprintUnit(ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
 		Atom& parentAtom = atomStack->currentAtomNotUnit();
 		MutexLocker locker{mutex};
 		auto& newRoot = cdeftable.atoms.createUnit(parentAtom, currentFilename);
@@ -320,35 +320,35 @@ struct OpcodeReader final {
 	}
 
 
-	void visit(ir::ISA::Operand<ir::ISA::Op::blueprint>& operands) {
+	void visit(ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
 		if (unlikely(nullptr == atomStack))
 			return complainOperand(operands, "invalid stack for blueprint");
-		auto kind = static_cast<ir::ISA::Blueprint>(operands.kind);
+		auto kind = static_cast<ir::isa::Blueprint>(operands.kind);
 		switch (kind) {
-			case ir::ISA::Blueprint::vardef: {
+			case ir::isa::Blueprint::vardef: {
 				mapBlueprintVardef(operands);
 				break;
 			}
-			case ir::ISA::Blueprint::param:
-			case ir::ISA::Blueprint::paramself:
-			case ir::ISA::Blueprint::gentypeparam: {
+			case ir::isa::Blueprint::param:
+			case ir::isa::Blueprint::paramself:
+			case ir::isa::Blueprint::gentypeparam: {
 				mapBlueprintParam(operands);
 				break;
 			}
-			case ir::ISA::Blueprint::funcdef:
-			case ir::ISA::Blueprint::typealias: {
+			case ir::isa::Blueprint::funcdef:
+			case ir::isa::Blueprint::typealias: {
 				mapBlueprintFuncdefOrTypedef(operands);
 				break;
 			}
-			case ir::ISA::Blueprint::classdef: {
+			case ir::isa::Blueprint::classdef: {
 				mapBlueprintClassdef(operands);
 				break;
 			}
-			case ir::ISA::Blueprint::namespacedef: {
+			case ir::isa::Blueprint::namespacedef: {
 				mapBlueprintNamespace(operands);
 				break;
 			}
-			case ir::ISA::Blueprint::unit: {
+			case ir::isa::Blueprint::unit: {
 				mapBlueprintUnit(operands);
 				break;
 			}
@@ -356,24 +356,24 @@ struct OpcodeReader final {
 	}
 
 
-	void visit(ir::ISA::Operand<ir::ISA::Op::pragma>& operands) {
+	void visit(ir::isa::Operand<ir::isa::Op::pragma>& operands) {
 		if (unlikely(nullptr == atomStack))
 			return complainOperand(operands, "invalid stack for blueprint pragma");
 		switch (operands.pragma) {
-			case ir::ISA::Pragma::codegen: {
+			case ir::isa::Pragma::codegen: {
 				break;
 			}
-			case ir::ISA::Pragma::builtinalias: {
+			case ir::isa::Pragma::builtinalias: {
 				Atom& atom = atomStack->atom;
 				atom.builtinalias = currentSequence.stringrefs[operands.value.builtinalias.namesid];
 				break;
 			}
-			case ir::ISA::Pragma::shortcircuit: {
+			case ir::isa::Pragma::shortcircuit: {
 				bool onoff = (0 != operands.value.shortcircuit);
 				atomStack->atom.parameters.shortcircuitValue = onoff;
 				break;
 			}
-			case ir::ISA::Pragma::suggest: {
+			case ir::isa::Pragma::suggest: {
 				bool onoff = (0 != operands.value.suggest);
 				if (not onoff)
 					atomStack->atom.flags -= Atom::Flags::suggestInReport;
@@ -381,19 +381,19 @@ struct OpcodeReader final {
 					atomStack->atom.flags += Atom::Flags::suggestInReport;
 				break;
 			}
-			case ir::ISA::Pragma::synthetic:
-			case ir::ISA::Pragma::blueprintsize:
-			case ir::ISA::Pragma::visibility:
-			case ir::ISA::Pragma::bodystart:
-			case ir::ISA::Pragma::shortcircuitOpNopOffset:
-			case ir::ISA::Pragma::shortcircuitMutateToBool:
-			case ir::ISA::Pragma::unknown:
+			case ir::isa::Pragma::synthetic:
+			case ir::isa::Pragma::blueprintsize:
+			case ir::isa::Pragma::visibility:
+			case ir::isa::Pragma::bodystart:
+			case ir::isa::Pragma::shortcircuitOpNopOffset:
+			case ir::isa::Pragma::shortcircuitMutateToBool:
+			case ir::isa::Pragma::unknown:
 				break;
 		}
 	}
 
 
-	void visit(ir::ISA::Operand<ir::ISA::Op::stacksize>& operands) {
+	void visit(ir::isa::Operand<ir::isa::Op::stacksize>& operands) {
 		if (unlikely(nullptr == atomStack))
 			return complainOperand(operands, "invalid parent atom");
 		Atom& parentAtom = atomStack->atom;
@@ -422,7 +422,7 @@ struct OpcodeReader final {
 	}
 
 
-	void visit(ir::ISA::Operand<ir::ISA::Op::scope>& operands) {
+	void visit(ir::isa::Operand<ir::isa::Op::scope>& operands) {
 		if (unlikely(nullptr == atomStack))
 			return complainOperand(operands, "invalid stack");
 		++(atomStack->scope);
@@ -430,7 +430,7 @@ struct OpcodeReader final {
 	}
 
 
-	void visit(ir::ISA::Operand<ir::ISA::Op::end>&) {
+	void visit(ir::isa::Operand<ir::isa::Op::end>&) {
 		// reset the last lvid
 		lastuint32_t = 0u;
 		if (likely(atomStack)) {
@@ -463,7 +463,7 @@ struct OpcodeReader final {
 	}
 
 
-	void visit(ir::ISA::Operand<ir::ISA::Op::stackalloc>& operands) {
+	void visit(ir::isa::Operand<ir::isa::Op::stackalloc>& operands) {
 		if (unlikely(not checkForuint32_t(operands, operands.lvid)))
 			return;
 		lastuint32_t = operands.lvid;
@@ -487,7 +487,7 @@ struct OpcodeReader final {
 	}
 
 
-	void visit(ir::ISA::Operand<ir::ISA::Op::self>& operands) {
+	void visit(ir::isa::Operand<ir::isa::Op::self>& operands) {
 		if (unlikely(not checkForuint32_t(operands, operands.self)))
 			return;
 		if (unlikely(nullptr == atomStack))
@@ -513,7 +513,7 @@ struct OpcodeReader final {
 	}
 
 
-	void visit(ir::ISA::Operand<ir::ISA::Op::identify>& operands) {
+	void visit(ir::isa::Operand<ir::isa::Op::identify>& operands) {
 		if (unlikely(not checkForuint32_t(operands, operands.lvid)))
 			return;
 		if (unlikely(operands.text == 0))
@@ -562,19 +562,19 @@ struct OpcodeReader final {
 	}
 
 
-	void visit(ir::ISA::Operand<ir::ISA::Op::identifyset>& operands) {
-		auto& newopc = ir::Instruction::fromOpcode(operands).to<ir::ISA::Op::identify>();
+	void visit(ir::isa::Operand<ir::isa::Op::identifyset>& operands) {
+		auto& newopc = ir::Instruction::fromOpcode(operands).to<ir::isa::Op::identify>();
 		visit(newopc);
 	}
 
 
-	void visit(ir::ISA::Operand<ir::ISA::Op::tpush>& operands) {
+	void visit(ir::isa::Operand<ir::isa::Op::tpush>& operands) {
 		if (unlikely(not checkForuint32_t(operands, operands.lvid)))
 			return;
 	}
 
 
-	void visit(ir::ISA::Operand<ir::ISA::Op::push>& operands) {
+	void visit(ir::isa::Operand<ir::isa::Op::push>& operands) {
 		if (unlikely(not checkForuint32_t(operands, operands.lvid)))
 			return;
 		if (operands.name != 0) { // named parameter
@@ -589,7 +589,7 @@ struct OpcodeReader final {
 	}
 
 
-	void visit(ir::ISA::Operand<ir::ISA::Op::call>& operands) {
+	void visit(ir::isa::Operand<ir::isa::Op::call>& operands) {
 		attachFuncCall(operands);
 		lastuint32_t = operands.lvid;
 		lastPushedIndexedParameters.clear();
@@ -597,7 +597,7 @@ struct OpcodeReader final {
 	}
 
 
-	void visit(ir::ISA::Operand<ir::ISA::Op::ret>& operands) {
+	void visit(ir::isa::Operand<ir::isa::Op::ret>& operands) {
 		if (operands.lvid != 0) {
 			if (unlikely(not checkForuint32_t(operands, operands.lvid)))
 				return;
@@ -610,7 +610,7 @@ struct OpcodeReader final {
 	}
 
 
-	void visit(ir::ISA::Operand<ir::ISA::Op::follow>& operands) {
+	void visit(ir::isa::Operand<ir::isa::Op::follow>& operands) {
 		if (unlikely(not checkForuint32_t(operands, operands.lvid)))
 			return;
 		if (unlikely(not checkForuint32_t(operands, operands.follower)))
@@ -625,13 +625,13 @@ struct OpcodeReader final {
 	}
 
 
-	void visit(ir::ISA::Operand<ir::ISA::Op::intrinsic>& operands) {
+	void visit(ir::isa::Operand<ir::isa::Op::intrinsic>& operands) {
 		if (unlikely(not checkForuint32_t(operands, operands.lvid)))
 			return;
 	}
 
 
-	void visit(ir::ISA::Operand<ir::ISA::Op::debugfile>& operands) {
+	void visit(ir::isa::Operand<ir::isa::Op::debugfile>& operands) {
 		currentFilename = currentSequence.stringrefs[operands.filename].c_str();
 		if (needAtomDbgFileReport) {
 			needAtomDbgFileReport = false;
@@ -640,7 +640,7 @@ struct OpcodeReader final {
 	}
 
 
-	void visit(ir::ISA::Operand<ir::ISA::Op::debugpos>& operands) {
+	void visit(ir::isa::Operand<ir::isa::Op::debugpos>& operands) {
 		currentLine = operands.line;
 		currentOffset = operands.offset;
 		if (unlikely(needAtomDbgOffsetReport)) {
@@ -651,8 +651,8 @@ struct OpcodeReader final {
 	}
 
 
-	void visit(ir::ISA::Operand<ir::ISA::Op::qualifiers>& operands) {
-		assert(static_cast<uint32_t>(operands.qualifier) < ir::ISA::TypeQualifierCount);
+	void visit(ir::isa::Operand<ir::isa::Op::qualifiers>& operands) {
+		assert(static_cast<uint32_t>(operands.qualifier) < ir::isa::TypeQualifierCount);
 		CLID clid {atomStack->atom.atomid, operands.lvid};
 		bool onoff = (operands.flag != 0);
 		MutexLocker locker{mutex};
@@ -660,40 +660,40 @@ struct OpcodeReader final {
 			return complainOperand(operands, "invalid clid");
 		auto& qualifiers = cdeftable.classdef(clid).qualifiers;
 		switch (operands.qualifier) {
-			case ir::ISA::TypeQualifier::ref:
+			case ir::isa::TypeQualifier::ref:
 				qualifiers.ref = onoff;
 				break;
-			case ir::ISA::TypeQualifier::constant:
+			case ir::isa::TypeQualifier::constant:
 				qualifiers.constant = onoff;
 				break;
 		}
 	}
 
 
-	template<ir::ISA::Op O>
-	void visit(ir::ISA::Operand<O>& operands) {
+	template<ir::isa::Op O>
+	void visit(ir::isa::Operand<O>& operands) {
 		switch (O) {
 			// all following opcodes can be safely ignored
-			case ir::ISA::Op::allocate:
-			case ir::ISA::Op::comment:
-			case ir::ISA::Op::ensureresolved:
-			case ir::ISA::Op::classdefsizeof:
-			case ir::ISA::Op::namealias:
-			case ir::ISA::Op::store:
-			case ir::ISA::Op::storeText:
-			case ir::ISA::Op::storeConstant:
-			case ir::ISA::Op::memalloc:
-			case ir::ISA::Op::memcopy:
-			case ir::ISA::Op::typeisobject:
-			case ir::ISA::Op::ref:
-			case ir::ISA::Op::unref:
-			case ir::ISA::Op::assign:
-			case ir::ISA::Op::label:
-			case ir::ISA::Op::jmp:
-			case ir::ISA::Op::jz:
-			case ir::ISA::Op::jnz:
-			case ir::ISA::Op::nop:
-			case ir::ISA::Op::commontype:
+			case ir::isa::Op::allocate:
+			case ir::isa::Op::comment:
+			case ir::isa::Op::ensureresolved:
+			case ir::isa::Op::classdefsizeof:
+			case ir::isa::Op::namealias:
+			case ir::isa::Op::store:
+			case ir::isa::Op::storeText:
+			case ir::isa::Op::storeConstant:
+			case ir::isa::Op::memalloc:
+			case ir::isa::Op::memcopy:
+			case ir::isa::Op::typeisobject:
+			case ir::isa::Op::ref:
+			case ir::isa::Op::unref:
+			case ir::isa::Op::assign:
+			case ir::isa::Op::label:
+			case ir::isa::Op::jmp:
+			case ir::isa::Op::jz:
+			case ir::isa::Op::jnz:
+			case ir::isa::Op::nop:
+			case ir::isa::Op::commontype:
 				break;
 			// error for all the other ones
 			default:

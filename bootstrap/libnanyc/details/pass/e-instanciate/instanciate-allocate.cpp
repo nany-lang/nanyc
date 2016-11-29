@@ -9,7 +9,7 @@ namespace Pass {
 namespace Instanciate {
 
 
-void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::allocate>& operands) {
+void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::allocate>& operands) {
 	if (not frame->verify(operands.atomid))
 		return frame->invalidate(operands.lvid);
 	// find the type of the object to allocate

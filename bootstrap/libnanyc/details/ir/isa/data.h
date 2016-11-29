@@ -16,7 +16,7 @@ struct Instruction;
 
 namespace ny {
 namespace ir {
-namespace ISA {
+namespace isa {
 
 enum class Pragma : uint32_t {
 	//! Unknown pragma / invalid
@@ -49,7 +49,7 @@ static const constexpr uint32_t PragmaCount = 1 + (uint32_t) Pragma::synthetic;
 
 /*!
 ** \internal the total number of items must currently be < 2^4 (see data struct)
-** \see struct Operand<ISA::Op::blueprint>
+** \see struct Operand<isa::Op::blueprint>
 */
 enum class Blueprint : uint32_t {
 	//! Function definition
@@ -82,10 +82,10 @@ enum class TypeQualifier : uint32_t {
 static const constexpr uint32_t TypeQualifierCount = 1 + (uint32_t) TypeQualifier::constant;
 
 
-template<ny::ir::ISA::Op O> struct Operand final {};
+template<ny::ir::isa::Op O> struct Operand final {};
 
 
-template<> struct Operand<ny::ir::ISA::Op::nop> final {
+template<> struct Operand<ny::ir::isa::Op::nop> final {
 	constexpr static const char* opname() {
 		return "nop";
 	}
@@ -94,7 +94,7 @@ template<> struct Operand<ny::ir::ISA::Op::nop> final {
 	template<class T> void eachLVID(T&) {}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::eq> final {
+template<> struct Operand<ny::ir::isa::Op::eq> final {
 	constexpr static const char* opname() {
 		return "eq";
 	}
@@ -108,7 +108,7 @@ template<> struct Operand<ny::ir::ISA::Op::eq> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::neq> final {
+template<> struct Operand<ny::ir::isa::Op::neq> final {
 	constexpr static const char* opname() {
 		return "neq";
 	}
@@ -122,7 +122,7 @@ template<> struct Operand<ny::ir::ISA::Op::neq> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::flt> final {
+template<> struct Operand<ny::ir::isa::Op::flt> final {
 	constexpr static const char* opname() {
 		return "flt";
 	}
@@ -136,7 +136,7 @@ template<> struct Operand<ny::ir::ISA::Op::flt> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::flte> final {
+template<> struct Operand<ny::ir::isa::Op::flte> final {
 	constexpr static const char* opname() {
 		return "flte";
 	}
@@ -150,7 +150,7 @@ template<> struct Operand<ny::ir::ISA::Op::flte> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::fgt> final {
+template<> struct Operand<ny::ir::isa::Op::fgt> final {
 	constexpr static const char* opname() {
 		return "fgt";
 	}
@@ -164,7 +164,7 @@ template<> struct Operand<ny::ir::ISA::Op::fgt> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::fgte> final {
+template<> struct Operand<ny::ir::isa::Op::fgte> final {
 	constexpr static const char* opname() {
 		return "fgte";
 	}
@@ -178,7 +178,7 @@ template<> struct Operand<ny::ir::ISA::Op::fgte> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::lt> final {
+template<> struct Operand<ny::ir::isa::Op::lt> final {
 	constexpr static const char* opname() {
 		return "lt";
 	}
@@ -192,7 +192,7 @@ template<> struct Operand<ny::ir::ISA::Op::lt> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::lte> final {
+template<> struct Operand<ny::ir::isa::Op::lte> final {
 	constexpr static const char* opname() {
 		return "lte";
 	}
@@ -206,7 +206,7 @@ template<> struct Operand<ny::ir::ISA::Op::lte> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::ilt> final {
+template<> struct Operand<ny::ir::isa::Op::ilt> final {
 	constexpr static const char* opname() {
 		return "ilt";
 	}
@@ -220,7 +220,7 @@ template<> struct Operand<ny::ir::ISA::Op::ilt> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::ilte> final {
+template<> struct Operand<ny::ir::isa::Op::ilte> final {
 	constexpr static const char* opname() {
 		return "ilte";
 	}
@@ -234,7 +234,7 @@ template<> struct Operand<ny::ir::ISA::Op::ilte> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::gt> final {
+template<> struct Operand<ny::ir::isa::Op::gt> final {
 	constexpr static const char* opname() {
 		return "gt";
 	}
@@ -248,7 +248,7 @@ template<> struct Operand<ny::ir::ISA::Op::gt> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::gte> final {
+template<> struct Operand<ny::ir::isa::Op::gte> final {
 	constexpr static const char* opname() {
 		return "gte";
 	}
@@ -262,7 +262,7 @@ template<> struct Operand<ny::ir::ISA::Op::gte> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::igt> final {
+template<> struct Operand<ny::ir::isa::Op::igt> final {
 	constexpr static const char* opname() {
 		return "igt";
 	}
@@ -276,7 +276,7 @@ template<> struct Operand<ny::ir::ISA::Op::igt> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::igte> final {
+template<> struct Operand<ny::ir::isa::Op::igte> final {
 	constexpr static const char* opname() {
 		return "igte";
 	}
@@ -290,7 +290,7 @@ template<> struct Operand<ny::ir::ISA::Op::igte> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::opand> final {
+template<> struct Operand<ny::ir::isa::Op::opand> final {
 	constexpr static const char* opname() {
 		return "and";
 	}
@@ -304,7 +304,7 @@ template<> struct Operand<ny::ir::ISA::Op::opand> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::opor> final {
+template<> struct Operand<ny::ir::isa::Op::opor> final {
 	constexpr static const char* opname() {
 		return "or";
 	}
@@ -318,7 +318,7 @@ template<> struct Operand<ny::ir::ISA::Op::opor> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::opxor> final {
+template<> struct Operand<ny::ir::isa::Op::opxor> final {
 	constexpr static const char* opname() {
 		return "xor";
 	}
@@ -332,7 +332,7 @@ template<> struct Operand<ny::ir::ISA::Op::opxor> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::opmod> final {
+template<> struct Operand<ny::ir::isa::Op::opmod> final {
 	constexpr static const char* opname() {
 		return "mod";
 	}
@@ -346,7 +346,7 @@ template<> struct Operand<ny::ir::ISA::Op::opmod> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::negation> final {
+template<> struct Operand<ny::ir::isa::Op::negation> final {
 	constexpr static const char* opname() {
 		return "negation";
 	}
@@ -359,7 +359,7 @@ template<> struct Operand<ny::ir::ISA::Op::negation> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::fadd> final {
+template<> struct Operand<ny::ir::isa::Op::fadd> final {
 	constexpr static const char* opname() {
 		return "fadd";
 	}
@@ -372,7 +372,7 @@ template<> struct Operand<ny::ir::ISA::Op::fadd> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::fsub> final {
+template<> struct Operand<ny::ir::isa::Op::fsub> final {
 	constexpr static const char* opname() {
 		return "fsub";
 	}
@@ -386,7 +386,7 @@ template<> struct Operand<ny::ir::ISA::Op::fsub> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::fmul> final {
+template<> struct Operand<ny::ir::isa::Op::fmul> final {
 	constexpr static const char* opname() {
 		return "fmul";
 	}
@@ -400,7 +400,7 @@ template<> struct Operand<ny::ir::ISA::Op::fmul> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::fdiv> final {
+template<> struct Operand<ny::ir::isa::Op::fdiv> final {
 	constexpr static const char* opname() {
 		return "fdiv";
 	}
@@ -414,7 +414,7 @@ template<> struct Operand<ny::ir::ISA::Op::fdiv> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::add> final {
+template<> struct Operand<ny::ir::isa::Op::add> final {
 	constexpr static const char* opname() {
 		return "add";
 	}
@@ -428,7 +428,7 @@ template<> struct Operand<ny::ir::ISA::Op::add> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::sub> final {
+template<> struct Operand<ny::ir::isa::Op::sub> final {
 	constexpr static const char* opname() {
 		return "sub";
 	}
@@ -442,7 +442,7 @@ template<> struct Operand<ny::ir::ISA::Op::sub> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::mul> final {
+template<> struct Operand<ny::ir::isa::Op::mul> final {
 	constexpr static const char* opname() {
 		return "mul";
 	}
@@ -456,7 +456,7 @@ template<> struct Operand<ny::ir::ISA::Op::mul> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::div> final {
+template<> struct Operand<ny::ir::isa::Op::div> final {
 	constexpr static const char* opname() {
 		return "div";
 	}
@@ -470,7 +470,7 @@ template<> struct Operand<ny::ir::ISA::Op::div> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::imul> final {
+template<> struct Operand<ny::ir::isa::Op::imul> final {
 	constexpr static const char* opname() {
 		return "imul";
 	}
@@ -484,7 +484,7 @@ template<> struct Operand<ny::ir::ISA::Op::imul> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::idiv> final {
+template<> struct Operand<ny::ir::isa::Op::idiv> final {
 	constexpr static const char* opname() {
 		return "idiv";
 	}
@@ -498,7 +498,7 @@ template<> struct Operand<ny::ir::ISA::Op::idiv> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::fieldget> final {
+template<> struct Operand<ny::ir::isa::Op::fieldget> final {
 	constexpr static const char* opname() {
 		return "fieldget";
 	}
@@ -511,7 +511,7 @@ template<> struct Operand<ny::ir::ISA::Op::fieldget> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::fieldset> final {
+template<> struct Operand<ny::ir::isa::Op::fieldset> final {
 	constexpr static const char* opname() {
 		return "fieldset";
 	}
@@ -524,7 +524,7 @@ template<> struct Operand<ny::ir::ISA::Op::fieldset> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::stacksize> final {
+template<> struct Operand<ny::ir::isa::Op::stacksize> final {
 	constexpr static const char* opname() {
 		return "stacksize";
 	}
@@ -533,7 +533,7 @@ template<> struct Operand<ny::ir::ISA::Op::stacksize> final {
 	template<class T> void eachLVID(T&) {}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::comment> final {
+template<> struct Operand<ny::ir::isa::Op::comment> final {
 	constexpr static const char* opname() {
 		return "comment";
 	}
@@ -542,7 +542,7 @@ template<> struct Operand<ny::ir::ISA::Op::comment> final {
 	template<class T> void eachLVID(T&) {}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::stackalloc> final {
+template<> struct Operand<ny::ir::isa::Op::stackalloc> final {
 	constexpr static const char* opname() {
 		return "stackalloc";
 	}
@@ -555,7 +555,7 @@ template<> struct Operand<ny::ir::ISA::Op::stackalloc> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::storeConstant> final {
+template<> struct Operand<ny::ir::isa::Op::storeConstant> final {
 	constexpr static const char* opname() {
 		return "storeConstant";
 	}
@@ -570,7 +570,7 @@ template<> struct Operand<ny::ir::ISA::Op::storeConstant> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::storeText> final {
+template<> struct Operand<ny::ir::isa::Op::storeText> final {
 	constexpr static const char* opname() {
 		return "storeText";
 	}
@@ -582,7 +582,7 @@ template<> struct Operand<ny::ir::ISA::Op::storeText> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::store> final {
+template<> struct Operand<ny::ir::isa::Op::store> final {
 	constexpr static const char* opname() {
 		return "store";
 	}
@@ -594,7 +594,7 @@ template<> struct Operand<ny::ir::ISA::Op::store> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::ret> final {
+template<> struct Operand<ny::ir::isa::Op::ret> final {
 	constexpr static const char* opname() {
 		return "ret";
 	}
@@ -606,7 +606,7 @@ template<> struct Operand<ny::ir::ISA::Op::ret> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::push> final {
+template<> struct Operand<ny::ir::isa::Op::push> final {
 	constexpr static const char* opname() {
 		return "push";
 	}
@@ -618,7 +618,7 @@ template<> struct Operand<ny::ir::ISA::Op::push> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::tpush> final {
+template<> struct Operand<ny::ir::isa::Op::tpush> final {
 	constexpr static const char* opname() {
 		return "tpush";
 	}
@@ -630,7 +630,7 @@ template<> struct Operand<ny::ir::ISA::Op::tpush> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::call> final {
+template<> struct Operand<ny::ir::isa::Op::call> final {
 	constexpr static const char* opname() {
 		return "call";
 	}
@@ -643,7 +643,7 @@ template<> struct Operand<ny::ir::ISA::Op::call> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::intrinsic> final {
+template<> struct Operand<ny::ir::isa::Op::intrinsic> final {
 	constexpr static const char* opname() {
 		return "intrinsic";
 	}
@@ -658,7 +658,7 @@ template<> struct Operand<ny::ir::ISA::Op::intrinsic> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::debugfile> final {
+template<> struct Operand<ny::ir::isa::Op::debugfile> final {
 	constexpr static const char* opname() {
 		return "debugfile";
 	}
@@ -667,7 +667,7 @@ template<> struct Operand<ny::ir::ISA::Op::debugfile> final {
 	template<class T> void eachLVID(T&) {}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::namealias> final {
+template<> struct Operand<ny::ir::isa::Op::namealias> final {
 	constexpr static const char* opname() {
 		return "namealias";
 	}
@@ -679,7 +679,7 @@ template<> struct Operand<ny::ir::ISA::Op::namealias> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::debugpos> final {
+template<> struct Operand<ny::ir::isa::Op::debugpos> final {
 	constexpr static const char* opname() {
 		return "debugpos";
 	}
@@ -689,7 +689,7 @@ template<> struct Operand<ny::ir::ISA::Op::debugpos> final {
 	template<class T> void eachLVID(T&) {}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::scope> final {
+template<> struct Operand<ny::ir::isa::Op::scope> final {
 	constexpr static const char* opname() {
 		return "scope";
 	}
@@ -697,7 +697,7 @@ template<> struct Operand<ny::ir::ISA::Op::scope> final {
 	template<class T> void eachLVID(T&) {}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::end> final {
+template<> struct Operand<ny::ir::isa::Op::end> final {
 	constexpr static const char* opname() {
 		return "end";
 	}
@@ -705,7 +705,7 @@ template<> struct Operand<ny::ir::ISA::Op::end> final {
 	template<class T> void eachLVID(T&) {}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::qualifiers> final {
+template<> struct Operand<ny::ir::isa::Op::qualifiers> final {
 	constexpr static const char* opname() {
 		return "qualifiers";
 	}
@@ -715,12 +715,12 @@ template<> struct Operand<ny::ir::ISA::Op::qualifiers> final {
 	uint32_t flag;
 
 	template<class T> void eachLVID(T& c) {
-		static_assert(sizeof(Operand<ny::ir::ISA::Op::qualifiers>) <= sizeof(uint32_t) * 4, "alignment required");
+		static_assert(sizeof(Operand<ny::ir::isa::Op::qualifiers>) <= sizeof(uint32_t) * 4, "alignment required");
 		c(lvid);
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::opassert> final {
+template<> struct Operand<ny::ir::isa::Op::opassert> final {
 	constexpr static const char* opname() {
 		return "assert";
 	}
@@ -731,7 +731,7 @@ template<> struct Operand<ny::ir::ISA::Op::opassert> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::memcheckhold> final {
+template<> struct Operand<ny::ir::isa::Op::memcheckhold> final {
 	constexpr static const char* opname() {
 		return "memcheckhold";
 	}
@@ -743,7 +743,7 @@ template<> struct Operand<ny::ir::ISA::Op::memcheckhold> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::label> final {
+template<> struct Operand<ny::ir::isa::Op::label> final {
 	constexpr static const char* opname() {
 		return "label";
 	}
@@ -754,7 +754,7 @@ template<> struct Operand<ny::ir::ISA::Op::label> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::jmp> final {
+template<> struct Operand<ny::ir::isa::Op::jmp> final {
 	constexpr static const char* opname() {
 		return "jmp";
 	}
@@ -763,7 +763,7 @@ template<> struct Operand<ny::ir::ISA::Op::jmp> final {
 	template<class T> void eachLVID(T&) {}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::jz> final {
+template<> struct Operand<ny::ir::isa::Op::jz> final {
 	constexpr static const char* opname() {
 		return "jz";
 	}
@@ -776,7 +776,7 @@ template<> struct Operand<ny::ir::ISA::Op::jz> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::jnz> final {
+template<> struct Operand<ny::ir::isa::Op::jnz> final {
 	constexpr static const char* opname() {
 		return "jnz";
 	}
@@ -789,7 +789,7 @@ template<> struct Operand<ny::ir::ISA::Op::jnz> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::memalloc> final {
+template<> struct Operand<ny::ir::isa::Op::memalloc> final {
 	constexpr static const char* opname() {
 		return "memalloc";
 	}
@@ -801,7 +801,7 @@ template<> struct Operand<ny::ir::ISA::Op::memalloc> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::memfree> final {
+template<> struct Operand<ny::ir::isa::Op::memfree> final {
 	constexpr static const char* opname() {
 		return "memfree";
 	}
@@ -813,7 +813,7 @@ template<> struct Operand<ny::ir::ISA::Op::memfree> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::memfill> final {
+template<> struct Operand<ny::ir::isa::Op::memfill> final {
 	constexpr static const char* opname() {
 		return "memfill";
 	}
@@ -826,7 +826,7 @@ template<> struct Operand<ny::ir::ISA::Op::memfill> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::memcopy> final {
+template<> struct Operand<ny::ir::isa::Op::memcopy> final {
 	constexpr static const char* opname() {
 		return "memcopy";
 	}
@@ -839,7 +839,7 @@ template<> struct Operand<ny::ir::ISA::Op::memcopy> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::memmove> final {
+template<> struct Operand<ny::ir::isa::Op::memmove> final {
 	constexpr static const char* opname() {
 		return "memmove";
 	}
@@ -852,7 +852,7 @@ template<> struct Operand<ny::ir::ISA::Op::memmove> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::memcmp> final {
+template<> struct Operand<ny::ir::isa::Op::memcmp> final {
 	constexpr static const char* opname() {
 		return "memcmp";
 	}
@@ -865,7 +865,7 @@ template<> struct Operand<ny::ir::ISA::Op::memcmp> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::cstrlen> final {
+template<> struct Operand<ny::ir::isa::Op::cstrlen> final {
 	constexpr static const char* opname() {
 		return "cstrlen";
 	}
@@ -878,7 +878,7 @@ template<> struct Operand<ny::ir::ISA::Op::cstrlen> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::load_u64> final {
+template<> struct Operand<ny::ir::isa::Op::load_u64> final {
 	constexpr static const char* opname() {
 		return "load_u64";
 	}
@@ -889,7 +889,7 @@ template<> struct Operand<ny::ir::ISA::Op::load_u64> final {
 		c(lvid, ptrlvid);
 	}
 };
-template<> struct Operand<ny::ir::ISA::Op::load_u32> final {
+template<> struct Operand<ny::ir::isa::Op::load_u32> final {
 	constexpr static const char* opname() {
 		return "load_u32";
 	}
@@ -900,7 +900,7 @@ template<> struct Operand<ny::ir::ISA::Op::load_u32> final {
 		c(lvid, ptrlvid);
 	}
 };
-template<> struct Operand<ny::ir::ISA::Op::load_u8> final {
+template<> struct Operand<ny::ir::isa::Op::load_u8> final {
 	constexpr static const char* opname() {
 		return "load_u8";
 	}
@@ -912,7 +912,7 @@ template<> struct Operand<ny::ir::ISA::Op::load_u8> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::store_u64> final {
+template<> struct Operand<ny::ir::isa::Op::store_u64> final {
 	constexpr static const char* opname() {
 		return "store_u64";
 	}
@@ -923,7 +923,7 @@ template<> struct Operand<ny::ir::ISA::Op::store_u64> final {
 		c(lvid, ptrlvid);
 	}
 };
-template<> struct Operand<ny::ir::ISA::Op::store_u32> final {
+template<> struct Operand<ny::ir::isa::Op::store_u32> final {
 	constexpr static const char* opname() {
 		return "store_u32";
 	}
@@ -934,7 +934,7 @@ template<> struct Operand<ny::ir::ISA::Op::store_u32> final {
 		c(lvid, ptrlvid);
 	}
 };
-template<> struct Operand<ny::ir::ISA::Op::store_u8> final {
+template<> struct Operand<ny::ir::isa::Op::store_u8> final {
 	constexpr static const char* opname() {
 		return "store_u8";
 	}
@@ -946,7 +946,7 @@ template<> struct Operand<ny::ir::ISA::Op::store_u8> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::memrealloc> final {
+template<> struct Operand<ny::ir::isa::Op::memrealloc> final {
 	constexpr static const char* opname() {
 		return "memrealloc";
 	}
@@ -959,7 +959,7 @@ template<> struct Operand<ny::ir::ISA::Op::memrealloc> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::pragma> final {
+template<> struct Operand<ny::ir::isa::Op::pragma> final {
 	constexpr static const char* opname() {
 		return "pragma";
 	}
@@ -991,7 +991,7 @@ template<> struct Operand<ny::ir::ISA::Op::pragma> final {
 	value;
 
 	template<class T> void eachLVID(T& c) {
-		static_assert(sizeof(Operand<ny::ir::ISA::Op::pragma>) <= sizeof(uint32_t) * 4, "alignment required");
+		static_assert(sizeof(Operand<ny::ir::isa::Op::pragma>) <= sizeof(uint32_t) * 4, "alignment required");
 		switch (pragma) {
 			case Pragma::synthetic:                {
 				c(value.synthetic.lvid);
@@ -1018,14 +1018,14 @@ template<> struct Operand<ny::ir::ISA::Op::pragma> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::blueprint> final {
+template<> struct Operand<ny::ir::isa::Op::blueprint> final {
 	constexpr static const char* opname() {
 		return "blueprint";
 	}
 
 	uint32_t opcode;
 	//! Kind of blueprint (classdef, vardef, funcdef...)
-	//! \see enum ir::ISA::Blueprint
+	//! \see enum ir::isa::Blueprint
 	uint32_t kind: 4;
 	//! Attached lvid (if any)
 	uint32_t lvid: 28; // should be big enough even for large func
@@ -1042,14 +1042,14 @@ template<> struct Operand<ny::ir::ISA::Op::blueprint> final {
 		lvid = converter.lvid;
 	}
 	template<class T> void eachLVID(T& c) {
-		static_assert(sizeof(Operand<ny::ir::ISA::Op::blueprint>) <= sizeof(uint32_t) * 4, "alignment required");
+		static_assert(sizeof(Operand<ny::ir::isa::Op::blueprint>) <= sizeof(uint32_t) * 4, "alignment required");
 		uint32_t cplvid = lvid;
 		c(cplvid);
 		setLVID(cplvid);
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::self> final {
+template<> struct Operand<ny::ir::isa::Op::self> final {
 	constexpr static const char* opname() {
 		return "self";
 	}
@@ -1060,7 +1060,7 @@ template<> struct Operand<ny::ir::ISA::Op::self> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::identify> final {
+template<> struct Operand<ny::ir::isa::Op::identify> final {
 	constexpr static const char* opname() {
 		return "identify";
 	}
@@ -1072,7 +1072,7 @@ template<> struct Operand<ny::ir::ISA::Op::identify> final {
 		c(lvid, self);
 	}
 };
-template<> struct Operand<ny::ir::ISA::Op::identifyset> final { // MUST be identical to 'identify'
+template<> struct Operand<ny::ir::isa::Op::identifyset> final { // MUST be identical to 'identify'
 	constexpr static const char* opname() {
 		return "identifyset";
 	}
@@ -1085,7 +1085,7 @@ template<> struct Operand<ny::ir::ISA::Op::identifyset> final { // MUST be ident
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::ensureresolved> final {
+template<> struct Operand<ny::ir::isa::Op::ensureresolved> final {
 	constexpr static const char* opname() {
 		return "ensureresolved";
 	}
@@ -1096,7 +1096,7 @@ template<> struct Operand<ny::ir::ISA::Op::ensureresolved> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::commontype> final {
+template<> struct Operand<ny::ir::isa::Op::commontype> final {
 	constexpr static const char* opname() {
 		return "commontype";
 	}
@@ -1108,7 +1108,7 @@ template<> struct Operand<ny::ir::ISA::Op::commontype> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::assign> final {
+template<> struct Operand<ny::ir::isa::Op::assign> final {
 	constexpr static const char* opname() {
 		return "assign";
 	}
@@ -1121,7 +1121,7 @@ template<> struct Operand<ny::ir::ISA::Op::assign> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::follow> final {
+template<> struct Operand<ny::ir::isa::Op::follow> final {
 	constexpr static const char* opname() {
 		return "follow";
 	}
@@ -1134,7 +1134,7 @@ template<> struct Operand<ny::ir::ISA::Op::follow> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::typeisobject> final {
+template<> struct Operand<ny::ir::isa::Op::typeisobject> final {
 	constexpr static const char* opname() {
 		return "typeisobject";
 	}
@@ -1145,7 +1145,7 @@ template<> struct Operand<ny::ir::ISA::Op::typeisobject> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::classdefsizeof> final {
+template<> struct Operand<ny::ir::isa::Op::classdefsizeof> final {
 	constexpr static const char* opname() {
 		return "classdefsizeof";
 	}
@@ -1157,7 +1157,7 @@ template<> struct Operand<ny::ir::ISA::Op::classdefsizeof> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::ref> final {
+template<> struct Operand<ny::ir::isa::Op::ref> final {
 	constexpr static const char* opname() {
 		return "ref";
 	}
@@ -1168,7 +1168,7 @@ template<> struct Operand<ny::ir::ISA::Op::ref> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::unref> final {
+template<> struct Operand<ny::ir::isa::Op::unref> final {
 	constexpr static const char* opname() {
 		return "unref";
 	}
@@ -1185,7 +1185,7 @@ template<> struct Operand<ny::ir::ISA::Op::unref> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::allocate> final {
+template<> struct Operand<ny::ir::isa::Op::allocate> final {
 	constexpr static const char* opname() {
 		return "allocate";
 	}
@@ -1198,7 +1198,7 @@ template<> struct Operand<ny::ir::ISA::Op::allocate> final {
 	}
 };
 
-template<> struct Operand<ny::ir::ISA::Op::dispose> final {
+template<> struct Operand<ny::ir::isa::Op::dispose> final {
 	constexpr static const char* opname() {
 		return "dispose";
 	}
@@ -1219,15 +1219,15 @@ template<> struct Operand<ny::ir::ISA::Op::dispose> final {
 
 Yuni::String print(const Sequence&, const ny::ir::Instruction&, const AtomMap* = nullptr);
 
-template<ny::ir::ISA::Op O>
+template<ny::ir::isa::Op O>
 inline Yuni::String
-print(const Sequence& sequence, const ny::ir::ISA::Operand<O>& operands, const AtomMap* map = nullptr) {
+print(const Sequence& sequence, const ny::ir::isa::Operand<O>& operands, const AtomMap* map = nullptr) {
 	return print(sequence, reinterpret_cast<const ny::ir::Instruction&>(operands), map);
 }
 
 void printExtract(YString& out, const Sequence&, uint32_t offset, const AtomMap* = nullptr);
 
 
-} // namespace ISA
+} // namespace isa
 } // namespace ir
 } // namespace ny

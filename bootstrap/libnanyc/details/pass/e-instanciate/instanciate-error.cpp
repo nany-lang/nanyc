@@ -418,7 +418,7 @@ Logs::Report emitReportEntry(void* self, Logs::Level level) {
 					h << ", signature only";
 				h << "]\n";
 				auto* map = &(sb.cdeftable.originalTable().atoms);
-				ir::ISA::printExtract(h.message.message, sb.currentSequence, offset, map);
+				ir::isa::printExtract(h.message.message, sb.currentSequence, offset, map);
 			}
 		}
 	}
@@ -506,7 +506,7 @@ bool SequenceBuilder::complainOperand(const ir::Instruction& operands, AnyString
 		message << msg;
 	else
 		message << "unexpected opcode";
-	message << ": '" << ir::ISA::print(currentSequence, operands) << '\'';
+	message << ": '" << ir::isa::print(currentSequence, operands) << '\'';
 	// stop reading the opcodes
 	currentSequence.invalidateCursor(*cursor);
 	return false;

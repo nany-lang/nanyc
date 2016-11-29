@@ -7,7 +7,7 @@ using namespace Yuni;
 
 namespace ny {
 namespace ir {
-namespace ISA {
+namespace isa {
 
 
 String print(const Sequence& sequence, const ny::ir::Instruction& instr, const ny::AtomMap* atommap) {
@@ -37,6 +37,6 @@ void printExtract(YString& out, const Sequence& sequence, uint32_t offset, const
 }
 
 
-} // namespace ISA
+} // namespace isa
 } // namespace ir
 } // namespace ny

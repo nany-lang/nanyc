@@ -10,7 +10,7 @@ namespace Pass {
 namespace Instanciate {
 
 
-bool SequenceBuilder::instanciateUserDefinedIntrinsic(const ir::ISA::Operand<ir::ISA::Op::intrinsic>&
+bool SequenceBuilder::instanciateUserDefinedIntrinsic(const ir::isa::Operand<ir::isa::Op::intrinsic>&
 		operands) {
 	bool success = ([&]() -> bool {
 		AnyString name = currentSequence.stringrefs[operands.intrinsic];
@@ -90,7 +90,7 @@ bool SequenceBuilder::instanciateUserDefinedIntrinsic(const ir::ISA::Operand<ir:
 }
 
 
-void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::intrinsic>& operands) {
+void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::intrinsic>& operands) {
 	assert(frame != nullptr);
 	if (unlikely(not instanciateUserDefinedIntrinsic(operands))) {
 		frame->invalidate(operands.lvid);

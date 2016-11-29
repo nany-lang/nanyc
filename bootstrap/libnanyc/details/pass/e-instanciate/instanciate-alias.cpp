@@ -44,7 +44,7 @@ void SequenceBuilder::declareNamedVariable(const AnyString& name, uint32_t lvid,
 }
 
 
-// inline void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::namealias>& operands)
+// inline void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::namealias>& operands)
 // see .h
 
 } // namespace Instanciate

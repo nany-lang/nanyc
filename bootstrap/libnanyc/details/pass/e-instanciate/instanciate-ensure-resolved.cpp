@@ -9,7 +9,7 @@ namespace Pass {
 namespace Instanciate {
 
 
-void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::ensureresolved>& operands) {
+void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::ensureresolved>& operands) {
 	bool ok = [&]() -> bool {
 		assert(frame != nullptr);
 		if (not frame->verify(operands.lvid))

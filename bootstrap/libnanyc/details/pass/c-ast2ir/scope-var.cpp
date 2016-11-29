@@ -119,7 +119,7 @@ bool emitVarInClass(Scope& scope, const AnyString& varname, AST::Node& node, AST
 		return false;
 	// follow
 	{
-		auto& operands    = out.emit<ISA::Op::follow>();
+		auto& operands    = out.emit<isa::Op::follow>();
 		operands.follower = mbvar;
 		operands.lvid     = lvid;
 		operands.symlink  = 0;
@@ -146,7 +146,7 @@ bool emitVarInFunc(Scope& scope, const AnyString& varname, AST::Node& node, AST:
 		if (not scope.visitASTType(*varType, lvidtype) or lvidtype == 0)
 			return false;
 		// follow
-		auto& operands    = out.emit<ISA::Op::follow>();
+		auto& operands    = out.emit<isa::Op::follow>();
 		operands.follower = varlvid;
 		operands.lvid     = lvidtype;
 		operands.symlink  = 0;

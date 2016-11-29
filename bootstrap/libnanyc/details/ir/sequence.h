@@ -54,21 +54,21 @@ struct Sequence final {
 	//! \name Opcodes
 	//@{
 	//! Fetch an instruction at a given offset
-	template<ISA::Op O> ISA::Operand<O>& at(uint32_t offset);
+	template<isa::Op O> isa::Operand<O>& at(uint32_t offset);
 	//! Fetch an instruction at a given offset (const)
-	template<ISA::Op O> const ISA::Operand<O>& at(uint32_t offset) const;
+	template<isa::Op O> const isa::Operand<O>& at(uint32_t offset) const;
 	//! Fetch an instruction at a given offset
 	const Instruction& at(uint32_t offset) const;
 	//! Fetch an instruction at a given offset
 	Instruction& at(uint32_t offset);
 
 	//! emit a new Instruction
-	template<ISA::Op O> ISA::Operand<O>& emit();
+	template<isa::Op O> isa::Operand<O>& emit();
 	//! emit a new Instruction (without reserving data if needed)
-	template<ISA::Op O> ISA::Operand<O>& emitraw();
+	template<isa::Op O> isa::Operand<O>& emitraw();
 
 	//! Get the offset of an instruction within the sequence
-	template<ISA::Op O> uint32_t offsetOf(const ISA::Operand<O>& instr) const;
+	template<isa::Op O> uint32_t offsetOf(const isa::Operand<O>& instr) const;
 	//! Get the offset of an instruction within the sequence
 	uint32_t offsetOf(const Instruction& instr) const;
 	//@}

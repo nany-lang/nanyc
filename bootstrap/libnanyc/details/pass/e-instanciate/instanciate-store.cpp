@@ -9,7 +9,7 @@ namespace Pass {
 namespace Instanciate {
 
 
-void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::storeConstant>& operands) {
+void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::storeConstant>& operands) {
 	assert(frame != nullptr);
 	frame->lvids(operands.lvid).synthetic = false;
 	if (canGenerateCode())
@@ -17,7 +17,7 @@ void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::storeConstant>& 
 }
 
 
-void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::store>& operands) {
+void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::store>& operands) {
 	assert(frame != nullptr);
 	frame->lvids(operands.lvid).synthetic = false;
 	if (not frame->verify(operands.source))
@@ -34,7 +34,7 @@ void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::store>& operands
 }
 
 
-void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::storeText>& operands) {
+void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::storeText>& operands) {
 	if (canGenerateCode()) {
 		uint32_t sid = ir::emit::constantText(out, operands.lvid, currentSequence.stringrefs[operands.text]);
 		auto& lvidinfo = frame->lvids(operands.lvid);

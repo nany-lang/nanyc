@@ -64,8 +64,8 @@ bool Scope::visitASTExprCallParameters(AST::Node& node, ShortcircuitUpdate* shor
 									// (see visitASTExprCall) and can be used for reading a variable member
 									shortcircuit->offsetStackalloc = out.opcodeCount();
 									ir::emit::alloc(out, 0 /*label + 1*/);
-									out.emitraw<ir::ISA::Op::nop>(); // fieldget, if not builtin type
-									out.emitraw<ir::ISA::Op::nop>(); // jump
+									out.emitraw<ir::isa::Op::nop>(); // fieldget, if not builtin type
+									out.emitraw<ir::isa::Op::nop>(); // jump
 								}
 								// generate scope to prevent against unwanted var release in case of jump
 								// (will be released later in `Scope::visitASTExprCall`)
@@ -177,9 +177,9 @@ bool Scope::visitASTExprCall(AST::Node* node, uint32_t& localvar, AST::Node* par
 			// (thus the lvid for this will be exactly (shortcircuitlabel + 1))
 			nextvar(); // sclabel + 1
 			if (scupdt.offsetPragma != 0)
-				out.at<ir::ISA::Op::pragma>(scupdt.offsetPragma).value.shortcircuitMetadata.label = sclabel;
+				out.at<ir::isa::Op::pragma>(scupdt.offsetPragma).value.shortcircuitMetadata.label = sclabel;
 			if (scupdt.offsetStackalloc != 0)
-				out.at<ir::ISA::Op::stackalloc>(scupdt.offsetStackalloc).lvid = sclabel + 1;
+				out.at<ir::isa::Op::stackalloc>(scupdt.offsetStackalloc).lvid = sclabel + 1;
 			ir::emit::scopeEnd(out);
 			ir::emit::alloc(out, nextvar(), nyt_u64); // allocating for sizeof
 			ir::emit::pragma::shortcircuitMutateToBool(out, callret, ret__bool);

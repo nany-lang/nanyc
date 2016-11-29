@@ -8,7 +8,7 @@ namespace Pass {
 namespace Instanciate {
 
 
-void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::assign>& operands) {
+void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::assign>& operands) {
 	assert(frame != nullptr);
 	frame->lvids(operands.lhs).synthetic = false;
 	if (not frame->verify(operands.rhs))

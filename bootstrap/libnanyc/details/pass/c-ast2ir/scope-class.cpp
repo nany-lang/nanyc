@@ -120,7 +120,7 @@ bool ClassInspector::inspectBody(AST::Node& node) {
 	// evaluate the whole function, and grab the node body for continuing evaluation
 	{
 		success = inspect(node);
-		auto& operands = out.at<ISA::Op::blueprint>(bpoffset);
+		auto& operands = out.at<isa::Op::blueprint>(bpoffset);
 		operands.name = out.stringrefs.ref(classname);
 	}
 	if (likely(body != nullptr)) {
@@ -131,8 +131,8 @@ bool ClassInspector::inspectBody(AST::Node& node) {
 	}
 	ir::emit::scopeEnd(out);
 	uint32_t blpsize = out.opcodeCount() - bpoffset;
-	out.at<ISA::Op::pragma>(bpoffsiz).value.blueprintsize = blpsize;
-	out.at<ISA::Op::stacksize>(bpoffsck).add = scope.nextVarID + 1u;
+	out.at<isa::Op::pragma>(bpoffsiz).value.blueprintsize = blpsize;
+	out.at<isa::Op::stacksize>(bpoffsck).add = scope.nextVarID + 1u;
 	return success;
 }
 
