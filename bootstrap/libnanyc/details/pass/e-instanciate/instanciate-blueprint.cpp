@@ -70,7 +70,6 @@ void funcOrClassOrType(SequenceBuilder& seq, const ir::isa::Operand<ir::isa::Op:
 		}
 	}
 	else {
-		// ignoring completely this blueprint
 		currentSequence.moveCursorFromBlueprintToEnd(*seq.cursor);
 		if (bug)
 			*seq.cursor = &currentSequence.at(currentSequence.offsetOf(**seq.cursor) + 1);
@@ -78,13 +77,12 @@ void funcOrClassOrType(SequenceBuilder& seq, const ir::isa::Operand<ir::isa::Op:
 			// anonymous class
 			// The flag Atom::Flags::captureVariables should already be set via 'mapping'
 			assert(atom.flags(Atom::Flags::captureVariables));
-			Atom* resAtom = seq.instanciateAtomClass(atom); // instanciating the class
+			Atom* resAtom = seq.instanciateAtomClass(atom);
 			if (unlikely(!resAtom)) {
 				if (seq.frame)
 					seq.frame->invalidate(lvid);
 				return;
 			}
-			// updating the attached lvid for automatic type declaration
 			seq.cdeftable.substitute(lvid).mutateToAtom(resAtom);
 		}
 	}
@@ -140,7 +138,6 @@ void asSelf(SequenceBuilder& seq, const ir::isa::Operand<ir::isa::Op::blueprint>
 
 
 void vardef(SequenceBuilder& seq, uint32_t lvid, uint32_t sid) {
-	// update the type of the variable member
 	if (seq.frame != nullptr) {
 		if (seq.frame->atom.isClass()) {
 			const AnyString& varname = seq.currentSequence.stringrefs[sid];
@@ -162,7 +159,7 @@ void vardef(SequenceBuilder& seq, uint32_t lvid, uint32_t sid) {
 void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
 	auto kind = static_cast<ir::isa::Blueprint>(operands.kind);
 	switch (kind) {
-		case ir::isa::Blueprint::param: { // -- function parameter
+		case ir::isa::Blueprint::param: {
 			parameter(*this, operands.lvid, true, operands.name);
 			break;
 		}
@@ -170,7 +167,7 @@ void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::blueprint>& oper
 			parameter(*this, operands.lvid, false, operands.name);
 			break;
 		}
-		case ir::isa::Blueprint::paramself: { // -- function parameter
+		case ir::isa::Blueprint::paramself: {
 			asSelf(*this, operands);
 			break;
 		}
@@ -185,8 +182,7 @@ void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::blueprint>& oper
 			break;
 		}
 		case ir::isa::Blueprint::namespacedef: {
-			// see mapping instead
-			break;
+			break; // see mapping instead
 		}
 		case ir::isa::Blueprint::unit: {
 			unit(*this, operands);

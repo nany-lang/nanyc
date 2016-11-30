@@ -26,9 +26,7 @@ bool pragmaBodyStart(SequenceBuilder& seq) {
 	uint32_t count = atom.parameters.size();
 	bool success = true;
 	atom.parameters.each([&](uint32_t i, const AnyString& name, const Vardef & vardef) {
-		// lvid for the given parameter
 		uint32_t lvid  = i + 1 + 1; // 1: return type, 2: first parameter
-		// the parameters are real objects
 		frame.lvids(lvid).synthetic = false;
 		// Parameters Deep copy (if required)
 		auto& cdef = seq.cdeftable.classdef(vardef.clid);
@@ -41,7 +39,6 @@ bool pragmaBodyStart(SequenceBuilder& seq) {
 				});
 				// a register has already been reserved for cloning parameters
 				uint32_t clone = 2 + count + i; // 1: return type, 2: first parameter
-				// the new value is not synthetic
 				frame.lvids(clone).synthetic = false;
 				bool r = seq.instanciateAssignment(frame, clone, lvid, false, false, true);
 				if (unlikely(not r))
@@ -63,17 +60,16 @@ bool pragmaBodyStart(SequenceBuilder& seq) {
 			}
 		}
 	});
-	// generating some code on the fly
-	if (atom.isSpecial() /*ctor, operators...*/ and generateCode and success) {
-		if (seq.generateClassVarsAutoInit) { // var init (called by ctor)
+	if (atom.isSpecial() and generateCode and success) {
+		if (seq.generateClassVarsAutoInit) { // ctor
 			seq.generateClassVarsAutoInit = false;
 			seq.generateMemberVarDefaultInitialization();
 		}
-		if (seq.generateClassVarsAutoRelease) { // var release (called by dtor)
+		if (seq.generateClassVarsAutoRelease) { // dtor
 			seq.generateClassVarsAutoRelease = false;
 			seq.generateMemberVarDefaultDispose();
 		}
-		if (seq.generateClassVarsAutoClone) { // var deep copy (copy ctor)
+		if (seq.generateClassVarsAutoClone) { // deep copy (ctor)
 			seq.generateClassVarsAutoClone = false;
 			seq.generateMemberVarDefaultClone();
 		}
