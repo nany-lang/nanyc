@@ -53,35 +53,25 @@ void prepareSignature(Signature& signature, InstanciateData& info) {
 
 bool makeNewAtomInstanciation(InstanciateData& info, Atom& atom) {
 	// create a new atom with non-generic parameters / from a contextual atom
-	// (generic/anonymous class)
-	// re-map from the parent
+	// (generic or anonymous class) and re-map from the parent
 	{
 		auto& sequence  = *atom.opcodes.sequence;
 		auto& originaltable = info.cdeftable.originalTable();
-		// the mutex is useless here since the code instanciation is mono-threaded
-		// but it's required by the mapping (which must be thread-safe in the first passes - see attach)
-		// TODO remove this mutex
-		Mutex mutex;
+		Mutex mutex; // useless but currently required for the first pass by SequenceMapping
 		Pass::Mapping::SequenceMapping mapper{originaltable, mutex, sequence};
 		mapper.evaluateWholeSequence = false;
-		mapper.prefixNameForFirstAtomCreated = "^";
-		// run the type mapping
+		mapper.prefixNameForFirstAtomCreated = "^"; // not an user-defined atom
 		mapper.map(*atom.parent, atom.opcodes.offset);
 		if (unlikely(!mapper.firstAtomCreated))
-			return (error() << "failed to remap atom '" << atom.caption() << "'");
+			return (error() << "failed to remap atom '" << atom.caption() << '\'');
 		assert(info.atom.get().atomid != mapper.firstAtomCreated->atomid);
 		assert(&info.atom.get() != mapper.firstAtomCreated);
 		info.atom = std::ref(*mapper.firstAtomCreated);
 	}
-	// the generic parameters are fully resolved now, avoid
-	// any new attempt to check them
 	auto& newAtom = info.atom.get();
 	newAtom.tmplparamsForPrinting.swap(newAtom.tmplparams);
-	// marking the new atom as instanciated, like any standard atom
 	newAtom.classinfo.isInstanciated = true;
-	// to keep the types for the new atoms
 	info.shouldMergeLayer = true;
-	// upate parameter types
 	return resolveStrictParameterTypes(info.build, newAtom, &info);
 }
 
