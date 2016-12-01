@@ -86,8 +86,8 @@ bool makeNewAtomInstanciation(InstanciateData& info, Atom& atom) {
 }
 
 
-//! Prepare the first local registers according the given signature
-void pushParameterTypes(ClassdefTableView& cdeftable, Atom& atom, const Signature& signature) {
+//! Prepare the first local registers from the parameter types
+void substituteParameterTypes(ClassdefTableView& cdeftable, Atom& atom, const Signature& signature) {
 	// magic constant +2
 	//  * +1: all clid are 1-based (0 is reserved for the atom itself, not for an internal var)
 	//  * +1: the CLID{X, 1} is reserved for the return type
@@ -144,8 +144,7 @@ ir::Sequence* performAtomInstanciation(InstanciateData& info, Signature& signatu
 				   (report.subgroup(), newView, info.build, &outIR, inputIR, info.parent);
 	if (config::traces::sourceOpcodeSequence)
 		debugPrintSourceOpcodeSequence(info.cdeftable, info.atom.get(), "[ir-from-ast] ");
-	// transfert input parameters
-	pushParameterTypes(builder->cdeftable, atom, signature);
+	substituteParameterTypes(builder->cdeftable, atom, signature);
 	builder->layerDepthLimit = 2; // allow the first blueprint to be instanciated
 	// atomid mapping, usefull to keep track of the good atom id
 	builder->mappingBlueprintAtomID[0] = atomRequested.atomid; // {from}
