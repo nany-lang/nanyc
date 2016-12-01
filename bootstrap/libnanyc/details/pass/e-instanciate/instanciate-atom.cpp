@@ -93,7 +93,6 @@ void pushParameterTypes(SequenceBuilder& seq, Atom& atom, const Signature& signa
 	//  * +1: all clid are 1-based (0 is reserved for the atom itself, not for an internal var)
 	//  * +1: the CLID{X, 1} is reserved for the return type
 	auto& cdeftable = seq.cdeftable;
-	uint32_t count = signature.parameters.size();
 	// unused pseudo/invalid register
 	cdeftable.addSubstitute(nyt_void, nullptr, Qualifiers()); // unused, since 1-based
 	// redefine return type {atomid,1}
@@ -105,13 +104,11 @@ void pushParameterTypes(SequenceBuilder& seq, Atom& atom, const Signature& signa
 		cdeftable.addSubstitute(parameter.kind, parameter.atom, parameter.qualifiers);
 		assert(parameter.kind != nyt_any or parameter.atom != nullptr);
 	};
-	// parameters, as expected
+	uint32_t count = signature.parameters.size();
 	for (uint32_t i = 0; i != count; ++i)
 		substitute(signature.parameters[i]);
-	// reserved variables for cloning parameters (after normal parameters)
-	for (uint32_t i = 0; i != count; ++i)
+	for (uint32_t i = 0; i != count; ++i) // + reserved for cloning parameters
 		substitute(signature.parameters[i]);
-	// template parameters
 	count = signature.tmplparams.size();
 	for (uint32_t i = 0; i != count; ++i)
 		substitute(signature.tmplparams[i]);
