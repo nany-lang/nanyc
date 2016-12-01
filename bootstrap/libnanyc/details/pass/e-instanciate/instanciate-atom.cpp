@@ -87,19 +87,14 @@ bool makeNewAtomInstanciation(InstanciateData& info, Atom& atom) {
 
 
 //! Prepare the first local registers according the given signature
-void pushParameterTypes(SequenceBuilder& seq, Atom& atom, const Signature& signature) {
-	assert(seq.frame == NULL);
+void pushParameterTypes(ClassdefTableView& cdeftable, Atom& atom, const Signature& signature) {
 	// magic constant +2
 	//  * +1: all clid are 1-based (0 is reserved for the atom itself, not for an internal var)
 	//  * +1: the CLID{X, 1} is reserved for the return type
-	auto& cdeftable = seq.cdeftable;
-	// unused pseudo/invalid register
 	cdeftable.addSubstitute(nyt_void, nullptr, Qualifiers()); // unused, since 1-based
-	// redefine return type {atomid,1}
-	auto& rettype = cdeftable.rawclassdef(CLID{atom.atomid, 1});
-	assert(atom.atomid == rettype.clid.atomid());
-	Atom* atomparam = (not rettype.isBuiltinOrVoid()) ? cdeftable.findRawClassdefAtom(rettype) : nullptr;
-	cdeftable.addSubstitute(rettype.kind, atomparam, rettype.qualifiers);
+	auto& rettype = cdeftable.rawclassdef(CLID{atom.atomid, 1}); // return type
+	Atom* retAtom = (not rettype.isBuiltinOrVoid()) ? cdeftable.findRawClassdefAtom(rettype) : nullptr;
+	cdeftable.addSubstitute(rettype.kind, retAtom, rettype.qualifiers);
 	auto substitute = [&](auto & parameter) {
 		cdeftable.addSubstitute(parameter.kind, parameter.atom, parameter.qualifiers);
 		assert(parameter.kind != nyt_any or parameter.atom != nullptr);
@@ -150,7 +145,7 @@ ir::Sequence* performAtomInstanciation(InstanciateData& info, Signature& signatu
 	if (config::traces::sourceOpcodeSequence)
 		debugPrintSourceOpcodeSequence(info.cdeftable, info.atom.get(), "[ir-from-ast] ");
 	// transfert input parameters
-	pushParameterTypes(*builder, atom, signature);
+	pushParameterTypes(builder->cdeftable, atom, signature);
 	builder->layerDepthLimit = 2; // allow the first blueprint to be instanciated
 	// atomid mapping, usefull to keep track of the good atom id
 	builder->mappingBlueprintAtomID[0] = atomRequested.atomid; // {from}
