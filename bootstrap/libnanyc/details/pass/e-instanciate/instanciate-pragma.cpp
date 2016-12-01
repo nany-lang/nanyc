@@ -13,7 +13,7 @@ namespace Instanciate {
 namespace {
 
 
-bool pragmaBodyStart(SequenceBuilder& seq) {
+bool bodyStart(SequenceBuilder& seq) {
 	assert(seq.frame != nullptr);
 	assert(not seq.signatureOnly);
 	assert(seq.codeGenerationLock == 0 and "any good reason to not generate code ?");
@@ -78,7 +78,7 @@ bool pragmaBodyStart(SequenceBuilder& seq) {
 }
 
 
-void pragmaCodegen(SequenceBuilder& seq, bool onoff) {
+void codegen(SequenceBuilder& seq, bool onoff) {
 	auto& refcount = seq.codeGenerationLock;
 	if (onoff) {
 		if (refcount > 0) // re-enable code generation
@@ -89,7 +89,7 @@ void pragmaCodegen(SequenceBuilder& seq, bool onoff) {
 }
 
 
-void pragmaBlueprintSize(SequenceBuilder& seq, uint32_t opcodeCount) {
+void blueprintSize(SequenceBuilder& seq, uint32_t opcodeCount) {
 	if (0 == seq.layerDepthLimit) {
 		// ignore the current blueprint
 		//*cursor += operands.value.blueprintsize;
@@ -105,8 +105,7 @@ void pragmaBlueprintSize(SequenceBuilder& seq, uint32_t opcodeCount) {
 }
 
 
-void pragmaShortcircuitMutateToBool(SequenceBuilder& seq,
-									const ir::isa::Operand<ir::isa::Op::pragma>& operands) {
+void shortcircuitMutateToBool(SequenceBuilder& seq, const ir::isa::Operand<ir::isa::Op::pragma>& operands) {
 	uint32_t lvid = operands.value.shortcircuitMutate.lvid;
 	uint32_t source = operands.value.shortcircuitMutate.source;
 	seq.frame->lvids(lvid).synthetic = false;
@@ -138,19 +137,19 @@ void pragmaShortcircuitMutateToBool(SequenceBuilder& seq,
 void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::pragma>& operands) {
 	switch (operands.pragma) {
 		case ir::isa::Pragma::codegen: {
-			pragmaCodegen(*this, operands.value.codegen != 0);
+			codegen(*this, operands.value.codegen != 0);
 			break;
 		}
 		case ir::isa::Pragma::bodystart: {
 			// In 'signature only' mode, we only care about the
 			// parameter user types. Everything after this opcode is unrelevant
-			bool r = (!signatureOnly and pragmaBodyStart(*this)); // params deep copy, implicit var auto-init...
+			bool r = (!signatureOnly and bodyStart(*this)); // params deep copy, implicit var auto-init...
 			if (not r)
 				currentSequence.invalidateCursor(*cursor);
 			break;
 		}
 		case ir::isa::Pragma::blueprintsize: {
-			pragmaBlueprintSize(*this, operands.value.blueprintsize);
+			blueprintSize(*this, operands.value.blueprintsize);
 			break;
 		}
 		case ir::isa::Pragma::visibility: {
@@ -162,7 +161,7 @@ void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::pragma>& operand
 			break;
 		}
 		case ir::isa::Pragma::shortcircuitMutateToBool: {
-			pragmaShortcircuitMutateToBool(*this, operands);
+			shortcircuitMutateToBool(*this, operands);
 			break;
 		}
 		case ir::isa::Pragma::synthetic: {
