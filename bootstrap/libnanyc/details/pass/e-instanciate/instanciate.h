@@ -321,7 +321,11 @@ public:
 	//! Force mapping from an atomid to another one
 	// This mapping is required instnaciating the code from a
 	// forked atom and to avoid invalid references
-	uint32_t mappingBlueprintAtomID[2] = {0, 0};
+	struct {
+		uint32_t from = 0;
+		uint32_t to = 0;
+	}
+	mappingBlueprintAtomID;
 	//! cursor
 	ir::Instruction** cursor = nullptr;
 

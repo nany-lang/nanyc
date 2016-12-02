@@ -137,8 +137,8 @@ ir::Sequence* performAtomInstanciation(InstanciateData& info, Signature& signatu
 	substituteParameterTypes(builder->cdeftable, atom, signature);
 	builder->layerDepthLimit = 2; // allow the first blueprint to be instanciated
 	// atomid mapping, usefull to keep track of the good atom id
-	builder->mappingBlueprintAtomID[0] = atomRequested.atomid; // {from}
-	builder->mappingBlueprintAtomID[1] = atom.atomid;          // {to}
+	builder->mappingBlueprintAtomID.from = atomRequested.atomid;
+	builder->mappingBlueprintAtomID.to   = atom.atomid;
 	// Read the input ir sequence, resolve all types, and generate
 	// a new ir sequence ready for execution ! (with or without optimization passes)
 	// (everything happens here)
@@ -593,8 +593,8 @@ bool instanciateAtomParameterTypes(InstanciateData& info) {
 	builder->signatureOnly = true;
 	builder->codeGenerationLock = 666; // arbitrary value != 0 to prevent from code generation
 	// Atom ID mapping, irelevant here
-	builder->mappingBlueprintAtomID[0] = atom.atomid;
-	builder->mappingBlueprintAtomID[1] = atom.atomid;
+	builder->mappingBlueprintAtomID.from = atom.atomid;
+	builder->mappingBlueprintAtomID.to   = atom.atomid;
 	bool instanciated = builder->readAndInstanciate(atom.opcodes.offset);
 	assert(builder->codeGenerationLock == 666);
 	if (not instanciated)
