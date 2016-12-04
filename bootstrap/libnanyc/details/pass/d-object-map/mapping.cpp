@@ -96,7 +96,7 @@ struct OpcodeReader final {
 		if (debugmode) {
 			if (unlikely(lvid == 0 or not (lvid < atomStack->classdefs.size()))) {
 				complainOperand(operands, String{"mapping: invalid lvid %"} << lvid
-								<< " (upper bound: %" << atomStack->classdefs.size() << ')');
+					<< " (upper bound: %" << atomStack->classdefs.size() << ')');
 				return false;
 			}
 		}
@@ -166,16 +166,16 @@ struct OpcodeReader final {
 		lastPushedIndexedParameters.clear();
 		// global func operators (or unittest) always belong to root, even if declared in a specific namespace
 		bool isGlobalOperator = isFuncdef and atom.type == Atom::Type::namespacedef
-								and funcname[0] == '^'
-								and (not funcname.startsWith("^view^"))
-								and (not funcname.startsWith("^prop"));
+			and funcname[0] == '^'
+			and (not funcname.startsWith("^view^"))
+			and (not funcname.startsWith("^prop"));
 		auto& parentAtom = (not isGlobalOperator)
-						   ? atom
-						   : cdeftable.atoms.root;
+			? atom
+			: cdeftable.atoms.root;
 		MutexLocker locker{mutex};
 		auto& newatom = isFuncdef
-						? cdeftable.atoms.createFuncdef(parentAtom, funcname)
-						: cdeftable.atoms.createTypealias(parentAtom, funcname);
+			? cdeftable.atoms.createFuncdef(parentAtom, funcname)
+			: cdeftable.atoms.createTypealias(parentAtom, funcname);
 		newatom.opcodes.sequence = &currentSequence;
 		newatom.opcodes.offset   = currentSequence.offsetOf(operands);
 		cdeftable.registerAtom(newatom);
@@ -213,8 +213,7 @@ struct OpcodeReader final {
 				cdeftable.registerAtom(newClassAtom);
 				return newClassAtom;
 			}
-			else
-			{
+			else {
 				String tmpname;
 				tmpname.reserve(classname.size() + prefixNameForFirstAtomCreated.size());
 				tmpname << prefixNameForFirstAtomCreated << classname;
