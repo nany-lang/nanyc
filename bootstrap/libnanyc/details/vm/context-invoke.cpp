@@ -107,7 +107,6 @@ public:
 	~Executor() {
 		if (dyncall)
 			dcFree(dyncall);
-		// memory leaks ?
 		memchecker.printLeaksIfAny(context.cf);
 	}
 

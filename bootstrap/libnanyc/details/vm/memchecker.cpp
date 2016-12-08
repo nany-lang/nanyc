@@ -1,4 +1,5 @@
 #include "memchecker.h"
+#include "details/vm/console.h"
 
 using namespace Yuni;
 
@@ -17,23 +18,22 @@ void MemChecker<true>::releaseAll(nyallocator_t& allocator) {
 
 
 void MemChecker<true>::printLeaks(const nyprogram_cf_t& cf) const {
-	auto print = [&](const AnyString & msg) {
-		cf.console.write_stderr(cf.console.internal, msg.c_str(), msg.size());
+	auto cerr = [&cf](const AnyString& string) {
+		ny::vm::console::cerr(cf, string);
 	};
 	ShortString128 msg;
-	print("\n\n=== nany vm: memory leaks detected in ");
-	msg << ownedPointers.size();
-	print(msg);
-	print(" blocks ===\n");
-	for (auto& pair : ownedPointers) {
+	msg << "\n\n=== nanyc vm: memory leaks detected in ";
+	msg << ownedPointers.size() << " blocks ===\n";
+	cerr(msg);
+	for (auto& pair: ownedPointers) {
 		msg.clear();
 		msg << "    block " << (void*) pair.first << ' ';
 		msg << pair.second.objsize << " bytes at ";
 		msg << pair.second.origin;
 		msg << '\n';
-		print(msg);
+		cerr(msg);
 	}
-	print("\n");
+	cerr("\n");
 }
 
 
