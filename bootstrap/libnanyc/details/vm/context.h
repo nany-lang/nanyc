@@ -58,7 +58,7 @@ public:
 
 	struct IO {
 		/*!
-		** \briefFind the adapter and the relative adapter path from a virtual path
+		** \brief Find the adapter and the relative adapter path from a virtual path
 		**
 		** \param[out] relativepath Get a non-empty absolute path (but may contain segments like '.' amd '..')
 		** \param path Am aboslute virtual path
