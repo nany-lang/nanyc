@@ -17,7 +17,7 @@ void MemChecker<true>::releaseAll(nyallocator_t& allocator) {
 }
 
 
-void MemChecker<true>::printLeaks(const nyprogram_cf_t& cf) const {
+void MemChecker<true>::printLeaks(const nyprogram_cf_t& cf) const noexcept {
 	auto cerr = [&cf](const AnyString& string) {
 		ny::vm::console::cerr(cf, string);
 	};
@@ -25,13 +25,18 @@ void MemChecker<true>::printLeaks(const nyprogram_cf_t& cf) const {
 	msg << "\n\n=== nanyc vm: memory leaks detected in ";
 	msg << ownedPointers.size() << " blocks ===\n";
 	cerr(msg);
-	for (auto& pair: ownedPointers) {
-		msg.clear();
-		msg << "    block " << (void*) pair.first << ' ';
-		msg << pair.second.objsize << " bytes at ";
-		msg << pair.second.origin;
-		msg << '\n';
-		cerr(msg);
+	try {
+		for (auto& pair: ownedPointers) {
+			msg.clear();
+			msg << "    block " << (void*) pair.first << ' ';
+			msg << pair.second.objsize << " bytes at ";
+			msg << pair.second.origin;
+			msg << '\n';
+			cerr(msg);
+		}
+	}
+	catch (...) {
+		cerr("<received c++exception>");
 	}
 	cerr("\n");
 }

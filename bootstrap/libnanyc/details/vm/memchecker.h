@@ -92,14 +92,14 @@ template<> struct MemChecker<true> final {
 	}
 
 
-	void printLeaksIfAny(const nyprogram_cf_t& cf) const {
+	void printLeaksIfAny(const nyprogram_cf_t& cf) const noexcept {
 		if (unlikely(not ownedPointers.empty()))
 			printLeaks(cf);
 	}
 
 
 private:
-	void printLeaks(const nyprogram_cf_t&) const;
+	void printLeaks(const nyprogram_cf_t&) const noexcept;
 
 private:
 	struct AllocInfo final {
