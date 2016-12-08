@@ -50,11 +50,8 @@ namespace {
 struct Executor final {
 	nyallocator_t& allocator;
 	DCCallVM* dyncall = nullptr;
-	//! For C calls
 	nyvm_t cfvm;
-	//! Program configuratio
 	nyprogram_cf_t cf;
-	//! Current thread context
 	Context& context;
 	//! Registers for the current stack frame
 	DataRegister* registers = nullptr;
@@ -65,19 +62,13 @@ struct Executor final {
 	//! all pushed parameters
 	DataRegister funcparams[config::maxPushedParameters];
 	Stack stack;
-	//! Stack trace
 	Stacktrace<true> stacktrace;
-	//! Memory checker
 	MemChecker<true> memchecker;
 	//! upper label id encountered so far
 	uint32_t upperLabelID = 0;
-	//! Atom collection references
 	const AtomMap& map;
-	//! Source sequence
 	std::reference_wrapper<const ir::Sequence> sequence;
-	//! All user-defined intrinsics
 	const IntrinsicTable& userDefinedIntrinsics;
-	//! Reference to the current iterator
 	const ir::Instruction** cursor = nullptr;
 	//! Jump buffer, to handle exceptions during the execution of the program
 	std::jmp_buf jump_buffer;
@@ -112,12 +103,8 @@ public:
 
 
 	[[noreturn]] void abortMission() {
-		// dump information on the console
+		memchecker.releaseAll(allocator); // prevent memory leak reports
 		stacktrace.dump(ny::ref(context.program.build), map);
-		// avoid spurious err messages and memory leaks when used
-		// as scripting engine
-		memchecker.releaseAll(allocator);
-		// abort the execution of the program
 		std::longjmp(jump_buffer, 666);
 	}
 
@@ -191,30 +178,24 @@ public:
 
 
 	void destroy(uint64_t* object, uint32_t dtorid, uint32_t instanceid) {
-		// the dtor function to call
 		auto& dtor = *map.findAtom(dtorid);
-		if (false) { // traces
+		if (false) {
 			std::cout << " .. DESTROY " << (void*) object << " aka '"
 					  << dtor.caption() << "' at opc+" << sequence.get().offsetOf(**cursor) << '\n';
 			stacktrace.dump(ny::ref(context.program.build), map);
 			std::cout << '\n';
 		}
-		// the parent class
 		auto* classobject = dtor.parent;
 		assert(classobject != nullptr);
-		// its size
 		uint64_t classsizeof = classobject->runtimeSizeof();
 		classsizeof += config::extraObjectSize;
 		if (instanceid != (uint32_t) - 1) {
-			// reset parameters for func call
 			funcparamCount = 1;
 			funcparams[0].u64 = reinterpret_cast<uint64_t>(object); // self
-			// func call
 			call(0, dtor.atomid, instanceid);
 		}
 		if (debugmode)
 			memset(object, patternFree, classsizeof);
-		// sandbox release
 		deallocate(object, static_cast<size_t>(classsizeof));
 		memchecker.forget(object);
 	}
@@ -222,12 +203,11 @@ public:
 
 	inline void gotoLabel(uint32_t label) {
 		bool jmpsuccess = (label > upperLabelID)
-						  ? sequence.get().jumpToLabelForward(*cursor, label)
-						  : sequence.get().jumpToLabelBackward(*cursor, label);
+			? sequence.get().jumpToLabelForward(*cursor, label)
+			: sequence.get().jumpToLabelBackward(*cursor, label);
 		if (unlikely(not jmpsuccess))
 			emitLabelError(label);
-		// the labels are strictly ordered
-		upperLabelID = label;
+		upperLabelID = label; // the labels are strictly ordered
 	}
 
 
@@ -760,7 +740,7 @@ public:
 			return emitBadAlloc();
 		if (debugmode)
 			memset(pointer, patternAlloc, size);
-		pointer[0] = 0; // init ref counter
+		pointer[0] = 0;
 		registers[opr.lvid].u64 = reinterpret_cast<uint64_t>(pointer);
 		memchecker.hold(pointer, size, opr.lvid);
 	}
@@ -777,7 +757,6 @@ public:
 		oldsize += config::extraObjectSize;
 		newsize += config::extraObjectSize;
 		if (object) {
-			// checking the input pointer
 			vm_CHECK_POINTER(object, opr);
 			if (unlikely(not memchecker.checkObjectSize(object, static_cast<size_t>(oldsize))))
 				return emitPointerSizeMismatch(object, oldsize);
@@ -790,8 +769,7 @@ public:
 			memchecker.hold(newptr, newsize, opr.lvid);
 		}
 		else {
-			// `realloc` may not release the input pointer if the
-			// allocation failed
+			// `realloc` may not release the input pointer if the allocation failed
 			deallocate(object, oldsize);
 			emitBadAlloc();
 		}
@@ -943,8 +921,8 @@ public:
 	}
 
 	template<ir::isa::Op O> void visit(const ir::isa::Operand<O>& opr) {
-		vm_PRINT_OPCODE(opr); // FALLBACK
-		(void) opr; // unused
+		vm_PRINT_OPCODE(opr);
+		(void) opr;
 		return emitUnexpectedOpcode(ir::isa::Operand<O>::opname());
 	}
 
@@ -964,9 +942,7 @@ public:
 		for (uint32_t i = 0; i != funcparamCount; ++i)
 			registers[i + 2].u64 = funcparams[i].u64; // 2-based
 		funcparamCount = 0;
-		//
-		// iterate through all opcodes
-		//
+
 		callee.each(*this, 1); // offset: 1, avoid blueprint pragma
 		stack.pop(framesize);
 		return retRegister;
@@ -1018,7 +994,6 @@ public:
 
 bool Context::invoke(uint64_t& exitstatus, const ir::Sequence& callee, uint32_t atomid,
 		uint32_t instanceid) {
-	// if something happens
 	exitstatus = static_cast<uint64_t>(-1);
 	if (!cf.on_thread_create
 		or nyfalse != cf.on_thread_create(program.self(), self(), nullptr, name.c_str(), name.size())) {
