@@ -47,7 +47,7 @@ constexpr static const int patternFree = 0xCD;
 namespace {
 
 
-struct Executor final {
+struct ContextRunner final {
 	nyallocator_t& allocator;
 	DCCallVM* dyncall = nullptr;
 	nyvm_t cfvm;
@@ -78,7 +78,7 @@ struct Executor final {
 	#endif
 
 public:
-	Executor(Context& context, const ir::Sequence& callee)
+	ContextRunner(Context& context, const ir::Sequence& callee)
 		: allocator(context.program.cf.allocator)
 		, cf(context.program.cf)
 		, context(context)
@@ -95,7 +95,7 @@ public:
 		cfvm.console = &cf.console;
 	}
 
-	~Executor() {
+	~ContextRunner() {
 		if (dyncall)
 			dcFree(dyncall);
 		memchecker.printLeaksIfAny(context.cf);
@@ -986,7 +986,7 @@ public:
 		#endif
 	}
 
-}; // struct Executor
+}; // struct ContextRunner
 
 
 } // anonymous namespace
@@ -997,11 +997,11 @@ bool Context::invoke(uint64_t& exitstatus, const ir::Sequence& callee, uint32_t 
 	exitstatus = static_cast<uint64_t>(-1);
 	if (!cf.on_thread_create
 		or nyfalse != cf.on_thread_create(program.self(), self(), nullptr, name.c_str(), name.size())) {
-		Executor executor{*this, callee};
-		executor.stacktrace.push(atomid, instanceid);
-		if (setjmp(executor.jump_buffer) != 666) {
-			executor.invoke(callee);
-			exitstatus = executor.retRegister;
+		ContextRunner runner{*this, callee};
+		runner.stacktrace.push(atomid, instanceid);
+		if (setjmp(runner.jump_buffer) != 666) {
+			runner.invoke(callee);
+			exitstatus = runner.retRegister;
 			if (cf.on_thread_destroy)
 				cf.on_thread_destroy(program.self(), self());
 			return true;
