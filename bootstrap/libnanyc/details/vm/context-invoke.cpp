@@ -1,4 +1,4 @@
-#include "thread-context.h"
+#include "details/vm/context.h"
 #include "details/vm/types.h"
 #include "stack.h"
 #include "stacktrace.h"
@@ -54,7 +54,7 @@ struct Executor final {
 	//! Program configuratio
 	nyprogram_cf_t cf;
 	//! Current thread context
-	ThreadContext& threadContext;
+	Context& context;
 	//! Registers for the current stack frame
 	DataRegister* registers = nullptr;
 	//! Return value
@@ -86,20 +86,20 @@ struct Executor final {
 	#endif
 
 public:
-	Executor(ThreadContext& threadContext, const ir::Sequence& callee)
-		: allocator(threadContext.program.cf.allocator)
-		, cf(threadContext.program.cf)
-		, threadContext(threadContext)
-		, map(threadContext.program.map)
+	Executor(Context& context, const ir::Sequence& callee)
+		: allocator(context.program.cf.allocator)
+		, cf(context.program.cf)
+		, context(context)
+		, map(context.program.map)
 		, sequence(std::cref(callee))
-		, userDefinedIntrinsics(ny::ref(threadContext.program.build).intrinsics) {
+		, userDefinedIntrinsics(ny::ref(context.program.build).intrinsics) {
 		// dynamic C calls
 		dyncall = dcNewCallVM(4096);
 		dcMode(dyncall, DC_CALL_C_DEFAULT);
 		// prepare the current context for native C calls
 		cfvm.allocator = &allocator;
-		cfvm.program = threadContext.program.self();
-		cfvm.tctx = threadContext.self();
+		cfvm.program = context.program.self();
+		cfvm.tctx = context.self();
 		cfvm.console = &cf.console;
 	}
 
@@ -107,13 +107,13 @@ public:
 		if (dyncall)
 			dcFree(dyncall);
 		// memory leaks ?
-		memchecker.printLeaksIfAny(threadContext.cf);
+		memchecker.printLeaksIfAny(context.cf);
 	}
 
 
 	[[noreturn]] void abortMission() {
 		// dump information on the console
-		stacktrace.dump(ny::ref(threadContext.program.build), map);
+		stacktrace.dump(ny::ref(context.program.build), map);
 		// avoid spurious err messages and memory leaks when used
 		// as scripting engine
 		memchecker.releaseAll(allocator);
@@ -123,7 +123,7 @@ public:
 
 
 	[[noreturn]] void emitBadAlloc() {
-		threadContext.cerrException("failed to allocate memory");
+		context.cerrException("failed to allocate memory");
 		abortMission();
 	}
 
@@ -134,13 +134,13 @@ public:
 			<< size << " bytes, expected "
 			<< memchecker.fetchObjectSize(reinterpret_cast<const uint64_t*>(object))
 			<< " bytes";
-		threadContext.cerrException(msg);
+		context.cerrException(msg);
 		abortMission();
 	}
 
 
 	[[noreturn]] void emitAssert() {
-		threadContext.cerrException("assertion failed");
+		context.cerrException("assertion failed");
 		abortMission();
 	}
 
@@ -148,31 +148,31 @@ public:
 	[[noreturn]] void emitUnexpectedOpcode(const AnyString& name) {
 		ShortString64 msg;
 		msg << "error: vm: unexpected opcode '" << name << '\'';
-		threadContext.cerrException(msg);
+		context.cerrException(msg);
 		abortMission();
 	}
 
 
 	[[noreturn]] void emitInvalidIntrinsicParamType() {
-		threadContext.cerrException("intrinsic invalid parameter type");
+		context.cerrException("intrinsic invalid parameter type");
 		abortMission();
 	}
 
 
 	[[noreturn]] void emitInvalidReturnType() {
-		threadContext.cerrException("intrinsic invalid return type");
+		context.cerrException("intrinsic invalid return type");
 		abortMission();
 	}
 
 
 	[[noreturn]] void emitDividedByZero() {
-		threadContext.cerrException("division by zero");
+		context.cerrException("division by zero");
 		abortMission();
 	}
 
 
 	[[noreturn]] void emitUnknownPointer(void* p) {
-		threadContext.cerrUnknownPointer(p, sequence.get().offsetOf(**cursor));
+		context.cerrUnknownPointer(p, sequence.get().offsetOf(**cursor));
 		abortMission();
 	}
 
@@ -182,7 +182,7 @@ public:
 		msg << "invalid label %" << label;
 		msg << " (upper: %" << upperLabelID;
 		msg << "), opcode: +" << sequence.get().offsetOf(**cursor);
-		threadContext.cerrException(msg);
+		context.cerrException(msg);
 		abortMission();
 	}
 
@@ -204,7 +204,7 @@ public:
 		if (false) { // traces
 			std::cout << " .. DESTROY " << (void*) object << " aka '"
 					  << dtor.caption() << "' at opc+" << sequence.get().offsetOf(**cursor) << '\n';
-			stacktrace.dump(ny::ref(threadContext.program.build), map);
+			stacktrace.dump(ny::ref(context.program.build), map);
 			std::cout << '\n';
 		}
 		// the parent class
@@ -1024,7 +1024,7 @@ public:
 } // anonymous namespace
 
 
-bool ThreadContext::invoke(uint64_t& exitstatus, const ir::Sequence& callee, uint32_t atomid,
+bool Context::invoke(uint64_t& exitstatus, const ir::Sequence& callee, uint32_t atomid,
 		uint32_t instanceid) {
 	// if something happens
 	exitstatus = static_cast<uint64_t>(-1);

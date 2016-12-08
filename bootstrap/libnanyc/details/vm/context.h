@@ -4,10 +4,9 @@
 #include <array>
 
 
-
-
 namespace ny {
 namespace vm {
+
 
 struct Mountpoint final {
 	Yuni::ShortString256 path;
@@ -15,14 +14,14 @@ struct Mountpoint final {
 };
 
 
-class ThreadContext final {
+class Context final {
 public:
 	//! Default constructor
-	explicit ThreadContext(Program& program, const AnyString& name);
+	explicit Context(Program& program, const AnyString& name);
 	//! Clone a thread context
-	explicit ThreadContext(ThreadContext&);
+	explicit Context(Context&);
 	//! Destructor
-	~ThreadContext();
+	~Context();
 
 	//! Get the equivalent C type
 	nytctx_t* self();
@@ -95,10 +94,10 @@ public:
 private:
 	void initFallbackAdapter(nyio_adapter_t& adapter);
 
-}; // class ThreadContext
+}; // class Context
 
 
 } // namespace vm
 } // namespace ny
 
-#include "thread-context.hxx"
+#include "details/vm/context.hxx"

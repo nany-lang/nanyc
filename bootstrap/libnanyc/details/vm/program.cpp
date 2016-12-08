@@ -2,7 +2,7 @@
 #include "details/atom/atom.h"
 #include "details/intrinsic/intrinsic-table.h"
 #include "types.h"
-#include "thread-context.h"
+#include "details/vm/context.h"
 
 using namespace Yuni;
 
@@ -45,15 +45,15 @@ int Program::execute(uint32_t argc, const char** argv) {
 	uint32_t atomid = ny::ref(build).main.atomid;
 	uint32_t instanceid = ny::ref(build).main.instanceid;
 	auto& sequence = map.sequence(atomid, instanceid);
-	ThreadContext thrctx{*this, AnyString{cf.entrypoint.c_str, cf.entrypoint.size}};
-	bool success = thrctx.initializeFirstTContext();
+	Context context{*this, AnyString{cf.entrypoint.c_str, cf.entrypoint.size}};
+	bool success = context.initializeFirstTContext();
 	if (YUNI_UNLIKELY(not success))
 		return 666;
 	//
 	// Execute the program
 	//
 	uint64_t exitstatus;
-	if (thrctx.invoke(exitstatus, sequence, atomid, instanceid)) {
+	if (context.invoke(exitstatus, sequence, atomid, instanceid)) {
 		retvalue = static_cast<int>(exitstatus);
 		if (cf.on_terminate)
 			cf.on_terminate(self(), nytrue, retvalue);

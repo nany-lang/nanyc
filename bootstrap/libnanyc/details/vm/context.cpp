@@ -1,4 +1,4 @@
-#include "thread-context.h"
+#include "details/vm/context.h"
 #include <yuni/core/system/environment.h>
 #include <yuni/io/directory/system.h>
 #include <yuni/core/string.h>
@@ -11,14 +11,14 @@ namespace ny {
 namespace vm {
 
 
-ThreadContext::ThreadContext(Program& program, const AnyString& name)
+Context::Context(Program& program, const AnyString& name)
 	: program(program)
 	, cf(program.cf)
 	, name(name) {
 }
 
 
-ThreadContext::ThreadContext(ThreadContext& rhs)
+Context::Context(Context& rhs)
 	: program(rhs.program)
 	, cf(rhs.cf) {
 	memcpy(&io.fallback.adapter, &rhs.io.fallback.adapter, sizeof(nyio_adapter_t));
@@ -36,7 +36,7 @@ ThreadContext::ThreadContext(ThreadContext& rhs)
 }
 
 
-ThreadContext::~ThreadContext() {
+Context::~Context() {
 	for (uint32_t i = 0; i != io.mountpointSize; ++i) {
 		auto& mountpoint = io.mountpoints[i];
 		if (mountpoint.adapter.release)
@@ -45,7 +45,7 @@ ThreadContext::~ThreadContext() {
 }
 
 
-bool ThreadContext::IO::addMountpoint(const AnyString& path, nyio_adapter_t& adapter) {
+bool Context::IO::addMountpoint(const AnyString& path, nyio_adapter_t& adapter) {
 	if (mountpointSize < mountpoints.max_size() and path.size() < ShortString256::chunkSize) {
 		// inserting the new mountpoint at the begining
 		if (mountpointSize++ != 0) {
@@ -67,7 +67,7 @@ bool ThreadContext::IO::addMountpoint(const AnyString& path, nyio_adapter_t& ada
 }
 
 
-bool ThreadContext::initializeFirstTContext() {
+bool Context::initializeFirstTContext() {
 	// default current working directory
 	io.cwd = "/home";
 	// fallback filesystem
@@ -104,7 +104,7 @@ bool ThreadContext::initializeFirstTContext() {
 }
 
 
-void ThreadContext::cerrException(const AnyString& msg) {
+void Context::cerrException(const AnyString& msg) {
 	cerr("\n\n");
 	cerrColor(nyc_red);
 	cerr("exception: ");
@@ -115,7 +115,7 @@ void ThreadContext::cerrException(const AnyString& msg) {
 }
 
 
-void ThreadContext::cerrUnknownPointer(void* ptr, uint32_t offset) {
+void Context::cerrUnknownPointer(void* ptr, uint32_t offset) {
 	ShortString128 msg; // avoid memory allocation
 	msg << "unknown pointer " << ptr << ", opcode: +";
 	msg << offset;
@@ -123,7 +123,7 @@ void ThreadContext::cerrUnknownPointer(void* ptr, uint32_t offset) {
 }
 
 
-nyio_adapter_t& ThreadContext::IO::resolve(AnyString& adapterpath, const AnyString& path) {
+nyio_adapter_t& Context::IO::resolve(AnyString& adapterpath, const AnyString& path) {
 	// /some/root/folder[/some/adapter/folder]
 	//                 ^                     ^
 	//  mppath/msize --|        path/psize --|
