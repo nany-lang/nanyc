@@ -11,7 +11,7 @@ namespace vm {
 Stacktrace<true>::Stacktrace() {
 	uint32_t capacity = 64;
 	baseframe  = (Frame*)::malloc(sizeof(Frame) * capacity);
-	if (YUNI_UNLIKELY(nullptr == baseframe))
+	if (unlikely(!baseframe))
 		throw std::bad_alloc();
 	upperLimit = baseframe + capacity;
 	topframe   = baseframe;
@@ -29,7 +29,7 @@ void Stacktrace<true>::grow() {
 	auto size        = (offtop - offbase) / sizeof(Frame);
 	auto newcapacity = size + 64;
 	baseframe  = (Frame*)::realloc(baseframe, sizeof(Frame) * newcapacity);
-	if (YUNI_UNLIKELY(!baseframe))
+	if (unlikely(!baseframe))
 		throw std::bad_alloc();
 	topframe   = baseframe + size;
 	upperLimit = baseframe + newcapacity;

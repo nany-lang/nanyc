@@ -31,7 +31,7 @@ struct Stacktrace<true> final {
 
 
 	void push(uint32_t atomid, uint32_t instanceid) {
-		if (YUNI_UNLIKELY(not (++topframe < upperLimit)))
+		if (unlikely(not (++topframe < upperLimit)))
 			grow();
 		*topframe = Frame{{atomid, instanceid}};
 	}
