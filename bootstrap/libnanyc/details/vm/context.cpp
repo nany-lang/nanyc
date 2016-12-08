@@ -104,25 +104,6 @@ bool Context::initializeFirstTContext() {
 }
 
 
-void Context::cerrException(const AnyString& msg) {
-	cerr("\n\n");
-	cerrColor(nyc_red);
-	cerr("exception: ");
-	cerrColor(nyc_white);
-	cerr(msg);
-	cerrColor(nyc_none);
-	cerr("\n");
-}
-
-
-void Context::cerrUnknownPointer(void* ptr, uint32_t offset) {
-	ShortString128 msg; // avoid memory allocation
-	msg << "unknown pointer " << ptr << ", opcode: +";
-	msg << offset;
-	cerrException(msg);
-}
-
-
 nyio_adapter_t& Context::IO::resolve(AnyString& adapterpath, const AnyString& path) {
 	// /some/root/folder[/some/adapter/folder]
 	//                 ^                     ^

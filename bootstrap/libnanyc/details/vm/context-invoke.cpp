@@ -1,5 +1,6 @@
 #include "details/vm/context.h"
 #include "details/vm/types.h"
+#include "details/vm/console.h"
 #include "stack.h"
 #include "stacktrace.h"
 #include "memchecker.h"
@@ -123,66 +124,58 @@ public:
 
 
 	[[noreturn]] void emitBadAlloc() {
-		context.cerrException("failed to allocate memory");
+		ny::vm::console::badAlloc(context);
 		abortMission();
 	}
 
 
 	[[noreturn]] void emitPointerSizeMismatch(void* object, size_t size) {
-		ShortString128 msg;
-		msg << "pointer " << object << " size mismatch: got "
-			<< size << " bytes, expected "
-			<< memchecker.fetchObjectSize(reinterpret_cast<const uint64_t*>(object))
-			<< " bytes";
-		context.cerrException(msg);
+		ny::vm::console::invalidPointerSize(context, object,
+			/*got*/    size,
+			/*expect*/ memchecker.fetchObjectSize(reinterpret_cast<const uint64_t*>(object)));
 		abortMission();
 	}
 
 
 	[[noreturn]] void emitAssert() {
-		context.cerrException("assertion failed");
+		ny::vm::console::assertFailed(context);
 		abortMission();
 	}
 
 
 	[[noreturn]] void emitUnexpectedOpcode(const AnyString& name) {
-		ShortString64 msg;
-		msg << "error: vm: unexpected opcode '" << name << '\'';
-		context.cerrException(msg);
+		ny::vm::console::unexpectedOpcode(context, name);
 		abortMission();
 	}
 
 
 	[[noreturn]] void emitInvalidIntrinsicParamType() {
-		context.cerrException("intrinsic invalid parameter type");
+		ny::vm::console::invalidIntrinsicParameterType(context);
 		abortMission();
 	}
 
 
 	[[noreturn]] void emitInvalidReturnType() {
-		context.cerrException("intrinsic invalid return type");
+		ny::vm::console::invalidReturnType(context);
 		abortMission();
 	}
 
 
 	[[noreturn]] void emitDividedByZero() {
-		context.cerrException("division by zero");
+		ny::vm::console::divisionByZero(context);
 		abortMission();
 	}
 
 
 	[[noreturn]] void emitUnknownPointer(void* p) {
-		context.cerrUnknownPointer(p, sequence.get().offsetOf(**cursor));
+		ny::vm::console::unknownPointer(context, p, sequence.get().offsetOf(**cursor));
 		abortMission();
 	}
 
 
 	[[noreturn]] void emitLabelError(uint32_t label) {
-		ShortString256 msg;
-		msg << "invalid label %" << label;
-		msg << " (upper: %" << upperLabelID;
-		msg << "), opcode: +" << sequence.get().offsetOf(**cursor);
-		context.cerrException(msg);
+		ny::vm::console::invalidLabel(context, label, upperLabelID,
+			sequence.get().offsetOf(**cursor));
 		abortMission();
 	}
 

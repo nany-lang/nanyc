@@ -17,15 +17,5 @@ inline const nytctx_t* Context::self() const {
 }
 
 
-inline void Context::cerr(const AnyString& msg) {
-	cf.console.write_stderr(cf.console.internal, msg.c_str(), msg.size());
-}
-
-
-inline void Context::cerrColor(nycolor_t color) {
-	cf.console.set_color(cf.console.internal, nycerr, color);
-}
-
-
 } // namespace vm
 } // namespace ny

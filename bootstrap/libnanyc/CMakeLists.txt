@@ -313,6 +313,8 @@ addsrc(
 	"details/vm/context-invoke.cpp"
 	"details/vm/memchecker.h"
 	"details/vm/memchecker.cpp"
+	"details/vm/console.h"
+	"details/vm/console.cpp"
 	"details/vm/stacktrace.h"
 	"details/vm/stacktrace.hxx"
 	"details/vm/stacktrace.cpp"

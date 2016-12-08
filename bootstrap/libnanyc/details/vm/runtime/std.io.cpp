@@ -5,6 +5,7 @@
 #include <yuni/core/string.h>
 #include <yuni/io/file.h>
 #include "details/vm/context.h"
+#include "details/vm/console.h"
 
 using namespace Yuni;
 
@@ -191,7 +192,7 @@ static bool nanyc_io_folder_copy(nyvm_t* vm, const char* path, uint32_t len, con
 	AnyString requestedPathTo{to, tolen};
 	AnyString adapterPathTo;
 	auto& adapterTo = tc.io.resolve(adapterPathTo, requestedPathTo);
-	tc.cerr("error: !!__nanyc_io_folder_copy not implemented");
+	ny::vm::console::exception(tc, "!!__nanyc_io_folder_copy not implemented");
 	// TODO implement !!__nanyc_io_folder_copy
 	if (&adapter == &adapterTo) {
 		// optimisation when copying data with an unique adapter

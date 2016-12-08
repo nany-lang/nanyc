@@ -27,17 +27,6 @@ struct Context final {
 	//! Get the equivalent C type (const)
 	const nytctx_t* self() const;
 
-	/*!
-	** \brief Print a message on the console
-	*/
-	void cerr(const AnyString& msg);
-	//! Set the text color on the error output
-	void cerrColor(nycolor_t);
-
-	void cerrException(const AnyString& msg);
-	void cerrUnknownPointer(void*, uint32_t offset);
-
-
 	bool invoke(uint64_t& exitstatus, const ir::Sequence& callee, uint32_t atomid, uint32_t instanceid);
 
 	bool initializeFirstTContext();
