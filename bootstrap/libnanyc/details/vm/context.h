@@ -14,8 +14,7 @@ struct Mountpoint final {
 };
 
 
-class Context final {
-public:
+struct Context final {
 	//! Default constructor
 	explicit Context(Program& program, const AnyString& name);
 	//! Clone a thread context
@@ -94,7 +93,7 @@ public:
 private:
 	void initFallbackAdapter(nyio_adapter_t& adapter);
 
-}; // class Context
+}; // struct Context
 
 
 } // namespace vm
