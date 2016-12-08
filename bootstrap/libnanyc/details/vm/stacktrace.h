@@ -25,19 +25,9 @@ struct Stacktrace<true> final {
 		uint64_t u64;
 	};
 
-	Stacktrace() {
-		baseframe  = (Frame*)::malloc(sizeof(Frame) * 64);
-		if (YUNI_UNLIKELY(nullptr == baseframe))
-			throw std::bad_alloc();
-		upperLimit = baseframe + 64;
-		topframe   = baseframe;
-	}
-
+	Stacktrace();
 	Stacktrace(const Stacktrace&) = delete;
-
-	~Stacktrace() {
-		::free(baseframe);
-	}
+	~Stacktrace();
 
 
 	void push(uint32_t atomid, uint32_t instanceid) {

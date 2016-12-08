@@ -8,6 +8,20 @@ namespace ny {
 namespace vm {
 
 
+Stacktrace<true>::Stacktrace() {
+	baseframe  = (Frame*)::malloc(sizeof(Frame) * 64);
+	if (YUNI_UNLIKELY(nullptr == baseframe))
+		throw std::bad_alloc();
+	upperLimit = baseframe + 64;
+	topframe   = baseframe;
+}
+
+
+Stacktrace<true>::~Stacktrace() {
+	::free(baseframe);
+}
+
+
 void Stacktrace<true>::grow() {
 	auto offbase     = reinterpret_cast<std::uintptr_t>(baseframe);
 	auto offtop      = reinterpret_cast<std::uintptr_t>(topframe);
