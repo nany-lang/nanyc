@@ -1,10 +1,7 @@
 #pragma once
 #include "libnanyc.h"
-#include <yuni/string.h>
-#include <vector>
 #include "details/atom/atom-map.h"
 #include "details/context/build.h"
-
 
 
 namespace ny {
