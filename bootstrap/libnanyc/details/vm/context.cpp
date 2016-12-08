@@ -56,7 +56,7 @@ bool Context::IO::addMountpoint(const AnyString& path, nyio_adapter_t& adapter) 
 		auto& mp = mountpoints[0];
 		mp.path = path;
 		mp.path.trimRight('/');
-		if (YUNI_UNLIKELY(mp.path.empty()))
+		if (unlikely(mp.path.empty()))
 			mp.path << '/';
 		memcpy(&mp.adapter, &adapter, sizeof(nyio_adapter_t));
 		// reset the input adapter to prevent it from being used
@@ -79,7 +79,7 @@ bool Context::initializeFirstTContext() {
 	// mount home folder
 	{
 		bool r = Yuni::IO::Directory::System::UserHome(path) and path.size() < ShortString256::chunkSize;
-		if (YUNI_UNLIKELY(not r))
+		if (unlikely(not r))
 			return false;
 		auto& mp = io.mountpoints[io.mountpointSize++];
 		mp.path = "/home";
@@ -88,7 +88,7 @@ bool Context::initializeFirstTContext() {
 	// mount tmp folder
 	{
 		bool r = Yuni::IO::Directory::System::Temporary(path) and path.size() < ShortString256::chunkSize;
-		if (YUNI_UNLIKELY(not r))
+		if (unlikely(not r))
 			return false;
 		auto& mp = io.mountpoints[io.mountpointSize++];
 		mp.path = "/tmp";

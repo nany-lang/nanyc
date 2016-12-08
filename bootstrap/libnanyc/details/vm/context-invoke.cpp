@@ -17,7 +17,7 @@ using namespace Yuni;
 #define ny_vm_PRINT_OPCODES 0
 
 
-#define vm_CHECK_POINTER(P,LVID)  if (YUNI_UNLIKELY(not memchecker.has((P)))) \
+#define vm_CHECK_POINTER(P,LVID)  if (unlikely(not memchecker.has((P)))) \
 	{ \
 		emitUnknownPointer((P)); /*assert(false and "invalid pointer");*/ \
 	}
@@ -375,7 +375,7 @@ public:
 		ASSERT_LVID(opr.lhs);
 		ASSERT_LVID(opr.rhs);
 		auto r = registers[opr.rhs].f64;
-		if (YUNI_UNLIKELY((uint64_t)r == 0))
+		if (unlikely((uint64_t)r == 0))
 			emitDividedByZero();
 		registers[opr.lvid].f64 = registers[opr.lhs].f64 / r;
 	}
@@ -414,7 +414,7 @@ public:
 		ASSERT_LVID(opr.lhs);
 		ASSERT_LVID(opr.rhs);
 		auto r = registers[opr.rhs].u64;
-		if (YUNI_UNLIKELY(r == 0))
+		if (unlikely(r == 0))
 			emitDividedByZero();
 		registers[opr.lvid].u64 = registers[opr.lhs].u64 / r;
 	}
@@ -437,7 +437,7 @@ public:
 		ASSERT_LVID(opr.lhs);
 		ASSERT_LVID(opr.rhs);
 		auto r = static_cast<int64_t>(registers[opr.rhs].u64);
-		if (YUNI_UNLIKELY(r == 0))
+		if (unlikely(r == 0))
 			emitDividedByZero();
 		registers[opr.lvid].u64 = static_cast<uint64_t>(static_cast<int64_t>(registers[opr.lhs].u64) / r);
 	}
@@ -756,7 +756,7 @@ public:
 		}
 		size += config::extraObjectSize;
 		uint64_t* pointer = allocateraw<uint64_t>(size);
-		if (YUNI_UNLIKELY(!pointer))
+		if (unlikely(!pointer))
 			return emitBadAlloc();
 		if (debugmode)
 			memset(pointer, patternAlloc, size);
@@ -779,7 +779,7 @@ public:
 		if (object) {
 			// checking the input pointer
 			vm_CHECK_POINTER(object, opr);
-			if (YUNI_UNLIKELY(not memchecker.checkObjectSize(object, static_cast<size_t>(oldsize))))
+			if (unlikely(not memchecker.checkObjectSize(object, static_cast<size_t>(oldsize))))
 				return emitPointerSizeMismatch(object, oldsize);
 			memchecker.forget(object);
 		}
@@ -814,7 +814,7 @@ public:
 			vm_CHECK_POINTER(object, opr);
 			size_t size = static_cast<size_t>(registers[opr.regsize].u64);
 			size += config::extraObjectSize;
-			if (YUNI_UNLIKELY(not memchecker.checkObjectSize(object, static_cast<size_t>(size))))
+			if (unlikely(not memchecker.checkObjectSize(object, static_cast<size_t>(size))))
 				return emitPointerSizeMismatch(object, size);
 			if (debugmode)
 				memset(object, patternFree, size);
@@ -834,7 +834,7 @@ public:
 		size_t size = static_cast<size_t>(registers[opr.regsize].u64);
 		size += config::extraObjectSize;
 		uint8_t pattern = static_cast<uint8_t>(registers[opr.pattern].u64);
-		if (YUNI_UNLIKELY(not memchecker.checkObjectSize(object, static_cast<size_t>(size))))
+		if (unlikely(not memchecker.checkObjectSize(object, static_cast<size_t>(size))))
 			return emitPointerSizeMismatch(object, size);
 		memset(object, pattern, size);
 	}
@@ -938,7 +938,7 @@ public:
 	void visit(const ir::isa::Operand<ir::isa::Op::opassert>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
-		if (YUNI_UNLIKELY(registers[opr.lvid].u64 == 0))
+		if (unlikely(registers[opr.lvid].u64 == 0))
 			return emitAssert();
 	}
 

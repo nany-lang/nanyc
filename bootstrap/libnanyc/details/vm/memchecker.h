@@ -93,7 +93,7 @@ template<> struct MemChecker<true> final {
 
 
 	void printLeaksIfAny(const nyprogram_cf_t& cf) const {
-		if (YUNI_UNLIKELY(not ownedPointers.empty()))
+		if (unlikely(not ownedPointers.empty()))
 			printLeaks(cf);
 	}
 

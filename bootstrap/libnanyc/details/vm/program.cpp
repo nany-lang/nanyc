@@ -31,7 +31,7 @@ void Program::destroy() {
 
 
 int Program::execute(uint32_t argc, const char** argv) {
-	if (YUNI_UNLIKELY(cf.entrypoint.size == 0))
+	if (unlikely(cf.entrypoint.size == 0))
 		return 0;
 	if (cf.on_execute) {
 		if (nyfalse == cf.on_execute(self()))
@@ -47,7 +47,7 @@ int Program::execute(uint32_t argc, const char** argv) {
 	auto& sequence = map.sequence(atomid, instanceid);
 	Context context{*this, AnyString{cf.entrypoint.c_str, cf.entrypoint.size}};
 	bool success = context.initializeFirstTContext();
-	if (YUNI_UNLIKELY(not success))
+	if (unlikely(not success))
 		return 666;
 	//
 	// Execute the program

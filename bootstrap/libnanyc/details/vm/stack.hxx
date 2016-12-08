@@ -13,7 +13,7 @@ inline DataRegister* Stack::push(uint32_t count) {
 	dump("push +", count);
 	#endif
 	// not enough space in the current chunk to allocate N registers
-	if (YUNI_UNLIKELY(current->remains < count))
+	if (unlikely(current->remains < count))
 		pushNewChunk(count);
 	// the current
 	DataRegister* registers = current->cursor;
@@ -35,7 +35,7 @@ inline void Stack::pop(uint32_t count) {
 	current->cursor -= count;
 	assert(current->cursor >= current->block);
 	assert(current->cursor < current->block + current->capacity);
-	if (YUNI_UNLIKELY((current->remains += count) == current->capacity))
+	if (unlikely((current->remains += count) == current->capacity))
 		popChunk();
 }
 
