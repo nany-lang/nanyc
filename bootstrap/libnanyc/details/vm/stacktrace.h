@@ -28,7 +28,7 @@ struct Stacktrace<true> final {
 	~Stacktrace();
 
 	void push(uint32_t atomid, uint32_t instanceid);
-	void pop();
+	void pop() noexcept;
 	void dump(Build&, const AtomMap&) const;
 
 	Stacktrace& operator = (const Stacktrace&) = delete;

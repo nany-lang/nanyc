@@ -13,7 +13,7 @@ inline void Stacktrace<true>::push(uint32_t atomid, uint32_t instanceid) {
 }
 
 
-inline void Stacktrace<true>::pop() {
+inline void Stacktrace<true>::pop() noexcept {
 	assert(topframe > baseframe);
 	--topframe;
 }
