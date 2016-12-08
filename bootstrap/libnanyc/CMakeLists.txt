@@ -314,6 +314,7 @@ addsrc(
 	"details/vm/memchecker.h"
 	"details/vm/memchecker.cpp"
 	"details/vm/stacktrace.h"
+	"details/vm/stacktrace.hxx"
 	"details/vm/stacktrace.cpp"
 	"details/vm/stack.cpp"
 	"details/vm/stack.h"

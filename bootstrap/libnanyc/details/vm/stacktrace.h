@@ -7,6 +7,7 @@
 namespace ny {
 namespace vm {
 
+
 template<bool Enabled>
 struct Stacktrace final {
 	static void push(uint32_t, uint32_t) {}
@@ -26,19 +27,8 @@ struct Stacktrace<true> final {
 	Stacktrace(const Stacktrace&) = delete;
 	~Stacktrace();
 
-
-	void push(uint32_t atomid, uint32_t instanceid) {
-		if (unlikely(not (++topframe < upperLimit)))
-			grow();
-		*topframe = Frame{{atomid, instanceid}};
-	}
-
-
-	void pop() {
-		assert(topframe > baseframe);
-		--topframe;
-	}
-
+	void push(uint32_t atomid, uint32_t instanceid);
+	void pop();
 	void dump(Build&, const AtomMap&) const;
 
 	Stacktrace& operator = (const Stacktrace&) = delete;
@@ -54,8 +44,7 @@ private:
 }; // class Stacktrace
 
 
-
-
-
 } // namespace vm
 } // namespace ny
+
+#include "stacktrace.hxx"
