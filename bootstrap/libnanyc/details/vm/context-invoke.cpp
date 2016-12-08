@@ -104,7 +104,7 @@ public:
 
 	[[noreturn]] void abortMission() {
 		memchecker.releaseAll(allocator); // prevent memory leak reports
-		stacktrace.dump(ny::ref(context.program.build), map);
+		stacktrace.dump(context.cf, map);
 		std::longjmp(jump_buffer, 666);
 	}
 
@@ -182,7 +182,7 @@ public:
 		if (false) {
 			std::cout << " .. DESTROY " << (void*) object << " aka '"
 					  << dtor.caption() << "' at opc+" << sequence.get().offsetOf(**cursor) << '\n';
-			stacktrace.dump(ny::ref(context.program.build), map);
+			stacktrace.dump(context.cf, map);
 			std::cout << '\n';
 		}
 		auto* classobject = dtor.parent;

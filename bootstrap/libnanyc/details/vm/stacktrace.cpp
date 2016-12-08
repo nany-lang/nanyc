@@ -1,5 +1,6 @@
 #include "stacktrace.h"
 #include "details/context/build.h"
+#include "details/vm/console.h"
 
 using namespace Yuni;
 
@@ -36,40 +37,43 @@ void Stacktrace<true>::grow() {
 }
 
 
-void Stacktrace<true>::dump(Build& build, const AtomMap& map) const {
-	// this routine does not allocate memory to handle extreme situations
-	build.printStderr("stack trace:\n");
+void Stacktrace<true>::dump(const nyprogram_cf_t& cf, const AtomMap& map) const noexcept {
+	auto cerr = [&cf](const AnyString& string) {
+		ny::vm::console::cerr(cf, string);
+	};
+	auto color = [&cf](nycolor_t cl) {
+		ny::vm::console::color(cf, nycerr, cl);
+	};
+	color(nyc_none);
+	cerr("\nstack trace:\n");
 	uint32_t i = 0;
-	uint32_t count = 0;
-	for (auto* pointer = topframe; (pointer > baseframe); --pointer, ++i)
-		++count;
-	i = 0;
-	ShortString32 tmp;
+	ShortString64 tmp;
 	for (auto* pointer = topframe; (pointer > baseframe); --pointer, ++i) {
 		auto& frame = *pointer;
-		build.printStderr("    ");
-		build.cerrColor(nyc_lightblue);
-		tmp.clear() << '#' << i;
-		build.printStderr(tmp);
-		build.cerrColor(nyc_none);
-		build.printStderr(" in '");
-		auto caption = map.symbolname(frame.atomidInstance[0], frame.atomidInstance[1]);
-		build.cerrColor(nyc_white);
-		build.printStderr(caption);
-		build.cerrColor(nyc_none);
-		build.printStderr("' at '");
-		auto atom = map.findAtom(frame.atomidInstance[0]);
-		if (!!atom) {
-			build.printStderr(atom->origin.filename);
-			if (atom->origin.line != 0) {
-				tmp.clear();
-				tmp << ':' << atom->origin.line;
-				build.printStderr(tmp);
+		try {
+			cerr("    ");
+			color(nyc_lightblue);
+			cerr(tmp.clear() << '#' << i);
+			color(nyc_none);
+			cerr(" in '");
+			auto caption = map.symbolname(frame.atomidInstance[0], frame.atomidInstance[1]);
+			color(nyc_white);
+			cerr(caption);
+			color(nyc_none);
+			cerr("' at '");
+			auto atom = map.findAtom(frame.atomidInstance[0]);
+			if (!!atom) {
+				cerr(atom->origin.filename);
+				if (atom->origin.line != 0)
+					cerr(tmp.clear() << ':' << atom->origin.line);
 			}
+			else
+				cerr("<invalid-atom>");
 		}
-		else
-			build.printStderr("<invalid-atom>");
-		build.printStderr("'\n");
+		catch (...) {
+			cerr("<received c++exception>");
+		}
+		cerr("'\n");
 	}
 }
 

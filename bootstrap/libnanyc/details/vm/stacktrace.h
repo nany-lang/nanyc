@@ -29,7 +29,7 @@ struct Stacktrace<true> final {
 
 	void push(uint32_t atomid, uint32_t instanceid);
 	void pop() noexcept;
-	void dump(Build&, const AtomMap&) const;
+	void dump(const nyprogram_cf_t&, const AtomMap&) const noexcept;
 
 	Stacktrace& operator = (const Stacktrace&) = delete;
 
