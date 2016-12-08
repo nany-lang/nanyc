@@ -9,10 +9,11 @@ namespace vm {
 
 
 Stacktrace<true>::Stacktrace() {
-	baseframe  = (Frame*)::malloc(sizeof(Frame) * 64);
+	uint32_t capacity = 64;
+	baseframe  = (Frame*)::malloc(sizeof(Frame) * capacity);
 	if (YUNI_UNLIKELY(nullptr == baseframe))
 		throw std::bad_alloc();
-	upperLimit = baseframe + 64;
+	upperLimit = baseframe + capacity;
 	topframe   = baseframe;
 }
 
