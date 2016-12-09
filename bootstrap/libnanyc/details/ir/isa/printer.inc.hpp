@@ -11,7 +11,7 @@ namespace ny
 {
 namespace ir
 {
-namespace ISA
+namespace isa
 {
 namespace // anonymous
 {
@@ -233,8 +233,8 @@ namespace // anonymous
 			out << (operands.flag ? '+' : '-');
 			switch (operands.qualifier)
 			{
-				case ir::ISA::TypeQualifier::ref:      out << "ref"; break;
-				case ir::ISA::TypeQualifier::constant: out << "const"; break;
+				case ir::isa::TypeQualifier::ref:      out << "ref"; break;
+				case ir::isa::TypeQualifier::constant: out << "const"; break;
 			}
 		}
 
@@ -632,10 +632,10 @@ namespace // anonymous
 
 		void print(const Operand<Op::blueprint>& operands)
 		{
-			auto kind = static_cast<ir::ISA::Blueprint>(operands.kind);
+			auto kind = static_cast<ir::isa::Blueprint>(operands.kind);
 			switch (kind)
 			{
-				case ISA::Blueprint::funcdef:
+				case isa::Blueprint::funcdef:
 				{
 					printEOL();
 
@@ -656,28 +656,28 @@ namespace // anonymous
 					indent();
 					break;
 				}
-				case ISA::Blueprint::param:
+				case isa::Blueprint::param:
 				{
 					line() << "param ";
 					printString(operands.name);
 					out << ": %" << static_cast<uint32_t>(operands.lvid);
 					break;
 				}
-				case ISA::Blueprint::gentypeparam:
+				case isa::Blueprint::gentypeparam:
 				{
 					line() << "type param ";
 					printString(operands.name);
 					out << ": %" << static_cast<uint32_t>(operands.lvid);
 					break;
 				}
-				case ISA::Blueprint::paramself:
+				case isa::Blueprint::paramself:
 				{
 					line() << "param ";
 					printString(operands.name);
 					out << ", %" << (uint32_t) operands.lvid << " [self assign]";
 					break;
 				}
-				case ISA::Blueprint::classdef:
+				case isa::Blueprint::classdef:
 				{
 					printEOL();
 					line();
@@ -700,14 +700,14 @@ namespace // anonymous
 						out << "<unspecified>";
 					break;
 				}
-				case ISA::Blueprint::vardef:
+				case isa::Blueprint::vardef:
 				{
 					line() << "var ";
 					printString(operands.name);
 					out << ": %" << (uint32_t) operands.lvid;
 					break;
 				}
-				case ISA::Blueprint::typealias:
+				case isa::Blueprint::typealias:
 				{
 					line();
 					out << "typedef ";
@@ -727,14 +727,14 @@ namespace // anonymous
 						out << "<unspecified>";
 					break;
 				}
-				case ISA::Blueprint::namespacedef:
+				case isa::Blueprint::namespacedef:
 				{
 					line() << "namespace ";
 					printString(operands.name);
 					break;
 				}
 
-				case ISA::Blueprint::unit:
+				case isa::Blueprint::unit:
 				{
 					line() << "unit ";
 					printString(operands.name);
@@ -823,7 +823,7 @@ namespace // anonymous
 		}
 
 
-		template<ny::ir::ISA::Op O> inline void visit(const Operand<O>& instr)
+		template<ny::ir::isa::Op O> inline void visit(const Operand<O>& instr)
 		{
 			print(instr);
 			printEOL();
@@ -831,7 +831,7 @@ namespace // anonymous
 
 		inline void visit(const ir::Instruction& instruction)
 		{
-			LIBNANYC_IR_VISIT_SEQUENCE(const ir::ISA::Operand, *this, instruction);
+			LIBNANYC_IR_VISIT_SEQUENCE(const ir::isa::Operand, *this, instruction);
 		}
 	};
 
@@ -842,6 +842,6 @@ namespace // anonymous
 
 
 } // anonymous namespace
-} // namespace ISA
+} // namespace isa
 } // namespace ir
 } // namespace ny

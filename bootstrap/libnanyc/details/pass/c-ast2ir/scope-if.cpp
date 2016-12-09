@@ -78,9 +78,9 @@ bool Scope::generateIfStmt(AST::Node& expr, AST::Node& thenc, AST::Node* elseptr
 	}
 	labelEnd = ir::emit::label(out, nextvar());
 	// post-update label ids
-	out.at<ir::ISA::Op::jz>(opOffJz).label = (hasElseClause ? labelElse : labelEnd);
+	out.at<ir::isa::Op::jz>(opOffJz).label = (hasElseClause ? labelElse : labelEnd);
 	if (opOffIntermediateEnd != 0)
-		out.at<ir::ISA::Op::jmp>(opOffIntermediateEnd).label = labelEnd;
+		out.at<ir::isa::Op::jmp>(opOffIntermediateEnd).label = labelEnd;
 	return success;
 }
 
@@ -147,9 +147,9 @@ bool Scope::generateIfExpr(uint32_t& ifret, AST::Node& expr, AST::Node& thenc, A
 	}
 	labelEnd = ir::emit::label(out, nextvar());
 	// post-update label ids
-	out.at<ir::ISA::Op::jz>(opOffJz).label = (hasElseClause ? labelElse : labelEnd);
+	out.at<ir::isa::Op::jz>(opOffJz).label = (hasElseClause ? labelElse : labelEnd);
 	if (opOffIntermediateEnd)
-		out.at<ir::ISA::Op::jmp>(opOffIntermediateEnd).label = labelEnd;
+		out.at<ir::isa::Op::jmp>(opOffIntermediateEnd).label = labelEnd;
 	return success;
 }
 

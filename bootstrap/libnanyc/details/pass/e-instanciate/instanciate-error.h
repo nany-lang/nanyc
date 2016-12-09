@@ -61,13 +61,16 @@ bool typesDoNotMatch(const Classdef& from, const Classdef& to);
 //! Invalid self value for calling property of a class
 bool selfMissingForPropertyCall(const Atom& property, uint32_t self);
 
+//! Parameter type has vanished for some reason...
+bool parameterTypeHasVanished(const SequenceBuilder&, uint32_t);
+
 
 //! Return type mismatch
 bool returnTypeMismatch(const Classdef& expected, const Classdef& usertype);
 
 //! Return with implicit conversion
 bool returnTypeImplicitConversion(const Classdef& expected, const Classdef& usertype, uint32_t line = 0,
-								  uint32_t offset = 0);
+	uint32_t offset = 0);
 
 //! Return type is missing
 bool returnTypeMissing(const Classdef* expected, const Classdef* usertype);

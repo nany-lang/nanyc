@@ -1,14 +1,12 @@
 #pragma once
 #include "libnanyc.h"
-#include <yuni/string.h>
-#include <vector>
 #include "details/atom/atom-map.h"
 #include "details/context/build.h"
 
 
-
 namespace ny {
 namespace vm {
+
 
 template<bool Enabled>
 struct Stacktrace final {
@@ -18,74 +16,35 @@ struct Stacktrace final {
 };
 
 
-
 template<>
 struct Stacktrace<true> final {
 	union Frame {
-		//! atom id / instance id
-		uint32_t atomidInstance[2];
-		//! raw value
+		uint32_t atomidInstance[2]; // atom id / instance id
 		uint64_t u64;
 	};
 
-public:
-	//! Default constructor
-	Stacktrace() {
-		baseframe  = (Frame*)::malloc(sizeof(Frame) * 64);
-		if (YUNI_UNLIKELY(nullptr == baseframe))
-			throw std::bad_alloc();
-		upperLimit = baseframe + 64;
-		topframe   = baseframe;
-	}
-
-	//! deleted Copy constructor
+	Stacktrace();
 	Stacktrace(const Stacktrace&) = delete;
+	~Stacktrace();
 
-	//! Destructor
-	~Stacktrace() {
-		::free(baseframe);
-	}
+	void push(uint32_t atomid, uint32_t instanceid);
+	void pop() noexcept;
+	void dump(const nyprogram_cf_t&, const AtomMap&) const noexcept;
 
-
-	//! Register a new stack frame
-	void push(uint32_t atomid, uint32_t instanceid) {
-		if (YUNI_UNLIKELY(not (++topframe < upperLimit)))
-			grow();
-		*topframe = Frame{{atomid, instanceid}};
-	}
-
-
-	//! Remove the last stack frame
-	void pop() {
-		assert(topframe > baseframe);
-		--topframe;
-	}
-
-
-	//! Export the whole stack to a string
-	void dump(Build&, const AtomMap&) const;
-
-	//! deleted Operator assignment
 	Stacktrace& operator = (const Stacktrace&) = delete;
 
 
 private:
-	//! Increase the capacity of the stack
 	void grow();
 
-private:
-	//! The current frame
 	Frame* topframe = nullptr;
-	//! The upper frame limit
 	Frame* upperLimit = nullptr;
-	//! The base frame
 	Frame* baseframe = nullptr;
 
 }; // class Stacktrace
 
 
-
-
-
 } // namespace vm
 } // namespace ny
+
+#include "stacktrace.hxx"

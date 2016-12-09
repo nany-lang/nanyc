@@ -1,6 +1,6 @@
 #include "runtime.h"
 #include "details/intrinsic/intrinsic-table.h"
-#include "details/vm/thread-context.h"
+#include "details/vm/context.h"
 #include <yuni/core/hash/checksum/md5.h>
 #include <iostream>
 
@@ -8,7 +8,7 @@ using namespace Yuni;
 
 
 static void* nanyc_digest_md5(nyvm_t* vm, const char* string, uint64_t length) {
-	auto& tc = *reinterpret_cast<ny::vm::ThreadContext*>(vm->tctx);
+	auto& context = *reinterpret_cast<ny::vm::Context*>(vm->tctx);
 	Hash::Checksum::MD5 md5;
 	md5.fromRawData(string, length);
 	if (not md5.value().empty()) {
@@ -19,10 +19,10 @@ static void* nanyc_digest_md5(nyvm_t* vm, const char* string, uint64_t length) {
 			const char* src = md5.value().c_str();
 			for (uint32_t i = 0; i != size; ++i)
 				cstr[i] = src[i];
-			tc.returnValue.size     = md5.value().size();
-			tc.returnValue.capacity = md5.value().size();
-			tc.returnValue.data     = cstr;
-			return &tc.returnValue;
+			context.returnValue.size     = md5.value().size();
+			context.returnValue.capacity = md5.value().size();
+			context.returnValue.data     = cstr;
+			return &context.returnValue;
 		}
 	}
 	return nullptr;

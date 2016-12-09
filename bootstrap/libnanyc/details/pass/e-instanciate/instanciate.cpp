@@ -102,7 +102,7 @@ uint32_t SequenceBuilder::createLocalVariables(uint32_t count) {
 	assert(canGenerateCode());
 	assert(frame != nullptr);
 	assert(frame->offsetOpcodeStacksize != (uint32_t) - 1);
-	auto& operands = out->at<ir::ISA::Op::stacksize>(frame->offsetOpcodeStacksize);
+	auto& operands = out->at<ir::isa::Op::stacksize>(frame->offsetOpcodeStacksize);
 	uint32_t startOffset = operands.add;
 	int scope = frame->scope;
 	operands.add += count;
@@ -121,29 +121,29 @@ uint32_t SequenceBuilder::createLocalVariables(uint32_t count) {
 }
 
 
-inline void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::namealias>& operands) {
+inline void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::namealias>& operands) {
 	const auto& name = currentSequence.stringrefs[operands.name];
 	declareNamedVariable(name, operands.lvid);
 }
 
 
-inline void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::debugfile>& operands) {
+inline void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::debugfile>& operands) {
 	currentFilename = currentSequence.stringrefs[operands.filename].c_str();
 }
 
 
-inline void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::debugpos>& operands) {
+inline void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::debugpos>& operands) {
 	currentLine   = operands.line;
 	currentOffset = operands.offset;
 }
 
 
-inline void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::unref>& operands) {
+inline void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::unref>& operands) {
 	tryUnrefObject(operands.lvid);
 }
 
 
-inline void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::nop>&) {
+inline void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::nop>&) {
 	// duplicate nop as well since they can be used to insert code
 	// (for shortcircuit for example)
 	if (canGenerateCode())
@@ -151,46 +151,46 @@ inline void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::nop>&) {
 }
 
 
-inline void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::label>& operands) {
+inline void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::label>& operands) {
 	if (canGenerateCode())
 		/*uint32_t lbl =*/ ir::emit::label(out, operands.label);
 }
 
 
-inline void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::qualifiers>& operands) {
-	assert(static_cast<uint32_t>(operands.qualifier) < ir::ISA::TypeQualifierCount);
+inline void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::qualifiers>& operands) {
+	assert(static_cast<uint32_t>(operands.qualifier) < ir::isa::TypeQualifierCount);
 	bool  onoff = (operands.flag != 0);
 	auto& qualifiers = cdeftable.substitute(operands.lvid).qualifiers;
 	switch (operands.qualifier) {
-		case ir::ISA::TypeQualifier::ref:
+		case ir::isa::TypeQualifier::ref:
 			qualifiers.ref = onoff;
 			break;
-		case ir::ISA::TypeQualifier::constant:
+		case ir::isa::TypeQualifier::constant:
 			qualifiers.constant = onoff;
 			break;
 	}
 }
 
 
-inline void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::jmp>& opc) {
+inline void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::jmp>& opc) {
 	if (canGenerateCode())
-		out->emit<ir::ISA::Op::jmp>() = opc;
+		out->emit<ir::isa::Op::jmp>() = opc;
 }
 
 
-inline void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::jz>& opc) {
+inline void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::jz>& opc) {
 	if (canGenerateCode())
-		out->emit<ir::ISA::Op::jz>() = opc;
+		out->emit<ir::isa::Op::jz>() = opc;
 }
 
 
-inline void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::jnz>& opc) {
+inline void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::jnz>& opc) {
 	if (canGenerateCode())
-		out->emit<ir::ISA::Op::jnz>() = opc;
+		out->emit<ir::isa::Op::jnz>() = opc;
 }
 
 
-inline void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::comment>& opc) {
+inline void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::comment>& opc) {
 	if (debugmode and canGenerateCode())
 		ir::emit::trace(out, [&]() {
 		return currentSequence.stringrefs[opc.text];
@@ -198,8 +198,8 @@ inline void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::comment>&
 }
 
 
-template<ir::ISA::Op O>
-void SequenceBuilder::visit(const ir::ISA::Operand<O>& operands) {
+template<ir::isa::Op O>
+void SequenceBuilder::visit(const ir::isa::Operand<O>& operands) {
 	complainOperand(ir::Instruction::fromOpcode(operands));
 }
 

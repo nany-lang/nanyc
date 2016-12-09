@@ -9,7 +9,7 @@ namespace Pass {
 namespace Instanciate {
 
 
-void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::ret>& operands) {
+void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::ret>& operands) {
 	// current frame
 	if (unlikely(frame->atom.type != Atom::Type::funcdef)) // just in case
 		return (void)(error() << "return values are only accepted in functions");

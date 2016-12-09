@@ -53,65 +53,47 @@ void prepareSignature(Signature& signature, InstanciateData& info) {
 
 bool makeNewAtomInstanciation(InstanciateData& info, Atom& atom) {
 	// create a new atom with non-generic parameters / from a contextual atom
-	// (generic/anonymous class)
-	// re-map from the parent
+	// (generic or anonymous class) and re-map from the parent
 	{
 		auto& sequence  = *atom.opcodes.sequence;
 		auto& originaltable = info.cdeftable.originalTable();
-		// the mutex is useless here since the code instanciation is mono-threaded
-		// but it's required by the mapping (which must be thread-safe in the first passes - see attach)
-		// TODO remove this mutex
-		Mutex mutex;
+		Mutex mutex; // useless but currently required for the first pass by SequenceMapping
 		Pass::Mapping::SequenceMapping mapper{originaltable, mutex, sequence};
 		mapper.evaluateWholeSequence = false;
-		mapper.prefixNameForFirstAtomCreated = "^";
-		// run the type mapping
+		mapper.prefixNameForFirstAtomCreated = "^"; // not an user-defined atom
 		mapper.map(*atom.parent, atom.opcodes.offset);
 		if (unlikely(!mapper.firstAtomCreated))
-			return (error() << "failed to remap atom '" << atom.caption() << "'");
+			return (error() << "failed to remap atom '" << atom.caption() << '\'');
 		assert(info.atom.get().atomid != mapper.firstAtomCreated->atomid);
 		assert(&info.atom.get() != mapper.firstAtomCreated);
 		info.atom = std::ref(*mapper.firstAtomCreated);
 	}
-	// the generic parameters are fully resolved now, avoid
-	// any new attempt to check them
 	auto& newAtom = info.atom.get();
 	newAtom.tmplparamsForPrinting.swap(newAtom.tmplparams);
-	// marking the new atom as instanciated, like any standard atom
 	newAtom.classinfo.isInstanciated = true;
-	// to keep the types for the new atoms
 	info.shouldMergeLayer = true;
-	// upate parameter types
 	return resolveStrictParameterTypes(info.build, newAtom, &info);
 }
 
 
-//! Prepare the first local registers according the given signature
-void pushParameterTypes(SequenceBuilder& seq, Atom& atom, const Signature& signature) {
-	assert(seq.frame == NULL);
+//! Prepare the first local registers from the parameter types
+void substituteParameterTypes(ClassdefTableView& cdeftable, Atom& atom, const Signature& signature) {
 	// magic constant +2
 	//  * +1: all clid are 1-based (0 is reserved for the atom itself, not for an internal var)
 	//  * +1: the CLID{X, 1} is reserved for the return type
-	auto& cdeftable = seq.cdeftable;
-	uint32_t count = signature.parameters.size();
-	// unused pseudo/invalid register
 	cdeftable.addSubstitute(nyt_void, nullptr, Qualifiers()); // unused, since 1-based
-	// redefine return type {atomid,1}
-	auto& rettype = cdeftable.rawclassdef(CLID{atom.atomid, 1});
-	assert(atom.atomid == rettype.clid.atomid());
-	Atom* atomparam = (not rettype.isBuiltinOrVoid()) ? cdeftable.findRawClassdefAtom(rettype) : nullptr;
-	cdeftable.addSubstitute(rettype.kind, atomparam, rettype.qualifiers);
+	auto& rettype = cdeftable.rawclassdef(CLID{atom.atomid, 1}); // return type
+	Atom* retAtom = (not rettype.isBuiltinOrVoid()) ? cdeftable.findRawClassdefAtom(rettype) : nullptr;
+	cdeftable.addSubstitute(rettype.kind, retAtom, rettype.qualifiers);
 	auto substitute = [&](auto & parameter) {
 		cdeftable.addSubstitute(parameter.kind, parameter.atom, parameter.qualifiers);
 		assert(parameter.kind != nyt_any or parameter.atom != nullptr);
 	};
-	// parameters, as expected
+	uint32_t count = signature.parameters.size();
 	for (uint32_t i = 0; i != count; ++i)
 		substitute(signature.parameters[i]);
-	// reserved variables for cloning parameters (after normal parameters)
-	for (uint32_t i = 0; i != count; ++i)
+	for (uint32_t i = 0; i != count; ++i) // + reserved for cloning parameters
 		substitute(signature.parameters[i]);
-	// template parameters
 	count = signature.tmplparams.size();
 	for (uint32_t i = 0; i != count; ++i)
 		substitute(signature.tmplparams[i]);
@@ -152,8 +134,7 @@ ir::Sequence* performAtomInstanciation(InstanciateData& info, Signature& signatu
 				   (report.subgroup(), newView, info.build, &outIR, inputIR, info.parent);
 	if (config::traces::sourceOpcodeSequence)
 		debugPrintSourceOpcodeSequence(info.cdeftable, info.atom.get(), "[ir-from-ast] ");
-	// transfert input parameters
-	pushParameterTypes(*builder, atom, signature);
+	substituteParameterTypes(builder->cdeftable, atom, signature);
 	builder->layerDepthLimit = 2; // allow the first blueprint to be instanciated
 	// atomid mapping, usefull to keep track of the good atom id
 	builder->mappingBlueprintAtomID[0] = atomRequested.atomid; // {from}

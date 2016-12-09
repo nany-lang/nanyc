@@ -377,6 +377,15 @@ bool selfMissingForPropertyCall(const Atom& property, uint32_t self) {
 }
 
 
+bool parameterTypeHasVanished(const SequenceBuilder& seq, uint32_t i) {
+	auto& frame = *seq.frame;
+	auto e = ice();
+	e << "type has vanished for parameter " << i;
+	e << " for " << frame.atom.caption(seq.cdeftable);
+	return false;
+}
+
+
 } // namespace complain
 
 
@@ -409,7 +418,7 @@ Logs::Report emitReportEntry(void* self, Logs::Level level) {
 					h << ", signature only";
 				h << "]\n";
 				auto* map = &(sb.cdeftable.originalTable().atoms);
-				ir::ISA::printExtract(h.message.message, sb.currentSequence, offset, map);
+				ir::isa::printExtract(h.message.message, sb.currentSequence, offset, map);
 			}
 		}
 	}
@@ -497,7 +506,7 @@ bool SequenceBuilder::complainOperand(const ir::Instruction& operands, AnyString
 		message << msg;
 	else
 		message << "unexpected opcode";
-	message << ": '" << ir::ISA::print(currentSequence, operands) << '\'';
+	message << ": '" << ir::isa::print(currentSequence, operands) << '\'';
 	// stop reading the opcodes
 	currentSequence.invalidateCursor(*cursor);
 	return false;

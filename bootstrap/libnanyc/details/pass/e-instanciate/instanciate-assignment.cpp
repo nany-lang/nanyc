@@ -205,7 +205,7 @@ bool SequenceBuilder::instanciateAssignment(AtomStackFrame& frame, uint32_t lhs,
 }
 
 
-bool SequenceBuilder::instanciateAssignment(const ir::ISA::Operand<ir::ISA::Op::call>& operands) {
+bool SequenceBuilder::instanciateAssignment(const ir::isa::Operand<ir::isa::Op::call>& operands) {
 	assert(frame != nullptr);
 	if (unlikely(pushedparams.func.indexed.size() != 1))
 		return (ice() << "assignment: invalid number of pushed parameters");

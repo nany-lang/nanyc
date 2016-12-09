@@ -17,7 +17,7 @@ struct PostProcessStackAllocWalker final {
 		, atomid(atomid) {
 	}
 
-	void visit(ir::ISA::Operand<ir::ISA::Op::stackalloc>& opc) {
+	void visit(ir::isa::Operand<ir::isa::Op::stackalloc>& opc) {
 		if (debugmode) {
 			if (not table.hasClassdef(CLID{atomid, opc.lvid})) {
 				ice() << "failed to get classdef " << CLID{atomid, opc.lvid};
@@ -37,7 +37,7 @@ struct PostProcessStackAllocWalker final {
 			opc.type = static_cast<uint32_t>(cdef.kind);
 	}
 
-	template<ir::ISA::Op O> void visit(const ir::ISA::Operand<O>&) {}
+	template<ir::isa::Op O> void visit(const ir::isa::Operand<O>&) {}
 
 	ClassdefTableView& table;
 	uint32_t atomid;

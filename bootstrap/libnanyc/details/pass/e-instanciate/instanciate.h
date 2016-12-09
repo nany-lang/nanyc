@@ -63,44 +63,44 @@ struct SequenceBuilder final {
 
 	//! \name Visitors for all supported opcodes
 	//@{
-	void visit(const ir::ISA::Operand<ir::ISA::Op::scope>&);
-	void visit(const ir::ISA::Operand<ir::ISA::Op::end>&);
-	void visit(const ir::ISA::Operand<ir::ISA::Op::ret>&);
-	void visit(const ir::ISA::Operand<ir::ISA::Op::intrinsic>&);
-	void visit(const ir::ISA::Operand<ir::ISA::Op::call>&);
-	void visit(const ir::ISA::Operand<ir::ISA::Op::stackalloc>&);
-	void visit(const ir::ISA::Operand<ir::ISA::Op::allocate>&);
-	void visit(const ir::ISA::Operand<ir::ISA::Op::push>&);
-	void visit(const ir::ISA::Operand<ir::ISA::Op::tpush>&);
-	void visit(const ir::ISA::Operand<ir::ISA::Op::classdefsizeof>&);
-	void visit(const ir::ISA::Operand<ir::ISA::Op::follow>&);
-	void visit(const ir::ISA::Operand<ir::ISA::Op::identify>&);
-	void visit(const ir::ISA::Operand<ir::ISA::Op::identifyset>&);
-	void visit(const ir::ISA::Operand<ir::ISA::Op::ensureresolved>&);
-	void visit(const ir::ISA::Operand<ir::ISA::Op::debugfile>&);
-	void visit(const ir::ISA::Operand<ir::ISA::Op::debugpos>&);
-	void visit(const ir::ISA::Operand<ir::ISA::Op::pragma>&);
-	void visit(const ir::ISA::Operand<ir::ISA::Op::blueprint>&);
-	void visit(const ir::ISA::Operand<ir::ISA::Op::stacksize>&);
-	void visit(const ir::ISA::Operand<ir::ISA::Op::namealias>&);
-	void visit(const ir::ISA::Operand<ir::ISA::Op::storeConstant>&);
-	void visit(const ir::ISA::Operand<ir::ISA::Op::store>&);
-	void visit(const ir::ISA::Operand<ir::ISA::Op::storeText>&);
-	void visit(const ir::ISA::Operand<ir::ISA::Op::typeisobject>&);
-	void visit(const ir::ISA::Operand<ir::ISA::Op::ref>&);
-	void visit(const ir::ISA::Operand<ir::ISA::Op::unref>&);
-	void visit(const ir::ISA::Operand<ir::ISA::Op::assign>&);
-	void visit(const ir::ISA::Operand<ir::ISA::Op::self>&);
-	void visit(const ir::ISA::Operand<ir::ISA::Op::qualifiers>&);
-	void visit(const ir::ISA::Operand<ir::ISA::Op::nop>&);
-	void visit(const ir::ISA::Operand<ir::ISA::Op::label>&);
-	void visit(const ir::ISA::Operand<ir::ISA::Op::jmp>&);
-	void visit(const ir::ISA::Operand<ir::ISA::Op::jz>&);
-	void visit(const ir::ISA::Operand<ir::ISA::Op::jnz>&);
-	void visit(const ir::ISA::Operand<ir::ISA::Op::comment>&);
-	void visit(const ir::ISA::Operand<ir::ISA::Op::commontype>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::scope>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::end>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::ret>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::intrinsic>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::call>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::stackalloc>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::allocate>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::push>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::tpush>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::classdefsizeof>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::follow>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::identify>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::identifyset>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::ensureresolved>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::debugfile>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::debugpos>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::pragma>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::blueprint>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::stacksize>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::namealias>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::storeConstant>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::store>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::storeText>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::typeisobject>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::ref>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::unref>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::assign>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::self>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::qualifiers>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::nop>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::label>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::jmp>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::jz>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::jnz>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::comment>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::commontype>&);
 	//! visitor - fallback
-	template<ir::ISA::Op O> void visit(const ir::ISA::Operand<O>&);
+	template<ir::isa::Op O> void visit(const ir::isa::Operand<O>&);
 
 	//! Walk through all opcodes generated from the AST
 	bool readAndInstanciate(uint32_t offset);
@@ -171,15 +171,15 @@ struct SequenceBuilder final {
 	void generateMemberVarDefaultClone();
 
 
-	bool instanciateAssignment(const ir::ISA::Operand<ir::ISA::Op::call>& operands);
+	bool instanciateAssignment(const ir::isa::Operand<ir::isa::Op::call>& operands);
 
 	bool instanciateAssignment(AtomStackFrame& frame, uint32_t lhs, uint32_t rhs, bool canDisposeLHS = true,
 							   bool checktype = true, bool forceDeepcopy = false);
 
 	//! perform type resolution and fetch data (local variable, func...)
-	bool identify(const ir::ISA::Operand<ir::ISA::Op::identify>& operands, const AnyString& name,
+	bool identify(const ir::isa::Operand<ir::isa::Op::identify>& operands, const AnyString& name,
 				  bool firstChance = true);
-	bool identifyCapturedVar(const ir::ISA::Operand<ir::ISA::Op::identify>& operands, const AnyString& name);
+	bool identifyCapturedVar(const ir::isa::Operand<ir::isa::Op::identify>& operands, const AnyString& name);
 
 	//! Try to capture variables from a list of potentiel candidates created by the mapping
 	void captureVariables(Atom& atom);
@@ -197,7 +197,7 @@ struct SequenceBuilder final {
 	void declareNamedVariable(const AnyString& name, uint32_t lvid, bool autorelease = true);
 
 	void instanciateInstrinsicCall();
-	bool instanciateUserDefinedIntrinsic(const ir::ISA::Operand<ir::ISA::Op::intrinsic>& operands);
+	bool instanciateUserDefinedIntrinsic(const ir::isa::Operand<ir::isa::Op::intrinsic>& operands);
 	Yuni::Tribool::Value instanciateBuiltinIntrinsic(const AnyString& name, uint32_t lvid,
 			bool canComplain = true);
 	Yuni::Tribool::Value instanciateBuiltinIntrinsicSpecific(const AnyString& name, uint32_t lvid,

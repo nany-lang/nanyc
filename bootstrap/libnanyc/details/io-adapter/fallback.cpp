@@ -1,4 +1,4 @@
-#include "details/vm/thread-context.h"
+#include "details/vm/context.h"
 
 using namespace Yuni;
 
@@ -168,7 +168,7 @@ namespace ny {
 namespace vm {
 
 
-void ThreadContext::initFallbackAdapter(nyio_adapter_t& adapter) {
+void Context::initFallbackAdapter(nyio_adapter_t& adapter) {
 	memset(&adapter, 0x0, sizeof(nyio_adapter_t));
 	adapter.stat = nanyc_io_fallback_stat;
 	adapter.statex = nanyc_io_fallback_statex;

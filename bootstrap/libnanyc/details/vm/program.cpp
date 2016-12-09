@@ -2,7 +2,7 @@
 #include "details/atom/atom.h"
 #include "details/intrinsic/intrinsic-table.h"
 #include "types.h"
-#include "thread-context.h"
+#include "details/vm/context.h"
 
 using namespace Yuni;
 
@@ -31,7 +31,7 @@ void Program::destroy() {
 
 
 int Program::execute(uint32_t argc, const char** argv) {
-	if (YUNI_UNLIKELY(cf.entrypoint.size == 0))
+	if (unlikely(cf.entrypoint.size == 0))
 		return 0;
 	if (cf.on_execute) {
 		if (nyfalse == cf.on_execute(self()))
@@ -45,15 +45,15 @@ int Program::execute(uint32_t argc, const char** argv) {
 	uint32_t atomid = ny::ref(build).main.atomid;
 	uint32_t instanceid = ny::ref(build).main.instanceid;
 	auto& sequence = map.sequence(atomid, instanceid);
-	ThreadContext thrctx{*this, AnyString{cf.entrypoint.c_str, cf.entrypoint.size}};
-	bool success = thrctx.initializeFirstTContext();
-	if (YUNI_UNLIKELY(not success))
+	Context context{*this, AnyString{cf.entrypoint.c_str, cf.entrypoint.size}};
+	bool success = context.initializeFirstTContext();
+	if (unlikely(not success))
 		return 666;
 	//
 	// Execute the program
 	//
 	uint64_t exitstatus;
-	if (thrctx.invoke(exitstatus, sequence, atomid, instanceid)) {
+	if (context.invoke(exitstatus, sequence, atomid, instanceid)) {
 		retvalue = static_cast<int>(exitstatus);
 		if (cf.on_terminate)
 			cf.on_terminate(self(), nytrue, retvalue);

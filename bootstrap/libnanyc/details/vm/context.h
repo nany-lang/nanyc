@@ -4,10 +4,9 @@
 #include <array>
 
 
-
-
 namespace ny {
 namespace vm {
+
 
 struct Mountpoint final {
 	Yuni::ShortString256 path;
@@ -15,30 +14,18 @@ struct Mountpoint final {
 };
 
 
-class ThreadContext final {
-public:
+struct Context final {
 	//! Default constructor
-	explicit ThreadContext(Program& program, const AnyString& name);
+	explicit Context(Program& program, const AnyString& name);
 	//! Clone a thread context
-	explicit ThreadContext(ThreadContext&);
+	explicit Context(Context&);
 	//! Destructor
-	~ThreadContext();
+	~Context();
 
 	//! Get the equivalent C type
 	nytctx_t* self();
 	//! Get the equivalent C type (const)
 	const nytctx_t* self() const;
-
-	/*!
-	** \brief Print a message on the console
-	*/
-	void cerr(const AnyString& msg);
-	//! Set the text color on the error output
-	void cerrColor(nycolor_t);
-
-	void cerrException(const AnyString& msg);
-	void cerrUnknownPointer(void*, uint32_t offset);
-
 
 	bool invoke(uint64_t& exitstatus, const ir::Sequence& callee, uint32_t atomid, uint32_t instanceid);
 
@@ -59,7 +46,7 @@ public:
 
 	struct IO {
 		/*!
-		** \briefFind the adapter and the relative adapter path from a virtual path
+		** \brief Find the adapter and the relative adapter path from a virtual path
 		**
 		** \param[out] relativepath Get a non-empty absolute path (but may contain segments like '.' amd '..')
 		** \param path Am aboslute virtual path
@@ -95,10 +82,10 @@ public:
 private:
 	void initFallbackAdapter(nyio_adapter_t& adapter);
 
-}; // class ThreadContext
+}; // struct Context
 
 
 } // namespace vm
 } // namespace ny
 
-#include "thread-context.hxx"
+#include "details/vm/context.hxx"

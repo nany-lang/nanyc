@@ -44,17 +44,17 @@ inline Instruction& Sequence::at(uint32_t offset) {
 }
 
 
-template<ISA::Op O> inline ISA::Operand<O>& Sequence::at(uint32_t offset) {
+template<isa::Op O> inline isa::Operand<O>& Sequence::at(uint32_t offset) {
 	assert(offset < m_size);
-	static_assert(sizeof(Instruction) >= sizeof(ISA::Operand<O>), "m_size mismatch");
-	return reinterpret_cast<ISA::Operand<O>&>(m_body[offset]);
+	static_assert(sizeof(Instruction) >= sizeof(isa::Operand<O>), "m_size mismatch");
+	return reinterpret_cast<isa::Operand<O>&>(m_body[offset]);
 }
 
 
-template<ISA::Op O> inline const ISA::Operand<O>& Sequence::at(uint32_t offset) const {
+template<isa::Op O> inline const isa::Operand<O>& Sequence::at(uint32_t offset) const {
 	assert(offset < m_size);
-	static_assert(sizeof(Instruction) >= sizeof(ISA::Operand<O>), "m_size mismatch");
-	return reinterpret_cast<ISA::Operand<O>&>(m_body[offset]);
+	static_assert(sizeof(Instruction) >= sizeof(isa::Operand<O>), "m_size mismatch");
+	return reinterpret_cast<isa::Operand<O>&>(m_body[offset]);
 }
 
 
@@ -78,9 +78,9 @@ inline bool Sequence::isCursorValid(const Instruction& instr) const {
 }
 
 
-template<ISA::Op O>
-inline uint32_t Sequence::offsetOf(const ISA::Operand<O>& instr) const {
-	static_assert(sizeof(Instruction) >= sizeof(ISA::Operand<O>), "m_size mismatch");
+template<isa::Op O>
+inline uint32_t Sequence::offsetOf(const isa::Operand<O>& instr) const {
+	static_assert(sizeof(Instruction) >= sizeof(isa::Operand<O>), "m_size mismatch");
 	return offsetOf(ir::Instruction::fromOpcode(instr));
 }
 
@@ -99,8 +99,8 @@ inline bool Sequence::jumpToLabelForward(const Instruction*& cursor, uint32_t la
 	const auto* const end = m_body + m_size;
 	const Instruction* instr = cursor;
 	while (++instr < end) {
-		if (instr->opcodes[0] == static_cast<uint32_t>(ir::ISA::Op::label)) {
-			auto& operands = (*instr).to<ir::ISA::Op::label>();
+		if (instr->opcodes[0] == static_cast<uint32_t>(ir::isa::Op::label)) {
+			auto& operands = (*instr).to<ir::isa::Op::label>();
 			if (operands.label == label) {
 				cursor = instr;
 				return true;
@@ -116,8 +116,8 @@ inline bool Sequence::jumpToLabelBackward(const Instruction*& cursor, uint32_t l
 	const auto* const base = m_body;
 	const Instruction* instr = cursor;
 	while (instr-- > base) {
-		if (instr->opcodes[0] == static_cast<uint32_t>(ir::ISA::Op::label)) {
-			auto& operands = (*instr).to<ir::ISA::Op::label>();
+		if (instr->opcodes[0] == static_cast<uint32_t>(ir::isa::Op::label)) {
+			auto& operands = (*instr).to<ir::isa::Op::label>();
 			if (operands.label == label) {
 				cursor = instr;
 				return true;
@@ -137,9 +137,9 @@ template<class T> inline void Sequence::each(T& visitor, uint32_t offset) {
 		for ( ; it < end; ++it) {
 			#if NANY_PRINT_sequence_OPCODES != 0
 			std::cout << "== opcode == at " << (it - m_body) << "|" << (void*) it << " :: ";
-			std::cout << it->opcodes[0] << ": " << ir::ISA::print(*this, *it) << '\n';
+			std::cout << it->opcodes[0] << ": " << ir::isa::print(*this, *it) << '\n';
 			#endif
-			LIBNANYC_IR_VISIT_SEQUENCE(ir::ISA::Operand, visitor, *it);
+			LIBNANYC_IR_VISIT_SEQUENCE(ir::isa::Operand, visitor, *it);
 		}
 	}
 }
@@ -153,16 +153,16 @@ template<class T> inline void Sequence::each(T& visitor, uint32_t offset) const 
 		for ( ; it < end; ++it) {
 			#if NANY_PRINT_sequence_OPCODES != 0
 			std::cout << "== opcode == at " << (it - m_body) << "|" << (void*) it << " :: ";
-			std::cout << it->opcodes[0] << ": " << ir::ISA::print(*this, *it) << '\n';
+			std::cout << it->opcodes[0] << ": " << ir::isa::print(*this, *it) << '\n';
 			#endif
-			LIBNANYC_IR_VISIT_SEQUENCE(const ir::ISA::Operand, visitor, *it);
+			LIBNANYC_IR_VISIT_SEQUENCE(const ir::isa::Operand, visitor, *it);
 		}
 	}
 }
 
 
-template<ISA::Op O> inline ISA::Operand<O>& Sequence::emitraw() {
-	static_assert(sizeof(Instruction) >= sizeof(ISA::Operand<O>), "m_size mismatch");
+template<isa::Op O> inline isa::Operand<O>& Sequence::emitraw() {
+	static_assert(sizeof(Instruction) >= sizeof(isa::Operand<O>), "m_size mismatch");
 	assert(m_size + 1 <= m_capacity);
 	auto& result = at<O>(m_size++);
 	result.opcode = static_cast<uint32_t>(O);
@@ -170,10 +170,10 @@ template<ISA::Op O> inline ISA::Operand<O>& Sequence::emitraw() {
 }
 
 
-template<ISA::Op O> inline ISA::Operand<O>& Sequence::emit() {
+template<isa::Op O> inline isa::Operand<O>& Sequence::emit() {
 	if (unlikely(m_capacity < m_size + 1))
 		grow(m_size + 1);
-	static_assert(sizeof(Instruction) >= sizeof(ISA::Operand<O>), "m_size mismatch");
+	static_assert(sizeof(Instruction) >= sizeof(isa::Operand<O>), "m_size mismatch");
 	assert(m_size + 1 <= m_capacity);
 	auto& result = at<O>(m_size++);
 	result.opcode = static_cast<uint32_t>(O);

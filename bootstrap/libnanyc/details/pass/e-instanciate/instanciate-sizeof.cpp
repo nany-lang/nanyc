@@ -9,7 +9,7 @@ namespace Pass {
 namespace Instanciate {
 
 
-void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::classdefsizeof>& operands) {
+void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::classdefsizeof>& operands) {
 	if (canGenerateCode()) {
 		if (not frame->verify(operands.type))
 			return frame->invalidate(operands.lvid);

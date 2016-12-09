@@ -8,7 +8,7 @@ namespace Pass {
 namespace Instanciate {
 
 
-void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::follow>& operands) {
+void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::follow>& operands) {
 	// in 'signature only' mode (resolving defined parameter types), all
 	// types must be gathered
 	if (not operands.symlink or signatureOnly) {

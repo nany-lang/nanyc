@@ -35,8 +35,8 @@ bool Source::passTransformASTToIR(Logs::Report& report) {
 		success &= scope.visitAST(astnodes[i]);
 	ir::emit::scopeEnd(out);
 	uint32_t blpsize = out.opcodeCount() - bpoffset;
-	out.at<ir::ISA::Op::pragma>(bpoffsiz).value.blueprintsize = blpsize;
-	scope.sequence().at<ir::ISA::Op::stacksize>(bpoffsck).add = scope.nextvar();
+	out.at<ir::isa::Op::pragma>(bpoffsiz).value.blueprintsize = blpsize;
+	scope.sequence().at<ir::isa::Op::stacksize>(bpoffsck).add = scope.nextvar();
 	// do not keep back information
 	buildinfo.parsing.parser.clear();
 	m_content.clear();

@@ -7,7 +7,7 @@ namespace ny {
 namespace Pass {
 namespace Instanciate {
 
-void SequenceBuilder::visit(const ir::ISA::Operand<ir::ISA::Op::stackalloc>& operands) {
+void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::stackalloc>& operands) {
 	assert(frame != nullptr);
 	if (not frame->verify(operands.lvid))
 		return;

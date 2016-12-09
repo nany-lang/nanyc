@@ -16,31 +16,31 @@ Sequence::~Sequence() {
 
 
 void Sequence::moveCursorFromBlueprintToEnd(const Instruction*& cursor) const {
-	assert((*cursor).opcodes[0] == static_cast<uint32_t>(ir::ISA::Op::blueprint));
-	if ((*cursor).opcodes[0] == static_cast<uint32_t>(ir::ISA::Op::blueprint)) {
+	assert((*cursor).opcodes[0] == static_cast<uint32_t>(ir::isa::Op::blueprint));
+	if ((*cursor).opcodes[0] == static_cast<uint32_t>(ir::isa::Op::blueprint)) {
 		// next opcode, which should be blueprint.size
 		(cursor)++;
 		// getting the size and moving the cursor
-		auto& blueprintsize = (*cursor).to<ir::ISA::Op::pragma>();
-		assert(blueprintsize.opcode == (uint32_t) ir::ISA::Op::pragma);
+		auto& blueprintsize = (*cursor).to<ir::isa::Op::pragma>();
+		assert(blueprintsize.opcode == (uint32_t) ir::isa::Op::pragma);
 		assert(blueprintsize.value.blueprintsize >= 2);
 		cursor += blueprintsize.value.blueprintsize - 2; // -2: blueprint:class+blueprint:size
-		assert((*cursor).opcodes[0] == (uint32_t) ir::ISA::Op::end);
+		assert((*cursor).opcodes[0] == (uint32_t) ir::isa::Op::end);
 	}
 }
 
 
 void Sequence::moveCursorFromBlueprintToEnd(Instruction*& cursor) const {
-	assert((*cursor).opcodes[0] == static_cast<uint32_t>(ir::ISA::Op::blueprint));
-	if ((*cursor).opcodes[0] == static_cast<uint32_t>(ir::ISA::Op::blueprint)) {
+	assert((*cursor).opcodes[0] == static_cast<uint32_t>(ir::isa::Op::blueprint));
+	if ((*cursor).opcodes[0] == static_cast<uint32_t>(ir::isa::Op::blueprint)) {
 		// next opcode, which should be blueprint.size
 		(cursor)++;
 		// getting the size and moving the cursor
-		auto& blueprintsize = (*cursor).to<ir::ISA::Op::pragma>();
-		assert(blueprintsize.opcode == (uint32_t) ir::ISA::Op::pragma);
+		auto& blueprintsize = (*cursor).to<ir::isa::Op::pragma>();
+		assert(blueprintsize.opcode == (uint32_t) ir::isa::Op::pragma);
 		assert(blueprintsize.value.blueprintsize >= 2);
 		cursor += blueprintsize.value.blueprintsize - 2; // -2: blueprint:class+blueprint:size
-		assert((*cursor).opcodes[0] == (uint32_t) ir::ISA::Op::end);
+		assert((*cursor).opcodes[0] == (uint32_t) ir::isa::Op::end);
 	}
 }
 
@@ -71,7 +71,7 @@ void Sequence::grow(uint32_t count) {
 
 void Sequence::print(YString& out, const AtomMap* atommap, uint32_t offset) const {
 	out.reserve(out.size() + (m_size * 100)); // arbitrary
-	ir::ISA::Printer<String> printer{out, *this};
+	ir::isa::Printer<String> printer{out, *this};
 	printer.atommap = atommap;
 	printer.offset = offset;
 	each(printer, offset);
@@ -88,15 +88,15 @@ struct WalkerIncreaseLVID final {
 		, sequence(sequence) {
 	}
 
-	void visit(ir::ISA::Operand<ir::ISA::Op::stacksize>& operands) {
+	void visit(ir::isa::Operand<ir::isa::Op::stacksize>& operands) {
 		operands.add += inc;
 	}
 
-	void visit(ir::ISA::Operand<ir::ISA::Op::blueprint>& operands) {
-		auto kind = static_cast<ir::ISA::Blueprint>(operands.kind);
+	void visit(ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
+		auto kind = static_cast<ir::isa::Blueprint>(operands.kind);
 		switch (kind) {
-			case ir::ISA::Blueprint::funcdef:
-			case ir::ISA::Blueprint::classdef:
+			case ir::isa::Blueprint::funcdef:
+			case ir::isa::Blueprint::classdef:
 				sequence.moveCursorFromBlueprintToEnd(*cursor);
 				break;
 			default:
@@ -105,16 +105,16 @@ struct WalkerIncreaseLVID final {
 		}
 	}
 
-	void visit(ir::ISA::Operand<ir::ISA::Op::scope>&) {
+	void visit(ir::isa::Operand<ir::isa::Op::scope>&) {
 		++depth;
 	}
 
-	void visit(ir::ISA::Operand<ir::ISA::Op::end>&) {
+	void visit(ir::isa::Operand<ir::isa::Op::end>&) {
 		if (depth-- == 0)
 			sequence.invalidateCursor(*cursor);
 	}
 
-	template<ir::ISA::Op O> void visit(ir::ISA::Operand<O>& operands) {
+	template<ir::isa::Op O> void visit(ir::isa::Operand<O>& operands) {
 		// ask to the opcode datatype to update its own lvid
 		// (see operator() below)
 		operands.eachLVID(*this);

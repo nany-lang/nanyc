@@ -11,12 +11,12 @@ inline ClassdefTableView::ClassdefTableView(ClassdefTable& table)
 
 
 inline ClassdefTableView::ClassdefTableView(ClassdefTableView& view)
-	: table(view.table) {
+	: ClassdefTableView(view.table) {
 }
 
 
 inline ClassdefTableView::ClassdefTableView(ClassdefTableView& view, uint32_t atomid, uint count)
-	: table(view.table) {
+	: ClassdefTableView(view.table) {
 	// preparing the new layer via the local data, then swapping
 	previous.atomid = atomid;
 	// reminder: parameters are 2-based

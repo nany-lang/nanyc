@@ -70,21 +70,21 @@ void SequenceBuilder::captureVariables(Atom& atom) {
 	uint32_t startLvid = atom.localVariablesCount + 1; // 1-based
 	auto offset = atom.opcodes.offset;
 	#ifndef NDEBUG
-	auto& blueprint = sequence.at<ir::ISA::Op::blueprint>(offset);
-	assert(blueprint.opcode == (uint32_t) ir::ISA::Op::blueprint);
+	auto& blueprint = sequence.at<ir::isa::Op::blueprint>(offset);
+	assert(blueprint.opcode == (uint32_t) ir::isa::Op::blueprint);
 	#endif
 	// blueprint size
 	++offset;
 	#ifndef NDEBUG
-	auto& blueprintsize = sequence.at<ir::ISA::Op::pragma>(offset);
-	assert(blueprintsize.opcode == (uint32_t) ir::ISA::Op::pragma);
+	auto& blueprintsize = sequence.at<ir::isa::Op::pragma>(offset);
+	assert(blueprintsize.opcode == (uint32_t) ir::isa::Op::pragma);
 	#endif
 	// Updating the opcode stacksize
 	++offset;
-	auto& stacksize = sequence.at<ir::ISA::Op::stacksize>(offset);
-	assert(stacksize.opcode == static_cast<uint32_t>(ir::ISA::Op::stacksize));
+	auto& stacksize = sequence.at<ir::isa::Op::stacksize>(offset);
+	assert(stacksize.opcode == static_cast<uint32_t>(ir::isa::Op::stacksize));
 	assert(stacksize.add + 1 == startLvid);
-	if (unlikely(stacksize.opcode != static_cast<uint32_t>(ir::ISA::Op::stacksize)))
+	if (unlikely(stacksize.opcode != static_cast<uint32_t>(ir::isa::Op::stacksize)))
 		return (void)(ice() << "capturing variable: stacksize opcode expected");
 	// new stack size
 	stacksize.add += count;
@@ -176,7 +176,7 @@ bool SequenceBuilder::pushCapturedVarsAsParameters(const Atom& atomclass) {
 }
 
 
-bool SequenceBuilder::identifyCapturedVar(const ir::ISA::Operand<ir::ISA::Op::identify>& operands,
+bool SequenceBuilder::identifyCapturedVar(const ir::isa::Operand<ir::isa::Op::identify>& operands,
 		const AnyString& name) {
 	AnyString captureName;
 	{
