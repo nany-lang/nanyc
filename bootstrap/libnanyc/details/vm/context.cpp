@@ -4,6 +4,7 @@
 #include <yuni/io/directory/system.h>
 #include <yuni/core/string.h>
 #include <yuni/core/system/windows.hdr.h>
+#include "details/vm/console.h"
 
 using namespace Yuni;
 
@@ -146,17 +147,25 @@ bool Context::invoke(uint64_t& exitstatus, const ir::Sequence& callee, uint32_t 
 	if (!cf.on_thread_create
 		or nyfalse != cf.on_thread_create(program.self(), self(), nullptr, name.c_str(), name.size())) {
 		ContextRunner runner{*this, callee};
-		runner.initialize();
-		runner.stacktrace.push(atomid, instanceid);
-		if (setjmp(runner.jump_buffer) != 666) {
-			runner.invoke(callee);
-			exitstatus = runner.retRegister;
-			if (cf.on_thread_destroy)
-				cf.on_thread_destroy(program.self(), self());
-			return true;
+		try {
+			runner.initialize();
+			runner.stacktrace.push(atomid, instanceid);
+			if (setjmp(runner.jump_buffer) != 666) {
+				runner.invoke(callee);
+				exitstatus = runner.retRegister;
+				if (cf.on_thread_destroy)
+					cf.on_thread_destroy(program.self(), self());
+				return true;
+			}
+			else {
+				// execution of the program failed
+			}
 		}
-		else {
-			// execution of the program failed
+		catch (const std::bad_alloc&) {
+			ny::vm::console::badAlloc(*this);
+		}
+		catch (const std::exception& e) {
+			ny::vm::console::exception(*this, e.what());
 		}
 		if (cf.on_thread_destroy)
 			cf.on_thread_destroy(program.self(), self());
