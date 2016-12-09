@@ -77,6 +77,7 @@ struct ContextRunner final {
 public:
 	ContextRunner(Context&, const ir::Sequence& callee);
 	~ContextRunner();
+	void initialize();
 
 	[[noreturn]] void abortMission();
 	[[noreturn]] void emitBadAlloc();

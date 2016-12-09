@@ -146,6 +146,7 @@ bool Context::invoke(uint64_t& exitstatus, const ir::Sequence& callee, uint32_t 
 	if (!cf.on_thread_create
 		or nyfalse != cf.on_thread_create(program.self(), self(), nullptr, name.c_str(), name.size())) {
 		ContextRunner runner{*this, callee};
+		runner.initialize();
 		runner.stacktrace.push(atomid, instanceid);
 		if (setjmp(runner.jump_buffer) != 666) {
 			runner.invoke(callee);

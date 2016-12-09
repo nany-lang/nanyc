@@ -15,6 +15,10 @@ ContextRunner::ContextRunner(Context& context, const ir::Sequence& callee)
 	, map(context.program.map)
 	, sequence(std::cref(callee))
 	, userDefinedIntrinsics(ny::ref(context.program.build).intrinsics) {
+}
+
+
+void ContextRunner::initialize() {
 	// dynamic C calls
 	dyncall = dcNewCallVM(4096);
 	dcMode(dyncall, DC_CALL_C_DEFAULT);
