@@ -161,6 +161,9 @@ bool Context::invoke(uint64_t& exitstatus, const ir::Sequence& callee, uint32_t 
 				// execution of the program failed
 			}
 		}
+		catch (const ContextRunner::Exception& e) {
+			ny::vm::console::exception(*this, e.what());
+		}
 		catch (const std::bad_alloc&) {
 			ny::vm::console::badAlloc(*this);
 		}

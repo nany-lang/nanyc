@@ -44,6 +44,9 @@ struct ContextRunner final {
 	//! Pattern for memset free regions (debug)
 	constexpr static const int patternFree = 0xCD;
 
+	struct Exception: public std::exception {
+	};
+
 	//! Registers for the current stack frame
 	DataRegister* registers = nullptr;
 	//! Return value
