@@ -150,16 +150,11 @@ bool Context::invoke(uint64_t& exitstatus, const ir::Sequence& callee, uint32_t 
 		try {
 			runner.initialize();
 			runner.stacktrace.push(atomid, instanceid);
-			if (setjmp(runner.jump_buffer) != 666) {
-				runner.invoke(callee);
-				exitstatus = runner.retRegister;
-				if (cf.on_thread_destroy)
-					cf.on_thread_destroy(program.self(), self());
-				return true;
-			}
-			else {
-				// execution of the program failed
-			}
+			runner.invoke(callee);
+			exitstatus = runner.retRegister;
+			if (cf.on_thread_destroy)
+				cf.on_thread_destroy(program.self(), self());
+			return true;
 		}
 		catch (const ContextRunner::Abort&) {
 			// error already reported

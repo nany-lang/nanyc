@@ -21,7 +21,6 @@ ContextRunner::ContextRunner(Context& context, const ir::Sequence& callee)
 void ContextRunner::initialize() {
 	// dynamic C calls
 	dyncall = dcNewCallVM(4096);
-	if (!dyncall)
 	dcMode(dyncall, DC_CALL_C_DEFAULT);
 	// prepare the current context for native C calls
 	cfvm.allocator = &allocator;
@@ -41,7 +40,7 @@ ContextRunner::~ContextRunner() {
 void ContextRunner::abortMission() {
 	memchecker.releaseAll(allocator); // prevent memory leak reports
 	stacktrace.dump(context.cf, map);
-	std::longjmp(jump_buffer, 666);
+	throw Abort();
 }
 
 

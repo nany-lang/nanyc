@@ -72,8 +72,6 @@ struct ContextRunner final {
 	std::reference_wrapper<const ir::Sequence> sequence;
 	const IntrinsicTable& userDefinedIntrinsics;
 	const ir::Instruction** cursor = nullptr;
-	//! Jump buffer, to handle exceptions during the execution of the program
-	std::jmp_buf jump_buffer;
 	#ifndef NDEBUG
 	//! Total number of registers in the current frame
 	uint32_t registerCount = 0;
