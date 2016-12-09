@@ -86,7 +86,7 @@ struct Executor final {
 	#endif
 
 public:
-	Executor(ThreadContext& threadContext, const ir::Sequence& callee) noexcept
+	Executor(ThreadContext& threadContext, const ir::Sequence& callee)
 		: allocator(threadContext.program.cf.allocator)
 		, cf(threadContext.program.cf)
 		, threadContext(threadContext)
@@ -103,7 +103,7 @@ public:
 		cfvm.console = &cf.console;
 	}
 
-	~Executor() noexcept {
+	~Executor() {
 		if (dyncall)
 			dcFree(dyncall);
 		// memory leaks ?
@@ -111,7 +111,7 @@ public:
 	}
 
 
-	[[noreturn]] void abortMission() noexcept {
+	[[noreturn]] void abortMission() {
 		// dump information on the console
 		stacktrace.dump(ny::ref(threadContext.program.build), map);
 		// avoid spurious err messages and memory leaks when used
@@ -122,13 +122,13 @@ public:
 	}
 
 
-	[[noreturn]] void emitBadAlloc() noexcept {
+	[[noreturn]] void emitBadAlloc() {
 		threadContext.cerrException("failed to allocate memory");
 		abortMission();
 	}
 
 
-	[[noreturn]] void emitPointerSizeMismatch(void* object, size_t size) noexcept {
+	[[noreturn]] void emitPointerSizeMismatch(void* object, size_t size) {
 		ShortString128 msg;
 		msg << "pointer " << object << " size mismatch: got "
 			<< size << " bytes, expected "
@@ -139,13 +139,13 @@ public:
 	}
 
 
-	[[noreturn]] void emitAssert() noexcept {
+	[[noreturn]] void emitAssert() {
 		threadContext.cerrException("assertion failed");
 		abortMission();
 	}
 
 
-	[[noreturn]] void emitUnexpectedOpcode(const AnyString& name) noexcept {
+	[[noreturn]] void emitUnexpectedOpcode(const AnyString& name) {
 		ShortString64 msg;
 		msg << "error: vm: unexpected opcode '" << name << '\'';
 		threadContext.cerrException(msg);
@@ -153,31 +153,31 @@ public:
 	}
 
 
-	[[noreturn]] void emitInvalidIntrinsicParamType() noexcept {
+	[[noreturn]] void emitInvalidIntrinsicParamType() {
 		threadContext.cerrException("intrinsic invalid parameter type");
 		abortMission();
 	}
 
 
-	[[noreturn]] void emitInvalidReturnType() noexcept {
+	[[noreturn]] void emitInvalidReturnType() {
 		threadContext.cerrException("intrinsic invalid return type");
 		abortMission();
 	}
 
 
-	[[noreturn]] void emitDividedByZero() noexcept {
+	[[noreturn]] void emitDividedByZero() {
 		threadContext.cerrException("division by zero");
 		abortMission();
 	}
 
 
-	[[noreturn]] void emitUnknownPointer(void* p) noexcept {
+	[[noreturn]] void emitUnknownPointer(void* p) {
 		threadContext.cerrUnknownPointer(p, sequence.get().offsetOf(**cursor));
 		abortMission();
 	}
 
 
-	[[noreturn]] void emitLabelError(uint32_t label) noexcept {
+	[[noreturn]] void emitLabelError(uint32_t label) {
 		ShortString256 msg;
 		msg << "invalid label %" << label;
 		msg << " (upper: %" << upperLabelID;
@@ -187,18 +187,18 @@ public:
 	}
 
 
-	template<class T> inline T* allocateraw(size_t size) noexcept {
+	template<class T> inline T* allocateraw(size_t size) {
 		return (T*) allocator.allocate(&allocator, size);
 	}
 
 
-	inline void deallocate(void* object, size_t size) noexcept {
+	inline void deallocate(void* object, size_t size) {
 		assert(object != nullptr);
 		allocator.deallocate(&allocator, object, size);
 	}
 
 
-	void destroy(uint64_t* object, uint32_t dtorid, uint32_t instanceid) noexcept {
+	void destroy(uint64_t* object, uint32_t dtorid, uint32_t instanceid) {
 		// the dtor function to call
 		auto& dtor = *map.findAtom(dtorid);
 		if (false) { // traces
@@ -228,7 +228,7 @@ public:
 	}
 
 
-	inline void gotoLabel(uint32_t label) noexcept {
+	inline void gotoLabel(uint32_t label) {
 		bool jmpsuccess = (label > upperLabelID)
 						  ? sequence.get().jumpToLabelForward(*cursor, label)
 						  : sequence.get().jumpToLabelBackward(*cursor, label);
@@ -246,7 +246,7 @@ public:
 	inline void visit(const ir::isa::Operand<ir::isa::Op::nop>&) {}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::negation>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::negation>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.lhs);
@@ -254,7 +254,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::intrinsic>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::intrinsic>& opr) {
 		vm_PRINT_OPCODE(opr);
 		dcReset(dyncall);
 		dcArgPointer(dyncall, &cfvm);
@@ -350,7 +350,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::fadd>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::fadd>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.lhs);
@@ -359,7 +359,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::fsub>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::fsub>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.lhs);
@@ -368,7 +368,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::fmul>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::fmul>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.lhs);
@@ -377,7 +377,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::fdiv>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::fdiv>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.lhs);
@@ -389,7 +389,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::add>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::add>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.lhs);
@@ -398,7 +398,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::sub>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::sub>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.lhs);
@@ -407,7 +407,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::mul>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::mul>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.lhs);
@@ -416,7 +416,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::div>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::div>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.lhs);
@@ -428,7 +428,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::imul>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::imul>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.lhs);
@@ -439,7 +439,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::idiv>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::idiv>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.lhs);
@@ -451,7 +451,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::eq>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::eq>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.lhs);
@@ -460,7 +460,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::neq>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::neq>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.lhs);
@@ -469,7 +469,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::lt>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::lt>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.lhs);
@@ -478,7 +478,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::lte>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::lte>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.lhs);
@@ -487,7 +487,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::ilt>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::ilt>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.lhs);
@@ -496,7 +496,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::ilte>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::ilte>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.lhs);
@@ -505,7 +505,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::gt>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::gt>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.lhs);
@@ -514,7 +514,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::gte>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::gte>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.lhs);
@@ -523,7 +523,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::igt>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::igt>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.lhs);
@@ -532,7 +532,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::igte>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::igte>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.lhs);
@@ -541,7 +541,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::flt>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::flt>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.lhs);
@@ -550,7 +550,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::flte>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::flte>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.lhs);
@@ -559,7 +559,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::fgt>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::fgt>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.lhs);
@@ -568,7 +568,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::fgte>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::fgte>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.lhs);
@@ -577,7 +577,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::opand>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::opand>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.lhs);
@@ -586,7 +586,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::opor>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::opor>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.lhs);
@@ -595,7 +595,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::opxor>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::opxor>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.lhs);
@@ -604,7 +604,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::opmod>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::opmod>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.lhs);
@@ -613,7 +613,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::push>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::push>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.lvid);
@@ -621,7 +621,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::ret>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::ret>& opr) {
 		vm_PRINT_OPCODE(opr);
 		assert(opr.lvid == 0 or opr.lvid < registerCount);
 		retRegister = registers[opr.lvid].u64;
@@ -629,7 +629,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::store>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::store>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.source);
@@ -637,7 +637,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::storeText>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::storeText>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		registers[opr.lvid].u64 =
@@ -645,14 +645,14 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::storeConstant>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::storeConstant>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		registers[opr.lvid].u64 = opr.value.u64;
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::classdefsizeof>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::classdefsizeof>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		assert(map.findAtom(opr.type) != nullptr);
@@ -660,14 +660,14 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::call>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::call>& opr) {
 		ASSERT_LVID(opr.lvid);
 		vm_PRINT_OPCODE(opr);
 		call(opr.lvid, opr.ptr2func, opr.instanceid);
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::fieldset>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::fieldset>& opr) {
 		assert(opr.self < registerCount);
 		ASSERT_LVID(opr.lvid);
 		uint64_t* object = reinterpret_cast<uint64_t*>(registers[opr.self].u64);
@@ -676,7 +676,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::fieldget>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::fieldget>& opr) {
 		ASSERT_LVID(opr.self);
 		ASSERT_LVID(opr.lvid);
 		uint64_t* object = reinterpret_cast<uint64_t*>(registers[opr.self].u64);
@@ -685,24 +685,24 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::label>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::label>& opr) {
 		if (opr.label > upperLabelID)
 			upperLabelID = opr.label;
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::jmp>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::jmp>& opr) {
 		gotoLabel(opr.label);
 	}
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::jnz>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::jnz>& opr) {
 		if (registers[opr.lvid].u64 != 0) {
 			registers[opr.result].u64 = 1;
 			gotoLabel(opr.label);
 		}
 	}
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::jz>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::jz>& opr) {
 		if (registers[opr.lvid].u64 == 0) {
 			registers[opr.result].u64 = 0;
 			gotoLabel(opr.label);
@@ -710,7 +710,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::ref>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::ref>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		uint64_t* object = reinterpret_cast<uint64_t*>(registers[opr.lvid].u64);
@@ -719,7 +719,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::unref>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::unref>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		uint64_t* object = reinterpret_cast<uint64_t*>(registers[opr.lvid].u64);
@@ -729,7 +729,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::dispose>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::dispose>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		uint64_t* object = reinterpret_cast<uint64_t*>(registers[opr.lvid].u64);
@@ -738,14 +738,14 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::stackalloc>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::stackalloc>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		(void) opr;
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::memalloc>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::memalloc>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.regsize);
@@ -774,7 +774,7 @@ public:
 	}
 
 
-	inline void visit(const ir::isa::Operand<ir::isa::Op::memrealloc>& opr) noexcept {
+	inline void visit(const ir::isa::Operand<ir::isa::Op::memrealloc>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.oldsize);
@@ -806,14 +806,14 @@ public:
 	}
 
 
-	void visit(const ir::isa::Operand<ir::isa::Op::memcheckhold>& opr) noexcept {
+	void visit(const ir::isa::Operand<ir::isa::Op::memcheckhold>& opr) {
 		uint64_t* ptr = reinterpret_cast<uint64_t*>(registers[opr.lvid].u64);
 		uint64_t size = registers[opr.size].u64 + config::extraObjectSize;
 		memchecker.hold(ptr, size, opr.lvid);
 	}
 
 
-	void visit(const ir::isa::Operand<ir::isa::Op::memfree>& opr) noexcept {
+	void visit(const ir::isa::Operand<ir::isa::Op::memfree>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.regsize);
@@ -832,7 +832,7 @@ public:
 	}
 
 
-	void visit(const ir::isa::Operand<ir::isa::Op::memfill>& opr) noexcept {
+	void visit(const ir::isa::Operand<ir::isa::Op::memfill>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.regsize);
@@ -848,7 +848,7 @@ public:
 	}
 
 
-	void visit(const ir::isa::Operand<ir::isa::Op::memcopy>& opr) noexcept {
+	void visit(const ir::isa::Operand<ir::isa::Op::memcopy>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.srclvid);
@@ -860,7 +860,7 @@ public:
 	}
 
 
-	void visit(const ir::isa::Operand<ir::isa::Op::memmove>& opr) noexcept {
+	void visit(const ir::isa::Operand<ir::isa::Op::memmove>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.srclvid);
@@ -872,7 +872,7 @@ public:
 	}
 
 
-	void visit(const ir::isa::Operand<ir::isa::Op::memcmp>& opr) noexcept {
+	void visit(const ir::isa::Operand<ir::isa::Op::memcmp>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.srclvid);
@@ -885,7 +885,7 @@ public:
 	}
 
 
-	void visit(const ir::isa::Operand<ir::isa::Op::cstrlen>& opr) noexcept {
+	void visit(const ir::isa::Operand<ir::isa::Op::cstrlen>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.ptr);
@@ -895,7 +895,7 @@ public:
 	}
 
 
-	void visit(const ir::isa::Operand<ir::isa::Op::load_u64>& opr) noexcept {
+	void visit(const ir::isa::Operand<ir::isa::Op::load_u64>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.ptrlvid);
@@ -903,7 +903,7 @@ public:
 	}
 
 
-	void visit(const ir::isa::Operand<ir::isa::Op::load_u32>& opr) noexcept {
+	void visit(const ir::isa::Operand<ir::isa::Op::load_u32>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.ptrlvid);
@@ -911,7 +911,7 @@ public:
 	}
 
 
-	void visit(const ir::isa::Operand<ir::isa::Op::load_u8>& opr) noexcept {
+	void visit(const ir::isa::Operand<ir::isa::Op::load_u8>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.ptrlvid);
@@ -919,7 +919,7 @@ public:
 	}
 
 
-	void visit(const ir::isa::Operand<ir::isa::Op::store_u64>& opr) noexcept {
+	void visit(const ir::isa::Operand<ir::isa::Op::store_u64>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.ptrlvid);
@@ -927,7 +927,7 @@ public:
 	}
 
 
-	void visit(const ir::isa::Operand<ir::isa::Op::store_u32>& opr) noexcept {
+	void visit(const ir::isa::Operand<ir::isa::Op::store_u32>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.ptrlvid);
@@ -935,7 +935,7 @@ public:
 	}
 
 
-	void visit(const ir::isa::Operand<ir::isa::Op::store_u8>& opr) noexcept {
+	void visit(const ir::isa::Operand<ir::isa::Op::store_u8>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.ptrlvid);
@@ -943,21 +943,21 @@ public:
 	}
 
 
-	void visit(const ir::isa::Operand<ir::isa::Op::opassert>& opr) noexcept {
+	void visit(const ir::isa::Operand<ir::isa::Op::opassert>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		if (YUNI_UNLIKELY(registers[opr.lvid].u64 == 0))
 			return emitAssert();
 	}
 
-	template<ir::isa::Op O> void visit(const ir::isa::Operand<O>& opr) noexcept {
+	template<ir::isa::Op O> void visit(const ir::isa::Operand<O>& opr) {
 		vm_PRINT_OPCODE(opr); // FALLBACK
 		(void) opr; // unused
 		return emitUnexpectedOpcode(ir::isa::Operand<O>::opname());
 	}
 
 
-	uint64_t invoke(const ir::Sequence& callee) noexcept {
+	uint64_t invoke(const ir::Sequence& callee) {
 		const uint32_t framesize = callee.at<ir::isa::Op::stacksize>(0).add;
 		#ifndef NDEBUG
 		assert(framesize < 1024 * 1024);
@@ -981,7 +981,7 @@ public:
 	}
 
 
-	void call(uint32_t retlvid, uint32_t atomfunc, uint32_t instanceid) noexcept {
+	void call(uint32_t retlvid, uint32_t atomfunc, uint32_t instanceid) {
 		assert(retlvid == 0 or retlvid < registerCount);
 		#if ny_vm_PRINT_OPCODES != 0
 		std::cout << "== ny:vm >>  registers before call\n";
