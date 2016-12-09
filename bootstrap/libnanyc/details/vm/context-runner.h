@@ -46,6 +46,8 @@ struct ContextRunner final {
 
 	struct Exception: public std::exception {
 	};
+	struct Abort final : public Exception {
+	};
 
 	//! Registers for the current stack frame
 	DataRegister* registers = nullptr;
