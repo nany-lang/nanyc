@@ -47,9 +47,8 @@ void ContextRunner::emitBadAlloc() {
 
 
 void ContextRunner::emitPointerSizeMismatch(void* object, size_t size) {
-	ny::vm::console::invalidPointerSize(context, object,
-		/*got*/    size,
-		/*expect*/ memchecker.fetchObjectSize(reinterpret_cast<const uint64_t*>(object)));
+	size_t expect = memchecker.fetchObjectSize(reinterpret_cast<const uint64_t*>(object));
+	ny::vm::console::invalidPointerSize(context, object, size, expect);
 	abortMission();
 }
 
@@ -91,8 +90,8 @@ void ContextRunner::emitUnknownPointer(void* p) {
 
 
 void ContextRunner::emitLabelError(uint32_t label) {
-	ny::vm::console::invalidLabel(context, label, upperLabelID,
-		sequence.get().offsetOf(**cursor));
+	auto offset = sequence.get().offsetOf(**cursor);
+	ny::vm::console::invalidLabel(context, label, upperLabelID, offset);
 	abortMission();
 }
 
