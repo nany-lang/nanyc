@@ -156,6 +156,9 @@ bool Context::invoke(uint64_t& exitstatus, const ir::Sequence& callee, uint32_t 
 				cf.on_thread_destroy(program.self(), self());
 			return true;
 		}
+		catch (const ContextRunner::DyncallError&) {
+			ny::vm::console::exception(*this, "dyncall failed");
+		}
 		catch (const ContextRunner::Abort&) {
 			// error already reported
 		}

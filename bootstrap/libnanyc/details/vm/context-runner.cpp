@@ -21,6 +21,8 @@ ContextRunner::ContextRunner(Context& context, const ir::Sequence& callee)
 void ContextRunner::initialize() {
 	// dynamic C calls
 	dyncall = dcNewCallVM(4096);
+	if (unlikely(!dyncall))
+		throw DyncallError();
 	dcMode(dyncall, DC_CALL_C_DEFAULT);
 	// prepare the current context for native C calls
 	cfvm.allocator = &allocator;

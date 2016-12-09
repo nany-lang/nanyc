@@ -48,6 +48,8 @@ struct ContextRunner final {
 	};
 	struct Abort final : public Exception {
 	};
+	struct DyncallError final : public Exception {
+	};
 
 	//! Registers for the current stack frame
 	DataRegister* registers = nullptr;
