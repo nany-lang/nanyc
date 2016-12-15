@@ -357,11 +357,11 @@ void runAllUnittests(nyrun_cf_t& runcf, Settings& settings, const char** filelis
 	normalizeNumberOfParallelJobs(settings.jobs);
 	if (settings.unittests.empty())
 		fetchUnittestList(runcf, settings.unittests, filelist, filecount);
-	for (uint32_t r = 0; r != settings.repeat; ++r) {
+	for (uint32_t pass = 0; pass != settings.repeat; ++pass) {
 		if (settings.shuffle)
 			shuffleUnittests(settings.unittests);
 		if (settings.shuffle or settings.repeat > 1)
-			printPassInfo(settings, r);
+			printPassInfo(settings, pass);
 		std::cout << '\n';
 		runUnittests(runcf, settings, filelist, filecount);
 	}
