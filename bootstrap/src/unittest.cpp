@@ -83,8 +83,7 @@ void fetchUnittestList(nyrun_cf_t& runcf, std::vector<String>& torun, const char
 	runcf.program.entrypoint.c_str = nullptr;
 	runcf.build.ignore_atoms = nytrue;
 	runcf.build.userdata = &torun;
-	runcf.build.on_unittest = [](void* userdata, const char* mod, uint32_t modlen, const char* name,
-	uint32_t nlen) {
+	runcf.build.on_unittest = [](void* userdata, const char* mod, uint32_t modlen, const char* name, uint32_t nlen) {
 		AnyString module{mod, modlen};
 		AnyString testname{name, nlen};
 		((std::vector<String>*) userdata)->emplace_back();
@@ -117,8 +116,7 @@ int listAllUnittests(nyrun_cf_t& runcf, const Settings& settings, const char** f
 	runcf.program.entrypoint.c_str = nullptr;
 	runcf.build.ignore_atoms = nytrue;
 	runcf.build.userdata = &alltests;
-	runcf.build.on_unittest = [](void* userdata, const char* mod, uint32_t modlen, const char* name,
-	uint32_t nlen) {
+	runcf.build.on_unittest = [](void* userdata, const char* mod, uint32_t modlen, const char* name, uint32_t nlen) {
 		AnyString module{mod, modlen};
 		AnyString testname{name, nlen};
 		auto& dict = *((std::set<std::pair<String, String>>*) userdata);
