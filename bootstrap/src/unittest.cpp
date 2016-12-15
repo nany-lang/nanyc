@@ -328,8 +328,8 @@ void runUnittests(nyrun_cf_t& runcf, const Settings& settings, const char** file
 	uint32_t failCount = 0;
 	int64_t starttime = DateTime::NowMilliSeconds();
 	for (auto& testname : settings.unittests) {
-		bool localsuccess = runtest<true>(runcf, settings, testname, filelist, filecount);
-		++(localsuccess ? successCount : failCount);
+		bool success = runtest<true>(runcf, settings, testname, filelist, filecount);
+		++(success ? successCount : failCount);
 	}
 	int64_t duration = DateTime::NowMilliSeconds() - starttime;
 	printStatstics(settings, duration, successCount, failCount);
