@@ -338,7 +338,7 @@ void printStatstics(const Settings& settings, int64_t duration, uint32_t success
 			std::cout << "1 failed";
 			break;
 		default:
-			std::cout << "" << failCount << " failed";
+			std::cout << failCount << " failed";
 			break;
 	}
 	if (failCount and settings.colors.out)
