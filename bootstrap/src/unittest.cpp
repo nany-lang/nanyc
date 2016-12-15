@@ -46,6 +46,14 @@ void shuffleUnittests(std::vector<String>& unittests) {
 }
 
 
+void normalizeNumberOfParallelJobs(uint32_t& jobs) {
+	if (jobs == 0)
+		jobs = 1;
+	else if (jobs > 256) // arbitrary
+		jobs = 256;
+}
+
+
 void parseCommandLine(Settings& settings, int argc, char** argv) {
 	GetOpt::Parser options;
 	options.addFlag(settings.listAll, 'l', "list", "List all unit tests");
@@ -380,9 +388,7 @@ auto canonicalizeAllFilenames(std::vector<String>& remainingArgs) {
 void runAllUnittests(nyrun_cf_t& runcf, Settings& settings, const char** filelist, uint32_t filecount) {
 	printNanycInfo(settings);
 	printSourceFilenames(filelist, filecount);
-	if (settings.jobs == 0 or settings.jobs > 128)
-		settings.jobs = 1; // System::CPU::Count();
-	// no unittest provided from the command - default: all
+	normalizeNumberOfParallelJobs(settings.jobs);
 	if (settings.unittests.empty())
 		fetchUnittestList(runcf, settings.unittests, filelist, filecount);
 	for (uint32_t r = 0; r != settings.repeat; ++r) {
