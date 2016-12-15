@@ -55,7 +55,7 @@ int main(int argc, const char** argv) {
 		break;
 	}
 	// execute the script
-	int exitstatus = -1;
+	int exitstatus = EXIT_FAILURE;
 	if (firstarg < argc) {
 		runcf.build.on_error_file_eacces = &ny::print::fileAccessError;
 		// the new arguments, after removing all command line arguments
