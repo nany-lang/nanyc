@@ -264,13 +264,9 @@ bool runtest(nyrun_cf_t& originalRuncf, const Settings& settings, const String& 
 		if (settings.colors.out)
 			System::Console::ResetTextColor(std::cout);
 		std::cout << testname;
-		if (duration < 1200 or not settings.colors.out)
-			std::cout << "  (" << duration << "ms)     ";
-		else {
-			System::Console::SetTextColor(std::cout, System::Console::purple);
-			std::cout << "  (" << duration << "ms)     ";
-			System::Console::ResetTextColor(std::cout);
-		}
+		System::Console::SetTextColor(std::cout, System::Console::lightblue);
+		std::cout << "  (" << duration << "ms)     ";
+		System::Console::ResetTextColor(std::cout);
 		std::cout << '\n';
 		if (not console.cerr.empty()) {
 			console.cerr.trimRight();
