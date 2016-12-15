@@ -78,6 +78,38 @@ void parseCommandLine(Settings& settings, int argc, char** argv) {
 }
 
 
+void printNanycInfo(const Settings& settings) {
+	if (settings.colors.out)
+		System::Console::SetTextColor(std::cout, System::Console::bold);
+	std::cout << "nanyc C++/boostrap unittest " << nylib_version();
+	if (settings.colors.out)
+		System::Console::ResetTextColor(std::cout);
+	std::cout << '\n';
+	nylib_print_info_for_bugreport();
+	std::cout << ">\n";
+}
+
+
+void printSourceFilenames(const char** filelist, uint32_t filecount) {
+	for (uint32_t i = 0; i != filecount; ++i)
+		std::cout << "> from '" << filelist[i] << "'\n";
+	std::cout << '\n';
+}
+
+
+void printPassInfo(const Settings& settings, uint32_t pass) {
+	std::cout << "running " << settings.unittests.size() << " tests...";
+	if (settings.repeat > 1) {
+		if (settings.colors.out)
+			System::Console::SetTextColor(std::cout, System::Console::bold);
+		std::cout << " (pass " << (pass + 1) << '/' << settings.repeat << ')';
+		if (settings.colors.out)
+			System::Console::ResetTextColor(std::cout);
+	}
+	std::cout << '\n';
+}
+
+
 void fetchUnittestList(nyrun_cf_t& runcf, std::vector<String>& torun, const char** filelist, uint32_t count) {
 	std::cout << "searching for unittests in all source files...\n" << std::flush;
 	runcf.build.entrypoint.size = 0; // disable any compilation by default
@@ -346,17 +378,8 @@ auto canonicalizeAllFilenames(std::vector<String>& remainingArgs) {
 
 
 void runAllUnittests(nyrun_cf_t& runcf, Settings& settings, const char** filelist, uint32_t filecount) {
-	if (settings.colors.out)
-		System::Console::SetTextColor(std::cout, System::Console::bold);
-	std::cout << "nanyc C++/boostrap unittest " << nylib_version();
-	if (settings.colors.out)
-		System::Console::ResetTextColor(std::cout);
-	std::cout << '\n';
-	nylib_print_info_for_bugreport();
-	std::cout << ">\n";
-	for (uint32_t i = 0; i != filecount; ++i)
-		std::cout << "> from '" << filelist[i] << "'\n";
-	std::cout << '\n';
+	printNanycInfo(settings);
+	printSourceFilenames(filelist, filecount);
 	if (settings.jobs == 0 or settings.jobs > 128)
 		settings.jobs = 1; // System::CPU::Count();
 	// no unittest provided from the command - default: all
@@ -365,24 +388,15 @@ void runAllUnittests(nyrun_cf_t& runcf, Settings& settings, const char** filelis
 	for (uint32_t r = 0; r != settings.repeat; ++r) {
 		if (settings.shuffle)
 			shuffleUnittests(settings.unittests);
-		if (settings.shuffle or settings.repeat > 1) {
-			std::cout << "running " << settings.unittests.size() << " tests...";
-			if (settings.repeat > 1) {
-				if (settings.colors.out)
-					System::Console::SetTextColor(std::cout, System::Console::bold);
-				std::cout << " (pass " << (r + 1) << '/' << settings.repeat << ')';
-				if (settings.colors.out)
-					System::Console::ResetTextColor(std::cout);
-			}
-			std::cout << '\n';
-		}
+		if (settings.shuffle or settings.repeat > 1)
+			printPassInfo(settings, r);
 		std::cout << '\n';
 		runUnittests(runcf, settings, filelist, filecount);
 	}
 }
 
 
-} // anonymous
+} // namespace
 
 
 int main(int argc, char** argv) {
