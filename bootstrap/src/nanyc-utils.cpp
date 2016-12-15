@@ -12,6 +12,7 @@ int noInputScript(const char* const argv0) {
 	return EXIT_FAILURE;
 }
 
+
 int usage(const char* const argv0) {
 	std::cout << "Usage: " << argv0 << " [options] file...\n";
 	std::cout << "Options:\n";
@@ -22,20 +23,24 @@ int usage(const char* const argv0) {
 	return EXIT_SUCCESS;
 }
 
+
 int bugReportInfo() {
 	nylib_print_info_for_bugreport();
 	return EXIT_SUCCESS;
 }
+
 
 int version() {
 	std::cout << nylib_version() << '\n';
 	return EXIT_SUCCESS;
 }
 
+
 int unknownOption(const char* const argv0, const char* const name) {
 	std::cerr << argv0 << ": unknown option '" << name << "'\n";
 	return EXIT_FAILURE;
 }
+
 
 void fileAccessError(const nyproject_t*, nybuild_t*, const char* file, uint32_t length) {
 	std::cerr << "error: failed to access to '";
