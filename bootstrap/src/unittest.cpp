@@ -18,6 +18,10 @@ using namespace Yuni;
 namespace {
 
 
+struct BuildFail final: public std::exception {
+};
+
+
 struct Settings final {
 	std::vector<String> unittests;
 	std::vector<String> remainingArgs;
@@ -42,7 +46,7 @@ void shuffleUnittests(std::vector<String>& unittests) {
 }
 
 
-bool parseCommandLine(Settings& settings, int argc, char** argv) {
+void parseCommandLine(Settings& settings, int argc, char** argv) {
 	GetOpt::Parser options;
 	options.addFlag(settings.listAll, 'l', "list", "List all unit tests");
 	options.addFlag(settings.unittests, 'r', "run", "Run a specific test");
@@ -59,19 +63,18 @@ bool parseCommandLine(Settings& settings, int argc, char** argv) {
 	if (not options(argc, argv)) {
 		if (options.errors())
 			throw std::runtime_error("Abort due to error");
-		return false;
+		throw EXIT_SUCCESS;
 	}
 	if (version) {
 		std::cout << nylib_version() << '\n';
-		return false;
+		throw EXIT_SUCCESS;
 	}
 	if (bugreport) {
 		nylib_print_info_for_bugreport();
-		return false;
+		throw EXIT_SUCCESS;
 	}
 	if (settings.remainingArgs.empty())
 		throw std::runtime_error("no input script file");
-	return true;
 }
 
 
@@ -108,7 +111,7 @@ void fetchUnittestList(nyrun_cf_t& runcf, std::vector<String>& torun, const char
 }
 
 
-int listAllUnittests(nyrun_cf_t& runcf, const Settings& settings, const char** filelist, uint32_t count) {
+void listAllUnittests(nyrun_cf_t& runcf, const Settings& settings, const char** filelist, uint32_t count) {
 	std::set<std::pair<String, String>> alltests;
 	runcf.build.entrypoint.size  = 0; // disable any compilation by default
 	runcf.build.entrypoint.c_str = nullptr;
@@ -123,10 +126,8 @@ int listAllUnittests(nyrun_cf_t& runcf, const Settings& settings, const char** f
 		dict.emplace(std::make_pair(String{module}, String{testname}));
 	};
 	int64_t starttime = DateTime::NowMilliSeconds();
-	if (0 != nyrun_filelist(&runcf, filelist, count, 0, nullptr)) {
-		std::cerr << "error: failed to compile. aborting.\n";
-		return EXIT_FAILURE;
-	}
+	if (0 != nyrun_filelist(&runcf, filelist, count, 0, nullptr))
+		throw BuildFail{};
 	int64_t duration = DateTime::NowMilliSeconds() - starttime;
 	AnyString lastmodule;
 	uint32_t moduleCount = 0;
@@ -173,7 +174,6 @@ int listAllUnittests(nyrun_cf_t& runcf, const Settings& settings, const char** f
 	if (settings.colors.out)
 		System::Console::ResetTextColor(std::cout);
 	std::cout << "  (" << duration << "ms)\n\n";
-	return EXIT_SUCCESS;
 }
 
 
@@ -312,7 +312,7 @@ void printStatstics(const Settings& settings, int64_t duration, uint32_t success
 }
 
 
-bool runUnittests(nyrun_cf_t& runcf, const Settings& settings, const char** filelist, uint32_t filecount) {
+void runUnittests(nyrun_cf_t& runcf, const Settings& settings, const char** filelist, uint32_t filecount) {
 	if (settings.unittests.empty())
 		throw std::runtime_error("error: no unit test name");
 	runcf.build.ignore_atoms = nytrue;
@@ -327,7 +327,8 @@ bool runUnittests(nyrun_cf_t& runcf, const Settings& settings, const char** file
 	}
 	int64_t duration = DateTime::NowMilliSeconds() - starttime;
 	printStatstics(settings, duration, successCount, failCount);
-	return (failCount == 0 and successCount != 0);
+	if (failCount != 0 or successCount == 0)
+		throw EXIT_FAILURE;
 }
 
 
@@ -344,7 +345,7 @@ auto canonicalizeAllFilenames(std::vector<String>& remainingArgs) {
 }
 
 
-int runAllUnittests(nyrun_cf_t& runcf, Settings& settings, const char** filelist, uint32_t filecount) {
+void runAllUnittests(nyrun_cf_t& runcf, Settings& settings, const char** filelist, uint32_t filecount) {
 	if (settings.colors.out)
 		System::Console::SetTextColor(std::cout, System::Console::bold);
 	std::cout << "nanyc C++/boostrap unittest " << nylib_version();
@@ -361,7 +362,6 @@ int runAllUnittests(nyrun_cf_t& runcf, Settings& settings, const char** filelist
 	// no unittest provided from the command - default: all
 	if (settings.unittests.empty())
 		fetchUnittestList(runcf, settings.unittests, filelist, filecount);
-	int exitcode = EXIT_SUCCESS;
 	for (uint32_t r = 0; r != settings.repeat; ++r) {
 		if (settings.shuffle)
 			shuffleUnittests(settings.unittests);
@@ -377,11 +377,8 @@ int runAllUnittests(nyrun_cf_t& runcf, Settings& settings, const char** filelist
 			std::cout << '\n';
 		}
 		std::cout << '\n';
-		bool success = runUnittests(runcf, settings, filelist, filecount);
-		if (not success)
-			exitcode = EXIT_FAILURE;
+		runUnittests(runcf, settings, filelist, filecount);
 	}
-	return exitcode;
 }
 
 
@@ -391,8 +388,7 @@ int runAllUnittests(nyrun_cf_t& runcf, Settings& settings, const char** filelist
 int main(int argc, char** argv) {
 	try {
 		Settings settings;
-		if (not parseCommandLine(settings, argc, argv))
-			return EXIT_SUCCESS;
+		parseCommandLine(settings, argc, argv);
 		auto filecount = static_cast<uint32_t>(settings.remainingArgs.size());
 		auto filelist = canonicalizeAllFilenames(settings.remainingArgs);
 		settings.colors.out = System::Console::IsStdoutTTY();
@@ -401,12 +397,20 @@ int main(int argc, char** argv) {
 		nyrun_cf_init(&runcf);
 		if (settings.nslTests)
 			runcf.project.with_nsl_unittests = nytrue;
-		return (settings.listAll)
-			   ? listAllUnittests(runcf, settings, filelist.get(), filecount)
-			   : runAllUnittests(runcf, settings, filelist.get(), filecount);
+		if (settings.listAll)
+			listAllUnittests(runcf, settings, filelist.get(), filecount);
+		else
+			runAllUnittests(runcf, settings, filelist.get(), filecount);
+		return EXIT_SUCCESS;
+	}
+	catch (const BuildFail&) {
+		std::cerr << "error: failed to compile. aborting.\n";
 	}
 	catch (const std::exception& e) {
 		std::cerr << argv[0] << ": " << e.what() << '\n';
+	}
+	catch (int e) {
+		return e;
 	}
 	return EXIT_FAILURE;
 }
