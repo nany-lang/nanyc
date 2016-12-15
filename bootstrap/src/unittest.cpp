@@ -358,7 +358,7 @@ void runAllUnittests(nyrun_cf_t& runcf, Settings& settings, const char** filelis
 			shuffleUnittests(settings.unittests);
 		if (settings.shuffle or settings.repeat > 1)
 			printPassInfo(settings, pass);
-		std::cout << '\n';
+		std::cout << std::endl;
 		runUnittests(runcf, settings, filelist, filecount);
 	}
 }
