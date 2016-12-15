@@ -137,15 +137,9 @@ void fetchUnittestList(nyrun_cf_t& runcf, std::vector<String>& torun, const char
 	nyrun_filelist(&runcf, filelist, count, 0, nullptr);
 	int64_t duration = DateTime::NowMilliSeconds() - starttime;
 	switch (torun.size()) {
-		case 0:
-			std::cout << "0 test found";
-			break;
-		case 1:
-			std::cout << "1 test found";
-			break;
-		default:
-			std::cout << torun.size() << " tests found";
-			break;
+		case 0:  std::cout << "0 test found"; break;
+		case 1:  std::cout << "1 test found"; break;
+		default: std::cout << torun.size() << " tests found";
 	}
 	std::cout << " (" << duration << "ms)\n";
 }
@@ -191,25 +185,14 @@ void listAllUnittests(nyrun_cf_t& runcf, const Settings& settings, const char** 
 	if (settings.colors.out)
 		System::Console::SetTextColor(std::cout, System::Console::lightblue);
 	switch (moduleCount) {
-		case 0:
-			break;
-		case 1:
-			std::cout << "1 module, ";
-			break;
-		default:
-			std::cout << moduleCount << " modules, ";
-			break;
+		case 0:  break;
+		case 1:  std::cout << "1 module, "; break;
+		default: std::cout << moduleCount << " modules, ";
 	}
 	switch (alltests.size()) {
-		case 0:
-			std::cout << "0 test found";
-			break;
-		case 1:
-			std::cout << "1 test found";
-			break;
-		default:
-			std::cout << alltests.size() << " tests found";
-			break;
+		case 0:  std::cout << "0 test found"; break;
+		case 1:  std::cout << "1 test found"; break;
+		default: std::cout << alltests.size() << " tests found";
 	}
 	if (settings.colors.out)
 		System::Console::ResetTextColor(std::cout);
@@ -302,28 +285,16 @@ bool runtest(nyrun_cf_t& originalRuncf, const Settings& settings, const String& 
 
 void printStatstics(const Settings& settings, int64_t duration, uint32_t successCount, uint32_t failCount) {
 	switch (settings.unittests.size()) {
-		case 0:
-			std::cout << "\n       0 test, ";
-			break;
-		case 1:
-			std::cout << "\n       1 test";
-			break;
-		default:
-			std::cout << "\n       " << settings.unittests.size() << " tests, ";
-			break;
+		case 0:  std::cout << "\n       0 test, "; break;
+		case 1:  std::cout << "\n       1 test"; break;
+		default: std::cout << "\n       " << settings.unittests.size() << " tests, ";
 	}
 	if (successCount and settings.colors.out)
 		System::Console::SetTextColor(std::cout, System::Console::green);
 	switch (successCount) {
-		case 0:
-			std::cout << "0 passing";
-			break;
-		case 1:
-			std::cout << "1 passing";
-			break;
-		default:
-			std::cout << successCount << " passing";
-			break;
+		case 0:  std::cout << "0 passing"; break;
+		case 1:  std::cout << "1 passing"; break;
+		default: std::cout << successCount << " passing";
 	}
 	if (successCount and settings.colors.out)
 		System::Console::ResetTextColor(std::cout);
@@ -332,14 +303,9 @@ void printStatstics(const Settings& settings, int64_t duration, uint32_t success
 	if (failCount and settings.colors.out)
 		System::Console::SetTextColor(std::cout, System::Console::red);
 	switch (failCount) {
-		case 0:
-			break;
-		case 1:
-			std::cout << "1 failed";
-			break;
-		default:
-			std::cout << failCount << " failed";
-			break;
+		case 0:  break;
+		case 1:  std::cout << "1 failed"; break;
+		default: std::cout << failCount << " failed";
 	}
 	if (failCount and settings.colors.out)
 		System::Console::ResetTextColor(std::cout);
