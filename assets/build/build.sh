@@ -56,7 +56,6 @@ fi
 title "ENVIRONMENT"
 cat ./build-settings.txt
 echo
-env
 
 
 title "CLEANUP"
