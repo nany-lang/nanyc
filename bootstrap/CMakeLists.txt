@@ -56,6 +56,7 @@ if (NOT WIN32)
 	set(nany_os_windows 0)
 	if (EXISTS "/etc/debian_version")
 		set(nany_os_debian 1)
+		system(nany_arch dpkg --print-architecture)
 	endif()
 else()
 	set(nany_os_windows 1)
@@ -248,10 +249,8 @@ add_custom_target(install-libnanyc-dev-tools
 #
 # Packages
 #
-if (NOT WIN32)
-	include("cmake/packages-deb-rpm.cmake")
-	create_rules_for_packages(deb)
-	create_rules_for_packages(rpm)
+if (nany_os_debian)
+	include("cmake/packages-deb.cmake")
 endif()
 if (WIN32)
 	include("cmake/packages-msi.cmake")

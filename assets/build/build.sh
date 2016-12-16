@@ -78,7 +78,7 @@ make check || die "check failed"
 
 if [ $platform == linux ]; then
 	title "PACKAGE DEB"
-	make package-deb || die "package deb failed";
+	make packages-deb || die "packages deb failed";
 fi
 
 

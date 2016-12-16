@@ -1,0 +1,8 @@
+Package: nanyc-extras
+Architecture: @nany_arch@
+Maintainer: @nany
+Priority: optional
+Version: @nany_version@
+Description: Nany Compiler Internal Dev Tools
+Section: devel
+Depends: libnanyc (>=@nany_version@)
