@@ -43,14 +43,14 @@ export NPROC=1
 
 
 # update on TRAVIS
-if [ "${TRAVIS_OS_NAME}" != "" -a $platform == linux ]; then
-	if [ "$CC"  == "" ];    then export CC="gcc-4.9"; fi
-	if [ "$CXX" == "" ];    then export CXX="g++-4.9"; fi
-	if [ "$CC"  == "gcc" ]; then export CC="gcc-4.9"; fi
-	if [ "$CXX" == "g++" ]; then export CXX="g++-4.9"; fi
+if [ -n "${TRAVIS_OS_NAME}" -a $platform == linux ]; then
+	[ "$CC"  == "" ]    && export CC="gcc-4.9";
+	[ "$CXX" == "" ]    && export CXX="g++-4.9";
+	[ "$CC"  == "gcc" ] && export CC="gcc-4.9";
+	[ "$CXX" == "g++" ] && export CXX="g++-4.9";
 fi
-[ "$CC"  == "" ] && export CC="gcc";
-[ "$CXX" == "" ] && export CXX="g++";
+[ -z "$CC" ]  && export CC="gcc";
+[ -z "$CXX" ] && export CXX="g++";
 
 
 title "ENVIRONMENT"
