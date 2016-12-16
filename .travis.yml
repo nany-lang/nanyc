@@ -1,14 +1,12 @@
 sudo: required
 dist: trusty
-language: ruby
+language: cpp
 osx_image: xcode8
 os:
     - linux
     - osx
 compiler:
     - gcc
-rvm:
-    - 2.2.3
 env:
     - BUILD_TYPE=debug
     - BUILD_TYPE=release
@@ -16,11 +14,7 @@ before_install:
     - if [ $TRAVIS_OS_NAME == linux ]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; fi
     - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get update; fi
     - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install -qq build-essential gcc-4.9 g++-4.9 cmake uuid-dev; fi
-    - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install -qq gem ruby-dev gcc make bsdtar rpm lintian python-setuptools; fi
-    - if [ $TRAVIS_OS_NAME == linux ]; then rvm use 2.2.3 --install --binary --fuzzy; fi
-    - if [ $TRAVIS_OS_NAME == linux ]; then ruby --version; rvm --version; bundle --version; gem --version; fi
-    - if [ $TRAVIS_OS_NAME == linux ]; then gem install fpm; fi
-    - if [ $TRAVIS_OS_NAME == linux ]; then gem env; fi
+    - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get install -qq gcc make bsdtar rpm lintian python-setuptools; fi
 script:
     - assets/build/build.sh
 notifications:
