@@ -54,6 +54,7 @@ fi
 
 
 title "ENVIRONMENT"
+uname -a
 cat ./build-settings.txt
 echo
 
