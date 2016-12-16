@@ -49,6 +49,20 @@ endif(WIN32)
 
 
 #
+# Underlying platform
+#
+set(nany_os_debian 0)
+if (NOT WIN32)
+	set(nany_os_windows 0)
+	if (EXISTS "/etc/debian_version")
+		set(nany_os_debian 1)
+	endif()
+else()
+	set(nany_os_windows 1)
+endif()
+
+
+#
 # -- Facilities for YCM - (vim/YouCompleteMe)
 #
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
