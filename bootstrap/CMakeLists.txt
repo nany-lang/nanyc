@@ -252,9 +252,9 @@ if (NOT WIN32)
 	include("cmake/packages-deb-rpm.cmake")
 	create_rules_for_packages(deb)
 	create_rules_for_packages(rpm)
-else()
+endif()
+if (WIN32)
 	include("cmake/packages-msi.cmake")
-	create_rules_for_package_msi()
 endif()
 
 # The end !

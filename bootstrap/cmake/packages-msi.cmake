@@ -1,4 +1,5 @@
-macro(create_rules_for_package_msi)
+function (produce_rules_dpk_msi)
+	message(STATUS "generating rules for MSI packages")
 	if ("${CMAKE_BUILD_TYPE}" STREQUAL "debug")
 		set(wix_config_mode "Debug")
 	else()
@@ -28,4 +29,7 @@ macro(create_rules_for_package_msi)
 		COMMAND "${CMAKE_COMMAND}" "-E" echo "-- wix light ${wix_wxs}.wixobj" 
 		COMMAND "C:\\Program Files (x86)\\WiX Toolset v${wix_ver}\\bin\\light.exe"
 		"-out" "nanyc-${nany_version}-${wix_arch}.msi" -ext WixUIExtension "${wix_wxs}.wixobj")
-endmacro()
+endfunction()
+
+
+produce_rules_dpk_msi()
