@@ -76,7 +76,7 @@ make -j ${NPROC} || (title "MAKE ERROR"; make VERBOSE=1 ; exit 1) || die "build 
 make check || die "check failed"
 
 
-if [ $platform == linux ]; then
+if [ $platform == linux -a \( -z "${TRAVIS_JOB_NUMBER}" -o "${BUILD_TYPE:-}" = 'release' \) ]; then
 	title "PACKAGE DEB"
 	make packages-deb || die "packages deb failed";
 fi
