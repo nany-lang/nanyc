@@ -73,7 +73,7 @@ public class string {
 
 	//! Get if the string is empty or contains only blank characters
 	var blank
-		-> isBlank();
+		-> std.details.string.isBlank(self);
 
 	//! Get the size of the string (in bytes)
 	var size
@@ -712,24 +712,6 @@ private:
 			m_capacity = 0__u32;
 			m_cstr = null;
 		}
-	}
-
-	func isBlank: bool {
-		var size = new u32(m_size);
-		if size != 0u32 then {
-			var i = 0u32;
-			var p = m_cstr;
-			var ascii = new std.Ascii;
-			do {
-				ascii.asU8 = !!load.u8(p + i.pod);
-				if not ascii.blank then
-					return false;
-				if (i += 1u) == size then
-					return true;
-			}
-			while __true;
-		}
-		return true;
 	}
 
 	func makeTrimmed: ref {
