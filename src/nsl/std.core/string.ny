@@ -371,10 +371,8 @@ public class string {
 		-> new u32(m_size);
 
 	//! Determines whether the string begins with the characters of another string
-	func startsWith(cref prefix: string): bool {
-		return (m_size != 0__u32 and prefix.m_size <= m_size)
-			and std.memory.equals(m_cstr, prefix.m_cstr, 0__u64 + prefix.m_size);
-	}
+	func startsWith(cref prefix: string): bool
+		-> std.details.string.startsWith(self, prefix);
 
 	//! Determines whether the string ends with the characters of another string
 	func endsWith(cref suffix: string): bool {
