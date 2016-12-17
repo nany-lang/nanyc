@@ -550,25 +550,25 @@ public class string {
 
 	//! Split the string
 	view split(cref filter): ref
-		-> makeViewSplit(filter, 1u, func (cref ascii) -> ascii.blank);
+		-> std.details.string.makeViewSplit(self, filter, 1u, func (cref ascii) -> ascii.blank);
 
 	//! Split the string
 	view split(cref filter, cref separator: std.Ascii): ref {
 		ref sep = separator;
-		return makeViewSplit(filter, 1u, func (cref ascii) -> ascii == sep);
+		return std.details.string.makeViewSplit(self, filter, 1u, func (cref ascii) -> ascii == sep);
 	}
 
 	//! Split the string
 	view split(cref filter, cref pattern: string): ref
-		-> makeViewSplit(filter, pattern.size, pattern);
+		-> std.details.string.makeViewSplit(self, filter, pattern.size, pattern);
 
 	//! Split the string
 	view split(cref filter, cref predicate): ref
-		-> makeViewSplit(filter, 1u, predicate);
+		-> std.details.string.makeViewSplit(self, filter, 1u, predicate);
 
 	//! Split the string
 	view lines(cref filter): ref
-		-> makeViewSplitByLines(filter);
+		-> std.details.string.makeViewSplitByLines(self, filter);
 
 	//! Find occurences
 	view index(cref filter, cref pattern): ref
@@ -615,86 +615,6 @@ private:
 			m_capacity = 0__u32;
 			m_cstr = null;
 		}
-	}
-
-	func makeViewSplit(cref filter, separatorLength: u32, cref predicate): ref {
-		ref m_parentString = self;
-		ref m_parentFilter = filter;
-		ref m_parentPredicate = predicate;
-		ref m_parentSepLength = separatorLength;
-		return new class {
-			func cursor: ref {
-				ref origstr = m_parentString;
-				ref accept = m_parentFilter;
-				ref predicate = m_parentPredicate;
-				ref separatorLength = m_parentSepLength;
-				return new class {
-					func findFirst: bool -> next();
-
-					func next: bool {
-						ref str = origstr;
-						if not (m_index < str.size) then
-							return false;
-						do {
-							var nextOffset = str.index(m_index, predicate);
-							if nextOffset > m_index then {
-								var distance = nextOffset - m_index;
-								m_word.assign(str.m_cstr + m_index.pod, distance.pod);
-							}
-							else
-								m_word.clear();
-							m_index = nextOffset + separatorLength;
-						}
-						while not accept(m_word);
-						return true;
-					}
-
-					func get: ref -> m_word;
-
-					var m_index = 0u;
-					var m_word = "";
-				};
-			}
-		};
-	}
-
-	func makeViewSplitByLines(cref filter): ref {
-		ref m_parentString = self;
-		ref m_parentFilter = filter;
-		return new class {
-			func cursor: ref {
-				ref origstr = m_parentString;
-				ref accept = m_parentFilter;
-				return new class {
-					func findFirst: bool -> next();
-
-					func next: bool {
-						ref str = origstr;
-						if not (m_index < str.size) then
-							return false;
-						do {
-							var nextOffset = str.index(m_index, '\n');
-							if nextOffset > m_index then {
-								var distance = nextOffset - m_index;
-								m_word.assign(str.m_cstr + m_index.pod, distance.pod);
-								if m_word.last == '\r' then
-									m_word.removeLastAscii();
-							}
-							else
-								m_word.clear();
-							m_index = nextOffset + 1u;
-						}
-						while not accept(m_word);
-						return true;
-					}
-
-					func get: ref -> m_word;
-
-					var m_index = 0u;
-					var m_word = "";
-				};
-			}
-		};
 	}
 
 	func makeViewIndex(cref filter, offset: u32, cref pattern): ref {
