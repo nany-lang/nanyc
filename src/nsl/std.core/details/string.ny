@@ -139,3 +139,6 @@ func endsWith(cref base, cref suffix: string): bool {
 	return (base.m_size != 0__u32 and fsize <= base.m_size)
 		and std.memory.equals(base.m_cstr + m_size - fsize, prefix.m_cstr, 0__u64 + fsize);
 }
+
+func left(cref base, bytes: u32): ref
+	-> if bytes.pod < m_size then new string(self, bytes) else new string();
