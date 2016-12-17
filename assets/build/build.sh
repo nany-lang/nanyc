@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+set -e
 
 title() {
 	echo
@@ -51,25 +51,22 @@ platform_and_env_settings() {
 	[ $platform == linux ] && export NPROC=$(nproc)
 	[ $platform == macos ] && export NPROC=$(sysctl -n hw.ncpu)
 	export platform="${platform}"
-	[ "$BUILD_TYPE" == "" ] && export BUILD_TYPE="debug"
+	[ -z "${BUILD_TYPE:-}" ] && export BUILD_TYPE="debug"
 
 	uname -a
 	cat	../build-settings.txt
 }
 
 compiler_settings() {
-	if [ -n "${TRAVIS_JOB_NUMBER}" -a $platform == linux ]; then
-		[ "$CC"  == "" ]    && export CC="gcc-5";
-		[ "$CXX" == "" ]    && export CXX="g++-5";
+	[ -z "${CC:-}" ]  && export CC="gcc";
+	[ -z "${CXX:-}" ] && export CXX="g++";
+	if [ -n "${TRAVIS_JOB_NUMBER:-}" -a $platform == linux ]; then
 		[ "$CC"  == "gcc" ] && export CC="gcc-5";
 		[ "$CXX" == "g++" ] && export CXX="g++-5";
 	fi
-	[ -z "$CC" ]  && export CC="gcc";
-	[ -z "$CXX" ] && export CXX="g++";
 }
 
 cmake_cleanup() {
-	cd bootstrap
 	echo " - delete CMakeCache.txt" && rm -f CMakeCache.txt
 	echo " - delete CMakeFiles" && rm -rf CMakeFiles
 }
@@ -95,7 +92,7 @@ print_packages() {
 }
 
 make_packages() {
-	[ ! "${BUILD_TYPE:-}" = 'release' ] && return
+	[ ! "${BUILD_TYPE}" = 'release' ] && return 0
 	local has_pkgs=0
 	[ $platform == linux ] && run "DEB" "Packages DEB" make_packages_deb && has_pkgs=1
 	[ $has_pkgs -ne 0 ] && run "output" "Distribution" print_packages
@@ -106,10 +103,11 @@ make_packages() {
 local_pwd=$(dirname "$0")
 root=$(cd "${local_pwd}" && pwd)
 pushd "${root}/../../bootstrap"
+[ -z "${BUILD_TYPE:-}" ] && export BUILD_TYPE="release"
 
 run "settings" "Platform / Env Settings" platform_and_env_settings
 run "compiler" "C++ Compiler settings" compiler_settings
-[ -z "${TRAVIS_JOB_NUMBER}" ] && cmake_cleanup
+[ -z "${TRAVIS_JOB_NUMBER:-}" ] && cmake_cleanup
 
 run "cmake" "Bootstrap: configure" configure
 run "build" "Bootstrap: build" build
