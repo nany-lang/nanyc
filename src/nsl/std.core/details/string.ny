@@ -39,3 +39,56 @@ func contains(cref base, cref ascii: std.Ascii): ref bool {
 	}
 	return false;
 }
+
+func index(cref base, offset: u32, cref needle: string): u32 {
+	var size = base.m_size;
+	var needlesize = needle.size;
+	if needlesize != 0u and (offset + needlesize <= size) then {
+		var maxsize = size - needlesize.pod;
+		do {
+			if maxsize != offset then {
+				offset = index(offset, needle.at(0u));
+				if not (offset <= maxsize) then
+					return new u32(size);
+			}
+			if std.memory.equals(base.m_cstr + offset.pod, needle.m_cstr, 0__u64 + needlesize.pod) then
+				return offset;
+			offset = offset + 1u;
+		}
+		while offset < maxsize;
+	}
+	return new u32(size);
+}
+
+func index(cref base, offset: u32, cref ascii: std.Ascii): u32 {
+	var size = base.m_size;
+	if offset < size then {
+		var p = base.m_cstr + offset.pod;
+		var needle = ascii.asU8.pod;
+		do {
+			if needle == !!load.u8(p) then
+				return offset;
+			offset += 1u;
+			p = p + 1__u32;
+		}
+		while offset < size;
+	}
+	return new u32(size);
+}
+
+func index(cref base, offset: u32, cref predicate): u32 {
+	var size = base.m_size;
+	if offset < size then {
+		var p = base.m_cstr + offset.pod;
+		var ascii = new std.Ascii;
+		do {
+			ascii.asU8 = !!load.u8(p);
+			if predicate(ascii) then
+				return offset;
+			offset += 1u;
+			p = p + 1__u32;
+		}
+		while offset < size;
+	}
+	return new u32(size);
+}
