@@ -517,7 +517,7 @@ public class string {
 	** \see blank
 	*/
 	var trimmed
-		-> makeTrimmed();
+		-> std.details.string.makeTrimmed(self);
 
 	//! Get the ascii at offset 'i' (without any check)
 	func at(cref i: u32): ref std.Ascii {
@@ -615,12 +615,6 @@ private:
 			m_capacity = 0__u32;
 			m_cstr = null;
 		}
-	}
-
-	func makeTrimmed: ref {
-		var newstr = new string(self);
-		newstr.trim();
-		return newstr;
 	}
 
 	func makeViewAscii(cref filter): ref {
