@@ -96,12 +96,12 @@ public class string {
 		-> m_cstr;
 
 	//! Increase the capacity of the container if necessary
-	func reserve(size: u32) {
+	func reserve(bytes: u32) {
 		if m_capacity < size.pod then
 			doGrow(size.pod);
 	}
 
-	#[nosuggest] func reserve(size: __u32) {
+	#[nosuggest] func reserve(bytes: __u32) {
 		if m_capacity < size then
 			doGrow(size);
 	}
@@ -379,11 +379,11 @@ public class string {
 		-> endsWith(self, suffix);
 
 	//! Remove the 'count' ascii from the end of the string
-	func chop(ascii: u32) {
-		if ascii != 0u then {
+	func chop(bytes: u32) {
+		if bytes != 0u then {
 			var size = m_size;
-			if size >= ascii.pod then
-				m_size = size - ascii.pod;
+			if size >= bytes.pod then
+				m_size = size - bytes.pod;
 			else
 				m_size = 0__u32;
 		}
@@ -391,12 +391,12 @@ public class string {
 
 
 	//! Remove the 'count' ascii from the begining of the string
-	func consume(ascii: u32) {
-		if ascii != 0u then {
+	func consume(bytes: u32) {
+		if bytes != 0u then {
 			var size = m_size;
-			if size > ascii.pod then {
-				size = size - ascii.pod;
-				std.memory.copyOverlap(m_cstr, m_cstr + ascii.pod, 0__u64 + size);
+			if size > bytes.pod then {
+				size = size - bytes.pod;
+				std.memory.copyOverlap(m_cstr, m_cstr + bytes.pod, 0__u64 + size);
 				m_size = size;
 			}
 			else
@@ -410,16 +410,16 @@ public class string {
 			m_size = count.pod;
 	}
 
-	func resize(count: u32) {
-		if m_capacity < count then
-			reserve(count);
-		m_size = count.pod;
+	func resize(bytes: u32) {
+		if m_capacity < bytes then
+			reserve(bytes);
+		m_size = bytes.pod;
 	}
 
-	#[nosuggest] func resize(count: __u32) {
-		if m_capacity < count then
-			reserve(count);
-		m_size = count;
+	#[nosuggest] func resize(bytes: __u32) {
+		if m_capacity < bytes then
+			reserve(bytes);
+		m_size = bytes;
 	}
 
 	//! Remove last ascii if any
@@ -430,8 +430,8 @@ public class string {
 	}
 
 	//! Get a new string with the first N characters
-	func left(count: u32): ref string
-		-> std.details.string.left(self, count);
+	func left(bytes: u32): ref string
+		-> std.details.string.left(self, bytes);
 
 	//! Get the Nth part of the string
 	func part(index: u32): ref string
