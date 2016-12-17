@@ -142,3 +142,9 @@ func endsWith(cref base, cref suffix: string): bool {
 
 func left(cref base, bytes: u32): ref
 	-> if bytes.pod < m_size then new string(self, bytes) else new string();
+
+func makeTrimmed(cref base): ref {
+	var newstr = new typeof(base)(base);
+	newstr.trim();
+	return newstr;
+}
