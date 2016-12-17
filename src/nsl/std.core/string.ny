@@ -530,7 +530,6 @@ public class string {
 		m_cstr = ptr;
 		m_size = size;
 		m_capacity = capacity;
-		print("adopt: \(ptr), size: \(size), capa: \(capacity)\n");
 	}
 
 	/*!
