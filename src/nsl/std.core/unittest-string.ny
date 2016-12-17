@@ -147,3 +147,8 @@ unittest std.core.string.isBlank {
 	assert(not s.blank);
 	assert(not s.empty);
 }
+
+unittest std.core.string.trimmed {
+	assert("  abc\t".trimmed == "abc");
+	assert("hello".trimmed == "hello");
+}
