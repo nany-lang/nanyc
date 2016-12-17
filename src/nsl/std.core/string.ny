@@ -538,11 +538,11 @@ public class string {
 	** \TODO UTF8 support (UTF8cpp?)
 	*/
 	view (cref filter): ref
-		-> makeViewAscii(filter);
+		-> std.details.string.makeViewAscii(self, filter);
 
 	//! View on each ascii
 	view ascii(cref filter): ref
-		-> makeViewAscii(filter);
+		-> std.details.string.makeViewAscii(self, filter);
 
 	//! View on each ascii as u8
 	view bytes(cref filter): ref
@@ -615,35 +615,6 @@ private:
 			m_capacity = 0__u32;
 			m_cstr = null;
 		}
-	}
-
-	func makeViewAscii(cref filter): ref {
-		ref m_parentString = self;
-		ref m_parentFilter = filter;
-		return new class {
-			func cursor: ref {
-				ref origstr = m_parentString;
-				ref accept = m_parentFilter;
-				return new class {
-					func findFirst: bool
-						-> (not origstr.empty) and (accept(origstr.at(0u)) or next());
-
-					func next: bool {
-						do {
-							m_index += 1u;
-							if not (m_index < origstr.size) then
-								return false;
-						}
-						while not accept(origstr.at(m_index));
-						return true;
-					}
-
-					func get: ref -> origstr.at(m_index);
-
-					var m_index = 0u;
-				};
-			}
-		};
 	}
 
 	func makeViewBytes(cref filter): ref {

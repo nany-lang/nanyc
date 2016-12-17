@@ -148,3 +148,32 @@ func makeTrimmed(cref base): ref {
 	newstr.trim();
 	return newstr;
 }
+
+func makeViewAscii(ref base, cref filter): ref {
+	ref m_parentString = base;
+	ref m_parentFilter = filter;
+	return new class {
+		func cursor: ref {
+			ref origstr = m_parentString;
+			ref accept = m_parentFilter;
+			return new class {
+				func findFirst: bool
+					-> (not origstr.empty) and (accept(origstr.at(0u)) or next());
+
+				func next: bool {
+					do {
+						m_index += 1u;
+						if not (m_index < origstr.size) then
+							return false;
+					}
+					while not accept(origstr.at(m_index));
+					return true;
+				}
+
+				func get: ref -> origstr.at(m_index);
+
+				var m_index = 0u;
+			};
+		}
+	};
+}
