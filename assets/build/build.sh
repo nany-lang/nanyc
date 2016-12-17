@@ -54,11 +54,13 @@ compiler_settings() {
 		[ "$CC"  == "gcc" ] && export CC="gcc-5";
 		[ "$CXX" == "g++" ] && export CXX="g++-5";
 	fi
+	echo "env CC=${CC} [$(which $CC)]"
+	echo "env CXX=${CXX} [$(which $CXX)]"
 }
 
 cmake_cleanup() {
-	echo " - delete CMakeCache.txt" && rm -f CMakeCache.txt
-	echo " - delete CMakeFiles" && rm -rf CMakeFiles
+	echo "delete CMakeCache.txt" && rm -f CMakeCache.txt
+	echo "delete CMakeFiles" && rm -rf CMakeFiles
 }
 
 configure() {
@@ -97,7 +99,9 @@ pushd "${root}/../../bootstrap"
 
 run "settings" "Platform / Env Settings" platform_and_env_settings
 run "compiler" "C++ Compiler settings" compiler_settings
-[ -z "${TRAVIS_JOB_NUMBER:-}" ] && cmake_cleanup
+[ -z "${TRAVIS_JOB_NUMBER:-}" ] && run "cleanup" "CMake cleanup" cmake_cleanup
+
+echo
 
 run "cmake" "Bootstrap: configure" configure
 run "build" "Bootstrap: build" build
