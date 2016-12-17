@@ -430,12 +430,8 @@ public class string {
 	}
 
 	//! Get a new string with the first N characters
-	func left(count: u32): ref string {
-		// TODO: utf8 instead of ascii
-		if count.pod < m_size then
-			return new string(self, count);
-		return new string();
-	}
+	func left(count: u32): ref string
+		-> std.details.string.left(self, count);
 
 	//! Get the Nth part of the string
 	func part(index: u32): ref string
