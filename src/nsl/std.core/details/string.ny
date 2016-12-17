@@ -286,3 +286,40 @@ func makeViewSplitByLines(ref base, cref filter): ref {
 		}
 	};
 }
+
+func makeViewIndex(ref base, cref filter, offset: u32, cref pattern): ref {
+	ref m_parentString = base;
+	ref m_parentFilter = filter;
+	ref m_parentPattern = pattern;
+	ref m_parentOffset = offset;
+	return new class {
+		func cursor: ref {
+			ref origstr = m_parentString;
+			ref accept = m_parentFilter;
+			ref pattern = m_parentPattern;
+			ref startOffset = m_parentOffset;
+			return new class {
+				func findFirst: bool -> next();
+
+				func next: bool {
+					ref str = origstr;
+					if not (m_index < str.size) then
+						return false;
+					do {
+						m_offset = str.index(m_index, pattern);
+						if not (m_offset < str.size) then
+							return false;
+						m_index = m_offset + 1u;
+					}
+					while not accept(m_offset);
+					return true;
+				}
+
+				func get: ref -> m_offset;
+
+				var m_index = startOffset;
+				var m_offset = 0u;
+			};
+		}
+	};
+}
