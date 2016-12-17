@@ -41,11 +41,11 @@ platform_and_env_settings() {
 }
 
 compiler_settings() {
-	if [ -n "${TRAVIS_OS_NAME}" -a $platform == linux ]; then
-		[ "$CC"  == "" ]    && export CC="gcc-4.9";
-		[ "$CXX" == "" ]    && export CXX="g++-4.9";
-		[ "$CC"  == "gcc" ] && export CC="gcc-4.9";
-		[ "$CXX" == "g++" ] && export CXX="g++-4.9";
+	if [ -n "${TRAVIS_JOB_NUMBER}" -a $platform == linux ]; then
+		[ "$CC"  == "" ]    && export CC="gcc-5";
+		[ "$CXX" == "" ]    && export CXX="g++-5";
+		[ "$CC"  == "gcc" ] && export CC="gcc-5";
+		[ "$CXX" == "g++" ] && export CXX="g++-5";
 	fi
 	[ -z "$CC" ]  && export CC="gcc";
 	[ -z "$CXX" ] && export CXX="g++";
