@@ -5,8 +5,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 
-unittest std.core.string.stayempty
-{
+unittest std.core.string.stayempty {
 	var s = "";
 	assert(s.size == 0u);
 	assert(s.capacity == 0u);
@@ -97,8 +96,7 @@ unittest std.core.string.stayempty
 	s.append(null, 0u);
 }
 
-unittest std.core.string.smallstring
-{
+unittest std.core.string.smallstring {
 	var s = "hello";
 	assert(s.capacity >= 5u);
 	assert(s.size == 5u);
