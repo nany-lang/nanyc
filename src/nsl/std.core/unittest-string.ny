@@ -152,3 +152,26 @@ unittest std.core.string.trimmed {
 	assert("  abc\t".trimmed == "abc");
 	assert("hello".trimmed == "hello");
 }
+
+unittest std.core.string.view.default {
+	var count = 0u;
+	for c in "abc" do
+		count += 1u;
+	assert(count == 3u);
+	count = 0u;
+	for c in "hello" do {
+		if count == 0u then
+			assert(c == 'h');
+		else if count == 1u then
+			assert(c == 'e');
+		else if count == 2u then
+			assert(c == 'l');
+		else if count == 3u then
+			assert(c == 'l');
+		else if count == 4u then
+			assert(c == 'o');
+		else
+			assert(false);
+		count += 1u;
+	}
+}
