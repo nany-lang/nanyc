@@ -30,6 +30,12 @@ bool bodyStart(SequenceBuilder& seq) {
 		frame.lvids(lvid).synthetic = false;
 		// Parameters Deep copy (if required)
 		auto& cdef = seq.cdeftable.classdef(vardef.clid);
+		if (not cdef.isBuiltinOrVoid()) {
+			if (unlikely(!seq.cdeftable.findClassdefAtom(cdef))) {
+				frame.invalidate(lvid);
+				success = complain::parameterTypeHasVanished(seq, i);
+			}
+		}
 		if (name[0] != '^') {
 			// normal input parameter (not captured - does not start with '^')
 			// clone it if necessary (only non-ref parameters)
@@ -51,12 +57,6 @@ bool bodyStart(SequenceBuilder& seq) {
 					ir::emit::copy(seq.out, lvid, clone); // register swap
 					ir::emit::trace(seq.out, "--\n");
 				}
-			}
-		}
-		if (not cdef.isBuiltinOrVoid()) {
-			if (unlikely(!seq.cdeftable.findClassdefAtom(cdef))) {
-				frame.invalidate(lvid);
-				success = complain::parameterTypeHasVanished(seq, i);
 			}
 		}
 	});

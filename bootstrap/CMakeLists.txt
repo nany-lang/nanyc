@@ -49,6 +49,21 @@ endif(WIN32)
 
 
 #
+# Underlying platform
+#
+set(nany_os_debian 0)
+if (NOT WIN32)
+	set(nany_os_windows 0)
+	if (EXISTS "/etc/debian_version")
+		set(nany_os_debian 1)
+		system(nany_arch dpkg --print-architecture)
+	endif()
+else()
+	set(nany_os_windows 1)
+endif()
+
+
+#
 # -- Facilities for YCM - (vim/YouCompleteMe)
 #
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
@@ -234,13 +249,11 @@ add_custom_target(install-libnanyc-dev-tools
 #
 # Packages
 #
-if (NOT WIN32)
-	include("cmake/packages-deb-rpm.cmake")
-	create_rules_for_packages(deb)
-	create_rules_for_packages(rpm)
-else()
+if (nany_os_debian)
+	include("cmake/packages-deb.cmake")
+endif()
+if (WIN32)
 	include("cmake/packages-msi.cmake")
-	create_rules_for_package_msi()
 endif()
 
 # The end !

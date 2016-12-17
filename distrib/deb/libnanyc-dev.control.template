@@ -1,0 +1,8 @@
+Package: libnanyc-dev
+Architecture: all
+Maintainer: @nany
+Priority: optional
+Version: @nany_version@
+Description: Nany Library Headers
+Section: devel
+Depends: libnanyc (>=@nany_version@)
