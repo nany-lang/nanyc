@@ -24,3 +24,18 @@ func isBlank(cref base): ref bool {
 	}
 	return true;
 }
+
+func contains(cref base, cref ascii: std.Ascii): ref bool {
+	if base.m_size != 0__u32 then {
+		var i = 0u;
+		var size = base.m_size;
+		var needle = ascii.asU8.pod;
+		var p = base.m_cstr;
+		do {
+			if needle == !!load.u8(p + i.pod) then
+				return true;
+		}
+		while (i += 1u) < size;
+	}
+	return false;
+}
