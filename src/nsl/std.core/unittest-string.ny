@@ -129,3 +129,21 @@ unittest std.core.string.smallstring {
 	assert(s.first == 'h');
 	assert(s.data != null);
 }
+
+unittest std.core.string.isBlank {
+	var s = "";
+	assert(s.blank);
+	assert(s.empty);
+	s = "  \t";
+	assert(s.blank);
+	assert(not s.empty);
+	s.clear();
+	assert(s.blank);
+	assert(s.empty);
+	s = " ";
+	assert(s.blank);
+	assert(not s.empty);
+	s = " a ";
+	assert(not s.blank);
+	assert(not s.empty);
+}
