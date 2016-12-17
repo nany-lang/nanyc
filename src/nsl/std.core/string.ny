@@ -335,20 +335,8 @@ public class string {
 	}
 
 	//! Get if the string contains a given ascii
-	func contains(cref ascii: std.Ascii): bool {
-		if m_size != 0__u32 then {
-			var i = 0u;
-			var size = m_size;
-			var needle = ascii.asU8.pod;
-			var p = m_cstr;
-			do {
-				if needle == !!load.u8(p + i.pod) then
-					return true;
-			}
-			while (i += 1u) < size;
-		}
-		return false;
-	}
+	func contains(cref ascii: std.Ascii): bool
+		-> std.details.string.contains(self, ascii);
 
 	func index(cref predicate): u32
 		-> index(0u, predicate);
