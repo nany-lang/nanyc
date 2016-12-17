@@ -37,7 +37,7 @@ platform_and_env_settings() {
 	[ "$BUILD_TYPE" == "" ] && export BUILD_TYPE="debug"
 
 	uname -a
-	cat	./build-settings.txt
+	cat	../build-settings.txt
 }
 
 compiler_settings() {
@@ -95,7 +95,7 @@ make_packages() {
 
 local_pwd=$(dirname "$0")
 root=$(cd "${local_pwd}" && pwd)
-pushd "${root}/../../"
+pushd "${root}/../../bootstrap"
 
 platform_and_env_settings
 compiler_settings
