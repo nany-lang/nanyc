@@ -375,11 +375,8 @@ public class string {
 		-> std.details.string.startsWith(self, prefix);
 
 	//! Determines whether the string ends with the characters of another string
-	func endsWith(cref suffix: string): bool {
-		var fsize = suffix.m_size;
-		return (m_size != 0__u32 and fsize <= m_size)
-			and std.memory.equals(m_cstr + m_size - fsize, prefix.m_cstr, 0__u64 + fsize);
-	}
+	func endsWith(cref suffix: string): bool
+		-> endsWith(self, suffix);
 
 	//! Remove the 'count' ascii from the end of the string
 	func chop(ascii: u32) {
