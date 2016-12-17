@@ -92,3 +92,24 @@ func index(cref base, offset: u32, cref predicate): u32 {
 	}
 	return new u32(size);
 }
+
+func lastIndex(cref base, offset: u32, cref ascii: std.Ascii): u32 {
+	var size = base.m_size;
+	if size != 0__u32 then {
+		if offset.pod >= size then
+			offset = size - 1u;
+
+		var p = base.m_cstr + offset.pod;
+		var needle = ascii.asU8.pod;
+		do {
+			if needle == !!load.u8(p) then
+				return offset;
+			if offset == 0u then
+				return new u32(size); // break
+			offset -= 1u;
+			p = p - 1__u32;
+		}
+		while true;
+	}
+	return new u32(size);
+}
