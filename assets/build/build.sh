@@ -1,15 +1,6 @@
 #!/usr/bin/env bash
 set -e
 
-title() {
-	echo
-	echo
-	echo
-	echo
-	echo "--- [ $1 ] ---"
-	echo
-}
-
 die() {
 	echo
 	echo
@@ -27,7 +18,7 @@ run() {
 		echo -en "travis_fold:start:${tag}\r${ANSI_CLEAR}"
 		echo "${title}"
 	else
-		title "${title}"
+		echo -e "\n\n\n{{{ $title }}}\n"
 	fi
 	$@ || die "failed to execute '$@'"
 	[ -n "${TRAVIS_JOB_NUMBER:-}" ] && echo -en "travis_fold:end:${tag}\r${ANSI_CLEAR}"
@@ -35,7 +26,6 @@ run() {
 }
 
 platform_and_env_settings() {
-	title "GENERAL"
 	platform='unknown'
 	unamestr=`uname`
 	if [[ "$unamestr" == 'Linux' ]]; then
