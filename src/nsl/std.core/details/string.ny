@@ -113,3 +113,18 @@ func lastIndex(cref base, offset: u32, cref ascii: std.Ascii): u32 {
 	}
 	return new u32(size);
 }
+
+func count(cref base, cref ascii: std.Ascii): u32 {
+	var c = 0u;
+	if base.m_size != 0__u32 then {
+		var i = 0u;
+		var size = base.m_size;
+		var needle = ascii.asU8.pod;
+		do {
+			if needle == !!load.u8(base.m_cstr + i.pod) then
+				c += 1u;
+		}
+		while (i += 1u) < size;
+	}
+	return c;
+}
