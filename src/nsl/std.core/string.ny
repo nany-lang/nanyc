@@ -364,20 +364,7 @@ public class string {
 
 	//! Get the number of ascii in the string
 	func count(cref ascii: std.Ascii): u32
-	{
-		var c = 0u;
-		if m_size != 0__u32 then {
-			var i = 0u;
-			var size = m_size;
-			var needle = ascii.asU8.pod;
-			do {
-				if needle == !!load.u8(m_cstr + i.pod) then
-					c += 1u;
-			}
-			while (i += 1u) < size;
-		}
-		return c;
-	}
+		-> std.details.string.count(self, ascii);
 
 	//! Get the total number of ascii in the string (same as 'size')
 	func count: u32
