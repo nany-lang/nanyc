@@ -17,6 +17,11 @@ die() {
 	exit 1
 }
 
+run() {
+	title $1; shift
+	$@
+}
+
 platform_and_env_settings() {
 	title "GENERAL"
 	platform='unknown'
@@ -52,43 +57,36 @@ compiler_settings() {
 }
 
 cmake_cleanup() {
-	title "CLEANUP"
 	cd bootstrap
 	echo " - delete CMakeCache.txt" && rm -f CMakeCache.txt
 	echo " - delete CMakeFiles" && rm -rf CMakeFiles
 }
 
 configure() {
-	title "CONFIGURE"
 	echo "# cmake . -DCMAKE_BUILD_TYPE=${BUILD_TYPE}"
 	cmake . -DCMAKE_BUILD_TYPE=${BUILD_TYPE} || die "bootstrap configure error"
 }
 
 build() {
-	title "BUILD"
 	echo "# make -j ${NPROC}"
-	make -j ${NPROC} || (title "MAKE ERROR"; make VERBOSE=1 ; exit 1) || die "build failed"
+	make -j ${NPROC} || (run  "SOMETHING HAS FAILED" make VERBOSE=1 ; exit 1) || die "build failed"
 	make check || die "check failed"
 }
 
 make_packages_deb() {
-	title "PACKAGES DEB"
 	make packages-deb || die "packages deb failed";
 }
 
 print_packages() {
-	title "FOR DISTRIBUTION"
 	(cd "${root}/../../distrib" && find  -maxdepth 1 -and -type f  -and -not -path '*/\.*' \
 		| xargs  ls -lh)
 }
 
 make_packages() {
-	if [ ! "${BUILD_TYPE:-}" = 'release' ]; then
-		return
-	fi
+	[ ! "${BUILD_TYPE:-}" = 'release' ] && return
 	local has_pkgs=0
-	[ $platform == linux ] && make_packages_deb && has_pkgs=1
-	[ $has_pkgs -ne 0 ] && print_packages
+	[ $platform == linux ] && run "Packages DEB" make_packages_deb && has_pkgs=1
+	[ $has_pkgs -ne 0 ] && run "Distribution" print_packages
 	return 0
 }
 
@@ -97,10 +95,10 @@ local_pwd=$(dirname "$0")
 root=$(cd "${local_pwd}" && pwd)
 pushd "${root}/../../bootstrap"
 
-platform_and_env_settings
-compiler_settings
+run "Platform & Env settings" platform_and_env_settings
+run "C++ Compiler settings" compiler_settings
 [ -z "${TRAVIS_JOB_NUMBER}" ] && cmake_cleanup
 
-configure
-build
+run "Bootstrap: configure" configure
+run "Bootstrap: build" build
 make_packages
