@@ -357,28 +357,10 @@ public class string {
 		-> std.details.string.index(self, offset, predicate);
 
 	func lastIndex(cref ascii: std.Ascii): u32
-		-> lastIndex(new u32(m_size), ascii);
+		-> std.details.string.lastIndex(self, new u32(m_size), ascii);
 
-	func lastIndex(offset: u32, cref ascii: std.Ascii): u32 {
-		var size = m_size;
-		if size != 0__u32 then {
-			if offset.pod >= size then
-				offset = size - 1u;
-
-			var p = m_cstr + offset.pod;
-			var needle = ascii.asU8.pod;
-			do {
-				if needle == !!load.u8(p) then
-					return offset;
-				if offset == 0u then
-					return new u32(size); // break
-				offset -= 1u;
-				p = p - 1__u32;
-			}
-			while true;
-		}
-		return new u32(size);
-	}
+	func lastIndex(offset: u32, cref ascii: std.Ascii): u32
+		-> std.details.string.lastIndex(self, offset, ascii);
 
 	//! Get the number of ascii in the string
 	func count(cref ascii: std.Ascii): u32
