@@ -52,7 +52,7 @@ inline bool SequenceBuilder::canGenerateCode() const {
 
 inline bool SequenceBuilder::checkForIntrinsicParamCount(const AnyString& name, uint32_t count) {
 	return (pushedparams.func.indexed.size() == count)
-		   or complainIntrinsicParameterCount(name, count);
+		or complainIntrinsicParameterCount(name, count);
 }
 
 

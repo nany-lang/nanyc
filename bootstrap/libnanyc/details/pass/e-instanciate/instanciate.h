@@ -22,6 +22,7 @@ namespace ny {
 namespace Pass {
 namespace Instanciate {
 
+
 struct InstanciateData;
 class OverloadedFuncCallResolver;
 
@@ -35,6 +36,7 @@ struct IndexedParameter final {
 	uint32_t offset;
 };
 
+
 struct NamedParameter final {
 	NamedParameter(const AnyString& name, uint32_t lvid, uint line, uint offset)
 		: name(name), lvid(lvid), line(line), offset(offset) {
@@ -44,10 +46,6 @@ struct NamedParameter final {
 	uint32_t line;
 	uint32_t offset;
 };
-
-
-
-
 
 
 struct SequenceBuilder final {
@@ -174,11 +172,11 @@ struct SequenceBuilder final {
 	bool instanciateAssignment(const ir::isa::Operand<ir::isa::Op::call>& operands);
 
 	bool instanciateAssignment(AtomStackFrame& frame, uint32_t lhs, uint32_t rhs, bool canDisposeLHS = true,
-							   bool checktype = true, bool forceDeepcopy = false);
+		bool checktype = true, bool forceDeepcopy = false);
 
 	//! perform type resolution and fetch data (local variable, func...)
 	bool identify(const ir::isa::Operand<ir::isa::Op::identify>& operands, const AnyString& name,
-				  bool firstChance = true);
+		bool firstChance = true);
 	bool identifyCapturedVar(const ir::isa::Operand<ir::isa::Op::identify>& operands, const AnyString& name);
 
 	//! Try to capture variables from a list of potentiel candidates created by the mapping
@@ -189,7 +187,7 @@ struct SequenceBuilder final {
 	bool instanciateAtomClassClone(Atom& atom, uint32_t self, uint32_t rhs);
 
 	bool instanciateAtomFunc(uint32_t& instanceid, Atom& funcAtom, uint32_t retlvid, uint32_t p1 = 0,
-							 uint32_t p2 = 0);
+		uint32_t p2 = 0);
 
 	bool pushCapturedVarsAsParameters(const Atom& atomclass);
 
@@ -199,9 +197,9 @@ struct SequenceBuilder final {
 	void instanciateInstrinsicCall();
 	bool instanciateUserDefinedIntrinsic(const ir::isa::Operand<ir::isa::Op::intrinsic>& operands);
 	Yuni::Tribool::Value instanciateBuiltinIntrinsic(const AnyString& name, uint32_t lvid,
-			bool canComplain = true);
+		bool canComplain = true);
 	Yuni::Tribool::Value instanciateBuiltinIntrinsicSpecific(const AnyString& name, uint32_t lvid,
-			bool canProduceError);
+		bool canProduceError);
 	//@}
 
 
@@ -210,7 +208,7 @@ struct SequenceBuilder final {
 	bool checkForIntrinsicParamCount(const AnyString& name, uint32_t count);
 	bool complainInvalidType(const char* origin, const Classdef& from, const Classdef& to);
 	void complainReturnTypeMultiple(const Classdef& expected, const Classdef& usertype, uint32_t line = 0,
-									uint32_t offset = 0);
+		uint32_t offset = 0);
 	//! Restriction on builtin intrinsics
 	bool complainBuiltinIntrinsicDoesNotAccept(const AnyString& name, const AnyString& what);
 	//! Complain about named parameters used with an intrinsic
@@ -219,7 +217,7 @@ struct SequenceBuilder final {
 	bool complainIntrinsicWithGenTypeParameters(const AnyString& name);
 	bool complainIntrinsicParameterCount(const AnyString& name, uint32_t count);
 	bool complainIntrinsicParameter(const AnyString& name, uint32_t pindex, const Classdef& got,
-									const AnyString& expected = nullptr);
+		const AnyString& expected = nullptr);
 	//! Emit a new error message with additional information on the given operand
 	bool complainOperand(const ir::Instruction& operands, AnyString msg = nullptr);
 	//! Emit a new warning/error for an unused variable
