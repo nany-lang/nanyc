@@ -392,8 +392,10 @@ Atom* SequenceBuilder::instanciateAtomClass(Atom& atom) {
 	overloadMatch.clear(); // reset
 	for (auto& param : pushedparams.gentypes.indexed)
 		overloadMatch.input.tmplparams.indexed.emplace_back(frame->atomid, param.lvid);
-	if (unlikely(not pushedparams.gentypes.named.empty()))
+	if (unlikely(not pushedparams.gentypes.named.empty())) {
 		error("named generic type parameters not implemented yet");
+		return nullptr;
+	}
 	TypeCheck::Match match = overloadMatch.validate(atom);
 	if (unlikely(TypeCheck::Match::none == match)) {
 		if (config::traces::sourceOpcodeSequence)
