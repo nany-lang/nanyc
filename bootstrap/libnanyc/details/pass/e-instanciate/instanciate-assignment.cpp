@@ -1,5 +1,6 @@
 #include "instanciate.h"
 #include "details/ir/emit.h"
+#include "details/pass/e-instanciate/ref-unref.h"
 
 using namespace Yuni;
 
@@ -72,8 +73,7 @@ bool SequenceBuilder::instanciateAssignment(AtomStackFrame& frame, uint32_t lhs,
 		else
 			cdeftable.substitute(lhs).mutateToBuiltin(cdefrhs.kind);
 	}
-	// can lhs be acquires ?
-	bool lhsCanBeAcquired = canBeAcquired(cdeflhs);
+	bool lhsCanBeAcquired = canBeAcquired(*this, cdeflhs);
 	// Determining the strategy for copying the two values
 	enum class AssignStrategy {
 		rawregister, ref, deepcopy,
@@ -145,9 +145,9 @@ bool SequenceBuilder::instanciateAssignment(AtomStackFrame& frame, uint32_t lhs,
 				ir::emit::ref(out, rhs);
 				// release the old left value
 				if (canDisposeLHS) {
-					tryUnrefObject(lhs);
+					tryUnrefObject(*this, lhs);
 					if (isMemberVariable)
-						tryUnrefObject(lhs);
+						tryUnrefObject(*this, lhs);
 				}
 				// copy the pointer
 				ir::emit::copy(out, lhs, rhs);
@@ -173,9 +173,9 @@ bool SequenceBuilder::instanciateAssignment(AtomStackFrame& frame, uint32_t lhs,
 				ir::emit::ref(out, rhs);
 				// release the old left value
 				if (canDisposeLHS) {
-					tryUnrefObject(lhs);
+					tryUnrefObject(*this, lhs);
 					if (isMemberVariable)
-						tryUnrefObject(lhs);
+						tryUnrefObject(*this, lhs);
 				}
 				// note: do not keep a reference on 'out->at...', since the internal buffer might be reized
 				uint32_t lvid = createLocalVariables(/*count*/ 2);
@@ -192,7 +192,7 @@ bool SequenceBuilder::instanciateAssignment(AtomStackFrame& frame, uint32_t lhs,
 				ir::emit::push(out, rhs); // the object to copy
 				ir::emit::call(out, retcall, rhsAtom->classinfo.clone.atomid, rhsAtom->classinfo.clone.instanceid);
 				// release rhs - copy is done
-				tryUnrefObject(rhs);
+				tryUnrefObject(*this, rhs);
 				if (isMemberVariable) {
 					ir::emit::ref(out, lhs);
 					ir::emit::fieldset(out, lhs, origin.self, origin.field);
@@ -234,7 +234,7 @@ bool SequenceBuilder::instanciateAssignment(const ir::isa::Operand<ir::isa::Op::
 	}
 	auto& cdeflhs = cdeftable.classdef(CLID{frame->atomid, lhs});
 	cdeftable.substitute(operands.lvid).import(cdeflhs);
-	if (canBeAcquired(cdeflhs)) {
+	if (canBeAcquired(*this, cdeflhs)) {
 		frame->lvids(operands.lvid).autorelease = true;
 		if (canGenerateCode()) {
 			ir::emit::copy(out, operands.lvid, lhs);

@@ -5,6 +5,7 @@
 #include <unistd.h>
 #endif
 #include "details/ir/emit.h"
+#include "details/pass/e-instanciate/ref-unref.h"
 
 using namespace Yuni;
 
@@ -141,7 +142,7 @@ bool intrinsicFieldset(SequenceBuilder& seq, uint32_t lvid) {
 	}
 	if (seq.canGenerateCode()) {
 		if (not implicitBuiltin) {
-			seq.tryToAcquireObject(objlvid);
+			tryToAcquireObject(seq, objlvid);
 			ir::emit::fieldset(seq.out, objlvid, /*self*/ 2, varatom->varinfo.effectiveFieldIndex);
 		}
 		else {
@@ -157,7 +158,7 @@ bool intrinsicFieldset(SequenceBuilder& seq, uint32_t lvid) {
 bool intrinsicRef(SequenceBuilder& seq, uint32_t lvid) {
 	seq.cdeftable.substitute(lvid).mutateToVoid();
 	if (seq.canGenerateCode())
-		seq.tryToAcquireObject(seq.pushedparams.func.indexed[0].lvid);
+		tryToAcquireObject(seq, seq.pushedparams.func.indexed[0].lvid);
 	return true;
 }
 
@@ -165,7 +166,7 @@ bool intrinsicRef(SequenceBuilder& seq, uint32_t lvid) {
 bool intrinsicUnref(SequenceBuilder& seq, uint32_t lvid) {
 	seq.cdeftable.substitute(lvid).mutateToVoid();
 	if (seq.canGenerateCode())
-		seq.tryUnrefObject(seq.pushedparams.func.indexed[0].lvid);
+		tryUnrefObject(seq, seq.pushedparams.func.indexed[0].lvid);
 	return true;
 }
 
@@ -174,7 +175,7 @@ bool intrinsicPointer(SequenceBuilder& seq, uint32_t lvid) {
 	seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_ptr);
 	if (seq.canGenerateCode()) {
 		uint32_t objlvid = seq.pushedparams.func.indexed[0].lvid;
-		if (seq.canBeAcquired(objlvid)) {
+		if (canBeAcquired(seq, objlvid)) {
 			// retrieving the pointer address of the object in input
 			// the objlvid representing the object is already the address
 			ir::emit::copy(seq.out, lvid, objlvid);

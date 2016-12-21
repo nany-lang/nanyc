@@ -5,6 +5,7 @@
 #include <unistd.h>
 #endif
 #include "details/ir/emit.h"
+#include "details/pass/e-instanciate/ref-unref.h"
 
 using namespace Yuni;
 
@@ -30,7 +31,7 @@ bool intrinsicReinterpret(SequenceBuilder& seq, uint32_t lvid) {
 		ir::emit::copy(seq.out, lvid, lhs);
 	auto& lvidinfo = seq.frame->lvids(lvid);
 	lvidinfo.synthetic = false;
-	if (seq.canBeAcquired(cdef) and seq.canGenerateCode()) { // re-acquire the object
+	if (canBeAcquired(seq, cdef) and seq.canGenerateCode()) { // re-acquire the object
 		ir::emit::ref(seq.out, lvid);
 		lvidinfo.autorelease = true;
 		lvidinfo.scope = seq.frame->scope;

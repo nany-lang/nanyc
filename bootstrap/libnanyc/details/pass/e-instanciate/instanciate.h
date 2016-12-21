@@ -115,12 +115,6 @@ struct SequenceBuilder final {
 	*/
 	Atom& resolveTypeAlias(Atom& atom, const Classdef*& cdefout);
 
-	//! Get if a value from a register can be acquired (ref counting)
-	bool canBeAcquired(uint32_t lvid) const;
-	//! Get if a type definition can be acquired (ref. counting)
-	bool canBeAcquired(const CLID& clid) const;
-	//! Get if a type definition can be acquired (ref. counting)
-	bool canBeAcquired(const Classdef& cdef) const;
 
 	/*!
 	** \brief Determine if an atom is fully typed and retrieve its return type into the signature
@@ -134,14 +128,6 @@ struct SequenceBuilder final {
 
 	//! \name Helpers for propgram memory management
 	//@{
-	//! Emit 'ref' opcode if 'type' can be acquired (e.g. is not a builtin type)
-	template<class T> void tryToAcquireObject(uint32_t lvid, const T& type);
-	//! Emit 'ref' opcode if 'lvid' can be acquired (e.g. is not a builtin type)
-	void tryToAcquireObject(uint32_t lvid);
-	//! Emit 'ref' opcode whether 'lvid' can be acquired or not (no check)
-	void acquireObject(uint32_t lvid);
-	//! Emit 'unref' opcode if 'lvid' can be acquired
-	void tryUnrefObject(uint32_t lvid);
 
 	//! Create 'count' new local variables and return the first lvid
 	uint32_t createLocalVariables(uint32_t count = 1);

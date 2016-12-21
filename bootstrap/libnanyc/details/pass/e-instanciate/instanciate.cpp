@@ -8,6 +8,7 @@
 #include "instanciate-debug.h"
 #include "func-overload-match.h"
 #include "details/ir/emit.h"
+#include "details/pass/e-instanciate/ref-unref.h"
 #include <memory>
 
 using namespace Yuni;
@@ -71,7 +72,7 @@ void SequenceBuilder::releaseScopedVariables(int scope, bool forget) {
 			if (clcvr.autorelease) {
 				//if (not clcvr.userDefinedName.empty())
 				//  ir::emit::trace(out, [&](){return String{"unref var "} << clcvr.userDefinedName << " -> %" << i;});
-				tryUnrefObject(i);
+				tryUnrefObject(*this, i);
 			}
 			// forget this variable!
 			if (forget) {
@@ -135,11 +136,6 @@ inline void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::debugfile
 inline void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::debugpos>& operands) {
 	currentLine   = operands.line;
 	currentOffset = operands.offset;
-}
-
-
-inline void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::unref>& operands) {
-	tryUnrefObject(operands.lvid);
 }
 
 

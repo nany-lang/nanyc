@@ -1,4 +1,5 @@
 #include "instanciate.h"
+#include "details/pass/e-instanciate/ref-unref.h"
 
 using namespace Yuni;
 
@@ -64,7 +65,7 @@ void SequenceBuilder::generateMemberVarDefaultClone() {
 				// .. copied to the member
 				ir::emit::fieldset(out, lhsptr, /*self*/ 2, subatom.varinfo.effectiveFieldIndex);
 				// prevent the cloned object from being released at the end of the scope
-				assert(canBeAcquired(lhsptr));
+				assert(canBeAcquired(*this, lhsptr));
 				frame->lvids(lhsptr).autorelease = false;
 				break;
 			}

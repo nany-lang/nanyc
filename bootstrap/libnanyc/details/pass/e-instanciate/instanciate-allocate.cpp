@@ -1,5 +1,6 @@
 #include "instanciate.h"
 #include "instanciate-error.h"
+#include "details/pass/e-instanciate/ref-unref.h"
 
 using namespace Yuni;
 
@@ -39,7 +40,7 @@ void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::allocate>& opera
 		// for storing the size of the object
 		ir::emit::type::objectSizeof(out, operands.lvid - 1, atom->atomid);
 		ir::emit::memory::allocate(out, operands.lvid, operands.lvid - 1);
-		acquireObject(operands.lvid);
+		acquireObject(*this, operands.lvid);
 	}
 }
 

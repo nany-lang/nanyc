@@ -3,6 +3,7 @@
 #include "instanciate-atom.h"
 #include "libnanyc-traces.h"
 #include "details/ir/emit.h"
+#include "details/pass/e-instanciate/ref-unref.h"
 
 using namespace Yuni;
 
@@ -94,7 +95,7 @@ bool emitIdentifyForSingleResult(SequenceBuilder& seq, bool isLocalVar, const Cl
 			// read the address
 			assert(self != 0 and "'self can be null only for type resolution'");
 			ir::emit::fieldget(seq.out, operands.lvid, self, atom.varinfo.effectiveFieldIndex);
-			seq.tryToAcquireObject(operands.lvid, cdefvar);
+			tryToAcquireObject(seq, operands.lvid, cdefvar);
 		}
 	}
 	else {
@@ -109,7 +110,7 @@ bool emitIdentifyForSingleResult(SequenceBuilder& seq, bool isLocalVar, const Cl
 			lvidinfo.origin.memalloc = false;
 			lvidinfo.origin.returnedValue = false;
 			if (seq.canGenerateCode())
-				seq.acquireObject(operands.lvid);
+				acquireObject(seq, operands.lvid);
 		}
 	}
 	return true;

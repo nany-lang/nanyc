@@ -1,6 +1,7 @@
 #include "instanciate.h"
 #include "details/ir/emit.h"
 #include "instanciate-error.h"
+#include "details/pass/e-instanciate/ref-unref.h"
 
 using namespace Yuni;
 
@@ -49,7 +50,7 @@ bool bodyStart(SequenceBuilder& seq) {
 				bool r = seq.instanciateAssignment(frame, clone, lvid, false, false, true);
 				if (unlikely(not r))
 					frame.invalidate(clone);
-				if (seq.canBeAcquired(lvid)) {
+				if (canBeAcquired(seq, lvid)) {
 					frame.lvids(lvid).autorelease = true;
 					frame.lvids(clone).autorelease = false;
 				}
