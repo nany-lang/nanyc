@@ -8,6 +8,7 @@
 #include "instanciate-debug.h"
 #include "instanciate-error.h"
 #include <memory>
+#include "details/pass/e-instanciate/ref-unref.h"
 
 using namespace Yuni;
 
@@ -491,7 +492,7 @@ bool SequenceBuilder::doInstanciateAtomFunc(Logs::Message::Ptr& subreport, Insta
 				return (ice() << "return: invalid atom for return type");
 			frame->lvids(retlvid).synthetic = false;
 			// release automatically the returned value, acquired by the function
-			if (canBeAcquired(info.returnType))
+			if (canBeAcquired(*this, info.returnType))
 				frame->lvids(retlvid).autorelease = true;
 		}
 		else

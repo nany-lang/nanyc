@@ -1,4 +1,5 @@
 #include "instanciate.h"
+#include "details/pass/e-instanciate/ref-unref.h"
 
 using namespace Yuni;
 
@@ -39,7 +40,7 @@ void SequenceBuilder::generateMemberVarDefaultInitialization() {
 					return (void)(ice() << "invalid atom for automatic initialization of captured variable '" << name << '\'');
 				ir::emit::fieldset(out, lvid, /*self*/ 2, varatom->varinfo.effectiveFieldIndex);
 				// acquire 'lvid' to keep it alive
-				if (canBeAcquired(cdef))
+				if (canBeAcquired(*this, cdef))
 					ir::emit::ref(out, lvid);
 			}
 		});
@@ -126,8 +127,8 @@ void SequenceBuilder::generateMemberVarDefaultInitialization() {
 						return;
 					}
 					ir::emit::fieldset(out, lvid, /*self*/ 2, varatom->varinfo.effectiveFieldIndex);
-					// acquire 'lvid' to keep it alive
-					if (canBeAcquired(cdef))
+					// can't use tryToAcquireObject here to prevent unref at the end of scope
+					if (canBeAcquired(*this, cdef))
 						ir::emit::ref(out, lvid);
 				}
 				// mark it as 'used' to suppress spurious error reporting

@@ -1,5 +1,6 @@
 #include "instanciate.h"
 #include "instanciate-error.h"
+#include "details/pass/e-instanciate/ref-unref.h"
 
 using namespace Yuni;
 
@@ -34,7 +35,7 @@ void SequenceBuilder::declareNamedVariable(const AnyString& name, uint32_t lvid,
 			// be anything and probably something that can not be released
 			and frame->verify(lvid)
 			// and of course if the data can be acquired
-			and canBeAcquired(cdeftable.classdef(CLID{frame->atomid, lvid}));
+			and canBeAcquired(*this, cdeftable.classdef(CLID{frame->atomid, lvid}));
 	}
 	else {
 		lr.errorReported = true;

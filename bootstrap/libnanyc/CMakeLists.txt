@@ -263,6 +263,8 @@ addsrc(
 
 	"details/pass/e-instanciate/stack-frame.h"
 	"details/pass/e-instanciate/stack-frame.hxx"
+	"details/pass/e-instanciate/ref-unref.h"
+	"details/pass/e-instanciate/ref-unref.cpp"
 	"details/pass/e-instanciate/instanciate-capture-variable.cpp"
 	"details/pass/e-instanciate/instanciate-identify.cpp"
 	"details/pass/e-instanciate/instanciate-ensure-resolved.cpp"
@@ -287,7 +289,6 @@ addsrc(
 	"details/pass/e-instanciate/instanciate-pragma.cpp"
 	"details/pass/e-instanciate/instanciate-blueprint.cpp"
 	"details/pass/e-instanciate/instanciate-assignment.cpp"
-	"details/pass/e-instanciate/instanciate-ref-unref.cpp"
 	"details/pass/e-instanciate/instanciate-assign.cpp"
 	"details/pass/e-instanciate/instanciate-typeisobject.cpp"
 	"details/pass/e-instanciate/instanciate-commontype.cpp"

@@ -1,5 +1,6 @@
 #include "instanciate.h"
 #include "instanciate-error.h"
+#include "details/pass/e-instanciate/ref-unref.h"
 
 using namespace Yuni;
 
@@ -137,7 +138,7 @@ void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::ret>& operands) 
 						if (unlikely(not r))
 							return frame->invalidate(retlvid);
 					}
-					tryToAcquireObject(retlvid, spare);
+					tryToAcquireObject(*this, retlvid, spare);
 					releaseScopedVariables(0 /*all scopes*/);
 					ir::emit::ret(out, retlvid, 0);
 				}
