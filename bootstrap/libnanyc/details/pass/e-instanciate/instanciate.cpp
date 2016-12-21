@@ -23,7 +23,7 @@ void retriveReportMetadata(void* self, Logs::Level, const AST::Node*, Yuni::Stri
 
 
 SequenceBuilder::SequenceBuilder(Logs::Report report, ClassdefTableView& cdeftable, Build& build,
-								 ir::Sequence* out, ir::Sequence& sequence, SequenceBuilder* parent)
+		 ir::Sequence* out, ir::Sequence& sequence, SequenceBuilder* parent)
 	: cdeftable(cdeftable)
 	, out(out)
 	, currentSequence(sequence)
@@ -191,10 +191,11 @@ inline void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::jnz>& opc
 
 
 inline void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::comment>& opc) {
-	if (debugmode and canGenerateCode())
+	if (debugmode and canGenerateCode()) {
 		ir::emit::trace(out, [&]() {
-		return currentSequence.stringrefs[opc.text];
-	});
+			return currentSequence.stringrefs[opc.text];
+		});
+	}
 }
 
 

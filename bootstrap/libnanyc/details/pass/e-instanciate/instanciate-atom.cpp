@@ -207,7 +207,7 @@ bool instanciateRecursiveAtom(InstanciateData& info) {
 		return false;
 	}
 	bool success = (info.parent
-					and info.parent->getReturnTypeForRecursiveFunc(atom, info.returnType));
+		and info.parent->getReturnTypeForRecursiveFunc(atom, info.returnType));
 	if (unlikely(not success)) {
 		info.returnType.mutateToAny();
 		error() << "parameters/return types must be fully defined to allow recursive func calls";
@@ -586,8 +586,7 @@ bool instanciateAtomParameterTypes(InstanciateData& info) {
 		return (ice() << "invalid atom: no ir code");
 	}
 	// instanciate the sequence attached to the atom
-	auto builder = std::make_unique<SequenceBuilder>
-				   (report.subgroup(), newview, info.build, outIR, inputIR, info.parent);
+	auto builder = std::make_unique<SequenceBuilder>(report.subgroup(), newview, info.build, outIR, inputIR, info.parent);
 	//if (info.parentAtom)
 	builder->layerDepthLimit = 2; // allow the first blueprint to be instanciated
 	builder->signatureOnly = true;
@@ -612,7 +611,6 @@ bool instanciateAtomParameterTypes(InstanciateData& info) {
 			rawcdef.mutateToBuiltinOrVoid(cdef.kind);
 		}
 	};
-	// import parameter types
 	atom.parameters.each([&](uint32_t, const AnyString&, const Vardef & vardef) {
 		mergeType(vardef.clid);
 	});
@@ -622,13 +620,10 @@ bool instanciateAtomParameterTypes(InstanciateData& info) {
 
 
 bool instanciateAtom(InstanciateData& info) {
-	// prepare the matching signature
 	Signature signature;
 	prepareSignature(signature, info);
 	assert(info.params.size() == signature.parameters.size());
-	// the atom being instanciated
 	auto& atom = info.atom.get();
-	// Another atom, if the target atom had changed
 	Atom* remapAtom = nullptr;
 	auto valid = atom.instances.isValid(signature, info.instanceid, info.returnType, remapAtom);
 	switch (valid) {
@@ -637,7 +632,6 @@ bool instanciateAtom(InstanciateData& info) {
 				if (unlikely(not instanciateRecursiveAtom(info)))
 					return false;
 			}
-			// instance already present
 			if (unlikely(remapAtom != nullptr)) // the target atom may have changed (template class)
 				info.atom = std::ref(*remapAtom);
 			return true;
