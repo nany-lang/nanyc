@@ -1,7 +1,8 @@
+#include <nany/console.h>
 #include <yuni/yuni.h>
 #include <yuni/core/system/console/console.h>
-#include "nany/nany.h"
 #include <iostream>
+#include <string.h>
 
 using namespace Yuni;
 

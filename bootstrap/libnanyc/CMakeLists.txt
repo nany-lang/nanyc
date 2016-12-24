@@ -490,6 +490,7 @@ addsrc(
 	FILES
 	"include/nany/types.h"
 	"include/nany/allocator.h"
+	"include/nany/console.h"
 	"include/nany/libinfo.h"
 	"include/nany/nany.h")
 
