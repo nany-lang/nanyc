@@ -488,6 +488,7 @@ addsrc(
 	NAME  nysrc_public_headers
 	GROUP "public-headers"
 	FILES
+	"include/nany/types.h"
 	"include/nany/nany.h")
 
 addsrc(
