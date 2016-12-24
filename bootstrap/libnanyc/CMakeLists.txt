@@ -489,6 +489,7 @@ addsrc(
 	GROUP "public-headers"
 	FILES
 	"include/nany/types.h"
+	"include/nany/allocator.h"
 	"include/nany/libinfo.h"
 	"include/nany/nany.h")
 

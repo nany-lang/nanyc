@@ -1,5 +1,5 @@
 #include <yuni/yuni.h>
-#include <nany/nany.h>
+#include <nany/allocator.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
