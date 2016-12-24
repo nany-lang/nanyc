@@ -1,4 +1,5 @@
 #include "nanyc-utils.h"
+#include <nany/libinfo.h>
 #include <yuni/string.h>
 #include <iostream>
 

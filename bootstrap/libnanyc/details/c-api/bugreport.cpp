@@ -1,4 +1,5 @@
-#include "nany/nany.h"
+#include <nany/nany.h>
+#include <nany/libinfo.h>
 #include <yuni/io/file.h>
 #include <yuni/core/math.h>
 #include <yuni/core/process/program.h>

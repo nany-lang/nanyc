@@ -1,4 +1,5 @@
-#include "nany/nany.h"
+#include <nany/nany.h>
+#include <nany/libinfo.h>
 #include "libnanyc-version.h"
 #include <assert.h>
 
