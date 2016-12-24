@@ -1,5 +1,5 @@
 #include <yuni/yuni.h>
-#include "nany/nany.h"
+#include <nany/allocator.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
@@ -8,10 +8,7 @@
 #define NANY_DEBUG_ALLOCATOR_FILL 0
 
 
-
-
-static void* nany_allocate(nyallocator_t* alloc, size_t size)
-{
+static void* nany_allocate(nyallocator_t* alloc, size_t size) {
 	assert(0 != size);
 	assert(alloc != NULL);
 	void* p = malloc(size);
@@ -25,14 +22,11 @@ static void* nany_allocate(nyallocator_t* alloc, size_t size)
 }
 
 
-static void* nany_reallocate(nyallocator_t* alloc, void* ptr, size_t oldsize, size_t newsize)
-{
+static void* nany_reallocate(nyallocator_t* alloc, void* ptr, size_t oldsize, size_t newsize) {
 	void* p;
-
+	(void) oldsize;
 	assert(0 != newsize);
 	assert(alloc != NULL);
-	(void) oldsize;
-
 	p = realloc(ptr, newsize);
 	if (YUNI_UNLIKELY(!p and alloc->on_not_enough_memory))
 		alloc->on_not_enough_memory(alloc, nyfalse);
@@ -40,10 +34,9 @@ static void* nany_reallocate(nyallocator_t* alloc, void* ptr, size_t oldsize, si
 }
 
 
-static void nany_free(nyallocator_t* allocator, void* ptr, size_t size)
-{
-	(void) allocator;
+static void nany_free(nyallocator_t* allocator, void* ptr, size_t size) {
 	(void) size;
+	(void) allocator;
 	#if NANY_DEBUG_ALLOCATOR_FILL != 0
 	if (ptr)
 		memset(p, 0xEF, size);
@@ -52,10 +45,8 @@ static void nany_free(nyallocator_t* allocator, void* ptr, size_t size)
 }
 
 
-void nany_memalloc_set_default(nyallocator_t* allocator)
-{
-	if (allocator)
-	{
+void nany_memalloc_set_default(nyallocator_t* allocator) {
+	if (allocator) {
 		allocator->allocate   = &nany_allocate;
 		allocator->reallocate = &nany_reallocate;
 		allocator->deallocate = &nany_free;
@@ -69,32 +60,23 @@ void nany_memalloc_set_default(nyallocator_t* allocator)
 
 
 
-
-
-
-static void* nyallocator_withlimit_allocate(nyallocator_t* allocator, size_t size)
-{
+static void* nyallocator_withlimit_allocate(nyallocator_t* allocator, size_t size) {
 	void* p;
-
 	assert(0 != size);
 	assert(allocator != NULL);
 	// TODO not thread safe
-	if ((allocator->reserved_mem0 += size) < allocator->limit_mem_size)
-	{
+	if ((allocator->reserved_mem0 += size) < allocator->limit_mem_size) {
 		p = malloc(size);
-		if (p)
-		{
+		if (p) {
 			#if NANY_DEBUG_ALLOCATOR_FILL != 0
 			memset(ptr, 0xCD, size);
 			#endif
 			return p;
 		}
-
 		if (allocator->on_not_enough_memory)
 			allocator->on_not_enough_memory(allocator, nyfalse);
 	}
-	else
-	{
+	else {
 		if (allocator->on_not_enough_memory)
 			allocator->on_not_enough_memory(allocator, nytrue);
 	}
@@ -103,18 +85,14 @@ static void* nyallocator_withlimit_allocate(nyallocator_t* allocator, size_t siz
 }
 
 
-static void* nyallocator_withlimit_reallocate(nyallocator_t* allocator, void* ptr, size_t oldsize, size_t newsize)
-{
+static void* nyallocator_withlimit_reallocate(nyallocator_t* allocator, void* ptr, size_t oldsize, size_t newsize) {
 	void* p;
-
 	assert(allocator != NULL);
 	// in this implementation, the total allocated is based on the fact that
 	// it costs nothing to reallocate a chunk of memory smaller than the previous one
 	// A safer implementation would probably consider that the cost is always based on
 	// the old size + the new one
-
-	if (newsize > oldsize)
-	{
+	if (newsize > oldsize) {
 		// TODO not thread safe
 		if ((allocator->reserved_mem0 += (newsize - oldsize)) < allocator->limit_mem_size)
 		{
@@ -124,38 +102,31 @@ static void* nyallocator_withlimit_reallocate(nyallocator_t* allocator, void* pt
 
 			allocator->reserved_mem0 -= newsize - oldsize;
 		}
-		else
-		{
+		else {
 			if (allocator->on_not_enough_memory)
 				allocator->on_not_enough_memory(allocator, nytrue);
 			return NULL;
 		}
 	}
-	else
-	{
+	else {
 		p = realloc(ptr, newsize);
-		if (p)
-		{
+		if (p) {
 			allocator->reserved_mem0 -= oldsize - newsize;
 			return p;
 		}
 	}
-
 	if (allocator->on_not_enough_memory)
 		allocator->on_not_enough_memory(allocator, nyfalse);
 	return NULL;
 }
 
 
-static void nyallocator_withlimit_release(nyallocator_t* allocator, void* ptr, size_t size)
-{
+static void nyallocator_withlimit_release(nyallocator_t* allocator, void* ptr, size_t size) {
 	assert(allocator != NULL);
-	if (ptr)
-	{
+	if (ptr) {
 		#if NANY_DEBUG_ALLOCATOR_FILL != 0
 		memset(ptr, 0xEF, size);
 		#endif
-
 		free(ptr);
 		// TODO not thread safe
 		allocator->reserved_mem0 -= size;
@@ -163,10 +134,8 @@ static void nyallocator_withlimit_release(nyallocator_t* allocator, void* ptr, s
 }
 
 
-void nany_memalloc_set_with_limit(nyallocator_t* allocator, size_t limit)
-{
-	if (allocator)
-	{
+void nany_memalloc_set_with_limit(nyallocator_t* allocator, size_t limit) {
+	if (allocator) {
 		allocator->allocate   = &nyallocator_withlimit_allocate;
 		allocator->reallocate = &nyallocator_withlimit_reallocate;
 		allocator->deallocate = &nyallocator_withlimit_release;
@@ -178,8 +147,7 @@ void nany_memalloc_set_with_limit(nyallocator_t* allocator, size_t limit)
 }
 
 
-void nany_memalloc_copy(nyallocator_t* out, const nyallocator_t* const src)
-{
+void nany_memalloc_copy(nyallocator_t* out, const nyallocator_t* const src) {
 	if (out)
 		memcpy(out, src, sizeof(nyallocator_t));
 }

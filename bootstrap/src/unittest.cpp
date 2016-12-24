@@ -1,6 +1,7 @@
 #include <yuni/yuni.h>
 #include <yuni/core/getopt.h>
 #include <nany/nany.h>
+#include <nany/libinfo.h>
 #include <yuni/datetime/timestamp.h>
 #include <yuni/core/system/cpu.h>
 #include <yuni/core/system/console/console.h>
