@@ -14,10 +14,6 @@ namespace ny {
 //! Function definition
 struct Funcdef final
 	: public Yuni::IIntrusiveSmartPtr<Funcdef, false, Yuni::Policy::SingleThreaded> {
-	//! The class ancestor
-	using Ancestor = Yuni::IIntrusiveSmartPtr<Funcdef, false, Yuni::Policy::SingleThreaded>;
-	//! The most suitable smart ptr for the class
-	using Ptr = Ancestor::SmartPtrType<Funcdef>::Ptr;
 
 	//! \name Queries
 	//@{
