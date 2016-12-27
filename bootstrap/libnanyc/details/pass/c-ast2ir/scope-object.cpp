@@ -67,7 +67,7 @@ bool Scope::visitASTExprObject(AST::Node& node, uint32_t& localvar) {
 				auto& grandChild = expr->firstChild().firstChild();
 				bool isFunc = grandChild.rule == AST::rgFunction;
 				if (not isFunc) {
-					AST::Node::Ptr var = new AST::Node{AST::rgVar};
+					auto var = make_ref<AST::Node>(AST::rgVar);
 					var->append(AST::rgVarByValue);
 					var->children.push_back(identifier);
 					(var->append(AST::rgVarProperty)).children.push_back(expr);

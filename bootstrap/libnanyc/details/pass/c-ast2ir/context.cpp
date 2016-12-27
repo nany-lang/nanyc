@@ -36,7 +36,7 @@ Logs::Report Context::emitReportEntry(void* self, Logs::Level level) {
 
 
 void Context::retriveReportMetadata(void* self, Logs::Level, const AST::Node* node, String& filename,
-									uint32_t& line, uint32_t& offset) {
+		uint32_t& line, uint32_t& offset) {
 	auto& ctx = *(reinterpret_cast<Context*>(self));
 	filename = ctx.dbgSourceFilename;
 	if (node and node->offset > 0) {
@@ -84,10 +84,10 @@ void Context::prepareReuseForStrings() {
 	//     type-decl
 	//     |   identifier: string
 	auto& cache = reuse.string;
-	cache.createObject = new AST::Node{AST::rgNew};
-	AST::Node::Ptr typeDecl = new AST::Node{AST::rgTypeDecl};
+	cache.createObject = make_ref<AST::Node>(AST::rgNew);
+	auto typeDecl = make_ref<AST::Node>(AST::rgTypeDecl);
 	cache.createObject->children.push_back(typeDecl);
-	AST::Node::Ptr classname = new AST::Node{AST::rgIdentifier};
+	auto classname = make_ref<AST::Node>(AST::rgIdentifier);
 	typeDecl->children.push_back(classname);
 	classname->text = "string";
 }
@@ -102,7 +102,7 @@ void Context::prepareReuseForLiterals() {
 	//           expr
 	//               register: <lvid>
 	auto& cache = reuse.literal;
-	cache.node = new AST::Node{AST::rgNew};
+	cache.node = make_ref<AST::Node>(AST::rgNew);
 	auto& identifier = cache.node->append(AST::rgTypeDecl, AST::rgIdentifier);
 	cache.classname = &identifier;
 	auto& expr = cache.node->append(AST::rgCall, AST::rgCallParameter, AST::rgExpr);
@@ -122,7 +122,7 @@ void Context::prepareReuseForAsciis() {
 	//           expr
 	//               register: <lvid>
 	auto& cache = reuse.ascii;
-	cache.node = new AST::Node{AST::rgNew};
+	cache.node = make_ref<AST::Node>(AST::rgNew);
 	auto& typedecl = cache.node->append(AST::rgTypeDecl);
 	auto& identifier = typedecl.append(AST::rgIdentifier);
 	identifier.text = "std";
@@ -144,9 +144,9 @@ void Context::prepareReuseForClasses() {
 
 void Context::prepareReuseForVariableMembers() {
 	reuse.func.node = AST::createNodeFunc(reuse.func.funcname);
-	AST::Node::Ptr funcBody = new AST::Node{AST::rgFuncBody};
+	auto funcBody = make_ref<AST::Node>(AST::rgFuncBody);
 	(reuse.func.node)->children.push_back(funcBody);
-	AST::Node::Ptr expr = new AST::Node{AST::rgExpr};
+	auto expr = make_ref<AST::Node>(AST::rgExpr);
 	funcBody->children.push_back(expr);
 	// intrinsic (+2)
 	//     entity (+3)
@@ -159,30 +159,30 @@ void Context::prepareReuseForVariableMembers() {
 	//         call-parameter
 	//         |   expr
 	//         |       <expr B>
-	AST::Node::Ptr intrinsic = new AST::Node{AST::rgIntrinsic};
+	auto intrinsic = make_ref<AST::Node>(AST::rgIntrinsic);
 	expr->children.push_back(intrinsic);
 	intrinsic->children.push_back(AST::createNodeIdentifier("^fieldset"));
-	AST::Node::Ptr call = new AST::Node{AST::rgCall};
+	auto call = make_ref<AST::Node>(AST::rgCall);
 	intrinsic->children.push_back(call);
 	// param 2 - expr
 	{
-		reuse.func.callparam = new AST::Node{AST::rgCallParameter};
+		reuse.func.callparam = make_ref<AST::Node>(AST::rgCallParameter);
 		call->children.push_back(reuse.func.callparam);
 	}
 	// param text varname
 	{
-		AST::Node::Ptr callparam = new AST::Node{AST::rgCallParameter};
+		auto callparam = make_ref<AST::Node>(AST::rgCallParameter);
 		call->children.push_back(callparam);
-		AST::Node::Ptr pexpr = new AST::Node{AST::rgExpr};
+		auto pexpr = make_ref<AST::Node>(AST::rgExpr);
 		callparam->children.push_back(pexpr);
-		reuse.func.varname = new AST::Node{AST::rgStringLiteral};
+		reuse.func.varname = make_ref<AST::Node>(AST::rgStringLiteral);
 		pexpr->children.push_back(reuse.func.varname);
 	}
 }
 
 
 void Context::prepareReuseForClosures() {
-	reuse.closure.node = new AST::Node{AST::rgExpr};
+	reuse.closure.node = make_ref<AST::Node>(AST::rgExpr);
 	// expr
 	//   expr-value
 	//       new
@@ -252,7 +252,7 @@ void Context::prepareReuseForIn() {
 	//                                               expr-value
 	//                                                   identifier: <predicate>
 	//
-	reuse.inset.node = new AST::Node{AST::rgExpr};
+	reuse.inset.node = make_ref<AST::Node>(AST::rgExpr);
 	auto& exprValue = reuse.inset.node->append(AST::rgExprValue);
 	auto& exprGroup = exprValue.append(AST::rgExprGroup);
 	reuse.inset.container = &exprGroup;
@@ -276,7 +276,7 @@ void Context::prepareReuseForIn() {
 	reuse.inset.predicate = &ret;
 	// -- always 'true' predicate
 	// -- (when the predicate caluse `i in <set> | <predicate>` is missing)
-	reuse.inset.premadeAlwaysTrue = new AST::Node{AST::rgExpr};
+	reuse.inset.premadeAlwaysTrue = make_ref<AST::Node>(AST::rgExpr);
 	auto& trueNew = reuse.inset.premadeAlwaysTrue->append(AST::rgNew);
 	auto& trueType = trueNew.append(AST::rgTypeDecl, AST::rgIdentifier);
 	trueType.text = "bool";
@@ -343,7 +343,7 @@ void Context::prepareReuseForLoops() {
 	//                            |                                   identifier: next
 	//                            |                                       call
 	//                            else-then {optional}
-	reuse.loops.node = new AST::Node{AST::rgExpr};
+	reuse.loops.node = make_ref<AST::Node>(AST::rgExpr);
 	auto& scope = reuse.loops.node->append(AST::rgScope);
 	// capture the cursor
 	{
@@ -391,7 +391,7 @@ void Context::prepareReuseForLoops() {
 	auto& next = cursorEnd.append(AST::rgExprSubDot, AST::rgIdentifier);
 	next.text = "next";
 	next.append(AST::rgCall);
-	reuse.loops.elseClause = new AST::Node(AST::rgIfElse);
+	reuse.loops.elseClause = make_ref<AST::Node>(AST::rgIfElse);
 	reuse.loops.elseScope = &(reuse.loops.elseClause->append(AST::rgExpr, AST::rgExprValue, AST::rgScope));
 }
 
@@ -415,7 +415,7 @@ void Context::prepareReuseForPropertiesGET() {
 	//             |       return (+2)
 	//             |           expr
 	//             |               ...
-	AST::Node::Ptr root = new AST::Node(AST::rgFunction);
+	auto root = make_ref<AST::Node>(AST::rgFunction);
 	reuse.properties.get.node = root;
 	// function name
 	auto& symbolname = root->append
@@ -423,9 +423,9 @@ void Context::prepareReuseForPropertiesGET() {
 	reuse.properties.get.propname = &symbolname.append(AST::rgIdentifier);
 	// Return types
 	reuse.properties.get.type = &root->append(AST::rgFuncReturnType, AST::rgType);
-	reuse.properties.get.typeIsRefAny = new AST::Node{AST::rgTypeQualifier};
+	reuse.properties.get.typeIsRefAny = make_ref<AST::Node>(AST::rgTypeQualifier);
 	reuse.properties.get.typeIsRefAny->append(AST::rgRef);
-	reuse.properties.get.typeIsAny = new AST::Node{AST::rgTypeDecl};
+	reuse.properties.get.typeIsAny = make_ref<AST::Node>(AST::rgTypeDecl);
 	auto& any = reuse.properties.get.typeIsAny->append(AST::rgIdentifier);
 	any.text = "any";
 	// body
@@ -446,7 +446,7 @@ void Context::prepareReuseForPropertiesSET() {
 	//     |   |   identifier: value
 	//     func-body
 	//         scope
-	AST::Node::Ptr root = new AST::Node{AST::rgFunction};
+	auto root = make_ref<AST::Node>(AST::rgFunction);
 	reuse.properties.set.node = root;
 	auto& symbol = root->append(AST::rgFunctionKind, AST::rgFunctionKindFunction, AST::rgSymbolName);
 	auto& identifier = symbol.append(AST::rgIdentifier);
@@ -470,7 +470,7 @@ void Context::prepareReuseForUnittest() {
 	//     |           identifier: ^unittest^<name>
 	//     func-body
 	//         .. scope ..
-	AST::Node::Ptr root = new AST::Node{AST::rgFunction};
+	auto root = make_ref<AST::Node>(AST::rgFunction);
 	reuse.unittest.node = root;
 	auto& symbol = root->append(AST::rgFunctionKind, AST::rgFunctionKindFunction, AST::rgSymbolName);
 	auto& identifier = symbol.append(AST::rgIdentifier);
@@ -486,7 +486,7 @@ void Context::prepareReuseForAnonymObjects() {
 	// |           type-decl
 	// |               class
 	// |                   class-body
-	AST::Node::Ptr root = new AST::Node{AST::rgExprGroup};
+	auto root = make_ref<AST::Node>(AST::rgExprGroup);
 	reuse.object.node = root;
 	auto& typedecl = root->append(AST::rgExprValue, AST::rgNew, AST::rgTypeDecl);
 	reuse.object.classbody = &typedecl.append(AST::rgClass, AST::rgClassBody);
@@ -514,7 +514,7 @@ void Context::prepareReuseForShorthandArray() {
 	//                 |                       |   expr
 	//                 |                       |       expr-value
 	//                 |                       |           identifier: <value2>
-	AST::Node::Ptr newnode = new AST::Node{AST::rgNew};
+	auto newnode = make_ref<AST::Node>(AST::rgNew);
 	reuse.shorthandArray.node = newnode;
 	auto& typedecl = newnode->append(AST::rgTypeDecl);
 	auto& stdname = typedecl.append(AST::rgIdentifier);

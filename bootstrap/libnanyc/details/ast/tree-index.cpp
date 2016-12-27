@@ -21,7 +21,7 @@ void ASTHelper::nodeReparentAtTheEnd(AST::Node& node, AST::Node& oldParent, uint
 	assert(&node != &newParent and "should not be similar");
 	assert(index < oldParent.children.size());
 	// acquire node pointer
-	AST::Node::Ptr ptr = &node;
+	Ref<AST::Node> ptr = &node;
 	// remove first it from the old parent
 	oldParent.children.erase(index);
 	// add the child first, to keep a reference somewhere

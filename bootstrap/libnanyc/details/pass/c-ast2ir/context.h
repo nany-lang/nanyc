@@ -102,106 +102,106 @@ public:
 
 	struct {
 		struct {
-			AST::Node::Ptr node;
-			AST::Node* classname = nullptr;
-			AST::Node* lvidnode = nullptr;
+			yuni::Ref<AST::Node> node;
+			yuni::Ref<AST::Node> classname = nullptr;
+			yuni::Ref<AST::Node> lvidnode = nullptr;
 		}
 		literal;
 
 		struct {
-			AST::Node::Ptr createObject;
+			yuni::Ref<AST::Node> createObject;
 			YString text;
 		}
 		string;
 
 		struct {
-			AST::Node::Ptr node;
-			AST::Node* lvidnode = nullptr;
+			yuni::Ref<AST::Node> node;
+			yuni::Ref<AST::Node> lvidnode = nullptr;
 		}
 		ascii;
 
 		struct {
-			AST::Node::Ptr node;
-			AST::Node* funcname = nullptr;
-			AST::Node* varname = nullptr;
-			AST::Node* callparam = nullptr;
+			yuni::Ref<AST::Node> node;
+			yuni::Ref<AST::Node> funcname;
+			yuni::Ref<AST::Node> varname = nullptr;
+			yuni::Ref<AST::Node> callparam = nullptr;
 		}
 		func;
 
 		struct {
-			AST::Node::Ptr node;
-			AST::Node* funcname = nullptr;
+			yuni::Ref<AST::Node> node;
+			yuni::Ref<AST::Node> funcname;
 		}
 		operatorDefault;
 
 		struct {
-			AST::Node::Ptr node;
-			AST::Node* funcname = nullptr;
+			yuni::Ref<AST::Node> node;
+			yuni::Ref<AST::Node> funcname;
 		}
 		operatorClone;
 
 		struct {
-			AST::Node::Ptr node; // expr
-			AST::Node* func = nullptr;
-			AST::Node* classdef = nullptr;
-			AST::Node* funcbody = nullptr;
-			AST::Node* params = nullptr;
-			AST::Node* rettype = nullptr;
+			yuni::Ref<AST::Node> node; // expr
+			yuni::Ref<AST::Node> func = nullptr;
+			yuni::Ref<AST::Node> classdef = nullptr;
+			yuni::Ref<AST::Node> funcbody = nullptr;
+			yuni::Ref<AST::Node> params = nullptr;
+			yuni::Ref<AST::Node> rettype = nullptr;
 		}
 		closure;
 
 		struct {
-			AST::Node::Ptr node;
-			AST::Node* container = nullptr;
-			AST::Node* viewname = nullptr;
-			AST::Node* elementname = nullptr;
-			AST::Node* predicate = nullptr;
-			AST::Node* call = nullptr;
-			AST::Node::Ptr premadeAlwaysTrue;
+			yuni::Ref<AST::Node> node;
+			yuni::Ref<AST::Node> container = nullptr;
+			yuni::Ref<AST::Node> viewname = nullptr;
+			yuni::Ref<AST::Node> elementname = nullptr;
+			yuni::Ref<AST::Node> predicate = nullptr;
+			yuni::Ref<AST::Node> call = nullptr;
+			yuni::Ref<AST::Node> premadeAlwaysTrue;
 		}
 		inset;
 
 		struct {
-			AST::Node::Ptr node;
-			AST::Node* viewlvid = nullptr;
-			std::array<AST::Node*, 4> cursorname;
-			AST::Node* elementname = nullptr;
-			AST::Node* scope;
+			yuni::Ref<AST::Node> node;
+			yuni::Ref<AST::Node> viewlvid = nullptr;
+			std::array<yuni::Ref<AST::Node>, 4> cursorname;
+			yuni::Ref<AST::Node> elementname = nullptr;
+			yuni::Ref<AST::Node> scope;
 
-			AST::Node* ifnode = nullptr;
-			AST::Node::Ptr elseClause;
-			AST::Node* elseScope = nullptr;
+			yuni::Ref<AST::Node> ifnode = nullptr;
+			yuni::Ref<AST::Node> elseClause;
+			yuni::Ref<AST::Node> elseScope = nullptr;
 		}
 		loops;
 
 		struct {
 			struct {
-				AST::Node::Ptr node;
-				AST::Node* propname = nullptr;
-				AST::Node* returnValue = nullptr;
+				yuni::Ref<AST::Node> node;
+				yuni::Ref<AST::Node> propname = nullptr;
+				yuni::Ref<AST::Node> returnValue = nullptr;
 
 				//! node type
-				AST::Node* type = nullptr;
+				yuni::Ref<AST::Node> type = nullptr;
 				//! node to use as a child when any
-				AST::Node::Ptr typeIsAny;
+				yuni::Ref<AST::Node> typeIsAny;
 				//! node to use as a child when ref
-				AST::Node::Ptr typeIsRefAny;
+				yuni::Ref<AST::Node> typeIsRefAny;
 			}
 			get;
 
 			struct {
-				AST::Node::Ptr node;
-				AST::Node* propname = nullptr;
-				AST::Node* body = nullptr;
+				yuni::Ref<AST::Node> node;
+				yuni::Ref<AST::Node> propname = nullptr;
+				yuni::Ref<AST::Node> body = nullptr;
 			}
 			set;
 		}
 		properties;
 
 		struct {
-			AST::Node::Ptr node;
-			AST::Node* funcname = nullptr;
-			AST::Node* funcbody = nullptr;
+			yuni::Ref<AST::Node> node;
+			yuni::Ref<AST::Node> funcname = nullptr;
+			yuni::Ref<AST::Node> funcbody = nullptr;
 		}
 		unittest;
 
@@ -214,14 +214,14 @@ public:
 		attributes;
 
 		struct {
-			AST::Node::Ptr node;
-			AST::Node* classbody = nullptr;
+			yuni::Ref<AST::Node> node;
+			yuni::Ref<AST::Node> classbody = nullptr;
 		}
 		object;
 
 		struct {
-			AST::Node::Ptr node;
-			AST::Node* typeofcall = nullptr;
+			yuni::Ref<AST::Node> node;
+			yuni::Ref<AST::Node> typeofcall = nullptr;
 		}
 		shorthandArray;
 	}

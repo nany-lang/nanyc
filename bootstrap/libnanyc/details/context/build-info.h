@@ -31,7 +31,7 @@ public:
 		//! AST manipulation
 		ASTHelper ast;
 		//! Root node
-		AST::Node::Ptr rootnode;
+		yuni::Ref<AST::Node> rootnode;
 
 		//! The original sequence, generated from the normalized AST
 		ir::Sequence sequence;

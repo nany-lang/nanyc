@@ -7,8 +7,8 @@ namespace ny {
 namespace AST {
 
 
-Node* createNodeFunc(Node*& funcname) {
-	Node* func = new Node{rgFunction};
+Ref<Node> createNodeFunc(Ref<Node>& funcname) {
+	auto func = make_ref<Node>(rgFunction);
 	// no visibility, using the default one
 	// // visibility: public
 	// // funcGetNode.children.push_back(new Node{rgVisibility, "public"});
@@ -16,13 +16,13 @@ Node* createNodeFunc(Node*& funcname) {
 	// |   function-kind-function (+2)
 	// |       symbol-name
 	// |           identifier: main
-	Node::Ptr funcKind = new Node{rgFunctionKind};
+	auto funcKind = make_ref<Node>(rgFunctionKind);
 	func->children.push_back(funcKind);
 	{
-		Node::Ptr funcKindFunc = new Node{rgFunctionKindFunction};
+		auto funcKindFunc = make_ref<Node>(rgFunctionKindFunction);
 		funcKind->children.push_back(funcKindFunc);
 		{
-			Node::Ptr symname = new Node{rgSymbolName};
+			auto symname = make_ref<Node>(rgSymbolName);
 			funcKindFunc->children.push_back(symname);
 			funcname = createNodeIdentifier(nullptr);
 			symname->children.push_back(funcname);
@@ -32,15 +32,15 @@ Node* createNodeFunc(Node*& funcname) {
 }
 
 
-Node* createNodeFuncCrefParam(Node*& funcname, const AnyString& paramname) {
-	auto* func = createNodeFunc(funcname);
+Ref<Node> createNodeFuncCrefParam(Ref<Node>& funcname, const AnyString& paramname) {
+	auto func = createNodeFunc(funcname);
 	// func-params (+3)
 	// |   func-param (+2)
 	// |   |   cref
 	// |   |   identifier: rhs
-	Node::Ptr params = new Node{rgFuncParams};
+	auto params = make_ref<Node>(rgFuncParams);
 	func->children.push_back(params);
-	Node::Ptr firstParam = new Node{rgFuncParam};
+	auto firstParam = make_ref<Node>(rgFuncParam);
 	params->children.push_back(firstParam);
 	firstParam->children.push_back(new Node{rgCref});
 	firstParam->children.push_back(createNodeIdentifier(paramname));
