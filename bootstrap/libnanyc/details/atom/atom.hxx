@@ -30,11 +30,6 @@ inline bool Atom::canCaptureVariabes() const {
 }
 
 
-inline Atom* Atom::createDummy() {
-	return new Atom("", Type::classdef);
-}
-
-
 inline CLID Atom::clid() const {
 	return CLID::AtomMapID(atomid);
 }

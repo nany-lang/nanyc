@@ -37,10 +37,6 @@ namespace ny {
 struct Atom final
 	: public Yuni::IIntrusiveSmartPtr<Atom, false, Yuni::Policy::SingleThreaded>
 	, Yuni::NonCopyable<Atom> {
-	//! The class ancestor
-	using Ancestor = Yuni::IIntrusiveSmartPtr<Atom, false, Yuni::Policy::SingleThreaded>;
-	//! The most suitable smart ptr for the class
-	using Ptr = Ancestor::SmartPtrType<Atom>::Ptr;
 
 	enum class Type : yuint8 {
 		//! define a part of a namespace
@@ -150,14 +146,12 @@ struct Atom final
 	};
 
 public:
-	//! Create a dummy atom
-	static Atom* createDummy();
-
 	//! Get the atom keyword ('func', 'class', 'operator'...) of a given name
 	static void extractNames(AnyString& keyword, AnyString& varname, const AnyString& name);
 
 public:
-	//! Public destructor
+	explicit Atom(const AnyString& name, Type type);
+	explicit Atom(Atom& rootparent, const AnyString& name, Type type);
 	~Atom();
 
 	//! \name Queries
@@ -516,14 +510,8 @@ public:
 	std::unique_ptr<std::unordered_set<AnyString>> candidatesForCapture;
 
 private:
-	//! Default constructor
-	explicit Atom(const AnyString& name, Type type);
-	//! Default constructor, with a parent
-	explicit Atom(Atom& rootparent, const AnyString& name, Type type);
-
-private:
 	//! Atoms that belong to this atom (sub-classes, methods...)
-	std::multimap<AnyString, Ptr> m_children;
+	std::multimap<AnyString, yuni::Ref<Atom>> m_children;
 	//! Name of the current atom
 	AnyString m_name;
 	// nakama !

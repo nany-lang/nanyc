@@ -10,23 +10,20 @@ namespace ny {
 namespace {
 
 
-bool createDummyAtom(Atom::Ptr& out) {
-	out = Atom::createDummy();
-	out->builtinMapping = nyt_void;
-	return true;
+auto createDummyAtom() {
+	auto atom = yuni::make_ref<Atom>("", Atom::Type::classdef);
+	atom->builtinMapping = nyt_void;
+	return atom;
 }
 
 
-bool findCoreObject(Atom::Ptr& out, nytype_t kind, const AnyString& name, Atom& root) {
-	if (not config::importNSL)
-		return createDummyAtom(out);
+auto findCoreObject(nytype_t kind, const AnyString& name, Atom& root) {
 	Atom* atom = nullptr;
 	switch (root.findClassAtom(atom, name)) {
 		case 1: {
 			assert(atom != nullptr);
-			out = atom;
 			atom->builtinMapping = kind;
-			return true;
+			return Ref<Atom>{atom};
 		}
 		case 0: {
 			error() << "failed to find builtin 'class " << name << "' from nsl";
@@ -35,7 +32,7 @@ bool findCoreObject(Atom::Ptr& out, nytype_t kind, const AnyString& name, Atom& 
 		default:
 			error() << "multiple definition for 'class" << name << "'";
 	}
-	return false;
+	throw std::runtime_error("not found");
 }
 
 
@@ -46,12 +43,12 @@ AtomMap::AtomMap(StringRefs& stringrefs)
 	: root(AnyString(), Atom::Type::namespacedef) // global namespace
 	, stringrefs(stringrefs) {
 	// since `m_atomGrpID` will start from 1
-	m_byIndex.push_back(nullptr);
+	m_byIndex.emplace_back(nullptr);
 }
 
 
 Atom& AtomMap::createNewAtom(Atom::Type type, Atom& parent, const AnyString& name) {
-	Atom::Ptr newnode = new Atom(parent, stringrefs.refstr(name), type);
+	auto newnode = yuni::make_ref<Atom>(parent, stringrefs.refstr(name), type);
 	newnode->atomid = ++m_atomGrpID;
 	m_byIndex.emplace_back(newnode);
 	return *newnode;
@@ -76,23 +73,33 @@ AnyString AtomMap::symbolname(uint32_t atomid, uint32_t index) const {
 
 
 bool AtomMap::fetchAndIndexCoreObjects() {
-	bool success = (core.object[nyt_bool] != nullptr) // quick & arbitrary check
-		or
-		(findCoreObject(core.object[nyt_bool],   nyt_bool, "bool", root)
-		and findCoreObject(core.object[nyt_i8],  nyt_i8,   "i8",  root)
-		and findCoreObject(core.object[nyt_i16], nyt_i16,  "i16", root)
-		and findCoreObject(core.object[nyt_i32], nyt_i32,  "i32", root)
-		and findCoreObject(core.object[nyt_i64], nyt_i64,  "i64", root)
-		and findCoreObject(core.object[nyt_u8],  nyt_u8,   "u8",  root)
-		and findCoreObject(core.object[nyt_u16], nyt_u16,  "u16", root)
-		and findCoreObject(core.object[nyt_u32], nyt_u32,  "u32", root)
-		and findCoreObject(core.object[nyt_u64], nyt_u64,  "u64", root)
-		and findCoreObject(core.object[nyt_f32], nyt_f32,  "f32", root)
-		and findCoreObject(core.object[nyt_f64], nyt_f64,  "f64", root)
-		and findCoreObject(core.object[nyt_ptr], nyt_ptr,  "pointer", root));
-	if (unlikely(not success))
+	if (unlikely(!!core.object[nyt_bool]))
+		return true;
+	if (not config::importNSL) {
+		for (auto& object: core.object)
+			object = createDummyAtom();
+		return true;
+	}
+	try {
+		core.object[nyt_bool] = findCoreObject(nyt_bool, "bool", root);
+		core.object[nyt_i8]   = findCoreObject(nyt_i8,   "i8",  root);
+		core.object[nyt_i16]  = findCoreObject(nyt_i16,  "i16", root);
+		core.object[nyt_i32]  = findCoreObject(nyt_i32,  "i32", root);
+		core.object[nyt_i64]  = findCoreObject(nyt_i64,  "i64", root);
+		core.object[nyt_u8]   = findCoreObject(nyt_u8,   "u8",  root);
+		core.object[nyt_u16]  = findCoreObject(nyt_u16,  "u16", root);
+		core.object[nyt_u32]  = findCoreObject(nyt_u32,  "u32", root);
+		core.object[nyt_u64]  = findCoreObject(nyt_u64,  "u64", root);
+		core.object[nyt_f32]  = findCoreObject(nyt_f32,  "f32", root);
+		core.object[nyt_f64]  = findCoreObject(nyt_f64,  "f64", root);
+		core.object[nyt_ptr]  = findCoreObject(nyt_ptr,  "pointer", root);
+		return true;
+	}
+	catch (const std::exception&) {
+		// invalidate
 		core.object[nyt_bool] = nullptr;
-	return success;
+	}
+	return false;
 }
 
 

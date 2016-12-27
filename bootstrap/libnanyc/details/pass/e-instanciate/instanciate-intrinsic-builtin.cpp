@@ -509,7 +509,7 @@ bool intrinsicNOT(SequenceBuilder& seq, uint32_t lvid) {
 	// --- result of the operator
 	if (atomBuiltinCast != nullptr) {
 		// implicit convertion from builtin __bool to object bool
-		atomBuiltinCast = Atom::Ptr::WeakPointer(seq.cdeftable.atoms().core.object[nyt_bool]);
+		atomBuiltinCast = Ref<Atom>::WeakPointer(seq.cdeftable.atoms().core.object[nyt_bool]);
 		assert(atomBuiltinCast != nullptr);
 		assert(not atomBuiltinCast->hasGenericParameters());
 		Atom* remapAtom = seq.instanciateAtomClass(*atomBuiltinCast);
@@ -574,7 +574,7 @@ bool intrinsicAssert(SequenceBuilder& seq, uint32_t lvid) {
 	// --- result of the operator
 	if (atomBuiltinCast != nullptr) {
 		// implicit convertion from builtin __bool to object bool
-		atomBuiltinCast = Atom::Ptr::WeakPointer(seq.cdeftable.atoms().core.object[nyt_bool]);
+		atomBuiltinCast = Ref<Atom>::WeakPointer(seq.cdeftable.atoms().core.object[nyt_bool]);
 		assert(atomBuiltinCast != nullptr);
 		assert(not atomBuiltinCast->hasGenericParameters());
 		Atom* remapAtom = seq.instanciateAtomClass(*atomBuiltinCast);
@@ -656,7 +656,7 @@ inline bool emitBuiltinOperator(SequenceBuilder& seq, uint32_t lvid, const char*
 			return seq.complainIntrinsicParameter(name, 1, cdefrhs);
 		}
 		if (atomBuiltinCast != nullptr and builtinlhs != nyt_ptr)
-			atomBuiltinCast = Atom::Ptr::WeakPointer(seq.cdeftable.atoms().core.object[builtinlhs]);
+			atomBuiltinCast = Ref<Atom>::WeakPointer(seq.cdeftable.atoms().core.object[builtinlhs]);
 	}
 	switch (builtinlhs) {
 		case nyt_bool: {
@@ -694,7 +694,7 @@ inline bool emitBuiltinOperator(SequenceBuilder& seq, uint32_t lvid, const char*
 		and seq.shortcircuit.label == 0) { // the result is a real instance
 		// implicit convertion from builtin (__i32...) to object (i32...)
 		if (R != nyt_any) { // force the result type
-			atomBuiltinCast = Atom::Ptr::WeakPointer(seq.cdeftable.atoms().core.object[R]);
+			atomBuiltinCast = Ref<Atom>::WeakPointer(seq.cdeftable.atoms().core.object[R]);
 			assert(atomBuiltinCast != nullptr);
 			assert(not atomBuiltinCast->hasGenericParameters());
 		}
