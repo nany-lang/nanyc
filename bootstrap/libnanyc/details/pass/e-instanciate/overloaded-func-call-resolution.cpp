@@ -134,7 +134,7 @@ bool OverloadedFuncCallResolver::resolve(const std::vector<std::reference_wrappe
 				if (not suitable[r])
 					continue;
 				// reporting for the instanciation (may or may not be created by `instanciateAtom`)
-				Logs::Message::Ptr newReport;
+				std::shared_ptr<Logs::Message> newReport;
 				auto& solutionAtom = solutions[r].get();
 				// trying to instanciate the solution
 				Pass::Instanciate::InstanciateData info {

@@ -16,9 +16,9 @@ struct SequenceBuilder;
 
 
 struct InstanciateData final {
-	InstanciateData(Logs::Message::Ptr& report, Atom& atom, ClassdefTableView& cdeftable, Build& build,
-					decltype(FuncOverloadMatch::result.params)& params,
-					decltype(FuncOverloadMatch::result.params)& tmplparams)
+	InstanciateData(std::shared_ptr<Logs::Message>& report, Atom& atom, ClassdefTableView& cdeftable, Build& build,
+			decltype(FuncOverloadMatch::result.params)& params,
+			decltype(FuncOverloadMatch::result.params)& tmplparams)
 		: cdeftable(cdeftable)
 		, atom(atom)
 		, build(build)
@@ -27,7 +27,7 @@ struct InstanciateData final {
 		, report(report) {
 		returnType.mutateToAny();
 		if (!report)
-			report = new Logs::Message{Logs::Level::none};
+			report = std::make_shared<Logs::Message>(Logs::Level::none);
 	}
 
 	//! The original view to the classdef table
@@ -61,7 +61,7 @@ struct InstanciateData final {
 	SequenceBuilder* parent = nullptr;
 
 	//! Error reporting
-	Logs::Message::Ptr& report;
+	std::shared_ptr<Logs::Message>& report;
 
 	bool signatureOnly = false;
 

@@ -1,11 +1,12 @@
 #pragma once
 #include "libnanyc.h"
-#include <yuni/core/smartptr/intrusive.h>
 #include <yuni/core/string.h>
 #include <yuni/core/noncopyable.h>
+#include <yuni/thread/mutex.h>
 #include "levels.h"
 #include "nany/nany.h"
 #include <iosfwd>
+#include <memory>
 
 
 namespace ny { struct Atom; }
@@ -15,17 +16,7 @@ namespace ny {
 namespace Logs {
 
 
-struct Message final
-	: public Yuni::IIntrusiveSmartPtr<Message, false, Yuni::Policy::ObjectLevelLockable>
-	, Yuni::NonCopyable<Message> {
-	//! The class ancestor
-	using Ancestor = Yuni::IIntrusiveSmartPtr<Message, false, Yuni::Policy::ObjectLevelLockable>;
-	//! The most suitable smart ptr for the class
-	using Ptr = Ancestor::SmartPtrType<Message>::Ptr;
-	//! Threading policy
-	using ThreadingPolicy = Ancestor::ThreadingPolicy;
-
-public:
+struct Message final: Yuni::NonCopyable<Message> {
 	Message(Level level)
 		: level(level) {
 	}
@@ -33,7 +24,7 @@ public:
 	//! Create a new sub-entry
 	Message& createEntry(Level level);
 
-	void appendEntry(const Message::Ptr& message);
+	void appendEntry(const std::shared_ptr<Message>& message);
 
 	void print(nyconsole_t&, bool unify = false);
 
@@ -53,7 +44,7 @@ public:
 	YString message;
 
 	//! Sub-entries
-	std::vector<Message::Ptr> entries;
+	std::vector<std::shared_ptr<Message>> entries;
 
 	/*!
 	** \internal Default value means 'like previously'
@@ -86,6 +77,7 @@ public:
 
 	//! Flag to remember if some errors or warning have occured or not
 	bool hasErrors = false;
+	mutable yuni::Mutex m_mutex;
 
 }; // struct Message
 

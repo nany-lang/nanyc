@@ -156,7 +156,7 @@ bool emitFuncCall(SequenceBuilder& seq, const ir::isa::Operand<ir::isa::Op::call
 		tmplparams.swap(overloadMatch.result.tmplparams);
 	}
 	if (atom->builtinalias.empty()) { // normal func call
-		Logs::Message::Ptr subreport;
+		std::shared_ptr<Logs::Message> subreport;
 		InstanciateData info{subreport, *atom, cdeftable, seq.build, params, tmplparams};
 		if (not seq.doInstanciateAtomFunc(subreport, info, lvid)) // instanciate the called func
 			return false;
@@ -260,7 +260,7 @@ bool emitPropsetCall(SequenceBuilder& seq, const ir::isa::Operand<ir::isa::Op::c
 	// result of the func call
 	uint32_t lvid = operands.lvid;
 	// report for instanciation
-	Logs::Message::Ptr subreport;
+	std::shared_ptr<Logs::Message> subreport;
 	// all pushed parameters
 	decltype(FuncOverloadMatch::result.params) params;
 	// all pushed template parameters

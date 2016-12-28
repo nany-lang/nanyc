@@ -222,7 +222,7 @@ struct SequenceBuilder final {
 
 
 public:
-	bool doInstanciateAtomFunc(Logs::Message::Ptr& subreport, InstanciateData& info, uint32_t retlvid);
+	bool doInstanciateAtomFunc(std::shared_ptr<Logs::Message>& subreport, InstanciateData& info, uint32_t retlvid);
 	void pushNewFrame(Atom& atom);
 	void popFrame();
 
