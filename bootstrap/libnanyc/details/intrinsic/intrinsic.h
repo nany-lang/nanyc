@@ -20,8 +20,6 @@ class Intrinsic final
 public:
 	//! The class ancestor
 	using Ancestor = Yuni::IIntrusiveSmartPtr<Intrinsic, false, Yuni::Policy::SingleThreaded>;
-	//! The most suitable smart ptr for the class
-	using Ptr = Ancestor::SmartPtrType<Intrinsic>::Ptr;
 
 
 public:

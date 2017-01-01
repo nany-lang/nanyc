@@ -86,7 +86,7 @@ inline bool IntrinsicTable::add(const AnyString& name, T callback) {
 		return false;
 	using B = Yuni::Bind<T>;
 	static_assert(B::argumentCount < config::maxPushedParameters, "too many params");
-	Intrinsic::Ptr ptr = new Intrinsic(name, reinterpret_cast<void*>(callback));
+	auto ptr = yuni::make_ref<Intrinsic>(name, reinterpret_cast<void*>(callback));
 	pIntrinsics.emplace_back(ptr);
 	auto& intrinsic = *ptr;
 	pByNames.insert(std::make_pair(AnyString{intrinsic.name}, &intrinsic));
@@ -96,7 +96,7 @@ inline bool IntrinsicTable::add(const AnyString& name, T callback) {
 		intrinsic.rettype = CTypeToNanyType<typename B::ReturnType>::type;
 	// the first argument must be the thread context
 	static_assert(Yuni::Static::Type::Equal <
-				  typename B::template Argument<0>::Type, nyvm_t* >::Yes, "requires 'nytctx_t*'");
+		typename B::template Argument<0>::Type, nyvm_t* >::Yes, "requires 'nytctx_t*'");
 	if (B::argumentCount > 1) {
 		IntrinsicPushParameter<1, B::argumentCount, B>::push(intrinsic);
 		intrinsic.paramcount = static_cast<uint32_t>(B::argumentCount - 1);
@@ -120,7 +120,7 @@ inline uint32_t IntrinsicTable::size() const {
 }
 
 
-inline Intrinsic::Ptr IntrinsicTable::find(const AnyString& name) const {
+inline yuni::Ref<Intrinsic> IntrinsicTable::find(const AnyString& name) const {
 	auto it = pByNames.find(name);
 	return (it != pByNames.end()) ? it->second : nullptr;
 }
