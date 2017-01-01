@@ -42,7 +42,7 @@ void ClassdefTableView::print(Yuni::String& out, bool clearBefore) const {
 	out << "CLASSDEF TABLE\n";
 	std::map<uint32_t, std::map<uint32_t, Classdef*>> orderedlist;
 	for (auto& pair : table.m_classdefs)
-		orderedlist[pair.first.atomid()][pair.first.lvid()] = Classdef::Ptr::WeakPointer(pair.second);
+		orderedlist[pair.first.atomid()][pair.first.lvid()] = Ref<Classdef>::WeakPointer(pair.second);
 	bool firstAtom = true;
 	for (auto& pairAtomID : orderedlist) {
 		if (not firstAtom)
