@@ -12,13 +12,9 @@ namespace ny {
 class Project final
 	: public Yuni::IIntrusiveSmartPtr<Project, false, Yuni::Policy::SingleThreaded> {
 public:
-	explicit Project(const nyproject_cf_t& cf);
+	explicit Project(const nyproject_cf_t& cf, bool unittests);
 	Project(const Project&) = delete;
 	~Project();
-
-	//! Initialize the project (after the ref count has been incremented)
-	void init(bool unittests);
-
 
 	nyproject_t* self();
 	const nyproject_t* self() const;

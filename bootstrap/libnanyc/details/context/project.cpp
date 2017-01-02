@@ -8,8 +8,15 @@ using namespace Yuni;
 namespace ny {
 
 
-Project::Project(const nyproject_cf_t& cf)
+Project::Project(const nyproject_cf_t& cf, bool unittests)
 	: cf(cf) {
+	targets.anonym = doCreateTarget("{default}");
+	targets.nsl    = doCreateTarget("{nsl}");
+	if (config::importNSL) {
+		nsl::import::core(*this);
+		if (unittests)
+			nsl::import::unittests(*this);
+	}
 }
 
 
@@ -42,17 +49,6 @@ void Project::unregisterTargetFromProject(CTarget& target) {
 		cf.on_target_removed(self(), target.self(), name.c_str(), name.size());
 	// remove the target from the list of all targets
 	targets.all.erase(name);
-}
-
-
-void Project::init(bool unittests) {
-	targets.anonym = doCreateTarget("{default}");
-	targets.nsl    = doCreateTarget("{nsl}");
-	if (config::importNSL) {
-		nsl::import::core(*this);
-		if (unittests)
-			nsl::import::unittests(*this);
-	}
 }
 
 

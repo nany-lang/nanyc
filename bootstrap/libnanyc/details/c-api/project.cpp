@@ -13,19 +13,17 @@ extern "C" void nyproject_cf_init(nyproject_cf_t* cf) {
 
 
 extern "C" nyproject_t* nyproject_create(const nyproject_cf_t* cf) {
+	bool withUnittests = (cf->with_nsl_unittests != nyfalse);
 	std::unique_ptr<ny::Project> project;
 	try {
 		if (cf) {
-			project = std::make_unique<ny::Project>(*cf);
+			project = std::make_unique<ny::Project>(*cf, withUnittests);
 		}
 		else {
 			nyproject_cf_t ncf;
 			nyproject_cf_init(&ncf);
-			project = std::make_unique<ny::Project>(ncf);
+			project = std::make_unique<ny::Project>(ncf, withUnittests);
 		}
-		// initialize the project after incrementing the ref count
-		bool withUnittests = (cf->with_nsl_unittests != nyfalse);
-		project->init(withUnittests);
 		// making sure that user-events do not destroy the project by mistake
 		project->addRef();
 		return project.release()->self();
