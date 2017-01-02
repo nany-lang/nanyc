@@ -40,14 +40,10 @@ void Project::init(bool unittests) {
 		if (unittests)
 			nsl::import::unittests(*this);
 	}
-	if (cf.on_create)
-		cf.on_create(self());
 }
 
 
 void Project::destroy() {
-	if (cf.on_destroy)
-		cf.on_destroy(self());
 	this->~Project();
 	auto& allocator = cf.allocator;
 	allocator.deallocate(&allocator, this, sizeof(ny::Project));

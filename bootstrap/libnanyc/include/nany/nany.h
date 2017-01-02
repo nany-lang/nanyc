@@ -363,10 +363,6 @@ typedef struct nyproject_cf_t {
 	/*! Memory allocator */
 	nyallocator_t allocator;
 
-	/*! A project has been created */
-	void (*on_create)(nyproject_t*);
-	/*! A project has been destroyed */
-	void (*on_destroy)(nyproject_t*);
 	/*! A new target has been added */
 	void (*on_target_added)(nyproject_t*, nytarget_t*, const char* name, uint32_t len);
 	/*! A target has been removed */
@@ -449,11 +445,6 @@ typedef struct nybuild_cf_t {
 
 	/*! AN unittest has been found */
 	void (*on_unittest)(void* userdata, const char* mod, uint32_t mlen, const char* name, uint32_t nlen);
-
-	/*! A project has been created */
-	void (*on_create)(nybuild_t*, nyproject_t*);
-	/*! A project has been destroyed */
-	void (*on_destroy)(nybuild_t*, nyproject_t*);
 
 	/*! Query if a new build can be started */
 	nybool_t (*on_query)(const nyproject_t*);

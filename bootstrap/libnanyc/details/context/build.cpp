@@ -30,8 +30,6 @@ Build::AttachedSequenceRef::~AttachedSequenceRef() {
 
 
 void Build::destroy() {
-	if (cf.on_destroy)
-		cf.on_destroy(self(), project.self());
 	this->~Build();
 	auto& allocator = const_cast<nyallocator_t&>(cf.allocator);
 	allocator.deallocate(&allocator, this, sizeof(ny::Build));
@@ -72,8 +70,6 @@ void Build::init() {
 		nsl::import::console(intrinsics);
 		nsl::import::digest(intrinsics);
 	}
-	if (cf.on_create)
-		cf.on_create(self(), project.self());
 }
 
 
