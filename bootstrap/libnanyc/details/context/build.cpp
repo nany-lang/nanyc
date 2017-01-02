@@ -29,13 +29,6 @@ Build::AttachedSequenceRef::~AttachedSequenceRef() {
 }
 
 
-void Build::destroy() {
-	this->~Build();
-	auto& allocator = const_cast<nyallocator_t&>(cf.allocator);
-	allocator.deallocate(&allocator, this, sizeof(ny::Build));
-}
-
-
 void Build::init() {
 	if (not m_targets.empty()) { // big cleanup
 		m_targets.clear();

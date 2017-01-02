@@ -37,13 +37,11 @@ public:
 
 
 public:
-	//! Ctor with an user-defined settings
 	explicit Build(Project& project, const nybuild_cf_t& cf, bool async);
+	~Build();
 
 	//! Initialize the project (after the ref count has been incremented)
 	void init();
-	//! Call the destructor and release this
-	void destroy();
 
 	/*!
 	** \brief Compile the project
@@ -128,9 +126,6 @@ public:
 	main;
 
 private:
-	//! Destructor, deallocate() must be called
-	~Build();
-
 	std::vector<std::reference_wrapper<Source>> m_sources;
 	std::vector<yuni::Ref<CTarget>> m_targets;
 	std::vector<AttachedSequenceRef> m_attachedSequences;
