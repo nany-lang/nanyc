@@ -19,7 +19,7 @@ inline Build::~Build() {
 	m_sources.clear();
 	m_targets.clear();
 	if (project.release())
-		project.destroy();
+		delete &project;
 }
 
 

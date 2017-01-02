@@ -43,11 +43,4 @@ void Project::init(bool unittests) {
 }
 
 
-void Project::destroy() {
-	this->~Project();
-	auto& allocator = cf.allocator;
-	allocator.deallocate(&allocator, this, sizeof(ny::Project));
-}
-
-
 } // namespace ny

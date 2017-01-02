@@ -12,15 +12,12 @@ namespace ny {
 class Project final
 	: public Yuni::IIntrusiveSmartPtr<Project, false, Yuni::Policy::SingleThreaded> {
 public:
-	//! Ctor with an user-defined settings
 	explicit Project(const nyproject_cf_t& cf);
-	//! Copy ctor
 	Project(const Project&) = delete;
+	~Project();
 
 	//! Initialize the project (after the ref count has been incremented)
 	void init(bool unittests);
-	//! Call the destructor and release this
-	void destroy();
 
 
 	nyproject_t* self();
@@ -54,8 +51,6 @@ public:
 
 
 private:
-	//! Destructor, private, destroy() must be used instead
-	~Project();
 
 	yuni::Ref<CTarget> doCreateTarget(const AnyString& name);
 	void unregisterTargetFromProject(CTarget& target);

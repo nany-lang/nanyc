@@ -13,29 +13,25 @@ extern "C" void nyproject_cf_init(nyproject_cf_t* cf) {
 
 
 extern "C" nyproject_t* nyproject_create(const nyproject_cf_t* cf) {
-	ny::Project* project;
-	if (cf) {
-		auto& allocator = const_cast<nyallocator_t&>(cf->allocator);
-		void* inplace = allocator.allocate(&allocator, sizeof(ny::Project));
-		if (unlikely(!inplace))
-			return nullptr;
-		project = new (inplace) ny::Project(*cf);
+	std::unique_ptr<ny::Project> project;
+	try {
+		if (cf) {
+			project = std::make_unique<ny::Project>(*cf);
+		}
+		else {
+			nyproject_cf_t ncf;
+			nyproject_cf_init(&ncf);
+			project = std::make_unique<ny::Project>(ncf);
+		}
+		// initialize the project after incrementing the ref count
+		bool withUnittests = (cf->with_nsl_unittests != nyfalse);
+		project->init(withUnittests);
+		// making sure that user-events do not destroy the project by mistake
+		project->addRef();
+		return project.release()->self();
 	}
-	else {
-		nyproject_cf_t ncf;
-		nyproject_cf_init(&ncf);
-		auto& allocator = const_cast<nyallocator_t&>(ncf.allocator);
-		void* inplace = allocator.allocate(&allocator, sizeof(ny::Project));
-		if (unlikely(!inplace))
-			return nullptr;
-		project = new (inplace) ny::Project(ncf);
-	}
-	// making sure that user-events do not destroy the project by mistake
-	project->addRef();
-	// initialize the project after incrementing the ref count
-	bool withUnittests = (cf->with_nsl_unittests != nyfalse);
-	project->init(withUnittests);
-	return project->self();
+	catch (...) {}
+	return nullptr;
 }
 
 
@@ -49,7 +45,7 @@ extern "C" void nyproject_unref(nyproject_t* ptr) {
 	if (ptr) {
 		auto& project = ny::ref(ptr);
 		if (project.release())
-			project.destroy();
+			delete &project;
 	}
 }
 
