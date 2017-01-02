@@ -23,13 +23,6 @@ void flushAll(nyconsole_t& console) {
 } // anonymous namespace
 
 
-void Program::destroy() {
-	this->~Program();
-	auto& allocator = const_cast<nyallocator_t&>(cf.allocator);
-	allocator.deallocate(&allocator, this, sizeof(ny::vm::Program));
-}
-
-
 int Program::execute(uint32_t argc, const char** argv) {
 	if (unlikely(cf.entrypoint.size == 0))
 		return 0;
