@@ -29,6 +29,24 @@ Build::AttachedSequenceRef::~AttachedSequenceRef() {
 }
 
 
+Build::Build(Project& project, const nybuild_cf_t& cf, bool async)
+	: cf(cf)
+	, project(project)
+	, isAsync(async) {
+	project.addRef();
+}
+
+
+Build::~Build() {
+	// clear internal containers before releasing the project itself
+	m_attachedSequences.clear();
+	m_sources.clear();
+	m_targets.clear();
+	if (project.release())
+		delete &project;
+}
+
+
 void Build::init() {
 	if (not m_targets.empty()) { // big cleanup
 		m_targets.clear();

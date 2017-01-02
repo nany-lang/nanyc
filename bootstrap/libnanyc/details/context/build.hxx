@@ -5,24 +5,6 @@
 namespace ny {
 
 
-inline Build::Build(Project& project, const nybuild_cf_t& cf, bool async)
-	: cf(cf)
-	, project(project)
-	, isAsync(async) {
-	project.addRef();
-}
-
-
-inline Build::~Build() {
-	// clear internal containers before releasing the project itself
-	m_attachedSequences.clear();
-	m_sources.clear();
-	m_targets.clear();
-	if (project.release())
-		delete &project;
-}
-
-
 inline nybuild_t* Build::self() {
 	return reinterpret_cast<nybuild_t*>(this);
 }
