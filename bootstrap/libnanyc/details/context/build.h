@@ -40,9 +40,6 @@ public:
 	explicit Build(Project& project, const nybuild_cf_t& cf, bool async);
 	~Build();
 
-	//! Initialize the project (after the ref count has been incremented)
-	void init();
-
 	/*!
 	** \brief Compile the project
 	*/

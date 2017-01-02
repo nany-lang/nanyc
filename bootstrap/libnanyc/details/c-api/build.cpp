@@ -73,8 +73,6 @@ extern "C" nybuild_t* nybuild_prepare(nyproject_t* ptr, const nybuild_cf_t* cf) 
 				nybuild_cf_init(&ncf, ptr);
 				build = std::make_unique<ny::Build>(project, ncf, async);
 			}
-			// initialize the project after incrementing the ref count
-			build->init();
 			// making sure that user-events do not destroy the project by mistake
 			build->addRef();
 			return build.release()->self();
