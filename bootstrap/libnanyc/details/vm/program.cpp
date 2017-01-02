@@ -23,6 +23,21 @@ void flushAll(nyconsole_t& console) {
 } // anonymous namespace
 
 
+Program::Program(const nyprogram_cf_t& cf, nybuild_t* build)
+	: cf(cf)
+	, build(build)
+	, map(ref(build).cdeftable.atoms) {
+	ref(build).addRef(); // nany_build_ref()
+}
+
+
+Program::~Program() {
+	auto& b = ref(build); // nany_build_unref(&build);
+	if (b.release())
+		delete &b;
+}
+
+
 int Program::execute(uint32_t argc, const char** argv) {
 	if (unlikely(cf.entrypoint.size == 0))
 		return 0;

@@ -30,21 +30,6 @@ inline const nyprogram_t* Program::self() const {
 }
 
 
-inline Program::Program(const nyprogram_cf_t& cf, nybuild_t* build)
-	: cf(cf)
-	, build(build)
-	, map(ref(build).cdeftable.atoms) {
-	ref(build).addRef(); // nany_build_ref()
-}
-
-
-inline Program::~Program() {
-	auto& b = ref(build); // nany_build_unref(&build);
-	if (b.release())
-		delete &b;
-}
-
-
 inline void Program::printStderr(const AnyString& msg) {
 	cf.console.write_stderr(cf.console.internal, msg.c_str(), msg.size());
 }
