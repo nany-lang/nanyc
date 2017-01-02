@@ -44,9 +44,9 @@ struct AtomMap final {
 	AnyString symbolname(uint32_t atomid, uint32_t index) const;
 
 	//! Retrive an Atom object from its unique id (const)
-	Atom::Ptr findAtom(uint32_t atomid) const;
+	yuni::Ref<Atom> findAtom(uint32_t atomid) const;
 	//! Retrive an Atom object from its unique id
-	Atom::Ptr findAtom(uint32_t atomid);
+	yuni::Ref<Atom> findAtom(uint32_t atomid);
 
 	//! Try to retrieve the corresponding classes for core objects (bool, i32...)
 	bool fetchAndIndexCoreObjects();
@@ -59,7 +59,7 @@ public:
 	StringRefs& stringrefs;
 
 	struct {
-		Atom::Ptr object[nyt_count];
+		yuni::Ref<Atom> object[nyt_count];
 	}
 	core;
 
@@ -70,7 +70,7 @@ private:
 	Atom& createNewAtom(Atom::Type type, Atom& root, const AnyString& name);
 
 private:
-	std::vector<Atom::Ptr> m_byIndex;
+	std::vector<yuni::Ref<Atom>> m_byIndex;
 	uint32_t m_atomGrpID = 0;
 	friend struct ClassdefTable;
 

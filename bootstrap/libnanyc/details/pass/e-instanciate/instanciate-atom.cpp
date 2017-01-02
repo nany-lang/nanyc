@@ -224,7 +224,7 @@ bool resolveTypesBeforeBodyStart(Build& build, Atom& atom, InstanciateData* orig
 		using ParamList = decltype(Pass::Instanciate::FuncOverloadMatch::result.params);
 		ParamList params; // input parameters (won't be used)
 		ParamList tmplparams;
-		Logs::Message::Ptr newReport;
+		std::shared_ptr<Logs::Message> newReport;
 		ny::Logs::Report report{*build.messages.get()};
 		Pass::Instanciate::InstanciateData info {
 			newReport, atom, cdeftblView, build, params, tmplparams
@@ -410,7 +410,7 @@ Atom* SequenceBuilder::instanciateAtomClass(Atom& atom) {
 	decltype(FuncOverloadMatch::result.params) tmplparams;
 	params.swap(overloadMatch.result.params);
 	tmplparams.swap(overloadMatch.result.tmplparams);
-	Logs::Message::Ptr newReport;
+	std::shared_ptr<Logs::Message> newReport;
 	Pass::Instanciate::InstanciateData info{newReport, atom, cdeftable, build, params, tmplparams};
 	info.parentAtom = &(frame->atom);
 	info.shouldMergeLayer = true;
@@ -459,7 +459,7 @@ bool SequenceBuilder::instanciateAtomFunc(uint32_t& instanceid, Atom& funcAtom, 
 	params.swap(overloadMatch.result.params);
 	tmplparams.swap(overloadMatch.result.tmplparams);
 	// instanciate the called func
-	Logs::Message::Ptr subreport;
+	std::shared_ptr<Logs::Message> subreport;
 	InstanciateData info{subreport, funcAtom, cdeftable, build, params, tmplparams};
 	bool instok = doInstanciateAtomFunc(subreport, info, retlvid);
 	instanceid = info.instanceid;
@@ -469,7 +469,7 @@ bool SequenceBuilder::instanciateAtomFunc(uint32_t& instanceid, Atom& funcAtom, 
 }
 
 
-bool SequenceBuilder::doInstanciateAtomFunc(Logs::Message::Ptr& subreport, InstanciateData& info,
+bool SequenceBuilder::doInstanciateAtomFunc(std::shared_ptr<Logs::Message>& subreport, InstanciateData& info,
 		uint32_t retlvid) {
 	// even within a typeof, any new instanciation must see their code generated
 	// (and its errors generated)

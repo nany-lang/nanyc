@@ -17,11 +17,11 @@ namespace {
 
 
 void printMessageRecursive(nyconsole_t& out, const Message& message, bool unify, String& xx,
-						   uint32_t indent = 0) {
-	Message::ThreadingPolicy::MutexLocker locker{message};
+		uint32_t indent = 0) {
+	MutexLocker locker{message.m_mutex};
 	// which output ?
 	nyconsole_output_t omode = (unify or (message.level != Level::error and message.level != Level::warning))
-							   ? nycout : nycerr;
+		? nycout : nycerr;
 	// function writer
 	auto wrfn = (omode == nycout) ? out.write_stdout : out.write_stderr;
 	// print method
@@ -177,18 +177,18 @@ void printMessageRecursive(nyconsole_t& out, const Message& message, bool unify,
 
 
 Message& Message::createEntry(Level level) {
-	Message* entry = new Message{level};
-	ThreadingPolicy::MutexLocker locker{*this};
+	auto entry = std::make_shared<Message>(level);
+	MutexLocker locker{m_mutex};
 	entry->origins = origins;
 	entries.push_back(entry);
 	return *entry;
 }
 
 
-void Message::appendEntry(const Message::Ptr& entry) {
+void Message::appendEntry(const std::shared_ptr<Message>& entry) {
 	if (!!entry) {
 		if (not (entry->entries.empty() and entry->level == Level::none)) {
-			ThreadingPolicy::MutexLocker locker{*this};
+			MutexLocker locker{m_mutex};
 			entries.push_back(entry);
 			hasErrors &= entry->hasErrors;
 		}

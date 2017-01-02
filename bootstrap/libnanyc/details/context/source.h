@@ -23,8 +23,6 @@ class Source final
 public:
 	//! The class ancestor
 	using Ancestor = Yuni::IIntrusiveSmartPtr<Source, false, Yuni::Policy::SingleThreaded>;
-	//! The most suitable smart ptr for the class
-	using Ptr = Ancestor::SmartPtrType<Source>::Ptr;
 	//! Threading policy
 	using ThreadingPolicy = Ancestor::ThreadingPolicy;
 

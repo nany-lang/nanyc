@@ -61,39 +61,23 @@ extern "C" nybuild_t* nybuild_prepare(nyproject_t* ptr, const nybuild_cf_t* cf) 
 	if (ptr) {
 		constexpr bool async = false;
 		auto& project = ny::ref(ptr);
-		ny::Build* build;
+		std::unique_ptr<ny::Build> build;
 		try {
 			if (cf) {
 				if (cf->on_query and (nyfalse == cf->on_query(ptr)))
 					return nullptr;
-				auto& allocator = const_cast<nyallocator_t&>(cf->allocator);
-				void* inplace = allocator.allocate(&allocator, sizeof(ny::Build));
-				if (!inplace)
-					return nullptr;
-				build = new (inplace) ny::Build(project, *cf, async);
+				build = std::make_unique<ny::Build>(&project, *cf, async);
 			}
 			else {
 				nybuild_cf_t ncf;
 				nybuild_cf_init(&ncf, ptr);
-				auto& allocator = const_cast<nyallocator_t&>(ncf.allocator);
-				void* inplace = allocator.allocate(&allocator, sizeof(ny::Build));
-				if (!inplace)
-					return nullptr;
-				build = new (inplace) ny::Build(project, ncf, async);
+				build = std::make_unique<ny::Build>(&project, ncf, async);
 			}
-		}
-		catch (...) {
-			return nullptr;
-		}
-		try {
 			// making sure that user-events do not destroy the project by mistake
 			build->addRef();
-			// initialize the project after incrementing the ref count
-			build->init();
-			return build->self();
+			return build.release()->self();
 		}
 		catch (...) {
-			build->destroy();
 		}
 	}
 	return nullptr;
@@ -116,7 +100,7 @@ extern "C" void nybuild_unref(nybuild_t* ptr) {
 		try {
 			auto& build = ny::ref(ptr);
 			if (build.release())
-				build.destroy();
+				delete &build;
 		}
 		catch (...) {}
 	}

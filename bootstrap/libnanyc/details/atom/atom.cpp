@@ -619,7 +619,7 @@ Atom* Atom::findNamespaceAtom(const AnyString& name) {
 
 
 void Atom::renameChild(const AnyString& from, const AnyString& to) {
-	Ptr child;
+	Ref<Atom> child;
 	auto range = m_children.equal_range(from);
 	for (auto it = range.first; it != range.second; ) {
 		if (unlikely(!!child)) // error

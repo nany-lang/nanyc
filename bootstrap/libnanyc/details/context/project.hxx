@@ -5,19 +5,6 @@
 namespace ny {
 
 
-inline Project::Project(const nyproject_cf_t& cf)
-	: cf(cf) {
-}
-
-
-inline Project::~Project() {
-	// this container must be destroyed first
-	targets.all.clear();
-	targets.anonym = nullptr;
-	targets.nsl = nullptr;
-}
-
-
 inline nyproject_t* Project::self() {
 	return reinterpret_cast<nyproject_t*>(this);
 }
@@ -26,7 +13,6 @@ inline nyproject_t* Project::self() {
 inline const nyproject_t* Project::self() const {
 	return reinterpret_cast<const nyproject_t*>(this);
 }
-
 
 
 inline Project& ref(nyproject_t* const ptr) {

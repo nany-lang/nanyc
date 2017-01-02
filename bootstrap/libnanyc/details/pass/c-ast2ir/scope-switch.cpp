@@ -26,20 +26,20 @@ bool Scope::visitASTExprSwitch(AST::Node& node) {
 	ir::emit::alloc(out, casecondlvid, nyt_bool);
 	// the current implementation generates a 'if' statement for each 'case'
 	// these variables are for simulating an AST node
-	AST::Node::Ptr exprCase = new AST::Node{AST::rgExpr};
-	AST::Node::Ptr cond = AST::createNodeIdentifier("^==");
+	auto exprCase = make_ref<AST::Node>(AST::rgExpr);
+	auto cond = AST::createNodeIdentifier("^==");
 	exprCase->children.push_back(cond);
-	AST::Node::Ptr call = new AST::Node{AST::rgCall};
+	auto call = make_ref<AST::Node>(AST::rgCall);
 	cond->children.push_back(call);
 	// lhs
-	AST::Node::Ptr lhs = new AST::Node{AST::rgCallParameter};
+	auto lhs = make_ref<AST::Node>(AST::rgCallParameter);
 	call->children.push_back(lhs);
 	ShortString16 lvidstr;
-	AST::Node::Ptr lhsExpr = new AST::Node{AST::rgExpr};
+	auto lhsExpr = make_ref<AST::Node>(AST::rgExpr);
 	lhs->children.push_back(lhsExpr);
-	AST::Node::Ptr lhsValue = new AST::Node{AST::rgRegister};
+	auto lhsValue = make_ref<AST::Node>(AST::rgRegister);
 	lhsExpr->children.push_back(lhsValue);
-	AST::Node::Ptr rhs = new AST::Node{AST::rgCallParameter};
+	auto rhs = make_ref<AST::Node>(AST::rgCallParameter);
 	call->children.push_back(rhs);
 	// using a scope for the body to have proper variable scoping
 	AST::Node bodyScope{AST::rgScope};

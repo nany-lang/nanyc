@@ -221,10 +221,8 @@ typedef struct nyproject_t nyproject_t;
 typedef struct nytarget_t nytarget_t;
 /*! Opaque structure to a source */
 typedef struct nysource_t nysource_t;
-
 /*! Build */
 typedef struct nybuild_t nybuild_t;
-
 /*! VM Program */
 typedef struct nyprogram_t nyprogram_t;
 /*! VM Thread Context */
@@ -234,26 +232,42 @@ typedef struct nythread_t nytctx_t;
 
 /*! \name Memory allocator */
 /*@{*/
+struct nyallocator_t;
+
+typedef struct nyallocator_cf_t {
+	void* userdata;
+	/*! Create a multi-threaded allocator */
+	nybool_t (*create_mt)(struct nyallocator_t*, const struct nyallocator_cf_t*);
+	/*! Create a single-threaded allocator */
+	nybool_t (*create_st)(struct nyallocator_t*, const struct nyallocator_cf_t*);
+	/*! event: not enough memory */
+	void (*on_not_enough_memory)(struct nyallocator_t*, nybool_t limit_reached);
+}
+nyallocator_cf_t;
+
 typedef struct nyallocator_t {
+	void* userdata;
 	/*! Allocates some memory */
 	void* (*allocate)(struct nyallocator_t*, size_t);
 	/*! Re-allocate */
 	void* (*reallocate)(struct nyallocator_t*, void* ptr, size_t oldsize, size_t newsize);
 	/*! free */
 	void (*deallocate)(struct nyallocator_t*, void* ptr, size_t);
-
 	/*! Special values that may not be used directly but are here for performance reasons */
 	volatile size_t reserved_mem0;
 	/*! Memory usage limit (in bytes) */
 	size_t limit_mem_size;
-
 	/*! event: not enough memory */
 	void (*on_not_enough_memory)(struct nyallocator_t*, nybool_t limit_reached);
+	/*! event: callback for aborting program execuion */
+	void (*on_internal_abort)(struct nyallocator_t*);
 	/*! Flush STDERR */
-	void (*release)(const struct nyallocator_t*);
+	void (*release)(struct nyallocator_t*);
 }
 nyallocator_t;
 
+
+NY_EXPORT void nyallocator_cf_init(nyallocator_cf_t*);
 
 /*! Set callbacks to the standard C memory allocator */
 NY_EXPORT void nany_memalloc_set_default(nyallocator_t*);
@@ -344,16 +358,10 @@ void nyconsole_cf_copy(nyconsole_t* out, const nyconsole_t* const src);
 typedef struct nyproject_cf_t {
 	/*! Memory allocator */
 	nyallocator_t allocator;
-
-	/*! A project has been created */
-	void (*on_create)(nyproject_t*);
-	/*! A project has been destroyed */
-	void (*on_destroy)(nyproject_t*);
 	/*! A new target has been added */
 	void (*on_target_added)(nyproject_t*, nytarget_t*, const char* name, uint32_t len);
 	/*! A target has been removed */
 	void (*on_target_removed)(nyproject_t*, nytarget_t*, const char* name, uint32_t len);
-
 	/*! Load unittsts from nsl */
 	nybool_t with_nsl_unittests;
 }
@@ -432,11 +440,6 @@ typedef struct nybuild_cf_t {
 	/*! AN unittest has been found */
 	void (*on_unittest)(void* userdata, const char* mod, uint32_t mlen, const char* name, uint32_t nlen);
 
-	/*! A project has been created */
-	void (*on_create)(nybuild_t*, nyproject_t*);
-	/*! A project has been destroyed */
-	void (*on_destroy)(nybuild_t*, nyproject_t*);
-
 	/*! Query if a new build can be started */
 	nybool_t (*on_query)(const nyproject_t*);
 	/*! A new build has been started */
@@ -473,7 +476,6 @@ NY_EXPORT nybool_t nybuild(nybuild_t*);
 ** \param print_header nytrue to add information about the compiler
 */
 NY_EXPORT void nybuild_print_report_to_console(nybuild_t* build, nybool_t print_header);
-
 
 /*!
 ** \brief Acquire a build
@@ -529,7 +531,6 @@ typedef enum nyio_automout_flag_t {
 	nyioaf_all   = (uint32_t) - 1,
 	/*! No automount */
 	nyioaf_none  = 0,
-
 	/*! Automount /root, to acces to the local filesystem */
 	nyioaf_root  = (1 << 0),
 	/*! Automount /tmp, temporary folder from the process point of view */
@@ -546,7 +547,7 @@ nyio_automout_flag_t;
 
 /*! Callback for iterating through the list of opened files */
 typedef nybool_t (*nyio_opened_files_it_t)(const char* vpath, uint32_t len, const char* localpath,
-		uint32_t lplen);
+	uint32_t lplen);
 
 
 /*! IO Adapter */
@@ -655,7 +656,7 @@ typedef struct nyio_cf_t {
 	nyio_err_t (*on_mount_query)(nyprogram_t*, nytctx_t*, const char* url, const char* path, uint32_t len);
 	/*! event: create an adapter from an url */
 	nyio_err_t (*on_adapter_create)(nyprogram_t*, nytctx_t*, nyio_adapter_t**, const char* url,
-									nyio_adapter_t* parent);
+		nyio_adapter_t* parent);
 
 	/*! Flag to automatically mount some standard paths */
 	/*! \see nyio_automout_flag_t */
@@ -667,7 +668,7 @@ nyio_cf_t;
 ** \brief Create an adapter to access to a local folder
 */
 NY_EXPORT void nyio_adapter_create_from_local_folder(nyio_adapter_t*, nyallocator_t*,
-		const char* localfolder, size_t len);
+	const char* localfolder, size_t len);
 /*@}*/
 
 
@@ -817,7 +818,7 @@ NY_EXPORT nybool_t nyprint_ast_from_memory(const char* content, int fd, nybool_t
 ** \param content Arbitrary utf-8 content (c-string)
 */
 NY_EXPORT  nybool_t nyprint_ast_from_memory_n(const char* content, size_t length, int fd,
-		nybool_t unixcolors);
+	nybool_t unixcolors);
 
 /*!
 ** \brief Check if a filename is a valid nany source code
@@ -896,7 +897,6 @@ typedef struct nyrun_cf_t {
 	nybuild_cf_t build;
 	/*! Default program settings */
 	nyprogram_cf_t program;
-
 	/*! A non-zero value for verbose mode */
 	nybool_t verbose;
 }
@@ -906,7 +906,7 @@ nyrun_cf_t;
 NY_EXPORT void nyrun_cf_init(nyrun_cf_t*);
 
 /*! Release resources held by a template object */
-NY_EXPORT void nyrun_cf_release(const nyrun_cf_t*);
+NY_EXPORT void nyrun_cf_release(nyrun_cf_t*);
 /*!
 ** \brief Compile & run a nany program
 **
@@ -929,7 +929,7 @@ NY_EXPORT int nyrun(const nyrun_cf_t* cf, const char* source, uint32_t argc, con
 ** \return Exit status code
 */
 NY_EXPORT int nyrun_n(const nyrun_cf_t* cf, const char* source, size_t length, uint32_t argc,
-					  const char** argv);
+	const char** argv);
 
 
 /*!
@@ -954,10 +954,10 @@ NY_EXPORT int nyrun_file(const nyrun_cf_t* cf, const char* file, uint32_t argc, 
 ** \return Exit status code
 */
 NY_EXPORT int nyrun_file_n(const nyrun_cf_t* cf, const char* file, size_t length, uint32_t argc,
-						   const char** argv);
+	const char** argv);
 
 NY_EXPORT int nyrun_filelist(const nyrun_cf_t* cf, const char** files, uint32_t file_count, uint32_t argc,
-							 const char** argv);
+	const char** argv);
 /*@}*/
 
 

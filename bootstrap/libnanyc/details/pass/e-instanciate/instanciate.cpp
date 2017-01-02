@@ -261,7 +261,7 @@ bool Build::instanciate(const AnyString& entrypoint, const nytype_t* args, uint3
 	}
 	decltype(Pass::Instanciate::FuncOverloadMatch::result.params) params;
 	decltype(Pass::Instanciate::FuncOverloadMatch::result.params) tmplparams;
-	Logs::Message::Ptr newReport;
+	std::shared_ptr<Logs::Message> newReport;
 	ClassdefTableView cdeftblView{cdeftable};
 	Pass::Instanciate::InstanciateData info {
 		newReport, *entrypointAtom, cdeftblView, *this, params, tmplparams

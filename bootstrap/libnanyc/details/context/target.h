@@ -29,8 +29,6 @@ class CTarget final
 public:
 	//! The class ancestor
 	using Ancestor = Yuni::IIntrusiveSmartPtr<CTarget, false, Yuni::Policy::SingleThreaded>;
-	//! The most suitable smart ptr for the class
-	using Ptr = Ancestor::SmartPtrType<CTarget>::Ptr;
 	//! Threading policy
 	using ThreadingPolicy = Ancestor::ThreadingPolicy;
 
@@ -74,7 +72,7 @@ private:
 	//! Name of the target
 	Yuni::ShortString64 m_name;
 	//! All sources attached to the target
-	std::vector<Source::Ptr> m_sources;
+	std::vector<yuni::Ref<Source>> m_sources;
 	//! All sources ordered by their filename
 	std::unordered_map<AnyString, std::reference_wrapper<Source>> m_sourcesByFilename;
 	//! All sources ordered by their name

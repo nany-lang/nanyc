@@ -31,8 +31,7 @@ public:
 
 public:
 	OverloadedFuncCallResolver(SequenceBuilder* parent, Logs::Report report, FuncOverloadMatch& overloadMatch,
-							   ClassdefTableView& cdeftable,
-							   Build& build)
+			ClassdefTableView& cdeftable, Build& build)
 		: overloadMatch(overloadMatch)
 		, report(report)
 		, cdeftable(cdeftable)
@@ -77,7 +76,7 @@ public:
 	std::vector<uint32_t> scores;
 
 	//! All subreports for suitable solutions
-	std::vector<Logs::Message::Ptr> subreports;
+	std::vector<std::shared_ptr<Logs::Message>> subreports;
 
 private:
 	FuncOverloadMatch& overloadMatch;

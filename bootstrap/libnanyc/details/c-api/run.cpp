@@ -248,7 +248,7 @@ extern "C" void nyrun_cf_init(nyrun_cf_t* cf) {
 }
 
 
-extern "C" void nyrun_cf_release(const nyrun_cf_t* cf) {
+extern "C" void nyrun_cf_release(nyrun_cf_t* cf) {
 	if (cf) {
 		if (cf->console.release)
 			cf->console.release(&(cf->console));

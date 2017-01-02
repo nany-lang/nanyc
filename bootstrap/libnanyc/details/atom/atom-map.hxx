@@ -48,12 +48,12 @@ inline const ir::Sequence* AtomMap::sequenceIfExists(uint32_t atomid, uint32_t i
 }
 
 
-inline Atom::Ptr AtomMap::findAtom(uint32_t atomid) const {
+inline yuni::Ref<Atom> AtomMap::findAtom(uint32_t atomid) const {
 	return atomid < m_byIndex.size() ? m_byIndex[atomid] : nullptr;
 }
 
 
-inline Atom::Ptr AtomMap::findAtom(uint32_t atomid) {
+inline yuni::Ref<Atom> AtomMap::findAtom(uint32_t atomid) {
 	return atomid < m_byIndex.size() ? m_byIndex[atomid] : nullptr;
 }
 

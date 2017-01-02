@@ -64,7 +64,7 @@ inline bool EmptyReport::hasErrors() const {
 }
 
 
-inline void Report::appendEntry(const Message::Ptr& entry) {
+inline void Report::appendEntry(const std::shared_ptr<Message>& entry) {
 	message.appendEntry(entry);
 }
 

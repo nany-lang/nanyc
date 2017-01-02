@@ -26,8 +26,7 @@ public:
 	** \brief Create a brand new program
 	*/
 	Program(const nyprogram_cf_t&, nybuild_t*);
-
-	void destroy();
+	~Program();
 
 	/*!
 	** \brief Execute the main entry point
@@ -58,8 +57,6 @@ public:
 
 
 private:
-	//! Destructor, should use destroy instead
-	~Program();
 
 }; // class Program
 

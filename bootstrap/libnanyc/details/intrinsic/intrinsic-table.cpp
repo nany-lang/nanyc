@@ -1,5 +1,7 @@
 #include "intrinsic-table.h"
 
+using namespace yuni;
+
 
 namespace ny {
 
@@ -14,7 +16,7 @@ bool IntrinsicTable::add(const AnyString& name, void* callback, nytype_t ret, va
 		return false;
 	if (YUNI_UNLIKELY(nullptr == callback))
 		return false;
-	Intrinsic::Ptr intrinsic = new Intrinsic(name, callback);
+	auto intrinsic = make_ref<Intrinsic>(name, callback);
 	intrinsic->rettype = ret;
 	intrinsic->id = (uint32_t) pIntrinsics.size();
 	uint32_t count = 0;

@@ -101,7 +101,7 @@ template<class T> T* userHandler() {
 typedef Report (*Callback)(void*, Logs::Level);
 //! Callback for metadata
 typedef void (*CallbackMetadata)(void*, Logs::Level, const AST::Node*, Yuni::String& filename, uint32_t& line,
-								 uint32_t& offset);
+	 uint32_t& offset);
 
 
 struct Handler final {

@@ -177,7 +177,7 @@ private:
 	};
 
 	//! All class definitions
-	std::unordered_map<CLID, Classdef::Ptr> m_classdefs;
+	std::unordered_map<CLID, yuni::Ref<Classdef>> m_classdefs;
 	//! The current layer
 	mutable LayerItem m_layer;
 

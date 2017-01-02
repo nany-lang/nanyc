@@ -23,10 +23,18 @@ void flushAll(nyconsole_t& console) {
 } // anonymous namespace
 
 
-void Program::destroy() {
-	this->~Program();
-	auto& allocator = const_cast<nyallocator_t&>(cf.allocator);
-	allocator.deallocate(&allocator, this, sizeof(ny::vm::Program));
+Program::Program(const nyprogram_cf_t& cf, nybuild_t* build)
+	: cf(cf)
+	, build(build)
+	, map(ref(build).cdeftable.atoms) {
+	ref(build).addRef(); // nany_build_ref()
+}
+
+
+Program::~Program() {
+	auto& b = ref(build); // nany_build_unref(&build);
+	if (b.release())
+		delete &b;
 }
 
 

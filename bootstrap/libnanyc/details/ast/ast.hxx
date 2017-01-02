@@ -6,8 +6,8 @@ namespace ny {
 namespace AST {
 
 
-inline Node* createNodeIdentifier(const AnyString& name) {
-	return new Node{rgIdentifier, name};
+inline yuni::Ref<Node> createNodeIdentifier(const AnyString& name) {
+	return yuni::make_ref<Node>(rgIdentifier, name);
 }
 
 

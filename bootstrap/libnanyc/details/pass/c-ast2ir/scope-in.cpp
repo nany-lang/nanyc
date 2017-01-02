@@ -80,7 +80,7 @@ bool Scope::visitASTExprIn(AST::Node& node, uint32_t& localvar, ShortString128& 
 		elementname << "%vr" << nextvar();
 	context.reuse.inset.elementname->text = elementname;
 	if (!predicate)
-		predicate = AST::Node::Ptr::WeakPointer(context.reuse.inset.premadeAlwaysTrue);
+		predicate = Ref<AST::Node>::WeakPointer(context.reuse.inset.premadeAlwaysTrue);
 	context.reuse.inset.predicate->children.clear();
 	context.reuse.inset.predicate->children.push_back(predicate);
 	if (additionalParams) {
@@ -92,7 +92,7 @@ bool Scope::visitASTExprIn(AST::Node& node, uint32_t& localvar, ShortString128& 
 	bool success = visitASTExpr(*context.reuse.inset.node, localvar);
 	if (additionalParams) { // remove the additional parameters
 		auto& vec = context.reuse.inset.call->children;
-		AST::Node::Ptr firstNode = &(vec.front());
+		Ref<AST::Node> firstNode = &(vec.front());
 		vec.clear();
 		vec.push_back(firstNode);
 	}

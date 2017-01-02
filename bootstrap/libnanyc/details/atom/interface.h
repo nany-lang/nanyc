@@ -36,9 +36,9 @@ private:
 
 private:
 	//! Interface restrictions
-	std::vector<Funcdef::Ptr> pInterface;
+	std::vector<yuni::Ref<Funcdef>> pInterface;
 	//! Self
-	Funcdef::Ptr pSelf;
+	yuni::Ref<Funcdef> pSelf;
 	friend struct ClassdefTable;
 
 }; // struct ClassdefInterface

@@ -58,7 +58,7 @@ bool Scope::visitASTFor(AST::Node& node) {
 	ShortString32 cursorname;
 	cursorname << "%cursor_" << lvidstr;
 	AnyString crname = cursorname;
-	for (auto*& mnode : context.reuse.loops.cursorname)
+	for (auto& mnode : context.reuse.loops.cursorname)
 		mnode->text = crname;
 	context.reuse.loops.elementname->text = elementname;
 	auto& scopeChildren = context.reuse.loops.scope->children;

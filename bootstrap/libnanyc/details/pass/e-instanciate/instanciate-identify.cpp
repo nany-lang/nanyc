@@ -120,7 +120,7 @@ bool emitIdentifyForSingleResult(SequenceBuilder& seq, bool isLocalVar, const Cl
 bool emitIdentifyForProperty(SequenceBuilder& seq, const ir::isa::Operand<ir::isa::Op::identify>& operands,
 		Atom& propatom, uint32_t self) {
 	// report for instanciation
-	Logs::Message::Ptr subreport;
+	std::shared_ptr<Logs::Message> subreport;
 	// all pushed parameters
 	decltype(FuncOverloadMatch::result.params) params;
 	// all pushed template parameters

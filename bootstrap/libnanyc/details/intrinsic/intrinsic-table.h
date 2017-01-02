@@ -35,7 +35,7 @@ public:
 	uint32_t size() const;
 
 	//! Find an intrinsic by its name
-	Intrinsic::Ptr find(const AnyString& name) const;
+	yuni::Ref<Intrinsic> find(const AnyString& name) const;
 
 	//! Get the intrinsic for a given intrinsic id
 	const Intrinsic& operator [] (uint32_t id) const;
@@ -43,9 +43,9 @@ public:
 
 private:
 	//! All intrinsics
-	std::vector<Intrinsic::Ptr> pIntrinsics;
+	std::vector<yuni::Ref<Intrinsic>> pIntrinsics;
 	//! All intrinsics, ordered by their name
-	std::unordered_map<AnyString, Intrinsic::Ptr> pByNames;
+	std::unordered_map<AnyString, yuni::Ref<Intrinsic>> pByNames;
 
 }; // class IntrinsicTable
 

@@ -9,13 +9,13 @@ namespace AST {
 
 
 //! Create a new node 'identifier' ()
-Node* createNodeIdentifier(const AnyString& name);
+yuni::Ref<Node> createNodeIdentifier(const AnyString& name);
 
 //! Create a new node 'function'
-Node* createNodeFunc(Node*& funcname);
+yuni::Ref<Node> createNodeFunc(yuni::Ref<Node>& funcname);
 
 //! Create a new node 'function' with 1 cref param
-Node* createNodeFuncCrefParam(Node*& funcname, const AnyString& paramname);
+yuni::Ref<Node> createNodeFuncCrefParam(yuni::Ref<Node>& funcname, const AnyString& paramname);
 
 
 //! Extract the complete identifier string (from an entity node)

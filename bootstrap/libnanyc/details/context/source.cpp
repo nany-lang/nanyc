@@ -52,7 +52,7 @@ void Source::resetTarget(CTarget* target) {
 void Source::complainEAccess(Build& build) const {
 	auto func = build.cf.on_error_file_eacces;
 	if (func)
-		func(build.project.self(), build.self(), m_filename.c_str(), m_filename.size());
+		func(build.project->self(), build.self(), m_filename.c_str(), m_filename.size());
 }
 
 

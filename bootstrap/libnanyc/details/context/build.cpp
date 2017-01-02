@@ -29,16 +29,10 @@ Build::AttachedSequenceRef::~AttachedSequenceRef() {
 }
 
 
-void Build::destroy() {
-	if (cf.on_destroy)
-		cf.on_destroy(self(), project.self());
-	this->~Build();
-	auto& allocator = const_cast<nyallocator_t&>(cf.allocator);
-	allocator.deallocate(&allocator, this, sizeof(ny::Build));
-}
-
-
-void Build::init() {
+Build::Build(Ref<Project> project, const nybuild_cf_t& cf, bool async)
+	: cf(cf)
+	, project(project)
+	, isAsync(async) {
 	if (not m_targets.empty()) { // big cleanup
 		m_targets.clear();
 		m_targets.shrink_to_fit();
@@ -50,14 +44,14 @@ void Build::init() {
 		buildtime = 0;
 		messages = nullptr;
 	}
-	m_targets.reserve(project.targets.all.size());
+	m_targets.reserve(project->targets.all.size());
 	m_sources.reserve(32); // arbitrary, at least more than 20 source files from nsl
 	success = true;
 	// keeping our own list of targets / sources to be completely
 	// isolated from the project
 	messages = std::make_unique<Logs::Message>(Logs::Level::none);
-	for (auto& pair : project.targets.all) {
-		CTarget::Ptr newtarget = new CTarget{project.self(), *pair.second};
+	for (auto& pair : project->targets.all) {
+		auto newtarget = make_ref<CTarget>(project->self(), *pair.second);
 		newtarget->eachSource([&](Source & source) {
 			m_sources.push_back(std::ref(source));
 		});
@@ -72,8 +66,14 @@ void Build::init() {
 		nsl::import::console(intrinsics);
 		nsl::import::digest(intrinsics);
 	}
-	if (cf.on_create)
-		cf.on_create(self(), project.self());
+}
+
+
+Build::~Build() {
+	// clear internal containers before releasing the project itself
+	m_attachedSequences.clear();
+	m_sources.clear();
+	m_targets.clear();
 }
 
 

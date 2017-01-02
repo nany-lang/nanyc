@@ -51,7 +51,7 @@ public:
 	//! Create a dummy message, for sub-grouping
 	Report subgroup();
 
-	void appendEntry(const Message::Ptr&);
+	void appendEntry(const std::shared_ptr<Message>&);
 	//@}
 
 

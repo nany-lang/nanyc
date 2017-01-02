@@ -23,11 +23,6 @@ struct Atom;
 //! Class definition
 struct Classdef final
 	: public Yuni::IIntrusiveSmartPtr<Classdef, false, Yuni::Policy::SingleThreaded> {
-	//! The class ancestor
-	typedef Yuni::IIntrusiveSmartPtr<Classdef, false, Yuni::Policy::SingleThreaded>  Ancestor;
-	//! The most suitable smart ptr for the class
-	typedef Ancestor::SmartPtrType<Classdef>::Ptr  Ptr;
-
 	//! Null cdef
 	static const Classdef nullcdef;
 

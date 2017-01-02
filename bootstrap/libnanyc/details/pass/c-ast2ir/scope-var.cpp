@@ -46,12 +46,12 @@ bool generateTypeofForClassVar(Scope& scope, uint32_t& lvid, AST::Node& varAssig
 	//       call-parameter
 	//       |   expr
 	//       |     identifier: A
-	AST::Node::Ptr typeofn = new AST::Node{AST::rgTypeof};
-	AST::Node::Ptr call = new AST::Node{AST::rgCall};
+	auto typeofn = make_ref<AST::Node>(AST::rgTypeof);
+	auto call = make_ref<AST::Node>(AST::rgCall);
 	typeofn->children.push_back(call);
 	// first parameter - the expr
 	{
-		AST::Node::Ptr param = new AST::Node{AST::rgCallParameter};
+		auto param = make_ref<AST::Node>(AST::rgCallParameter);
 		call->children.push_back(param);
 		uint index = varAssign.findFirst(AST::rgExpr);
 		if (unlikely(not (index < varAssign.children.size()))) {
