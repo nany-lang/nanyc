@@ -29,11 +29,10 @@ Build::AttachedSequenceRef::~AttachedSequenceRef() {
 }
 
 
-Build::Build(Project& project, const nybuild_cf_t& cf, bool async)
+Build::Build(Ref<Project> project, const nybuild_cf_t& cf, bool async)
 	: cf(cf)
 	, project(project)
 	, isAsync(async) {
-	project.addRef();
 	if (not m_targets.empty()) { // big cleanup
 		m_targets.clear();
 		m_targets.shrink_to_fit();
@@ -45,14 +44,14 @@ Build::Build(Project& project, const nybuild_cf_t& cf, bool async)
 		buildtime = 0;
 		messages = nullptr;
 	}
-	m_targets.reserve(project.targets.all.size());
+	m_targets.reserve(project->targets.all.size());
 	m_sources.reserve(32); // arbitrary, at least more than 20 source files from nsl
 	success = true;
 	// keeping our own list of targets / sources to be completely
 	// isolated from the project
 	messages = std::make_unique<Logs::Message>(Logs::Level::none);
-	for (auto& pair : project.targets.all) {
-		auto newtarget = make_ref<CTarget>(project.self(), *pair.second);
+	for (auto& pair : project->targets.all) {
+		auto newtarget = make_ref<CTarget>(project->self(), *pair.second);
 		newtarget->eachSource([&](Source & source) {
 			m_sources.push_back(std::ref(source));
 		});
@@ -75,8 +74,6 @@ Build::~Build() {
 	m_attachedSequences.clear();
 	m_sources.clear();
 	m_targets.clear();
-	if (project.release())
-		delete &project;
 }
 
 

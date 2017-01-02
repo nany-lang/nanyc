@@ -66,12 +66,12 @@ extern "C" nybuild_t* nybuild_prepare(nyproject_t* ptr, const nybuild_cf_t* cf) 
 			if (cf) {
 				if (cf->on_query and (nyfalse == cf->on_query(ptr)))
 					return nullptr;
-				build = std::make_unique<ny::Build>(project, *cf, async);
+				build = std::make_unique<ny::Build>(&project, *cf, async);
 			}
 			else {
 				nybuild_cf_t ncf;
 				nybuild_cf_init(&ncf, ptr);
-				build = std::make_unique<ny::Build>(project, ncf, async);
+				build = std::make_unique<ny::Build>(&project, ncf, async);
 			}
 			// making sure that user-events do not destroy the project by mistake
 			build->addRef();

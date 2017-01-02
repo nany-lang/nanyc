@@ -37,7 +37,7 @@ public:
 
 
 public:
-	explicit Build(Project& project, const nybuild_cf_t& cf, bool async);
+	explicit Build(yuni::Ref<Project> project, const nybuild_cf_t& cf, bool async);
 	~Build();
 
 	/*!
@@ -92,7 +92,7 @@ public:
 	//! User settings
 	nybuild_cf_t cf;
 	//! Attached project
-	Project& project;
+	yuni::Ref<Project> project;
 
 	//! Canceled flag
 	Yuni::Atomic::Bool canceled;
