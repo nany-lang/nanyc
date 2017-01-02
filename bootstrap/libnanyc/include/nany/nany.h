@@ -234,7 +234,21 @@ typedef struct nythread_t nytctx_t;
 
 /*! \name Memory allocator */
 /*@{*/
+struct nyallocator_t;
+
+typedef struct nyallocator_cf_t {
+	void* userdata;
+	/*! Create a multi-threaded allocator */
+	nybool_t (*create_mt)(struct nyallocator_t*, const struct nyallocator_cf_t*);
+	/*! Create a single-threaded allocator */
+	nybool_t (*create_st)(struct nyallocator_t*, const struct nyallocator_cf_t*);
+	/*! event: not enough memory */
+	void (*on_not_enough_memory)(struct nyallocator_t*, nybool_t limit_reached);
+}
+nyallocator_cf_t;
+
 typedef struct nyallocator_t {
+	void* userdata;
 	/*! Allocates some memory */
 	void* (*allocate)(struct nyallocator_t*, size_t);
 	/*! Re-allocate */
@@ -249,11 +263,15 @@ typedef struct nyallocator_t {
 
 	/*! event: not enough memory */
 	void (*on_not_enough_memory)(struct nyallocator_t*, nybool_t limit_reached);
+	/*! event: callback for aborting program execuion */
+	void (*on_internal_abort)(struct nyallocator_t*);
 	/*! Flush STDERR */
-	void (*release)(const struct nyallocator_t*);
+	void (*release)(struct nyallocator_t*);
 }
 nyallocator_t;
 
+
+NY_EXPORT void nyallocator_cf_init(nyallocator_cf_t*);
 
 /*! Set callbacks to the standard C memory allocator */
 NY_EXPORT void nany_memalloc_set_default(nyallocator_t*);
@@ -906,7 +924,7 @@ nyrun_cf_t;
 NY_EXPORT void nyrun_cf_init(nyrun_cf_t*);
 
 /*! Release resources held by a template object */
-NY_EXPORT void nyrun_cf_release(const nyrun_cf_t*);
+NY_EXPORT void nyrun_cf_release(nyrun_cf_t*);
 /*!
 ** \brief Compile & run a nany program
 **

@@ -8,6 +8,58 @@
 #define NANY_DEBUG_ALLOCATOR_FILL 0
 
 
+static void nyallocator_abort(nyallocator_t* allocator) {
+	if (allocator->on_not_enough_memory)
+		allocator->on_not_enough_memory(allocator, nyfalse);
+	if (allocator->on_internal_abort)
+		allocator->on_internal_abort(allocator);
+}
+
+
+static void* nystdmalloc_alloc(nyallocator_t* allocator, size_t size) {
+	void* p = malloc(size);
+	if (p)
+		return p;
+	nyallocator_abort(allocator);
+	return NULL;
+}
+
+
+static void* nystdmalloc_reallocate(nyallocator_t* allocator, void* ptr, size_t oldsize, size_t newsize) {
+	(void) oldsize;
+	void* p = realloc(ptr, newsize);
+	if (p)
+		return p;
+	free(ptr);
+	nyallocator_abort(allocator);
+	return NULL;
+}
+
+
+static void nystdmalloc_deallocate(nyallocator_t* allocator, void* ptr, size_t size) {
+	(void) allocator;
+	(void) size;
+	free(ptr);
+}
+
+
+static nybool_t nystdmalloc_create_mt(nyallocator_t* allocator, const nyallocator_cf_t* cf) {
+	memset(allocator, 0x0, sizeof(nyallocator_t));
+	allocator->on_not_enough_memory = cf->on_not_enough_memory;
+	allocator->allocate = &nystdmalloc_alloc;
+	allocator->reallocate = &nystdmalloc_reallocate;
+	allocator->deallocate = &nystdmalloc_deallocate;
+	return nytrue;
+}
+
+
+void nyallocator_cf_init(nyallocator_cf_t* cf) {
+	if (cf) {
+		memset(cf, 0x0, sizeof(nyallocator_cf_t));
+		cf->create_mt = &nystdmalloc_create_mt;
+		cf->create_st = &nystdmalloc_create_mt;
+	}
+}
 
 
 static void* nany_allocate(nyallocator_t* alloc, size_t size)
