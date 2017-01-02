@@ -8,6 +8,19 @@ using namespace Yuni;
 namespace ny {
 
 
+Project::Project(const nyproject_cf_t& cf)
+	: cf(cf) {
+}
+
+
+Project::~Project() {
+	// this container must be destroyed first
+	targets.all.clear();
+	targets.anonym = nullptr;
+	targets.nsl = nullptr;
+}
+
+
 Ref<CTarget> Project::doCreateTarget(const AnyString& name) {
 	auto target = make_ref<CTarget>(self(), name);
 	if (!!target) {
