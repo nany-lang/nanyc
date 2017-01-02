@@ -8,14 +8,12 @@ using namespace Yuni;
 namespace ny {
 
 
-CTarget::Ptr Project::doCreateTarget(const AnyString& name) {
-	CTarget::Ptr target = new CTarget(self(), name);
+Ref<CTarget> Project::doCreateTarget(const AnyString& name) {
+	auto target = make_ref<CTarget>(self(), name);
 	if (!!target) {
 		// !!internal: using the target name as reference
 		const AnyString& name = target->name();
-		// add the target in the project
 		targets.all.insert(std::make_pair(name, target));
-		// event
 		if (cf.on_target_added)
 			cf.on_target_added(self(), target->self(), name.c_str(), name.size());
 	}

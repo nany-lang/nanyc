@@ -45,12 +45,11 @@ public:
 
 	struct {
 		//! Default target
-		CTarget::Ptr anonym;
+		yuni::Ref<CTarget> anonym;
 		//! Default target
-		CTarget::Ptr nsl;
-
+		yuni::Ref<CTarget> nsl;
 		//! All other targets
-		std::map<AnyString, CTarget::Ptr> all;
+		std::map<AnyString, yuni::Ref<CTarget>> all;
 	}
 	targets;
 
@@ -62,7 +61,7 @@ private:
 	//! Destructor, private, destroy() must be used instead
 	~Project();
 
-	CTarget::Ptr doCreateTarget(const AnyString& name);
+	yuni::Ref<CTarget> doCreateTarget(const AnyString& name);
 	void unregisterTargetFromProject(CTarget& target);
 	friend class CTarget;
 

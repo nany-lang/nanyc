@@ -22,9 +22,9 @@ CTarget::CTarget(nyproject_t* project, const CTarget& rhs)
 		m_sources.reserve(rhs.m_sources.size());
 		for (auto& ptr : rhs.m_sources) {
 			auto& source = *ptr;
-			Source::Ptr newsource{new Source(this, source)};
-			m_sources.push_back(newsource);
-			auto& ref = *newsource;
+			auto newSource = make_ref<Source>(this, source);
+			m_sources.push_back(newSource);
+			auto& ref = *newSource;
 			switch (ref.m_type) {
 				case Source::Type::memory: {
 					m_sourcesByName.insert(std::make_pair(ref.m_filename, std::ref(ref)));
@@ -56,7 +56,7 @@ CTarget::~CTarget() {
 
 void CTarget::addSource(const AnyString& name, const AnyString& content) {
 	if (not content.empty()) {
-		Source::Ptr source{new Source(this, Source::Type::memory, name, content)};
+		auto source = make_ref<Source>(this, Source::Type::memory, name, content);
 		auto it = m_sourcesByName.find(source->m_filename);
 		if (it == m_sourcesByName.end())
 			m_sourcesByName.insert(std::make_pair(AnyString{source->m_filename}, std::ref(*source)));
@@ -69,13 +69,13 @@ void CTarget::addSource(const AnyString& name, const AnyString& content) {
 
 void CTarget::addSourceFromFile(const AnyString& filename) {
 	if (not filename.empty()) {
-		auto source = std::make_unique<Source>(this, Source::Type::file, filename, AnyString());
+		auto source = make_ref<Source>(this, Source::Type::file, filename, AnyString());
 		auto it = m_sourcesByFilename.find(source->m_filename);
 		if (it == m_sourcesByFilename.end())
 			m_sourcesByFilename.insert(std::make_pair(AnyString{source->m_filename}, std::ref(*source)));
 		else
 			it->second = std::ref(*source);
-		m_sources.emplace_back(source.release());
+		m_sources.emplace_back(source);
 	}
 }
 

@@ -57,7 +57,7 @@ void Build::init() {
 	// isolated from the project
 	messages = std::make_unique<Logs::Message>(Logs::Level::none);
 	for (auto& pair : project.targets.all) {
-		CTarget::Ptr newtarget = new CTarget{project.self(), *pair.second};
+		auto newtarget = make_ref<CTarget>(project.self(), *pair.second);
 		newtarget->eachSource([&](Source & source) {
 			m_sources.push_back(std::ref(source));
 		});

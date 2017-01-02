@@ -132,7 +132,7 @@ private:
 	~Build();
 
 	std::vector<std::reference_wrapper<Source>> m_sources;
-	std::vector<CTarget::Ptr> m_targets;
+	std::vector<yuni::Ref<CTarget>> m_targets;
 	std::vector<AttachedSequenceRef> m_attachedSequences;
 
 }; // class Build
