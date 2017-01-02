@@ -12,10 +12,6 @@ namespace ny {
 class Project final
 	: public Yuni::IIntrusiveSmartPtr<Project, false, Yuni::Policy::SingleThreaded> {
 public:
-	using IntrusiveSmartPtr = Yuni::IIntrusiveSmartPtr<Project, false, Yuni::Policy::SingleThreaded>;
-	using Ptr = IntrusiveSmartPtr::Ptr;
-
-public:
 	//! Ctor with an user-defined settings
 	explicit Project(const nyproject_cf_t& cf);
 	//! Copy ctor
