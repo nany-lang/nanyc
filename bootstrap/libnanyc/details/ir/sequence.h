@@ -22,6 +22,7 @@ namespace ir {
 struct Sequence final {
 	Sequence() = default;
 	Sequence(const Sequence&) = delete;
+	Sequence(const Sequence&, uint32_t offset);
 	~Sequence();
 
 	//! \name Cursor manipulation

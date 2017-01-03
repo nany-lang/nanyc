@@ -10,6 +10,38 @@ namespace ny {
 namespace ir {
 
 
+namespace {
+
+
+inline uint32_t calculateCapacity(uint32_t capacity, uint32_t minimum) {
+	do {
+		capacity += 1000u;
+	}
+	while (capacity < minimum);
+	return capacity;
+}
+
+
+} // namespace
+
+
+Sequence::Sequence(const Sequence& other, uint32_t offset)
+		: stringrefs(other.stringrefs) {
+	assert(offset < other.m_size);
+	uint32_t size = other.m_size - offset;
+	if (size != 0) {
+		uint32_t capacity = calculateCapacity(0, size);
+		auto* body = (Instruction*) malloc(sizeof(Instruction) * capacity);
+		if (!body)
+			throw std::bad_alloc();
+		YUNI_MEMCPY(body, sizeof(Instruction) * capacity, other.m_body + offset, size * sizeof(Instruction));
+		m_size = size;
+		m_capacity = capacity;
+		m_body = body;
+	}
+}
+
+
 Sequence::~Sequence() {
 	free(m_body);
 }
@@ -56,11 +88,7 @@ void Sequence::clear() {
 
 void Sequence::grow(uint32_t count) {
 	assert(count > 0);
-	auto newCapacity = m_capacity;
-	do {
-		newCapacity += 1000u;
-	}
-	while (newCapacity < count);
+	auto newCapacity = calculateCapacity(m_capacity, count);
 	auto* newbody = (Instruction*) realloc(m_body, sizeof(Instruction) * newCapacity);
 	if (unlikely(nullptr == newbody))
 		throw std::bad_alloc();
