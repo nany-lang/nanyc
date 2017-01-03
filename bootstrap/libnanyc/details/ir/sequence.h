@@ -20,15 +20,9 @@ namespace ir {
 
 
 struct Sequence final {
-	//! \name Constructors & Destructor
-	//@{
-	//! Default constructor
 	Sequence() = default;
-	//! Copy constructor
 	Sequence(const Sequence&) = delete;
-	//! Destructor
 	~Sequence();
-	//@}
 
 	//! \name Cursor manipulation
 	//@{
@@ -126,7 +120,6 @@ public:
 	StringRefs stringrefs;
 
 private:
-	//! grow to accept N instructions
 	void grow(uint32_t instrCount);
 
 private:
