@@ -56,16 +56,16 @@ void Sequence::clear() {
 
 void Sequence::grow(uint32_t count) {
 	assert(count > 0);
-	auto newcapa = m_capacity;
+	auto newCapacity = m_capacity;
 	do {
-		newcapa += 1000u;
+		newCapacity += 1000u;
 	}
-	while (newcapa < count);
-	auto* newbody = (Instruction*) realloc(m_body, sizeof(Instruction) * newcapa);
+	while (newCapacity < count);
+	auto* newbody = (Instruction*) realloc(m_body, sizeof(Instruction) * newCapacity);
 	if (unlikely(nullptr == newbody))
 		throw std::bad_alloc();
 	m_body = newbody;
-	m_capacity = newcapa;
+	m_capacity = newCapacity;
 }
 
 
