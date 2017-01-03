@@ -101,7 +101,7 @@ void substituteParameterTypes(ClassdefTableView& cdeftable, Atom& atom, const Si
 }
 
 
-ir::Sequence* performAtomInstanciation(InstanciateData& info, Signature& signature) {
+ir::Sequence* translateAndInstanciateASTIRCode(InstanciateData& info, Signature& signature) {
 	auto& atomRequested = info.atom.get();
 	if (unlikely(!atomRequested.opcodes.sequence or !atomRequested.parent)) {
 		ice() << "invalid atom";
@@ -641,7 +641,7 @@ bool instanciateAtom(InstanciateData& info) {
 		}
 		case Tribool::Value::indeterminate: {
 			// the atom must be instanciated
-			return (nullptr != performAtomInstanciation(info, signature));
+			return (nullptr != translateAndInstanciateASTIRCode(info, signature));
 		}
 		case Tribool::Value::no: {
 			// failed to instanciate last time. error already reported
