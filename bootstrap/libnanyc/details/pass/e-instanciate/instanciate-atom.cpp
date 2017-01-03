@@ -64,7 +64,7 @@ bool duplicateAtomForSpecialization(InstanciateData& info, Atom& atom) {
 		mapper.prefixNameForFirstAtomCreated = "^"; // not an user-defined atom
 		mapper.map(*atom.parent, atom.opcodes.offset);
 		if (unlikely(!mapper.firstAtomCreated))
-			return (error() << "failed to remap atom '" << atom.caption() << '\'');
+			return (ice() << "failed to remap atom '" << atom.caption() << '\'');
 		assert(info.atom.get().atomid != mapper.firstAtomCreated->atomid);
 		assert(&info.atom.get() != mapper.firstAtomCreated);
 		info.atom = std::ref(*mapper.firstAtomCreated);
