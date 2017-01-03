@@ -7,7 +7,7 @@ using namespace Yuni;
 namespace ny {
 
 AST::Node* ASTHelper::nodeAppend(AST::Node& parent, enum AST::Rule rule) {
-	auto* node = nodeCreate(rule);
+	auto* node = new AST::Node(rule);
 	node->offset = parent.offset;
 	node->offsetEnd = parent.offsetEnd;
 	node->parent = &parent;
