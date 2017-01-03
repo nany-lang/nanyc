@@ -52,7 +52,7 @@ void prepareSignature(Signature& signature, InstanciateData& info) {
 }
 
 
-bool makeNewAtomInstanciation(InstanciateData& info, Atom& atom) {
+bool duplicateAtomForSpecialization(InstanciateData& info, Atom& atom) {
 	// create a new atom with non-generic parameters / from a contextual atom
 	// (generic or anonymous class) and re-map from the parent
 	{
@@ -110,7 +110,7 @@ ir::Sequence* translateAndInstanciateASTIRCode(InstanciateData& info, Signature&
 	// In case or an anonymous class or a class with generic type parameters, it is
 	// necessary to use new atoms (t needs a forked version to work on to have different types)
 	if (atomRequested.isContextual()) {
-		if (not makeNewAtomInstanciation(info, atomRequested))
+		if (not duplicateAtomForSpecialization(info, atomRequested))
 			return nullptr;
 		assert(&info.atom.get() != &atomRequested and "a new atom must be used");
 	}
