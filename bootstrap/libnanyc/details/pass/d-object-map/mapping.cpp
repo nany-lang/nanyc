@@ -13,6 +13,14 @@ namespace Mapping {
 namespace {
 
 
+template<class T>
+inline void rememberFirstAtomCreated(T& mapping, Atom& atom) {
+	mapping.firstAtomCreated = &atom;
+	if (mapping.firstAtomOwnSequence)
+		atom.opcodes.owned = true;
+}
+
+
 //! Stack frame per atom definition (class, func)
 struct AtomStackFrame final {
 	AtomStackFrame(Atom& atom, std::unique_ptr<AtomStackFrame>& next)
@@ -64,10 +72,11 @@ struct OpcodeReader final {
 		, mutex(mapping.mutex)
 		, currentSequence(mapping.currentSequence)
 		, firstAtomCreated(mapping.firstAtomCreated)
+		, firstAtomOwnSequence(mapping.firstAtomOwnSequence)
 		, prefixNameForFirstAtomCreated{mapping.prefixNameForFirstAtomCreated}
 		, evaluateWholeSequence(mapping.evaluateWholeSequence)
 		, mapping(mapping) {
-		firstAtomCreated = nullptr;
+		firstAtomCreated = nullptr; // reset the original variable
 		lastPushedNamedParameters.reserve(8); // arbitrary
 		lastPushedIndexedParameters.reserve(8);
 	}
@@ -194,7 +203,7 @@ struct OpcodeReader final {
 			}
 		}
 		if (!firstAtomCreated)
-			firstAtomCreated = &newatom;
+			rememberFirstAtomCreated(*this, newatom);
 	}
 
 
@@ -235,7 +244,7 @@ struct OpcodeReader final {
 		if (operands.lvid != 0)
 			atomStack->capture.enabled(newClassAtom);
 		if (!firstAtomCreated)
-			firstAtomCreated = &newClassAtom;
+			rememberFirstAtomCreated(*this, newClassAtom);
 	}
 
 
@@ -294,7 +303,7 @@ struct OpcodeReader final {
 		cdeftable.registerAtom(newVarAtom);
 		newVarAtom.returnType.clid.reclass(atom.atomid, operands.lvid);
 		if (!firstAtomCreated)
-			firstAtomCreated = &newVarAtom;
+			rememberFirstAtomCreated(*this, newVarAtom);
 	}
 
 
@@ -733,6 +742,7 @@ struct OpcodeReader final {
 	uint32_t lastuint32_t = 0;
 	//! The first atom created by the mapping
 	Atom*& firstAtomCreated;
+	bool firstAtomOwnSequence = false;
 	//! Last pushed indexed parameters
 	std::vector<uint32_t> lastPushedIndexedParameters;
 	//! Last pushed named parameters

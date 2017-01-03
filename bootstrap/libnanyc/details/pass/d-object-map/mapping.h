@@ -38,6 +38,8 @@ public:
 	// This value might be used when a mapping is done on the fly
 	// (while instanciating code for example)
 	Atom* firstAtomCreated = nullptr;
+	//! Does the first atom created own the sequence
+	bool firstAtomOwnSequence = false;
 
 }; // class SequenceMapping
 
