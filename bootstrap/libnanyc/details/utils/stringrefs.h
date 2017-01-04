@@ -7,31 +7,21 @@
 
 namespace ny {
 
-/*!
-** \brief Placeholder for storing duplicate strings
-*/
+
+//! Container for minimizing memory use of duplicate strings
 class StringRefs final {
 public:
-	//! Default constructor
 	StringRefs();
-	//! Copy constructor
 	StringRefs(const StringRefs&) = delete;
-	//! Destructor
 	~StringRefs() = default;
 
-	/*!
-	** \brief Add a new entry within the catalog
-	*/
+	//! Add a new entry within the catalog
 	AnyString refstr(const AnyString& text);
 
-	/*!
-	** \brief Get the unique id of a string
-	*/
+	//! Get the unique id of a string
 	uint32_t ref(const AnyString& text);
 
-	/*!
-	** \brief Get if a given string is already indexed
-	*/
+	//! Get if a given string is already indexed
 	bool exists(const AnyString& text) const;
 
 	//! Clear the container
@@ -40,18 +30,12 @@ public:
 	//! Get the size in bytes occupied by this object
 	size_t sizeInBytes() const;
 
-
-	//! \name Operators
-	//@{
-	//! Retrieve a stored string
+	//! Retrieve a stored string from its index
 	AnyString operator [] (uint32_t ix) const;
-	//! Copy operator
-	StringRefs& operator = (const StringRefs&) = delete;
-	//@}
 
+	StringRefs& operator = (const StringRefs&) = delete;
 
 private:
-	//! Register string
 	uint32_t keepString(const AnyString& text);
 
 private:
@@ -67,9 +51,9 @@ private:
 		char* m_cstr = nullptr;
 		uint32_t m_size = 0;
 	};
-	//! Index for all unique references (name <-> index)
+	//! Storage for all unique strings
 	std::vector<StringImmutablePointer> m_storage;
-	//! Index for fast retrieval
+	//! Mapping between a stored string and its internal index
 	std::unordered_map<AnyString, uint32_t> m_index;
 
 }; // class StringRefs
