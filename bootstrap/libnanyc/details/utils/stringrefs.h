@@ -8,8 +8,7 @@ namespace ny {
 
 
 //! Container for minimizing memory use of duplicate strings
-class StringRefs final {
-public:
+struct StringRefs final {
 	StringRefs();
 	StringRefs(const StringRefs&) = delete;
 	~StringRefs() = default;
@@ -55,7 +54,7 @@ private:
 	//! Mapping between a stored string and its internal index
 	std::unordered_map<AnyString, uint32_t> m_index;
 
-}; // class StringRefs
+}; // struct StringRefs
 
 
 } // namespace ny
