@@ -64,13 +64,13 @@ private:
 		StringImmutablePointer& operator = (const StringImmutablePointer&) = delete;
 		StringImmutablePointer& operator = (StringImmutablePointer&&) = delete;
 		AnyString toString() const;
-		char* text = nullptr;
-		uint32_t size = 0;
+		char* m_cstr = nullptr;
+		uint32_t m_size = 0;
 	};
 	//! Index for all unique references (name <-> index)
-	std::vector<StringImmutablePointer> pRefs;
+	std::vector<StringImmutablePointer> m_storage;
 	//! Index for fast retrieval
-	std::unordered_map<AnyString, uint32_t> pIndex;
+	std::unordered_map<AnyString, uint32_t> m_index;
 
 }; // class StringRefs
 
