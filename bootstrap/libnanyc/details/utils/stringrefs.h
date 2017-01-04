@@ -11,6 +11,7 @@ namespace ny {
 //! Container for minimizing memory use of duplicate strings
 struct StringRefs final {
 	StringRefs();
+	StringRefs(StringRefs&&) = default;
 	StringRefs(const StringRefs&);
 
 	//! Add a new entry within the catalog
@@ -32,6 +33,7 @@ struct StringRefs final {
 	AnyString operator [] (uint32_t ix) const;
 
 	StringRefs& operator = (const StringRefs&);
+	StringRefs& operator = (StringRefs&&) = default;
 
 private:
 	uint32_t keepString(const AnyString& text);
