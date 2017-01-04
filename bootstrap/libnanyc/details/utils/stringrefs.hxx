@@ -31,14 +31,14 @@ inline AnyString StringRefs::StringImmutablePointer::toString() const {
 
 
 inline bool StringRefs::exists(const AnyString& text) const {
-	return (m_index.count(text) != 0);
+	return m_index.count(text) != 0;
 }
 
 
 inline uint32_t StringRefs::ref(const AnyString& text) {
 	if (YUNI_LIKELY(not text.empty())) {
 		auto it = m_index.find(text);
-		return (it != m_index.end()) ? it->second : keepString(text);
+		return it != m_index.end() ? it->second : keepString(text);
 	}
 	return 0;
 }
