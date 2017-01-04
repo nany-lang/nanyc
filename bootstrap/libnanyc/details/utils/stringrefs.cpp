@@ -26,6 +26,24 @@ StringRefs::StringRefs() {
 }
 
 
+StringRefs::StringRefs(const StringRefs& other)
+	: m_storage(other.m_storage) {
+	for (auto& entry: other.m_index)
+		m_index.emplace(m_storage[entry.second], entry.second);
+}
+
+
+StringRefs& StringRefs::operator = (const StringRefs& other) {
+	if (&other != this) {
+		m_index.clear();
+		m_storage = other.m_storage;
+		for (auto& entry: other.m_index)
+			m_index.emplace(m_storage[entry.second], entry.second);
+	}
+	return *this;
+}
+
+
 void StringRefs::clear() {
 	m_storage.clear();
 	m_storage.emplace_back(); // keep the element 0 empty
