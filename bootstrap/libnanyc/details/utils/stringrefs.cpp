@@ -6,6 +6,21 @@ using namespace Yuni;
 namespace ny {
 
 
+namespace {
+
+
+template<class K, class V>
+auto estimateMapMemoryOverhead(const std::unordered_map<K,V>& map) {
+	auto entrySize = sizeof(K) + sizeof(V) + sizeof(void*);
+	auto bucketSize = sizeof(void*);
+	auto adminSize = 3 * sizeof(void*) + sizeof(size_t);
+	return adminSize + map.size() * entrySize + map.max_bucket_count() * bucketSize;
+}
+
+
+} // namespace
+
+
 StringRefs::StringRefs() {
 	m_storage.reserve(8);
 	m_storage.emplace_back(); // keep the element 0 empty
@@ -29,12 +44,10 @@ uint32_t StringRefs::keepString(const AnyString& text) {
 
 
 size_t StringRefs::sizeInBytes() const {
-	size_t s = sizeof(void*) * m_storage.capacity();
+	size_t bytes = estimateMapMemoryOverhead(m_index);
 	for (auto& element : m_storage)
-		s += element.m_size + 1;
-	// arbitrary
-	s += m_index.size() * (sizeof(std::pair<AnyString, uint32_t>) * sizeof(void*) * 2);
-	return s;
+		bytes += element.m_size;
+	return bytes;
 }
 
 
