@@ -4,7 +4,6 @@
 #include <deque>
 
 
-
 namespace ny {
 
 
@@ -57,9 +56,6 @@ private:
 	std::unordered_map<AnyString, uint32_t> m_index;
 
 }; // class StringRefs
-
-
-
 
 
 } // namespace ny
