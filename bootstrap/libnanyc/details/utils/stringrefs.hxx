@@ -43,6 +43,7 @@ inline uint32_t StringRefs::ref(const AnyString& text) {
 	return 0;
 }
 
+
 inline AnyString StringRefs::refstr(const AnyString& text) {
 	return (*this)[ref(text)];
 }
