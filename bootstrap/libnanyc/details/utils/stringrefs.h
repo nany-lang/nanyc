@@ -11,7 +11,7 @@ namespace ny {
 //! Container for minimizing memory use of duplicate strings
 struct StringRefs final {
 	StringRefs();
-	StringRefs(const StringRefs&) = delete;
+	StringRefs(const StringRefs&);
 
 	//! Add a new entry within the catalog
 	AnyString refstr(const AnyString& text);
@@ -31,7 +31,7 @@ struct StringRefs final {
 	//! Retrieve a stored string from its index
 	AnyString operator [] (uint32_t ix) const;
 
-	StringRefs& operator = (const StringRefs&) = delete;
+	StringRefs& operator = (const StringRefs&);
 
 private:
 	uint32_t keepString(const AnyString& text);
