@@ -30,11 +30,6 @@ inline AnyString StringRefs::StringImmutablePointer::toString() const {
 }
 
 
-inline bool StringRefs::empty() const {
-	return pIndex.empty();
-}
-
-
 inline bool StringRefs::exists(const AnyString& text) const {
 	return (pIndex.count(text) != 0);
 }
