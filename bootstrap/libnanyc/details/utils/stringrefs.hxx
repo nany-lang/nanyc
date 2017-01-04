@@ -11,11 +11,8 @@ inline bool StringRefs::exists(const AnyString& text) const {
 
 
 inline uint32_t StringRefs::ref(const AnyString& text) {
-	if (YUNI_LIKELY(not text.empty())) {
-		auto it = m_index.find(text);
-		return it != m_index.end() ? it->second : keepString(text);
-	}
-	return 0;
+	auto it = m_index.find(text);
+	return it != m_index.end() ? it->second : keepString(text);
 }
 
 

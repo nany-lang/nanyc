@@ -23,6 +23,7 @@ auto estimateMapMemoryOverhead(const std::unordered_map<K,V>& map) {
 
 StringRefs::StringRefs() {
 	m_storage.emplace_back(); // keep the element 0 empty
+	m_index.emplace(AnyString(), 0);
 }
 
 
@@ -45,14 +46,14 @@ StringRefs& StringRefs::operator = (const StringRefs& other) {
 
 
 void StringRefs::clear() {
-	m_storage.clear();
-	m_storage.emplace_back(); // keep the element 0 empty
 	m_index.clear();
+	m_storage.clear();
+	m_storage.emplace_back(); // keep the element 0 empty (as invalid)
+	m_index.emplace(AnyString(), 0);
 }
 
 
 uint32_t StringRefs::keepString(const AnyString& text) {
-	assert(not text.empty());
 	uint32_t ix = static_cast<uint32_t>(m_storage.size());
 	m_storage.emplace_back(text);
 	m_index.insert(std::make_pair(AnyString{m_storage.back()}, ix));
