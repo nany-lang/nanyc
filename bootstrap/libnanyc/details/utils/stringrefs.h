@@ -34,10 +34,6 @@ public:
 	*/
 	bool exists(const AnyString& text) const;
 
-
-	//! Get if the container is empty
-	bool empty() const;
-
 	//! Clear the container
 	void clear();
 
