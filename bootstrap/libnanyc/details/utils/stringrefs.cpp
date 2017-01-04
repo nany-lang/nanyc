@@ -37,7 +37,7 @@ uint32_t StringRefs::keepString(const AnyString& text) {
 	assert(not text.empty());
 	uint32_t ix = static_cast<uint32_t>(m_storage.size());
 	m_storage.emplace_back(text);
-	m_index.insert(std::make_pair(m_storage.back().toString(), ix));
+	m_index.insert(std::make_pair(AnyString{m_storage.back()}, ix));
 	return ix;
 }
 
@@ -45,7 +45,7 @@ uint32_t StringRefs::keepString(const AnyString& text) {
 size_t StringRefs::sizeInBytes() const {
 	size_t bytes = estimateMapMemoryOverhead(m_index);
 	for (auto& element : m_storage)
-		bytes += element.m_size;
+		bytes += element.capacity();
 	return bytes;
 }
 
