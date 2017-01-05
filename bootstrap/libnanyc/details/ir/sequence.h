@@ -59,8 +59,6 @@ struct Sequence final {
 
 	//! emit a new Instruction
 	template<isa::Op O> isa::Operand<O>& emit();
-	//! emit a new Instruction (without reserving data if needed)
-	template<isa::Op O> isa::Operand<O>& emitraw();
 
 	//! Get the offset of an instruction within the sequence
 	template<isa::Op O> uint32_t offsetOf(const isa::Operand<O>& instr) const;

@@ -64,8 +64,8 @@ bool Scope::visitASTExprCallParameters(AST::Node& node, ShortcircuitUpdate* shor
 									// (see visitASTExprCall) and can be used for reading a variable member
 									shortcircuit->offsetStackalloc = out.opcodeCount();
 									ir::emit::alloc(out, 0 /*label + 1*/);
-									out.emitraw<ir::isa::Op::nop>(); // fieldget, if not builtin type
-									out.emitraw<ir::isa::Op::nop>(); // jump
+									ir::emit::nop(out); // fieldget, if not builtin type
+									ir::emit::nop(out); // jump
 								}
 								// generate scope to prevent against unwanted var release in case of jump
 								// (will be released later in `Scope::visitASTExprCall`)
