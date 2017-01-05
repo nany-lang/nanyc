@@ -50,7 +50,7 @@ private:
 		uint32_t m_size = 0;
 	};
 	//! Storage for all unique strings
-	std::vector<StringImmutablePointer> m_storage;
+	std::deque<StringImmutablePointer> m_storage;
 	//! Mapping between a stored string and its internal index
 	std::unordered_map<AnyString, uint32_t> m_index;
 

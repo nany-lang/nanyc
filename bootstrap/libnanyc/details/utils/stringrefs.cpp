@@ -22,7 +22,6 @@ auto estimateMapMemoryOverhead(const std::unordered_map<K,V>& map) {
 
 
 StringRefs::StringRefs() {
-	m_storage.reserve(8);
 	m_storage.emplace_back(); // keep the element 0 empty
 }
 
