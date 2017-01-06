@@ -3,6 +3,7 @@
 #include "details/reporting/message.h"
 #include "details/utils/origin.h"
 #include "details/pass/d-object-map/mapping.h"
+#include "details/errors/complain.h"
 #include "libnanyc-traces.h"
 #include "instanciate-atom.h"
 #include "instanciate-debug.h"
@@ -618,30 +619,35 @@ bool instanciateAtomParameterTypes(InstanciateData& info) {
 
 
 bool instanciateAtom(InstanciateData& info) {
-	Signature signature;
-	prepareSignature(signature, info);
-	assert(info.params.size() == signature.parameters.size());
-	auto& atom = info.atom.get();
-	Atom* remapAtom = nullptr;
-	auto valid = atom.instances.isValid(signature, info.instanceid, info.returnType, remapAtom);
-	switch (valid) {
-		case Tribool::Value::yes: {
-			if (unlikely(atom.flags(Atom::Flags::instanciating))) { // recursive func detected
-				if (unlikely(not instanciateRecursiveAtom(info)))
-					return false;
+	try {
+		Signature signature;
+		prepareSignature(signature, info);
+		assert(info.params.size() == signature.parameters.size());
+		auto& atom = info.atom.get();
+		Atom* remapAtom = nullptr;
+		auto valid = atom.instances.isValid(signature, info.instanceid, info.returnType, remapAtom);
+		switch (valid) {
+			case Tribool::Value::yes: {
+				if (unlikely(atom.flags(Atom::Flags::instanciating))) { // recursive func detected
+					if (unlikely(not instanciateRecursiveAtom(info)))
+						return false;
+				}
+				if (unlikely(remapAtom != nullptr)) // the target atom may have changed (template class)
+					info.atom = std::ref(*remapAtom);
+				return true;
 			}
-			if (unlikely(remapAtom != nullptr)) // the target atom may have changed (template class)
-				info.atom = std::ref(*remapAtom);
-			return true;
+			case Tribool::Value::indeterminate: {
+				// the atom must be instanciated
+				return (nullptr != translateAndInstanciateASTIRCode(info, signature));
+			}
+			case Tribool::Value::no: {
+				// failed to instanciate last time. error already reported
+				break;
+			}
 		}
-		case Tribool::Value::indeterminate: {
-			// the atom must be instanciated
-			return (nullptr != translateAndInstanciateASTIRCode(info, signature));
-		}
-		case Tribool::Value::no: {
-			// failed to instanciate last time. error already reported
-			break;
-		}
+	}
+	catch (const std::exception& e) {
+		ny::complain::exception(e);
 	}
 	return false;
 }
