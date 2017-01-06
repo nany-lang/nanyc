@@ -55,21 +55,18 @@ void prepareSignature(Signature& signature, InstanciateData& info) {
 bool duplicateAtomForSpecialization(InstanciateData& info, Atom& atom) {
 	// create a new atom with non-generic parameters / from a contextual atom
 	// (generic or anonymous class) and re-map from the parent
-	{
-		auto& sequence  = *atom.opcodes.sequence;
-		auto& originaltable = info.cdeftable.originalTable();
-		Mutex mutex; // useless but currently required for the first pass by SequenceMapping
-		Pass::Mapping::SequenceMapping mapper{originaltable, mutex, sequence};
-		mapper.evaluateWholeSequence = false;
-		mapper.prefixNameForFirstAtomCreated = "^"; // not an user-defined atom
-		mapper.map(*atom.parent, atom.opcodes.offset);
-		if (unlikely(!mapper.firstAtomCreated))
-			return (ice() << "failed to remap atom '" << atom.caption() << '\'');
-		assert(info.atom.get().atomid != mapper.firstAtomCreated->atomid);
-		assert(&info.atom.get() != mapper.firstAtomCreated);
-		info.atom = std::ref(*mapper.firstAtomCreated);
-	}
-	auto& newAtom = info.atom.get();
+	auto& sequence  = *atom.opcodes.sequence;
+	auto& originaltable = info.cdeftable.originalTable();
+	Mutex mutex; // useless but currently required for the first pass by SequenceMapping
+	Pass::Mapping::SequenceMapping mapper{originaltable, mutex, sequence};
+	mapper.evaluateWholeSequence = false;
+	mapper.prefixNameForFirstAtomCreated = "^"; // not an user-defined atom
+	mapper.map(*atom.parent, atom.opcodes.offset);
+	if (unlikely(!mapper.firstAtomCreated))
+		return (ice() << "failed to remap atom '" << atom.caption() << '\'');
+	auto& newAtom = *mapper.firstAtomCreated;
+	assert(atom.atomid != newAtom.atomid);
+	info.atom = std::ref(newAtom);
 	newAtom.tmplparamsForPrinting.swap(newAtom.tmplparams);
 	newAtom.classinfo.isInstanciated = true;
 	info.shouldMergeLayer = true;
