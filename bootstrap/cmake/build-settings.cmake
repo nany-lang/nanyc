@@ -74,3 +74,6 @@ version: ${nany_version}
 version_string: ${nany_version_string}
 version_metadata: ${nany_version_metadata}
 ")
+
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
