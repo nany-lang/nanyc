@@ -457,6 +457,8 @@ addsrc(
 	"details/reporting/report.hxx"
 	"details/errors/errors.h"
 	"details/errors/errors.cpp"
+	"details/errors/complain.h"
+	"details/errors/complain.cpp"
 	"details/reporting/levels.h")
 
 addsrc(

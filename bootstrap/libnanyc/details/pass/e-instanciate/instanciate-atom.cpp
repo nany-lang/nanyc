@@ -64,7 +64,7 @@ bool duplicateAtomForSpecialization(InstanciateData& info, Atom& atom) {
 	options.offset = atom.opcodes.offset;
 	Pass::map(*atom.parent, originaltable, mutex, sequence, options);
 	if (unlikely(!options.firstAtomCreated))
-		return (ice() << "failed to remap atom '" << atom.caption() << '\'');
+		return ny::complain::invalidAtomMapping(atom.caption());
 	auto& newAtom = *options.firstAtomCreated;
 	assert(atom.atomid != newAtom.atomid);
 	info.atom = std::ref(newAtom);
@@ -102,7 +102,7 @@ void substituteParameterTypes(ClassdefTableView& cdeftable, Atom& atom, const Si
 ir::Sequence* translateAndInstanciateASTIRCode(InstanciateData& info, Signature& signature) {
 	auto& atomRequested = info.atom.get();
 	if (unlikely(!atomRequested.opcodes.sequence or !atomRequested.parent)) {
-		ice() << "invalid atom";
+		ny::complain::invalidAtom("ast ir code translation");
 		return nullptr;
 	}
 	// In case or an anonymous class or a class with generic type parameters, it is
@@ -130,7 +130,7 @@ ir::Sequence* translateAndInstanciateASTIRCode(InstanciateData& info, Signature&
 	Logs::Report report{*info.report};
 	// instanciate the sequence attached to the atom
 	auto builder = std::make_unique<SequenceBuilder>
-				   (report.subgroup(), newView, info.build, &outIR, inputIR, info.parent);
+		(report.subgroup(), newView, info.build, &outIR, inputIR, info.parent);
 	if (config::traces::sourceOpcodeSequence)
 		debugPrintSourceOpcodeSequence(info.cdeftable, info.atom.get(), "[ir-from-ast] ");
 	substituteParameterTypes(builder->cdeftable, atom, signature);
@@ -168,7 +168,7 @@ ir::Sequence* translateAndInstanciateASTIRCode(InstanciateData& info, Signature&
 					if (atom)
 						info.returnType.mutateToAtom(atom);
 					else
-						success = (ice() << "invalid atom pointer in func return type for '" << symbolName << '\'');
+						success = ny::complain::invalidAtomForFuncReturn(symbolName);
 				}
 				else
 					info.returnType.kind = cdefReturn.kind;
@@ -199,12 +199,9 @@ ir::Sequence* translateAndInstanciateASTIRCode(InstanciateData& info, Signature&
 
 bool instanciateRecursiveAtom(InstanciateData& info) {
 	Atom& atom = info.atom.get();
-	// mark the func as recursive
+	if (unlikely(not atom.isFunction()))
+		return ny::complain::invalidRecursiveAtom(atom.caption());
 	atom.flags += Atom::Flags::recursive;
-	if (unlikely(not atom.isFunction())) {
-		ice() << "cannot mark non function '" << atom.caption() << "' as recursive";
-		return false;
-	}
 	bool success = (info.parent
 		and info.parent->getReturnTypeForRecursiveFunc(atom, info.returnType));
 	if (unlikely(not success)) {
@@ -237,7 +234,7 @@ bool resolveTypesBeforeBodyStart(Build& build, Atom& atom, InstanciateData* orig
 		auto& tmplparams = originalInfo->tmplparams;
 		auto pindex = atom.classinfo.nextFieldIndex;
 		if (unlikely(not (pindex < tmplparams.size())))
-			return (ice() << "gen type invalid index");
+			return ny::complain::inconsistentGenericTypeParameterIndex();
 		atom.returnType.clid = CLID::AtomMapID(atom.atomid);
 		auto& srccdef = build.cdeftable.classdef(tmplparams[pindex].clid);
 		auto& rawcdef = build.cdeftable.rawclassdef(CLID::AtomMapID(atom.atomid));
