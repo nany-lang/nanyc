@@ -58,13 +58,14 @@ bool duplicateAtomForSpecialization(InstanciateData& info, Atom& atom) {
 	auto& sequence  = *atom.opcodes.sequence;
 	auto& originaltable = info.cdeftable.originalTable();
 	Mutex mutex; // useless but currently required for the first pass by SequenceMapping
-	Pass::Mapping::SequenceMapping mapper{originaltable, mutex, sequence};
-	mapper.evaluateWholeSequence = false;
-	mapper.prefixNameForFirstAtomCreated = "^"; // not an user-defined atom
-	mapper.map(*atom.parent, atom.opcodes.offset);
-	if (unlikely(!mapper.firstAtomCreated))
+	Pass::MappingOptions options;
+	options.evaluateWholeSequence = false;
+	options.prefixNameForFirstAtomCreated = "^"; // not an user-defined atom
+	options.offset = atom.opcodes.offset;
+	Pass::map(*atom.parent, originaltable, mutex, sequence, options);
+	if (unlikely(!options.firstAtomCreated))
 		return (ice() << "failed to remap atom '" << atom.caption() << '\'');
-	auto& newAtom = *mapper.firstAtomCreated;
+	auto& newAtom = *options.firstAtomCreated;
 	assert(atom.atomid != newAtom.atomid);
 	info.atom = std::ref(newAtom);
 	newAtom.tmplparamsForPrinting.swap(newAtom.tmplparams);

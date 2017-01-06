@@ -9,43 +9,29 @@
 #include "details/ir/instruction.h"
 
 
-
-
 namespace ny {
 namespace Pass {
-namespace Mapping {
 
 
-class SequenceMapping final {
-public:
-	SequenceMapping(ClassdefTable& cdeftable, Yuni::Mutex& mutex, ir::Sequence& sequence);
-
-	bool map(Atom& parentAtom, uint32_t offset = 0);
-
-
-public:
-	//! The classdef table (must be protected by 'mutex' in some passes)
-	ClassdefTable& cdeftable;
-	//! Mutex for the cdeftable
-	Yuni::Mutex& mutex;
-	//! Current sequence
-	ir::Sequence& currentSequence;
+struct MappingOptions final {
 	//! Flag to evaluate the whole sequence, or only a portion of it
 	bool evaluateWholeSequence = true;
 	//! Prefix to prepend for the first atom created by the mapping
 	AnyString prefixNameForFirstAtomCreated;
+	//! IR Code offset
+	uint32_t offset = 0;
+	//! Does the first atom created own the sequence
+	bool firstAtomOwnSequence = false;
+
 	//! The first atom created by the mapping
 	// This value might be used when a mapping is done on the fly
 	// (while instanciating code for example)
 	Atom* firstAtomCreated = nullptr;
-	//! Does the first atom created own the sequence
-	bool firstAtomOwnSequence = false;
-
-}; // class SequenceMapping
+};
 
 
+bool map(Atom& parent, ClassdefTable&, Yuni::Mutex&, ir::Sequence&, MappingOptions&);
 
 
-} // namespace Mapping
 } // namespace Pass
 } // namespace ny

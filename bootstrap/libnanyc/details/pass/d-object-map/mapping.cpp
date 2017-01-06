@@ -7,7 +7,6 @@ using namespace Yuni;
 
 namespace ny {
 namespace Pass {
-namespace Mapping {
 
 
 namespace {
@@ -15,7 +14,7 @@ namespace {
 
 template<class T>
 inline void rememberFirstAtomCreated(T& mapping, Atom& atom) {
-	mapping.firstAtomCreated = &atom;
+	mapping.options.firstAtomCreated = &atom;
 	if (mapping.firstAtomOwnSequence)
 		atom.opcodes.owned = true;
 }
@@ -39,9 +38,7 @@ struct AtomStackFrame final {
 	//! Information for capturing variables
 	struct CaptureVariables {
 		//! Get if allowed to capture variables
-		bool enabled() const {
-			return atom != nullptr;
-		}
+		bool enabled() const { return atom; }
 
 		void enabled(Atom& newatom) {
 			atom = &newatom;
@@ -63,20 +60,18 @@ struct AtomStackFrame final {
 		return (not atom.isUnit()) ? atom : (*(atom.parent));
 	}
 
-}; // class AtomStackFrame
+}; // struct AtomStackFrame
 
 
 struct OpcodeReader final {
-	OpcodeReader(SequenceMapping& mapping)
-		: cdeftable(mapping.cdeftable)
-		, mutex(mapping.mutex)
-		, currentSequence(mapping.currentSequence)
-		, firstAtomCreated(mapping.firstAtomCreated)
-		, firstAtomOwnSequence(mapping.firstAtomOwnSequence)
-		, prefixNameForFirstAtomCreated{mapping.prefixNameForFirstAtomCreated}
-		, evaluateWholeSequence(mapping.evaluateWholeSequence)
-		, mapping(mapping) {
-		firstAtomCreated = nullptr; // reset the original variable
+	OpcodeReader(ClassdefTable& cdeftable, Mutex& mutex, ir::Sequence& sequence, MappingOptions& options)
+		: cdeftable(cdeftable)
+		, mutex(mutex)
+		, currentSequence(sequence)
+		, firstAtomOwnSequence(options.firstAtomOwnSequence)
+		, prefixNameForFirstAtomCreated{options.prefixNameForFirstAtomCreated}
+		, evaluateWholeSequence(options.evaluateWholeSequence)
+		, options(options) {
 		lastPushedNamedParameters.reserve(8); // arbitrary
 		lastPushedIndexedParameters.reserve(8);
 	}
@@ -202,7 +197,7 @@ struct OpcodeReader final {
 				newatom.flags += Atom::Flags::captureVariables;
 			}
 		}
-		if (!firstAtomCreated)
+		if (!options.firstAtomCreated)
 			rememberFirstAtomCreated(*this, newatom);
 	}
 
@@ -243,7 +238,7 @@ struct OpcodeReader final {
 		pushNewFrame(newClassAtom);
 		if (operands.lvid != 0)
 			atomStack->capture.enabled(newClassAtom);
-		if (!firstAtomCreated)
+		if (!options.firstAtomCreated)
 			rememberFirstAtomCreated(*this, newClassAtom);
 	}
 
@@ -302,7 +297,7 @@ struct OpcodeReader final {
 		auto& newVarAtom = cdeftable.atoms.createVardef(atom, varname);
 		cdeftable.registerAtom(newVarAtom);
 		newVarAtom.returnType.clid.reclass(atom.atomid, operands.lvid);
-		if (!firstAtomCreated)
+		if (!options.firstAtomCreated)
 			rememberFirstAtomCreated(*this, newVarAtom);
 	}
 
@@ -711,7 +706,7 @@ struct OpcodeReader final {
 	}
 
 
-	bool map(Atom& parentAtom, uint32_t offset) {
+	bool operator () (Atom& parentAtom, uint32_t offset) {
 		// some reset if reused
 		assert(not atomStack);
 		pushNewFrame(parentAtom);
@@ -735,13 +730,10 @@ struct OpcodeReader final {
 	Yuni::Mutex& mutex;
 	//! Current sequence
 	ir::Sequence& currentSequence;
-
 	//! Blueprint root element
 	std::unique_ptr<AtomStackFrame> atomStack;
 	//! Last lvid (for pushed parameters)
 	uint32_t lastuint32_t = 0;
-	//! The first atom created by the mapping
-	Atom*& firstAtomCreated;
 	bool firstAtomOwnSequence = false;
 	//! Last pushed indexed parameters
 	std::vector<uint32_t> lastPushedIndexedParameters;
@@ -751,29 +743,20 @@ struct OpcodeReader final {
 	AnyString prefixNameForFirstAtomCreated;
 	//! Flag to evaluate the whole sequence, or only a portion of it
 	bool evaluateWholeSequence = true;
-
 	bool needAtomDbgFileReport = false;
 	bool needAtomDbgOffsetReport = false;
-
-	//! cursor for iterating through all opcocdes
-	ir::Instruction** cursor = nullptr;
-
 	const char* currentFilename = nullptr;
 	uint32_t currentLine = 0;
 	uint32_t currentOffset = 0;
-	SequenceMapping& mapping;
+	MappingOptions& options;
 	bool success = false;
+
+	//! cursor for iterating through all opcocdes
+	ir::Instruction** cursor = nullptr;
 };
 
 
 } // anonymous namespace
-
-
-SequenceMapping::SequenceMapping(ClassdefTable& cdeftable, Mutex& mutex, ir::Sequence& sequence)
-	: cdeftable(cdeftable)
-	, mutex(mutex)
-	, currentSequence(sequence) {
-}
 
 
 static void retriveReportMetadata(void* self, Logs::Level level, const AST::Node*, String& filename,
@@ -786,13 +769,13 @@ static void retriveReportMetadata(void* self, Logs::Level level, const AST::Node
 }
 
 
-bool SequenceMapping::map(Atom& parentAtom, uint32_t offset) {
-	OpcodeReader reader{*this};
+bool map(Atom& parent, ClassdefTable& cdeftable, Mutex& mutex, ir::Sequence& sequence, MappingOptions& options) {
+	options.firstAtomCreated = nullptr;
+	OpcodeReader reader{cdeftable, mutex, sequence, options};
 	Logs::MetadataHandler handler{&reader, &retriveReportMetadata};
-	return reader.map(parentAtom, offset);
+	return reader(parent, options.offset);
 }
 
 
-} // namespace Mapping
 } // namespace Pass
 } // namespace ny
