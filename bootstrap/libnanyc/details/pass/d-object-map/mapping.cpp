@@ -1,6 +1,7 @@
 #include "mapping.h"
 #include "details/atom/classdef-table-view.h"
 #include "details/ir/sequence.h"
+#include "details/errors/complain.h"
 
 using namespace Yuni;
 
@@ -770,10 +771,16 @@ static void retriveReportMetadata(void* self, Logs::Level level, const AST::Node
 
 
 bool map(Atom& parent, ClassdefTable& cdeftable, Mutex& mutex, ir::Sequence& sequence, MappingOptions& options) {
-	options.firstAtomCreated = nullptr;
-	OpcodeReader reader{cdeftable, mutex, sequence, options};
-	Logs::MetadataHandler handler{&reader, &retriveReportMetadata};
-	return reader(parent, options.offset);
+	try {
+		options.firstAtomCreated = nullptr;
+		OpcodeReader reader{cdeftable, mutex, sequence, options};
+		Logs::MetadataHandler handler{&reader, &retriveReportMetadata};
+		return reader(parent, options.offset);
+	}
+	catch (const std::exception& e) {
+		complain::exception(e);
+	}
+	return false;
 }
 
 
