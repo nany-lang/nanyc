@@ -93,8 +93,6 @@ struct Sequence final {
 	uint32_t opcodeCount() const;
 	//! Get the capacity of the sequence (in instructions)
 	uint32_t capacity() const;
-	//! Get the amount of memory in bytes used by the sequence
-	size_t sizeInBytes() const;
 
 	//! Clear the sequence
 	void clear();

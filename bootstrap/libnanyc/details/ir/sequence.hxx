@@ -11,11 +11,6 @@ namespace ny {
 namespace ir {
 
 
-inline size_t Sequence::sizeInBytes() const {
-	return m_capacity * sizeof(Instruction) + stringrefs.sizeInBytes();
-}
-
-
 inline void Sequence::reserve(uint32_t count) {
 	if (m_capacity < count)
 		grow(count);

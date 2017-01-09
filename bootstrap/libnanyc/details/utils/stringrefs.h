@@ -26,9 +26,6 @@ struct StringRefs final {
 	//! Clear the container
 	void clear();
 
-	//! Get the size in bytes occupied by this object
-	size_t sizeInBytes() const;
-
 	//! Retrieve a stored string from its index
 	AnyString operator [] (uint32_t ix) const;
 
