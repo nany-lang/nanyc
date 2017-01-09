@@ -18,8 +18,6 @@ public:
 		: cf(cf) {
 	}
 
-	size_t inspectMemoryUsage() const;
-
 public:
 	nybuild_cf_t& cf;
 

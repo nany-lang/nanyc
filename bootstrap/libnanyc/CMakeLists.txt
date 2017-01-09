@@ -438,7 +438,6 @@ addsrc(
 	"details/context/build.cpp"
 
 	"details/context/build-info.h"
-	"details/context/build-info.cpp"
 	"details/context/target.h"
 	"details/context/target.hxx"
 	"details/context/target.cpp"
