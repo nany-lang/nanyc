@@ -9,10 +9,10 @@ namespace ir {
 namespace Producer {
 
 
-Context::Context(nybuild_cf_t& cf, AnyString filename, Sequence& sequence, Logs::Report report)
+Context::Context(nybuild_cf_t& cf, AnyString filename, Sequence& ircode, Logs::Report report)
 	: ignoreAtoms(cf.ignore_atoms != nyfalse)
 	, cf(cf)
-	, sequence(sequence)
+	, ircode(ircode)
 	, report(report)
 	, dbgSourceFilename(filename)
 	, localErrorHandler(this, &emitReportEntry)
@@ -61,7 +61,7 @@ void Context::retriveReportMetadata(void* self, Logs::Level, const AST::Node* no
 void Context::useNamespace(const AnyString& nmspc) {
 	if (not nmspc.empty()) {
 		nmspc.words(".", [&](const AnyString & part) -> bool {
-			ir::emit::blueprint::namespacedef(sequence, part);
+			ir::emit::blueprint::namespacedef(ircode, part);
 			return true;
 		});
 	}

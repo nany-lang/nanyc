@@ -8,290 +8,287 @@ namespace ir {
 namespace emit {
 namespace {
 
-struct SequenceRef final {
-	SequenceRef(Sequence& sequence) : sequence(sequence) {}
-	SequenceRef(Sequence* sequence) : sequence(*sequence) {
-		assert(sequence != nullptr);
-	}
-
-	Sequence& sequence;
+struct IRCodeRef final {
+	IRCodeRef(Sequence& ircode) : ircode(ircode) {}
+	IRCodeRef(Sequence* ircode) : ircode(*ircode) { assert(ircode != nullptr); }
+	Sequence& ircode;
 };
 
 
-inline void opnot(SequenceRef ref, uint32_t lvid, uint32_t lhs) {
-	auto& operands = ref.sequence.emit<isa::Op::negation>();
+inline void opnot(IRCodeRef ref, uint32_t lvid, uint32_t lhs) {
+	auto& operands = ref.ircode.emit<isa::Op::negation>();
 	operands.lvid  = lvid;
 	operands.lhs   = lhs;
 }
 
 
-inline void opfadd(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
-	auto& operands = ref.sequence.emit<isa::Op::fadd>();
-	operands.lvid  = lvid;
-	operands.lhs   = lhs;
-	operands.rhs   = rhs;
-}
-
-
-inline void opfsub(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
-	auto& operands = ref.sequence.emit<isa::Op::fsub>();
+inline void opfadd(IRCodeRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+	auto& operands = ref.ircode.emit<isa::Op::fadd>();
 	operands.lvid  = lvid;
 	operands.lhs   = lhs;
 	operands.rhs   = rhs;
 }
 
 
-inline void opfdiv(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
-	auto& operands = ref.sequence.emit<isa::Op::fdiv>();
+inline void opfsub(IRCodeRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+	auto& operands = ref.ircode.emit<isa::Op::fsub>();
 	operands.lvid  = lvid;
 	operands.lhs   = lhs;
 	operands.rhs   = rhs;
 }
 
 
-inline void opfmul(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
-	auto& operands = ref.sequence.emit<isa::Op::fmul>();
+inline void opfdiv(IRCodeRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+	auto& operands = ref.ircode.emit<isa::Op::fdiv>();
 	operands.lvid  = lvid;
 	operands.lhs   = lhs;
 	operands.rhs   = rhs;
 }
 
 
-inline void opadd(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
-	auto& operands = ref.sequence.emit<isa::Op::add>();
+inline void opfmul(IRCodeRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+	auto& operands = ref.ircode.emit<isa::Op::fmul>();
 	operands.lvid  = lvid;
 	operands.lhs   = lhs;
 	operands.rhs   = rhs;
 }
 
 
-inline void opsub(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
-	auto& operands = ref.sequence.emit<isa::Op::sub>();
+inline void opadd(IRCodeRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+	auto& operands = ref.ircode.emit<isa::Op::add>();
 	operands.lvid  = lvid;
 	operands.lhs   = lhs;
 	operands.rhs   = rhs;
 }
 
 
-inline void opdiv(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
-	auto& operands = ref.sequence.emit<isa::Op::div>();
+inline void opsub(IRCodeRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+	auto& operands = ref.ircode.emit<isa::Op::sub>();
 	operands.lvid  = lvid;
 	operands.lhs   = lhs;
 	operands.rhs   = rhs;
 }
 
 
-inline void opmul(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
-	auto& operands = ref.sequence.emit<isa::Op::mul>();
+inline void opdiv(IRCodeRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+	auto& operands = ref.ircode.emit<isa::Op::div>();
 	operands.lvid  = lvid;
 	operands.lhs   = lhs;
 	operands.rhs   = rhs;
 }
 
 
-inline void opimul(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
-	auto& operands = ref.sequence.emit<isa::Op::imul>();
+inline void opmul(IRCodeRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+	auto& operands = ref.ircode.emit<isa::Op::mul>();
 	operands.lvid  = lvid;
 	operands.lhs   = lhs;
 	operands.rhs   = rhs;
 }
 
 
-inline void opidiv(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
-	auto& operands = ref.sequence.emit<isa::Op::idiv>();
+inline void opimul(IRCodeRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+	auto& operands = ref.ircode.emit<isa::Op::imul>();
 	operands.lvid  = lvid;
 	operands.lhs   = lhs;
 	operands.rhs   = rhs;
 }
 
 
-inline void opeq(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
-	auto& operands = ref.sequence.emit<isa::Op::eq>();
+inline void opidiv(IRCodeRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+	auto& operands = ref.ircode.emit<isa::Op::idiv>();
 	operands.lvid  = lvid;
 	operands.lhs   = lhs;
 	operands.rhs   = rhs;
 }
 
 
-inline void opneq(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
-	auto& operands = ref.sequence.emit<isa::Op::neq>();
+inline void opeq(IRCodeRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+	auto& operands = ref.ircode.emit<isa::Op::eq>();
 	operands.lvid  = lvid;
 	operands.lhs   = lhs;
 	operands.rhs   = rhs;
 }
 
 
-inline void opflt(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
-	auto& operands = ref.sequence.emit<isa::Op::flt>();
+inline void opneq(IRCodeRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+	auto& operands = ref.ircode.emit<isa::Op::neq>();
 	operands.lvid  = lvid;
 	operands.lhs   = lhs;
 	operands.rhs   = rhs;
 }
 
 
-inline void opflte(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
-	auto& operands = ref.sequence.emit<isa::Op::flte>();
+inline void opflt(IRCodeRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+	auto& operands = ref.ircode.emit<isa::Op::flt>();
 	operands.lvid  = lvid;
 	operands.lhs   = lhs;
 	operands.rhs   = rhs;
 }
 
 
-inline void opfgt(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
-	auto& operands = ref.sequence.emit<isa::Op::fgt>();
+inline void opflte(IRCodeRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+	auto& operands = ref.ircode.emit<isa::Op::flte>();
 	operands.lvid  = lvid;
 	operands.lhs   = lhs;
 	operands.rhs   = rhs;
 }
 
 
-inline void opfgte(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
-	auto& operands = ref.sequence.emit<isa::Op::fgte>();
+inline void opfgt(IRCodeRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+	auto& operands = ref.ircode.emit<isa::Op::fgt>();
 	operands.lvid  = lvid;
 	operands.lhs   = lhs;
 	operands.rhs   = rhs;
 }
 
 
-inline void oplt(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
-	auto& operands = ref.sequence.emit<isa::Op::lt>();
+inline void opfgte(IRCodeRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+	auto& operands = ref.ircode.emit<isa::Op::fgte>();
 	operands.lvid  = lvid;
 	operands.lhs   = lhs;
 	operands.rhs   = rhs;
 }
 
 
-inline void oplte(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
-	auto& operands = ref.sequence.emit<isa::Op::lte>();
+inline void oplt(IRCodeRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+	auto& operands = ref.ircode.emit<isa::Op::lt>();
 	operands.lvid  = lvid;
 	operands.lhs   = lhs;
 	operands.rhs   = rhs;
 }
 
 
-inline void opilt(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
-	auto& operands = ref.sequence.emit<isa::Op::ilt>();
+inline void oplte(IRCodeRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+	auto& operands = ref.ircode.emit<isa::Op::lte>();
 	operands.lvid  = lvid;
 	operands.lhs   = lhs;
 	operands.rhs   = rhs;
 }
 
 
-inline void opilte(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
-	auto& operands = ref.sequence.emit<isa::Op::ilte>();
+inline void opilt(IRCodeRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+	auto& operands = ref.ircode.emit<isa::Op::ilt>();
 	operands.lvid  = lvid;
 	operands.lhs   = lhs;
 	operands.rhs   = rhs;
 }
 
 
-inline void opgt(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
-	auto& operands = ref.sequence.emit<isa::Op::gt>();
+inline void opilte(IRCodeRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+	auto& operands = ref.ircode.emit<isa::Op::ilte>();
 	operands.lvid  = lvid;
 	operands.lhs   = lhs;
 	operands.rhs   = rhs;
 }
 
 
-inline void opgte(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
-	auto& operands = ref.sequence.emit<isa::Op::gte>();
+inline void opgt(IRCodeRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+	auto& operands = ref.ircode.emit<isa::Op::gt>();
 	operands.lvid  = lvid;
 	operands.lhs   = lhs;
 	operands.rhs   = rhs;
 }
 
 
-inline void opigt(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
-	auto& operands = ref.sequence.emit<isa::Op::igt>();
+inline void opgte(IRCodeRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+	auto& operands = ref.ircode.emit<isa::Op::gte>();
 	operands.lvid  = lvid;
 	operands.lhs   = lhs;
 	operands.rhs   = rhs;
 }
 
 
-inline void opigte(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
-	auto& operands = ref.sequence.emit<isa::Op::igte>();
+inline void opigt(IRCodeRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+	auto& operands = ref.ircode.emit<isa::Op::igt>();
 	operands.lvid  = lvid;
 	operands.lhs   = lhs;
 	operands.rhs   = rhs;
 }
 
 
-inline void opand(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
-	auto& operands = ref.sequence.emit<isa::Op::opand>();
+inline void opigte(IRCodeRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+	auto& operands = ref.ircode.emit<isa::Op::igte>();
 	operands.lvid  = lvid;
 	operands.lhs   = lhs;
 	operands.rhs   = rhs;
 }
 
 
-inline void opor(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
-	auto& operands = ref.sequence.emit<isa::Op::opor>();
+inline void opand(IRCodeRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+	auto& operands = ref.ircode.emit<isa::Op::opand>();
 	operands.lvid  = lvid;
 	operands.lhs   = lhs;
 	operands.rhs   = rhs;
 }
 
 
-inline void opxor(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
-	auto& operands = ref.sequence.emit<isa::Op::opxor>();
+inline void opor(IRCodeRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+	auto& operands = ref.ircode.emit<isa::Op::opor>();
 	operands.lvid  = lvid;
 	operands.lhs   = lhs;
 	operands.rhs   = rhs;
 }
 
 
-inline void opmod(SequenceRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
-	auto& operands = ref.sequence.emit<isa::Op::opmod>();
+inline void opxor(IRCodeRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+	auto& operands = ref.ircode.emit<isa::Op::opxor>();
 	operands.lvid  = lvid;
 	operands.lhs   = lhs;
 	operands.rhs   = rhs;
 }
 
 
-inline void nop(SequenceRef ref) {
-	ref.sequence.emit<isa::Op::nop>();
+inline void opmod(IRCodeRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+	auto& operands = ref.ircode.emit<isa::Op::opmod>();
+	operands.lvid  = lvid;
+	operands.lhs   = lhs;
+	operands.rhs   = rhs;
+}
+
+
+inline void nop(IRCodeRef ref) {
+	ref.ircode.emit<isa::Op::nop>();
 }
 
 
 //! Copy two register
-inline void copy(SequenceRef ref, uint32_t lvid, uint32_t source) {
-	auto& operands = ref.sequence.emit<isa::Op::store>();
+inline void copy(IRCodeRef ref, uint32_t lvid, uint32_t source) {
+	auto& operands = ref.ircode.emit<isa::Op::store>();
 	operands.lvid = lvid;
 	operands.source = source;
 }
 
 
-inline void constantu64(SequenceRef ref, uint32_t lvid, uint64_t value) {
-	auto& operands = ref.sequence.emit<isa::Op::storeConstant>();
+inline void constantu64(IRCodeRef ref, uint32_t lvid, uint64_t value) {
+	auto& operands = ref.ircode.emit<isa::Op::storeConstant>();
 	operands.lvid = lvid;
 	operands.value.u64 = value;
 }
 
 
-inline void constantf64(SequenceRef ref, uint32_t lvid, double value) {
-	auto& operands = ref.sequence.emit<isa::Op::storeConstant>();
+inline void constantf64(IRCodeRef ref, uint32_t lvid, double value) {
+	auto& operands = ref.ircode.emit<isa::Op::storeConstant>();
 	operands.lvid  = lvid;
 	operands.value.f64 = value;
 }
 
 
-inline void constantbool(SequenceRef ref, uint32_t lvid, bool value) {
+inline void constantbool(IRCodeRef ref, uint32_t lvid, bool value) {
 	constantu64(ref, lvid, value ? 1 : 0);
 }
 
 
-inline uint32_t constantText(SequenceRef ref, uint32_t lvid, const AnyString& text) {
-	auto& operands = ref.sequence.emit<isa::Op::storeText>();
+inline uint32_t constantText(IRCodeRef ref, uint32_t lvid, const AnyString& text) {
+	auto& operands = ref.ircode.emit<isa::Op::storeText>();
 	operands.lvid = lvid;
-	operands.text = ref.sequence.stringrefs.ref(text);
+	operands.text = ref.ircode.stringrefs.ref(text);
 	return operands.text;
 }
 
 
 //! Allocate a new variable on the stack and get the register
-inline uint32_t alloc(SequenceRef ref, uint32_t lvid, nytype_t type = nyt_any) {
-	auto& operands  = ref.sequence.emit<isa::Op::stackalloc>();
+inline uint32_t alloc(IRCodeRef ref, uint32_t lvid, nytype_t type = nyt_any) {
+	auto& operands  = ref.ircode.emit<isa::Op::stackalloc>();
 	operands.lvid   = lvid;
 	operands.type   = static_cast<uint32_t>(type);
 	operands.atomid = (uint32_t) - 1;
@@ -300,7 +297,7 @@ inline uint32_t alloc(SequenceRef ref, uint32_t lvid, nytype_t type = nyt_any) {
 
 
 //! Allocate a new variable on the stack and assign a value to it and get the register
-inline uint32_t allocu64(SequenceRef ref, uint32_t lvid, nytype_t type, uint64_t value) {
+inline uint32_t allocu64(IRCodeRef ref, uint32_t lvid, nytype_t type, uint64_t value) {
 	ir::emit::alloc(ref, lvid, type);
 	ir::emit::constantu64(ref, lvid, value);
 	return lvid;
@@ -308,7 +305,7 @@ inline uint32_t allocu64(SequenceRef ref, uint32_t lvid, nytype_t type, uint64_t
 
 
 //! Allocate a new variable on the stack and assign a value to it and get the register
-inline uint32_t allocf64(SequenceRef ref, uint32_t lvid, nytype_t type, double value) {
+inline uint32_t allocf64(IRCodeRef ref, uint32_t lvid, nytype_t type, double value) {
 	ir::emit::alloc(ref, lvid, type);
 	ir::emit::constantf64(ref, lvid, value);
 	return lvid;
@@ -316,71 +313,71 @@ inline uint32_t allocf64(SequenceRef ref, uint32_t lvid, nytype_t type, double v
 
 
 //! Allocate a new variable on the stack and assign a text to it and get the register
-inline uint32_t alloctext(SequenceRef ref, uint32_t lvid, const AnyString& text) {
+inline uint32_t alloctext(IRCodeRef ref, uint32_t lvid, const AnyString& text) {
 	ir::emit::alloc(ref, lvid, nyt_ptr);
 	ir::emit::constantText(ref, lvid, text);
 	return lvid;
 }
 
 
-inline uint32_t increaseStacksize(SequenceRef ref, uint32_t size = 0) {
-	uint32_t offset = ref.sequence.opcodeCount();
-	ref.sequence.emit<isa::Op::stacksize>().add = size;
+inline uint32_t increaseStacksize(IRCodeRef ref, uint32_t size = 0) {
+	uint32_t offset = ref.ircode.opcodeCount();
+	ref.ircode.emit<isa::Op::stacksize>().add = size;
 	return offset;
 }
 
 
-inline void cassert(SequenceRef ref, uint32_t lvid) {
-	ref.sequence.emit<isa::Op::opassert>().lvid = lvid;
+inline void cassert(IRCodeRef ref, uint32_t lvid) {
+	ref.ircode.emit<isa::Op::opassert>().lvid = lvid;
 }
 
 
-inline uint32_t objectAlloc(SequenceRef ref, uint32_t lvid, uint32_t atomid) {
-	auto& operands = ref.sequence.emit<isa::Op::allocate>();
+inline uint32_t objectAlloc(IRCodeRef ref, uint32_t lvid, uint32_t atomid) {
+	auto& operands = ref.ircode.emit<isa::Op::allocate>();
 	operands.lvid = lvid;
 	operands.atomid = atomid;
 	return lvid;
 }
 
 
-inline void ref(SequenceRef ref, uint32_t lvid) {
-	ref.sequence.emit<isa::Op::ref>().lvid = lvid;
+inline void ref(IRCodeRef ref, uint32_t lvid) {
+	ref.ircode.emit<isa::Op::ref>().lvid = lvid;
 }
 
 
-inline void unref(SequenceRef ref, uint32_t lvid, uint32_t atomid, uint32_t instanceid) {
-	auto& operands = ref.sequence.emit<isa::Op::unref>();
+inline void unref(IRCodeRef ref, uint32_t lvid, uint32_t atomid, uint32_t instanceid) {
+	auto& operands = ref.ircode.emit<isa::Op::unref>();
 	operands.lvid = lvid;
 	operands.atomid = atomid;
 	operands.instanceid = instanceid;
 }
 
 
-inline void scopeBegin(SequenceRef ref) {
-	ref.sequence.emit<isa::Op::scope>();
+inline void scopeBegin(IRCodeRef ref) {
+	ref.ircode.emit<isa::Op::scope>();
 }
 
 
-inline void scopeEnd(SequenceRef ref) {
-	ref.sequence.emit<isa::Op::end>();
+inline void scopeEnd(IRCodeRef ref) {
+	ref.ircode.emit<isa::Op::end>();
 }
 
 
-inline uint32_t label(SequenceRef ref, uint32_t labelid) {
-	ref.sequence.emit<isa::Op::label>().label = labelid;
+inline uint32_t label(IRCodeRef ref, uint32_t labelid) {
+	ref.ircode.emit<isa::Op::label>().label = labelid;
 	return labelid;
 }
 
 
 //! Unconditional jump
-inline void jmp(SequenceRef ref, uint32_t label) {
-	ref.sequence.emit<isa::Op::jmp>().label = label;
+inline void jmp(IRCodeRef ref, uint32_t label) {
+	ref.ircode.emit<isa::Op::jmp>().label = label;
 }
 
 
 //! jump if zero
-inline void jz(SequenceRef ref, uint32_t lvid, uint32_t result, uint32_t label) {
-	auto& opc  = ref.sequence.emit<isa::Op::jz>();
+inline void jz(IRCodeRef ref, uint32_t lvid, uint32_t result, uint32_t label) {
+	auto& opc  = ref.ircode.emit<isa::Op::jz>();
 	opc.lvid   = lvid;
 	opc.result = result;
 	opc.label  = label;
@@ -388,121 +385,118 @@ inline void jz(SequenceRef ref, uint32_t lvid, uint32_t result, uint32_t label) 
 
 
 //! jump if not zero
-inline void jnz(SequenceRef ref, uint32_t lvid, uint32_t result, uint32_t label) {
-	auto& opc  = ref.sequence.emit<isa::Op::jnz>();
+inline void jnz(IRCodeRef ref, uint32_t lvid, uint32_t result, uint32_t label) {
+	auto& opc  = ref.ircode.emit<isa::Op::jnz>();
 	opc.lvid   = lvid;
 	opc.result = result;
 	opc.label  = label;
 }
 
 
-inline void identify(SequenceRef ref, uint32_t lvid, const AnyString& name, uint32_t self) {
-	auto& sequence = ref.sequence;
-	auto& operands = sequence.emit<isa::Op::identify>();
+inline void identify(IRCodeRef ref, uint32_t lvid, const AnyString& name, uint32_t self) {
+	auto& operands = ref.ircode.emit<isa::Op::identify>();
 	operands.lvid  = lvid;
 	operands.self  = self;
-	operands.text  = sequence.stringrefs.ref(name);
+	operands.text  = ref.ircode.stringrefs.ref(name);
 }
 
 
-inline void namealias(SequenceRef ref, uint32_t lvid, const AnyString& name) {
-	auto& sequence = ref.sequence;
-	auto& operands = sequence.emit<isa::Op::namealias>();
+inline void namealias(IRCodeRef ref, uint32_t lvid, const AnyString& name) {
+	auto& operands = ref.ircode.emit<isa::Op::namealias>();
 	operands.lvid  = lvid;
-	operands.name  = sequence.stringrefs.ref(name);
+	operands.name  = ref.ircode.stringrefs.ref(name);
 }
 
 
-inline void push(SequenceRef ref, uint32_t lvid) {
-	auto& operands = ref.sequence.emit<isa::Op::push>();
-	operands.lvid  = lvid;
-	operands.name  = 0;
-}
-
-
-inline void push(SequenceRef ref, uint32_t lvid, const AnyString& name) {
-	auto& sequence = ref.sequence;
-	auto& operands = sequence.emit<isa::Op::push>();
-	operands.lvid  = lvid;
-	operands.name  = (not name.empty()) ? sequence.stringrefs.ref(name) : 0;
-}
-
-
-inline void tpush(SequenceRef ref, uint32_t lvid) {
-	auto& operands = ref.sequence.emit<isa::Op::tpush>();
+inline void push(IRCodeRef ref, uint32_t lvid) {
+	auto& operands = ref.ircode.emit<isa::Op::push>();
 	operands.lvid  = lvid;
 	operands.name  = 0;
 }
 
 
-inline void tpush(SequenceRef ref, uint32_t lvid, const AnyString& name) {
-	auto& operands = ref.sequence.emit<isa::Op::tpush>();
+inline void push(IRCodeRef ref, uint32_t lvid, const AnyString& name) {
+	auto& operands = ref.ircode.emit<isa::Op::push>();
 	operands.lvid  = lvid;
-	operands.name  = (not name.empty()) ? ref.sequence.stringrefs.ref(name) : 0;
+	operands.name  = (not name.empty()) ? ref.ircode.stringrefs.ref(name) : 0;
 }
 
 
-inline void call(SequenceRef ref, uint32_t lvid, uint32_t ptr2func) {
-	auto& operands = ref.sequence.emit<isa::Op::call>();
+inline void tpush(IRCodeRef ref, uint32_t lvid) {
+	auto& operands = ref.ircode.emit<isa::Op::tpush>();
+	operands.lvid  = lvid;
+	operands.name  = 0;
+}
+
+
+inline void tpush(IRCodeRef ref, uint32_t lvid, const AnyString& name) {
+	auto& operands = ref.ircode.emit<isa::Op::tpush>();
+	operands.lvid  = lvid;
+	operands.name  = (not name.empty()) ? ref.ircode.stringrefs.ref(name) : 0;
+}
+
+
+inline void call(IRCodeRef ref, uint32_t lvid, uint32_t ptr2func) {
+	auto& operands = ref.ircode.emit<isa::Op::call>();
 	operands.lvid  = lvid;
 	operands.ptr2func = ptr2func;
 	operands.instanceid = (uint32_t) - 1;
 }
 
 
-inline void call(SequenceRef ref, uint32_t lvid, uint32_t atomid, uint32_t instanceid) {
+inline void call(IRCodeRef ref, uint32_t lvid, uint32_t atomid, uint32_t instanceid) {
 	assert(instanceid != (uint32_t) - 1);
-	auto& operands = ref.sequence.emit<isa::Op::call>();
+	auto& operands = ref.ircode.emit<isa::Op::call>();
 	operands.lvid  = lvid;
 	operands.ptr2func = atomid;
 	operands.instanceid = instanceid;
 }
 
 
-inline void intrinsic(SequenceRef ref, uint32_t lvid, const AnyString& name, uint32_t id = (uint32_t) - 1) {
-	auto& operands     = ref.sequence.emit<isa::Op::intrinsic>();
+inline void intrinsic(IRCodeRef ref, uint32_t lvid, const AnyString& name, uint32_t id = (uint32_t) - 1) {
+	auto& operands     = ref.ircode.emit<isa::Op::intrinsic>();
 	operands.lvid      = lvid;
-	operands.intrinsic = ref.sequence.stringrefs.ref(name);
+	operands.intrinsic = ref.ircode.stringrefs.ref(name);
 	operands.iid       = id;
 }
 
 
 //! Return with no value
-inline void ret(SequenceRef ref) {
-	auto& operands   = ref.sequence.emit<isa::Op::ret>();
+inline void ret(IRCodeRef ref) {
+	auto& operands   = ref.ircode.emit<isa::Op::ret>();
 	operands.lvid    = 0;
 	operands.tmplvid = 0;
 }
 
 
 //! Return from value
-inline void ret(SequenceRef ref, uint32_t lvid, uint32_t tmplvid) {
-	auto& operands   = ref.sequence.emit<isa::Op::ret>();
+inline void ret(IRCodeRef ref, uint32_t lvid, uint32_t tmplvid) {
+	auto& operands   = ref.ircode.emit<isa::Op::ret>();
 	operands.lvid    = lvid;
 	operands.tmplvid = tmplvid;
 }
 
 
-inline void assign(SequenceRef ref, uint32_t lhs, uint32_t rhs, bool canDisposeLHS) {
-	auto& operands = ref.sequence.emit<isa::Op::assign>();
+inline void assign(IRCodeRef ref, uint32_t lhs, uint32_t rhs, bool canDisposeLHS) {
+	auto& operands = ref.ircode.emit<isa::Op::assign>();
 	operands.lhs = lhs;
 	operands.rhs = rhs;
 	operands.disposelhs = canDisposeLHS;
 }
 
 
-inline void fieldget(SequenceRef ref, uint32_t lvid, uint32_t self, uint32_t fieldindex) {
+inline void fieldget(IRCodeRef ref, uint32_t lvid, uint32_t self, uint32_t fieldindex) {
 	assert(lvid != 0 and self != 0);
-	auto& operands = ref.sequence.emit<isa::Op::fieldget>();
+	auto& operands = ref.ircode.emit<isa::Op::fieldget>();
 	operands.lvid  = lvid;
 	operands.self  = self;
 	operands.var   = fieldindex;
 }
 
 
-inline void fieldset(SequenceRef ref, uint32_t lvid, uint32_t self, uint32_t varid) {
+inline void fieldset(IRCodeRef ref, uint32_t lvid, uint32_t self, uint32_t varid) {
 	assert(lvid != 0 and self != 0);
-	auto& operands = ref.sequence.emit<isa::Op::fieldset>();
+	auto& operands = ref.ircode.emit<isa::Op::fieldset>();
 	operands.lvid  = lvid;
 	operands.self  = self;
 	operands.var   = varid;
@@ -510,25 +504,23 @@ inline void fieldset(SequenceRef ref, uint32_t lvid, uint32_t self, uint32_t var
 
 
 template<class T> struct TraceWriter final {
-	static void emit(SequenceRef ref, const T& value) {
-		auto& sequence = ref.sequence;
-		sequence.emit<isa::Op::comment>().text = sequence.stringrefs.ref(value());
+	static void emit(IRCodeRef ref, const T& value) {
+		ref.ircode.emit<isa::Op::comment>().text = ref.ircode.stringrefs.ref(value());
 	}
 };
 
 
 template<uint32_t N>
 struct TraceWriter<char[N]> final {
-	static void emit(SequenceRef ref, const char* value) {
-		auto& sequence = ref.sequence;
-		sequence.emit<isa::Op::comment>().text = sequence.stringrefs.ref(AnyString{value, N});
+	static void emit(IRCodeRef ref, const char* value) {
+		ref.ircode.emit<isa::Op::comment>().text = ref.ircode.stringrefs.ref(AnyString{value, N});
 	}
 };
 
 
 //! Insert a comment in the IR code
 template<class T>
-inline void trace(SequenceRef ref, const T& value) {
+inline void trace(IRCodeRef ref, const T& value) {
 	//! ir::emit::trace(out, [](){return "some comments here";});
 	if (yuni::debugmode)
 		TraceWriter<T>::emit(std::move(ref), value);
@@ -537,7 +529,7 @@ inline void trace(SequenceRef ref, const T& value) {
 
 //! Insert a comment in the IR code
 template<class T>
-inline void trace(SequenceRef ref, bool condition, const T& value) {
+inline void trace(IRCodeRef ref, bool condition, const T& value) {
 	//! ir::emit::trace(out, [](){return "some comments here";});
 	if (yuni::debugmode and condition)
 		TraceWriter<T>::emit(std::move(ref), value);
@@ -545,9 +537,9 @@ inline void trace(SequenceRef ref, bool condition, const T& value) {
 
 
 //! Insert empty comment line in the IR code
-inline void trace(SequenceRef ref) {
+inline void trace(IRCodeRef ref) {
 	if (yuni::debugmode)
-		ref.sequence.emit<isa::Op::comment>().text = 0;
+		ref.ircode.emit<isa::Op::comment>().text = 0;
 }
 
 
@@ -564,48 +556,48 @@ namespace type {
 namespace {
 
 
-inline void isself(SequenceRef ref, uint32_t lvid) {
-	ref.sequence.emit<isa::Op::self>().self = lvid;
+inline void isself(IRCodeRef ref, uint32_t lvid) {
+	ref.ircode.emit<isa::Op::self>().self = lvid;
 }
 
 
-inline void isobject(SequenceRef ref, uint32_t lvid) {
-	ref.sequence.emit<isa::Op::typeisobject>().lvid = lvid;
+inline void isobject(IRCodeRef ref, uint32_t lvid) {
+	ref.ircode.emit<isa::Op::typeisobject>().lvid = lvid;
 }
 
 
-inline void common(SequenceRef ref, uint32_t lvid, uint32_t previous) {
-	auto& operands = ref.sequence.emit<isa::Op::commontype>();
+inline void common(IRCodeRef ref, uint32_t lvid, uint32_t previous) {
+	auto& operands = ref.ircode.emit<isa::Op::commontype>();
 	operands.lvid = lvid;
 	operands.previous = previous;
 }
 
 
-inline void objectSizeof(SequenceRef ref, uint32_t lvid, uint32_t type) {
-	auto& operands = ref.sequence.emit<isa::Op::classdefsizeof>();
+inline void objectSizeof(IRCodeRef ref, uint32_t lvid, uint32_t type) {
+	auto& operands = ref.ircode.emit<isa::Op::classdefsizeof>();
 	operands.lvid  = lvid;
 	operands.type  = type;
 }
 
 
-inline void qualifierRef(SequenceRef ref, uint32_t lvid, bool flag) {
-	auto& operands = ref.sequence.emit<isa::Op::qualifiers>();
+inline void qualifierRef(IRCodeRef ref, uint32_t lvid, bool flag) {
+	auto& operands = ref.ircode.emit<isa::Op::qualifiers>();
 	operands.lvid  = lvid;
 	operands.flag  = static_cast<uint32_t>(flag);
 	operands.qualifier = ir::isa::TypeQualifier::ref;
 }
 
 
-inline void qualifierConst(SequenceRef ref, uint32_t lvid, bool flag) {
-	auto& operands = ref.sequence.emit<isa::Op::qualifiers>();
+inline void qualifierConst(IRCodeRef ref, uint32_t lvid, bool flag) {
+	auto& operands = ref.ircode.emit<isa::Op::qualifiers>();
 	operands.lvid  = lvid;
 	operands.flag  = static_cast<uint32_t>(flag);
 	operands.qualifier = ir::isa::TypeQualifier::constant;
 }
 
 
-inline void ensureResolved(SequenceRef ref, uint32_t lvid) {
-	ref.sequence.emit<isa::Op::ensureresolved>().lvid = lvid;
+inline void ensureResolved(IRCodeRef ref, uint32_t lvid) {
+	ref.ircode.emit<isa::Op::ensureresolved>().lvid = lvid;
 }
 
 
@@ -624,33 +616,33 @@ namespace {
 
 
 template<ir::isa::Blueprint KindT>
-inline auto& make(SequenceRef& ref) {
-	auto& operands = ref.sequence.emit<ir::isa::Op::blueprint>();
+inline auto& make(IRCodeRef& ref) {
+	auto& operands = ref.ircode.emit<ir::isa::Op::blueprint>();
 	operands.kind = (decltype(operands.kind)) KindT;
 	return operands;
 }
 
 
-inline uint32_t unit(SequenceRef ref, const AnyString& filename) {
-	uint32_t offset = ref.sequence.opcodeCount();
+inline uint32_t unit(IRCodeRef ref, const AnyString& filename) {
+	uint32_t offset = ref.ircode.opcodeCount();
 	auto& operands  = blueprint::make<ir::isa::Blueprint::unit>(ref);
-	operands.name   = ref.sequence.stringrefs.ref(filename);
+	operands.name   = ref.ircode.stringrefs.ref(filename);
 	operands.atomid = (uint32_t) - 1;
 	operands.lvid   = 0u;
 	return offset;
 }
 
 
-inline void namespacedef(SequenceRef ref, const AnyString& name) {
+inline void namespacedef(IRCodeRef ref, const AnyString& name) {
 	auto& operands  = blueprint::make<ir::isa::Blueprint::namespacedef>(ref);
-	operands.name   = ref.sequence.stringrefs.ref(name);
+	operands.name   = ref.ircode.stringrefs.ref(name);
 	operands.atomid = (uint32_t) - 1;
 	operands.lvid   = 0u;
 }
 
 
-inline uint32_t classdef(SequenceRef ref, uint32_t lvid) {
-	uint32_t offset = ref.sequence.opcodeCount();
+inline uint32_t classdef(IRCodeRef ref, uint32_t lvid) {
+	uint32_t offset = ref.ircode.opcodeCount();
 	auto& operands  = blueprint::make<ir::isa::Blueprint::classdef>(ref);
 	operands.name   = 0u;
 	operands.atomid = (uint32_t) - 1;
@@ -659,16 +651,16 @@ inline uint32_t classdef(SequenceRef ref, uint32_t lvid) {
 }
 
 
-inline void func(SequenceRef ref, const AnyString& name, uint32_t atomid) {
+inline void func(IRCodeRef ref, const AnyString& name, uint32_t atomid) {
 	auto& operands  = blueprint::make<ir::isa::Blueprint::funcdef>(ref);
-	operands.name   = ref.sequence.stringrefs.ref(name);
+	operands.name   = ref.ircode.stringrefs.ref(name);
 	operands.atomid = atomid;
 	operands.lvid   = 0u;
 }
 
 
-inline uint32_t func(SequenceRef ref) {
-	uint32_t offset = ref.sequence.opcodeCount();
+inline uint32_t func(IRCodeRef ref) {
+	uint32_t offset = ref.ircode.opcodeCount();
 	auto& operands  = blueprint::make<ir::isa::Blueprint::funcdef>(ref);
 	operands.name   = 0u;
 	operands.atomid = (uint32_t) - 1;
@@ -677,36 +669,36 @@ inline uint32_t func(SequenceRef ref) {
 }
 
 
-inline void var(SequenceRef ref, uint32_t lvid, const AnyString& name) {
+inline void var(IRCodeRef ref, uint32_t lvid, const AnyString& name) {
 	auto& operands  = blueprint::make<ir::isa::Blueprint::vardef>(ref);
-	operands.name   = ref.sequence.stringrefs.ref(name);
+	operands.name   = ref.ircode.stringrefs.ref(name);
 	operands.atomid = (uint32_t) - 1;
 	operands.setLVID(lvid);
 }
 
 
-inline uint32_t typealias(SequenceRef ref, const AnyString& name, uint32_t atomid = (uint32_t) - 1) {
-	uint32_t offset = ref.sequence.opcodeCount();
+inline uint32_t typealias(IRCodeRef ref, const AnyString& name, uint32_t atomid = (uint32_t) - 1) {
+	uint32_t offset = ref.ircode.opcodeCount();
 	auto& operands  = blueprint::make<ir::isa::Blueprint::typealias>(ref);
-	operands.name   = ref.sequence.stringrefs.ref(name);
+	operands.name   = ref.ircode.stringrefs.ref(name);
 	operands.atomid = atomid;
 	operands.lvid   = 0u;
 	return offset;
 }
 
 
-inline uint32_t param(SequenceRef ref, uint32_t lvid, const AnyString& name) {
-	uint32_t offset = ref.sequence.opcodeCount();
+inline uint32_t param(IRCodeRef ref, uint32_t lvid, const AnyString& name) {
+	uint32_t offset = ref.ircode.opcodeCount();
 	auto& operands  = blueprint::make<ir::isa::Blueprint::param>(ref);
-	operands.name   = ref.sequence.stringrefs.ref(name);
+	operands.name   = ref.ircode.stringrefs.ref(name);
 	operands.atomid = (uint32_t) - 1;
 	operands.setLVID(lvid);
 	return offset;
 }
 
 
-inline uint32_t param(SequenceRef ref, uint32_t lvid) {
-	uint32_t offset = ref.sequence.opcodeCount();
+inline uint32_t param(IRCodeRef ref, uint32_t lvid) {
+	uint32_t offset = ref.ircode.opcodeCount();
 	auto& operands  = blueprint::make<ir::isa::Blueprint::param>(ref);
 	operands.name   = 0;
 	operands.atomid = (uint32_t) - 1;
@@ -715,18 +707,18 @@ inline uint32_t param(SequenceRef ref, uint32_t lvid) {
 }
 
 
-inline uint32_t tparam(SequenceRef ref, uint32_t lvid, const AnyString& name) {
-	uint32_t offset = ref.sequence.opcodeCount();
+inline uint32_t tparam(IRCodeRef ref, uint32_t lvid, const AnyString& name) {
+	uint32_t offset = ref.ircode.opcodeCount();
 	auto& operands  = blueprint::make<ir::isa::Blueprint::gentypeparam>(ref);
-	operands.name   = ref.sequence.stringrefs.ref(name);
+	operands.name   = ref.ircode.stringrefs.ref(name);
 	operands.atomid = (uint32_t) - 1;
 	operands.setLVID(lvid);
 	return offset;
 }
 
 
-inline uint32_t tparam(SequenceRef ref, uint32_t lvid) {
-	uint32_t offset = ref.sequence.opcodeCount();
+inline uint32_t tparam(IRCodeRef ref, uint32_t lvid) {
+	uint32_t offset = ref.ircode.opcodeCount();
 	auto& operands  = blueprint::make<ir::isa::Blueprint::gentypeparam>(ref);
 	operands.name   = 0;
 	operands.atomid = (uint32_t) - 1;
@@ -749,113 +741,113 @@ namespace memory {
 namespace {
 
 
-inline uint32_t allocate(SequenceRef ref, uint32_t lvid, uint32_t regsize) {
-	auto& operands   = ref.sequence.emit<isa::Op::memalloc>();
+inline uint32_t allocate(IRCodeRef ref, uint32_t lvid, uint32_t regsize) {
+	auto& operands   = ref.ircode.emit<isa::Op::memalloc>();
 	operands.lvid    = lvid;
 	operands.regsize = regsize;
 	return lvid;
 }
 
 
-inline void reallocate(SequenceRef ref, uint32_t lvid, uint32_t oldsize, uint32_t newsize) {
-	auto& operands   = ref.sequence.emit<isa::Op::memrealloc>();
+inline void reallocate(IRCodeRef ref, uint32_t lvid, uint32_t oldsize, uint32_t newsize) {
+	auto& operands   = ref.ircode.emit<isa::Op::memrealloc>();
 	operands.lvid    = lvid;
 	operands.oldsize = oldsize;
 	operands.newsize = newsize;
 }
 
 
-inline void dispose(SequenceRef ref, uint32_t lvid, uint32_t regsize) {
-	auto& operands   = ref.sequence.emit<isa::Op::memfree>();
+inline void dispose(IRCodeRef ref, uint32_t lvid, uint32_t regsize) {
+	auto& operands   = ref.ircode.emit<isa::Op::memfree>();
 	operands.lvid    = lvid;
 	operands.regsize = regsize;
 }
 
 
-inline void fill(SequenceRef ref, uint32_t lvid, uint32_t regsize, uint32_t pattern) {
-	auto& operands   = ref.sequence.emit<isa::Op::memfill>();
+inline void fill(IRCodeRef ref, uint32_t lvid, uint32_t regsize, uint32_t pattern) {
+	auto& operands   = ref.ircode.emit<isa::Op::memfill>();
 	operands.lvid    = lvid;
 	operands.regsize = regsize;
 	operands.pattern = pattern;
 }
 
 
-inline void copyNoOverlap(SequenceRef ref, uint32_t lvid, uint32_t srclvid, uint32_t regsize) {
-	auto& operands   = ref.sequence.emit<isa::Op::memcopy>();
+inline void copyNoOverlap(IRCodeRef ref, uint32_t lvid, uint32_t srclvid, uint32_t regsize) {
+	auto& operands   = ref.ircode.emit<isa::Op::memcopy>();
 	operands.lvid    = lvid;
 	operands.srclvid = srclvid;
 	operands.regsize = regsize;
 }
 
 
-inline void copy(SequenceRef ref, uint32_t lvid, uint32_t srclvid, uint32_t regsize) {
-	auto& operands   = ref.sequence.emit<isa::Op::memmove>();
+inline void copy(IRCodeRef ref, uint32_t lvid, uint32_t srclvid, uint32_t regsize) {
+	auto& operands   = ref.ircode.emit<isa::Op::memmove>();
 	operands.lvid    = lvid;
 	operands.srclvid = srclvid;
 	operands.regsize = regsize;
 }
 
 
-inline void compare(SequenceRef ref, uint32_t lvid, uint32_t srclvid, uint32_t regsize) {
-	auto& operands   = ref.sequence.emit<isa::Op::memcmp>();
+inline void compare(IRCodeRef ref, uint32_t lvid, uint32_t srclvid, uint32_t regsize) {
+	auto& operands   = ref.ircode.emit<isa::Op::memcmp>();
 	operands.lvid    = lvid;
 	operands.srclvid = srclvid;
 	operands.regsize = regsize;
 }
 
 
-inline void cstrlen(SequenceRef ref, uint32_t lvid, uint32_t bits, uint32_t ptr) {
-	auto& operands = ref.sequence.emit<isa::Op::cstrlen>();
+inline void cstrlen(IRCodeRef ref, uint32_t lvid, uint32_t bits, uint32_t ptr) {
+	auto& operands = ref.ircode.emit<isa::Op::cstrlen>();
 	operands.lvid  = lvid;
 	operands.bits  = bits;
 	operands.ptr   = ptr;
 }
 
 
-inline void loadu64(SequenceRef ref, uint32_t lvid, uint32_t addr) {
-	auto& opr   = ref.sequence.emit<isa::Op::load_u64>();
+inline void loadu64(IRCodeRef ref, uint32_t lvid, uint32_t addr) {
+	auto& opr   = ref.ircode.emit<isa::Op::load_u64>();
 	opr.lvid    = lvid;
 	opr.ptrlvid = addr;
 }
 
 
-inline void loadu32(SequenceRef ref, uint32_t lvid, uint32_t addr) {
-	auto& opr   = ref.sequence.emit<isa::Op::load_u32>();
+inline void loadu32(IRCodeRef ref, uint32_t lvid, uint32_t addr) {
+	auto& opr   = ref.ircode.emit<isa::Op::load_u32>();
 	opr.lvid    = lvid;
 	opr.ptrlvid = addr;
 }
 
 
-inline void loadu8(SequenceRef ref, uint32_t lvid, uint32_t addr) {
-	auto& opr   = ref.sequence.emit<isa::Op::load_u8>();
+inline void loadu8(IRCodeRef ref, uint32_t lvid, uint32_t addr) {
+	auto& opr   = ref.ircode.emit<isa::Op::load_u8>();
 	opr.lvid    = lvid;
 	opr.ptrlvid = addr;
 }
 
 
-inline void storeu64(SequenceRef ref, uint32_t lvid, uint32_t addr) {
-	auto& opr   = ref.sequence.emit<isa::Op::store_u64>();
+inline void storeu64(IRCodeRef ref, uint32_t lvid, uint32_t addr) {
+	auto& opr   = ref.ircode.emit<isa::Op::store_u64>();
 	opr.lvid    = lvid;
 	opr.ptrlvid = addr;
 }
 
 
-inline void storeu32(SequenceRef ref, uint32_t lvid, uint32_t addr) {
-	auto& opr   = ref.sequence.emit<isa::Op::store_u32>();
+inline void storeu32(IRCodeRef ref, uint32_t lvid, uint32_t addr) {
+	auto& opr   = ref.ircode.emit<isa::Op::store_u32>();
 	opr.lvid    = lvid;
 	opr.ptrlvid = addr;
 }
 
 
-inline void storeu8(SequenceRef ref, uint32_t lvid, uint32_t addr) {
-	auto& opr   = ref.sequence.emit<isa::Op::store_u8>();
+inline void storeu8(IRCodeRef ref, uint32_t lvid, uint32_t addr) {
+	auto& opr   = ref.ircode.emit<isa::Op::store_u8>();
 	opr.lvid    = lvid;
 	opr.ptrlvid = addr;
 }
 
 
-inline void hold(SequenceRef ref, uint32_t lvid, uint32_t size) {
-	auto& opr = ref.sequence.emit<isa::Op::memcheckhold>();
+inline void hold(IRCodeRef ref, uint32_t lvid, uint32_t size) {
+	auto& opr = ref.ircode.emit<isa::Op::memcheckhold>();
 	opr.lvid = lvid;
 	opr.size = size;
 }
@@ -874,72 +866,72 @@ namespace emit {
 namespace pragma {
 namespace {
 
-inline auto& make(SequenceRef& ref, ir::isa::Pragma value) {
-	auto& operands = ref.sequence.emit<isa::Op::pragma>();
+inline auto& make(IRCodeRef& ref, ir::isa::Pragma value) {
+	auto& operands = ref.ircode.emit<isa::Op::pragma>();
 	operands.pragma = value;
 	return operands;
 }
 
 
 //! Emit opcode that indicates the begining of a func body
-inline void funcbody(SequenceRef ref) {
+inline void funcbody(IRCodeRef ref) {
 	pragma::make(ref, ir::isa::Pragma::bodystart);
 }
 
 
-inline void synthetic(SequenceRef ref, uint32_t lvid, bool onoff) {
+inline void synthetic(IRCodeRef ref, uint32_t lvid, bool onoff) {
 	auto& operands = pragma::make(ref, ir::isa::Pragma::synthetic);
 	operands.value.synthetic.lvid  = lvid;
 	operands.value.synthetic.onoff = static_cast<uint32_t>(onoff);
 }
 
 
-inline void suggest(SequenceRef ref, bool onoff) {
+inline void suggest(IRCodeRef ref, bool onoff) {
 	auto& operands = pragma::make(ref, ir::isa::Pragma::suggest);
 	operands.value.suggest = static_cast<uint32_t>(onoff);
 }
 
 
 //! Emit opcode to disable code generation
-inline void codegen(SequenceRef ref, bool enabled) {
+inline void codegen(IRCodeRef ref, bool enabled) {
 	auto& operands = pragma::make(ref, ir::isa::Pragma::codegen);
 	operands.value.codegen = static_cast<uint32_t>(enabled);
 }
 
 
-inline void builtinAlias(SequenceRef ref, const AnyString& name) {
+inline void builtinAlias(IRCodeRef ref, const AnyString& name) {
 	auto& operands = pragma::make(ref, ir::isa::Pragma::builtinalias);
-	operands.value.builtinalias.namesid = ref.sequence.stringrefs.ref(name);
+	operands.value.builtinalias.namesid = ref.ircode.stringrefs.ref(name);
 }
 
 
-inline void shortcircuit(SequenceRef ref, bool evalvalue) {
+inline void shortcircuit(IRCodeRef ref, bool evalvalue) {
 	auto& operands = pragma::make(ref, ir::isa::Pragma::shortcircuit);
 	operands.value.shortcircuit = static_cast<uint32_t>(evalvalue);
 }
 
 
-inline void shortcircuitMetadata(SequenceRef ref, uint32_t label) {
+inline void shortcircuitMetadata(IRCodeRef ref, uint32_t label) {
 	auto& operands = pragma::make(ref, ir::isa::Pragma::shortcircuitOpNopOffset);
 	operands.value.shortcircuitMetadata.label = label;
 }
 
 
-inline void shortcircuitMutateToBool(SequenceRef ref, uint32_t lvid, uint32_t source) {
+inline void shortcircuitMutateToBool(IRCodeRef ref, uint32_t lvid, uint32_t source) {
 	auto& operands = pragma::make(ref, ir::isa::Pragma::shortcircuitMutateToBool);
 	operands.value.shortcircuitMutate.lvid = lvid;
 	operands.value.shortcircuitMutate.source = source;
 }
 
 
-inline void visibility(SequenceRef ref, nyvisibility_t visibility) {
+inline void visibility(IRCodeRef ref, nyvisibility_t visibility) {
 	auto& operands = pragma::make(ref, ir::isa::Pragma::visibility);
 	operands.value.visibility = static_cast<uint32_t>(visibility);
 }
 
 
-inline uint32_t blueprintSize(SequenceRef ref) {
-	uint32_t offset = ref.sequence.opcodeCount();
+inline uint32_t blueprintSize(IRCodeRef ref) {
+	uint32_t offset = ref.ircode.opcodeCount();
 	auto& operands = pragma::make(ref, ir::isa::Pragma::blueprintsize);
 	operands.value.blueprintsize = 0;
 	return offset;
@@ -959,14 +951,13 @@ namespace {
 
 
 //! Emit a debug filename opcode
-inline void filename(SequenceRef ref, const AnyString& path) {
-	auto& sequence = ref.sequence;
-	sequence.emit<isa::Op::debugfile>().filename = sequence.stringrefs.ref(path);
+inline void filename(IRCodeRef ref, const AnyString& path) {
+	ref.ircode.emit<isa::Op::debugfile>().filename = ref.ircode.stringrefs.ref(path);
 }
 
 
-inline void position(SequenceRef ref, uint32_t line, uint32_t offset) {
-	auto& operands  = ref.sequence.emit<isa::Op::debugpos>();
+inline void position(IRCodeRef ref, uint32_t line, uint32_t offset) {
+	auto& operands  = ref.ircode.emit<isa::Op::debugpos>();
 	operands.line   = line;
 	operands.offset = offset;
 }
@@ -986,28 +977,28 @@ namespace {
 
 
 struct ScopeLocker final {
-	ScopeLocker(Sequence& sequence): sequence(sequence) {
-		ir::emit::scopeBegin(sequence);
+	ScopeLocker(Sequence& ircode): ircode(ircode) {
+		ir::emit::scopeBegin(ircode);
 	}
 	~ScopeLocker() {
-		ir::emit::scopeEnd(sequence);
+		ir::emit::scopeEnd(ircode);
 	}
 	ScopeLocker(const ScopeLocker&) = delete;
 	ScopeLocker(ScopeLocker&&) = default;
-	Sequence& sequence;
+	Sequence& ircode;
 };
 
 
 struct CodegenLocker final {
-	CodegenLocker(Sequence& sequence): sequence(sequence) {
-		ir::emit::pragma::codegen(sequence, false);
+	CodegenLocker(Sequence& ircode): ircode(ircode) {
+		ir::emit::pragma::codegen(ircode, false);
 	}
 	~CodegenLocker() {
-		ir::emit::pragma::codegen(sequence, true);
+		ir::emit::pragma::codegen(ircode, true);
 	}
 	CodegenLocker(const CodegenLocker&) = delete;
 	CodegenLocker(CodegenLocker&&) = default;
-	Sequence& sequence;
+	Sequence& ircode;
 };
 
 

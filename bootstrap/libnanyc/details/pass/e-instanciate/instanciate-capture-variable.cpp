@@ -61,27 +61,27 @@ void SequenceBuilder::captureVariables(Atom& atom) {
 	if (count == 0) // nothing to capture
 		return;
 	assert(!!narrowedCandadiateList);
-	assert(atom.opcodes.sequence != nullptr and "invalid empty IR sequence");
-	if (unlikely(atom.opcodes.sequence == nullptr))
+	assert(atom.opcodes.ircode and "invalid empty IR sequence");
+	if (unlikely(atom.opcodes.ircode == nullptr))
 		return;
-	auto& sequence = *atom.opcodes.sequence;
+	auto& ircode = *atom.opcodes.ircode;
 	auto& table = cdeftable.originalTable();
 	// Base offset for the new lvid (new captured variables in the class)
 	uint32_t startLvid = atom.localVariablesCount + 1; // 1-based
 	auto offset = atom.opcodes.offset;
 	#ifndef NDEBUG
-	auto& blueprint = sequence.at<ir::isa::Op::blueprint>(offset);
+	auto& blueprint = ircode.at<ir::isa::Op::blueprint>(offset);
 	assert(blueprint.opcode == (uint32_t) ir::isa::Op::blueprint);
 	#endif
 	// blueprint size
 	++offset;
 	#ifndef NDEBUG
-	auto& blueprintsize = sequence.at<ir::isa::Op::pragma>(offset);
+	auto& blueprintsize = ircode.at<ir::isa::Op::pragma>(offset);
 	assert(blueprintsize.opcode == (uint32_t) ir::isa::Op::pragma);
 	#endif
 	// Updating the opcode stacksize
 	++offset;
-	auto& stacksize = sequence.at<ir::isa::Op::stacksize>(offset);
+	auto& stacksize = ircode.at<ir::isa::Op::stacksize>(offset);
 	assert(stacksize.opcode == static_cast<uint32_t>(ir::isa::Op::stacksize));
 	assert(stacksize.add + 1 == startLvid);
 	if (unlikely(stacksize.opcode != static_cast<uint32_t>(ir::isa::Op::stacksize)))

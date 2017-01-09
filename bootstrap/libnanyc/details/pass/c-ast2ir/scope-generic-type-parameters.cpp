@@ -24,7 +24,7 @@ bool declSingleGenericTypeParameter(Scope& scope, AST::Node& node) {
 				if (not checkForValidIdentifierName(child, name))
 					return false;
 				scope.emitDebugpos(child);
-				ir::emit::blueprint::tparam(scope.sequence(), scope.nextvar(), name);
+				ir::emit::blueprint::tparam(scope.ircode(), scope.nextvar(), name);
 				break;
 			}
 			case AST::rgVarType: {
@@ -82,7 +82,7 @@ bool Scope::visitASTDeclGenericTypeParameters(AST::Node& node) {
 	assert(node.rule == AST::rgClassTemplateParams);
 	if (unlikely(node.children.empty()))
 		return true;
-	ir::emit::trace(sequence(), "generic type parameters");
+	ir::emit::trace(ircode(), "generic type parameters");
 	bool success = true;
 	for (auto& child : node.children) {
 		switch (child.rule) {

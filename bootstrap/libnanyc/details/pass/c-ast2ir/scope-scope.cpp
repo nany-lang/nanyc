@@ -21,7 +21,7 @@ bool Scope::visitASTExprScope(AST::Node& node) {
 		}
 		return false;
 	}
-	ir::emit::ScopeLocker opscope{sequence()};
+	ir::emit::ScopeLocker opscope{ircode()};
 	ir::Producer::Scope scope{*this};
 	bool success = true;
 	for (auto& child : node.children)

@@ -21,7 +21,7 @@ namespace // anonymous
 		S& out;
 		Yuni::String tabs;
 		Yuni::String tmp;
-		const Sequence& sequence;
+		const Sequence& ircode;
 		const Instruction** cursor = nullptr;
 		const ny::AtomMap* atommap = nullptr;
 		Yuni::ShortString64 lineHeader;
@@ -29,8 +29,8 @@ namespace // anonymous
 		uint32_t offset = 0;
 
 
-		Printer(S& out, const Sequence& sequence)
-			: out(out), sequence(sequence)
+		Printer(S& out, const Sequence& ircode)
+			: out(out), ircode(ircode)
 		{
 			lineHeader << "           ";
 		}
@@ -41,7 +41,7 @@ namespace // anonymous
 
 		void printString(uint32_t sid)
 		{
-			auto text = sequence.stringrefs[sid];
+			auto text = ircode.stringrefs[sid];
 			out << '@' << sid << "\"" << text << "\"";
 		}
 
@@ -49,7 +49,7 @@ namespace // anonymous
 		{
 			if (cursor)
 			{
-				auto offset = sequence.offsetOf(**cursor);
+				auto offset = ircode.offsetOf(**cursor);
 				if (offset != lastOffset)
 				{
 					lastOffset = offset;
@@ -373,7 +373,7 @@ namespace // anonymous
 			if (operands.text != 0) // not empty
 			{
 				line() << "// ";
-				auto text = sequence.stringrefs[operands.text];
+				auto text = ircode.stringrefs[operands.text];
 				if (not text.contains('\n'))
 				{
 					printString(operands.text);
@@ -482,7 +482,7 @@ namespace // anonymous
 
 			// partial print and the end-of-scope has been reached
 			if (tabs.empty() and offset != 0)
-				sequence.invalidateCursor(*cursor);
+				ircode.invalidateCursor(*cursor);
 		}
 
 		void print(const Operand<Op::follow>& operands)

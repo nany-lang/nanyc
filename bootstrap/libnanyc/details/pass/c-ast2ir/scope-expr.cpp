@@ -32,11 +32,11 @@ bool visitASTExprRegister(Scope& scope, AST::Node& node, uint32_t& localvar) {
 bool Scope::visitASTExprIdentifier(AST::Node& node, uint32_t& localvar) {
 	// value fetching
 	emitDebugpos(node);
-	auto& out = sequence();
+	auto& irout = ircode();
 	// allocate a local variable to receive information about the current identifier
-	uint32_t rid = ir::emit::alloc(out, nextvar());
-	uint32_t offset = out.opcodeCount();
-	ir::emit::identify(out, rid, node.text, localvar);
+	uint32_t rid = ir::emit::alloc(irout, nextvar());
+	uint32_t offset = irout.opcodeCount();
+	ir::emit::identify(irout, rid, node.text, localvar);
 	// the result of the current expression is now the new allocated local variable
 	localvar = rid;
 	// promotion to identify:set
@@ -50,7 +50,7 @@ bool Scope::visitASTExprIdentifier(AST::Node& node, uint32_t& localvar) {
 		// children
 		return node.children.empty() or visitASTExprContinuation(node, localvar);
 	}
-	auto& operands = out.at<ir::isa::Op::identify>(lastIdentifyOpcOffset);
+	auto& operands = irout.at<ir::isa::Op::identify>(lastIdentifyOpcOffset);
 	assert(operands.opcode == static_cast<uint32_t>(ir::isa::Op::identify));
 	if (operands.opcode == static_cast<uint32_t>(ir::isa::Op::identify)) {
 		operands.opcode = static_cast<uint32_t>(ir::isa::Op::identifyset);
@@ -65,11 +65,11 @@ bool Scope::visitASTExprIdOperator(AST::Node& node, uint32_t& localvar) {
 	if (unlikely((node.children.size() != 1) or (node.children[0].rule != AST::rgFunctionKindOpname)))
 		return unexpectedNode(node, "[expr/operator]");
 	emitDebugpos(node);
-	auto& out = sequence();
-	uint32_t rid = ir::emit::alloc(out, nextvar());
+	auto& irout = ircode();
+	uint32_t rid = ir::emit::alloc(irout, nextvar());
 	ShortString64 idname;
 	idname << '^' << node.children[0].text;
-	ir::emit::identify(out, rid, idname, localvar);
+	ir::emit::identify(irout, rid, idname, localvar);
 	localvar = rid;
 	return true;
 }
@@ -172,11 +172,11 @@ void Scope::emitExprAttributes(uint32_t& localvar) {
 	if (unlikely(attrs.flags(Attributes::Flag::pushSynthetic))) {
 		// do not report errors
 		attrs.flags -= Attributes::Flag::pushSynthetic;
-		auto& out = sequence();
-		ir::emit::trace(out, [&]() {
+		auto& irout = ircode();
+		ir::emit::trace(irout, [&]() {
 			return String("#[__nanyc_synthetic: %") << localvar << ']';
 		});
-		ir::emit::pragma::synthetic(out, localvar, false);
+		ir::emit::pragma::synthetic(irout, localvar, false);
 	}
 }
 
@@ -224,7 +224,7 @@ bool Scope::visitASTExpr(AST::Node& orignode, uint32_t& localvar, bool allowScop
 	if (r and localvar != 0 and localvar != (uint32_t) - 1) {
 		scope.emitTmplParametersIfAny();
 		scope.emitDebugpos(node);
-		ir::emit::type::ensureResolved(scope.sequence(), localvar);
+		ir::emit::type::ensureResolved(scope.ircode(), localvar);
 		if (unlikely(!!scope.attributes))
 			scope.emitExprAttributes(localvar);
 	}

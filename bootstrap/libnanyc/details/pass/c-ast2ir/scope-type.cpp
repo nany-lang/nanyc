@@ -35,7 +35,7 @@ bool Scope::visitASTExprTypeDecl(AST::Node& node, uint32_t& localvar) {
 		}
 	}
 	ir::Producer::Scope scope{*this};
-	ir::emit::CodegenLocker codegenDisabler{sequence()};
+	ir::emit::CodegenLocker codegenDisabler{ircode()};
 	return scope.visitASTExpr(node, localvar);
 }
 
@@ -86,15 +86,15 @@ bool Scope::visitASTType(AST::Node& node, uint32_t& localvar) {
 		}
 	}
 	emitDebugpos(node);
-	auto& out = sequence();
+	auto& irout = ircode();
 	// create a value even if nothing to always have an attached value
 	if (localvar == 0 and not reallyVoid /*any*/)
-		localvar = ir::emit::alloc(out, nextvar());
+		localvar = ir::emit::alloc(irout, nextvar());
 	if (0 != localvar) {
 		if (localvar == (uint32_t) - 1)
-			localvar = ir::emit::alloc(out, reserveLocalVariable());
-		ir::emit::type::qualifierRef(out, localvar, isRef);
-		ir::emit::type::qualifierConst(out, localvar, isConst);
+			localvar = ir::emit::alloc(irout, reserveLocalVariable());
+		ir::emit::type::qualifierRef(irout, localvar, isRef);
+		ir::emit::type::qualifierConst(irout, localvar, isConst);
 	}
 	return success;
 }

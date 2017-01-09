@@ -27,12 +27,12 @@ void Scope::emitDebugpos(AST::Node& node) {
 void Scope::doEmitTmplParameters() {
 	assert(lastPushedTmplParams.get());
 	if (not lastPushedTmplParams->empty()) {
-		auto& outIR = sequence();
+		auto& irout = ircode();
 		for (auto& pair : *lastPushedTmplParams) {
 			if (pair.second.empty())
-				ir::emit::tpush(outIR, pair.first);
+				ir::emit::tpush(irout, pair.first);
 			else
-				ir::emit::tpush(outIR, pair.first, pair.second);
+				ir::emit::tpush(irout, pair.first, pair.second);
 		}
 	}
 	lastPushedTmplParams = nullptr;

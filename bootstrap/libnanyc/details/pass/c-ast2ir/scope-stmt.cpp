@@ -64,7 +64,7 @@ bool Scope::visitASTStmt(AST::Node& orignode) {
 			// no break here - same as `expr-group`
 		}
 		case AST::rgExprGroup: {
-			ir::emit::ScopeLocker opscope{sequence()};
+			ir::emit::ScopeLocker opscope{ircode()};
 			uint32_t localvar = 0;
 			return visitASTExpr(node, localvar, /*allowScope:*/true);
 		}

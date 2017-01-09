@@ -65,10 +65,10 @@ struct AtomStackFrame final {
 
 
 struct OpcodeReader final {
-	OpcodeReader(ClassdefTable& cdeftable, Mutex& mutex, ir::Sequence& sequence, MappingOptions& options)
+	OpcodeReader(ClassdefTable& cdeftable, Mutex& mutex, ir::Sequence& ircode, MappingOptions& options)
 		: cdeftable(cdeftable)
 		, mutex(mutex)
-		, currentSequence(sequence)
+		, ircode(ircode)
 		, firstAtomOwnSequence(options.firstAtomOwnSequence)
 		, prefixNameForFirstAtomCreated{options.prefixNameForFirstAtomCreated}
 		, evaluateWholeSequence(options.evaluateWholeSequence)
@@ -85,7 +85,7 @@ struct OpcodeReader final {
 			trace << msg << ':';
 		else
 			trace << "invalid opcode ";
-		trace << " '" << ir::isa::print(currentSequence, operands) << '\'';
+		trace << " '" << ir::isa::print(ircode, operands) << '\'';
 		success = false;
 	}
 
@@ -162,7 +162,7 @@ struct OpcodeReader final {
 		bool isFuncdef = (kind == ir::isa::Blueprint::funcdef);
 		// registering the blueprint into the outline...
 		Atom& atom = atomStack->currentAtomNotUnit();
-		AnyString funcname = currentSequence.stringrefs[operands.name];
+		AnyString funcname = ircode.stringrefs[operands.name];
 		if (unlikely(funcname.empty()))
 			return complainOperand(operands, (isFuncdef) ? "invalid func name" : "invalid typedef name");
 		// reset last lvid and parameters
@@ -181,8 +181,8 @@ struct OpcodeReader final {
 		auto& newatom = isFuncdef
 			? cdeftable.atoms.createFuncdef(parentAtom, funcname)
 			: cdeftable.atoms.createTypealias(parentAtom, funcname);
-		newatom.opcodes.sequence = &currentSequence;
-		newatom.opcodes.offset   = currentSequence.offsetOf(operands);
+		newatom.opcodes.ircode = &ircode;
+		newatom.opcodes.offset   = ircode.offsetOf(operands);
 		cdeftable.registerAtom(newatom);
 		operands.atomid = newatom.atomid;
 		newatom.returnType.clid.reclass(newatom.atomid, 1);
@@ -210,7 +210,7 @@ struct OpcodeReader final {
 		lastuint32_t = 0;
 		lastPushedNamedParameters.clear();
 		lastPushedIndexedParameters.clear();
-		AnyString classname = currentSequence.stringrefs[operands.name];
+		AnyString classname = ircode.stringrefs[operands.name];
 		Atom& newClassAtom = [&]() -> Atom& {
 			if (prefixNameForFirstAtomCreated.empty()) {
 				MutexLocker locker{mutex};
@@ -229,8 +229,8 @@ struct OpcodeReader final {
 				return newClassAtom;
 			}
 		}();
-		newClassAtom.opcodes.sequence = &currentSequence;
-		newClassAtom.opcodes.offset   = currentSequence.offsetOf(operands);
+		newClassAtom.opcodes.ircode = &ircode;
+		newClassAtom.opcodes.offset = ircode.offsetOf(operands);
 		// update atomid
 		operands.atomid = newClassAtom.atomid;
 		// requires additional information
@@ -258,7 +258,7 @@ struct OpcodeReader final {
 		if (unlikely(not isGenTypeParam and not frame.atom.isFunction()))
 			return complainOperand(operands, "parameter for non-function");
 		CLID clid{frame.atom.atomid, paramuint32_t};
-		AnyString name = currentSequence.stringrefs[operands.name];
+		AnyString name = ircode.stringrefs[operands.name];
 		auto& parameters = (not isGenTypeParam)
 						   ? frame.atom.parameters : frame.atom.tmplparams;
 		parameters.append(clid, name);
@@ -287,7 +287,7 @@ struct OpcodeReader final {
 	void mapBlueprintVardef(ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
 		// registering the blueprint into the outline...
 		Atom& atom = atomStack->currentAtomNotUnit();
-		AnyString varname = currentSequence.stringrefs[operands.name];
+		AnyString varname = ircode.stringrefs[operands.name];
 		if (unlikely(varname.empty()))
 			return complainOperand(operands, "invalid func name");
 		if (unlikely(atom.type != Atom::Type::classdef))
@@ -304,7 +304,7 @@ struct OpcodeReader final {
 
 
 	void mapBlueprintNamespace(ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
-		AnyString nmname = currentSequence.stringrefs[operands.name];
+		AnyString nmname = ircode.stringrefs[operands.name];
 		Atom& parentAtom = atomStack->currentAtomNotUnit();
 		MutexLocker locker{mutex};
 		Atom& newRoot = cdeftable.atoms.createNamespace(parentAtom, nmname);
@@ -369,7 +369,7 @@ struct OpcodeReader final {
 			}
 			case ir::isa::Pragma::builtinalias: {
 				Atom& atom = atomStack->atom;
-				atom.builtinalias = currentSequence.stringrefs[operands.value.builtinalias.namesid];
+				atom.builtinalias = ircode.stringrefs[operands.value.builtinalias.namesid];
 				break;
 			}
 			case ir::isa::Pragma::shortcircuit: {
@@ -457,12 +457,12 @@ struct OpcodeReader final {
 				std::unique_ptr<AtomStackFrame> next{atomStack->next.release()};
 				atomStack.swap(next);
 				if (!atomStack or (not evaluateWholeSequence and !atomStack->next))
-					currentSequence.invalidateCursor(*cursor);
+					ircode.invalidateCursor(*cursor);
 			}
 		}
 		else {
 			assert(false and "invalid stack");
-			currentSequence.invalidateCursor(*cursor);
+			ircode.invalidateCursor(*cursor);
 		}
 	}
 
@@ -522,7 +522,7 @@ struct OpcodeReader final {
 			return;
 		if (unlikely(operands.text == 0))
 			return complainOperand(operands, "invalid symbol name");
-		AnyString name = currentSequence.stringrefs[operands.text];
+		AnyString name = ircode.stringrefs[operands.text];
 		if (unlikely(name.empty()))
 			return complainOperand(operands, "invalid empty identifier");
 		lastuint32_t = operands.lvid;
@@ -582,7 +582,7 @@ struct OpcodeReader final {
 		if (unlikely(not checkForuint32_t(operands, operands.lvid)))
 			return;
 		if (operands.name != 0) { // named parameter
-			AnyString name = currentSequence.stringrefs[operands.name];
+			AnyString name = ircode.stringrefs[operands.name];
 			lastPushedNamedParameters.emplace_back(std::make_pair(name, operands.lvid));
 		}
 		else {
@@ -636,7 +636,7 @@ struct OpcodeReader final {
 
 
 	void visit(ir::isa::Operand<ir::isa::Op::debugfile>& operands) {
-		currentFilename = currentSequence.stringrefs[operands.filename].c_str();
+		currentFilename = ircode.stringrefs[operands.filename].c_str();
 		if (needAtomDbgFileReport) {
 			needAtomDbgFileReport = false;
 			atomStack->atom.origin.filename = currentFilename;
@@ -719,7 +719,7 @@ struct OpcodeReader final {
 		currentLine = 0u;
 		success = true;
 		// -- walk through all opcodes
-		currentSequence.each(*this, offset);
+		ircode.each(*this, offset);
 		atomStack.reset(nullptr); // cleanup after use
 		return success;
 	}
@@ -730,7 +730,7 @@ struct OpcodeReader final {
 	//! Mutex for the cdeftable
 	Yuni::Mutex& mutex;
 	//! Current sequence
-	ir::Sequence& currentSequence;
+	ir::Sequence& ircode;
 	//! Blueprint root element
 	std::unique_ptr<AtomStackFrame> atomStack;
 	//! Last lvid (for pushed parameters)
@@ -770,10 +770,10 @@ static void retriveReportMetadata(void* self, Logs::Level level, const AST::Node
 }
 
 
-bool map(Atom& parent, ClassdefTable& cdeftable, Mutex& mutex, ir::Sequence& sequence, MappingOptions& options) {
+bool map(Atom& parent, ClassdefTable& cdeftable, Mutex& mutex, ir::Sequence& ircode, MappingOptions& options) {
 	try {
 		options.firstAtomCreated = nullptr;
-		OpcodeReader reader{cdeftable, mutex, sequence, options};
+		OpcodeReader reader{cdeftable, mutex, ircode, options};
 		Logs::MetadataHandler handler{&reader, &retriveReportMetadata};
 		return reader(parent, options.offset);
 	}

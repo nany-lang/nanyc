@@ -36,15 +36,15 @@ inline Atom& AtomMap::createUnit(Atom& parent, const AnyString& name) {
 }
 
 
-inline const ir::Sequence& AtomMap::sequence(uint32_t atomid, uint32_t index) const {
+inline const ir::Sequence& AtomMap::ircode(uint32_t atomid, uint32_t index) const {
 	assert(atomid < m_byIndex.size());
-	return m_byIndex[atomid]->instances[index].sequence();
+	return m_byIndex[atomid]->instances[index].ircode();
 }
 
 
-inline const ir::Sequence* AtomMap::sequenceIfExists(uint32_t atomid, uint32_t index) const {
+inline const ir::Sequence* AtomMap::ircodeIfExists(uint32_t atomid, uint32_t index) const {
 	return (atomid < m_byIndex.size())
-		   ? m_byIndex[atomid]->instances[index].sequenceIfExists() : nullptr;
+		? m_byIndex[atomid]->instances[index].ircodeIfExists() : nullptr;
 }
 
 

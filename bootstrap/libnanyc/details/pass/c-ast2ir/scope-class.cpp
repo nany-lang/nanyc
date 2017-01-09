@@ -51,14 +51,14 @@ ClassInspector::ClassInspector(Scope& parentscope, uint32_t lvid)
 	// a log of code relies on the fact that %{atomid:1} is the type of the return value
 	// starting from +2 to avoid to always check for the type of the atom everywhere in the code
 	scope.nextvar();
-	auto& out = scope.sequence();
+	auto& irout = scope.ircode();
 	// creating a new blueprint for the function
-	bpoffset = ir::emit::blueprint::classdef(out, lvid);
-	bpoffsiz = ir::emit::pragma::blueprintSize(out);
-	bpoffsck = ir::emit::increaseStacksize(out);
+	bpoffset = ir::emit::blueprint::classdef(irout, lvid);
+	bpoffsiz = ir::emit::pragma::blueprintSize(irout);
+	bpoffsck = ir::emit::increaseStacksize(irout);
 	// making sure that debug info are available
 	scope.context.invalidateLastDebugLine();
-	ir::emit::dbginfo::filename(out, scope.context.dbgSourceFilename);
+	ir::emit::dbginfo::filename(irout, scope.context.dbgSourceFilename);
 }
 
 
@@ -116,23 +116,23 @@ bool ClassInspector::inspect(AST::Node& node) {
 
 bool ClassInspector::inspectBody(AST::Node& node) {
 	bool success = true;
-	auto& out = scope.sequence();
+	auto& irout = scope.ircode();
 	// evaluate the whole function, and grab the node body for continuing evaluation
 	{
 		success = inspect(node);
-		auto& operands = out.at<isa::Op::blueprint>(bpoffset);
-		operands.name = out.stringrefs.ref(classname);
+		auto& operands = irout.at<isa::Op::blueprint>(bpoffset);
+		operands.name = irout.stringrefs.ref(classname);
 	}
 	if (likely(body != nullptr)) {
-		ir::emit::trace(out, "\nclass body");
+		ir::emit::trace(irout, "\nclass body");
 		// continue evaluating the func body independantly of the previous data and results
 		for (auto& stmtnode : body->children)
 			success &= scope.visitASTStmt(stmtnode);
 	}
-	ir::emit::scopeEnd(out);
-	uint32_t blpsize = out.opcodeCount() - bpoffset;
-	out.at<isa::Op::pragma>(bpoffsiz).value.blueprintsize = blpsize;
-	out.at<isa::Op::stacksize>(bpoffsck).add = scope.nextVarID + 1u;
+	ir::emit::scopeEnd(irout);
+	uint32_t blpsize = irout.opcodeCount() - bpoffset;
+	irout.at<isa::Op::pragma>(bpoffsiz).value.blueprintsize = blpsize;
+	irout.at<isa::Op::stacksize>(bpoffsck).add = scope.nextVarID + 1u;
 	return success;
 }
 

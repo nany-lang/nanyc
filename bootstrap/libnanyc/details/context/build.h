@@ -23,15 +23,15 @@ public:
 
 public:
 	struct AttachedSequenceRef final {
-		AttachedSequenceRef(ir::Sequence* sequence, bool owned)
-			: sequence(sequence)
+		AttachedSequenceRef(ir::Sequence* ircode, bool owned)
+			: ircode(ircode)
 			, owned(owned) {
 		}
 		AttachedSequenceRef(AttachedSequenceRef&&) = default;
 		AttachedSequenceRef(const AttachedSequenceRef&) = delete;
 		~AttachedSequenceRef();
 
-		ir::Sequence* sequence = nullptr;
+		ir::Sequence* ircode = nullptr;
 		bool owned = false;
 	};
 
@@ -48,7 +48,7 @@ public:
 	/*!
 	** Attach an IR sequence
 	*/
-	bool attach(ir::Sequence& sequence, bool owned = false);
+	bool attach(ir::Sequence&, bool owned = false);
 
 	/*!
 	** \brief Try to resolve strict parameter types
@@ -125,7 +125,7 @@ public:
 private:
 	std::vector<std::reference_wrapper<Source>> m_sources;
 	std::vector<yuni::Ref<CTarget>> m_targets;
-	std::vector<AttachedSequenceRef> m_attachedSequences;
+	std::vector<AttachedSequenceRef> m_attachedIRCodes;
 
 }; // class Build
 

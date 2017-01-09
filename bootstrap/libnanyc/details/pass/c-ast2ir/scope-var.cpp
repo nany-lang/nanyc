@@ -94,16 +94,16 @@ bool generateInitFuncForClassVar(Scope& scope, const AnyString& varname, uint32_
 
 bool emitVarInClass(Scope& scope, const AnyString& varname, AST::Node& node, AST::Node* varType,
 					AST::Node* varAssign, bool ref, bool constant) {
-	auto& out = scope.sequence();
+	auto& irout = scope.ircode();
 	if (debugmode) {
-		ir::emit::trace(out);
-		ir::emit::trace(out, [&]() {
+		ir::emit::trace(irout);
+		ir::emit::trace(irout, [&]() {
 			return String{"class var "} << varname;
 		});
 	}
 	// the new member variable
 	auto mbvar = scope.nextvar();
-	ir::emit::alloc(out, mbvar);
+	ir::emit::alloc(irout, mbvar);
 	// the type of the expression
 	uint32_t lvid = 0;
 	if (varType != nullptr) {
@@ -119,18 +119,18 @@ bool emitVarInClass(Scope& scope, const AnyString& varname, AST::Node& node, AST
 		return false;
 	// follow
 	{
-		auto& operands    = out.emit<isa::Op::follow>();
+		auto& operands    = irout.emit<isa::Op::follow>();
 		operands.follower = mbvar;
 		operands.lvid     = lvid;
 		operands.symlink  = 0;
 	}
 	// preserve var / ref / const
-	ir::emit::type::qualifierRef(out, mbvar, ref);
+	ir::emit::type::qualifierRef(irout, mbvar, ref);
 	if (constant)
-		ir::emit::type::qualifierConst(out, mbvar, true);
+		ir::emit::type::qualifierConst(irout, mbvar, true);
 	// variable definition
 	scope.emitDebugpos(node);
-	ir::emit::blueprint::var(out, mbvar, varname);
+	ir::emit::blueprint::var(irout, mbvar, varname);
 	// generating an INIT func for the variable
 	return generateInitFuncForClassVar(scope, varname, mbvar, *varAssign);
 }
@@ -138,41 +138,41 @@ bool emitVarInClass(Scope& scope, const AnyString& varname, AST::Node& node, AST
 
 bool emitVarInFunc(Scope& scope, const AnyString& varname, AST::Node& node, AST::Node* varType,
 		AST::Node* varAssign, bool ref, bool constant) {
-	auto& out = scope.sequence();
+	auto& irout = scope.ircode();
 	// create the variable itself
-	uint32_t varlvid = ir::emit::alloc(out, scope.nextvar());
+	uint32_t varlvid = ir::emit::alloc(irout, scope.nextvar());
 	if (varType != nullptr) {
 		uint32_t lvidtype;
 		if (not scope.visitASTType(*varType, lvidtype) or lvidtype == 0)
 			return false;
 		// follow
-		auto& operands    = out.emit<isa::Op::follow>();
+		auto& operands    = irout.emit<isa::Op::follow>();
 		operands.follower = varlvid;
 		operands.lvid     = lvidtype;
 		operands.symlink  = 0;
 	}
 	// preserve var / ref / const
-	ir::emit::type::qualifierRef(out, varlvid, ref);
+	ir::emit::type::qualifierRef(irout, varlvid, ref);
 	if (constant)
-		ir::emit::type::qualifierConst(out, varlvid, true);
+		ir::emit::type::qualifierConst(irout, varlvid, true);
 	// default value
 	{
 		uint32_t rhs = 0;
-		ir::emit::ScopeLocker opscope{out};
+		ir::emit::ScopeLocker opscope{irout};
 		if (not varValueInitialization(scope, rhs, *varAssign, node, varname))
 			return false;
 		assert(rhs != 0);
 		if (not ref)
-			ir::emit::assign(out, varlvid, rhs, false);
+			ir::emit::assign(irout, varlvid, rhs, false);
 		else {
-			ir::emit::copy(out, varlvid, rhs); // re-acquire to keep the value alive
-			ir::emit::ref(out, varlvid);
+			ir::emit::copy(irout, varlvid, rhs); // re-acquire to keep the value alive
+			ir::emit::ref(irout, varlvid);
 		}
 	}
 	// important: the alias must be declared *after* the right value
 	// (otherwise it may be used by the code)
 	scope.emitDebugpos(node); // reset the debug position
-	ir::emit::namealias(out, varlvid, varname);
+	ir::emit::namealias(irout, varlvid, varname);
 	return true;
 }
 

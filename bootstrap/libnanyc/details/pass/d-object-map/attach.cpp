@@ -13,7 +13,7 @@ namespace ny {
 bool Build::attach(ir::Sequence& sequence, bool owned) {
 	{
 		MutexLocker locker{mutex};
-		m_attachedSequences.push_back(AttachedSequenceRef{&sequence, owned});
+		m_attachedIRCodes.push_back(AttachedSequenceRef{&sequence, owned});
 	}
 	Pass::MappingOptions options;
 	return Pass::map(cdeftable.atoms.root, cdeftable, mutex, sequence, options);

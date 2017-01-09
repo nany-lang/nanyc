@@ -32,15 +32,15 @@ bool Scope::visitASTExprTypeof(AST::Node& node, uint32_t& localvar) {
 	assert(node.rule == AST::rgTypeof);
 	uint32_t previous = 0;
 	bool success = true;
-	auto& out = sequence();
+	auto& irout = ircode();
 	ir::Producer::Scope scope{*this};
-	ir::emit::CodegenLocker codegen{out};
+	ir::emit::CodegenLocker codegen{irout};
 	for (auto& child : node.children) {
 		switch (child.rule) {
 			case AST::rgCall: { // typeof
 				for (auto& param : child.children) {
 					if (param.rule == AST::rgCallParameter) {
-						success &= appendSingleType(scope, param.firstChild(), out, previous);
+						success &= appendSingleType(scope, param.firstChild(), irout, previous);
 						break;
 					}
 				}

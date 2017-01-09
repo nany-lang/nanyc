@@ -363,9 +363,9 @@ public:
 		struct Ref final {
 			Ref(Instances& ref, uint32_t index): m_ref(ref), m_index(index) {}
 			//! Get the attached IR sequence
-			ir::Sequence& sequence();
+			ir::Sequence& ircode();
 			//! Get the attached IR sequence, if any
-			ir::Sequence* sequenceIfExists();
+			ir::Sequence* ircodeIfExists();
 			//! Get the symbol name of the instantiation (with fully qualified types)
 			AnyString symbolname() const;
 			//! Instance ID
@@ -390,7 +390,7 @@ public:
 		//! \return index of the instantiation
 		Ref create(const Signature& signature, Atom* remapAtom);
 
-		//! Fetch the sequence for a given signature (if any) and update the signature
+		//! Fetch the ircode for a given signature (if any) and update the signature
 		Yuni::Tribool::Value isValid(const Signature& signature, uint32_t& iid, Classdef&, Atom*& remapAtom) const;
 
 		//! Number of instances
@@ -404,7 +404,7 @@ public:
 		void invalidate(uint32_t index, const Signature&);
 
 		struct Metadata final {
-			std::unique_ptr<ir::Sequence> sequence;
+			std::unique_ptr<ir::Sequence> ircode;
 			Classdef rettype;
 			Atom* remapAtom = nullptr;
 			Yuni::String symbol;
@@ -489,7 +489,7 @@ public:
 	//! The original IR sequence
 	struct {
 		//! The original IR sequence
-		ir::Sequence* sequence = nullptr;
+		ir::Sequence* ircode = nullptr;
 		//! Offset to start within this sequence
 		// \warning offset of the operands of the blueprint, not the opcode value
 		uint32_t offset = 0;

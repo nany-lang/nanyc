@@ -180,7 +180,7 @@ Atom::Instances::Ref Atom::Instances::create(const Signature& signature, Atom* r
 	m_instances.emplace_back();
 	auto& details = m_instances[index];
 	details.remapAtom = remapAtom;
-	details.sequence  = std::make_unique<ir::Sequence>();
+	details.ircode  = std::make_unique<ir::Sequence>();
 	m_instancesIDs.emplace(signature, index);
 	return Ref{*this, index};
 }
@@ -199,13 +199,13 @@ void Atom::Instances::invalidate(uint32_t index, const Signature& signature) {
 	assert(index < m_instances.size());
 	m_instancesIDs[signature] = (uint32_t) - 1;
 	auto& details = m_instances[index];
-	details.sequence = nullptr;
+	details.ircode = nullptr;
 	details.remapAtom = nullptr;
 }
 
 
 Tribool::Value Atom::Instances::isValid(const Signature& signature, uint32_t& iid, Classdef& rettype,
-										Atom*& remapAtom) const {
+		Atom*& remapAtom) const {
 	auto it = m_instancesIDs.find(signature);
 	if (it != m_instancesIDs.end()) {
 		uint32_t id = it->second;
@@ -229,8 +229,8 @@ String Atom::Instances::print(const AtomMap& atommap) const {
 	String out;
 	for (size_t i = 0; i != m_instances.size(); ++i) {
 		out << m_instances[i].symbol << " // #" << i << "\n{\n";
-		if (m_instances[i].sequence)
-			m_instances[i].sequence->print(prgm, &atommap);
+		if (m_instances[i].ircode)
+			m_instances[i].ircode->print(prgm, &atommap);
 		prgm.replace("\n", "\n    ");
 		prgm.trimRight();
 		out << prgm << "\n}\n";
@@ -257,7 +257,7 @@ Atom::Atom(Atom& rootparent, const AnyString& name, Atom::Type type)
 
 Atom::~Atom() {
 	if (opcodes.owned)
-		delete opcodes.sequence;
+		delete opcodes.ircode;
 }
 
 

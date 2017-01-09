@@ -23,8 +23,8 @@
 
 #if ny_vm_PRINT_OPCODES != 0
 #define vm_PRINT_OPCODE(O)  do { std::cout << "== ny:vm +" \
-		<< sequence.get().offsetOf(opr) << "  == "  \
-		<< ny::ir::isa::print(sequence.get(), opr, &map) << '\n';} while (0)
+		<< ircode.get().offsetOf(opr) << "  == "  \
+		<< ny::ir::isa::print(ircode.get(), opr, &map) << '\n';} while (0)
 #else
 #define vm_PRINT_OPCODE(O)
 #endif
@@ -71,7 +71,7 @@ struct ContextRunner final {
 	//! upper label id encountered so far
 	uint32_t upperLabelID = 0;
 	const AtomMap& map;
-	std::reference_wrapper<const ir::Sequence> sequence;
+	std::reference_wrapper<const ir::Sequence> ircode;
 	const IntrinsicTable& userDefinedIntrinsics;
 	const ir::Instruction** cursor = nullptr;
 	#ifndef NDEBUG
@@ -112,8 +112,8 @@ public:
 
 	inline void gotoLabel(uint32_t label) {
 		bool jmpsuccess = (label > upperLabelID)
-			? sequence.get().jumpToLabelForward(*cursor, label)
-			: sequence.get().jumpToLabelBackward(*cursor, label);
+			? ircode.get().jumpToLabelForward(*cursor, label)
+			: ircode.get().jumpToLabelBackward(*cursor, label);
 		if (unlikely(not jmpsuccess))
 			emitLabelError(label);
 		upperLabelID = label; // the labels are strictly ordered
@@ -413,7 +413,7 @@ public:
 		vm_PRINT_OPCODE(opr);
 		assert(opr.lvid == 0 or opr.lvid < registerCount);
 		retRegister = registers[opr.lvid].u64;
-		sequence.get().invalidateCursor(*cursor);
+		ircode.get().invalidateCursor(*cursor);
 	}
 
 
@@ -429,7 +429,7 @@ public:
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		registers[opr.lvid].u64 =
-			reinterpret_cast<uint64_t>(sequence.get().stringrefs[opr.text].c_str());
+			reinterpret_cast<uint64_t>(ircode.get().stringrefs[opr.text].c_str());
 	}
 
 
@@ -684,7 +684,7 @@ public:
 		#endif
 		// save the current stack frame
 		auto* storestackptr = registers;
-		auto storesequence = sequence;
+		auto storeircode = std::cref(ircode);
 		auto* storecursor = cursor;
 		#ifndef NDEBUG
 		auto  storestckfrmsize = registerCount;
@@ -693,12 +693,12 @@ public:
 		uint32_t memcheckPreviousAtomid = memchecker.atomid();
 		stacktrace.push(atomfunc, instanceid);
 		// call
-		uint64_t ret = invoke(map.sequence(atomfunc, instanceid));
+		uint64_t ret = invoke(map.ircode(atomfunc, instanceid));
 		// restore the previous stack frame and store the result of the call
 		upperLabelID = labelid;
 		registers = storestackptr;
 		registers[retlvid].u64 = ret;
-		sequence = storesequence;
+		ircode = std::cref(storeircode);
 		cursor = storecursor;
 		#ifndef NDEBUG
 		registerCount = storestckfrmsize;

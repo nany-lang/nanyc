@@ -56,14 +56,14 @@ void prepareSignature(Signature& signature, InstanciateData& info) {
 bool duplicateAtomForSpecialization(InstanciateData& info, Atom& atom) {
 	// create a new atom with non-generic parameters / from a contextual atom
 	// (generic or anonymous class) and re-map from the parent
-	auto& sequence  = *atom.opcodes.sequence;
+	auto& ircode  = *atom.opcodes.ircode;
 	auto& originaltable = info.cdeftable.originalTable();
 	Mutex mutex; // useless but currently required for the first pass by SequenceMapping
 	Pass::MappingOptions options;
 	options.evaluateWholeSequence = false;
 	options.prefixNameForFirstAtomCreated = "^"; // not an user-defined atom
 	options.offset = atom.opcodes.offset;
-	Pass::map(*atom.parent, originaltable, mutex, sequence, options);
+	Pass::map(*atom.parent, originaltable, mutex, ircode, options);
 	if (unlikely(!options.firstAtomCreated))
 		return ny::complain::invalidAtomMapping(atom.caption());
 	auto& newAtom = *options.firstAtomCreated;
@@ -102,7 +102,7 @@ void substituteParameterTypes(ClassdefTableView& cdeftable, Atom& atom, const Si
 
 ir::Sequence* translateAndInstanciateASTIRCode(InstanciateData& info, Signature& signature) {
 	auto& atomRequested = info.atom.get();
-	if (unlikely(!atomRequested.opcodes.sequence or !atomRequested.parent)) {
+	if (unlikely(!atomRequested.opcodes.ircode or !atomRequested.parent)) {
 		ny::complain::invalidAtom("ast ir code translation");
 		return nullptr;
 	}
@@ -121,17 +121,17 @@ ir::Sequence* translateAndInstanciateASTIRCode(InstanciateData& info, Signature&
 	// `atomRequested` is probably `atom` itself, but different for template classes
 	auto instance = atomRequested.instances.create(signature, &atom);
 	info.instanceid = instance.id();
-	// the original ir sequence generated from the AST
-	auto& inputIR = *(atom.opcodes.sequence);
-	// the new ir sequence for the instanciated function
-	auto& outIR = instance.sequence();
+	// the original ir code generated from the AST
+	auto& irin = *(atom.opcodes.ircode);
+	// the new ir code for the instanciated function
+	auto& irout = instance.ircode();
 	// new layer for the cdeftable
 	ClassdefTableView newView{info.cdeftable, atom.atomid, signature.parameters.size()};
 	// Error reporting
 	Logs::Report report{*info.report};
-	// instanciate the sequence attached to the atom
+	// translate/instanciate the ir code attached to the atom
 	auto builder = std::make_unique<SequenceBuilder>
-		(report.subgroup(), newView, info.build, &outIR, inputIR, info.parent);
+		(report.subgroup(), newView, info.build, &irout, irin, info.parent);
 	if (config::traces::sourceOpcodeSequence)
 		debugPrintSourceOpcodeSequence(info.cdeftable, info.atom.get(), "[ir-from-ast] ");
 	substituteParameterTypes(builder->cdeftable, atom, signature);
@@ -139,11 +139,11 @@ ir::Sequence* translateAndInstanciateASTIRCode(InstanciateData& info, Signature&
 	// atomid mapping, usefull to keep track of the good atom id
 	builder->mappingBlueprintAtomID.from = atomRequested.atomid;
 	builder->mappingBlueprintAtomID.to   = atom.atomid;
-	// Read the input ir sequence, resolve all types, and generate
-	// a new ir sequence ready for execution ! (with or without optimization passes)
+	// Read the input ir code, resolve all types, and generate
+	// a new ir code ready for execution ! (with or without optimization passes)
 	// (everything happens here)
 	bool success = builder->readAndInstanciate(atom.opcodes.offset);
-	updateTypesInAllStackallocOp(outIR, newView, atom.atomid);
+	updateTypesInAllStackallocOp(irout, newView, atom.atomid);
 	// keep all deduced types
 	if (/*likely(success) and*/ info.shouldMergeLayer)
 		newView.mergeSubstitutes();
@@ -157,7 +157,7 @@ ir::Sequence* translateAndInstanciateASTIRCode(InstanciateData& info, Signature&
 		atom.retrieveCaption(symbolName, newView);  // ex: A.foo(...)...
 	}
 	if (config::traces::generatedOpcodeSequence)
-		debugPrintIRSequence(symbolName, outIR, newView);
+		debugPrintIRSequence(symbolName, irout, newView);
 	if (success) {
 		switch (atom.type) {
 			case Atom::Type::funcdef:
@@ -188,10 +188,10 @@ ir::Sequence* translateAndInstanciateASTIRCode(InstanciateData& info, Signature&
 		}
 		if (likely(success)) {
 			instance.update(std::move(symbolName), info.returnType);
-			return &outIR;
+			return &irout;
 		}
 	}
-	// failed to instanciate the input ir sequence. This can be expected, if trying
+	// failed to instanciate the input ir code. This can be expected, if trying
 	// to not instanciate the appropriate function (if several overloads are present for example)
 	info.instanceid = instance.invalidate(signature);
 	return nullptr;
@@ -569,23 +569,23 @@ bool instanciateAtomParameterTypes(InstanciateData& info) {
 	// the current atom, probably different from `previousAtom`
 	auto& atom = info.atom.get();
 	// the original ir sequence generated from the AST
-	auto& inputIR = *(atom.opcodes.sequence);
+	auto& irin = *(atom.opcodes.ircode);
 	// no output
-	ir::Sequence* outIR = nullptr;
+	ir::Sequence* irout = nullptr;
 	// new layer for the cdeftable
 	ClassdefTableView newview{info.cdeftable, atom.atomid, signature.parameters.size()};
 	// log
 	Logs::Report report{*info.report};
 	if (unlikely(!atom.parent))
 		return (ice() << "invalid atom, no parent");
-	if (!atom.opcodes.sequence) {
+	if (!atom.opcodes.ircode) {
 		// type alias for template classes can be empty (generated by the compiler)
 		if (atom.isTypeAlias())
 			return true;
 		return (ice() << "invalid atom: no ir code");
 	}
 	// instanciate the sequence attached to the atom
-	auto builder = std::make_unique<SequenceBuilder>(report.subgroup(), newview, info.build, outIR, inputIR, info.parent);
+	auto builder = std::make_unique<SequenceBuilder>(report.subgroup(), newview, info.build, irout, irin, info.parent);
 	//if (info.parentAtom)
 	builder->layerDepthLimit = 2; // allow the first blueprint to be instanciated
 	builder->signatureOnly = true;

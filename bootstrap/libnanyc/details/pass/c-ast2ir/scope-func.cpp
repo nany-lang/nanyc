@@ -75,7 +75,7 @@ bool FuncInspector::inspectVisibility(AST::Node& node) {
 			}
 			// set the visibility
 			scope.emitDebugpos(node);
-			ir::emit::pragma::visibility(scope.sequence(), visibility);
+			ir::emit::pragma::visibility(scope.ircode(), visibility);
 		}
 		else {
 			// should really never happen...
@@ -156,7 +156,7 @@ bool FuncInspector::inspectSingleParameter(uint pindex, AST::Node& node, uint32_
 	bool success = true;
 	// operator new (self x)
 	bool autoMemberAssignment = false;
-	auto& out = scope.sequence();
+	auto& irout = scope.ircode();
 	// we can have the following pattern: ref a: sometype
 	// the qualifiers will be reset by the type definition (if any)
 	// thus, if 'ref' or 'const' is provided, the opcodes must be generated _after_
@@ -198,7 +198,7 @@ bool FuncInspector::inspectSingleParameter(uint pindex, AST::Node& node, uint32_
 					}
 				}
 				if (isValidLocalvar(paramtype)) {
-					auto& operands    = out.emit<isa::Op::follow>();
+					auto& operands    = irout.emit<isa::Op::follow>();
 					operands.follower = lvid;
 					operands.lvid     = paramtype;
 					operands.symlink  = 1;
@@ -231,10 +231,10 @@ bool FuncInspector::inspectSingleParameter(uint pindex, AST::Node& node, uint32_
 		paramname = scope.acquireString(String() << "_p_" << (void*)(&node));
 	}
 	// update the parameter name within the ir code (whatever previous result)
-	auto sid = out.stringrefs.ref(paramname);
+	auto sid = irout.stringrefs.ref(paramname);
 	// update the parameter opcode
 	{
-		auto& opparam = out.at<isa::Op::blueprint>(paramoffset);
+		auto& opparam = irout.at<isa::Op::blueprint>(paramoffset);
 		opparam.name  = sid;
 		if (autoMemberAssignment)
 			opparam.kind = (uint32_t) ir::isa::Blueprint::paramself;
@@ -242,9 +242,9 @@ bool FuncInspector::inspectSingleParameter(uint pindex, AST::Node& node, uint32_
 	// the qualifiers may have been set by the type definition
 	// thus they must be overriden and not always reset
 	if (ref)
-		ir::emit::type::qualifierRef(out, lvid, true);
+		ir::emit::type::qualifierRef(irout, lvid, true);
 	if (constant)
-		ir::emit::type::qualifierConst(out, lvid, true);
+		ir::emit::type::qualifierConst(irout, lvid, true);
 	return success;
 }
 
@@ -281,12 +281,12 @@ bool FuncInspector::inspectParameters(AST::Node* node, AST::Node* nodeTypeParams
 	// creating all blueprint parameters first to have their 'lvid' predictible
 	// as a consequence, classdef for parameters start from 2 (0: null, 1: return type)
 	// and variables for parameters start from 1
-	auto& out = scope.sequence();
+	auto& irout = scope.ircode();
 	// dealing first with the implicit parameter 'self'
 	if (hasImplicitSelf) {
 		uint32_t selfid = scope.nextvar();
-		ir::emit::blueprint::param(out, selfid, "self");
-		ir::emit::type::isself(out, selfid);
+		ir::emit::blueprint::param(irout, selfid, "self");
+		ir::emit::type::isself(irout, selfid);
 	}
 	// iterating through all other user-defined parameters
 	uint32_t offset = (hasImplicitSelf) ? 1u : 0u;
@@ -296,18 +296,18 @@ bool FuncInspector::inspectParameters(AST::Node* node, AST::Node* nodeTypeParams
 		// declare all parameters first
 		uint32_t paramOffsets[config::maxPushedParameters];
 		for (uint32_t i = offset; i < paramCount; ++i) { // reserving lvid for each parameter
-			uint32_t opaddr = ir::emit::blueprint::param(out, scope.nextvar(), nullptr);
+			uint32_t opaddr = ir::emit::blueprint::param(irout, scope.nextvar(), nullptr);
 			paramOffsets[i - offset] = opaddr;
 		}
 		// reserve registers (as many as parameters) for cloning parameters
 		for (uint32_t i = 0u; i != paramCount; ++i)
-			ir::emit::alloc(out, scope.nextvar());
+			ir::emit::alloc(irout, scope.nextvar());
 		// Generating ir for template parameters before the ir code for parameters
 		// (especially for being able to use these types)
 		if (nodeTypeParams)
 			success &= scope.visitASTDeclGenericTypeParameters(*nodeTypeParams);
 		// inspecting each parameter
-		ir::emit::trace(out, "function parameters");
+		ir::emit::trace(irout, "function parameters");
 		// Generate ir (typing and default value) for each parameter
 		assert(node != nullptr and "should not be here if there is no real parameter");
 		for (uint32_t i = offset; i < paramCount; ++i)
@@ -320,8 +320,8 @@ bool FuncInspector::inspectParameters(AST::Node* node, AST::Node* nodeTypeParams
 bool FuncInspector::inspectReturnType(AST::Node& node) {
 	assert(node.rule == AST::rgFuncReturnType and "invalid return type node");
 	assert(not node.children.empty() and " should been tested already");
-	auto& out = scope.sequence();
-	ir::emit::trace(out, "return type");
+	auto& irout = scope.ircode();
+	ir::emit::trace(irout, "return type");
 	uint32_t rettype = 0;
 	for (auto& child : node.children) {
 		switch (child.rule) {
@@ -342,20 +342,20 @@ bool FuncInspector::inspectReturnType(AST::Node& node) {
 			assert(rettype != 0);
 		}
 		assert(rettype != 0);
-		auto& operands    = out.emit<isa::Op::follow>();
+		auto& operands    = irout.emit<isa::Op::follow>();
 		operands.follower = 1; // params are 2-based (1 is the return type)
 		operands.lvid     = rettype;
 		operands.symlink  = 0;
 	}
-	ir::emit::trace(out, "end return type");
+	ir::emit::trace(irout, "end return type");
 	return true;
 }
 
 
 bool FuncInspector::inspectAttributes(Attributes& attrs) {
-	auto& out = scope.sequence();
+	auto& irout = scope.ircode();
 	if (attrs.flags(Attributes::Flag::shortcircuit)) {
-		ir::emit::pragma::shortcircuit(out, true);
+		ir::emit::pragma::shortcircuit(irout, true);
 		attrs.flags -= Attributes::Flag::shortcircuit;
 	}
 	if (attrs.flags(Attributes::Flag::builtinAlias)) {
@@ -363,11 +363,11 @@ bool FuncInspector::inspectAttributes(Attributes& attrs) {
 		ShortString64 value;
 		if (not AST::appendEntityAsString(value, *attrs.builtinAlias))
 			return error(*attrs.builtinAlias) << "invalid builtinalias attribute";
-		ir::emit::pragma::builtinAlias(out, value);
+		ir::emit::pragma::builtinAlias(irout, value);
 		attrs.flags -= Attributes::Flag::builtinAlias;
 	}
 	if (attrs.flags(Attributes::Flag::doNotSuggest)) {
-		ir::emit::pragma::suggest(out, false);
+		ir::emit::pragma::suggest(irout, false);
 		attrs.flags -= Attributes::Flag::doNotSuggest;
 		assert(not attrs.flags(Attributes::Flag::doNotSuggest));
 	}
@@ -460,14 +460,14 @@ bool Scope::visitASTFunc(AST::Node& node) {
 	scope.resetLocalCounters();
 	scope.kind = Scope::Kind::kfunc;
 	scope.broadcastNextVarID = false;
-	auto& out = sequence();
+	auto& irout = ircode();
 	// creating a new blueprint for the function
-	uint32_t bpoffset = ir::emit::blueprint::func(out);
-	uint32_t bpoffsiz = ir::emit::pragma::blueprintSize(out);
-	uint32_t bpoffsck = ir::emit::increaseStacksize(out);
+	uint32_t bpoffset = ir::emit::blueprint::func(irout);
+	uint32_t bpoffsiz = ir::emit::pragma::blueprintSize(irout);
+	uint32_t bpoffsck = ir::emit::increaseStacksize(irout);
 	// making sure that debug info are available
 	context.pPreviousDbgLine = (uint32_t) - 1; // forcing debug infos
-	ir::emit::dbginfo::filename(out, context.dbgSourceFilename);
+	ir::emit::dbginfo::filename(irout, context.dbgSourceFilename);
 	scope.emitDebugpos(node);
 	bool success = true;
 	bool isOperator = false;
@@ -478,22 +478,22 @@ bool Scope::visitASTFunc(AST::Node& node) {
 
 		isOperator = (inspector.funcname.first() == '^');
 		// update the func name
-		auto sid = out.stringrefs.ref(inspector.funcname);
-		out.at<isa::Op::blueprint>(bpoffset).name = sid;
+		auto sid = irout.stringrefs.ref(inspector.funcname);
+		irout.at<isa::Op::blueprint>(bpoffset).name = sid;
 		return inspector.body;
 	})();
-	ir::emit::pragma::funcbody(out);
+	ir::emit::pragma::funcbody(irout);
 	if (likely(body != nullptr)) {
-		ir::emit::trace(out, "\nfunc body");
+		ir::emit::trace(irout, "\nfunc body");
 		// continue evaluating the func body independantly of the previous data and results
 		for (auto& stmtnode : body->children)
 			success &= scope.visitASTStmt(stmtnode);
 	}
 	// end of the blueprint
-	ir::emit::scopeEnd(out);
-	uint32_t blpsize = out.opcodeCount() - bpoffset;
-	out.at<isa::Op::pragma>(bpoffsiz).value.blueprintsize = blpsize;
-	out.at<isa::Op::stacksize>(bpoffsck).add = scope.nextVarID + 1u;
+	ir::emit::scopeEnd(irout);
+	uint32_t blpsize = irout.opcodeCount() - bpoffset;
+	irout.at<isa::Op::pragma>(bpoffsiz).value.blueprintsize = blpsize;
+	irout.at<isa::Op::stacksize>(bpoffsck).add = scope.nextVarID + 1u;
 	return success;
 }
 

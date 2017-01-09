@@ -110,10 +110,10 @@ namespace {
 
 
 struct WalkerIncreaseLVID final {
-	WalkerIncreaseLVID(ir::Sequence& sequence, uint32_t inc, uint32_t greaterThan)
+	WalkerIncreaseLVID(ir::Sequence& ircode, uint32_t inc, uint32_t greaterThan)
 		: greaterThan(greaterThan)
 		, inc(inc)
-		, sequence(sequence) {
+		, ircode(ircode) {
 	}
 
 	void visit(ir::isa::Operand<ir::isa::Op::stacksize>& operands) {
@@ -125,7 +125,7 @@ struct WalkerIncreaseLVID final {
 		switch (kind) {
 			case ir::isa::Blueprint::funcdef:
 			case ir::isa::Blueprint::classdef:
-				sequence.moveCursorFromBlueprintToEnd(*cursor);
+				ircode.moveCursorFromBlueprintToEnd(*cursor);
 				break;
 			default:
 				operands.eachLVID(*this);
@@ -139,7 +139,7 @@ struct WalkerIncreaseLVID final {
 
 	void visit(ir::isa::Operand<ir::isa::Op::end>&) {
 		if (depth-- == 0)
-			sequence.invalidateCursor(*cursor);
+			ircode.invalidateCursor(*cursor);
 	}
 
 	template<ir::isa::Op O> void visit(ir::isa::Operand<O>& operands) {
@@ -171,7 +171,7 @@ struct WalkerIncreaseLVID final {
 	uint32_t inc;
 	uint32_t depth = 0;
 	Instruction** cursor = nullptr;
-	Sequence& sequence;
+	Sequence& ircode;
 };
 
 

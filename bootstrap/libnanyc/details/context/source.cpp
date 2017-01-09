@@ -100,7 +100,7 @@ bool Source::build(Build& build) {
 				success &= passASTFromSource();
 				success &= passDuplicateAndNormalizeAST(report);
 				success &= passTransformASTToIR(report);
-				success = success and build.attach(m_details->parsing.sequence);
+				success = success and build.attach(m_details->parsing.ircode);
 				m_details->parsing.success = success;
 			}
 		}

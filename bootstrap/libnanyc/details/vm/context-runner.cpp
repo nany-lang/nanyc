@@ -13,7 +13,7 @@ ContextRunner::ContextRunner(Context& context, const ir::Sequence& callee)
 	, cf(context.program.cf)
 	, context(context)
 	, map(context.program.map)
-	, sequence(std::cref(callee))
+	, ircode(std::cref(callee))
 	, userDefinedIntrinsics(ny::ref(context.program.build).intrinsics) {
 }
 
@@ -90,13 +90,13 @@ void ContextRunner::emitDividedByZero() {
 
 
 void ContextRunner::emitUnknownPointer(void* p) {
-	ny::vm::console::unknownPointer(context, p, sequence.get().offsetOf(**cursor));
+	ny::vm::console::unknownPointer(context, p, ircode.get().offsetOf(**cursor));
 	abortMission();
 }
 
 
 void ContextRunner::emitLabelError(uint32_t label) {
-	auto offset = sequence.get().offsetOf(**cursor);
+	auto offset = ircode.get().offsetOf(**cursor);
 	ny::vm::console::invalidLabel(context, label, upperLabelID, offset);
 	abortMission();
 }
@@ -106,7 +106,7 @@ void ContextRunner::destroy(uint64_t* object, uint32_t dtorid, uint32_t instance
 	auto& dtor = *map.findAtom(dtorid);
 	if (false) {
 		std::cout << " .. DESTROY " << (void*) object << " aka '"
-			<< dtor.caption() << "' at opc+" << sequence.get().offsetOf(**cursor) << '\n';
+			<< dtor.caption() << "' at opc+" << ircode.get().offsetOf(**cursor) << '\n';
 		stacktrace.dump(context.cf, map);
 		std::cout << '\n';
 	}
@@ -309,7 +309,7 @@ uint64_t ContextRunner::invoke(const ir::Sequence& callee) {
 	#endif
 	registers = stack.push(framesize);
 	registers[0].u64 = 0;
-	sequence = std::cref(callee);
+	ircode = std::cref(callee);
 	upperLabelID = 0;
 	// retrieve parameters for the func
 	for (uint32_t i = 0; i != funcparamCount; ++i)

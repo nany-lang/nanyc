@@ -69,8 +69,8 @@ bool Scope::visitASTExprNew(AST::Node& node, uint32_t& localvar) {
 		return false;
 	// debug info
 	emitDebugpos((call ? *call : node));
-	auto& out = sequence();
-	ir::emit::type::isobject(out, rettype);
+	auto& irout = ircode();
+	ir::emit::type::isobject(irout, rettype);
 	// OBJECT ALLOCATION
 	uint32_t pointer = 0;
 	if (inplace == nullptr) {
@@ -78,30 +78,30 @@ bool Scope::visitASTExprNew(AST::Node& node, uint32_t& localvar) {
 		// trick: a register will be allocated even if unused for now
 		// it will be later (when instanciating the func) to put the sizeof
 		// of the object to allocate
-		ir::emit::alloc(out, nextvar(), nyt_u64);
-		pointer = ir::emit::alloc(out, nextvar());
-		ir::emit::objectAlloc(out, pointer, rettype);
+		ir::emit::alloc(irout, nextvar(), nyt_u64);
+		pointer = ir::emit::alloc(irout, nextvar());
+		ir::emit::objectAlloc(irout, pointer, rettype);
 	}
 	else {
 		uint32_t inplaceExpr = 0;
 		if (not visitASTExpr(*inplace, inplaceExpr))
 			return false;
 		// intermediate pointer to force type __pointer
-		uint32_t tmpptr = ir::emit::alloc(out, nextvar(), nyt_ptr);
-		ir::emit::assign(out, tmpptr, inplaceExpr, false);
+		uint32_t tmpptr = ir::emit::alloc(irout, nextvar(), nyt_ptr);
+		ir::emit::assign(irout, tmpptr, inplaceExpr, false);
 		// promoting the given __pointer to T
-		pointer = ir::emit::alloc(out, nextvar());
-		ir::emit::copy(out, pointer, tmpptr);
+		pointer = ir::emit::alloc(irout, nextvar());
+		ir::emit::copy(irout, pointer, tmpptr);
 	}
 	// type propagation
-	auto& operands    = out.emit<isa::Op::follow>();
+	auto& operands    = irout.emit<isa::Op::follow>();
 	operands.follower = pointer;
 	operands.lvid     = rettype;
 	operands.symlink  = 0;
 	localvar = pointer;
 	// CONSTRUCTOR CALL
-	uint32_t lvidcall = ir::emit::alloc(out, nextvar());
-	ir::emit::identify(out, lvidcall, "^new", pointer);
+	uint32_t lvidcall = ir::emit::alloc(irout, nextvar());
+	ir::emit::identify(irout, lvidcall, "^new", pointer);
 	return visitASTExprCall(call, lvidcall);
 }
 

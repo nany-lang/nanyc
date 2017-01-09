@@ -33,13 +33,13 @@ inline Scope::~Scope() {
 }
 
 
-inline Sequence& Scope::sequence() {
-	return context.sequence;
+inline Sequence& Scope::ircode() {
+	return context.ircode;
 }
 
 
 inline AnyString Scope::acquireString(const AnyString& string) {
-	return context.sequence.stringrefs.refstr(string);
+	return context.ircode.stringrefs.refstr(string);
 }
 
 
@@ -52,7 +52,7 @@ inline void Scope::addDebugCurrentPosition(uint line, uint offset) {
 	if (context.debuginfo and
 		(not config::removeRedundantDbgOffset or offset != context.pPreviousDbgOffset
 		 or line != context.pPreviousDbgLine)) {
-		ir::emit::dbginfo::position(context.sequence, line, offset);
+		ir::emit::dbginfo::position(context.ircode, line, offset);
 		context.pPreviousDbgOffset = offset;
 		context.pPreviousDbgLine = line;
 	}
@@ -81,25 +81,25 @@ inline uint32_t Scope::reserveLocalVariable() {
 
 inline uint32_t Scope::createLocalBuiltinVoid(AST::Node& node) {
 	emitDebugpos(node);
-	return ir::emit::alloc(context.sequence, nextvar(), nyt_void);
+	return ir::emit::alloc(context.ircode, nextvar(), nyt_void);
 }
 
 
 inline uint32_t Scope::createLocalBuiltinAny(AST::Node& node) {
 	emitDebugpos(node);
-	return ir::emit::alloc(context.sequence, nextvar());
+	return ir::emit::alloc(context.ircode, nextvar());
 }
 
 
 inline uint32_t Scope::createLocalBuiltinFloat(AST::Node& node, nytype_t type, double value) {
 	emitDebugpos(node);
-	return ir::emit::allocf64(context.sequence, nextvar(), type, value);
+	return ir::emit::allocf64(context.ircode, nextvar(), type, value);
 }
 
 
 inline uint32_t Scope::createLocalBuiltinInt(AST::Node& node, nytype_t type, yuint64 value) {
 	emitDebugpos(node);
-	return ir::emit::allocu64(context.sequence, nextvar(), type, value);
+	return ir::emit::allocu64(context.ircode, nextvar(), type, value);
 }
 
 
@@ -134,7 +134,7 @@ inline void Scope::emitDebugpos(AST::Node* node) {
 
 inline bool Scope::visitASTExprSubDot(AST::Node& node, uint32_t& localvar) {
 	emitTmplParametersIfAny();
-	ir::emit::type::ensureResolved(context.sequence, localvar);
+	ir::emit::type::ensureResolved(context.ircode, localvar);
 	return visitASTExprContinuation(node, localvar);
 }
 

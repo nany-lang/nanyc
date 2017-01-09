@@ -34,7 +34,7 @@ public:
 		yuni::Ref<AST::Node> rootnode;
 
 		//! The original sequence, generated from the normalized AST
-		ir::Sequence sequence;
+		ir::Sequence ircode;
 
 		//! Parse / IR result
 		bool success = false;
