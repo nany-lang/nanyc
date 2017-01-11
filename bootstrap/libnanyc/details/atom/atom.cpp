@@ -180,7 +180,7 @@ Atom::Instances::Ref Atom::Instances::create(const Signature& signature, Atom* r
 	m_instances.emplace_back();
 	auto& details = m_instances[index];
 	details.remapAtom = remapAtom;
-	details.ircode  = std::make_unique<ir::Sequence>();
+	details.ircode = std::make_unique<ir::Sequence>();
 	m_instancesIDs.emplace(signature, index);
 	return Ref{*this, index};
 }

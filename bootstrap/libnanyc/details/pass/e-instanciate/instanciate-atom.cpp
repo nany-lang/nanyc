@@ -56,14 +56,14 @@ void prepareSignature(Signature& signature, InstanciateData& info) {
 bool duplicateAtomForSpecialization(InstanciateData& info, Atom& atom) {
 	// create a new atom with non-generic parameters / from a contextual atom
 	// (generic or anonymous class) and re-map from the parent
-	auto& ircode  = *atom.opcodes.ircode;
+	auto* ircode = atom.opcodes.ircode;
 	auto& originaltable = info.cdeftable.originalTable();
 	Mutex mutex; // useless but currently required for the first pass by SequenceMapping
 	Pass::MappingOptions options;
 	options.evaluateWholeSequence = false;
 	options.prefixNameForFirstAtomCreated = "^"; // not an user-defined atom
 	options.offset = atom.opcodes.offset;
-	Pass::map(*atom.parent, originaltable, mutex, ircode, options);
+	Pass::map(*atom.parent, originaltable, mutex, *ircode, options);
 	if (unlikely(!options.firstAtomCreated))
 		return ny::complain::invalidAtomMapping(atom.caption());
 	auto& newAtom = *options.firstAtomCreated;
@@ -121,17 +121,11 @@ ir::Sequence* translateAndInstanciateASTIRCode(InstanciateData& info, Signature&
 	// `atomRequested` is probably `atom` itself, but different for template classes
 	auto instance = atomRequested.instances.create(signature, &atom);
 	info.instanceid = instance.id();
-	// the original ir code generated from the AST
-	auto& irin = *(atom.opcodes.ircode);
-	// the new ir code for the instanciated function
-	auto& irout = instance.ircode();
-	// new layer for the cdeftable
 	ClassdefTableView newView{info.cdeftable, atom.atomid, signature.parameters.size()};
-	// Error reporting
 	Logs::Report report{*info.report};
-	// translate/instanciate the ir code attached to the atom
-	auto builder = std::make_unique<SequenceBuilder>
-		(report.subgroup(), newView, info.build, &irout, irin, info.parent);
+	auto& irin = *(atom.opcodes.ircode);
+	auto& irout = instance.ircode();
+	auto builder = std::make_unique<SequenceBuilder>(report.subgroup(), newView, info.build, &irout, irin, info.parent);
 	if (config::traces::sourceOpcodeSequence)
 		debugPrintSourceOpcodeSequence(info.cdeftable, info.atom.get(), "[ir-from-ast] ");
 	substituteParameterTypes(builder->cdeftable, atom, signature);
@@ -222,9 +216,7 @@ bool resolveTypesBeforeBodyStart(Build& build, Atom& atom, InstanciateData* orig
 		ParamList tmplparams;
 		std::shared_ptr<Logs::Message> newReport;
 		ny::Logs::Report report{*build.messages.get()};
-		Pass::Instanciate::InstanciateData info {
-			newReport, atom, cdeftblView, build, params, tmplparams
-		};
+		Pass::Instanciate::InstanciateData info{newReport, atom, cdeftblView, build, params, tmplparams};
 		bool success = Pass::Instanciate::instanciateAtomParameterTypes(info);
 		if (not success)
 			report.appendEntry(newReport);
@@ -565,17 +557,7 @@ bool instanciateAtomParameterTypes(InstanciateData& info) {
 	// The second parameter will be of interest in this case
 	// The sequence builder will stop as soon as the opcode 'bodystart'
 	// is encountered
-	Signature signature;
-	// the current atom, probably different from `previousAtom`
 	auto& atom = info.atom.get();
-	// the original ir sequence generated from the AST
-	auto& irin = *(atom.opcodes.ircode);
-	// no output
-	ir::Sequence* irout = nullptr;
-	// new layer for the cdeftable
-	ClassdefTableView newview{info.cdeftable, atom.atomid, signature.parameters.size()};
-	// log
-	Logs::Report report{*info.report};
 	if (unlikely(!atom.parent))
 		return (ice() << "invalid atom, no parent");
 	if (!atom.opcodes.ircode) {
@@ -584,7 +566,11 @@ bool instanciateAtomParameterTypes(InstanciateData& info) {
 			return true;
 		return (ice() << "invalid atom: no ir code");
 	}
-	// instanciate the sequence attached to the atom
+	Logs::Report report{*info.report};
+	Signature signature;
+	ClassdefTableView newview{info.cdeftable, atom.atomid, signature.parameters.size()};
+	auto& irin = *(atom.opcodes.ircode);
+	auto* irout = (ir::Sequence*) nullptr;
 	auto builder = std::make_unique<SequenceBuilder>(report.subgroup(), newview, info.build, irout, irin, info.parent);
 	//if (info.parentAtom)
 	builder->layerDepthLimit = 2; // allow the first blueprint to be instanciated
@@ -638,7 +624,7 @@ bool instanciateAtom(InstanciateData& info) {
 			}
 			case Tribool::Value::indeterminate: {
 				// the atom must be instanciated
-				return (nullptr != translateAndInstanciateASTIRCode(info, signature));
+				return translateAndInstanciateASTIRCode(info, signature) != nullptr;
 			}
 			case Tribool::Value::no: {
 				// failed to instanciate last time. error already reported

@@ -182,7 +182,7 @@ struct OpcodeReader final {
 			? cdeftable.atoms.createFuncdef(parentAtom, funcname)
 			: cdeftable.atoms.createTypealias(parentAtom, funcname);
 		newatom.opcodes.ircode = &ircode;
-		newatom.opcodes.offset   = ircode.offsetOf(operands);
+		newatom.opcodes.offset = ircode.offsetOf(operands);
 		cdeftable.registerAtom(newatom);
 		operands.atomid = newatom.atomid;
 		newatom.returnType.clid.reclass(newatom.atomid, 1);
