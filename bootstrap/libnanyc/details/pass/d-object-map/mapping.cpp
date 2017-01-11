@@ -23,6 +23,9 @@ inline void rememberFirstAtomCreated(T& mapping, Atom& atom) {
 
 //! Stack frame per atom definition (class, func)
 struct AtomStackFrame final {
+	AtomStackFrame(Atom& atom)
+		: atom(atom) {
+	}
 	AtomStackFrame(Atom& atom, std::unique_ptr<AtomStackFrame>& next)
 		: atom(atom), next(std::move(next)) {
 	}
@@ -708,19 +711,8 @@ struct OpcodeReader final {
 
 
 	bool operator () (Atom& parentAtom, uint32_t offset) {
-		// some reset if reused
-		assert(not atomStack);
-		pushNewFrame(parentAtom);
-		lastuint32_t = 0u;
-		lastPushedNamedParameters.clear();
-		lastPushedIndexedParameters.clear();
-		currentFilename = nullptr;
-		currentOffset = 0u;
-		currentLine = 0u;
-		success = true;
-		// -- walk through all opcodes
+		atomStack = std::make_unique<AtomStackFrame>(parentAtom);
 		ircode.each(*this, offset);
-		atomStack.reset(nullptr); // cleanup after use
 		return success;
 	}
 
@@ -750,7 +742,7 @@ struct OpcodeReader final {
 	uint32_t currentLine = 0;
 	uint32_t currentOffset = 0;
 	MappingOptions& options;
-	bool success = false;
+	bool success = true;
 
 	//! cursor for iterating through all opcocdes
 	ir::Instruction** cursor = nullptr;
