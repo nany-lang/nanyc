@@ -56,18 +56,23 @@ void prepareSignature(Signature& signature, InstanciateData& info) {
 bool duplicateAtomForSpecialization(InstanciateData& info, Atom& atom) {
 	// create a new atom with non-generic parameters / from a contextual atom
 	// (generic or anonymous class) and re-map from the parent
-	auto* ircode = atom.opcodes.ircode;
+	//auto* ircode = atom.opcodes.ircode;
+	assert(atom.opcodes.ircode != nullptr);
+	auto* ircode = new ir::Sequence(*atom.opcodes.ircode, 0);
+	assert(atom.opcodes.offset < ircode->opcodeCount());
 	auto& originaltable = info.cdeftable.originalTable();
 	Mutex mutex; // useless but currently required for the first pass by SequenceMapping
 	Pass::MappingOptions options;
 	options.evaluateWholeSequence = false;
 	options.prefixNameForFirstAtomCreated = "^"; // not an user-defined atom
 	options.offset = atom.opcodes.offset;
+	options.firstAtomOwnSequence = true;
 	Pass::map(*atom.parent, originaltable, mutex, *ircode, options);
 	if (unlikely(!options.firstAtomCreated))
 		return ny::complain::invalidAtomMapping(atom.caption());
 	auto& newAtom = *options.firstAtomCreated;
 	assert(atom.atomid != newAtom.atomid);
+	assert(newAtom.opcodes.offset < newAtom.opcodes.ircode->opcodeCount());
 	info.atom = std::ref(newAtom);
 	newAtom.tmplparamsForPrinting.swap(newAtom.tmplparams);
 	newAtom.classinfo.isInstanciated = true;

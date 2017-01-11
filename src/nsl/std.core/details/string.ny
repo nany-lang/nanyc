@@ -76,7 +76,7 @@ func index(cref base, offset: u32, cref ascii: std.Ascii): u32 {
 	return new u32(size);
 }
 
-func index(cref base, offset: u32, cref predicate): u32 {
+func index(cref base, offset: u32, ref predicate): u32 {
 	var size = base.m_size;
 	if offset < size then {
 		var p = base.m_cstr + offset.pod;
@@ -149,7 +149,7 @@ func makeTrimmed(cref base): ref {
 	return newstr;
 }
 
-func makeViewAscii(ref base, cref filter): ref {
+func makeViewAscii(ref base, ref filter): ref {
 	ref m_parentString = base;
 	ref m_parentFilter = filter;
 	return new class {
@@ -178,7 +178,7 @@ func makeViewAscii(ref base, cref filter): ref {
 	};
 }
 
-func makeViewBytes(ref base, cref filter): ref {
+func makeViewBytes(ref base, ref filter): ref {
 	ref m_parentString = base;
 	ref m_parentFilter = filter;
 	return new class {
@@ -207,7 +207,7 @@ func makeViewBytes(ref base, cref filter): ref {
 	};
 }
 
-func makeViewSplit(ref base, cref filter, separatorLength: u32, cref predicate): ref {
+func makeViewSplit(ref base, ref filter, separatorLength: u32, ref predicate): ref {
 	ref m_parentString = base;
 	ref m_parentFilter = filter;
 	ref m_parentPredicate = predicate;
@@ -248,7 +248,7 @@ func makeViewSplit(ref base, cref filter, separatorLength: u32, cref predicate):
 	};
 }
 
-func makeViewSplitByLines(ref base, cref filter): ref {
+func makeViewSplitByLines(ref base, ref filter): ref {
 	ref m_parentString = base;
 	ref m_parentFilter = filter;
 	return new class {
@@ -287,7 +287,7 @@ func makeViewSplitByLines(ref base, cref filter): ref {
 	};
 }
 
-func makeViewIndex(ref base, cref filter, offset: u32, cref pattern): ref {
+func makeViewIndex(ref base, ref filter, offset: u32, ref pattern): ref {
 	ref m_parentString = base;
 	ref m_parentFilter = filter;
 	ref m_parentPattern = pattern;

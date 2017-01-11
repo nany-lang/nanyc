@@ -539,45 +539,45 @@ public class string {
 	** \brief View on each UTF8 character
 	** \TODO UTF8 support (UTF8cpp?)
 	*/
-	view (cref filter): ref
+	view (ref filter): ref
 		-> std.details.string.makeViewAscii(self, filter);
 
 	//! View on each ascii
-	view ascii(cref filter): ref
+	view ascii(ref filter): ref
 		-> std.details.string.makeViewAscii(self, filter);
 
 	//! View on each ascii as u8
-	view bytes(cref filter): ref
+	view bytes(ref filter): ref
 		-> std.details.string.makeViewBytes(self, filter);
 
 	//! Split the string
-	view split(cref filter): ref
+	view split(ref filter): ref
 		-> std.details.string.makeViewSplit(self, filter, 1u, func (cref ascii) -> ascii.blank);
 
 	//! Split the string
-	view split(cref filter, cref separator: std.Ascii): ref {
+	view split(ref filter, cref separator: std.Ascii): ref {
 		ref sep = separator;
 		return std.details.string.makeViewSplit(self, filter, 1u, func (cref ascii) -> ascii == sep);
 	}
 
 	//! Split the string
-	view split(cref filter, cref pattern: string): ref
+	view split(ref filter, ref pattern: string): ref
 		-> std.details.string.makeViewSplit(self, filter, pattern.size, pattern);
 
 	//! Split the string
-	view split(cref filter, cref predicate): ref
+	view split(ref filter, ref predicate): ref
 		-> std.details.string.makeViewSplit(self, filter, 1u, predicate);
 
 	//! Split the string
-	view lines(cref filter): ref
+	view lines(ref filter): ref
 		-> std.details.string.makeViewSplitByLines(self, filter);
 
 	//! Find occurences
-	view index(cref filter, cref pattern): ref
+	view index(ref filter, cref pattern): ref
 		-> std.details.string.makeViewIndex(filter, 0u, pattern);
 
 	//! Find occurences
-	view index(cref filter, offset: u32, cref pattern): ref
+	view index(ref filter, offset: u32, cref pattern): ref
 		-> std.details.string.makeViewIndex(filter, offset, pattern);
 
 	/*!
