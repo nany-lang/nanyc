@@ -57,7 +57,6 @@ int Program::execute(uint32_t argc, const char** argv) {
 	bool success = context.initializeFirstTContext();
 	if (unlikely(not success))
 		return 666;
-	// Execute the program
 	uint64_t exitstatus;
 	if (context.invoke(exitstatus, ircode, atomid, instanceid)) {
 		retvalue = static_cast<int>(exitstatus);
@@ -70,7 +69,6 @@ int Program::execute(uint32_t argc, const char** argv) {
 	}
 	if (cf.on_terminate)
 		cf.on_terminate(self(), nyfalse, retvalue);
-	// Always flush the output
 	flushAll(cf.console);
 	return retvalue;
 }

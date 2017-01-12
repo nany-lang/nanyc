@@ -39,9 +39,7 @@ namespace vm {
 
 
 struct ContextRunner final {
-	//! Pattern for memset alloc regions (debug)
 	constexpr static const int patternAlloc = 0xCD;
-	//! Pattern for memset free regions (debug)
 	constexpr static const int patternFree = 0xCD;
 
 	struct Exception: public std::exception {

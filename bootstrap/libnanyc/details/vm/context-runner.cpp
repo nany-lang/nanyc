@@ -19,12 +19,10 @@ ContextRunner::ContextRunner(Context& context, const ir::Sequence& callee)
 
 
 void ContextRunner::initialize() {
-	// dynamic C calls
 	dyncall = dcNewCallVM(4096);
 	if (unlikely(!dyncall))
 		throw DyncallError();
 	dcMode(dyncall, DC_CALL_C_DEFAULT);
-	// prepare the current context for native C calls
 	cfvm.allocator = &allocator;
 	cfvm.program = context.program.self();
 	cfvm.tctx = context.self();
@@ -236,7 +234,6 @@ void ContextRunner::visit(const ir::isa::Operand<ir::isa::Op::memalloc>& opr) {
 		size = static_cast<size_t>(request);
 	}
 	else {
-		// 64bits platform
 		size = static_cast<size_t>(registers[opr.regsize].u64);
 	}
 	size += config::extraObjectSize;
@@ -311,7 +308,6 @@ uint64_t ContextRunner::invoke(const ir::Sequence& callee) {
 	registers[0].u64 = 0;
 	ircode = std::cref(callee);
 	upperLabelID = 0;
-	// retrieve parameters for the func
 	for (uint32_t i = 0; i != funcparamCount; ++i)
 		registers[i + 2].u64 = funcparams[i].u64; // 2-based
 	funcparamCount = 0;
