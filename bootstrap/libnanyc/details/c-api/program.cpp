@@ -46,7 +46,7 @@ extern "C" int nyprogram_main(nyprogram_t* ptr, uint32_t argc, const char** argv
 		auto& program = ny::ref(ptr);
 		return program.execute(argc, argv);
 	}
-	return 1;
+	return EXIT_FAILURE;
 }
 
 

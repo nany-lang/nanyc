@@ -49,7 +49,7 @@ int Program::execute(uint32_t argc, const char** argv) {
 	// (requires std.Array<:T:>)
 	(void) argc;
 	(void) argv;
-	retvalue = 1; // EXIT_FAILURE
+	retvalue = EXIT_FAILURE;
 	uint32_t atomid = ny::ref(build).main.atomid;
 	uint32_t instanceid = ny::ref(build).main.instanceid;
 	auto& ircode = map.ircode(atomid, instanceid);
@@ -72,7 +72,7 @@ int Program::execute(uint32_t argc, const char** argv) {
 		cf.on_terminate(self(), nyfalse, retvalue);
 	// Always flush the output
 	flushAll(cf.console);
-	return (retvalue != 0) ? retvalue : 1; // avoid 0 if failure
+	return retvalue;
 }
 
 
