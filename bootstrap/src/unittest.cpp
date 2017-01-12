@@ -324,7 +324,12 @@ void runUnittests(nyrun_cf_t& runcf, const Settings& settings, const char** file
 	uint32_t failCount = 0;
 	int64_t starttime = DateTime::NowMilliSeconds();
 	for (auto& testname : settings.unittests) {
-		bool success = runtest<true>(runcf, settings, testname, filelist, filecount);
+		bool success = false;
+		try {
+			success = runtest<true>(runcf, settings, testname, filelist, filecount);
+		}
+		catch (const std::exception&) {
+		}
 		++(success ? successCount : failCount);
 	}
 	int64_t duration = DateTime::NowMilliSeconds() - starttime;
