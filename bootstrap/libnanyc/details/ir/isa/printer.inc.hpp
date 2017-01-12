@@ -240,8 +240,14 @@ namespace // anonymous
 			out << ": ";
 			out << nytype_to_cstring((nytype_t) operands.type);
 
-			if (operands.atomid != (uint32_t) -1)
-				out << " atom: " << operands.atomid;
+			if (operands.atomid != (uint32_t) -1) {
+				out << " // atom: " << operands.atomid;
+				if (atommap) {
+					auto atom = atommap->findAtom(operands.atomid);
+					if (atom)
+						out << " '" << atom->caption() << '\'';
+				}
+			}
 		}
 
 
