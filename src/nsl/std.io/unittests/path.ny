@@ -4,8 +4,8 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-unittest std.io.path.extension
-{
+
+unittest std.io.path.extension {
 	var tryPathExtension = func (cref file: string, cref expect: string, cref withDot: string) {
 		var expectHas = (not withDot.empty);
 		ref expectDot = withDot;
@@ -13,7 +13,6 @@ unittest std.io.path.extension
 		var has   = std.io.path.hasExtension(file);
 		var dot   = std.io.path.extension(file);
 		var nodot = std.io.path.extension(file, withDot: false);
-
 		if has != expectHas or dot != expectDot or nodot != expectNoDot then {
 			printerr("error: fail '\(file)'\n");
 			printerr("       got: has: '\(has)', ext: '\(dot)', nodot: '\(nodot)'\n");
@@ -35,8 +34,7 @@ unittest std.io.path.extension
 	tryPathExtension("../../../././././foo.bmp", expect: "bmp", withDot: ".bmp");
 }
 
-unittest std.io.path.filename
-{
+unittest std.io.path.filename {
 	var tryPathFilename = func (cref path: string, cref expect: string) {
 		ref got = std.io.path.filename(path);
 		if got != expect then {
@@ -54,8 +52,7 @@ unittest std.io.path.filename
 	tryPathFilename("", expect: "");
 }
 
-unittest std.io.path.folder
-{
+unittest std.io.path.folder {
 	var tryPathFolder = func (cref path: string, cref expect: string) {
 		ref got = std.io.path.folder(path);
 		if got != expect then {
@@ -73,8 +70,7 @@ unittest std.io.path.folder
 	tryPathFolder("", expect: "");
 }
 
-unittest std.io.path.parent
-{
+unittest std.io.path.parent {
 	var tryPathParentFolder = func (cref path: string, cref expect: string) {
 		ref got = std.io.path.parent(path);
 		if got != expect then {
@@ -93,8 +89,7 @@ unittest std.io.path.parent
 	tryPathParentFolder("", expect: "");
 }
 
-unittest std.io.path.stem
-{
+unittest std.io.path.stem {
 	var tryPathStem = func (cref path: string, cref expect: string) {
 		ref got = std.io.path.stem(path);
 		if got != expect then {
@@ -112,8 +107,7 @@ unittest std.io.path.stem
 	tryPathStem("", expect: "");
 }
 
-unittest std.io.path.normalize
-{
+unittest std.io.path.normalize {
 	var tryPathNormalize = func (cref path: string, cref expect: string) {
 		var got = std.io.path.normalize(path);
 		if got != expect then {
