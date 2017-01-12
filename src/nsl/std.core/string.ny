@@ -53,8 +53,11 @@ public class string {
 		append(str, size.pod);
 	}
 
-	operator clone(cref rhs: string) {
-		 append(rhs);
+	operator clone(cref other: string) {
+		m_size = 0__u32;
+		m_capacity = 0__u32;
+		m_cstr = null;
+		append(other.m_cstr, other.m_size);
 	}
 
 	operator dispose {
