@@ -224,22 +224,18 @@ void ContextRunner::visit(const ir::isa::Operand<ir::isa::Op::memalloc>& opr) {
 	vm_PRINT_OPCODE(opr);
 	ASSERT_LVID(opr.lvid);
 	ASSERT_LVID(opr.regsize);
-	size_t size;
-	if (sizeof(size_t) < sizeof(uint64_t)) {
-		// size_t is less than a u64 (32bits platform probably)
-		// so it is possible to ask more than the system can provide
+	size_t size = [&]() -> size_t {
+		if (sizeof(size_t) == sizeof(uint64_t))
+			return static_cast<size_t>(registers[opr.regsize].u64);
 		auto request = registers[opr.regsize].u64;
 		if (std::numeric_limits<size_t>::max() <= request)
-			return emitBadAlloc();
-		size = static_cast<size_t>(request);
-	}
-	else {
-		size = static_cast<size_t>(registers[opr.regsize].u64);
-	}
+			emitBadAlloc();
+		return static_cast<size_t>(request);
+	}();
 	size += config::extraObjectSize;
 	uint64_t* pointer = allocateraw<uint64_t>(size);
 	if (unlikely(!pointer))
-		return emitBadAlloc();
+		emitBadAlloc();
 	if (debugmode)
 		memset(pointer, patternAlloc, size);
 	pointer[0] = 0;
