@@ -222,7 +222,7 @@ extern "C" int nyrun_filelist(const nyrun_cf_t* cf, const char** files, uint32_t
 		try {
 			auto program = compileFilelist(cf, files, file_count);
 			if (!!program)
-				return run(program.get(), "a,out", argc, argv);
+				return run(program.get(), "a.out", argc, argv);
 		}
 		catch (...) {}
 	}
