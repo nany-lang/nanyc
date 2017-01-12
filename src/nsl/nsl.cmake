@@ -59,6 +59,7 @@ set(nsl_files
 
 set(nsl_files_unittest
 	"${nsl_root}/std.core/unittest-string.ny"
+	"${nsl_root}/std.core/unittests/closure.ny"
 	"${nsl_root}/std.digest/unittest-digest.ny"
 	"${nsl_root}/std.io/unittest.ny"
 
