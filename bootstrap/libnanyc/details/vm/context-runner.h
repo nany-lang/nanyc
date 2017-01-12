@@ -690,6 +690,7 @@ public:
 		auto labelid = upperLabelID;
 		uint32_t memcheckPreviousAtomid = memchecker.atomid();
 		stacktrace.push(atomfunc, instanceid);
+		retRegister = 0;
 		// call
 		uint64_t ret = invoke(map.ircode(atomfunc, instanceid));
 		// restore the previous stack frame and store the result of the call
