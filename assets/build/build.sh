@@ -50,10 +50,6 @@ platform_and_env_settings() {
 compiler_settings() {
 	[ -z "${CC:-}" ]  && export CC="gcc";
 	[ -z "${CXX:-}" ] && export CXX="g++";
-	if [ -n "${TRAVIS_JOB_NUMBER:-}" -a $platform == linux ]; then
-		[ "$CC"  == "gcc" ] && export CC="gcc-5";
-		[ "$CXX" == "g++" ] && export CXX="g++-5";
-	fi
 	echo "env CC=${CC} [$(which $CC)]"
 	echo "env CXX=${CXX} [$(which $CXX)]"
 }
