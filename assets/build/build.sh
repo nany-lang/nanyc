@@ -82,7 +82,13 @@ print_packages() {
 make_packages() {
 	[ ! "${BUILD_TYPE}" = 'release' ] && return 0
 	local has_pkgs=0
-	[ $platform == linux ] && run "DEB" "Packages DEB" make_packages_deb && has_pkgs=1
+	if [ "$platform" == linux ]; then
+		if [ -f /etc/redhat-release ]; then
+			echo "RPM not implemented"
+		elif [ -f /etc/debian_version ]; then
+			run "DEB" "Packages DEB" make_packages_deb && has_pkgs=1
+		fi
+	fi
 	[ $has_pkgs -ne 0 ] && run "output" "Distribution" print_packages
 	return 0
 }
