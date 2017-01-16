@@ -16,15 +16,15 @@ void SequenceBuilder::captureVariables(Atom& atom) {
 	// get the ownership of the container to release it
 	assert(atom.candidatesForCapture != nullptr);
 	auto candidatesPtr = std::move(atom.candidatesForCapture);
-	auto& candidates = *candidatesPtr;
-	if (unlikely(candidates.empty()))
+	auto& originalCandidates = *candidatesPtr;
+	if (unlikely(originalCandidates.empty()))
 		return;
 	// The list of variables that can be really captured
 	struct CapturedVar final {
 		AnyString name;
 		CLID clid;
 	};
-	std::unique_ptr<CapturedVar[]> narrowedCandadiateList;
+	std::unique_ptr<CapturedVar[]> candidates;
 	//
 	// -- FILTERING
 	// Keeping only local variables from the candidate list
@@ -34,12 +34,12 @@ void SequenceBuilder::captureVariables(Atom& atom) {
 		if (config::traces::capturedVariables)
 			trace() << "capturing variables in '" << frame->atom.caption() << '\'';
 		ShortString128 newVarname;
-		for (auto& varname : candidates) {
+		for (auto& varname : originalCandidates) {
 			uint32_t lvid = frame->findLocalVariable(varname);
 			if (lvid != 0) {
-				if (!narrowedCandadiateList)
-					narrowedCandadiateList = std::make_unique<CapturedVar[]>(candidates.size());
-				auto& element = narrowedCandadiateList[count++];
+				if (!candidates)
+					candidates = std::make_unique<CapturedVar[]>(originalCandidates.size());
+				auto& element = candidates[count++];
 				newVarname.clear() << "^trap^" << varname;
 				// the new name must be stored somewhere
 				element.name = currentSequence.stringrefs.refstr(newVarname);
@@ -60,7 +60,7 @@ void SequenceBuilder::captureVariables(Atom& atom) {
 	}
 	if (count == 0) // nothing to capture
 		return;
-	assert(!!narrowedCandadiateList);
+	assert(!!candidates);
 	assert(atom.opcodes.ircode and "invalid empty IR sequence");
 	if (unlikely(atom.opcodes.ircode == nullptr))
 		return;
@@ -93,7 +93,7 @@ void SequenceBuilder::captureVariables(Atom& atom) {
 	if (config::traces::capturedVariables)
 		trace() << ".. creating new local variables from {" << atom.atomid << ',' << startLvid << '}';
 	for (uint32_t i = 0; i != count; ++i) {
-		auto& var = narrowedCandadiateList[i];
+		auto& var = candidates[i];
 		// new atom for the new variable member
 		auto& newVarAtom = table.atoms.createVardef(atom, var.name);
 		table.registerAtom(newVarAtom);
@@ -130,7 +130,7 @@ void SequenceBuilder::captureVariables(Atom& atom) {
 			if (config::traces::capturedVariables)
 				trace() << ".. appending " << count << " params to ctor " << child.caption();
 			for (uint32_t i = 0; i != count; ++i) {
-				auto& var = narrowedCandadiateList[i];
+				auto& var = candidates[i];
 				CLID clid{atom.atomid, startLvid + i};
 				bool success = child.parameters.append(clid, var.name);
 				if (unlikely(not success)) {
