@@ -1,5 +1,6 @@
 #include "complain.h"
 #include "details/errors/errors.h"
+#include "details/ir/isa/data.h"
 
 
 namespace ny {
@@ -42,6 +43,16 @@ bool invalidRecursiveAtom(const AnyString& atom) {
 
 bool inconsistentGenericTypeParameterIndex() {
 	return (ice() << "generic type parameter index inconsistent with size()");
+}
+
+
+Opcode::Opcode(const ny::ir::Sequence& ircode, const ir::Instruction& operands, const AnyString& usermsg) {
+	// ICE: unknown opcode 'resolveAttribute': from 'ref %4 = resolve %3."()"'
+	if (not usermsg.empty())
+		msg << usermsg << ':';
+	else
+		msg << "invalid opcode ";
+	msg << " '" << ny::ir::isa::print(ircode, operands) << '\'';
 }
 
 

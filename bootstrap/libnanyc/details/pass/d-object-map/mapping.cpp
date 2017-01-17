@@ -13,6 +13,14 @@ namespace Pass {
 namespace {
 
 
+struct EOperand final: public ny::complain::Opcode {
+	template<ir::isa::Op O>
+	EOperand(const ir::Sequence& ircode, const ir::isa::Operand<O>& operands, const AnyString& msg)
+		: ny::complain::Opcode(ircode, ir::Instruction::fromOpcode(operands), msg) {
+	}
+};
+
+
 template<class T>
 inline void rememberFirstAtomCreated(T& mapping, Atom& atom) {
 	mapping.options.firstAtomCreated = &atom;
@@ -81,31 +89,12 @@ struct OpcodeReader final {
 	}
 
 
-	void complainOperand(const ir::Instruction& operands, AnyString msg) {
-		// example: ICE: unknown opcode 'resolveAttribute': from 'ref %4 = resolve %3."()"'
-		auto trace = ice();
-		if (not msg.empty())
-			trace << msg << ':';
-		else
-			trace << "invalid opcode ";
-		trace << " '" << ir::isa::print(ircode, operands) << '\'';
-		success = false;
-	}
-
-
-	template<ir::isa::Op O>
-	void complainOperand(const ir::isa::Operand<O>& operands, AnyString msg) {
-		complainOperand(ir::Instruction::fromOpcode(operands), msg);
-	}
-
-
 	template<ir::isa::Op O>
 	bool checkForuint32_t(const ir::isa::Operand<O>& operands, uint32_t lvid) {
 		if (debugmode) {
 			if (unlikely(lvid == 0 or not (lvid < atomStack->classdefs.size()))) {
-				complainOperand(operands, String{"mapping: invalid lvid %"} << lvid
+				throw EOperand(ircode, operands, String{"mapping: invalid lvid %"} << lvid
 					<< " (upper bound: %" << atomStack->classdefs.size() << ')');
-				return false;
 			}
 		}
 		return true;
@@ -167,7 +156,7 @@ struct OpcodeReader final {
 		Atom& atom = atomStack->currentAtomNotUnit();
 		AnyString funcname = ircode.stringrefs[operands.name];
 		if (unlikely(funcname.empty()))
-			return complainOperand(operands, (isFuncdef) ? "invalid func name" : "invalid typedef name");
+			throw EOperand(ircode, operands, (isFuncdef) ? "invalid func name" : "invalid typedef name");
 		// reset last lvid and parameters
 		lastuint32_t = 0;
 		lastPushedNamedParameters.clear();
@@ -259,7 +248,7 @@ struct OpcodeReader final {
 			   or kind == ir::isa::Blueprint::gentypeparam);
 		bool isGenTypeParam = (kind == ir::isa::Blueprint::gentypeparam);
 		if (unlikely(not isGenTypeParam and not frame.atom.isFunction()))
-			return complainOperand(operands, "parameter for non-function");
+			throw EOperand(ircode, operands, "parameter for non-function");
 		CLID clid{frame.atom.atomid, paramuint32_t};
 		AnyString name = ircode.stringrefs[operands.name];
 		auto& parameters = (not isGenTypeParam)
@@ -292,9 +281,9 @@ struct OpcodeReader final {
 		Atom& atom = atomStack->currentAtomNotUnit();
 		AnyString varname = ircode.stringrefs[operands.name];
 		if (unlikely(varname.empty()))
-			return complainOperand(operands, "invalid func name");
+			throw EOperand(ircode, operands, "invalid func name");
 		if (unlikely(atom.type != Atom::Type::classdef))
-			return complainOperand(operands, "vardef: invalid parent atom");
+			throw EOperand(ircode, operands, "vardef: invalid parent atom");
 		if (atomStack->capture.enabled())
 			atomStack->capture.knownVars[varname] = atomStack->scope;
 		MutexLocker locker{mutex};
@@ -329,7 +318,7 @@ struct OpcodeReader final {
 
 	void visit(ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
 		if (unlikely(nullptr == atomStack))
-			return complainOperand(operands, "invalid stack for blueprint");
+			throw EOperand(ircode, operands, "invalid stack for blueprint");
 		auto kind = static_cast<ir::isa::Blueprint>(operands.kind);
 		switch (kind) {
 			case ir::isa::Blueprint::vardef: {
@@ -365,7 +354,7 @@ struct OpcodeReader final {
 
 	void visit(ir::isa::Operand<ir::isa::Op::pragma>& operands) {
 		if (unlikely(nullptr == atomStack))
-			return complainOperand(operands, "invalid stack for blueprint pragma");
+			throw EOperand(ircode, operands, "invalid stack for blueprint pragma");
 		switch (operands.pragma) {
 			case ir::isa::Pragma::codegen: {
 				break;
@@ -402,10 +391,10 @@ struct OpcodeReader final {
 
 	void visit(ir::isa::Operand<ir::isa::Op::stacksize>& operands) {
 		if (unlikely(nullptr == atomStack))
-			return complainOperand(operands, "invalid parent atom");
+			throw EOperand(ircode, operands, "invalid parent atom");
 		Atom& parentAtom = atomStack->atom;
 		if (unlikely(parentAtom.atomid == 0))
-			return complainOperand(operands, "mapping: invalid parent atom id");
+			throw EOperand(ircode, operands, "mapping: invalid parent atom id");
 		// creating all related classdefs
 		// (take max with 1 to prevent against invalid opcode)
 		uint localvarCount = operands.add;
@@ -418,7 +407,7 @@ struct OpcodeReader final {
 				// creating all related classdefs
 				// (take max with 1 to prevent against invalid opcode)
 				if (unlikely(localvarCount == 0))
-					return complainOperand(operands, "invalid local variable count for a func blueprint");
+					throw EOperand(ircode, operands, "invalid local variable count for a func blueprint");
 				// like parameters, the return type should not 'ref' by default
 				cdeftable.classdef(CLID{parentAtom.atomid, 1}).qualifiers.ref = false;
 				break;
@@ -431,7 +420,7 @@ struct OpcodeReader final {
 
 	void visit(ir::isa::Operand<ir::isa::Op::scope>& operands) {
 		if (unlikely(nullptr == atomStack))
-			return complainOperand(operands, "invalid stack");
+			throw EOperand(ircode, operands, "invalid stack");
 		++(atomStack->scope);
 		lastuint32_t = 0;
 	}
@@ -498,7 +487,7 @@ struct OpcodeReader final {
 		if (unlikely(not checkForuint32_t(operands, operands.self)))
 			return;
 		if (unlikely(nullptr == atomStack))
-			return complainOperand(operands, "invalid atom stack for 'resolveAsSelf'");
+			throw EOperand(ircode, operands, "invalid atom stack for 'resolveAsSelf'");
 		// we can have at least 2 patterns:
 		//
 		//  * the most frequent, called from a method contained within a class
@@ -516,7 +505,7 @@ struct OpcodeReader final {
 			}
 		}
 		// fallback - complainOperand
-		complainOperand(operands, "failed to find parent class for 'resolveAsSelf'");
+		throw EOperand(ircode, operands, "failed to find parent class for 'resolveAsSelf'");
 	}
 
 
@@ -524,10 +513,10 @@ struct OpcodeReader final {
 		if (unlikely(not checkForuint32_t(operands, operands.lvid)))
 			return;
 		if (unlikely(operands.text == 0))
-			return complainOperand(operands, "invalid symbol name");
+			throw EOperand(ircode, operands, "invalid symbol name");
 		AnyString name = ircode.stringrefs[operands.text];
 		if (unlikely(name.empty()))
-			return complainOperand(operands, "invalid empty identifier");
+			throw EOperand(ircode, operands, "invalid empty identifier");
 		lastuint32_t = operands.lvid;
 		auto& atomFrame = *atomStack;
 		auto& localClassdefs = atomFrame.classdefs;
@@ -590,7 +579,7 @@ struct OpcodeReader final {
 		}
 		else {
 			if (unlikely(not lastPushedNamedParameters.empty()))
-				return complainOperand(operands, "named parameters must be provided after standard parameters");
+				throw EOperand(ircode, operands, "named parameters must be provided after standard parameters");
 			lastPushedIndexedParameters.emplace_back(operands.lvid);
 		}
 	}
@@ -664,7 +653,7 @@ struct OpcodeReader final {
 		bool onoff = (operands.flag != 0);
 		MutexLocker locker{mutex};
 		if (debugmode and not cdeftable.hasClassdef(clid))
-			return complainOperand(operands, "invalid clid");
+			throw EOperand(ircode, operands, "invalid clid");
 		auto& qualifiers = cdeftable.classdef(clid).qualifiers;
 		switch (operands.qualifier) {
 			case ir::isa::TypeQualifier::ref:
@@ -704,8 +693,7 @@ struct OpcodeReader final {
 				break;
 			// error for all the other ones
 			default:
-				complainOperand(operands, "unsupported opcode in mapping");
-				break;
+				throw EOperand(ircode, operands, "unsupported opcode in mapping");
 		}
 	}
 

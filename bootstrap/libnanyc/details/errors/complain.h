@@ -3,8 +3,23 @@
 #include <exception>
 
 
+namespace ny { namespace ir { struct Instruction; }}
+namespace ny { namespace ir { struct Sequence; }}
+
+
 namespace ny {
 namespace complain {
+
+
+struct Exception: std::exception {
+	const char* what() const noexcept override { return msg.c_str(); }
+	yuni::String msg;
+};
+
+
+struct Opcode: Exception {
+	Opcode(const ny::ir::Sequence&, const ir::Instruction&, const AnyString&);
+};
 
 
 bool exception();
