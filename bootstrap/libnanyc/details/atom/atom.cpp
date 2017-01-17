@@ -14,7 +14,7 @@ namespace {
 
 
 template<class OutT, class ListT, class TableT>
-void atomParametersPrinter(OutT& out, ListT& list, const TableT* table, bool avoidSelf, AnyString sepBefore,
+void prettyPrintParameters(OutT& out, ListT& list, const TableT* table, bool avoidSelf, AnyString sepBefore,
 		AnyString sepAfter) {
 	bool first = true;
 	out << sepBefore;
@@ -119,9 +119,9 @@ void makeCaption(String& out, const Atom& atom, const ClassdefTableView* table, 
 		case Atom::Type::classdef:
 		case Atom::Type::typealias: {
 			if (not atom.tmplparams.empty())
-				atomParametersPrinter(out, atom.tmplparams, table, false, "<:", ":>");
+				prettyPrintParameters(out, atom.tmplparams, table, false, "<:", ":>");
 			if (not atom.parameters.empty())
-				atomParametersPrinter(out, atom.parameters, table, true, "(", ")");
+				prettyPrintParameters(out, atom.parameters, table, true, "(", ")");
 			if (table) {
 				if (not atom.returnType.clid.isVoid() and table->hasClassdef(atom.returnType.clid)) {
 					auto& retcdef = table->classdef(atom.returnType.clid);
@@ -324,13 +324,13 @@ void Atom::retrieveFullname(Yuni::String& out, const ClassdefTableView* table, b
 					out.append(AnyString{m_name, 1}); // operator like, removing ^
 			}
 			if (not tmplparamsForPrinting.empty())
-				atomParametersPrinter(out, tmplparamsForPrinting, table, false, "<:", ":>");
+				prettyPrintParameters(out, tmplparamsForPrinting, table, false, "<:", ":>");
 			break;
 		}
 		case Type::classdef: {
 			out += m_name;
 			if (not tmplparamsForPrinting.empty())
-				atomParametersPrinter(out, tmplparamsForPrinting, table, false, "<:", ":>");
+				prettyPrintParameters(out, tmplparamsForPrinting, table, false, "<:", ":>");
 			break;
 		}
 		case Type::namespacedef:
