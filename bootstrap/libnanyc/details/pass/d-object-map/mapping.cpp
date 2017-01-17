@@ -90,14 +90,13 @@ struct OpcodeReader final {
 
 
 	template<ir::isa::Op O>
-	bool checkForuint32_t(const ir::isa::Operand<O>& operands, uint32_t lvid) {
+	void assertLvid(const ir::isa::Operand<O>& operands, uint32_t lvid) {
 		if (debugmode) {
 			if (unlikely(lvid == 0 or not (lvid < atomStack->classdefs.size()))) {
 				throw EOperand(ircode, operands, String{"mapping: invalid lvid %"} << lvid
 					<< " (upper bound: %" << atomStack->classdefs.size() << ')');
 			}
 		}
-		return true;
 	}
 
 
@@ -115,10 +114,8 @@ struct OpcodeReader final {
 
 
 	void attachFuncCall(const ir::isa::Operand<ir::isa::Op::call>& operands) {
-		if (unlikely(not checkForuint32_t(operands, operands.ptr2func)))
-			return;
-		if (unlikely(not checkForuint32_t(operands, operands.lvid)))
-			return;
+		assertLvid(operands, operands.ptr2func);
+		assertLvid(operands, operands.lvid);
 		auto& stackframe     = *atomStack;
 		auto  atomid         = stackframe.atom.atomid;
 		auto& clidFuncToCall = stackframe.classdefs[operands.ptr2func];
@@ -241,8 +238,7 @@ struct OpcodeReader final {
 		// calculating the lvid for the current parameter
 		// (+1 since %1 is the return value/type)
 		uint paramuint32_t = (++frame.parameterIndex) + 1;
-		if (unlikely(not checkForuint32_t(operands, paramuint32_t)))
-			return;
+		assertLvid(operands, paramuint32_t);
 		auto kind = static_cast<ir::isa::Blueprint>(operands.kind);
 		assert(kind == ir::isa::Blueprint::param or kind == ir::isa::Blueprint::paramself
 			   or kind == ir::isa::Blueprint::gentypeparam);
@@ -460,8 +456,7 @@ struct OpcodeReader final {
 
 
 	void visit(ir::isa::Operand<ir::isa::Op::stackalloc>& operands) {
-		if (unlikely(not checkForuint32_t(operands, operands.lvid)))
-			return;
+		assertLvid(operands, operands.lvid);
 		lastuint32_t = operands.lvid;
 		auto clid = atomStack->classdefs[operands.lvid];
 		MutexLocker locker{mutex};
@@ -484,8 +479,7 @@ struct OpcodeReader final {
 
 
 	void visit(ir::isa::Operand<ir::isa::Op::self>& operands) {
-		if (unlikely(not checkForuint32_t(operands, operands.self)))
-			return;
+		assertLvid(operands, operands.self);
 		if (unlikely(nullptr == atomStack))
 			throw EOperand(ircode, operands, "invalid atom stack for 'resolveAsSelf'");
 		// we can have at least 2 patterns:
@@ -510,8 +504,7 @@ struct OpcodeReader final {
 
 
 	void visit(ir::isa::Operand<ir::isa::Op::identify>& operands) {
-		if (unlikely(not checkForuint32_t(operands, operands.lvid)))
-			return;
+		assertLvid(operands, operands.lvid);
 		if (unlikely(operands.text == 0))
 			throw EOperand(ircode, operands, "invalid symbol name");
 		AnyString name = ircode.stringrefs[operands.text];
@@ -541,8 +534,7 @@ struct OpcodeReader final {
 		else {
 			// trying to resolve an attribute
 			// (aka `parent.current`)
-			if (not checkForuint32_t(operands, operands.self))
-				return;
+			assertLvid(operands, operands.self);
 			// the type is currently unknown
 			// classdef.mutateToAny();
 			// retrieving the parent classdef
@@ -565,14 +557,12 @@ struct OpcodeReader final {
 
 
 	void visit(ir::isa::Operand<ir::isa::Op::tpush>& operands) {
-		if (unlikely(not checkForuint32_t(operands, operands.lvid)))
-			return;
+		assertLvid(operands, operands.lvid);
 	}
 
 
 	void visit(ir::isa::Operand<ir::isa::Op::push>& operands) {
-		if (unlikely(not checkForuint32_t(operands, operands.lvid)))
-			return;
+		assertLvid(operands, operands.lvid);
 		if (operands.name != 0) { // named parameter
 			AnyString name = ircode.stringrefs[operands.name];
 			lastPushedNamedParameters.emplace_back(std::make_pair(name, operands.lvid));
@@ -595,8 +585,7 @@ struct OpcodeReader final {
 
 	void visit(ir::isa::Operand<ir::isa::Op::ret>& operands) {
 		if (operands.lvid != 0) {
-			if (unlikely(not checkForuint32_t(operands, operands.lvid)))
-				return;
+			assertLvid(operands, operands.lvid);
 			auto& classdefRetValue = atomStack->classdefs[1]; // 1 is the return value
 			auto& classdef = atomStack->classdefs[operands.lvid];
 			MutexLocker locker{mutex};
@@ -607,10 +596,8 @@ struct OpcodeReader final {
 
 
 	void visit(ir::isa::Operand<ir::isa::Op::follow>& operands) {
-		if (unlikely(not checkForuint32_t(operands, operands.lvid)))
-			return;
-		if (unlikely(not checkForuint32_t(operands, operands.follower)))
-			return;
+		assertLvid(operands, operands.lvid);
+		assertLvid(operands, operands.follower);
 		auto& clidFollower = atomStack->classdefs[operands.follower];
 		auto& clid = atomStack->classdefs[operands.lvid];
 		MutexLocker locker{mutex};
@@ -622,8 +609,7 @@ struct OpcodeReader final {
 
 
 	void visit(ir::isa::Operand<ir::isa::Op::intrinsic>& operands) {
-		if (unlikely(not checkForuint32_t(operands, operands.lvid)))
-			return;
+		assertLvid(operands, operands.lvid);
 	}
 
 
