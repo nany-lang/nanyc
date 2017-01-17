@@ -13,18 +13,25 @@ namespace ny {
 namespace {
 
 
+inline bool isSelf(uint32_t i, const AnyString& name) {
+	return i == 0 and name == "self";
+}
+
+
 template<class OutT, class ListT, class TableT>
 void prettyPrintParameters(OutT& out, ListT& list, const TableT* table, bool avoidSelf, AnyString sepBefore,
 		AnyString sepAfter) {
 	bool first = true;
 	out << sepBefore;
-	list.each([&](uint32_t i, const AnyString & paramname, const Vardef & vardef) {
-		// avoid the first virtual parameter
-		if (avoidSelf and i == 0 and paramname == "self")
+	list.each([&](uint32_t i, const AnyString& paramname, const Vardef & vardef) {
+		if (not debugmode and avoidSelf and isSelf(i, paramname))
 			return;
 		if (not first)
 			out << ", ";
 		first = false;
+		bool self = debugmode and (avoidSelf and isSelf(i, paramname));
+		if (self)
+			out << '[';
 		out << paramname;
 		if (table) {
 			if (table) { // and table->hasClassdef(vardef.clid))
@@ -43,6 +50,8 @@ void prettyPrintParameters(OutT& out, ListT& list, const TableT* table, bool avo
 			if (not vardef.clid.isVoid())
 				out << ": any";
 		}
+		if (self)
+			out << ']';
 	});
 	out << sepAfter;
 }
