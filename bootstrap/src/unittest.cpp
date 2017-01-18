@@ -141,7 +141,7 @@ void fetchUnittestList(nyrun_cf_t& runcf, std::vector<String>& torun, const char
 		case 1:  std::cout << "1 test found"; break;
 		default: std::cout << torun.size() << " tests found";
 	}
-	std::cout << " (" << duration << "ms)\n";
+	std::cout << " (in " << duration << "ms)\n";
 }
 
 
@@ -196,7 +196,7 @@ void listAllUnittests(nyrun_cf_t& runcf, const Settings& settings, const char** 
 	}
 	if (settings.colors.out)
 		System::Console::ResetTextColor(std::cout);
-	std::cout << "  (" << duration << "ms)\n\n";
+	std::cout << "  (in " << duration << "ms)\n\n";
 }
 
 
