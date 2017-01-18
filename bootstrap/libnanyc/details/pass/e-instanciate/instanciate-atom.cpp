@@ -623,8 +623,11 @@ bool instanciateAtom(InstanciateData& info) {
 					if (unlikely(not instanciateRecursiveAtom(info)))
 						return false;
 				}
-				if (unlikely(remapAtom != nullptr)) // the target atom may have changed (template class)
+				if (unlikely(remapAtom != nullptr)) { // the target atom may have changed (template class)
 					info.atom = std::ref(*remapAtom);
+					if (remapAtom->isContextual())
+						return translateAndInstanciateASTIRCode(info, signature) != nullptr;
+				}
 				return true;
 			}
 			case Tribool::Value::indeterminate: {
