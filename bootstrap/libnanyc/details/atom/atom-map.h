@@ -60,6 +60,10 @@ public:
 
 	struct {
 		yuni::Ref<Atom> object[nyt_count];
+		struct {
+			yuni::Ref<Atom> call;
+		}
+		reflection;
 	}
 	core;
 
