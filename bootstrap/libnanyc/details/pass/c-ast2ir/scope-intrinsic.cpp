@@ -47,9 +47,9 @@ bool Scope::visitASTExprIntrinsic(AST::Node& node, uint32_t& localvar) {
 	}
 	// create a value even if nothing
 	emitDebugpos(node);
-	auto& out = sequence();
-	localvar = ir::emit::alloc(out, nextvar());
-	ir::emit::intrinsic(out, localvar, intrinsicname);
+	auto& irout = ircode();
+	localvar = ir::emit::alloc(irout, nextvar());
+	ir::emit::intrinsic(irout, localvar, intrinsicname);
 	return success;
 }
 

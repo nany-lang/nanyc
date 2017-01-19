@@ -16,12 +16,11 @@ namespace isa
 namespace // anonymous
 {
 
-	template<class S> struct Printer final
-	{
+	template<class S> struct Printer final {
 		S& out;
 		Yuni::String tabs;
 		Yuni::String tmp;
-		const Sequence& sequence;
+		const Sequence& ircode;
 		const Instruction** cursor = nullptr;
 		const ny::AtomMap* atommap = nullptr;
 		Yuni::ShortString64 lineHeader;
@@ -29,29 +28,28 @@ namespace // anonymous
 		uint32_t offset = 0;
 
 
-		Printer(S& out, const Sequence& sequence)
-			: out(out), sequence(sequence)
-		{
+		Printer(S& out, const Sequence& ircode)
+			: out(out)
+			, ircode(ircode) {
 			lineHeader << "           ";
 		}
+
 
 		void indent()   { tabs.append("    ", 4); }
 		void unindent() { tabs.chop(4); }
 		void printEOL() { out += '\n'; }
 
-		void printString(uint32_t sid)
-		{
-			auto text = sequence.stringrefs[sid];
+
+		void printString(uint32_t sid) {
+			auto text = ircode.stringrefs[sid];
 			out << '@' << sid << "\"" << text << "\"";
 		}
 
-		S& line()
-		{
-			if (cursor)
-			{
-				auto offset = sequence.offsetOf(**cursor);
-				if (offset != lastOffset)
-				{
+
+		S& line() {
+			if (cursor) {
+				auto offset = ircode.offsetOf(**cursor);
+				if (offset != lastOffset) {
 					lastOffset = offset;
 					Yuni::ShortString64 offsetstr;
 					offsetstr << ' ' << offset;
@@ -68,180 +66,147 @@ namespace // anonymous
 		}
 
 
-		void print(const Operand<Op::nop>&)
-		{
+		void print(const Operand<Op::nop>&) {
 			line() << "nop";
 		}
 
 
-		void print(const Operand<Op::negation>& operands)
-		{
+		void print(const Operand<Op::negation>& operands) {
 			line() << '%' << operands.lvid << " = not %" << operands.lhs;
 		}
 
 
-		template<class T> void printOperator(const T& operands, const AnyString& opname)
-		{
+		template<class T> void printOperator(const T& operands, const AnyString& opname) {
 			line() << '%' << operands.lvid << " = %" << operands.lhs << ' ' << opname << " %" << operands.rhs;
 		}
 
-		void print(const Operand<Op::eq>& operands)
-		{
+
+		void print(const Operand<Op::eq>& operands) {
 			printOperator(operands, "eq");
 		}
 
-		void print(const Operand<Op::neq>& operands)
-		{
+		void print(const Operand<Op::neq>& operands) {
 			printOperator(operands, "neq");
 		}
 
-		void print(const Operand<Op::lt>& operands)
-		{
+		void print(const Operand<Op::lt>& operands) {
 			printOperator(operands, "lt");
 		}
 
-		void print(const Operand<Op::lte>& operands)
-		{
+		void print(const Operand<Op::lte>& operands) {
 			printOperator(operands, "lte");
 		}
 
-		void print(const Operand<Op::ilt>& operands)
-		{
+		void print(const Operand<Op::ilt>& operands) {
 			printOperator(operands, "ilt");
 		}
 
-		void print(const Operand<Op::ilte>& operands)
-		{
+		void print(const Operand<Op::ilte>& operands) {
 			printOperator(operands, "ilte");
 		}
 
-		void print(const Operand<Op::gt>& operands)
-		{
+		void print(const Operand<Op::gt>& operands) {
 			printOperator(operands, "gt");
 		}
 
-		void print(const Operand<Op::gte>& operands)
-		{
+		void print(const Operand<Op::gte>& operands) {
 			printOperator(operands, "gte");
 		}
 
-		void print(const Operand<Op::igt>& operands)
-		{
+		void print(const Operand<Op::igt>& operands) {
 			printOperator(operands, "igt");
 		}
 
-		void print(const Operand<Op::igte>& operands)
-		{
+		void print(const Operand<Op::igte>& operands) {
 			printOperator(operands, "igte");
 		}
 
-		void print(const Operand<Op::flt>& operands)
-		{
+		void print(const Operand<Op::flt>& operands) {
 			printOperator(operands, "flt");
 		}
 
-		void print(const Operand<Op::flte>& operands)
-		{
+		void print(const Operand<Op::flte>& operands) {
 			printOperator(operands, "flte");
 		}
 
-		void print(const Operand<Op::fgt>& operands)
-		{
+		void print(const Operand<Op::fgt>& operands) {
 			printOperator(operands, "fgt");
 		}
 
-		void print(const Operand<Op::fgte>& operands)
-		{
+		void print(const Operand<Op::fgte>& operands) {
 			printOperator(operands, "fgte");
 		}
 
 
-		void print(const Operand<Op::opand>& operands)
-		{
+		void print(const Operand<Op::opand>& operands) {
 			printOperator(operands, "and");
 		}
 
-		void print(const Operand<Op::opor>& operands)
-		{
+		void print(const Operand<Op::opor>& operands) {
 			printOperator(operands, "or");
 		}
 
-		void print(const Operand<Op::opxor>& operands)
-		{
+		void print(const Operand<Op::opxor>& operands) {
 			printOperator(operands, "xor");
 		}
 
-		void print(const Operand<Op::opmod>& operands)
-		{
+		void print(const Operand<Op::opmod>& operands) {
 			printOperator(operands, "mod");
 		}
 
-		void print(const Operand<Op::fadd>& operands)
-		{
+		void print(const Operand<Op::fadd>& operands) {
 			printOperator(operands, "fadd");
 		}
 
-		void print(const Operand<Op::fsub>& operands)
-		{
+		void print(const Operand<Op::fsub>& operands) {
 			printOperator(operands, "fsub");
 		}
 
-		void print(const Operand<Op::fmul>& operands)
-		{
+		void print(const Operand<Op::fmul>& operands) {
 			printOperator(operands, "fmul");
 		}
 
-		void print(const Operand<Op::fdiv>& operands)
-		{
+		void print(const Operand<Op::fdiv>& operands) {
 			printOperator(operands, "fdiv");
 		}
 
-		void print(const Operand<Op::add>& operands)
-		{
+		void print(const Operand<Op::add>& operands) {
 			printOperator(operands, "add");
 		}
 
-		void print(const Operand<Op::sub>& operands)
-		{
+		void print(const Operand<Op::sub>& operands) {
 			printOperator(operands, "sub");
 		}
 
-		void print(const Operand<Op::mul>& operands)
-		{
+		void print(const Operand<Op::mul>& operands) {
 			printOperator(operands, "mul");
 		}
 
-		void print(const Operand<Op::imul>& operands)
-		{
+		void print(const Operand<Op::imul>& operands) {
 			printOperator(operands, "imul");
 		}
 
-		void print(const Operand<Op::div>& operands)
-		{
+		void print(const Operand<Op::div>& operands) {
 			printOperator(operands, "div");
 		}
 
-		void print(const Operand<Op::idiv>& operands)
-		{
+		void print(const Operand<Op::idiv>& operands) {
 			printOperator(operands, "idiv");
 		}
 
 
-		void print(const Operand<Op::qualifiers>& operands)
-		{
+		void print(const Operand<Op::qualifiers>& operands) {
 			line() << "qualifier %" << operands.lvid << ": ";
 			out << (operands.flag ? '+' : '-');
-			switch (operands.qualifier)
-			{
+			switch (operands.qualifier) {
 				case ir::isa::TypeQualifier::ref:      out << "ref"; break;
 				case ir::isa::TypeQualifier::constant: out << "const"; break;
 			}
 		}
 
-		void printAtomInstanceID(uint32_t atomid, uint32_t instanceid)
-		{
-			if (atommap and atomid != 0)
-			{
+
+		void printAtomInstanceID(uint32_t atomid, uint32_t instanceid) {
+			if (atommap and atomid != 0) {
 				out << " // ";
 				auto caption = atommap->symbolname(atomid, instanceid);
 				if (not caption.empty())
@@ -251,77 +216,77 @@ namespace // anonymous
 			}
 		}
 
-		void print(const Operand<Op::assign>& operands)
-		{
+
+		void print(const Operand<Op::assign>& operands) {
 			line() << '%' << operands.lhs << " = assign %" << operands.rhs;
 		}
 
 
-		void print(const Operand<Op::fieldget>& operands)
-		{
+		void print(const Operand<Op::fieldget>& operands) {
 			line() << '%' << operands.lvid << " = fieldget u64 %" << operands.self;
 			out << '.' << operands.var;
 		}
 
 
-		void print(const Operand<Op::fieldset>& operands)
-		{
+		void print(const Operand<Op::fieldset>& operands) {
 			line() << "fieldset %" << operands.self;
 			out << '.' << operands.var;
 			out << " = %" << operands.lvid;
 		}
 
 
-		void print(const Operand<Op::stackalloc>& operands)
-		{
+		void print(const Operand<Op::stackalloc>& operands) {
 			line() << "alloca %" << operands.lvid;
 			out << ": ";
 			out << nytype_to_cstring((nytype_t) operands.type);
 
-			if (operands.atomid != (uint32_t) -1)
-				out << " atom: " << operands.atomid;
+			if (operands.atomid != (uint32_t) -1) {
+				out << " // atom: " << operands.atomid;
+				if (atommap) {
+					auto atom = atommap->findAtom(operands.atomid);
+					if (atom)
+						out << " '" << atom->caption() << '\'';
+				}
+			}
 		}
 
-		void print(const Operand<Op::storeConstant>& operands)
-		{
+
+		void print(const Operand<Op::storeConstant>& operands) {
 			line() << '%' << operands.lvid << " = constant ";
 			out << (void*) operands.value.u64;
 			out << " (.u64: " << operands.value.u64 << ", .f64: " << operands.value.f64 << ')';
 		}
 
-		void print(const Operand<Op::storeText>& operands)
-		{
+
+		void print(const Operand<Op::storeText>& operands) {
 			line() << '%' << operands.lvid << " = text ";
 			printString(operands.text);
 		}
 
-		void print(const Operand<Op::store>& operands)
-		{
+
+		void print(const Operand<Op::store>& operands) {
 			line() << '%' << operands.lvid << " = %" << operands.source;
 		}
 
-		void print(const Operand<Op::ret>& operands)
-		{
+
+		void print(const Operand<Op::ret>& operands) {
 			if (operands.lvid == 0)
 				line() << "return void";
 			else
 				line() << "return %" << operands.lvid << ", copy %" << operands.tmplvid;
 		}
 
-		void print(const Operand<Op::stacksize>& operands)
-		{
+
+		void print(const Operand<Op::stacksize>& operands) {
 			line() << "stack.size +" << operands.add;
 		}
 
 
-		void print(const Operand<Op::push>& operands)
-		{
-			if (operands.name == 0)
-			{
+		void print(const Operand<Op::push>& operands) {
+			if (operands.name == 0) {
 				line() << "push %";
 			}
-			else
-			{
+			else {
 				line() << "push ";
 				printString(operands.name);
 				out << " %";
@@ -329,14 +294,12 @@ namespace // anonymous
 			out << operands.lvid;
 		}
 
-		void print(const Operand<Op::tpush>& operands)
-		{
-			if (operands.name == 0)
-			{
+
+		void print(const Operand<Op::tpush>& operands) {
+			if (operands.name == 0) {
 				line() << "tpush %";
 			}
-			else
-			{
+			else {
 				line() << "tpush ";
 				printString(operands.name);
 				out << " %";
@@ -344,23 +307,21 @@ namespace // anonymous
 			out << operands.lvid;
 		}
 
-		void print(const Operand<Op::call>& operands)
-		{
+
+		void print(const Operand<Op::call>& operands) {
 			line() << '%' << operands.lvid << " = call ";
-			if (operands.instanceid == (uint32_t) -1)
-			{
+			if (operands.instanceid == (uint32_t) -1) {
 				out << '%' << operands.ptr2func;
 			}
-			else
-			{
+			else {
 				out << "atom -> ";
 				out << operands.ptr2func << " #" << operands.instanceid;
 				printAtomInstanceID(operands.ptr2func, operands.instanceid);
 			}
 		}
 
-		void print(const Operand<Op::intrinsic>& operands)
-		{
+
+		void print(const Operand<Op::intrinsic>& operands) {
 			line() << '%' << operands.lvid << " = intrinsic ";
 			if (operands.iid != (uint32_t) -1)
 				out << "id:" << operands.iid;
@@ -368,18 +329,15 @@ namespace // anonymous
 				printString(operands.intrinsic);
 		}
 
-		void print(const Operand<Op::comment>& operands)
-		{
-			if (operands.text != 0) // not empty
-			{
+
+		void print(const Operand<Op::comment>& operands) {
+			if (operands.text != 0) { // not empty
 				line() << "// ";
-				auto text = sequence.stringrefs[operands.text];
-				if (not text.contains('\n'))
-				{
+				auto text = ircode.stringrefs[operands.text];
+				if (not text.contains('\n')) {
 					printString(operands.text);
 				}
-				else
-				{
+				else {
 					YString s = text;
 					YString r;
 					r << '\n' << lineHeader <<  tabs << "// ";
@@ -392,101 +350,90 @@ namespace // anonymous
 				printEOL();
 		}
 
-		void print(const Operand<Op::namealias>& operands)
-		{
+
+		void print(const Operand<Op::namealias>& operands) {
 			line() << "alias ";
 			printString(operands.name);
 			out << " -> %" << operands.lvid;
 		}
 
 
-		void print(const Operand<Op::debugfile>& operands)
-		{
+		void print(const Operand<Op::debugfile>& operands) {
 			line() << "dbg source file '";
 			printString(operands.filename);
 			out << '\'';
 		}
 
-		void print(const Operand<Op::debugpos>& operands)
-		{
+		void print(const Operand<Op::debugpos>& operands) {
 			line() << "dbg l." << operands.line << ',' << operands.offset;
 		}
 
 
-		void print(const Operand<Op::self>& operands)
-		{
+		void print(const Operand<Op::self>& operands) {
 			line() << "self %" << operands.self;
 		}
 
 
-		void print(const Operand<Op::identify>& operands)
-		{
+		void print(const Operand<Op::identify>& operands) {
 			line() << '%' << operands.lvid << " = identify ";
 			if (operands.self != 0)
 				out << '%' << operands.self << " . ";
 			printString(operands.text);
 		}
 
-		void print(const Operand<Op::identifyset>& operands)
-		{
+		void print(const Operand<Op::identifyset>& operands) {
 			line() << '%' << operands.lvid << " = identify:set ";
 			if (operands.self != 0)
 				out << '%' << operands.self << " . ";
 			printString(operands.text);
 		}
 
-		void print(const Operand<Op::ensureresolved>& operands)
-		{
+		void print(const Operand<Op::ensureresolved>& operands) {
 			line() << "ensure resolved %" << operands.lvid;
 		}
 
-		void print(const Operand<Op::commontype>& operands)
-		{
+		void print(const Operand<Op::commontype>& operands) {
 			line() << '%' << operands.lvid << " = common type with %" << operands.previous;
 		}
 
-		void print(const Operand<Op::label>& operands)
-		{
+		void print(const Operand<Op::label>& operands) {
 			line() << "label " << operands.label << ":";
 		}
 
 
-		void print(const Operand<Op::jmp>& operands)
-		{
+		void print(const Operand<Op::jmp>& operands) {
 			line() << "jmp " << operands.label;
 		}
 
-		void print(const Operand<Op::jz>& operands)
-		{
+
+		void print(const Operand<Op::jz>& operands) {
 			line() << "jz %" << operands.lvid << " == 0, %" << operands.result;
 			out << ", goto lbl " << operands.label;
 		}
 
-		void print(const Operand<Op::jnz>& operands)
-		{
+
+		void print(const Operand<Op::jnz>& operands) {
 			line() << "jnz %" << operands.lvid << " != 0, %" << operands.result;
 			out << ", goto lbl " << operands.label;
 		}
 
 
-		void print(const Operand<Op::scope>&)
-		{
+		void print(const Operand<Op::scope>&) {
 			line() << '{';
 			indent();
 		}
 
-		void print(const Operand<Op::end>&)
-		{
+		void print(const Operand<Op::end>&) {
 			unindent();
 			line() << '}';
 
 			// partial print and the end-of-scope has been reached
 			if (tabs.empty() and offset != 0)
-				sequence.invalidateCursor(*cursor);
+				ircode.invalidateCursor(*cursor);
 		}
 
-		void print(const Operand<Op::follow>& operands)
-		{
+
+		void print(const Operand<Op::follow>& operands) {
 			line() << '%';
 			if (0 == operands.symlink)
 				out << operands.follower << " follows -> %" << operands.lvid;
@@ -494,149 +441,139 @@ namespace // anonymous
 				out << operands.lvid << " symlink -> %" << operands.follower; // print like 'ln' command
 		}
 
-		void print(const Operand<Op::classdefsizeof>& operands)
-		{
+
+		void print(const Operand<Op::classdefsizeof>& operands) {
 			line() << '%' << operands.lvid << " = sizeof (%" << operands.type;
 			out << " or atomid " << operands.type << ')';
 		}
 
-		void print(const Operand<Op::allocate>& operands)
-		{
+
+		void print(const Operand<Op::allocate>& operands) {
 			line() << '%' << operands.lvid << " = allocate %" << operands.atomid;
 			out << " or atomid " << operands.atomid;
 		}
 
 
-		void print(const Operand<Op::memalloc>& operands)
-		{
+		void print(const Operand<Op::memalloc>& operands) {
 			line() << '%' << operands.lvid << " = memory.allocate %" << operands.regsize << " bytes";
 		}
 
-		void print(const Operand<Op::memfree>& operands)
-		{
+
+		void print(const Operand<Op::memfree>& operands) {
 			line() << "memory.free %" << operands.lvid << " size %" << operands.regsize;
 		}
 
-		void print(const Operand<Op::memfill>& operands)
-		{
+
+		void print(const Operand<Op::memfill>& operands) {
 			line() << "memory.fill %" << operands.lvid << " size %" << operands.regsize;
 		}
 
-		void print(const Operand<Op::memcopy>& operands)
-		{
+
+		void print(const Operand<Op::memcopy>& operands) {
 			line() << "memory.copy %" << operands.lvid << " from {%";
 			out << operands.srclvid;
 			out << ", size %" << operands.regsize << '}';
 		}
 
-		void print(const Operand<Op::memmove>& operands)
-		{
+
+		void print(const Operand<Op::memmove>& operands) {
 			line() << "memory.move %" << operands.lvid << " from {%";
 			out << operands.srclvid;
 			out << ", size %" << operands.regsize << '}';
 		}
 
-		void print(const Operand<Op::memcmp>& operands)
-		{
+
+		void print(const Operand<Op::memcmp>& operands) {
 			line() << '%' << operands.regsize << " = memory.cmp %" << operands.lvid << " from {%";
 			out << operands.srclvid;
 			out << ", size %" << operands.regsize << '}';
 		}
 
-		void print(const Operand<Op::cstrlen>& operands)
-		{
+
+		void print(const Operand<Op::cstrlen>& operands) {
 			line() << '%' << operands.lvid << " = cstrlen" << operands.bits << " %" << operands.ptr;
 		}
 
-		void print(const Operand<Op::load_u64>& operands)
-		{
+
+		void print(const Operand<Op::load_u64>& operands) {
 			line() << '%' << operands.lvid << " = load __u64 %" << operands.ptrlvid;
 		}
-		void print(const Operand<Op::load_u32>& operands)
-		{
+
+
+		void print(const Operand<Op::load_u32>& operands) {
 			line() << '%' << operands.lvid << " = load __u32 %" << operands.ptrlvid;
 		}
 
-		void print(const Operand<Op::load_u8>& operands)
-		{
+
+		void print(const Operand<Op::load_u8>& operands) {
 			line() << '%' << operands.lvid << " = load __u8 %" << operands.ptrlvid;
 		}
 
-		void print(const Operand<Op::store_u64>& operands)
-		{
+
+		void print(const Operand<Op::store_u64>& operands) {
 			line() << "store __u64 %" << operands.ptrlvid << " = %" << operands.lvid;
 		}
 
-		void print(const Operand<Op::store_u32>& operands)
-		{
+
+		void print(const Operand<Op::store_u32>& operands) {
 			line() << "store __u32 %" << operands.ptrlvid << " = %" << operands.lvid;
 		}
 
-		void print(const Operand<Op::store_u8>& operands)
-		{
+
+		void print(const Operand<Op::store_u8>& operands) {
 			line() << "store __u8 %" << operands.ptrlvid << " = %" << operands.lvid;
 		}
 
 
-		void print(const Operand<Op::memrealloc>& operands)
-		{
+		void print(const Operand<Op::memrealloc>& operands) {
 			line() << "memory.realloc %" << operands.lvid
 				<< " oldsize %" << operands.oldsize
 				<< " newsize %" << operands.newsize;
 		}
 
 
-		void print(const Operand<Op::ref>& operands)
-		{
+		void print(const Operand<Op::ref>& operands) {
 			line() << "+ref %" << operands.lvid;
 		}
 
-		void print(const Operand<Op::unref>& operands)
-		{
+
+		void print(const Operand<Op::unref>& operands) {
 			line() << "-unref %" << operands.lvid;
-			if (operands.atomid != 0)
-			{
+			if (operands.atomid != 0) {
 				out << " {atom id:";
 				out << operands.atomid << " #" << operands.instanceid << '}';
 			}
 		}
 
-		void print(const Operand<Op::dispose>& operands)
-		{
+
+		void print(const Operand<Op::dispose>& operands) {
 			line() << "dispose %" << operands.lvid;
-			if (operands.atomid != 0)
-			{
+			if (operands.atomid != 0) {
 				out << " {atom id:";
 				out << operands.atomid << " #" << operands.instanceid << '}';
 			}
 		}
 
 
-		void print(const Operand<Op::typeisobject>& operands)
-		{
+		void print(const Operand<Op::typeisobject>& operands) {
 			line() << "type is object %" << operands.lvid;
 		}
 
 
-		void print(const Operand<Op::memcheckhold>& operands)
-		{
+		void print(const Operand<Op::memcheckhold>& operands) {
 			line() << "memchecker.hold %" << operands.lvid << ", size: %" << operands.size;
 		}
 
 
-		void print(const Operand<Op::opassert>& operands)
-		{
+		void print(const Operand<Op::opassert>& operands) {
 			line() << "assert %" << operands.lvid << " != 0";
 		}
 
 
-		void print(const Operand<Op::blueprint>& operands)
-		{
+		void print(const Operand<Op::blueprint>& operands) {
 			auto kind = static_cast<ir::isa::Blueprint>(operands.kind);
-			switch (kind)
-			{
-				case isa::Blueprint::funcdef:
-				{
+			switch (kind) {
+				case isa::Blueprint::funcdef: {
 					printEOL();
 
 					line();
@@ -656,41 +593,35 @@ namespace // anonymous
 					indent();
 					break;
 				}
-				case isa::Blueprint::param:
-				{
+				case isa::Blueprint::param: {
 					line() << "param ";
 					printString(operands.name);
 					out << ": %" << static_cast<uint32_t>(operands.lvid);
 					break;
 				}
-				case isa::Blueprint::gentypeparam:
-				{
+				case isa::Blueprint::gentypeparam: {
 					line() << "type param ";
 					printString(operands.name);
 					out << ": %" << static_cast<uint32_t>(operands.lvid);
 					break;
 				}
-				case isa::Blueprint::paramself:
-				{
+				case isa::Blueprint::paramself: {
 					line() << "param ";
 					printString(operands.name);
 					out << ", %" << (uint32_t) operands.lvid << " [self assign]";
 					break;
 				}
-				case isa::Blueprint::classdef:
-				{
+				case isa::Blueprint::classdef: {
 					printEOL();
 					line();
 					if (operands.lvid != 0)
 						out << '%' << operands.lvid << " = ";
 					out << "class ";
-
 					printString(operands.name);
 					printEOL();
 					line() << '{';
 					indent();
 					printEOL();
-
 					// ID
 					uint32_t  atomid = operands.atomid;
 					line() << "// atomid: ";
@@ -700,24 +631,20 @@ namespace // anonymous
 						out << "<unspecified>";
 					break;
 				}
-				case isa::Blueprint::vardef:
-				{
+				case isa::Blueprint::vardef: {
 					line() << "var ";
 					printString(operands.name);
 					out << ": %" << (uint32_t) operands.lvid;
 					break;
 				}
-				case isa::Blueprint::typealias:
-				{
+				case isa::Blueprint::typealias: {
 					line();
 					out << "typedef ";
-
 					printString(operands.name);
 					printEOL();
 					line() << '{';
 					indent();
 					printEOL();
-
 					// ID
 					uint32_t  atomid = operands.atomid;
 					line() << "// atomid: ";
@@ -727,15 +654,13 @@ namespace // anonymous
 						out << "<unspecified>";
 					break;
 				}
-				case isa::Blueprint::namespacedef:
-				{
+				case isa::Blueprint::namespacedef: {
 					line() << "namespace ";
 					printString(operands.name);
 					break;
 				}
 
-				case isa::Blueprint::unit:
-				{
+				case isa::Blueprint::unit: {
 					line() << "unit ";
 					printString(operands.name);
 					printEOL();
@@ -747,75 +672,62 @@ namespace // anonymous
 		}
 
 
-		void print(const Operand<Op::pragma>& operands)
-		{
-			switch (operands.pragma)
-			{
-				case Pragma::codegen:
-				{
+		void print(const Operand<Op::pragma>& operands) {
+			switch (operands.pragma) {
+				case Pragma::codegen: {
 					line() << "pragma codegen ";
 					out << ((operands.value.codegen != 0) ? "enable" : "disable");
 					break;
 				}
-				case Pragma::blueprintsize:
-				{
+				case Pragma::blueprintsize: {
 					auto size = operands.value.blueprintsize;
 					line() << "// blueprint size " << size << " opcodes (";
 					out << (size * sizeof(Instruction)) << " bytes)";
 					break;
 				}
-				case Pragma::visibility:
-				{
+				case Pragma::visibility: {
 					auto* text = nyvisibility_to_cstring((nyvisibility_t) operands.value.visibility);
 					line() << "pragma visibility " << text;
 					break;
 				}
-				case Pragma::bodystart:
-				{
+				case Pragma::bodystart: {
 					line() << "pragma body start";
 					break;
 				}
-				case Pragma::shortcircuit:
-				{
+				case Pragma::shortcircuit: {
 					line() << "pragma shortcircuit ";
 					out << ((operands.value.shortcircuit) ? "__true" : "__false");
 					break;
 				}
-				case Pragma::shortcircuitOpNopOffset:
-				{
+				case Pragma::shortcircuitOpNopOffset: {
 					line() << "pragma shortcircuit metadata: label: ";
 					out << operands.value.shortcircuitMetadata.label;
 					out << ", tmpvar: ";
 					out << (1 + operands.value.shortcircuitMetadata.label);
 					break;
 				}
-				case Pragma::shortcircuitMutateToBool:
-				{
+				case Pragma::shortcircuitMutateToBool: {
 					line() << "pragma shortcircuit mutate to bool: %";
 					out << operands.value.shortcircuitMutate.lvid;
 					out << " = new bool %" << operands.value.shortcircuitMutate.source;
 					break;
 				}
-				case Pragma::builtinalias:
-				{
+				case Pragma::builtinalias: {
 					line() << "pragma builtinalias ";
 					printString(operands.value.builtinalias.namesid);
 					break;
 				}
-				case Pragma::suggest:
-				{
+				case Pragma::suggest: {
 					line() << "pragma suggest ";
 					out << (operands.value.suggest != 0 ? "true" : "false");
 					break;
 				}
-				case Pragma::synthetic:
-				{
+				case Pragma::synthetic: {
 					line() << "pragma synthetic %" << operands.value.synthetic.lvid << " = ";
 					out << (operands.value.synthetic.onoff != 0 ? "true" : "false");
 					break;
 				}
-				case Pragma::unknown:
-				{
+				case Pragma::unknown: {
 					line() << "<invalid pragma identifier>";
 					break;
 				}
@@ -823,14 +735,13 @@ namespace // anonymous
 		}
 
 
-		template<ny::ir::isa::Op O> inline void visit(const Operand<O>& instr)
-		{
+		template<ny::ir::isa::Op O> inline void visit(const Operand<O>& instr) {
 			print(instr);
 			printEOL();
 		}
 
-		inline void visit(const ir::Instruction& instruction)
-		{
+
+		inline void visit(const ir::Instruction& instruction) {
 			LIBNANYC_IR_VISIT_SEQUENCE(const ir::isa::Operand, *this, instruction);
 		}
 	};

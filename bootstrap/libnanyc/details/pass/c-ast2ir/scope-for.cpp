@@ -13,15 +13,14 @@ namespace Producer {
 bool Scope::visitASTFor(AST::Node& node) {
 	// Name of the target ref for each element in the container
 	ShortString128 elementname;
-	// output sequence
-	auto& out = sequence();
+	auto& irout = ircode();
 	// lvid of the view
 	uint32_t viewlvid = 0;
 	// 'do' clause
 	AST::Node* forDoClause = nullptr;
 	AST::Node* forElseClause = nullptr;
-	ir::emit::trace(out, "for");
-	ir::emit::ScopeLocker opscopeElse{out};
+	ir::emit::trace(irout, "for");
+	ir::emit::ScopeLocker opscopeElse{irout};
 	for (auto& child : node.children) {
 		switch (child.rule) {
 			case AST::rgIn: {

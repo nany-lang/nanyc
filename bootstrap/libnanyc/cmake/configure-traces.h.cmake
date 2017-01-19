@@ -47,9 +47,6 @@ static constexpr bool sourceOpcodeSequence = all or recommended or false;
 //! Print opcodes after program instanciation
 static constexpr bool generatedOpcodeSequence = all or recommended or false;
 
-//! Print opcodes after program instanciation
-static constexpr bool capturedVariables = all or false;
-
 //! Additionnal traces for properties resolution
 static constexpr bool properties = all or false;
 

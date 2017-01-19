@@ -49,19 +49,16 @@ int Program::execute(uint32_t argc, const char** argv) {
 	// (requires std.Array<:T:>)
 	(void) argc;
 	(void) argv;
-	retvalue = 1; // EXIT_FAILURE
+	retvalue = EXIT_FAILURE;
 	uint32_t atomid = ny::ref(build).main.atomid;
 	uint32_t instanceid = ny::ref(build).main.instanceid;
-	auto& sequence = map.sequence(atomid, instanceid);
+	auto& ircode = map.ircode(atomid, instanceid);
 	Context context{*this, AnyString{cf.entrypoint.c_str, cf.entrypoint.size}};
 	bool success = context.initializeFirstTContext();
 	if (unlikely(not success))
 		return 666;
-	//
-	// Execute the program
-	//
 	uint64_t exitstatus;
-	if (context.invoke(exitstatus, sequence, atomid, instanceid)) {
+	if (context.invoke(exitstatus, ircode, atomid, instanceid)) {
 		retvalue = static_cast<int>(exitstatus);
 		if (cf.on_terminate)
 			cf.on_terminate(self(), nytrue, retvalue);
@@ -72,9 +69,8 @@ int Program::execute(uint32_t argc, const char** argv) {
 	}
 	if (cf.on_terminate)
 		cf.on_terminate(self(), nyfalse, retvalue);
-	// Always flush the output
 	flushAll(cf.console);
-	return (retvalue != 0) ? retvalue : 1; // avoid 0 if failure
+	return retvalue;
 }
 
 

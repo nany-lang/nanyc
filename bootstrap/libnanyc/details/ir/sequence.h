@@ -20,15 +20,10 @@ namespace ir {
 
 
 struct Sequence final {
-	//! \name Constructors & Destructor
-	//@{
-	//! Default constructor
 	Sequence() = default;
-	//! Copy constructor
 	Sequence(const Sequence&) = delete;
-	//! Destructor
+	Sequence(const Sequence&, uint32_t offset);
 	~Sequence();
-	//@}
 
 	//! \name Cursor manipulation
 	//@{
@@ -64,8 +59,6 @@ struct Sequence final {
 
 	//! emit a new Instruction
 	template<isa::Op O> isa::Operand<O>& emit();
-	//! emit a new Instruction (without reserving data if needed)
-	template<isa::Op O> isa::Operand<O>& emitraw();
 
 	//! Get the offset of an instruction within the sequence
 	template<isa::Op O> uint32_t offsetOf(const isa::Operand<O>& instr) const;
@@ -100,8 +93,6 @@ struct Sequence final {
 	uint32_t opcodeCount() const;
 	//! Get the capacity of the sequence (in instructions)
 	uint32_t capacity() const;
-	//! Get the amount of memory in bytes used by the sequence
-	size_t sizeInBytes() const;
 
 	//! Clear the sequence
 	void clear();
@@ -126,7 +117,6 @@ public:
 	StringRefs stringrefs;
 
 private:
-	//! grow to accept N instructions
 	void grow(uint32_t instrCount);
 
 private:

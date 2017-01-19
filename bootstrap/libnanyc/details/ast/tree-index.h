@@ -10,8 +10,6 @@ namespace ny {
 
 class ASTHelper final {
 public:
-	//! Create a new node in raw mode (do not set parent/children sets)
-	AST::Node* nodeCreate(enum AST::Rule);
 	//! Append a new node and append it (+metadata)
 	AST::Node* nodeAppend(AST::Node& parent, enum AST::Rule);
 

@@ -10,6 +10,38 @@ namespace ny {
 namespace ir {
 
 
+namespace {
+
+
+inline uint32_t calculateCapacity(uint32_t capacity, uint32_t minimum) {
+	do {
+		capacity += 1000u;
+	}
+	while (capacity < minimum);
+	return capacity;
+}
+
+
+} // namespace
+
+
+Sequence::Sequence(const Sequence& other, uint32_t offset)
+		: stringrefs(other.stringrefs) {
+	assert(offset < other.m_size);
+	uint32_t size = other.m_size - offset;
+	if (size != 0) {
+		uint32_t capacity = calculateCapacity(0, size);
+		auto* body = (Instruction*) malloc(sizeof(Instruction) * capacity);
+		if (!body)
+			throw std::bad_alloc();
+		YUNI_MEMCPY(body, sizeof(Instruction) * capacity, other.m_body + offset, size * sizeof(Instruction));
+		m_size = size;
+		m_capacity = capacity;
+		m_body = body;
+	}
+}
+
+
 Sequence::~Sequence() {
 	free(m_body);
 }
@@ -56,16 +88,12 @@ void Sequence::clear() {
 
 void Sequence::grow(uint32_t count) {
 	assert(count > 0);
-	auto newcapa = m_capacity;
-	do {
-		newcapa += 1000u;
-	}
-	while (newcapa < count);
-	auto* newbody = (Instruction*) realloc(m_body, sizeof(Instruction) * newcapa);
+	auto newCapacity = calculateCapacity(m_capacity, count);
+	auto* newbody = (Instruction*) realloc(m_body, sizeof(Instruction) * newCapacity);
 	if (unlikely(nullptr == newbody))
 		throw std::bad_alloc();
 	m_body = newbody;
-	m_capacity = newcapa;
+	m_capacity = newCapacity;
 }
 
 
@@ -82,10 +110,10 @@ namespace {
 
 
 struct WalkerIncreaseLVID final {
-	WalkerIncreaseLVID(ir::Sequence& sequence, uint32_t inc, uint32_t greaterThan)
+	WalkerIncreaseLVID(ir::Sequence& ircode, uint32_t inc, uint32_t greaterThan)
 		: greaterThan(greaterThan)
 		, inc(inc)
-		, sequence(sequence) {
+		, ircode(ircode) {
 	}
 
 	void visit(ir::isa::Operand<ir::isa::Op::stacksize>& operands) {
@@ -97,7 +125,7 @@ struct WalkerIncreaseLVID final {
 		switch (kind) {
 			case ir::isa::Blueprint::funcdef:
 			case ir::isa::Blueprint::classdef:
-				sequence.moveCursorFromBlueprintToEnd(*cursor);
+				ircode.moveCursorFromBlueprintToEnd(*cursor);
 				break;
 			default:
 				operands.eachLVID(*this);
@@ -111,7 +139,7 @@ struct WalkerIncreaseLVID final {
 
 	void visit(ir::isa::Operand<ir::isa::Op::end>&) {
 		if (depth-- == 0)
-			sequence.invalidateCursor(*cursor);
+			ircode.invalidateCursor(*cursor);
 	}
 
 	template<ir::isa::Op O> void visit(ir::isa::Operand<O>& operands) {
@@ -143,7 +171,7 @@ struct WalkerIncreaseLVID final {
 	uint32_t inc;
 	uint32_t depth = 0;
 	Instruction** cursor = nullptr;
-	Sequence& sequence;
+	Sequence& ircode;
 };
 
 

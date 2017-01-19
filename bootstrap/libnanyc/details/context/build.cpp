@@ -25,7 +25,7 @@ Logs::Report buildGenerateReport(void* ptr, Logs::Level level) {
 
 Build::AttachedSequenceRef::~AttachedSequenceRef() {
 	if (owned)
-		delete sequence;
+		delete ircode;
 }
 
 
@@ -38,8 +38,8 @@ Build::Build(Ref<Project> project, const nybuild_cf_t& cf, bool async)
 		m_targets.shrink_to_fit();
 		m_sources.clear();
 		m_sources.shrink_to_fit();
-		m_attachedSequences.clear();
-		m_attachedSequences.shrink_to_fit();
+		m_attachedIRCodes.clear();
+		m_attachedIRCodes.shrink_to_fit();
 		duration = 0;
 		buildtime = 0;
 		messages = nullptr;
@@ -71,7 +71,7 @@ Build::Build(Ref<Project> project, const nybuild_cf_t& cf, bool async)
 
 Build::~Build() {
 	// clear internal containers before releasing the project itself
-	m_attachedSequences.clear();
+	m_attachedIRCodes.clear();
 	m_sources.clear();
 	m_targets.clear();
 }

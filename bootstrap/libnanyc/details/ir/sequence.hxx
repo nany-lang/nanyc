@@ -11,11 +11,6 @@ namespace ny {
 namespace ir {
 
 
-inline size_t Sequence::sizeInBytes() const {
-	return m_capacity * sizeof(Instruction) + stringrefs.sizeInBytes();
-}
-
-
 inline void Sequence::reserve(uint32_t count) {
 	if (m_capacity < count)
 		grow(count);
@@ -158,15 +153,6 @@ template<class T> inline void Sequence::each(T& visitor, uint32_t offset) const 
 			LIBNANYC_IR_VISIT_SEQUENCE(const ir::isa::Operand, visitor, *it);
 		}
 	}
-}
-
-
-template<isa::Op O> inline isa::Operand<O>& Sequence::emitraw() {
-	static_assert(sizeof(Instruction) >= sizeof(isa::Operand<O>), "m_size mismatch");
-	assert(m_size + 1 <= m_capacity);
-	auto& result = at<O>(m_size++);
-	result.opcode = static_cast<uint32_t>(O);
-	return result;
 }
 
 

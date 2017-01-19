@@ -29,9 +29,8 @@ void debugPrintSourceOpcodeSequence(const ClassdefTableView& table, const Atom& 
 	String text;
 	text << usertxt << table.keyword(atom) << ' '; // ex: func
 	atom.retrieveCaption(text, table);  // ex: A.foo(...)...
-	auto& seqprint = *(atom.opcodes.sequence);
 	uint32_t offset = atom.opcodes.offset;
-	debugPrintIRSequence(text, seqprint, table, offset);
+	debugPrintIRSequence(text, *atom.opcodes.ircode, table, offset);
 }
 
 

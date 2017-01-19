@@ -30,21 +30,21 @@ bool Scope::visitASTArray(AST::Node& node, uint32_t& localvar) {
 	bool success = visitASTExprNew(*context.reuse.shorthandArray.node, localvar);
 	typeofcall.children.clear();
 	if (success) {
-		auto& out = sequence();
-		ir::emit::ScopeLocker opscope{out};
+		auto& irout = ircode();
+		ir::emit::ScopeLocker opscope{irout};
 		emitDebugpos(node);
-		uint32_t lvidappend = ir::emit::alloc(out, nextvar());
-		ir::emit::identify(out, lvidappend, "append", localvar);
-		uint32_t func = ir::emit::alloc(out, nextvar());
-		ir::emit::identify(out, func, "^()", lvidappend);
+		uint32_t lvidappend = ir::emit::alloc(irout, nextvar());
+		ir::emit::identify(irout, lvidappend, "append", localvar);
+		uint32_t func = ir::emit::alloc(irout, nextvar());
+		ir::emit::identify(irout, func, "^()", lvidappend);
 		for (auto& child : node.children) {
 			if (child.rule == AST::rgCallParameter) {
 				uint32_t lvid = 0;
 				success &= visitASTExpr(child.firstChild(), lvid);
 				if (success) {
-					auto callret = ir::emit::alloc(out, nextvar());
-					ir::emit::push(out, lvid);
-					ir::emit::call(out, callret, func);
+					auto callret = ir::emit::alloc(irout, nextvar());
+					ir::emit::push(irout, lvid);
+					ir::emit::call(irout, callret, func);
 				}
 			}
 		}

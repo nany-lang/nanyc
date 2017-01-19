@@ -155,7 +155,7 @@ public:
 	//! Acquire a string
 	AnyString acquireString(const AnyString& string);
 	//! The attached sequence
-	Sequence& sequence();
+	Sequence& ircode();
 
 	//! Get if debuginfo should be used
 	bool hasDebuginfo() const;

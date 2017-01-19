@@ -18,8 +18,6 @@ public:
 		: cf(cf) {
 	}
 
-	size_t inspectMemoryUsage() const;
-
 public:
 	nybuild_cf_t& cf;
 
@@ -34,7 +32,7 @@ public:
 		yuni::Ref<AST::Node> rootnode;
 
 		//! The original sequence, generated from the normalized AST
-		ir::Sequence sequence;
+		ir::Sequence ircode;
 
 		//! Parse / IR result
 		bool success = false;

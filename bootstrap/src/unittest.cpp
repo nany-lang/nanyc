@@ -141,7 +141,7 @@ void fetchUnittestList(nyrun_cf_t& runcf, std::vector<String>& torun, const char
 		case 1:  std::cout << "1 test found"; break;
 		default: std::cout << torun.size() << " tests found";
 	}
-	std::cout << " (" << duration << "ms)\n";
+	std::cout << " (in " << duration << "ms)\n";
 }
 
 
@@ -196,7 +196,7 @@ void listAllUnittests(nyrun_cf_t& runcf, const Settings& settings, const char** 
 	}
 	if (settings.colors.out)
 		System::Console::ResetTextColor(std::cout);
-	std::cout << "  (" << duration << "ms)\n\n";
+	std::cout << "  (in " << duration << "ms)\n\n";
 }
 
 
@@ -324,7 +324,12 @@ void runUnittests(nyrun_cf_t& runcf, const Settings& settings, const char** file
 	uint32_t failCount = 0;
 	int64_t starttime = DateTime::NowMilliSeconds();
 	for (auto& testname : settings.unittests) {
-		bool success = runtest<true>(runcf, settings, testname, filelist, filecount);
+		bool success = false;
+		try {
+			success = runtest<true>(runcf, settings, testname, filelist, filecount);
+		}
+		catch (const std::exception&) {
+		}
 		++(success ? successCount : failCount);
 	}
 	int64_t duration = DateTime::NowMilliSeconds() - starttime;

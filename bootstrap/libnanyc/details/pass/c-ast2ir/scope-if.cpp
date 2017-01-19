@@ -11,37 +11,36 @@ namespace Producer {
 
 
 bool Scope::generateIfStmt(AST::Node& expr, AST::Node& thenc, AST::Node* elseptr,
-						   uint32_t* customjmpthenOffset) {
-	// output sequence
-	auto& out = sequence();
-	ir::emit::trace(out, "*** if-stmt");
+		uint32_t* customjmpthenOffset) {
+	auto& irout = ircode();
+	ir::emit::trace(irout, "*** if-stmt");
 	emitDebugpos(expr);
 	bool hasElseClause = (elseptr != nullptr);
 	bool success = true;
 	// expression
 	// evalation of the condition
-	uint32_t condlvid = ir::emit::alloc(out, nextvar(), nyt_bool);
+	uint32_t condlvid = ir::emit::alloc(irout, nextvar(), nyt_bool);
 	{
-		ir::emit::trace(out, "if-cond-stmt");
-		ir::emit::ScopeLocker opscopeCond{out};
+		ir::emit::trace(irout, "if-cond-stmt");
+		ir::emit::ScopeLocker opscopeCond{irout};
 		uint32_t exprEval = 0;
 		emitDebugpos(expr);
 		success &= visitASTExpr(expr, exprEval, false);
-		ir::emit::assign(out, condlvid, exprEval, false);
+		ir::emit::assign(irout, condlvid, exprEval, false);
 	}
 	uint32_t labelElse = 0; // (hasElseClause ? nextvar() : 0);
 	uint32_t labelEnd  = 0; // nextvar();
 	// jump to the 'else' clause if false (or end) (label updated later)
-	uint32_t opOffJz = out.opcodeCount();
-	ir::emit::jz(out, condlvid, 0, (hasElseClause ? labelElse : labelEnd));
+	uint32_t opOffJz = irout.opcodeCount();
+	ir::emit::jz(irout, condlvid, 0, (hasElseClause ? labelElse : labelEnd));
 	// opcode offset for jumping to label 'end' after 'then' stmt
 	uint32_t opOffIntermediateEnd = 0u;
 	// if-then...
 	{
-		ir::emit::trace(out, "then-stmt");
+		ir::emit::trace(irout, "then-stmt");
 		// stmt
 		{
-			ir::emit::ScopeLocker opscopeThen{out};
+			ir::emit::ScopeLocker opscopeThen{irout};
 			emitDebugpos(thenc);
 			if (unlikely(thenc.children.size() != 1))
 				return (ice(thenc) << "invalid if-then branch");
@@ -51,23 +50,23 @@ bool Scope::generateIfStmt(AST::Node& expr, AST::Node& thenc, AST::Node* elseptr
 		// jump to the end to not execute the 'else' clause
 		if (customjmpthenOffset == nullptr) {
 			if (hasElseClause) {
-				opOffIntermediateEnd = out.opcodeCount();
-				ir::emit::jmp(out, labelEnd);
+				opOffIntermediateEnd = irout.opcodeCount();
+				ir::emit::jmp(irout, labelEnd);
 			}
 		}
 		else {
-			*customjmpthenOffset = out.opcodeCount();
-			ir::emit::jmp(out, 0); // will be filled later
+			*customjmpthenOffset = irout.opcodeCount();
+			ir::emit::jmp(irout, 0); // will be filled later
 		}
 	}
 	// ...else
 	if (hasElseClause) {
 		assert(elseptr != nullptr);
-		ir::emit::trace(out, "else-stmt");
+		ir::emit::trace(irout, "else-stmt");
 		// stmt
 		{
-			labelElse = ir::emit::label(out, nextvar());
-			ir::emit::ScopeLocker opscopeElse{out};
+			labelElse = ir::emit::label(irout, nextvar());
+			ir::emit::ScopeLocker opscopeElse{irout};
 			auto& elsec = *elseptr;
 			emitDebugpos(elsec);
 			if (unlikely(elsec.children.size() != 1))
@@ -76,80 +75,80 @@ bool Scope::generateIfStmt(AST::Node& expr, AST::Node& thenc, AST::Node* elseptr
 			success &= visitASTStmt(elseNode);
 		}
 	}
-	labelEnd = ir::emit::label(out, nextvar());
+	labelEnd = ir::emit::label(irout, nextvar());
 	// post-update label ids
-	out.at<ir::isa::Op::jz>(opOffJz).label = (hasElseClause ? labelElse : labelEnd);
+	irout.at<ir::isa::Op::jz>(opOffJz).label = (hasElseClause ? labelElse : labelEnd);
 	if (opOffIntermediateEnd != 0)
-		out.at<ir::isa::Op::jmp>(opOffIntermediateEnd).label = labelEnd;
+		irout.at<ir::isa::Op::jmp>(opOffIntermediateEnd).label = labelEnd;
 	return success;
 }
 
 
 bool Scope::generateIfExpr(uint32_t& ifret, AST::Node& expr, AST::Node& thenc, AST::Node& elsec) {
 	// output sequence
-	auto& out = sequence();
-	ir::emit::trace(out, "*** if-expr");
+	auto& irout = ircode();
+	ir::emit::trace(irout, "*** if-expr");
 	emitDebugpos(expr);
 	// result of the expression
-	ifret = ir::emit::alloc(out, nextvar());
-	ir::emit::type::qualifierRef(out, ifret, true);
+	ifret = ir::emit::alloc(irout, nextvar());
+	ir::emit::type::qualifierRef(irout, ifret, true);
 	bool hasElseClause = true;
 	bool success = true;
 	// expression
 	// evalation of the condition
-	uint32_t condlvid = ir::emit::alloc(out, nextvar(), nyt_bool);
+	uint32_t condlvid = ir::emit::alloc(irout, nextvar(), nyt_bool);
 	{
-		ir::emit::trace(out, "if-cond-expr");
-		ir::emit::ScopeLocker opscopeCond{out};
+		ir::emit::trace(irout, "if-cond-expr");
+		ir::emit::ScopeLocker opscopeCond{irout};
 		uint32_t exprEval = 0;
 		success &= visitASTExpr(expr, exprEval, false);
-		ir::emit::assign(out, condlvid, exprEval, false);
+		ir::emit::assign(irout, condlvid, exprEval, false);
 	}
 	uint32_t labelElse = 0; // (hasElseClause ? nextvar() : 0);
 	uint32_t labelEnd  = 0; // nextvar();
 	// jump to the 'else' clause if false (or end)
-	uint32_t opOffJz = out.opcodeCount();
-	ir::emit::jz(out, condlvid, 0, (hasElseClause ? labelElse : labelEnd));
+	uint32_t opOffJz = irout.opcodeCount();
+	ir::emit::jz(irout, condlvid, 0, (hasElseClause ? labelElse : labelEnd));
 	// opcode offset for jumping to label 'end' after 'then' stmt
 	uint32_t opOffIntermediateEnd = 0u;
 	// if-then...
 	{
-		ir::emit::trace(out, "then-expr");
+		ir::emit::trace(irout, "then-expr");
 		{
-			ir::emit::ScopeLocker opscopeThen{out};
+			ir::emit::ScopeLocker opscopeThen{irout};
 			emitDebugpos(thenc);
 			if (unlikely(thenc.children.size() != 1))
 				return (ice(thenc) << "invalid if-then branch");
 			auto& thenNode = thenc.children[0];
 			uint32_t thenlvid;
 			success &= visitASTExpr(thenNode, thenlvid);
-			ir::emit::assign(out, ifret, thenlvid, false);
+			ir::emit::assign(irout, ifret, thenlvid, false);
 		}
 		if (hasElseClause) {
-			opOffIntermediateEnd = out.opcodeCount();
-			ir::emit::jmp(out, labelEnd);
+			opOffIntermediateEnd = irout.opcodeCount();
+			ir::emit::jmp(irout, labelEnd);
 		}
 	}
 	// ...else
 	if (hasElseClause) {
-		ir::emit::trace(out, "else-expr");
+		ir::emit::trace(irout, "else-expr");
 		{
-			labelElse = ir::emit::label(out, nextvar());
-			ir::emit::ScopeLocker opscopeElse{out};
+			labelElse = ir::emit::label(irout, nextvar());
+			ir::emit::ScopeLocker opscopeElse{irout};
 			emitDebugpos(elsec);
 			if (unlikely(elsec.children.size() != 1))
 				return (ice(elsec) << "invalid if-then branch");
 			auto& elseNode = elsec.children[0];
 			uint32_t elselvid;
 			success &= visitASTExpr(elseNode, elselvid);
-			ir::emit::assign(out, ifret, elselvid, false);
+			ir::emit::assign(irout, ifret, elselvid, false);
 		}
 	}
-	labelEnd = ir::emit::label(out, nextvar());
+	labelEnd = ir::emit::label(irout, nextvar());
 	// post-update label ids
-	out.at<ir::isa::Op::jz>(opOffJz).label = (hasElseClause ? labelElse : labelEnd);
+	irout.at<ir::isa::Op::jz>(opOffJz).label = (hasElseClause ? labelElse : labelEnd);
 	if (opOffIntermediateEnd)
-		out.at<ir::isa::Op::jmp>(opOffIntermediateEnd).label = labelEnd;
+		irout.at<ir::isa::Op::jmp>(opOffIntermediateEnd).label = labelEnd;
 	return success;
 }
 

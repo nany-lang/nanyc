@@ -35,10 +35,10 @@ struct AtomMap final {
 
 
 	//! Find the IR sequence for a given {atomid/instanceid} (null if not found)
-	const ir::Sequence* sequenceIfExists(uint32_t atomid, uint32_t index) const;
+	const ir::Sequence* ircodeIfExists(uint32_t atomid, uint32_t index) const;
 
-	//! Find the IR sequence for a given {atomid/instanceid}
-	const ir::Sequence& sequence(uint32_t atomid, uint32_t index) const;
+	//! Find the IR code for a given {atomid/instanceid}
+	const ir::Sequence& ircode(uint32_t atomid, uint32_t index) const;
 
 	//! Retrieve the human readable name of an atom (empty if not found)
 	AnyString symbolname(uint32_t atomid, uint32_t index) const;

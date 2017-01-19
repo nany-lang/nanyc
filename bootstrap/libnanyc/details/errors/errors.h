@@ -5,78 +5,49 @@
 namespace ny {
 
 // forward declarations
-namespace AST {
-class Node;
-}
+namespace AST { class Node; }
 
 
-
-/*!
-** \brief Generate a new error report
-*/
+//! Generate a new error report
 Logs::Report error();
 
-/*!
-** \brief Generate an error message
-** \return Always false
-*/
+//! Generate an error message
+//! \return Always false
 bool error(const AnyString& msg);
 
-/*!
-** \brief Generate a new error report
-*/
+//! Generate a new error report
 Logs::Report error(const AST::Node&);
 
-/*!
-** \brief Generate a new error report
-*/
+//! Generate a new error report
 void error(const AST::Node&, const AnyString& msg);
 
 
-/*!
-** \brief Generate a new warning report
-*/
+//! Generate a new warning report
 Logs::Report warning();
 
-/*!
-** \brief Generate a new warning report
-*/
+//! Generate a new warning report
 Logs::Report warning(const AST::Node&);
 
-/*!
-** \brief Generate a new info report
-*/
+//! Generate a new info report
 Logs::Report info();
 
-/*!
-** \brief Generate a new hint report
-*/
+//! Generate a new hint report
 Logs::Report hint();
 
-/*!
-** \brief Generate a new ICE report
-*/
+//! Generate a new ICE report
 Logs::Report ice();
 
-/*!
-** \brief Generate a new ICE report
-*/
+//! Generate a new ICE report
 Logs::Report ice(const AST::Node&);
 
-/*!
-** \brief Generate a new trace report
-*/
+//! Generate a new trace report
 Logs::Report trace();
 
-/*!
-** \brief Generate a new verbose report
-*/
+//! Generate a new verbose report
 Logs::Report verbose();
 
 
-/*!
-** \brief Emit ICE for unknown node
-*/
+//! Emit ICE for unknown node
 bool unexpectedNode(const AST::Node&, const AnyString& extra = nullptr);
 
 
@@ -147,9 +118,6 @@ public:
 private:
 	State previousState;
 }; // class Handler
-
-
-
 
 
 } // namespace Logs

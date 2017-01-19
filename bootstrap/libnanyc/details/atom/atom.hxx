@@ -283,15 +283,15 @@ inline Atom::Instances::Ref Atom::Instances::operator [] (uint32_t index) {
 }
 
 
-inline ir::Sequence* Atom::Instances::Ref::sequenceIfExists() {
+inline ir::Sequence* Atom::Instances::Ref::ircodeIfExists() {
 	return (m_index < m_ref.m_instances.size())
-		   ? m_ref.m_instances[m_index].sequence.get() : nullptr;
+		   ? m_ref.m_instances[m_index].ircode.get() : nullptr;
 }
 
 
-inline ir::Sequence& Atom::Instances::Ref::sequence() {
+inline ir::Sequence& Atom::Instances::Ref::ircode() {
 	assert(m_index < m_ref.m_instances.size());
-	return *(m_ref.m_instances[m_index].sequence.get());
+	return *(m_ref.m_instances[m_index].ircode.get());
 }
 
 

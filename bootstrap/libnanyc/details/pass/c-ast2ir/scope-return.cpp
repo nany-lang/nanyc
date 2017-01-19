@@ -15,16 +15,16 @@ bool Scope::visitASTExprReturn(AST::Node& node) {
 	// assert(not node.children.empty()); -- a return may be empty
 	bool success = true;
 	bool hasReturnValue = false;
-	auto& out = sequence();
+	auto& irout = ircode();
 	for (auto& child : node.children) {
 		switch (child.rule) {
 			case AST::rgExpr: {
-				ir::emit::ScopeLocker opscope{out};
+				ir::emit::ScopeLocker opscope{irout};
 				uint32_t localvar = 0;
 				success &= visitASTExpr(child, localvar);
 				// generate error on the begining of the expr and not the return itself
 				emitDebugpos(child);
-				ir::emit::ret(out, localvar, ir::emit::alloc(out, nextvar()));
+				ir::emit::ret(irout, localvar, ir::emit::alloc(irout, nextvar()));
 				hasReturnValue = true;
 				break;
 			}
@@ -34,7 +34,7 @@ bool Scope::visitASTExprReturn(AST::Node& node) {
 	}
 	if (not hasReturnValue) {
 		emitDebugpos(node);
-		ir::emit::ret(out);
+		ir::emit::ret(irout);
 	}
 	return success;
 }

@@ -33,14 +33,14 @@ bool Scope::visitASTTypedef(AST::Node& node) {
 	}
 	if (unlikely(nullptr == typeexpr))
 		return (ice(node) << "invalid typedef definition");
-	auto& out = sequence();
+	auto& irout = ircode();
 	ir::Producer::Scope scope{*this};
-	uint32_t bpoffset = ir::emit::blueprint::typealias(out, typedefname);
-	uint32_t bpoffsiz = ir::emit::pragma::blueprintSize(out);
-	uint32_t bpoffsck = ir::emit::increaseStacksize(out);
+	uint32_t bpoffset = ir::emit::blueprint::typealias(irout, typedefname);
+	uint32_t bpoffsiz = ir::emit::pragma::blueprintSize(irout);
+	uint32_t bpoffsck = ir::emit::increaseStacksize(irout);
 	// making sure that debug info are available
 	context.pPreviousDbgLine = (uint32_t) - 1; // forcing debug infos
-	ir::emit::dbginfo::filename(out, context.dbgSourceFilename);
+	ir::emit::dbginfo::filename(irout, context.dbgSourceFilename);
 	scope.emitDebugpos(node);
 	uint32_t returntype = 1u; // already allocated
 	uint32_t localvar   = 0;
@@ -48,16 +48,16 @@ bool Scope::visitASTTypedef(AST::Node& node) {
 	success &= (localvar > returntype);
 	scope.emitDebugpos(node);
 	if (success) {
-		auto& operands    = scope.sequence().emit<isa::Op::follow>();
+		auto& operands    = irout.emit<isa::Op::follow>();
 		operands.follower = returntype;
 		operands.lvid     = localvar;
 		operands.symlink  = 0;
 	}
-	ir::emit::pragma::funcbody(out); // to mimic other blueprints
-	ir::emit::scopeEnd(out);
-	uint32_t blpsize = out.opcodeCount() - bpoffset;
-	out.at<isa::Op::pragma>(bpoffsiz).value.blueprintsize = blpsize;
-	out.at<isa::Op::stacksize>(bpoffsck).add = scope.nextVarID + 1u;
+	ir::emit::pragma::funcbody(irout); // to mimic other blueprints
+	ir::emit::scopeEnd(irout);
+	uint32_t blpsize = irout.opcodeCount() - bpoffset;
+	irout.at<isa::Op::pragma>(bpoffsiz).value.blueprintsize = blpsize;
+	irout.at<isa::Op::stacksize>(bpoffsck).add = scope.nextVarID + 1u;
 	return success;
 }
 

@@ -13,18 +13,16 @@ ContextRunner::ContextRunner(Context& context, const ir::Sequence& callee)
 	, cf(context.program.cf)
 	, context(context)
 	, map(context.program.map)
-	, sequence(std::cref(callee))
+	, ircode(std::cref(callee))
 	, userDefinedIntrinsics(ny::ref(context.program.build).intrinsics) {
 }
 
 
 void ContextRunner::initialize() {
-	// dynamic C calls
 	dyncall = dcNewCallVM(4096);
 	if (unlikely(!dyncall))
 		throw DyncallError();
 	dcMode(dyncall, DC_CALL_C_DEFAULT);
-	// prepare the current context for native C calls
 	cfvm.allocator = &allocator;
 	cfvm.program = context.program.self();
 	cfvm.tctx = context.self();
@@ -90,13 +88,13 @@ void ContextRunner::emitDividedByZero() {
 
 
 void ContextRunner::emitUnknownPointer(void* p) {
-	ny::vm::console::unknownPointer(context, p, sequence.get().offsetOf(**cursor));
+	ny::vm::console::unknownPointer(context, p, ircode.get().offsetOf(**cursor));
 	abortMission();
 }
 
 
 void ContextRunner::emitLabelError(uint32_t label) {
-	auto offset = sequence.get().offsetOf(**cursor);
+	auto offset = ircode.get().offsetOf(**cursor);
 	ny::vm::console::invalidLabel(context, label, upperLabelID, offset);
 	abortMission();
 }
@@ -106,7 +104,7 @@ void ContextRunner::destroy(uint64_t* object, uint32_t dtorid, uint32_t instance
 	auto& dtor = *map.findAtom(dtorid);
 	if (false) {
 		std::cout << " .. DESTROY " << (void*) object << " aka '"
-			<< dtor.caption() << "' at opc+" << sequence.get().offsetOf(**cursor) << '\n';
+			<< dtor.caption() << "' at opc+" << ircode.get().offsetOf(**cursor) << '\n';
 		stacktrace.dump(context.cf, map);
 		std::cout << '\n';
 	}
@@ -226,23 +224,18 @@ void ContextRunner::visit(const ir::isa::Operand<ir::isa::Op::memalloc>& opr) {
 	vm_PRINT_OPCODE(opr);
 	ASSERT_LVID(opr.lvid);
 	ASSERT_LVID(opr.regsize);
-	size_t size;
-	if (sizeof(size_t) < sizeof(uint64_t)) {
-		// size_t is less than a u64 (32bits platform probably)
-		// so it is possible to ask more than the system can provide
+	size_t size = [&]() -> size_t {
+		if (sizeof(size_t) == sizeof(uint64_t))
+			return static_cast<size_t>(registers[opr.regsize].u64);
 		auto request = registers[opr.regsize].u64;
 		if (std::numeric_limits<size_t>::max() <= request)
-			return emitBadAlloc();
-		size = static_cast<size_t>(request);
-	}
-	else {
-		// 64bits platform
-		size = static_cast<size_t>(registers[opr.regsize].u64);
-	}
+			emitBadAlloc();
+		return static_cast<size_t>(request);
+	}();
 	size += config::extraObjectSize;
 	uint64_t* pointer = allocateraw<uint64_t>(size);
 	if (unlikely(!pointer))
-		return emitBadAlloc();
+		emitBadAlloc();
 	if (debugmode)
 		memset(pointer, patternAlloc, size);
 	pointer[0] = 0;
@@ -309,9 +302,8 @@ uint64_t ContextRunner::invoke(const ir::Sequence& callee) {
 	#endif
 	registers = stack.push(framesize);
 	registers[0].u64 = 0;
-	sequence = std::cref(callee);
+	ircode = std::cref(callee);
 	upperLabelID = 0;
-	// retrieve parameters for the func
 	for (uint32_t i = 0; i != funcparamCount; ++i)
 		registers[i + 2].u64 = funcparams[i].u64; // 2-based
 	funcparamCount = 0;

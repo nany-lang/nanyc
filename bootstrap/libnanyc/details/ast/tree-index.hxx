@@ -92,12 +92,6 @@ inline void ASTHelper::nodeRulePromote(AST::Node& node, enum AST::Rule rule) {
 }
 
 
-inline AST::Node* ASTHelper::nodeCreate(enum AST::Rule rule) {
-	auto* node = new AST::Node{rule};
-	return node;
-}
-
-
 inline AST::Node* ASTHelper::nodeAppendAsOriginal(AST::Node& parent, enum AST::Rule rule) {
 	return nodeAppend(parent, rule);
 }

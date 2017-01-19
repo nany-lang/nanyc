@@ -14,16 +14,16 @@ namespace Producer {
 bool Scope::visitASTExprSwitch(AST::Node& node) {
 	assert(node.rule == AST::rgSwitch);
 	bool success = true;
-	auto& out = sequence();
-	ir::emit::trace(out, "switch");
-	ir::emit::ScopeLocker opscopeSwitch{out};
+	auto& irout = ircode();
+	ir::emit::trace(irout, "switch");
+	ir::emit::ScopeLocker opscopeSwitch{irout};
 	emitDebugpos(node);
 	// the variable id of the initial condition
 	uint32_t valuelvid = 0;
 	// a temporary variable to compute if a 'case' value matches or not
 	// this variable is reused for each 'case'
 	uint32_t casecondlvid = nextvar();
-	ir::emit::alloc(out, casecondlvid, nyt_bool);
+	ir::emit::alloc(irout, casecondlvid, nyt_bool);
 	// the current implementation generates a 'if' statement for each 'case'
 	// these variables are for simulating an AST node
 	auto exprCase = make_ref<AST::Node>(AST::rgExpr);
@@ -49,13 +49,13 @@ bool Scope::visitASTExprSwitch(AST::Node& node) {
 	for (auto& child : node.children) {
 		switch (child.rule) {
 			case AST::rgSwitchCase: {
-				ir::emit::trace(out, "case");
+				ir::emit::trace(irout, "case");
 				if (unlikely(valuelvid == 0))
 					return (ice(child) << "switch: unexpected lvid value");
 				if (unlikely(child.children.size() != 2))
 					return unexpectedNode(child, "[ir/switch/case]");
 				if (success) {
-					ir::emit::ScopeLocker opscopeCase{out};
+					ir::emit::ScopeLocker opscopeCase{irout};
 					rhs->children.clear();
 					rhs->children.push_back(&(child.children[0]));
 					bodyScope.children.clear();
@@ -82,10 +82,10 @@ bool Scope::visitASTExprSwitch(AST::Node& node) {
 		}
 	}
 	emitDebugpos(node);
-	uint32_t labelEnd = ir::emit::label(out, nextvar());
+	uint32_t labelEnd = ir::emit::label(irout, nextvar());
 	// update all labels for jumping to the end
 	for (uint32_t i = 0 ; i != labelCount; ++i)
-		out.at<ir::isa::Op::jmp>(labels[i]).label = labelEnd;
+		irout.at<ir::isa::Op::jmp>(labels[i]).label = labelEnd;
 	return success;
 }
 

@@ -100,15 +100,15 @@ void ASTReplicator::transformExprNodeToFuncCallNOT(AST::Node& node) {
 	ast.nodeRulePromote(node, AST::rgIdentifier);
 	node.text = "^not";
 	// create a new subtree
-	auto& call = *ast.nodeCreate(AST::rgCall);
-	auto& lhs  = *ast.nodeAppend(call, {AST::rgCallParameter, AST::rgExpr});
+	auto call = make_ref<AST::Node>(AST::rgCall);
+	auto& lhs  = *ast.nodeAppend(*call, {AST::rgCallParameter, AST::rgExpr});
 	// re-parent lhs
 	ast.nodeReparentAtTheEnd(node.children[lhsIndex], node, lhsIndex, lhs);
 	// remove all remaining nodes
 	node.children.clear();
 	// re-parent the new node 'call'
-	call.parent = &node;
-	node.children.push_back(&call);
+	call->parent = &node;
+	node.children.push_back(call);
 }
 
 
@@ -149,9 +149,9 @@ void ASTReplicator::transformExprNodeToFuncCall(AST::Node& node) {
 	ast.nodeRulePromote(node, AST::rgIdentifier);
 	node.text = opname;
 	// create a new subtree
-	auto& call = *ast.nodeCreate(AST::rgCall);
-	auto& lhs  = *ast.nodeAppend(call, {AST::rgCallParameter, AST::rgExpr});
-	auto& rhs  = *ast.nodeAppend(call, {AST::rgCallParameter, AST::rgExpr});
+	auto call = make_ref<AST::Node>(AST::rgCall);
+	auto& lhs = *ast.nodeAppend(*call, {AST::rgCallParameter, AST::rgExpr});
+	auto& rhs = *ast.nodeAppend(*call, {AST::rgCallParameter, AST::rgExpr});
 	// re-parent rhs first, otherwise the index will be invalidated
 	ast.nodeReparentAtTheEnd(node.children[rhsIndex], node, rhsIndex, rhs);
 	// re-parent lhs
@@ -159,8 +159,8 @@ void ASTReplicator::transformExprNodeToFuncCall(AST::Node& node) {
 	// remove all remaining nodes
 	node.children.clear();
 	// re-parent the new node 'call'
-	call.parent = &node;
-	node.children.push_back(&call);
+	call->parent = &node;
+	node.children.push_back(call);
 }
 
 
@@ -563,7 +563,7 @@ bool Source::passDuplicateAndNormalizeAST(Logs::Report& report) {
 	auto& parser    = buildinfo.parsing.parser;
 	auto& ast       = buildinfo.parsing.ast;
 	//! Reset the root node
-	buildinfo.parsing.rootnode = ast.nodeCreate(AST::rgStart);
+	buildinfo.parsing.rootnode = make_ref<AST::Node>(AST::rgStart);
 	if (!parser.root or (parser.root->rule != AST::rgStart))
 		return false;
 	if (config::traces::astBeforeNormalize)

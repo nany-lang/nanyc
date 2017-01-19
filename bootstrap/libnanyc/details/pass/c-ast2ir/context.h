@@ -90,8 +90,8 @@ public:
 
 	//! Information about the current build
 	nybuild_cf_t& cf;
-	//! Linked ir sequence
-	Sequence& sequence;
+	//! Linked ir code
+	Sequence& ircode;
 	//! Reporting
 	Logs::Report report;
 	//! Has debug info ?

@@ -606,7 +606,7 @@ constexpr static const nytype_t promotion[nyt_count][nyt_count] = {
 
 
 template<nytype_t R, bool AcceptBool, bool AcceptInt, bool AcceptFloat,
-		 void (* M)(ir::emit::SequenceRef, uint32_t, uint32_t, uint32_t)>
+		 void (* M)(ir::emit::IRCodeRef, uint32_t, uint32_t, uint32_t)>
 inline bool emitBuiltinOperator(SequenceBuilder& seq, uint32_t lvid, const char* const name) {
 	assert(seq.pushedparams.func.indexed.size() == 2);
 	// -- LHS - PARAMETER 0 --

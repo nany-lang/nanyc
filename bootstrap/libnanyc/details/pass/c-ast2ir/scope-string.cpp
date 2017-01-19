@@ -15,37 +15,37 @@ namespace Producer {
 namespace {
 
 
-bool convertCharExtended(char& out, char c) {
+bool convertCharExtended(char& irout, char c) {
 	switch (c) {
 		case 'r':
-			out = '\r';
+		irout = '\r';
 			break;
 		case 'n':
-			out = '\n';
+		irout = '\n';
 			break;
 		case 't':
-			out = '\t';
+		irout = '\t';
 			break;
 		case 'v':
-			out = '\v';
+		irout = '\v';
 			break;
 		case '\\':
-			out = '\\';
+		irout = '\\';
 			break;
 		case '"':
-			out = '"';
+		irout = '"';
 			break;
 		case 'a':
-			out = '\a';
+		irout = '\a';
 			break;
 		case 'b':
-			out = '\b';
+		irout = '\b';
 			break;
 		case 'f':
-			out = '\f';
+		irout = '\f';
 			break;
 		case '0':
-			out = '\0';
+		irout = '\0';
 			break;
 		case 'c':  /* produce no further output */
 			break;
@@ -110,7 +110,7 @@ bool Scope::visitASTExprStringLiteral(AST::Node& node, uint32_t& localvar) {
 	// when called, this rule represents an internal cstring
 	// thus, this function can not be called by an user-defined string
 	emitDebugpos(node);
-	localvar = ir::emit::alloctext(sequence(), nextvar(), node.text);
+	localvar = ir::emit::alloctext(ircode(), nextvar(), node.text);
 	return true;
 }
 
@@ -131,22 +131,21 @@ bool Scope::visitASTExprString(AST::Node& node, uint32_t& localvar) {
 	bool success = visitASTExprNew(*(context.reuse.string.createObject), localvar);
 	if (unlikely(not success))
 		return false;
-	// sequence output
-	auto& out = sequence();
-	uint32_t idlvid = ir::emit::alloc(out, nextvar());
-	ir::emit::identify(out, idlvid, "append", localvar);
-	uint32_t calllvid = ir::emit::alloc(out, nextvar());
-	ir::emit::identify(out, calllvid, "^()", idlvid); // functor
+	auto& irout = ircode();
+	uint32_t idlvid = ir::emit::alloc(irout, nextvar());
+	ir::emit::identify(irout, idlvid, "append", localvar);
+	uint32_t calllvid = ir::emit::alloc(irout, nextvar());
+	ir::emit::identify(irout, calllvid, "^()", idlvid); // functor
 	context.reuse.string.text.clear();
 	AST::Node* firstLiteralNode = nullptr;
 	auto flush = [&]() {
 		emitDebugpos(*firstLiteralNode);
-		uint32_t sid = ir::emit::alloctext(out, nextvar(), context.reuse.string.text);
-		uint32_t lid = ir::emit::allocu64(out, nextvar(), nyt_u32, context.reuse.string.text.size());
-		uint32_t ret = ir::emit::alloc(out, nextvar(), nyt_void);
-		ir::emit::push(out, sid); // text: __text
-		ir::emit::push(out, lid); // size: __u64
-		ir::emit::call(out, ret, calllvid);
+		uint32_t sid = ir::emit::alloctext(irout, nextvar(), context.reuse.string.text);
+		uint32_t lid = ir::emit::allocu64(irout, nextvar(), nyt_u32, context.reuse.string.text.size());
+		uint32_t ret = ir::emit::alloc(irout, nextvar(), nyt_void);
+		ir::emit::push(irout, sid); // text: __text
+		ir::emit::push(irout, lid); // size: __u64
+		ir::emit::call(irout, ret, calllvid);
 	};
 	for (auto& child : node.children) {
 		switch (child.rule) {
@@ -170,15 +169,15 @@ bool Scope::visitASTExprString(AST::Node& node, uint32_t& localvar) {
 					if (unlikely(expr.rule != AST::rgExpr))
 						return unexpectedNode(expr, "[string-interpolation]");
 					// creating a scope for temporary expression (string interpolation)
-					ir::emit::ScopeLocker opscope{out};
+					ir::emit::ScopeLocker opscope{irout};
 					emitDebugpos(expr);
 					uint32_t lvid;
 					if (not visitASTExpr(expr, lvid))
 						return false;
 					emitDebugpos(expr);
-					uint32_t ret = ir::emit::alloc(out, nextvar(), nyt_void);
-					ir::emit::push(out, lvid);
-					ir::emit::call(out, ret, calllvid);
+					uint32_t ret = ir::emit::alloc(irout, nextvar(), nyt_void);
+					ir::emit::push(irout, lvid);
+					ir::emit::call(irout, ret, calllvid);
 				}
 				break;
 			}
