@@ -549,12 +549,8 @@ public:
 		ASSERT_LVID(opr.regsize);
 		ASSERT_LVID(opr.pattern);
 		uint64_t* object = reinterpret_cast<uint64_t*>(registers[opr.lvid].u64);
-		vm_CHECK_POINTER(object, opr);
 		size_t size = static_cast<size_t>(registers[opr.regsize].u64);
-		size += config::extraObjectSize;
 		uint8_t pattern = static_cast<uint8_t>(registers[opr.pattern].u64);
-		if (unlikely(not memchecker.checkObjectSize(object, static_cast<size_t>(size))))
-			return emitPointerSizeMismatch(object, size);
 		memset(object, pattern, size);
 	}
 
