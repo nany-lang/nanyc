@@ -25,6 +25,13 @@ struct MultipleDefinition final: std::exception {
 };
 
 
+struct ExpectClass final: std::exception {
+	ExpectClass(AnyString name) : name{name} {}
+	const char* what() const noexcept override {return nullptr;}
+	AnyString name;
+};
+
+
 auto createDummyAtom() {
 	auto atom = yuni::make_ref<Atom>("", Atom::Type::classdef);
 	atom->builtinMapping = nyt_void;
@@ -38,6 +45,8 @@ auto findBuiltinAtom(Atom& root, nytype_t kind, const AnyString& name) {
 		case 1: {
 			assert(atom != nullptr);
 			atom->builtinMapping = kind;
+			if (unlikely(not atom->isClass()))
+				throw ExpectClass{name};
 			return Ref<Atom>{atom};
 		}
 		case 0:  throw MissingBuiltin{name};
@@ -110,6 +119,9 @@ bool AtomMap::fetchAndIndexCoreObjects() {
 	}
 	catch (const MultipleDefinition& e) {
 		ice() << "multiple definition for type '" << e.name << '\'';
+	}
+	catch (const ExpectClass& e) {
+		ice() << "expect class for '" << e.name << '\'';
 	}
 	catch (const std::exception& e) {
 		ny::complain::exception(e);
