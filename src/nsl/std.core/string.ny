@@ -322,10 +322,11 @@ public class string {
 
 	//! Fill the string with a given pattern
 	func fill(cref ascii: std.Ascii) {
-		if m_size != 0__u32 then
+		if m_size != 0__u32 then {
+			assert(m_cstr != null);
 			std.memory.fill(m_cstr, 0__u64 + m_size, ascii.asU8.pod);
+		}
 	}
-
 
 	func join(cref list): ref {
 		ref str = "";
