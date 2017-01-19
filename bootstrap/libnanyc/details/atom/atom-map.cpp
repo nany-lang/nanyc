@@ -1,6 +1,7 @@
 #include "atom-map.h"
 #include "details/reporting/report.h"
 #include "details/errors/errors.h"
+#include "details/errors/complain.h"
 
 using namespace Yuni;
 
@@ -8,6 +9,20 @@ using namespace Yuni;
 namespace ny {
 
 namespace {
+
+
+struct MissingBuiltin final: std::exception {
+	MissingBuiltin(AnyString name) : name{name} {}
+	const char* what() const noexcept override {return nullptr;}
+	AnyString name;
+};
+
+
+struct MultipleDefinition final: std::exception {
+	MultipleDefinition(AnyString name) : name{name} {}
+	const char* what() const noexcept override {return nullptr;}
+	AnyString name;
+};
 
 
 auto createDummyAtom() {
@@ -25,14 +40,9 @@ auto findBuiltinAtom(Atom& root, nytype_t kind, const AnyString& name) {
 			atom->builtinMapping = kind;
 			return Ref<Atom>{atom};
 		}
-		case 0: {
-			error() << "failed to find builtin 'class " << name << "' from nsl";
-			break;
-		}
-		default:
-			error() << "multiple definition for 'class" << name << "'";
+		case 0:  throw MissingBuiltin{name};
+		default: throw MultipleDefinition{name};
 	}
-	throw std::runtime_error("not found");
 }
 
 
@@ -95,10 +105,16 @@ bool AtomMap::fetchAndIndexCoreObjects() {
 		core.object[nyt_ptr]  = findBuiltinAtom(root, nyt_ptr,  "pointer");
 		return true;
 	}
-	catch (const std::exception&) {
-		// invalidate
-		core.object[nyt_bool] = nullptr;
+	catch (const MissingBuiltin& e) {
+		ice() << "failed to find builtin '" << e.name << '\'';
 	}
+	catch (const MultipleDefinition& e) {
+		ice() << "multiple definition for type '" << e.name << '\'';
+	}
+	catch (const std::exception& e) {
+		ny::complain::exception(e);
+	}
+	core.object[nyt_bool] = nullptr;
 	return false;
 }
 
