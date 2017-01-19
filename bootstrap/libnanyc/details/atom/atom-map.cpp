@@ -17,7 +17,7 @@ auto createDummyAtom() {
 }
 
 
-auto findCoreObject(nytype_t kind, const AnyString& name, Atom& root) {
+auto findBuiltinAtom(Atom& root, nytype_t kind, const AnyString& name) {
 	Atom* atom = nullptr;
 	switch (root.findClassAtom(atom, name)) {
 		case 1: {
@@ -81,18 +81,18 @@ bool AtomMap::fetchAndIndexCoreObjects() {
 		return true;
 	}
 	try {
-		core.object[nyt_bool] = findCoreObject(nyt_bool, "bool", root);
-		core.object[nyt_i8]   = findCoreObject(nyt_i8,   "i8",  root);
-		core.object[nyt_i16]  = findCoreObject(nyt_i16,  "i16", root);
-		core.object[nyt_i32]  = findCoreObject(nyt_i32,  "i32", root);
-		core.object[nyt_i64]  = findCoreObject(nyt_i64,  "i64", root);
-		core.object[nyt_u8]   = findCoreObject(nyt_u8,   "u8",  root);
-		core.object[nyt_u16]  = findCoreObject(nyt_u16,  "u16", root);
-		core.object[nyt_u32]  = findCoreObject(nyt_u32,  "u32", root);
-		core.object[nyt_u64]  = findCoreObject(nyt_u64,  "u64", root);
-		core.object[nyt_f32]  = findCoreObject(nyt_f32,  "f32", root);
-		core.object[nyt_f64]  = findCoreObject(nyt_f64,  "f64", root);
-		core.object[nyt_ptr]  = findCoreObject(nyt_ptr,  "pointer", root);
+		core.object[nyt_bool] = findBuiltinAtom(root, nyt_bool, "bool");
+		core.object[nyt_i8]   = findBuiltinAtom(root, nyt_i8,   "i8");
+		core.object[nyt_i16]  = findBuiltinAtom(root, nyt_i16,  "i16");
+		core.object[nyt_i32]  = findBuiltinAtom(root, nyt_i32,  "i32");
+		core.object[nyt_i64]  = findBuiltinAtom(root, nyt_i64,  "i64");
+		core.object[nyt_u8]   = findBuiltinAtom(root, nyt_u8,   "u8");
+		core.object[nyt_u16]  = findBuiltinAtom(root, nyt_u16,  "u16");
+		core.object[nyt_u32]  = findBuiltinAtom(root, nyt_u32,  "u32");
+		core.object[nyt_u64]  = findBuiltinAtom(root, nyt_u64,  "u64");
+		core.object[nyt_f32]  = findBuiltinAtom(root, nyt_f32,  "f32");
+		core.object[nyt_f64]  = findBuiltinAtom(root, nyt_f64,  "f64");
+		core.object[nyt_ptr]  = findBuiltinAtom(root, nyt_ptr,  "pointer");
 		return true;
 	}
 	catch (const std::exception&) {
