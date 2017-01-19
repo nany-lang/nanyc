@@ -100,13 +100,13 @@ public class string {
 
 	//! Increase the capacity of the container if necessary
 	func reserve(bytes: u32) {
-		if m_capacity < size.pod then
-			doGrow(size.pod);
+		if m_capacity < bytes.pod then
+			doGrow(bytes.pod);
 	}
 
 	#[nosuggest] func reserve(bytes: __u32) {
-		if m_capacity < size then
-			doGrow(size);
+		if m_capacity < bytes then
+			doGrow(bytes);
 	}
 
 	func squeeze
