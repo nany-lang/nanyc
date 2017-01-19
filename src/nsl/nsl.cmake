@@ -24,6 +24,9 @@ set(nsl_files
 	# C types
 	"${nsl_root}/std.c/ctypes.ny"
 
+	# std.reflect
+	"${nsl_root}/std.reflect/typeinfo.ny"
+
 	# std.env
 	"${nsl_root}/std.env/env.ny"
 
