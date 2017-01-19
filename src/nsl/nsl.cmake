@@ -26,6 +26,7 @@ set(nsl_files
 
 	# std.reflect
 	"${nsl_root}/std.reflect/typeinfo.ny"
+	"${nsl_root}/std.reflect/reflect.ny"
 
 	# std.env
 	"${nsl_root}/std.env/env.ny"
