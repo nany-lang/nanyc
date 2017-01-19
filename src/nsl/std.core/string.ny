@@ -41,6 +41,12 @@ public class string {
 		}
 	}
 
+	//! Fill constructor
+	operator new (cref size: u32, cref pattern: std.Ascii) {
+		resize(size);
+		fill(pattern);
+	}
+
 	operator new (str: __pointer) {
 		appendCString(str);
 	}
