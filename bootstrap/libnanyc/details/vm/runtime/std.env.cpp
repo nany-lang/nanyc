@@ -1,5 +1,5 @@
 #include "runtime.h"
-#include "details/intrinsic/intrinsic-table.h"
+#include "details/intrinsic/catalog.h"
 #include <yuni/core/string.h>
 #include <yuni/core/system/environment.h>
 
@@ -82,7 +82,7 @@ namespace nsl {
 namespace import {
 
 
-void env(IntrinsicTable& intrinsics) {
+void env(ny::intrinsic::Catalog& intrinsics) {
 	intrinsics.add("__nanyc_env_set",    _nanyc_env_set);
 	intrinsics.add("__nanyc_env_unset",  _nanyc_env_unset);
 	intrinsics.add("__nanyc_env_read",   _nanyc_env_read);

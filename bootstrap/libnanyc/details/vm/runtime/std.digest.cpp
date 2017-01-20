@@ -1,5 +1,5 @@
 #include "runtime.h"
-#include "details/intrinsic/intrinsic-table.h"
+#include "details/intrinsic/catalog.h"
 #include "details/vm/context.h"
 #include <yuni/core/hash/checksum/md5.h>
 #include <iostream>
@@ -34,7 +34,7 @@ namespace nsl {
 namespace import {
 
 
-void digest(IntrinsicTable& intrinsics) {
+void digest(ny::intrinsic::Catalog& intrinsics) {
 	intrinsics.add("__nanyc_digest_md5",   nanyc_digest_md5);
 }
 

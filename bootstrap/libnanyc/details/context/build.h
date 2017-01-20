@@ -6,7 +6,7 @@
 #include "source.h"
 #include "details/reporting/message.h"
 #include "details/atom/classdef-table.h"
-#include "details/intrinsic/intrinsic-table.h"
+#include "details/intrinsic/catalog.h"
 
 
 
@@ -101,7 +101,7 @@ public:
 	ClassdefTable cdeftable;
 
 	//! All intrinsics
-	IntrinsicTable intrinsics;
+	intrinsic::Catalog intrinsics;
 
 	//! All report messages
 	std::unique_ptr<Logs::Message> messages;

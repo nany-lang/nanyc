@@ -423,9 +423,9 @@ addsrc(
 	FILES
 	"details/intrinsic/intrinsic.h"
 	"details/intrinsic/intrinsic.cpp"
-	"details/intrinsic/intrinsic-table.h"
-	"details/intrinsic/intrinsic-table.hxx"
-	"details/intrinsic/intrinsic-table.cpp")
+	"details/intrinsic/catalog.h"
+	"details/intrinsic/catalog.hxx"
+	"details/intrinsic/catalog.cpp")
 
 addsrc(
 	NAME  nysrc_details_context

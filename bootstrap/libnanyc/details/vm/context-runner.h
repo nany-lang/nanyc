@@ -70,7 +70,7 @@ struct ContextRunner final {
 	uint32_t upperLabelID = 0;
 	const AtomMap& map;
 	std::reference_wrapper<const ir::Sequence> ircode;
-	const IntrinsicTable& userDefinedIntrinsics;
+	const ny::intrinsic::Catalog& userDefinedIntrinsics;
 	const ir::Instruction** cursor = nullptr;
 	#ifndef NDEBUG
 	//! Total number of registers in the current frame

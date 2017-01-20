@@ -1,5 +1,5 @@
 #include "runtime.h"
-#include "details/intrinsic/intrinsic-table.h"
+#include "details/intrinsic/catalog.h"
 #include <yuni/core/string.h>
 #include <yuni/core/system/environment.h>
 
@@ -43,7 +43,7 @@ namespace nsl {
 namespace import {
 
 
-void console(IntrinsicTable& intrinsics) {
+void console(ny::intrinsic::Catalog& intrinsics) {
 	intrinsics.add("__nanyc_console_out",  _nanyc_console_out);
 	intrinsics.add("__nanyc_console_err",  _nanyc_console_err);
 	intrinsics.add("__nanyc_console_out_flush",  _nanyc_console_out_flush);

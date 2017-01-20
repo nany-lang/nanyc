@@ -13,7 +13,6 @@
 
 
 namespace ny {
-class IntrinsicTable;
 class Build;
 }
 
@@ -242,7 +241,7 @@ public:
 	//! Build context
 	Build& build;
 	//! intrinsics
-	const IntrinsicTable& intrinsics;
+	const ny::intrinsic::Catalog& intrinsics;
 
 	//! All pushed parameters
 	struct PushedParameters final {

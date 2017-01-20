@@ -1,8 +1,9 @@
 #pragma once
 #include "libnanyc.h"
+#include "details/intrinsic/catalog.h"
 
 
-namespace ny { class Project; class IntrinsicTable; }
+namespace ny { class Project; }
 
 namespace ny {
 namespace nsl {
@@ -16,25 +17,25 @@ void core(Project&);
 void unittests(Project&);
 
 //! Import intrinsics related to string manipulation
-void string(IntrinsicTable&);
+void string(ny::intrinsic::Catalog&);
 
 //! Import 'std.memory'
-void memory(IntrinsicTable&);
+void memory(ny::intrinsic::Catalog&);
 
 //! Import intrinsics related to IO accesses
-void io(IntrinsicTable&);
+void io(ny::intrinsic::Catalog&);
 
 //! Import intrinsics related to process manipulation
-void process(IntrinsicTable&);
+void process(ny::intrinsic::Catalog&);
 
 //! Import intrinsics related to environment variables manipulation
-void env(IntrinsicTable&);
+void env(ny::intrinsic::Catalog&);
 
 //! Import intrinsics related to console management
-void console(IntrinsicTable&);
+void console(ny::intrinsic::Catalog&);
 
 //! Import intrinsics related to digest
-void digest(IntrinsicTable&);
+void digest(ny::intrinsic::Catalog&);
 
 
 } // namespace import
