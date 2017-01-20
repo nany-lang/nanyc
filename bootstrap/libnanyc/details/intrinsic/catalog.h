@@ -15,8 +15,7 @@ namespace intrinsic {
 struct Catalog final {
 	//! Default constructor
 	Catalog();
-	//! Copy constructor
-	Catalog(const Catalog&) = default;
+	Catalog(const Catalog&) = delete;
 
 	//! Add a new intrinsic
 	template<class T> bool add(const AnyString& name, T callback);
@@ -33,6 +32,8 @@ struct Catalog final {
 
 	//! Get the intrinsic for a given intrinsic id
 	const Intrinsic& operator [] (uint32_t id) const;
+
+	const Catalog& operator = (const Catalog&) = delete;
 
 
 private:
