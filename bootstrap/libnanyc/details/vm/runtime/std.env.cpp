@@ -83,13 +83,13 @@ namespace import {
 
 
 void env(ny::intrinsic::Catalog& intrinsics) {
-	intrinsics.add("__nanyc_env_set",    _nanyc_env_set);
-	intrinsics.add("__nanyc_env_unset",  _nanyc_env_unset);
-	intrinsics.add("__nanyc_env_read",   _nanyc_env_read);
-	intrinsics.add("__nanyc_env_asbool", _nanyc_env_read_as_bool);
-	intrinsics.add("__nanyc_env_asi64",  _nanyc_env_read_as_i64);
-	intrinsics.add("__nanyc_env_asu64",  _nanyc_env_read_as_u64);
-	intrinsics.add("__nanyc_env_exists", _nanyc_env_exists);
+	intrinsics.emplace("__nanyc_env_set",    _nanyc_env_set);
+	intrinsics.emplace("__nanyc_env_unset",  _nanyc_env_unset);
+	intrinsics.emplace("__nanyc_env_read",   _nanyc_env_read);
+	intrinsics.emplace("__nanyc_env_asbool", _nanyc_env_read_as_bool);
+	intrinsics.emplace("__nanyc_env_asi64",  _nanyc_env_read_as_i64);
+	intrinsics.emplace("__nanyc_env_asu64",  _nanyc_env_read_as_u64);
+	intrinsics.emplace("__nanyc_env_exists", _nanyc_env_exists);
 }
 
 

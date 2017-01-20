@@ -16,7 +16,7 @@ namespace import {
 
 
 void process(ny::intrinsic::Catalog& intrinsics) {
-	intrinsics.add("__nanyc_os_execute",   nanyc_os_process_execute);
+	intrinsics.emplace("__nanyc_os_execute",   nanyc_os_process_execute);
 }
 
 

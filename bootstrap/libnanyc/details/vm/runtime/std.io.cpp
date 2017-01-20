@@ -391,37 +391,37 @@ namespace import {
 
 
 void io(ny::intrinsic::Catalog& intrinsics) {
-	intrinsics.add("__nanyc_io_set_cwd",  nanyc_io_set_cwd);
-	intrinsics.add("__nanyc_io_get_cwd",  nanyc_io_get_cwd);
-	intrinsics.add("__nanyc_io_folder_create",  nanyc_io_folder_create);
-	intrinsics.add("__nanyc_io_folder_erase",  nanyc_io_folder_erase);
-	intrinsics.add("__nanyc_io_folder_clear",  nanyc_io_folder_clear);
-	intrinsics.add("__nanyc_io_folder_size",  nanyc_io_folder_size);
-	intrinsics.add("__nanyc_io_folder_exists",  nanyc_io_folder_exists);
-	intrinsics.add("__nanyc_io_folder_copy",  nanyc_io_folder_copy);
-	intrinsics.add("__nanyc_io_folder_iterate",  nanyc_io_folder_iterate);
-	intrinsics.add("__nanyc_io_folder_iterator_close",  nanyc_io_folder_iterator_close);
-	intrinsics.add("__nanyc_io_folder_iterator_size",  nanyc_io_folder_iterator_size);
-	intrinsics.add("__nanyc_io_folder_iterator_name",  nanyc_io_folder_iterator_name);
-	intrinsics.add("__nanyc_io_folder_iterator_fullpath",  nanyc_io_folder_iterator_fullpath);
-	intrinsics.add("__nanyc_io_folder_iterator_next",  nanyc_io_folder_iterator_next);
-	intrinsics.add("__nanyc_io_file_exists", nanyc_io_file_exists);
-	intrinsics.add("__nanyc_io_file_size",   nanyc_io_file_size);
-	intrinsics.add("__nanyc_io_file_resize", nanyc_io_file_resize);
-	intrinsics.add("__nanyc_io_file_erase",  nanyc_io_file_erase);
-	intrinsics.add("__nanyc_io_file_set_contents",  nanyc_io_file_set_contents);
-	intrinsics.add("__nanyc_io_file_get_contents",  nanyc_io_file_get_contents);
-	intrinsics.add("__nanyc_io_file_open",   nanyc_io_file_open);
-	intrinsics.add("__nanyc_io_file_close",  nanyc_io_file_close);
-	intrinsics.add("__nanyc_io_file_flush",  nanyc_io_file_flush);
-	intrinsics.add("__nanyc_io_file_write",  nanyc_io_file_write);
-	intrinsics.add("__nanyc_io_file_read",   nanyc_io_file_read);
-	intrinsics.add("__nanyc_io_file_eof",   nanyc_io_file_eof);
-	intrinsics.add("__nanyc_io_file_seek",   nanyc_io_file_seek_set);
-	intrinsics.add("__nanyc_io_file_seek_from_end",   nanyc_io_file_seek_from_end);
-	intrinsics.add("__nanyc_io_file_seek_cur",   nanyc_io_file_seek_cur);
-	intrinsics.add("__nanyc_io_file_tell",   nanyc_io_file_tell);
-	intrinsics.add("__nanyc_io_mount_local",   nanyc_io_mount_local);
+	intrinsics.emplace("__nanyc_io_set_cwd",  nanyc_io_set_cwd);
+	intrinsics.emplace("__nanyc_io_get_cwd",  nanyc_io_get_cwd);
+	intrinsics.emplace("__nanyc_io_folder_create",  nanyc_io_folder_create);
+	intrinsics.emplace("__nanyc_io_folder_erase",  nanyc_io_folder_erase);
+	intrinsics.emplace("__nanyc_io_folder_clear",  nanyc_io_folder_clear);
+	intrinsics.emplace("__nanyc_io_folder_size",  nanyc_io_folder_size);
+	intrinsics.emplace("__nanyc_io_folder_exists",  nanyc_io_folder_exists);
+	intrinsics.emplace("__nanyc_io_folder_copy",  nanyc_io_folder_copy);
+	intrinsics.emplace("__nanyc_io_folder_iterate",  nanyc_io_folder_iterate);
+	intrinsics.emplace("__nanyc_io_folder_iterator_close",  nanyc_io_folder_iterator_close);
+	intrinsics.emplace("__nanyc_io_folder_iterator_size",  nanyc_io_folder_iterator_size);
+	intrinsics.emplace("__nanyc_io_folder_iterator_name",  nanyc_io_folder_iterator_name);
+	intrinsics.emplace("__nanyc_io_folder_iterator_fullpath",  nanyc_io_folder_iterator_fullpath);
+	intrinsics.emplace("__nanyc_io_folder_iterator_next",  nanyc_io_folder_iterator_next);
+	intrinsics.emplace("__nanyc_io_file_exists", nanyc_io_file_exists);
+	intrinsics.emplace("__nanyc_io_file_size",   nanyc_io_file_size);
+	intrinsics.emplace("__nanyc_io_file_resize", nanyc_io_file_resize);
+	intrinsics.emplace("__nanyc_io_file_erase",  nanyc_io_file_erase);
+	intrinsics.emplace("__nanyc_io_file_set_contents",  nanyc_io_file_set_contents);
+	intrinsics.emplace("__nanyc_io_file_get_contents",  nanyc_io_file_get_contents);
+	intrinsics.emplace("__nanyc_io_file_open",   nanyc_io_file_open);
+	intrinsics.emplace("__nanyc_io_file_close",  nanyc_io_file_close);
+	intrinsics.emplace("__nanyc_io_file_flush",  nanyc_io_file_flush);
+	intrinsics.emplace("__nanyc_io_file_write",  nanyc_io_file_write);
+	intrinsics.emplace("__nanyc_io_file_read",   nanyc_io_file_read);
+	intrinsics.emplace("__nanyc_io_file_eof",   nanyc_io_file_eof);
+	intrinsics.emplace("__nanyc_io_file_seek",   nanyc_io_file_seek_set);
+	intrinsics.emplace("__nanyc_io_file_seek_from_end",   nanyc_io_file_seek_from_end);
+	intrinsics.emplace("__nanyc_io_file_seek_cur",   nanyc_io_file_seek_cur);
+	intrinsics.emplace("__nanyc_io_file_tell",   nanyc_io_file_tell);
+	intrinsics.emplace("__nanyc_io_mount_local",   nanyc_io_mount_local);
 }
 
 

@@ -44,12 +44,12 @@ namespace import {
 
 
 void console(ny::intrinsic::Catalog& intrinsics) {
-	intrinsics.add("__nanyc_console_out",  _nanyc_console_out);
-	intrinsics.add("__nanyc_console_err",  _nanyc_console_err);
-	intrinsics.add("__nanyc_console_out_flush",  _nanyc_console_out_flush);
-	intrinsics.add("__nanyc_console_err_flush",  _nanyc_console_err_flush);
-	intrinsics.add("__nanyc_console_out_has_colors",  _nanyc_console_out_has_colors);
-	intrinsics.add("__nanyc_console_err_has_colors",  _nanyc_console_err_has_colors);
+	intrinsics.emplace("__nanyc_console_out",  _nanyc_console_out);
+	intrinsics.emplace("__nanyc_console_err",  _nanyc_console_err);
+	intrinsics.emplace("__nanyc_console_out_flush",  _nanyc_console_out_flush);
+	intrinsics.emplace("__nanyc_console_err_flush",  _nanyc_console_err_flush);
+	intrinsics.emplace("__nanyc_console_out_has_colors",  _nanyc_console_out_has_colors);
+	intrinsics.emplace("__nanyc_console_err_has_colors",  _nanyc_console_err_has_colors);
 }
 
 

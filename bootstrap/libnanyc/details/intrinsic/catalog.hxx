@@ -82,16 +82,18 @@ template<uint N, class T> struct IntrinsicPushParameter<N, N, T> final {
 
 
 template<class T>
-inline bool Catalog::add(const AnyString& name, T callback) {
-	if (YUNI_UNLIKELY(name.empty() or (0 != m_names.count(name))))
-		return false;
+inline void Catalog::emplace(const AnyString& name, T callback) {
+	assert(not name.empty());
+	assert(not exists(name));
+	assert(name.size() < Name::chunkSize and "intrinsic name too long");
 	using B = Yuni::Bind<T>;
 	static_assert(B::argumentCount < config::maxPushedParameters, "too many params");
-	auto ptr = yuni::make_ref<Intrinsic>(name, reinterpret_cast<void*>(callback));
-	m_intrinsics.emplace_back(ptr);
-	auto& intrinsic = *ptr;
-	m_names.insert(std::make_pair(AnyString{intrinsic.name}, &intrinsic));
-	intrinsic.id = ((uint32_t)m_intrinsics.size() - 1);
+	// emplace
+	uint32_t id = size();
+	m_intrinsics.emplace_back(reinterpret_cast<void*>(callback), id);
+	auto& intrinsic = m_intrinsics.back();
+	m_names.emplace(std::piecewise_construct,
+		std::forward_as_tuple(name), std::forward_as_tuple(id));
 	// return type / parameters
 	if (B::hasReturnValue)
 		intrinsic.rettype = CTypeToNanyType<typename B::ReturnType>::type;
@@ -102,7 +104,6 @@ inline bool Catalog::add(const AnyString& name, T callback) {
 		IntrinsicPushParameter<1, B::argumentCount, B>::push(intrinsic);
 		intrinsic.paramcount = static_cast<uint32_t>(B::argumentCount - 1);
 	}
-	return true;
 }
 
 
@@ -123,13 +124,13 @@ inline uint32_t Catalog::size() const {
 
 inline const Intrinsic* Catalog::find(const AnyString& name) const {
 	auto it = m_names.find(name);
-	return (it != m_names.end()) ? &*(it->second) : nullptr;
+	return (it != m_names.end()) ? &operator[](it->second) : nullptr;
 }
 
 
 inline const Intrinsic& Catalog::operator [] (uint32_t id) const {
 	assert(id < m_intrinsics.size());
-	return *(m_intrinsics[id]);
+	return m_intrinsics[id];
 }
 
 
