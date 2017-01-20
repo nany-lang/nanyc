@@ -28,7 +28,7 @@ struct Catalog final {
 	uint32_t size() const;
 
 	//! Find an intrinsic by its name
-	yuni::Ref<Intrinsic> find(const AnyString& name) const;
+	const Intrinsic* find(const AnyString& name) const;
 
 	//! Get the intrinsic for a given intrinsic id
 	const Intrinsic& operator [] (uint32_t id) const;

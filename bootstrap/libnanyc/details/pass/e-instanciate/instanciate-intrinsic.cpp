@@ -32,10 +32,10 @@ bool SequenceBuilder::instanciateUserDefinedIntrinsic(const ir::isa::Operand<ir:
 		}
 
 		// trying user-defined intrinsic
-		auto intrinsic = intrinsics.find(name);
+		auto* intrinsic = intrinsics.find(name);
 
 		// if not found, this could be a compiler intrinsic
-		if (intrinsic == nullptr) {
+		if (!intrinsic) {
 			switch (instanciateBuiltinIntrinsic(name, operands.lvid, false)) {
 				case Tribool::Value::indeterminate:
 					break; // not found
@@ -50,7 +50,7 @@ bool SequenceBuilder::instanciateUserDefinedIntrinsic(const ir::isa::Operand<ir:
 				if (retry == nytrue)
 					intrinsic = intrinsics.find(name);
 			}
-			if (unlikely(intrinsic == nullptr))
+			if (unlikely(!intrinsic))
 				return complain::unknownIntrinsic(name);
 		}
 
