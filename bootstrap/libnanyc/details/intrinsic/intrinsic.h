@@ -18,9 +18,10 @@ struct Intrinsic final
 	: public Yuni::IIntrusiveSmartPtr<Intrinsic, false, Yuni::Policy::SingleThreaded>
 	, Yuni::NonCopyable<Intrinsic> {
 public:
-	Intrinsic(const AnyString& name, void* callback)
+	Intrinsic(const AnyString& inname, void* callback)
 		: callback(callback)
-		, name(name) {
+		, name(inname) {
+		assert(inname.size() < name.chunkSize and "intrinsic name too long");
 	}
 
 	Intrinsic(const Intrinsic&) = default;
