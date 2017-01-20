@@ -33,7 +33,7 @@ public:
 	//! C-Callback
 	void* callback = nullptr;
 	//! name of the intrinsic
-	const Yuni::ShortString64 name;
+	const yuni::CString<40,false> name;
 	//! The return type
 	nytype_t rettype = nyt_void;
 	//! The total number of parameters
