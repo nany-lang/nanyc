@@ -422,7 +422,6 @@ addsrc(
 	GROUP "details/intrinsic"
 	FILES
 	"details/intrinsic/intrinsic.h"
-	"details/intrinsic/intrinsic.cpp"
 	"details/intrinsic/catalog.h"
 	"details/intrinsic/catalog.hxx"
 	"details/intrinsic/catalog.cpp")
