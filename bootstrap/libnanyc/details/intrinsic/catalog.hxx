@@ -1,9 +1,10 @@
 #pragma once
-#include "intrinsic-table.h"
+#include "catalog.h"
 #include <yuni/core/static/types.h>
 
 
 namespace ny {
+namespace intrinsic {
 
 
 template<class T> struct CTypeToNanyType {};
@@ -81,7 +82,7 @@ template<uint N, class T> struct IntrinsicPushParameter<N, N, T> final {
 
 
 template<class T>
-inline bool IntrinsicTable::add(const AnyString& name, T callback) {
+inline bool Catalog::add(const AnyString& name, T callback) {
 	if (YUNI_UNLIKELY(name.empty() or (0 != m_names.count(name))))
 		return false;
 	using B = Yuni::Bind<T>;
@@ -105,31 +106,32 @@ inline bool IntrinsicTable::add(const AnyString& name, T callback) {
 }
 
 
-inline bool IntrinsicTable::exists(const AnyString& name) const {
-	return (0 != m_names.count(name));
+inline bool Catalog::exists(const AnyString& name) const {
+	return m_names.count(name) != 0;
 }
 
 
-inline bool IntrinsicTable::empty() const {
+inline bool Catalog::empty() const {
 	return m_intrinsics.empty();
 }
 
 
-inline uint32_t IntrinsicTable::size() const {
+inline uint32_t Catalog::size() const {
 	return static_cast<uint32_t>(m_intrinsics.size());
 }
 
 
-inline yuni::Ref<Intrinsic> IntrinsicTable::find(const AnyString& name) const {
+inline yuni::Ref<Intrinsic> Catalog::find(const AnyString& name) const {
 	auto it = m_names.find(name);
 	return (it != m_names.end()) ? it->second : nullptr;
 }
 
 
-inline const Intrinsic& IntrinsicTable::operator [] (uint32_t id) const {
+inline const Intrinsic& Catalog::operator [] (uint32_t id) const {
 	assert(id < m_intrinsics.size());
 	return *(m_intrinsics[id]);
 }
 
 
+} // namespace intrinsic
 } // namespace ny

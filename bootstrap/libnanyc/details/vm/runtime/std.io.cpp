@@ -1,6 +1,6 @@
 #include "std.core.h"
 #include "runtime.h"
-#include "details/intrinsic/intrinsic-table.h"
+#include "details/intrinsic/catalog.h"
 #include <yuni/yuni.h>
 #include <yuni/core/string.h>
 #include <yuni/io/file.h>
@@ -390,7 +390,7 @@ namespace nsl {
 namespace import {
 
 
-void io(IntrinsicTable& intrinsics) {
+void io(ny::intrinsic::Catalog& intrinsics) {
 	intrinsics.add("__nanyc_io_set_cwd",  nanyc_io_set_cwd);
 	intrinsics.add("__nanyc_io_get_cwd",  nanyc_io_get_cwd);
 	intrinsics.add("__nanyc_io_folder_create",  nanyc_io_folder_create);

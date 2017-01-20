@@ -9,13 +9,14 @@
 
 
 namespace ny {
+namespace intrinsic {
 
 
-struct IntrinsicTable final {
+struct Catalog final {
 	//! Default constructor
-	IntrinsicTable();
+	Catalog();
 	//! Copy constructor
-	IntrinsicTable(const IntrinsicTable&) = default;
+	Catalog(const Catalog&) = default;
 
 	//! Add a new intrinsic
 	template<class T> bool add(const AnyString& name, T callback);
@@ -40,9 +41,10 @@ private:
 	//! All intrinsics, ordered by their name
 	std::unordered_map<AnyString, yuni::Ref<Intrinsic>> m_names;
 
-}; // class IntrinsicTable
+}; // struct Catalog
 
 
+} // namespace intrinsic
 } // namespace ny
 
-#include "intrinsic-table.hxx"
+#include "catalog.hxx"

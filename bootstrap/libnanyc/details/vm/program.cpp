@@ -1,6 +1,6 @@
 #include "program.h"
 #include "details/atom/atom.h"
-#include "details/intrinsic/intrinsic-table.h"
+#include "details/intrinsic/catalog.h"
 #include "types.h"
 #include "details/vm/context.h"
 

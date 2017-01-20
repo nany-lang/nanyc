@@ -3,7 +3,7 @@
 #include <yuni/core/string.h>
 #include "details/grammar/nany.h"
 #include "details/ast/tree-index.h"
-#include "details/intrinsic/intrinsic-table.h"
+#include "details/intrinsic/catalog.h"
 #include "details/ir/sequence.h"
 #include "nany/nany.h"
 

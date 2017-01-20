@@ -1,5 +1,5 @@
 #include "runtime.h"
-#include "details/intrinsic/intrinsic-table.h"
+#include "details/intrinsic/catalog.h"
 
 using namespace Yuni;
 
@@ -38,7 +38,7 @@ namespace nsl {
 namespace import {
 
 
-void string(IntrinsicTable& intrinsics) {
+void string(ny::intrinsic::Catalog& intrinsics) {
 	intrinsics.add("__nanyc.string.append.u8",   nanyc_string_append<uint8_t>);
 	intrinsics.add("__nanyc.string.append.u16",  nanyc_string_append<uint16_t>);
 	intrinsics.add("__nanyc.string.append.u32",  nanyc_string_append<uint32_t>);

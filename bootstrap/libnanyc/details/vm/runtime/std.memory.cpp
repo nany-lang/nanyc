@@ -1,5 +1,5 @@
 #include "std.core.h"
-#include "details/intrinsic/intrinsic-table.h"
+#include "details/intrinsic/catalog.h"
 #include <limits>
 
 
@@ -17,7 +17,7 @@ namespace nsl {
 namespace import {
 
 
-void memory(IntrinsicTable& intrinsics) {
+void memory(ny::intrinsic::Catalog& intrinsics) {
 	intrinsics.add("strlen32",  nanyc_strlen<uint32_t>);
 	intrinsics.add("strlen64",  nanyc_strlen<uint64_t>);
 }

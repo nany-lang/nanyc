@@ -1,5 +1,5 @@
 #include "instanciate.h"
-#include "details/intrinsic/intrinsic-table.h"
+#include "details/intrinsic/catalog.h"
 #include "instanciate-error.h"
 
 using namespace Yuni;

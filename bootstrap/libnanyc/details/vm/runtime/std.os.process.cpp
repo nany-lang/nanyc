@@ -1,5 +1,5 @@
 #include "std.core.h"
-#include "details/intrinsic/intrinsic-table.h"
+#include "details/intrinsic/catalog.h"
 #include <yuni/core/process/program.h>
 
 using namespace Yuni;
@@ -15,7 +15,7 @@ namespace nsl {
 namespace import {
 
 
-void process(IntrinsicTable& intrinsics) {
+void process(ny::intrinsic::Catalog& intrinsics) {
 	intrinsics.add("__nanyc_os_execute",   nanyc_os_process_execute);
 }
 
