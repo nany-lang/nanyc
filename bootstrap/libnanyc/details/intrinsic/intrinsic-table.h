@@ -8,17 +8,14 @@
 #include <stdarg.h>
 
 
-
 namespace ny {
 
-class IntrinsicTable final {
-public:
+
+struct IntrinsicTable final {
 	//! Default constructor
 	IntrinsicTable();
 	//! Copy constructor
 	IntrinsicTable(const IntrinsicTable&) = default;
-	//! Destructor
-	~IntrinsicTable() = default;
 
 	//! Add a new intrinsic
 	template<class T> bool add(const AnyString& name, T callback);
@@ -27,10 +24,8 @@ public:
 
 	//! Get if an intrinsic exists
 	bool exists(const AnyString& name) const;
-
 	//! Get if empty
 	bool empty() const;
-
 	//! The total number of user-defined intrinsics
 	uint32_t size() const;
 
@@ -43,14 +38,11 @@ public:
 
 private:
 	//! All intrinsics
-	std::vector<yuni::Ref<Intrinsic>> pIntrinsics;
+	std::vector<yuni::Ref<Intrinsic>> m_intrinsics;
 	//! All intrinsics, ordered by their name
-	std::unordered_map<AnyString, yuni::Ref<Intrinsic>> pByNames;
+	std::unordered_map<AnyString, yuni::Ref<Intrinsic>> m_names;
 
 }; // class IntrinsicTable
-
-
-
 
 
 } // namespace ny

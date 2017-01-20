@@ -82,15 +82,15 @@ template<uint N, class T> struct IntrinsicPushParameter<N, N, T> final {
 
 template<class T>
 inline bool IntrinsicTable::add(const AnyString& name, T callback) {
-	if (YUNI_UNLIKELY(name.empty() or (0 != pByNames.count(name))))
+	if (YUNI_UNLIKELY(name.empty() or (0 != m_names.count(name))))
 		return false;
 	using B = Yuni::Bind<T>;
 	static_assert(B::argumentCount < config::maxPushedParameters, "too many params");
 	auto ptr = yuni::make_ref<Intrinsic>(name, reinterpret_cast<void*>(callback));
-	pIntrinsics.emplace_back(ptr);
+	m_intrinsics.emplace_back(ptr);
 	auto& intrinsic = *ptr;
-	pByNames.insert(std::make_pair(AnyString{intrinsic.name}, &intrinsic));
-	intrinsic.id = ((uint32_t)pIntrinsics.size() - 1);
+	m_names.insert(std::make_pair(AnyString{intrinsic.name}, &intrinsic));
+	intrinsic.id = ((uint32_t)m_intrinsics.size() - 1);
 	// return type / parameters
 	if (B::hasReturnValue)
 		intrinsic.rettype = CTypeToNanyType<typename B::ReturnType>::type;
@@ -106,29 +106,29 @@ inline bool IntrinsicTable::add(const AnyString& name, T callback) {
 
 
 inline bool IntrinsicTable::exists(const AnyString& name) const {
-	return (0 != pByNames.count(name));
+	return (0 != m_names.count(name));
 }
 
 
 inline bool IntrinsicTable::empty() const {
-	return pIntrinsics.empty();
+	return m_intrinsics.empty();
 }
 
 
 inline uint32_t IntrinsicTable::size() const {
-	return static_cast<uint32_t>(pIntrinsics.size());
+	return static_cast<uint32_t>(m_intrinsics.size());
 }
 
 
 inline yuni::Ref<Intrinsic> IntrinsicTable::find(const AnyString& name) const {
-	auto it = pByNames.find(name);
-	return (it != pByNames.end()) ? it->second : nullptr;
+	auto it = m_names.find(name);
+	return (it != m_names.end()) ? it->second : nullptr;
 }
 
 
 inline const Intrinsic& IntrinsicTable::operator [] (uint32_t id) const {
-	assert(id < pIntrinsics.size());
-	return *(pIntrinsics[id]);
+	assert(id < m_intrinsics.size());
+	return *(m_intrinsics[id]);
 }
 
 
