@@ -18,8 +18,8 @@ namespace import {
 
 
 void memory(ny::intrinsic::Catalog& intrinsics) {
-	intrinsics.add("strlen32",  nanyc_strlen<uint32_t>);
-	intrinsics.add("strlen64",  nanyc_strlen<uint64_t>);
+	intrinsics.emplace("strlen32",  nanyc_strlen<uint32_t>);
+	intrinsics.emplace("strlen64",  nanyc_strlen<uint64_t>);
 }
 
 

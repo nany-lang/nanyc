@@ -18,7 +18,8 @@ struct Catalog final {
 	Catalog(const Catalog&) = delete;
 
 	//! Add a new intrinsic
-	template<class T> bool add(const AnyString& name, T callback);
+	// (no check performed if already exists)
+	template<class T> void emplace(const AnyString& name, T callback);
 
 	//! Get if an intrinsic exists
 	bool exists(const AnyString& name) const;
@@ -37,10 +38,11 @@ struct Catalog final {
 
 
 private:
+	using Name = yuni::CString<40,false>;
 	//! All intrinsics
-	std::vector<yuni::Ref<Intrinsic>> m_intrinsics;
+	std::vector<Intrinsic> m_intrinsics;
 	//! All intrinsics, ordered by their name
-	std::unordered_map<AnyString, yuni::Ref<Intrinsic>> m_names;
+	std::unordered_map<Name, uint32_t> m_names;
 
 }; // struct Catalog
 

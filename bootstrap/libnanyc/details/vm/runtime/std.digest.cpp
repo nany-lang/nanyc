@@ -35,7 +35,7 @@ namespace import {
 
 
 void digest(ny::intrinsic::Catalog& intrinsics) {
-	intrinsics.add("__nanyc_digest_md5",   nanyc_digest_md5);
+	intrinsics.emplace("__nanyc_digest_md5",   nanyc_digest_md5);
 }
 
 
