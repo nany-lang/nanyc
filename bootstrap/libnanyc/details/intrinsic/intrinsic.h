@@ -14,14 +14,9 @@ namespace ny {
 /*!
 ** \brief Definition of a single user-defined intrinsic
 */
-class Intrinsic final
+struct Intrinsic final
 	: public Yuni::IIntrusiveSmartPtr<Intrinsic, false, Yuni::Policy::SingleThreaded>
 	, Yuni::NonCopyable<Intrinsic> {
-public:
-	//! The class ancestor
-	using Ancestor = Yuni::IIntrusiveSmartPtr<Intrinsic, false, Yuni::Policy::SingleThreaded>;
-
-
 public:
 	Intrinsic(const AnyString& name, void* callback)
 		: callback(callback)
@@ -47,9 +42,7 @@ public:
 	//! Intrinsic ID
 	uint32_t id = (uint32_t) - 1;
 
-}; // class Intrinsic
-
-
+}; // struct Intrinsic
 
 
 } // namespace ny
