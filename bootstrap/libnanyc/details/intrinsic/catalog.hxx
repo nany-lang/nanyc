@@ -121,9 +121,9 @@ inline uint32_t Catalog::size() const {
 }
 
 
-inline yuni::Ref<Intrinsic> Catalog::find(const AnyString& name) const {
+inline const Intrinsic* Catalog::find(const AnyString& name) const {
 	auto it = m_names.find(name);
-	return (it != m_names.end()) ? it->second : nullptr;
+	return (it != m_names.end()) ? &*(it->second) : nullptr;
 }
 
 
