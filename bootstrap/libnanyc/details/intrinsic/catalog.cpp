@@ -6,7 +6,7 @@ namespace intrinsic {
 
 
 Catalog::Catalog() {
-	m_intrinsics.reserve(64);
+	m_intrinsics.reserve(128);
 }
 
 
