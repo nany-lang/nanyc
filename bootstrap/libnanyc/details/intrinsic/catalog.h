@@ -39,6 +39,9 @@ struct Catalog final {
 
 private:
 	using Name = yuni::CString<40,false>;
+
+	Intrinsic& makeIntrinsic(const AnyString& name, void* callback);
+
 	//! All intrinsics
 	std::vector<Intrinsic> m_intrinsics;
 	//! All intrinsics, ordered by their name
