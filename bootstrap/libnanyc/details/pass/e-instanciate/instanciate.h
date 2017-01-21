@@ -180,7 +180,6 @@ struct SequenceBuilder final {
 	void declareNamedVariable(const AnyString& name, uint32_t lvid, bool autorelease = true);
 
 	void instanciateInstrinsicCall();
-	bool instanciateUserDefinedIntrinsic(const ir::isa::Operand<ir::isa::Op::intrinsic>& operands);
 	Yuni::Tribool::Value instanciateBuiltinIntrinsic(const AnyString& name, uint32_t lvid,
 		bool canComplain = true);
 	Yuni::Tribool::Value instanciateBuiltinIntrinsicSpecific(const AnyString& name, uint32_t lvid,
