@@ -8,6 +8,7 @@
 
 
 namespace ny {
+namespace intrinsic {
 
 
 //! Definition of a single user-defined intrinsic
@@ -28,4 +29,5 @@ struct Intrinsic final {
 }; // struct Intrinsic
 
 
+} // namespace intrinsic
 } // namespace ny
