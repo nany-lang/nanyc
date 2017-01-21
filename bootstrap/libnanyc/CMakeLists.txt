@@ -247,59 +247,64 @@ addsrc(
 	"details/pass/d-object-map/attach.cpp")
 
 addsrc(
-	NAME  nysrc_details_pass_build_instanciate
-	GROUP "details/pass/e-instanciate"
+	NAME  nysrc_details_pass_build_semantic
+	GROUP "details/pass/e-semantic"
 	FILES
-	"details/pass/e-instanciate/instanciate.cpp"
-	"details/pass/e-instanciate/instanciate-atom.cpp"
-	"details/pass/e-instanciate/instanciate-atom.h"
-	"details/pass/e-instanciate/instanciate.h"
-	"details/pass/e-instanciate/instanciate.hxx"
+	"details/pass/e-semantic/semantic.cpp")
 
-	"details/pass/e-instanciate/type-check.cpp"
-	"details/pass/e-instanciate/type-check.h"
-	"details/pass/e-instanciate/func-overload-match.cpp"
-	"details/pass/e-instanciate/func-overload-match.h"
+addsrc(
+	NAME  nysrc_details_semantic
+	GROUP "details/semantic"
+	FILES
+	"details/semantic/semantic-analysis.cpp"
+	"details/semantic/semantic-analysis.h"
+	"details/semantic/semantic-analysis.hxx"
+	"details/semantic/atom-factory.cpp"
+	"details/semantic/atom-factory.h"
+	"details/semantic/type-check.cpp"
+	"details/semantic/type-check.h"
+	"details/semantic/func-overload-match.cpp"
+	"details/semantic/func-overload-match.h"
+	"details/semantic/overloaded-func-call-resolution.cpp"
+	"details/semantic/overloaded-func-call-resolution.h"
+	"details/semantic/stack-frame.h"
+	"details/semantic/stack-frame.hxx"
+	"details/semantic/capture-variable.cpp"
+	"details/semantic/ref-unref.h"
+	"details/semantic/assignment.cpp"
+	"details/semantic/member-variable-default-init.cpp"
+	"details/semantic/member-variable-default-dispose.cpp"
+	"details/semantic/member-variable-default-clone.cpp"
+	"details/semantic/update-all-stackalloc.cpp"
+	"details/semantic/debug.h"
+	"details/semantic/debug.cpp"
+	"details/semantic/deprecated-error.h"
+	"details/semantic/deprecated-error.cpp"
+	"details/semantic/error-not-declared.cpp"
 
-	"details/pass/e-instanciate/stack-frame.h"
-	"details/pass/e-instanciate/stack-frame.hxx"
-	"details/pass/e-instanciate/ref-unref.h"
-	"details/pass/e-instanciate/ref-unref.cpp"
-	"details/pass/e-instanciate/instanciate-capture-variable.cpp"
-	"details/pass/e-instanciate/instanciate-identify.cpp"
-	"details/pass/e-instanciate/instanciate-ensure-resolved.cpp"
-	"details/pass/e-instanciate/instanciate-self.cpp"
-	"details/pass/e-instanciate/instanciate-follow.cpp"
-	"details/pass/e-instanciate/instanciate-allocate.cpp"
-	"details/pass/e-instanciate/instanciate-stacksize.cpp"
-	"details/pass/e-instanciate/instanciate-alias.cpp"
-	"details/pass/e-instanciate/instanciate-store.cpp"
-	"details/pass/e-instanciate/instanciate-push.cpp"
-	"details/pass/e-instanciate/instanciate-builtin.cpp"
-	"details/pass/e-instanciate/instanciate-call.cpp"
-	"details/pass/e-instanciate/instanciate-sizeof.cpp"
-	"details/pass/e-instanciate/instanciate-error.h"
-	"details/pass/e-instanciate/instanciate-error.cpp"
-	"details/pass/e-instanciate/instanciate-error-not-declared.cpp"
-	"details/pass/e-instanciate/instanciate-intrinsic.cpp"
-	"details/pass/e-instanciate/instanciate-intrinsic-builtin.cpp"
-	"details/pass/e-instanciate/instanciate-intrinsic-builtin-specific.cpp"
-	"details/pass/e-instanciate/instanciate-return.cpp"
-	"details/pass/e-instanciate/instanciate-scope.cpp"
-	"details/pass/e-instanciate/instanciate-pragma.cpp"
-	"details/pass/e-instanciate/instanciate-blueprint.cpp"
-	"details/pass/e-instanciate/instanciate-assignment.cpp"
-	"details/pass/e-instanciate/instanciate-assign.cpp"
-	"details/pass/e-instanciate/instanciate-typeisobject.cpp"
-	"details/pass/e-instanciate/instanciate-commontype.cpp"
-	"details/pass/e-instanciate/instanciate-member-variable-default-init.cpp"
-	"details/pass/e-instanciate/instanciate-member-variable-default-dispose.cpp"
-	"details/pass/e-instanciate/instanciate-member-variable-default-clone.cpp"
-	"details/pass/e-instanciate/instanciate-update-all-stackalloc.cpp"
-	"details/pass/e-instanciate/instanciate-debug.h"
-	"details/pass/e-instanciate/instanciate-debug.cpp"
-	"details/pass/e-instanciate/overloaded-func-call-resolution.cpp"
-	"details/pass/e-instanciate/overloaded-func-call-resolution.h")
+	"details/semantic/opcode-ref-unref.cpp"
+	"details/semantic/opcode-identify.cpp"
+	"details/semantic/opcode-ensure-resolved.cpp"
+	"details/semantic/opcode-self.cpp"
+	"details/semantic/opcode-follow.cpp"
+	"details/semantic/opcode-allocate.cpp"
+	"details/semantic/opcode-stacksize.cpp"
+	"details/semantic/opcode-alias.cpp"
+	"details/semantic/opcode-store.cpp"
+	"details/semantic/opcode-push.cpp"
+	"details/semantic/opcode-stackalloc.cpp"
+	"details/semantic/opcode-call.cpp"
+	"details/semantic/opcode-sizeof.cpp"
+	"details/semantic/opcode-return.cpp"
+	"details/semantic/opcode-scope.cpp"
+	"details/semantic/opcode-pragma.cpp"
+	"details/semantic/opcode-blueprint.cpp"
+	"details/semantic/opcode-assign.cpp"
+	"details/semantic/opcode-typeisobject.cpp"
+	"details/semantic/opcode-commontype.cpp"
+	"details/semantic/opcode-intrinsic.cpp"
+	"details/semantic/intrinsics-nanyc.cpp"
+	"details/semantic/intrinsics-lang.cpp")
 
 addsrc(
 	NAME  nysrc_details_vm
@@ -533,11 +538,7 @@ add_library(libnanyc ${mode_libnany}
 	${nysrc_details_pass_ast_normalize}
 	${nysrc_details_pass_ast2ir}
 	${nysrc_details_pass_build_attach}
-	${nysrc_details_pass_build_instanciate}
-
-	${nysrc_nsl_stdcore}
-	${nysrc_details_vm}
-	${nysrc_details_vm_runtime}
+	${nysrc_details_pass_build_semantic}
 
 	${nysrc_details_utils}
 	${nysrc_details_ast}
@@ -548,6 +549,11 @@ add_library(libnanyc ${mode_libnany}
 	${nysrc_details_intrinsic}
 	${nysrc_details_context}
 	${nysrc_details_reporting}
+	${nysrc_details_semantic}
+
+	${nysrc_nsl_stdcore}
+	${nysrc_details_vm}
+	${nysrc_details_vm_runtime}
 
 	# misc
 	"${libnany_config_folder}/libnanyc-config.h"
