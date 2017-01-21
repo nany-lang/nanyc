@@ -279,8 +279,6 @@ public:
 	bool generateClassVarsAutoRelease = false;
 	//! Flag to generate variable member cloning after opcode 'stack size'
 	bool generateClassVarsAutoClone = false;
-	//! Flag to skip code instanciation as soon as the opcode blueprint size is encountered
-	bool shouldSkipCurrentAtom = false;
 
 	struct {
 		uint32_t label = 0;
