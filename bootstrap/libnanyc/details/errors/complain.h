@@ -22,6 +22,12 @@ struct Opcode: Exception {
 };
 
 
+struct SilentFall final: std::exception {
+	const char* what() const noexcept override { return "error silently ignored"; }
+};
+
+
+
 bool exception();
 bool exception(const std::exception&);
 
