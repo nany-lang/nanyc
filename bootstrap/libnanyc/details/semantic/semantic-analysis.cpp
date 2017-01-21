@@ -200,7 +200,7 @@ void SequenceBuilder::visit(const ir::isa::Operand<O>& operands) {
 }
 
 
-bool SequenceBuilder::readAndInstanciate(uint32_t offset) {
+bool SequenceBuilder::translateOpcodes(uint32_t offset) {
 	#if LIBNANYC_IR_PRINT_OPCODES != 0
 	std::cout << "\n\n -- sequence builder read start from " << (void*) this << "\n";
 	#endif
