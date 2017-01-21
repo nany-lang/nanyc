@@ -88,13 +88,7 @@ inline void Catalog::emplace(const AnyString& name, T callback) {
 	assert(name.size() < Name::chunkSize and "intrinsic name too long");
 	using B = Yuni::Bind<T>;
 	static_assert(B::argumentCount < config::maxPushedParameters, "too many params");
-	// emplace
-	uint32_t id = size();
-	m_intrinsics.emplace_back(reinterpret_cast<void*>(callback), id);
-	auto& intrinsic = m_intrinsics.back();
-	m_names.emplace(std::piecewise_construct,
-		std::forward_as_tuple(name), std::forward_as_tuple(id));
-	// return type / parameters
+	auto& intrinsic = makeIntrinsic(name, reinterpret_cast<void*>(callback));
 	if (B::hasReturnValue)
 		intrinsic.rettype = CTypeToNanyType<typename B::ReturnType>::type;
 	// the first argument must be the thread context
