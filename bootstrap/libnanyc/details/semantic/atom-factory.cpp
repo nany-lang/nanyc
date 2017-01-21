@@ -141,7 +141,7 @@ ir::Sequence* translateAndInstanciateASTIRCode(InstanciateData& info, Signature&
 	// Read the input ir code, resolve all types, and generate
 	// a new ir code ready for execution ! (with or without optimization passes)
 	// (everything happens here)
-	bool success = builder->readAndInstanciate(atom.opcodes.offset);
+	bool success = builder->translateOpcodes(atom.opcodes.offset);
 	updateTypesInAllStackallocOp(irout, newView, atom.atomid);
 	// keep all deduced types
 	if (/*likely(success) and*/ info.shouldMergeLayer)
@@ -584,7 +584,7 @@ bool instanciateAtomParameterTypes(InstanciateData& info) {
 	// Atom ID mapping, irelevant here
 	builder->mappingBlueprintAtomID.from = atom.atomid;
 	builder->mappingBlueprintAtomID.to   = atom.atomid;
-	bool instanciated = builder->readAndInstanciate(atom.opcodes.offset);
+	bool instanciated = builder->translateOpcodes(atom.opcodes.offset);
 	assert(builder->codeGenerationLock == 666);
 	if (not instanciated)
 		return false;

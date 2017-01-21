@@ -97,7 +97,7 @@ struct SequenceBuilder final {
 	template<ir::isa::Op O> void visit(const ir::isa::Operand<O>&);
 
 	//! Walk through all opcodes generated from the AST
-	bool readAndInstanciate(uint32_t offset);
+	bool translateOpcodes(uint32_t offset);
 	//@}
 
 
