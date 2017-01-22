@@ -12,8 +12,9 @@ namespace {
 
 void funcOrClassOrType(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
 	seq.pushedparams.clear();
-	seq.generateClassVarsAutoInit = false;
-	seq.generateClassVarsAutoRelease = false;
+	seq.bodystart.memberVarsInit = false;
+	seq.bodystart.memberVarsRelease = false;
+	seq.bodystart.memberVarsClone = false;
 	bool bug = (seq.layerDepthLimit == 0); // TODO: determine why this value can be zero with this opcode
 	if (not bug)
 		--seq.layerDepthLimit;
@@ -47,17 +48,17 @@ void funcOrClassOrType(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::bluepr
 				switch (atomname[1]) {
 					case 'd':
 						if (atomname == "^default-new")
-							seq.generateClassVarsAutoInit = true; // same as '^new'
+							seq.bodystart.memberVarsInit = true; // same as '^new'
 						else if (atomname == "^dispose")
-							seq.generateClassVarsAutoRelease = true;
+							seq.bodystart.memberVarsRelease = true;
 						break;
 					case 'n':
 						if (atomname == "^new")
-							seq.generateClassVarsAutoInit = true; // same as '^default-new'
+							seq.bodystart.memberVarsInit = true; // same as '^default-new'
 						break;
 					case 'o':
 						if (atomname == "^obj-clone")
-							seq.generateClassVarsAutoClone = true;
+							seq.bodystart.memberVarsClone = true;
 						break;
 				}
 			}
@@ -86,8 +87,9 @@ void funcOrClassOrType(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::bluepr
 void unit(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
 	assert(seq.frame != nullptr);
 	seq.pushedparams.clear();
-	seq.generateClassVarsAutoInit = false;
-	seq.generateClassVarsAutoRelease = false;
+	seq.bodystart.memberVarsInit = false;
+	seq.bodystart.memberVarsRelease = false;
+	seq.bodystart.memberVarsClone = false;
 	uint32_t atomid = operands.atomid;
 	auto atom = seq.cdeftable.atoms().findAtom(atomid);
 	if (unlikely(!atom)) {

@@ -14,6 +14,14 @@ namespace semantic {
 namespace {
 
 
+inline void callIf(Analyzer& analyzer, bool& flag, void (*callback)(Analyzer&)) {
+	if (flag) {
+		flag = false;
+		callback(analyzer);
+	}
+}
+
+
 bool bodyStart(Analyzer& seq) {
 	assert(seq.frame != nullptr);
 	assert(not seq.signatureOnly);
@@ -62,18 +70,12 @@ bool bodyStart(Analyzer& seq) {
 		}
 	});
 	if (atom.isSpecial() and generateCode and success) {
-		if (seq.generateClassVarsAutoInit) { // ctor
-			seq.generateClassVarsAutoInit = false;
-			produceMemberVarDefaultInitialization(seq);
-		}
-		if (seq.generateClassVarsAutoRelease) { // dtor
-			seq.generateClassVarsAutoRelease = false;
-			produceMemberVarDefaultDispose(seq);
-		}
-		if (seq.generateClassVarsAutoClone) { // deep copy (ctor)
-			seq.generateClassVarsAutoClone = false;
-			produceMemberVarDefaultClone(seq);
-		}
+		// ctor
+		callIf(seq, seq.bodystart.memberVarsInit, produceMemberVarDefaultInitialization);
+		// dtor
+		callIf(seq, seq.bodystart.memberVarsRelease, produceMemberVarDefaultDispose);
+		// copy ctor
+		callIf(seq, seq.bodystart.memberVarsClone, produceMemberVarDefaultClone);
 	}
 	return success;
 }
