@@ -11,7 +11,7 @@ namespace ny {
 namespace semantic {
 
 
-struct SequenceBuilder;
+struct Analyzer;
 
 
 class FuncOverloadMatch final {
@@ -30,7 +30,7 @@ public:
 	//! \name Constructor & Destructor
 	//@{
 	//! Default constructor
-	FuncOverloadMatch(SequenceBuilder*);
+	FuncOverloadMatch(Analyzer*);
 	// No copy constructor
 	FuncOverloadMatch(const FuncOverloadMatch&) = delete;
 	//@}
@@ -102,7 +102,7 @@ private:
 
 private:
 	bool pAllowImplicit = false;
-	SequenceBuilder* seq;
+	Analyzer* seq;
 
 }; // class FuncOverloadMatch
 

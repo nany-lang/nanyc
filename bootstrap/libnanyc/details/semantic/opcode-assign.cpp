@@ -7,7 +7,7 @@ namespace ny {
 namespace semantic {
 
 
-void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::assign>& operands) {
+void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::assign>& operands) {
 	assert(frame != nullptr);
 	frame->lvids(operands.lhs).synthetic = false;
 	if (not frame->verify(operands.rhs))

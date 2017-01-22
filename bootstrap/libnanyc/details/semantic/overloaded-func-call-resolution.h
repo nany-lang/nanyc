@@ -15,7 +15,7 @@ namespace ny {
 namespace semantic {
 
 
-struct SequenceBuilder;
+struct Analyzer;
 
 
 /*!
@@ -28,7 +28,7 @@ public:
 
 
 public:
-	OverloadedFuncCallResolver(SequenceBuilder* parent, Logs::Report report, FuncOverloadMatch& overloadMatch,
+	OverloadedFuncCallResolver(Analyzer* parent, Logs::Report report, FuncOverloadMatch& overloadMatch,
 			ClassdefTableView& cdeftable, Build& build)
 		: overloadMatch(overloadMatch)
 		, report(report)
@@ -89,7 +89,7 @@ private:
 	//! Parent build
 	Build& build;
 	//! Parent Sequence builder, if any
-	SequenceBuilder* parent = nullptr;;
+	Analyzer* parent = nullptr;;
 
 }; // class OverloadedFuncCallResolver
 

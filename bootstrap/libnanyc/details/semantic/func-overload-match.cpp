@@ -14,7 +14,7 @@ namespace ny {
 namespace semantic {
 
 
-FuncOverloadMatch::FuncOverloadMatch(SequenceBuilder* seq)
+FuncOverloadMatch::FuncOverloadMatch(Analyzer* seq)
 	: seq(seq) {
 	input.rettype.reserve(1); // currently, only 1 return value is allowed
 	input.params.indexed.reserve(config::maxPushedParameters);

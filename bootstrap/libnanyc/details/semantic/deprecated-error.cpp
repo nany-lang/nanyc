@@ -12,7 +12,7 @@ namespace complain {
 
 bool classdef(const Classdef& cdef, const char* usertxt) {
 	auto entry = (ice() << usertxt << ": " << cdef.clid << ' ');
-	auto* seq = Logs::userHandler<SequenceBuilder>();
+	auto* seq = Logs::userHandler<Analyzer>();
 	if (seq)
 		cdef.print(entry, seq->cdeftable);
 	return false;
@@ -27,7 +27,7 @@ bool unknownIntrinsic(const AnyString& name) {
 
 bool classNotInstanciated(const Atom& atom) {
 	auto err = ice();
-	auto* seq = Logs::userHandler<SequenceBuilder>();
+	auto* seq = Logs::userHandler<Analyzer>();
 	if (seq)
 		err << "class not instanciated: " << atom.caption(seq->cdeftable);
 	if (debugmode)
@@ -38,7 +38,7 @@ bool classNotInstanciated(const Atom& atom) {
 
 bool classOrFuncExpected(const Classdef& cdef) {
 	auto e = (error() << "class or function expected, got '");
-	auto* seq = Logs::userHandler<SequenceBuilder>();
+	auto* seq = Logs::userHandler<Analyzer>();
 	if (seq)
 		cdef.print(e.data().message, seq->cdeftable, false);
 	e << "' instead";
@@ -53,7 +53,7 @@ bool classRequired() {
 
 
 bool canNotAllocateClassNullAtom(const Classdef& cdef, uint32_t lvid) {
-	auto* seq = Logs::userHandler<SequenceBuilder>();
+	auto* seq = Logs::userHandler<Analyzer>();
 	auto err = (error() << "cannot instanciate object of type '");
 	if (seq)
 		cdef.print(err.data().message, seq->cdeftable, false);
@@ -72,7 +72,7 @@ bool invalidClassSelf(const AnyString& identifier) {
 	auto entry = ice();
 	entry << "identify: invalid 'self' object for '" << identifier;
 	entry << "' from '";
-	auto* seq = Logs::userHandler<SequenceBuilder>();
+	auto* seq = Logs::userHandler<Analyzer>();
 	if (seq and seq->frame)
 		entry << seq->frame->atom.caption();
 	else
@@ -104,7 +104,7 @@ bool invalidTypedef(const Classdef& cdef) {
 
 bool returnTypeMismatch(const Classdef& expected, const Classdef& usertype) {
 	auto err = (error() << "type mismatch in 'return' statement");
-	auto* seq = Logs::userHandler<SequenceBuilder>();
+	auto* seq = Logs::userHandler<Analyzer>();
 	if (seq) {
 		auto hint = err.hint();
 		if (debugmode) {
@@ -124,7 +124,7 @@ bool returnTypeMismatch(const Classdef& expected, const Classdef& usertype) {
 bool returnTypeImplicitConversion(const Classdef& expected, const Classdef& usertype, uint32_t line,
 								  uint32_t offset) {
 	auto err = (error() << "implicit conversion not supported in 'return'");
-	auto* seq = Logs::userHandler<SequenceBuilder>();
+	auto* seq = Logs::userHandler<Analyzer>();
 	if (seq) {
 		auto hint = err.hint();
 		if (debugmode) {
@@ -148,7 +148,7 @@ bool returnTypeImplicitConversion(const Classdef& expected, const Classdef& user
 bool returnTypeMissing(const Classdef* expected, const Classdef* usertype) {
 	if (expected) {
 		String tstr;
-		auto* seq = Logs::userHandler<SequenceBuilder>();
+		auto* seq = Logs::userHandler<Analyzer>();
 		if (seq)
 			expected->print(tstr, seq->cdeftable);
 		error() << "return-statement with no value, in function returning '" << tstr << '\'';
@@ -163,7 +163,7 @@ bool returnTypeMissing(const Classdef* expected, const Classdef* usertype) {
 
 bool returnMultipleTypes(const Classdef& expected, const Classdef& usertype, uint32_t line, uint32_t offset) {
 	auto err = (error() << "multiple incompatible types for 'return'");
-	auto* seq = Logs::userHandler<SequenceBuilder>();
+	auto* seq = Logs::userHandler<Analyzer>();
 	if (seq) {
 		auto hint = err.hint();
 		if (debugmode) {
@@ -186,7 +186,7 @@ bool returnMultipleTypes(const Classdef& expected, const Classdef& usertype, uin
 
 bool typedefCircularReference(const Atom& original, const Atom& responsible) {
 	auto err = (error() << "cannot resolve type alias '");
-	auto* seq = Logs::userHandler<SequenceBuilder>();
+	auto* seq = Logs::userHandler<Analyzer>();
 	if (seq)
 		original.retrieveCaption(err.data().message, seq->cdeftable);
 	err << "': circular dependcy";
@@ -201,7 +201,7 @@ bool typedefCircularReference(const Atom& original, const Atom& responsible) {
 
 bool typedefNotResolved(const Atom& original) {
 	auto err = (error() << "cannot resolve type alias '");
-	auto* seq = Logs::userHandler<SequenceBuilder>();
+	auto* seq = Logs::userHandler<Analyzer>();
 	if (seq)
 		original.retrieveCaption(err.data().message, seq->cdeftable);
 	err << '\'';
@@ -211,7 +211,7 @@ bool typedefNotResolved(const Atom& original) {
 
 bool typedefRefDeclaredAfter(const Atom& original, const Atom& responsible) {
 	auto err = (error() << "cannot resolve type alias");
-	auto* seq = Logs::userHandler<SequenceBuilder>();
+	auto* seq = Logs::userHandler<Analyzer>();
 	if (seq) {
 		err << " '";
 		original.retrieveCaption(err.data().message, seq->cdeftable);
@@ -237,7 +237,7 @@ bool multipleDefinitions(const Atom& atom, const AnyString& deffor) {
 bool redeclared(const AnyString& name, uint32_t previousDeclaration) {
 	auto err = (error() << "redeclaration of '" << name << '\'');
 	err << " in '";
-	auto* seq = Logs::userHandler<SequenceBuilder>();
+	auto* seq = Logs::userHandler<Analyzer>();
 	if (seq) {
 		err << seq->cdeftable.keyword(seq->frame->atom) << ' ';
 		seq->frame->atom.retrieveCaption(err.data().message, seq->cdeftable);
@@ -253,7 +253,7 @@ bool redeclared(const AnyString& name, uint32_t previousDeclaration) {
 
 
 bool multipleOverloads(uint32_t lvid) {
-	auto* seq = Logs::userHandler<SequenceBuilder>();
+	auto* seq = Logs::userHandler<Analyzer>();
 	auto* frame = seq->frame;
 	assert(frame != nullptr);
 	auto err = (error() << "ambigous resolution");
@@ -286,7 +286,7 @@ bool multipleOverloads(uint32_t lvid) {
 bool multipleOverloads(uint32_t lvid, const std::vector<std::reference_wrapper<Atom>>& solutions
 					   , const OverloadedFuncCallResolver& resolver) {
 	assert(solutions.size() == resolver.suitable.size());
-	auto* seq = Logs::userHandler<SequenceBuilder>();
+	auto* seq = Logs::userHandler<Analyzer>();
 	auto* frame = seq->frame;
 	String varname;
 	for (auto l = frame->lvids(lvid).referer; l != 0; l = frame->lvids(l).referer) {
@@ -348,7 +348,7 @@ bool multipleOverloads(uint32_t lvid, const std::vector<std::reference_wrapper<A
 
 
 bool typesDoNotMatch(const Classdef& from, const Classdef& to) {
-	auto* seq = Logs::userHandler<SequenceBuilder>();
+	auto* seq = Logs::userHandler<Analyzer>();
 	auto err = error();
 	err << "type '";
 	if (seq)
@@ -376,7 +376,7 @@ bool selfMissingForPropertyCall(const Atom& property, uint32_t self) {
 }
 
 
-bool parameterTypeHasVanished(const SequenceBuilder& seq, uint32_t i) {
+bool parameterTypeHasVanished(const Analyzer& seq, uint32_t i) {
 	auto& frame = *seq.frame;
 	auto e = ice();
 	e << "type has vanished for parameter " << i;
@@ -389,7 +389,7 @@ bool parameterTypeHasVanished(const SequenceBuilder& seq, uint32_t i) {
 
 
 Logs::Report emitReportEntry(void* self, Logs::Level level) {
-	auto& sb = *(reinterpret_cast<SequenceBuilder*>(self));
+	auto& sb = *(reinterpret_cast<Analyzer*>(self));
 	switch (level) {
 		default:
 			break;
@@ -411,7 +411,7 @@ Logs::Report emitReportEntry(void* self, Logs::Level level) {
 			if (sb.cursor and sb.currentSequence.isCursorValid(**sb.cursor)) {
 				uint32_t offset = sb.currentSequence.offsetOf(**sb.cursor);
 				auto h = entry.hint();
-				h << "dump opcodes at +" << offset << " [from SequenceBuilder ";
+				h << "dump opcodes at +" << offset << " [from Analyzer ";
 				h << self;
 				if (sb.signatureOnly)
 					h << ", signature only";
@@ -427,20 +427,20 @@ Logs::Report emitReportEntry(void* self, Logs::Level level) {
 
 void retriveReportMetadata(void* self, Logs::Level, const AST::Node*, String& filename, uint32_t& line,
 						   uint32_t& offset) {
-	auto& sb = *(reinterpret_cast<SequenceBuilder*>(self));
+	auto& sb = *(reinterpret_cast<Analyzer*>(self));
 	filename = sb.currentFilename;
 	line     = sb.currentLine;
 	offset   = sb.currentOffset;
 }
 
 
-bool SequenceBuilder::complainBuiltinIntrinsicDoesNotAccept(const AnyString& name, const AnyString& what) {
+bool Analyzer::complainBuiltinIntrinsicDoesNotAccept(const AnyString& name, const AnyString& what) {
 	error() << "builtin intrinsic '" << name << "' does not accept " << what;
 	return false;
 }
 
 
-bool SequenceBuilder::complainIntrinsicWithNamedParameters(const AnyString& name) {
+bool Analyzer::complainIntrinsicWithNamedParameters(const AnyString& name) {
 	assert(not pushedparams.func.named.empty() and "Uh ?");
 	auto err = (error());
 	err << "piko: intrinsic '" << name << "': named parameters are not allowed";
@@ -452,13 +452,13 @@ bool SequenceBuilder::complainIntrinsicWithNamedParameters(const AnyString& name
 }
 
 
-bool SequenceBuilder::complainIntrinsicWithGenTypeParameters(const AnyString& name) {
+bool Analyzer::complainIntrinsicWithGenTypeParameters(const AnyString& name) {
 	error() << "intrinsic '" << name << "': generic type parameters are not allowed";
 	return false;
 }
 
 
-bool SequenceBuilder::complainIntrinsicParameterCount(const AnyString& name, uint32_t count) {
+bool Analyzer::complainIntrinsicParameterCount(const AnyString& name, uint32_t count) {
 	uint32_t c = static_cast<uint32_t>(pushedparams.func.indexed.size());
 	assert(c != count);
 	auto err = (error() << "intrinsic '" << name << "': ");
@@ -471,7 +471,7 @@ bool SequenceBuilder::complainIntrinsicParameterCount(const AnyString& name, uin
 }
 
 
-bool SequenceBuilder::complainIntrinsicParameter(const AnyString& name, uint32_t pindex, const Classdef& got,
+bool Analyzer::complainIntrinsicParameter(const AnyString& name, uint32_t pindex, const Classdef& got,
 		const AnyString& expected) {
 	success = false;
 	auto& element = pushedparams.func.indexed[pindex];
@@ -497,7 +497,7 @@ bool SequenceBuilder::complainIntrinsicParameter(const AnyString& name, uint32_t
 }
 
 
-bool SequenceBuilder::complainOperand(const ir::Instruction& operands, AnyString msg) {
+bool Analyzer::complainOperand(const ir::Instruction& operands, AnyString msg) {
 	success = false;
 	auto message = ice();
 	// example: ice: unexpected opcode 'resolveAttribute': from 'ref %4 = resolve %3."()"'
@@ -512,7 +512,7 @@ bool SequenceBuilder::complainOperand(const ir::Instruction& operands, AnyString
 }
 
 
-void SequenceBuilder::complainUnusedVariable(const AtomStackFrame& frame, uint32_t lvid) const {
+void Analyzer::complainUnusedVariable(const AtomStackFrame& frame, uint32_t lvid) const {
 	auto& lvidinfo = frame.lvids(lvid);
 	if (not lvidinfo.errorReported) {
 		auto err = warning();
@@ -527,7 +527,7 @@ void SequenceBuilder::complainUnusedVariable(const AtomStackFrame& frame, uint32
 }
 
 
-bool SequenceBuilder::complainInvalidMemberRequestNonClass(const AnyString& name, nytype_t kind) const {
+bool Analyzer::complainInvalidMemberRequestNonClass(const AnyString& name, nytype_t kind) const {
 	assert(not name.empty());
 	success = false;
 	auto e = (error() << "request member '");
@@ -540,13 +540,13 @@ bool SequenceBuilder::complainInvalidMemberRequestNonClass(const AnyString& name
 }
 
 
-bool SequenceBuilder::complainUnknownBuiltinType(const AnyString& name) const {
+bool Analyzer::complainUnknownBuiltinType(const AnyString& name) const {
 	error() << "unknown builtin type '" << name << '\'';
 	return false;
 }
 
 
-bool SequenceBuilder::complainInvalidSelfRefForVariableAssignment(uint32_t lvid) const {
+bool Analyzer::complainInvalidSelfRefForVariableAssignment(uint32_t lvid) const {
 	assert(frame != nullptr);
 	auto& cdef = cdeftable.classdef(CLID{frame->atomid, lvid});
 	auto ce = (ice() << "invalid 'self' reference for variable assignment (self.= <expr>) ");
@@ -555,7 +555,7 @@ bool SequenceBuilder::complainInvalidSelfRefForVariableAssignment(uint32_t lvid)
 }
 
 
-bool SequenceBuilder::complainMissingOperator(Atom& atom, const AnyString& name) const {
+bool Analyzer::complainMissingOperator(Atom& atom, const AnyString& name) const {
 	auto ce = (ice() << "missing operator '" << name << "' for '");
 	ce << atom.keyword() << ' ';
 	atom.retrieveFullname(ce.data().message);
@@ -564,7 +564,7 @@ bool SequenceBuilder::complainMissingOperator(Atom& atom, const AnyString& name)
 }
 
 
-bool SequenceBuilder::complainInvalidType(const char* origin, const Classdef& from, const Classdef& to) {
+bool Analyzer::complainInvalidType(const char* origin, const Classdef& from, const Classdef& to) {
 	auto err = (error() << origin << "cannot convert '");
 	if (debugmode)
 		err << from.clid << ':';
@@ -578,7 +578,7 @@ bool SequenceBuilder::complainInvalidType(const char* origin, const Classdef& fr
 }
 
 
-bool SequenceBuilder::complainCannotCall(Atom& atom, FuncOverloadMatch& overloadMatch) {
+bool Analyzer::complainCannotCall(Atom& atom, FuncOverloadMatch& overloadMatch) {
 	auto err = (error() << "cannot call '" << cdeftable.keyword(atom) << ' ');
 	atom.retrieveCaption(err.data().message, cdeftable);
 	err << '\'';
@@ -589,7 +589,7 @@ bool SequenceBuilder::complainCannotCall(Atom& atom, FuncOverloadMatch& overload
 }
 
 
-void SequenceBuilder::complainPushedSynthetic(const CLID& clid, uint32_t paramindex,
+void Analyzer::complainPushedSynthetic(const CLID& clid, uint32_t paramindex,
 		const AnyString& paramname) {
 	auto err = error();
 	err << "cannot push synthetic object '";
@@ -604,7 +604,7 @@ void SequenceBuilder::complainPushedSynthetic(const CLID& clid, uint32_t paramin
 }
 
 
-void SequenceBuilder::complainInvalidParametersAfterSignatureMatching(Atom& atom,
+void Analyzer::complainInvalidParametersAfterSignatureMatching(Atom& atom,
 		FuncOverloadMatch& overloadMatch) {
 	// fail - try again to produce error message, hint, and any suggestion
 	auto err = (error());

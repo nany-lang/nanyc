@@ -17,7 +17,7 @@ namespace semantic {
 namespace {
 
 
-bool intrinsicReinterpret(SequenceBuilder& seq, uint32_t lvid) {
+bool intrinsicReinterpret(Analyzer& seq, uint32_t lvid) {
 	assert(seq.pushedparams.func.indexed.size() == 2);
 	uint32_t lhs    = seq.pushedparams.func.indexed[0].lvid;
 	uint32_t tolvid = seq.pushedparams.func.indexed[1].lvid;
@@ -39,7 +39,7 @@ bool intrinsicReinterpret(SequenceBuilder& seq, uint32_t lvid) {
 }
 
 
-bool intrinsicMemcheckerHold(SequenceBuilder& seq, uint32_t lvid) {
+bool intrinsicMemcheckerHold(Analyzer& seq, uint32_t lvid) {
 	seq.cdeftable.substitute(lvid).mutateToVoid();
 	uint32_t ptrlvid = seq.pushedparams.func.indexed[0].lvid;
 	auto& cdefptr = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, ptrlvid});
@@ -55,7 +55,7 @@ bool intrinsicMemcheckerHold(SequenceBuilder& seq, uint32_t lvid) {
 }
 
 
-using BuiltinIntrinsic = bool (*)(SequenceBuilder&, uint32_t);
+using BuiltinIntrinsic = bool (*)(Analyzer&, uint32_t);
 
 static const std::unordered_map<AnyString, std::pair<uint32_t, BuiltinIntrinsic>> builtinDispatch = {
 	{"__reinterpret",            { 2,  &intrinsicReinterpret, }},
@@ -66,7 +66,7 @@ static const std::unordered_map<AnyString, std::pair<uint32_t, BuiltinIntrinsic>
 } // anonymous namespace
 
 
-Tribool::Value SequenceBuilder::instanciateBuiltinIntrinsicSpecific(const AnyString& name, uint32_t lvid,
+Tribool::Value Analyzer::instanciateBuiltinIntrinsicSpecific(const AnyString& name, uint32_t lvid,
 		bool canProduceError) {
 	assert(not name.empty());
 	assert(frame != nullptr);

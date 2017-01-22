@@ -10,7 +10,7 @@ namespace ny {
 namespace semantic {
 
 
-struct SequenceBuilder;
+struct Analyzer;
 
 
 struct Settings final {
@@ -51,7 +51,7 @@ struct Settings final {
 	//! Make the layer persistent
 	bool shouldMergeLayer = false;
 	//! Parent
-	SequenceBuilder* parent = nullptr;
+	Analyzer* parent = nullptr;
 	//! Error reporting
 	std::shared_ptr<Logs::Message>& report;
 	bool signatureOnly = false;

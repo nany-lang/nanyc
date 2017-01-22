@@ -21,8 +21,8 @@ Logs::Report emitReportEntry(void* self, Logs::Level);
 void retriveReportMetadata(void* self, Logs::Level, const AST::Node*, Yuni::String&, uint32_t&, uint32_t&);
 
 
-SequenceBuilder::SequenceBuilder(Logs::Report report, ClassdefTableView& cdeftable, Build& build,
-		 ir::Sequence* out, ir::Sequence& sequence, SequenceBuilder* parent)
+Analyzer::Analyzer(Logs::Report report, ClassdefTableView& cdeftable, Build& build,
+		 ir::Sequence* out, ir::Sequence& sequence, Analyzer* parent)
 	: cdeftable(cdeftable)
 	, out(out)
 	, currentSequence(sequence)
@@ -42,7 +42,7 @@ SequenceBuilder::SequenceBuilder(Logs::Report report, ClassdefTableView& cdeftab
 }
 
 
-SequenceBuilder::~SequenceBuilder() {
+Analyzer::~Analyzer() {
 	if (config::traces::allTypeDefinitions) {
 		for (auto* f = frame; f != nullptr; f = f->previous)
 			debugPrintClassdefs(*f, cdeftable);
@@ -56,7 +56,7 @@ SequenceBuilder::~SequenceBuilder() {
 }
 
 
-void SequenceBuilder::releaseScopedVariables(int scope, bool forget) {
+void Analyzer::releaseScopedVariables(int scope, bool forget) {
 	if (unlikely(!frame))
 		return;
 	if (not forget and (not canGenerateCode()))
@@ -96,7 +96,7 @@ void SequenceBuilder::releaseScopedVariables(int scope, bool forget) {
 }
 
 
-uint32_t SequenceBuilder::createLocalVariables(uint32_t count) {
+uint32_t Analyzer::createLocalVariables(uint32_t count) {
 	assert(count > 0);
 	assert(canGenerateCode());
 	assert(frame != nullptr);
@@ -120,24 +120,24 @@ uint32_t SequenceBuilder::createLocalVariables(uint32_t count) {
 }
 
 
-inline void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::namealias>& operands) {
+inline void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::namealias>& operands) {
 	const auto& name = currentSequence.stringrefs[operands.name];
 	declareNamedVariable(name, operands.lvid);
 }
 
 
-inline void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::debugfile>& operands) {
+inline void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::debugfile>& operands) {
 	currentFilename = currentSequence.stringrefs[operands.filename].c_str();
 }
 
 
-inline void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::debugpos>& operands) {
+inline void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::debugpos>& operands) {
 	currentLine   = operands.line;
 	currentOffset = operands.offset;
 }
 
 
-inline void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::nop>&) {
+inline void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::nop>&) {
 	// duplicate nop as well since they can be used to insert code
 	// (for shortcircuit for example)
 	if (canGenerateCode())
@@ -145,13 +145,13 @@ inline void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::nop>&) {
 }
 
 
-inline void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::label>& operands) {
+inline void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::label>& operands) {
 	if (canGenerateCode())
 		/*uint32_t lbl =*/ ir::emit::label(out, operands.label);
 }
 
 
-inline void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::qualifiers>& operands) {
+inline void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::qualifiers>& operands) {
 	assert(static_cast<uint32_t>(operands.qualifier) < ir::isa::TypeQualifierCount);
 	bool  onoff = (operands.flag != 0);
 	auto& qualifiers = cdeftable.substitute(operands.lvid).qualifiers;
@@ -166,25 +166,25 @@ inline void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::qualifier
 }
 
 
-inline void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::jmp>& opc) {
+inline void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::jmp>& opc) {
 	if (canGenerateCode())
 		out->emit<ir::isa::Op::jmp>() = opc;
 }
 
 
-inline void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::jz>& opc) {
+inline void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::jz>& opc) {
 	if (canGenerateCode())
 		out->emit<ir::isa::Op::jz>() = opc;
 }
 
 
-inline void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::jnz>& opc) {
+inline void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::jnz>& opc) {
 	if (canGenerateCode())
 		out->emit<ir::isa::Op::jnz>() = opc;
 }
 
 
-inline void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::comment>& opc) {
+inline void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::comment>& opc) {
 	if (debugmode and canGenerateCode()) {
 		ir::emit::trace(out, [&]() {
 			return currentSequence.stringrefs[opc.text];
@@ -194,12 +194,12 @@ inline void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::comment>&
 
 
 template<ir::isa::Op O>
-void SequenceBuilder::visit(const ir::isa::Operand<O>& operands) {
+void Analyzer::visit(const ir::isa::Operand<O>& operands) {
 	complainOperand(ir::Instruction::fromOpcode(operands));
 }
 
 
-bool SequenceBuilder::translateOpcodes(uint32_t offset) {
+bool Analyzer::translateOpcodes(uint32_t offset) {
 	#if LIBNANYC_IR_PRINT_OPCODES != 0
 	std::cout << "\n\n -- sequence builder read start from " << (void*) this << "\n";
 	#endif
@@ -211,7 +211,7 @@ bool SequenceBuilder::translateOpcodes(uint32_t offset) {
 }
 
 
-void SequenceBuilder::PushedParameters::clear() {
+void Analyzer::PushedParameters::clear() {
 	func.indexed.clear();
 	func.named.clear();
 	gentypes.indexed.clear();

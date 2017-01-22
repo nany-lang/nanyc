@@ -9,7 +9,7 @@ namespace ny {
 namespace semantic {
 
 
-void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::ref>& operands) {
+void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::ref>& operands) {
 	if (not frame->verify(operands.lvid))
 		return;
 	if (unlikely(frame->lvids(operands.lvid).synthetic)) {
@@ -23,7 +23,7 @@ void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::ref>& operands) 
 }
 
 
-void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::unref>& operands) {
+void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::unref>& operands) {
 	tryUnrefObject(*this, operands.lvid);
 }
 

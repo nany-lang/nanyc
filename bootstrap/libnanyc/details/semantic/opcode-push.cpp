@@ -7,7 +7,7 @@ namespace ny {
 namespace semantic {
 
 
-void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::push>& operands) {
+void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::push>& operands) {
 	bool verified = (frame->verify(operands.lvid));
 	// always push the parameter to have a consistent output
 	if (0 == operands.name) {
@@ -26,7 +26,7 @@ void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::push>& operands)
 }
 
 
-void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::tpush>& operands) {
+void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::tpush>& operands) {
 	frame->verify(operands.lvid);
 	if (0 == operands.name)
 		pushedparams.gentypes.indexed.emplace_back(operands.lvid, currentLine, currentOffset);

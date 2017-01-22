@@ -9,7 +9,7 @@ namespace ny {
 namespace semantic {
 
 
-void SequenceBuilder::declareNamedVariable(const AnyString& name, uint32_t lvid, bool autoreleased) {
+void Analyzer::declareNamedVariable(const AnyString& name, uint32_t lvid, bool autoreleased) {
 	assert(frame != nullptr);
 	if (unlikely(not frame->verify(lvid)))
 		return;
@@ -44,7 +44,7 @@ void SequenceBuilder::declareNamedVariable(const AnyString& name, uint32_t lvid,
 }
 
 
-// inline void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::namealias>& operands)
+// inline void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::namealias>& operands)
 // see .h
 
 } // namespace semantic

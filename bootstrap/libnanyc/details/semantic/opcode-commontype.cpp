@@ -9,7 +9,7 @@ namespace ny {
 namespace semantic {
 
 
-void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::commontype>& operands) {
+void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::commontype>& operands) {
 	assert(frame != nullptr);
 	bool ok = [&]() -> bool {
 		if (operands.previous == 0)

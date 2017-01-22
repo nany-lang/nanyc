@@ -8,7 +8,7 @@ using namespace Yuni;
 namespace ny {
 namespace semantic {
 
-void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::scope>& /*operands*/) {
+void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::scope>& /*operands*/) {
 	if (frame != nullptr)
 		++(frame->scope);
 	if (canGenerateCode())
@@ -16,7 +16,7 @@ void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::scope>& /*operan
 }
 
 
-void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::end>& /*operands*/) {
+void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::end>& /*operands*/) {
 	if (frame != nullptr) {
 		releaseScopedVariables(frame->scope, /*forget*/ true);
 		// the scope might be zero if the opcode 'end' comes from a class or a func

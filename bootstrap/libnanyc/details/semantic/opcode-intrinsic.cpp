@@ -12,7 +12,7 @@ namespace semantic {
 namespace {
 
 
-bool translateIntrinsic(SequenceBuilder& seq, const ir::isa::Operand<ir::isa::Op::intrinsic>& operands) {
+bool translateIntrinsic(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::intrinsic>& operands) {
 	AnyString name = seq.currentSequence.stringrefs[operands.intrinsic];
 	if (unlikely(name.empty()))
 		return (error() << "invalid empty intrinsic name");
@@ -81,7 +81,7 @@ bool translateIntrinsic(SequenceBuilder& seq, const ir::isa::Operand<ir::isa::Op
 } // namespace
 
 
-void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::intrinsic>& operands) {
+void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::intrinsic>& operands) {
 	assert(frame != nullptr);
 	if (unlikely(not translateIntrinsic(*this, operands))) {
 		frame->invalidate(operands.lvid);

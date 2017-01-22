@@ -10,7 +10,7 @@ namespace semantic {
 namespace {
 
 
-void funcOrClassOrType(SequenceBuilder& seq, const ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
+void funcOrClassOrType(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
 	seq.pushedparams.clear();
 	seq.generateClassVarsAutoInit = false;
 	seq.generateClassVarsAutoRelease = false;
@@ -83,7 +83,7 @@ void funcOrClassOrType(SequenceBuilder& seq, const ir::isa::Operand<ir::isa::Op:
 }
 
 
-void unit(SequenceBuilder& seq, const ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
+void unit(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
 	assert(seq.frame != nullptr);
 	seq.pushedparams.clear();
 	seq.generateClassVarsAutoInit = false;
@@ -99,7 +99,7 @@ void unit(SequenceBuilder& seq, const ir::isa::Operand<ir::isa::Op::blueprint>& 
 }
 
 
-void parameter(SequenceBuilder& seq, uint32_t lvid, bool isvar, uint32_t nameindex) {
+void parameter(Analyzer& seq, uint32_t lvid, bool isvar, uint32_t nameindex) {
 	assert(seq.frame != nullptr);
 	auto& cdef = seq.cdeftable.substitute(lvid);
 	cdef.qualifiers.ref = false;
@@ -112,7 +112,7 @@ void parameter(SequenceBuilder& seq, uint32_t lvid, bool isvar, uint32_t nameind
 }
 
 
-void asSelf(SequenceBuilder& seq, const ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
+void asSelf(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
 	// -- with automatic variable assignment for operator new
 	// example: operator new (self varname) {}
 	assert(seq.frame != nullptr);
@@ -130,7 +130,7 @@ void asSelf(SequenceBuilder& seq, const ir::isa::Operand<ir::isa::Op::blueprint>
 }
 
 
-void vardef(SequenceBuilder& seq, uint32_t lvid, uint32_t sid) {
+void vardef(Analyzer& seq, uint32_t lvid, uint32_t sid) {
 	if (seq.frame != nullptr) {
 		if (seq.frame->atom.isClass()) {
 			const AnyString& varname = seq.currentSequence.stringrefs[sid];
@@ -149,7 +149,7 @@ void vardef(SequenceBuilder& seq, uint32_t lvid, uint32_t sid) {
 } // anonymous namespace
 
 
-void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
+void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
 	auto kind = static_cast<ir::isa::Blueprint>(operands.kind);
 	switch (kind) {
 		case ir::isa::Blueprint::param: {

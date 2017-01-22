@@ -8,7 +8,7 @@ namespace ny {
 namespace semantic {
 
 
-void SequenceBuilder::generateMemberVarDefaultInitialization() {
+void Analyzer::generateMemberVarDefaultInitialization() {
 	assert(frame != nullptr);
 	assert(canGenerateCode());
 	assert(frame->offsetOpcodeStacksize != (uint32_t) - 1);

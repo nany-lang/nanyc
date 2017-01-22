@@ -7,7 +7,7 @@ namespace ny {
 namespace semantic {
 
 
-void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::stackalloc>& operands) {
+void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::stackalloc>& operands) {
 	assert(frame != nullptr);
 	if (not frame->verify(operands.lvid))
 		return;

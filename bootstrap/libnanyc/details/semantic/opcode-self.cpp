@@ -7,7 +7,7 @@ namespace ny {
 namespace semantic {
 
 
-void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::self>& operands) {
+void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::self>& operands) {
 	// we can have at least 2 patterns:
 	//
 	//  * the most frequent, called from a method contained within a class
