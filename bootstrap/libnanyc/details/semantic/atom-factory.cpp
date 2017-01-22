@@ -21,29 +21,29 @@ namespace semantic {
 namespace {
 
 
-void prepareSignature(Signature& signature, Settings& info) {
-	uint32_t count = static_cast<uint32_t>(info.params.size());
+void prepareSignature(Signature& signature, Settings& settings) {
+	uint32_t count = static_cast<uint32_t>(settings.params.size());
 	if (count != 0) {
 		signature.parameters.resize(count);
 		for (uint32_t i = 0; i != count; ++i) {
-			assert(info.params[i].cdef != nullptr);
-			auto& cdef  = *(info.params[i].cdef);
+			assert(settings.params[i].cdef != nullptr);
+			auto& cdef  = *(settings.params[i].cdef);
 			auto& param = signature.parameters[i];
 			param.kind = cdef.kind;
 			param.qualifiers = cdef.qualifiers;
 			if (param.kind == nyt_any)
-				param.atom = const_cast<Atom*>(info.cdeftable.findClassdefAtom(cdef));
+				param.atom = const_cast<Atom*>(settings.cdeftable.findClassdefAtom(cdef));
 			assert(param.kind != nyt_any or param.atom != nullptr);
 		}
 	}
-	count = static_cast<uint32_t>(info.tmplparams.size());
+	count = static_cast<uint32_t>(settings.tmplparams.size());
 	if (count != 0) {
 		signature.tmplparams.resize(count);
 		for (uint32_t i = 0; i != count; ++i) {
-			assert(info.tmplparams[i].cdef != nullptr);
-			auto& cdef  = *(info.tmplparams[i].cdef);
+			assert(settings.tmplparams[i].cdef != nullptr);
+			auto& cdef  = *(settings.tmplparams[i].cdef);
 			auto& param = signature.tmplparams[i];
-			param.atom = const_cast<Atom*>(info.cdeftable.findClassdefAtom(cdef));
+			param.atom = const_cast<Atom*>(settings.cdeftable.findClassdefAtom(cdef));
 			param.kind = cdef.kind;
 			param.qualifiers = cdef.qualifiers;
 			assert(param.kind != nyt_any or param.atom != nullptr);
@@ -52,14 +52,14 @@ void prepareSignature(Signature& signature, Settings& info) {
 }
 
 
-bool duplicateAtomForSpecialization(Settings& info, Atom& atom) {
+bool duplicateAtomForSpecialization(Settings& settings, Atom& atom) {
 	// create a new atom with non-generic parameters / from a contextual atom
 	// (generic or anonymous class) and re-map from the parent
 	//auto* ircode = atom.opcodes.ircode;
 	assert(atom.opcodes.ircode != nullptr);
 	auto* ircode = new ir::Sequence(*atom.opcodes.ircode, 0);
 	assert(atom.opcodes.offset < ircode->opcodeCount());
-	auto& originaltable = info.cdeftable.originalTable();
+	auto& originaltable = settings.cdeftable.originalTable();
 	Mutex mutex; // useless but currently required for the first pass by SequenceMapping
 	Pass::MappingOptions options;
 	options.evaluateWholeSequence = false;
@@ -72,11 +72,11 @@ bool duplicateAtomForSpecialization(Settings& info, Atom& atom) {
 	auto& newAtom = *options.firstAtomCreated;
 	assert(atom.atomid != newAtom.atomid);
 	assert(newAtom.opcodes.offset < newAtom.opcodes.ircode->opcodeCount());
-	info.atom = std::ref(newAtom);
+	settings.atom = std::ref(newAtom);
 	newAtom.tmplparamsForPrinting.swap(newAtom.tmplparams);
 	newAtom.classinfo.isInstanciated = true;
-	info.shouldMergeLayer = true;
-	return resolveStrictParameterTypes(info.build, newAtom, &info);
+	settings.shouldMergeLayer = true;
+	return resolveStrictParameterTypes(settings.build, newAtom, &settings);
 }
 
 
@@ -104,8 +104,8 @@ void substituteParameterTypes(ClassdefTableView& cdeftable, Atom& atom, const Si
 }
 
 
-ir::Sequence* translateAndInstanciateASTIRCode(Settings& info, Signature& signature) {
-	auto& atomRequested = info.atom.get();
+ir::Sequence* translateAndInstanciateASTIRCode(Settings& settings, Signature& signature) {
+	auto& atomRequested = settings.atom.get();
 	if (unlikely(!atomRequested.opcodes.ircode or !atomRequested.parent)) {
 		ny::complain::invalidAtom("ast ir code translation");
 		return nullptr;
@@ -113,25 +113,25 @@ ir::Sequence* translateAndInstanciateASTIRCode(Settings& info, Signature& signat
 	// In case or an anonymous class or a class with generic type parameters, it is
 	// necessary to use new atoms (t needs a forked version to work on to have different types)
 	if (atomRequested.isContextual()) {
-		if (not duplicateAtomForSpecialization(info, atomRequested))
+		if (not duplicateAtomForSpecialization(settings, atomRequested))
 			return nullptr;
-		assert(&info.atom.get() != &atomRequested and "a new atom must be used");
+		assert(&settings.atom.get() != &atomRequested and "a new atom must be used");
 	}
-	auto& atom = info.atom.get(); // current atom, can be different from `atomRequested`
-	if (!!atom.candidatesForCapture and info.parent)
-		info.parent->captureVariables(atom);
+	auto& atom = settings.atom.get(); // current atom, can be different from `atomRequested`
+	if (!!atom.candidatesForCapture and settings.parent)
+		settings.parent->captureVariables(atom);
 	Atom::FlagAutoSwitch<Atom::Flags::instanciating> flagUpdater{atom};
 	// registering the new instanciation first (required for recursive functions & classes)
 	// `atomRequested` is probably `atom` itself, but different for template classes
 	auto instance = atomRequested.instances.create(signature, &atom);
-	info.instanceid = instance.id();
-	ClassdefTableView newView{info.cdeftable, atom.atomid, signature.parameters.size()};
-	Logs::Report report{*info.report};
+	settings.instanceid = instance.id();
+	ClassdefTableView newView{settings.cdeftable, atom.atomid, signature.parameters.size()};
+	Logs::Report report{*settings.report};
 	auto& irin = *(atom.opcodes.ircode);
 	auto& irout = instance.ircode();
-	auto builder = std::make_unique<SequenceBuilder>(report.subgroup(), newView, info.build, &irout, irin, info.parent);
+	auto builder = std::make_unique<SequenceBuilder>(report.subgroup(), newView, settings.build, &irout, irin, settings.parent);
 	if (config::traces::sourceOpcodeSequence)
-		debugPrintSourceOpcodeSequence(info.cdeftable, info.atom.get(), "[ir-from-ast] ");
+		debugPrintSourceOpcodeSequence(settings.cdeftable, settings.atom.get(), "[ir-from-ast] ");
 	substituteParameterTypes(builder->cdeftable, atom, signature);
 	builder->layerDepthLimit = 2; // allow the first blueprint to be instanciated
 	// Read the input ir code, resolve all types, and generate
@@ -140,7 +140,7 @@ ir::Sequence* translateAndInstanciateASTIRCode(Settings& info, Signature& signat
 	bool success = builder->translateOpcodes(atom.opcodes.offset);
 	updateTypesInAllStackallocOp(irout, newView, atom.atomid);
 	// keep all deduced types
-	if (/*likely(success) and*/ info.shouldMergeLayer)
+	if (/*likely(success) and*/ settings.shouldMergeLayer)
 		newView.mergeSubstitutes();
 	// Generating the full human readable name of the symbol with the
 	// apropriate types & qualifiers for all parameters
@@ -148,7 +148,7 @@ ir::Sequence* translateAndInstanciateASTIRCode(Settings& info, Signature& signat
 	// note: the content of the string will be moved to avoid memory allocation
 	String symbolName;
 	if (success or config::traces::generatedOpcodeSequence) {
-		symbolName << newView.keyword(info.atom) << ' '; // ex: func
+		symbolName << newView.keyword(settings.atom) << ' '; // ex: func
 		atom.retrieveCaption(symbolName, newView);  // ex: A.foo(...)...
 	}
 	if (config::traces::generatedOpcodeSequence)
@@ -157,17 +157,17 @@ ir::Sequence* translateAndInstanciateASTIRCode(Settings& info, Signature& signat
 		switch (atom.type) {
 			case Atom::Type::funcdef:
 			case Atom::Type::typealias: {
-				// copying the 'returned' type to 'info'
+				// copying the 'returned' type to 'settings'
 				auto& cdefReturn = newView.classdef(CLID{atom.atomid, 1});
 				if (not cdefReturn.isBuiltinOrVoid()) {
 					auto* atom = newView.findClassdefAtom(cdefReturn);
 					if (atom)
-						info.returnType.mutateToAtom(atom);
+						settings.returnType.mutateToAtom(atom);
 					else
 						success = ny::complain::invalidAtomForFuncReturn(symbolName);
 				}
 				else
-					info.returnType.kind = cdefReturn.kind;
+					settings.returnType.kind = cdefReturn.kind;
 				break;
 			}
 			case Atom::Type::classdef: {
@@ -178,30 +178,30 @@ ir::Sequence* translateAndInstanciateASTIRCode(Settings& info, Signature& signat
 			// [[fallthru]]
 			default: {
 				// not a function, so no return value (unlikely to be used anyway)
-				info.returnType.mutateToVoid();
+				settings.returnType.mutateToVoid();
 			}
 		}
 		if (likely(success)) {
-			instance.update(std::move(symbolName), info.returnType);
+			instance.update(std::move(symbolName), settings.returnType);
 			return &irout;
 		}
 	}
 	// failed to instanciate the input ir code. This can be expected, if trying
 	// to not instanciate the appropriate function (if several overloads are present for example)
-	info.instanceid = instance.invalidate(signature);
+	settings.instanceid = instance.invalidate(signature);
 	return nullptr;
 }
 
 
-bool instanciateRecursiveAtom(Settings& info) {
-	Atom& atom = info.atom.get();
+bool instanciateRecursiveAtom(Settings& settings) {
+	Atom& atom = settings.atom.get();
 	if (unlikely(not atom.isFunction()))
 		return ny::complain::invalidRecursiveAtom(atom.caption());
 	atom.flags += Atom::Flags::recursive;
-	bool success = (info.parent
-		and info.parent->getReturnTypeForRecursiveFunc(atom, info.returnType));
+	bool success = (settings.parent
+		and settings.parent->getReturnTypeForRecursiveFunc(atom, settings.returnType));
 	if (unlikely(not success)) {
-		info.returnType.mutateToAny();
+		settings.returnType.mutateToAny();
 		error() << "parameters/return types must be fully defined to allow recursive func calls";
 		return false;
 	}
@@ -217,14 +217,14 @@ bool resolveTypesBeforeBodyStart(Build& build, Atom& atom, Settings* originalInf
 		ParamList tmplparams;
 		std::shared_ptr<Logs::Message> newReport;
 		ny::Logs::Report report{*build.messages.get()};
-		ny::semantic::Settings info{newReport, atom, cdeftblView, build, params, tmplparams};
-		bool success = ny::semantic::instanciateAtomParameterTypes(info);
+		ny::semantic::Settings settings{newReport, atom, cdeftblView, build, params, tmplparams};
+		bool success = ny::semantic::instanciateAtomParameterTypes(settings);
 		if (not success)
 			report.appendEntry(newReport);
 		return success;
 	}
 	else {
-		// import generic type parameter from instanciation info
+		// import generic type parameter from instanciation settings
 		auto& tmplparams = originalInfo->tmplparams;
 		auto pindex = atom.classinfo.nextFieldIndex;
 		if (unlikely(not (pindex < tmplparams.size())))
@@ -400,15 +400,15 @@ Atom* SequenceBuilder::instanciateAtomClass(Atom& atom) {
 	params.swap(overloadMatch.result.params);
 	tmplparams.swap(overloadMatch.result.tmplparams);
 	std::shared_ptr<Logs::Message> newReport;
-	ny::semantic::Settings info{newReport, atom, cdeftable, build, params, tmplparams};
-	info.parentAtom = &(frame->atom);
-	info.shouldMergeLayer = true;
-	info.parent = this;
-	bool instanciated = ny::semantic::instanciateAtom(info);
+	ny::semantic::Settings settings{newReport, atom, cdeftable, build, params, tmplparams};
+	settings.parentAtom = &(frame->atom);
+	settings.shouldMergeLayer = true;
+	settings.parent = this;
+	bool instanciated = ny::semantic::instanciateAtom(settings);
 	report.subgroup().appendEntry(newReport);
 	// !! The target atom may have changed here
 	// (for any non contextual atoms, generic classes, anonymous classes...)
-	auto& resAtom = info.atom.get();
+	auto& resAtom = settings.atom.get();
 	if (not instanciated) { // failed
 		atom.flags += Atom::Flags::error;
 		resAtom.flags += Atom::Flags::error;
@@ -449,39 +449,39 @@ bool SequenceBuilder::instanciateAtomFunc(uint32_t& instanceid, Atom& funcAtom, 
 	tmplparams.swap(overloadMatch.result.tmplparams);
 	// instanciate the called func
 	std::shared_ptr<Logs::Message> subreport;
-	Settings info{subreport, funcAtom, cdeftable, build, params, tmplparams};
-	bool instok = doInstanciateAtomFunc(subreport, info, retlvid);
-	instanceid = info.instanceid;
+	Settings settings{subreport, funcAtom, cdeftable, build, params, tmplparams};
+	bool instok = doInstanciateAtomFunc(subreport, settings, retlvid);
+	instanceid = settings.instanceid;
 	if (unlikely(not instok and retlvid != 0))
 		frame->invalidate(retlvid);
 	return instok;
 }
 
 
-bool SequenceBuilder::doInstanciateAtomFunc(std::shared_ptr<Logs::Message>& subreport, Settings& info,
+bool SequenceBuilder::doInstanciateAtomFunc(std::shared_ptr<Logs::Message>& subreport, Settings& settings,
 		uint32_t retlvid) {
 	// even within a typeof, any new instanciation must see their code generated
 	// (and its errors generated)
-	info.canGenerateCode = true; // canGenerateCode();
-	info.parent = this;
-	bool instanciated = instanciateAtom(info);
+	settings.canGenerateCode = true; // canGenerateCode();
+	settings.parent = this;
+	bool instanciated = instanciateAtom(settings);
 	report.appendEntry(subreport);
 	if (unlikely(not instanciated))
 		return (success = false);
-	if (unlikely(info.instanceid == static_cast<uint32_t>(-1)))
-		return complain::classdef(info.returnType, "return: invalid instance id");
+	if (unlikely(settings.instanceid == static_cast<uint32_t>(-1)))
+		return complain::classdef(settings.returnType, "return: invalid instance id");
 	// import the return type of the instanciated sequence
 	if (retlvid != 0) {
 		auto& spare = cdeftable.substitute(retlvid);
-		if (not info.returnType.isVoid()) {
-			spare.kind  = info.returnType.kind;
-			spare.atom  = info.returnType.atom;
+		if (not settings.returnType.isVoid()) {
+			spare.kind  = settings.returnType.kind;
+			spare.atom  = settings.returnType.atom;
 			spare.instance = true; // force some values just in case
 			if (unlikely(not spare.isBuiltinOrVoid() and spare.atom == nullptr))
 				return (ice() << "return: invalid atom for return type");
 			frame->lvids(retlvid).synthetic = false;
 			// release automatically the returned value, acquired by the function
-			if (canBeAcquired(*this, info.returnType))
+			if (canBeAcquired(*this, settings.returnType))
 				frame->lvids(retlvid).autorelease = true;
 		}
 		else
@@ -549,7 +549,7 @@ bool SequenceBuilder::getReturnTypeForRecursiveFunc(const Atom& atom, Classdef& 
 }
 
 
-bool instanciateAtomParameterTypes(Settings& info) {
+bool instanciateAtomParameterTypes(Settings& settings) {
 	// Despite the location of this code, no real code instanciation
 	// of any sort will be done (the code is the same, that's why).
 	// This pass only intends to resolve user-given types for parameters
@@ -558,7 +558,7 @@ bool instanciateAtomParameterTypes(Settings& info) {
 	// The second parameter will be of interest in this case
 	// The sequence builder will stop as soon as the opcode 'bodystart'
 	// is encountered
-	auto& atom = info.atom.get();
+	auto& atom = settings.atom.get();
 	if (unlikely(!atom.parent))
 		return (ice() << "invalid atom, no parent");
 	if (!atom.opcodes.ircode) {
@@ -567,13 +567,12 @@ bool instanciateAtomParameterTypes(Settings& info) {
 			return true;
 		return (ice() << "invalid atom: no ir code");
 	}
-	Logs::Report report{*info.report};
+	Logs::Report report{*settings.report};
 	Signature signature;
-	ClassdefTableView newview{info.cdeftable, atom.atomid, signature.parameters.size()};
+	ClassdefTableView newview{settings.cdeftable, atom.atomid, signature.parameters.size()};
 	auto& irin = *(atom.opcodes.ircode);
 	auto* irout = (ir::Sequence*) nullptr;
-	auto builder = std::make_unique<SequenceBuilder>(report.subgroup(), newview, info.build, irout, irin, info.parent);
-	//if (info.parentAtom)
+	auto builder = std::make_unique<SequenceBuilder>(report.subgroup(), newview, settings.build, irout, irin, settings.parent);
 	builder->layerDepthLimit = 2; // allow the first blueprint to be instanciated
 	builder->signatureOnly = true;
 	builder->codeGenerationLock = 666; // arbitrary value != 0 to prevent from code generation
@@ -602,30 +601,30 @@ bool instanciateAtomParameterTypes(Settings& info) {
 }
 
 
-bool instanciateAtom(Settings& info) {
+bool instanciateAtom(Settings& settings) {
 	try {
 		Signature signature;
-		prepareSignature(signature, info);
-		assert(info.params.size() == signature.parameters.size());
-		auto& atom = info.atom.get();
+		prepareSignature(signature, settings);
+		assert(settings.params.size() == signature.parameters.size());
+		auto& atom = settings.atom.get();
 		Atom* remapAtom = nullptr;
-		auto valid = atom.instances.isValid(signature, info.instanceid, info.returnType, remapAtom);
+		auto valid = atom.instances.isValid(signature, settings.instanceid, settings.returnType, remapAtom);
 		switch (valid) {
 			case Tribool::Value::yes: {
 				if (unlikely(atom.flags(Atom::Flags::instanciating))) { // recursive func detected
-					if (unlikely(not instanciateRecursiveAtom(info)))
+					if (unlikely(not instanciateRecursiveAtom(settings)))
 						return false;
 				}
 				if (unlikely(remapAtom != nullptr)) { // the target atom may have changed (template class)
-					info.atom = std::ref(*remapAtom);
+					settings.atom = std::ref(*remapAtom);
 					if (remapAtom->isContextual())
-						return translateAndInstanciateASTIRCode(info, signature) != nullptr;
+						return translateAndInstanciateASTIRCode(settings, signature) != nullptr;
 				}
 				return true;
 			}
 			case Tribool::Value::indeterminate: {
 				// the atom must be instanciated
-				return translateAndInstanciateASTIRCode(info, signature) != nullptr;
+				return translateAndInstanciateASTIRCode(settings, signature) != nullptr;
 			}
 			case Tribool::Value::no: {
 				// failed to instanciate last time. error already reported

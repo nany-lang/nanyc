@@ -43,10 +43,10 @@ bool Build::instanciate(const AnyString& entrypoint, const nytype_t* args, uint3
 	decltype(ny::semantic::FuncOverloadMatch::result.params) tmplparams;
 	std::shared_ptr<Logs::Message> newReport;
 	ClassdefTableView cdeftblView{cdeftable};
-	ny::semantic::Settings info {
+	ny::semantic::Settings settings {
 		newReport, *entrypointAtom, cdeftblView, *this, params, tmplparams
 	};
-	bool instanciated = ny::semantic::instanciateAtom(info);
+	bool instanciated = ny::semantic::instanciateAtom(settings);
 	report.appendEntry(newReport);
 	if (config::traces::atomTable)
 		cdeftable.atoms.root.printTree(cdeftable);
@@ -56,7 +56,7 @@ bool Build::instanciate(const AnyString& entrypoint, const nytype_t* args, uint3
 		return false;
 	}
 	atomid = entrypointAtom->atomid;
-	instanceid = info.instanceid;
+	instanceid = settings.instanceid;
 	return true;
 }
 
