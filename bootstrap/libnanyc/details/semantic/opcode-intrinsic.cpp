@@ -12,22 +12,31 @@ namespace semantic {
 namespace {
 
 
+bool verifyParameters(Analyzer& analyzer, const AnyString& name) {
+	auto& pushedparams = analyzer.pushedparams;
+	// named parameters are not accepted
+	if (unlikely(not pushedparams.func.named.empty()))
+		return analyzer.complainIntrinsicWithNamedParameters(name);
+	// generic type parameters are not accepted
+	if (unlikely(not pushedparams.gentypes.indexed.empty() or not pushedparams.gentypes.named.empty()))
+		return analyzer.complainIntrinsicWithGenTypeParameters(name);
+	// checking if one parameter was already flag as 'error'
+	auto& frame = *analyzer.frame;
+	uint32_t count = static_cast<uint32_t>(pushedparams.func.indexed.size());
+	for (uint32_t i = 0u; i != count; ++i) {
+		if (unlikely(not frame.verify(pushedparams.func.indexed[i].lvid)))
+			return false;
+	}
+	return true;
+}
+
+
 bool translateIntrinsic(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::intrinsic>& operands) {
 	AnyString name = seq.currentSequence.stringrefs[operands.intrinsic];
 	if (unlikely(name.empty()))
 		return (error() << "invalid empty intrinsic name");
-	// named parameters are not accepted
-	if (unlikely(not seq.pushedparams.func.named.empty()))
-		return seq.complainIntrinsicWithNamedParameters(name);
-	// generic type parameters are not accepted
-	if (unlikely(not seq.pushedparams.gentypes.indexed.empty() or not seq.pushedparams.gentypes.named.empty()))
-		return seq.complainIntrinsicWithGenTypeParameters(name);
-	// checking if one parameter was already flag as 'error'
-	auto& frame = *seq.frame;
-	for (uint32_t i = 0u; i != seq.pushedparams.func.indexed.size(); ++i) {
-		if (unlikely(not frame.verify(seq.pushedparams.func.indexed[i].lvid)))
-			return false;
-	}
+	if (unlikely(not verifyParameters(seq, name)))
+		return false;
 	// trying user-defined intrinsic
 	auto* intrinsic = seq.intrinsics.find(name);
 	// if not found, this could be a compiler intrinsic
@@ -51,6 +60,7 @@ bool translateIntrinsic(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::intri
 	}
 	if (unlikely(not seq.checkForIntrinsicParamCount(name, intrinsic->paramcount)))
 		return false;
+	auto& frame = *seq.frame;
 	uint32_t count = static_cast<uint32_t>(seq.pushedparams.func.indexed.size());
 	frame.lvids(operands.lvid).synthetic = false;
 	// reset the returned type
