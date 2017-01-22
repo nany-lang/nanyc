@@ -283,14 +283,6 @@ public:
 	//! Flag to determine weather sub atoms can be instanciated in the same time
 	uint32_t layerDepthLimit = (uint32_t) - 1;
 	bool signatureOnly = false;
-	//! Force mapping from an atomid to another one
-	// This mapping is required instnaciating the code from a
-	// forked atom and to avoid invalid references
-	struct {
-		uint32_t from = 0;
-		uint32_t to = 0;
-	}
-	mappingBlueprintAtomID;
 	ir::Instruction** cursor = nullptr;
 
 }; // struct SequenceBuilder

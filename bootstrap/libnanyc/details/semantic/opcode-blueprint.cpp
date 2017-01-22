@@ -21,10 +21,6 @@ void funcOrClassOrType(SequenceBuilder& seq, const ir::isa::Operand<ir::isa::Op:
 	uint32_t lvid   = operands.lvid;
 	// retrieving the atomid - the atomid may be different from the one requested
 	// (class with generic types parameters, anonymous classes...)
-	assert(seq.mappingBlueprintAtomID.from != 0 and "mapping atomid not set");
-	assert(seq.mappingBlueprintAtomID.to   != 0 and "mapping atomid not set");
-	if (atomid == seq.mappingBlueprintAtomID.from)
-		atomid = seq.mappingBlueprintAtomID.to;
 	auto atomptr = seq.cdeftable.atoms().findAtom(atomid);
 	if (unlikely(!atomptr)) {
 		seq.complainOperand(ir::Instruction::fromOpcode(operands), "invalid atom");
@@ -93,7 +89,6 @@ void unit(SequenceBuilder& seq, const ir::isa::Operand<ir::isa::Op::blueprint>& 
 	seq.generateClassVarsAutoInit = false;
 	seq.generateClassVarsAutoRelease = false;
 	uint32_t atomid = operands.atomid;
-	assert(atomid != seq.mappingBlueprintAtomID.from and "mapping for an unit ?");
 	auto atom = seq.cdeftable.atoms().findAtom(atomid);
 	if (unlikely(!atom)) {
 		seq.complainOperand(ir::Instruction::fromOpcode(operands), "invalid unit atom");
