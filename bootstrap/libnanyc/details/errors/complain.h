@@ -17,6 +17,11 @@ struct Exception: std::exception {
 };
 
 
+struct ICE: public Exception {
+	using Exception::Exception;
+};
+
+
 struct Opcode: Exception {
 	Opcode(const ny::ir::Sequence&, const ir::Instruction&, const AnyString&);
 };
