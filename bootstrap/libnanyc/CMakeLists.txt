@@ -272,6 +272,7 @@ addsrc(
 	"details/semantic/capture-variable.cpp"
 	"details/semantic/ref-unref.h"
 	"details/semantic/assignment.cpp"
+	"details/semantic/member-variable.h"
 	"details/semantic/member-variable-default-init.cpp"
 	"details/semantic/member-variable-default-dispose.cpp"
 	"details/semantic/member-variable-default-clone.cpp"

@@ -131,14 +131,6 @@ struct Analyzer final {
 	//! Get if opcodes can be emitted (not within a type definition for example)
 	bool canGenerateCode() const;
 
-	//! Generate the function to initialize the class variables to their default values
-	void generateMemberVarDefaultInitialization();
-	//! Generate the destructor of the current class
-	void generateMemberVarDefaultDispose();
-	//! Generate the clone function of the current class
-	void generateMemberVarDefaultClone();
-
-
 	bool instanciateAssignment(const ir::isa::Operand<ir::isa::Op::call>& operands);
 
 	bool instanciateAssignment(AtomStackFrame& frame, uint32_t lhs, uint32_t rhs, bool canDisposeLHS = true,

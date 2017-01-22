@@ -1,4 +1,5 @@
 #include "semantic-analysis.h"
+#include "member-variable.h"
 
 using namespace Yuni;
 
@@ -7,13 +8,14 @@ namespace ny {
 namespace semantic {
 
 
-void Analyzer::generateMemberVarDefaultDispose() {
-	assert(frame != nullptr);
-	assert(canGenerateCode());
-	assert(frame->offsetOpcodeStacksize != (uint32_t) - 1);
+void produceMemberVarDefaultDispose(Analyzer& analyzer) {
+	assert(analyzer.canGenerateCode());
+	assert(analyzer.frame != nullptr);
+	auto& frame = *analyzer.frame;
+	assert(frame.offsetOpcodeStacksize != (uint32_t) - 1);
 	// special location: in a constructor - initializing all variables with their def value
 	// note: do not keep a reference on 'out->at...', since the internal buffer might be reized
-	auto& parentAtom = *(frame->atom.parent);
+	auto& parentAtom = *(frame.atom.parent);
 	std::vector<std::reference_wrapper<Atom>> atomvars;
 	Atom* userDefinedDispose = nullptr;
 	parentAtom.eachChild([&](Atom & subatom) -> bool {
@@ -31,7 +33,9 @@ void Analyzer::generateMemberVarDefaultDispose() {
 		return;
 	// resize
 	uint32_t more = (uint32_t)atomvars.size() + (userDefinedDispose ? 1 : 0);
-	uint32_t lvid = createLocalVariables(more);
+	uint32_t lvid = analyzer.createLocalVariables(more);
+	auto& cdeftable = analyzer.cdeftable;
+	auto& out = analyzer.out;
 	// call to user-defined operator dispose
 	if (userDefinedDispose) {
 		ir::emit::trace(out, "calling user destructor");
@@ -57,7 +61,7 @@ void Analyzer::generateMemberVarDefaultDispose() {
 		// ir::emit::trace(out, [&](){ return String("dispose for ") << subatom.name;});
 		// read the pointer
 		ir::emit::fieldget(out, reglvid, /*self*/ 2, subatom.varinfo.effectiveFieldIndex);
-		auto& origin  = frame->lvids(reglvid).origin.varMember;
+		auto& origin  = frame.lvids(reglvid).origin.varMember;
 		origin.self   = 2;
 		origin.atomid = subatom.atomid;
 		origin.field  = subatom.varinfo.effectiveFieldIndex;
@@ -70,7 +74,7 @@ void Analyzer::generateMemberVarDefaultDispose() {
 			continue;
 		}
 		if (0 == typeAtom->classinfo.dtor.atomid) {
-			if (not instanciateAtomClassDestructor(*typeAtom, reglvid))
+			if (not analyzer.instanciateAtomClassDestructor(*typeAtom, reglvid))
 				continue;
 		}
 		auto& classinfo = typeAtom->classinfo;
