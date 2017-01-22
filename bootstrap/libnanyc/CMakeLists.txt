@@ -282,6 +282,8 @@ addsrc(
 	"details/semantic/deprecated-error.h"
 	"details/semantic/deprecated-error.cpp"
 	"details/semantic/error-not-declared.cpp"
+	"details/semantic/exceptions.h"
+	"details/semantic/exceptions.cpp"
 
 	"details/semantic/opcode-ref-unref.cpp"
 	"details/semantic/opcode-identify.cpp"
