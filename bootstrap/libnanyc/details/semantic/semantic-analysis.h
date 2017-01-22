@@ -15,8 +15,7 @@ namespace ny { class Build; }
 
 
 namespace ny {
-namespace Pass {
-namespace Instanciate {
+namespace semantic {
 
 
 struct InstanciateData;
@@ -309,8 +308,7 @@ public:
 }; // struct SequenceBuilder
 
 
-} // namespace Instanciate
-} // namespace Pass
+} // namespace semantic
 } // namespace ny
 
 #include "semantic-analysis.hxx"

@@ -4,8 +4,7 @@
 
 
 namespace ny {
-namespace Pass {
-namespace Instanciate {
+namespace semantic {
 
 
 inline void SequenceBuilder::pushNewFrame(Atom& atom) {
@@ -32,6 +31,5 @@ inline bool SequenceBuilder::checkForIntrinsicParamCount(const AnyString& name, 
 }
 
 
-} // namespace Instanciate
-} // namespace Pass
+} // namespace semantic
 } // namespace ny

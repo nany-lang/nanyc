@@ -5,8 +5,7 @@ using namespace Yuni;
 
 
 namespace ny {
-namespace Pass {
-namespace Instanciate {
+namespace semantic {
 namespace TypeCheck {
 
 
@@ -138,6 +137,5 @@ Match isSimilarTo(SequenceBuilder& seq, const Classdef& from, const Classdef& to
 
 
 } // namespace TypeCheck
-} // namespace Instanciate
-} // namespace Pass
+} // namespace semantic
 } // namespace ny

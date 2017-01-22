@@ -5,8 +5,7 @@ using namespace Yuni;
 
 
 namespace ny {
-namespace Pass {
-namespace Instanciate {
+namespace semantic {
 
 
 void SequenceBuilder::generateMemberVarDefaultClone() {
@@ -93,6 +92,5 @@ void SequenceBuilder::generateMemberVarDefaultClone() {
 }
 
 
-} // namespace Instanciate
-} // namespace Pass
+} // namespace semantic
 } // namespace ny

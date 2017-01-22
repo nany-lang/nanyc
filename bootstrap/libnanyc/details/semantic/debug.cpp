@@ -4,8 +4,7 @@ using namespace Yuni;
 
 
 namespace ny {
-namespace Pass {
-namespace Instanciate {
+namespace semantic {
 
 
 void debugPrintIRSequence(const String& symbolName, const ir::Sequence& irseq,
@@ -61,6 +60,5 @@ void debugPrintClassdefs(const AtomStackFrame& frame, const ClassdefTableView& t
 }
 
 
-} // namespace Instanciate
-} // namespace Pass
+} // namespace semantic
 } // namespace ny

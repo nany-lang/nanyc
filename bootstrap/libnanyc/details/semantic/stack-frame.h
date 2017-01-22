@@ -9,8 +9,7 @@
 
 
 namespace ny {
-namespace Pass {
-namespace Instanciate {
+namespace semantic {
 
 
 struct ReturnValueMarker {
@@ -138,8 +137,7 @@ private:
 };
 
 
-} // namespace Instanciate
-} // namespace Pass
+} // namespace semantic
 } // namespace ny
 
 #include "stack-frame.hxx"

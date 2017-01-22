@@ -6,8 +6,7 @@ using namespace Yuni;
 
 
 namespace ny {
-namespace Pass {
-namespace Instanciate {
+namespace semantic {
 
 
 void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::ref>& operands) {
@@ -29,6 +28,5 @@ void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::unref>& operands
 }
 
 
-} // namespace Instanciate
-} // namespace Pass
+} // namespace semantic
 } // namespace ny

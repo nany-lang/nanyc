@@ -5,8 +5,7 @@ using namespace Yuni;
 
 
 namespace ny {
-namespace Pass {
-namespace Instanciate {
+namespace semantic {
 
 
 void SequenceBuilder::captureVariables(Atom& atom) {
@@ -162,6 +161,5 @@ bool SequenceBuilder::identifyCapturedVar(const ir::isa::Operand<ir::isa::Op::id
 }
 
 
-} // namespace Instanciate
-} // namespace Pass
+} // namespace semantic
 } // namespace ny

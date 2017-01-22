@@ -4,8 +4,7 @@
 
 
 namespace ny {
-namespace Pass {
-namespace Instanciate {
+namespace semantic {
 
 
 bool OverloadedFuncCallResolver::resolve(const std::vector<std::reference_wrapper<Atom>>& solutions) {
@@ -137,7 +136,7 @@ bool OverloadedFuncCallResolver::resolve(const std::vector<std::reference_wrappe
 				std::shared_ptr<Logs::Message> newReport;
 				auto& solutionAtom = solutions[r].get();
 				// trying to instanciate the solution
-				Pass::Instanciate::InstanciateData info {
+				ny::semantic::InstanciateData info {
 					newReport, solutionAtom, cdeftable, build, parameters[r].first, parameters[r].second
 				};
 				info.canGenerateCode = canGenerateCode;
@@ -176,6 +175,5 @@ bool OverloadedFuncCallResolver::resolve(const std::vector<std::reference_wrappe
 }
 
 
-} // namespace Instanciate
-} // namespace Pass
+} // namespace semantic
 } // namespace ny

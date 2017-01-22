@@ -5,8 +5,7 @@
 
 
 namespace ny {
-namespace Pass {
-namespace Instanciate {
+namespace semantic {
 namespace {
 
 
@@ -84,6 +83,5 @@ inline void tryUnrefObject(SequenceBuilder& sb, uint32_t lvid) {
 
 
 } // namespace
-} // namespace Instanciate
-} // namespace Pass
+} // namespace semantic
 } // namespace ny

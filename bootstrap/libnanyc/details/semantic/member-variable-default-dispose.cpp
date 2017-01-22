@@ -4,8 +4,7 @@ using namespace Yuni;
 
 
 namespace ny {
-namespace Pass {
-namespace Instanciate {
+namespace semantic {
 
 
 void SequenceBuilder::generateMemberVarDefaultDispose() {
@@ -80,6 +79,5 @@ void SequenceBuilder::generateMemberVarDefaultDispose() {
 }
 
 
-} // namespace Instanciate
-} // namespace Pass
+} // namespace semantic
 } // namespace ny

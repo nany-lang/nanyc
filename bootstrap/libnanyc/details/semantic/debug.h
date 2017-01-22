@@ -9,8 +9,7 @@
 
 
 namespace ny {
-namespace Pass {
-namespace Instanciate {
+namespace semantic {
 
 
 //! Print (to report) an IR sequence
@@ -24,6 +23,5 @@ void debugPrintSourceOpcodeSequence(const ClassdefTableView&, const Atom&, const
 void debugPrintClassdefs(const AtomStackFrame&, const ClassdefTableView&);
 
 
-} // namespace Instanciate
-} // namespace Pass
+} // namespace semantic
 } // namespace ny

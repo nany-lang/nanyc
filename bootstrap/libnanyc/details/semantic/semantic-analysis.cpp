@@ -14,8 +14,7 @@ using namespace Yuni;
 
 
 namespace ny {
-namespace Pass {
-namespace Instanciate {
+namespace semantic {
 
 
 Logs::Report emitReportEntry(void* self, Logs::Level);
@@ -220,6 +219,5 @@ void SequenceBuilder::PushedParameters::clear() {
 }
 
 
-} // namespace Instanciate
-} // namespace Pass
+} // namespace semantic
 } // namespace ny

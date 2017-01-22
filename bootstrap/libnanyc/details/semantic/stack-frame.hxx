@@ -3,8 +3,7 @@
 
 
 namespace ny {
-namespace Pass {
-namespace Instanciate {
+namespace semantic {
 
 
 inline void LVIDInfo::fillLogEntryWithLocation(Logs::Report& entry) const {
@@ -69,6 +68,5 @@ inline const LVIDInfo& AtomStackFrame::lvids(uint32_t i) const {
 }
 
 
-} // namespace Instanciate
-} // namespace Pass
+} // namespace semantic
 } // namespace ny

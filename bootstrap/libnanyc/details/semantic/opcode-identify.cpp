@@ -9,8 +9,7 @@ using namespace Yuni;
 
 
 namespace ny {
-namespace Pass {
-namespace Instanciate {
+namespace semantic {
 
 
 namespace {
@@ -520,6 +519,5 @@ void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::identifyset>& op
 }
 
 
-} // namespace Instanciate
-} // namespace Pass
+} // namespace semantic
 } // namespace ny

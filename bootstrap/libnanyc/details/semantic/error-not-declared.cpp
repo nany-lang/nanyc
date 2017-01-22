@@ -9,8 +9,7 @@ using namespace Yuni;
 
 
 namespace ny {
-namespace Pass {
-namespace Instanciate {
+namespace semantic {
 namespace complain {
 
 
@@ -202,6 +201,5 @@ bool notDeclaredInThisScope(const Atom* self, const Atom& atom, const AnyString&
 
 
 } // namespace complain
-} // namespace Instanciate
-} // namespace Pass
+} // namespace semantic
 } // namespace ny
