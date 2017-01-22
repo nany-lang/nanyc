@@ -12,7 +12,7 @@ using namespace Yuni;
 
 namespace ny {
 namespace semantic {
-
+namespace intrinsic {
 
 namespace {
 
@@ -66,25 +66,25 @@ static const std::unordered_map<AnyString, std::pair<uint32_t, BuiltinIntrinsic>
 } // anonymous namespace
 
 
-Tribool::Value Analyzer::instanciateBuiltinIntrinsicSpecific(const AnyString& name, uint32_t lvid,
-		bool canProduceError) {
+Tribool::Value nanycSpecifics(Analyzer& analyzer, const AnyString& name, uint32_t lvid, bool produceError) {
 	assert(not name.empty());
-	assert(frame != nullptr);
+	assert(analyzer.frame != nullptr);
 	auto it = builtinDispatch.find(name);
 	if (unlikely(it == builtinDispatch.end())) {
-		if (canProduceError)
+		if (produceError)
 			complain::unknownIntrinsic(name);
 		return Tribool::Value::indeterminate;
 	}
 	// checking for parameters
 	uint32_t count = it->second.first;
-	if (unlikely(not checkForIntrinsicParamCount(name, count)))
+	if (unlikely(not analyzer.checkForIntrinsicParamCount(name, count)))
 		return Tribool::Value::no;
-	frame->lvids(lvid).synthetic = false;
+	analyzer.frame->lvids(lvid).synthetic = false;
 	// intrinsic builtin found !
-	return ((it->second.second))(*this, lvid) ? Tribool::Value::yes : Tribool::Value::no;
+	return ((it->second.second))(analyzer, lvid) ? Tribool::Value::yes : Tribool::Value::no;
 }
 
 
+} // namespace intrinsic
 } // namespace semantic
 } // namespace ny

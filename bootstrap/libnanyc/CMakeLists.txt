@@ -304,6 +304,7 @@ addsrc(
 	"details/semantic/opcode-typeisobject.cpp"
 	"details/semantic/opcode-commontype.cpp"
 	"details/semantic/opcode-intrinsic.cpp"
+	"details/semantic/intrinsics.h"
 	"details/semantic/intrinsics-nanyc.cpp"
 	"details/semantic/intrinsics-lang.cpp")
 
