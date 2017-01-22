@@ -134,9 +134,6 @@ ir::Sequence* translateAndInstanciateASTIRCode(InstanciateData& info, Signature&
 		debugPrintSourceOpcodeSequence(info.cdeftable, info.atom.get(), "[ir-from-ast] ");
 	substituteParameterTypes(builder->cdeftable, atom, signature);
 	builder->layerDepthLimit = 2; // allow the first blueprint to be instanciated
-	// atomid mapping, usefull to keep track of the good atom id
-	builder->mappingBlueprintAtomID.from = atomRequested.atomid;
-	builder->mappingBlueprintAtomID.to   = atom.atomid;
 	// Read the input ir code, resolve all types, and generate
 	// a new ir code ready for execution ! (with or without optimization passes)
 	// (everything happens here)
@@ -580,9 +577,6 @@ bool instanciateAtomParameterTypes(InstanciateData& info) {
 	builder->layerDepthLimit = 2; // allow the first blueprint to be instanciated
 	builder->signatureOnly = true;
 	builder->codeGenerationLock = 666; // arbitrary value != 0 to prevent from code generation
-	// Atom ID mapping, irelevant here
-	builder->mappingBlueprintAtomID.from = atom.atomid;
-	builder->mappingBlueprintAtomID.to   = atom.atomid;
 	bool instanciated = builder->translateOpcodes(atom.opcodes.offset);
 	assert(builder->codeGenerationLock == 666);
 	if (not instanciated)
