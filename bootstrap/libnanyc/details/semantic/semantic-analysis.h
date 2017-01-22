@@ -250,12 +250,15 @@ public:
 	uint32_t currentOffset = 1;
 	//! Results for opcode 'resolve'
 	std::vector<std::reference_wrapper<Atom>> multipleResults;
-	//! Flag to generate variable member destruction after opcode 'stack size'
-	bool generateClassVarsAutoInit = false;
-	//! Flag to generate variable member initialization after opcode 'stack size'
-	bool generateClassVarsAutoRelease = false;
-	//! Flag to generate variable member cloning after opcode 'stack size'
-	bool generateClassVarsAutoClone = false;
+	struct final {
+		//! Flag to produce default member vars initialization (called from ctor)
+		bool memberVarsInit = false;
+		//! Flag to produce default member vars release (called from dtor)
+		bool memberVarsRelease = false;
+		//! Flag to produce default member vars cloning (called from copy-ctor)
+		bool memberVarsClone = false;
+	}
+	bodystart;
 
 	struct {
 		uint32_t label = 0;
