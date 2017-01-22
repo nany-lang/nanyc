@@ -18,7 +18,7 @@ namespace ny {
 namespace semantic {
 
 
-struct InstanciateData;
+struct Settings;
 class OverloadedFuncCallResolver;
 
 
@@ -205,7 +205,7 @@ struct SequenceBuilder final {
 
 
 public:
-	bool doInstanciateAtomFunc(std::shared_ptr<Logs::Message>& subreport, InstanciateData& info, uint32_t retlvid);
+	bool doInstanciateAtomFunc(std::shared_ptr<Logs::Message>& subreport, Settings& info, uint32_t retlvid);
 	void pushNewFrame(Atom& atom);
 	void popFrame();
 

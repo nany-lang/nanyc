@@ -141,7 +141,7 @@ bool emitIdentifyForProperty(SequenceBuilder& seq, const ir::isa::Operand<ir::is
 	// get new parameters
 	params.swap(overloadMatch.result.params);
 	tmplparams.swap(overloadMatch.result.tmplparams);
-	InstanciateData info{subreport, propatom, seq.cdeftable, seq.build, params, tmplparams};
+	Settings info{subreport, propatom, seq.cdeftable, seq.build, params, tmplparams};
 	if (not seq.doInstanciateAtomFunc(subreport, info, lvid))
 		return false;
 	if (seq.canGenerateCode()) {

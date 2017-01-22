@@ -136,7 +136,7 @@ bool OverloadedFuncCallResolver::resolve(const std::vector<std::reference_wrappe
 				std::shared_ptr<Logs::Message> newReport;
 				auto& solutionAtom = solutions[r].get();
 				// trying to instanciate the solution
-				ny::semantic::InstanciateData info {
+				ny::semantic::Settings info {
 					newReport, solutionAtom, cdeftable, build, parameters[r].first, parameters[r].second
 				};
 				info.canGenerateCode = canGenerateCode;
