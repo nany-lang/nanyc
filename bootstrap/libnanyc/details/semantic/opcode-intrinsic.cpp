@@ -1,6 +1,7 @@
 #include "semantic-analysis.h"
 #include "details/intrinsic/catalog.h"
 #include "deprecated-error.h"
+#include "intrinsics.h"
 
 using namespace Yuni;
 
@@ -37,8 +38,7 @@ bool translateIntrinsic(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::intri
 		return (error() << "invalid empty intrinsic name");
 	if (unlikely(not verifyParameters(seq, name)))
 		return false;
-	// official nanyc lang intrinsics
-	switch (seq.instanciateBuiltinIntrinsic(name, operands.lvid, false)) {
+	switch (intrinsic::langOrNanycSpecifics(seq, name, operands.lvid, false)) {
 		case Tribool::Value::yes:
 			return true;
 		case Tribool::Value::indeterminate:

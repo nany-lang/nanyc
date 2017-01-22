@@ -157,10 +157,6 @@ struct Analyzer final {
 	void declareNamedVariable(const AnyString& name, uint32_t lvid, bool autorelease = true);
 
 	void instanciateInstrinsicCall();
-	Yuni::Tribool::Value instanciateBuiltinIntrinsic(const AnyString& name, uint32_t lvid,
-		bool canComplain = true);
-	Yuni::Tribool::Value instanciateBuiltinIntrinsicSpecific(const AnyString& name, uint32_t lvid,
-		bool canProduceError);
 	//@}
 
 

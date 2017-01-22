@@ -2,6 +2,7 @@
 #include "atom-factory.h"
 #include "deprecated-error.h"
 #include "overloaded-func-call-resolution.h"
+#include "intrinsics.h"
 
 using namespace Yuni;
 
@@ -179,7 +180,7 @@ bool emitFuncCall(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::call>& oper
 		}
 		seq.shortcircuit.compareTo = atom->parameters.shortcircuitValue;
 		bool builtinok =
-			(Tribool::Value::yes == seq.instanciateBuiltinIntrinsic(atom->builtinalias, lvid));
+			(Tribool::Value::yes == intrinsic::langOrNanycSpecifics(seq, atom->builtinalias, lvid));
 		if (unlikely(not builtinok))
 			frame.invalidate(lvid);
 		return builtinok;

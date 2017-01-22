@@ -1,4 +1,5 @@
 #include "semantic-analysis.h"
+#include "intrinsics.h"
 #include "deprecated-error.h"
 #include "type-check.h"
 #ifdef YUNI_OS_UNIX
@@ -14,6 +15,7 @@ using namespace Yuni;
 
 namespace ny {
 namespace semantic {
+namespace intrinsic {
 
 namespace {
 
@@ -932,44 +934,46 @@ static const std::unordered_map<AnyString, std::pair<uint32_t, BuiltinIntrinsic>
 } // anonymous namespace
 
 
-Tribool::Value Analyzer::instanciateBuiltinIntrinsic(const AnyString& name, uint32_t lvid,
-		bool canProduceError) {
+Tribool::Value langOrNanycSpecifics(Analyzer& analyzer, const AnyString& name, uint32_t lvid, bool produceError) {
 	assert(not name.empty());
-	assert(frame != nullptr);
-	if (canProduceError) {
+	assert(analyzer.frame != nullptr);
+	auto& frame = *analyzer.frame;
+	if (produceError) {
+		auto& pushedparams = analyzer.pushedparams;
 		// named parameters are not accepted
 		if (unlikely(not pushedparams.func.named.empty())) {
-			complainIntrinsicWithNamedParameters(name);
+			analyzer.complainIntrinsicWithNamedParameters(name);
 			return Tribool::Value::no;
 		}
 		// generic type parameters are not accepted
 		if (unlikely(not pushedparams.gentypes.indexed.empty() or not pushedparams.gentypes.named.empty())) {
-			complainIntrinsicWithGenTypeParameters(name);
+			analyzer.complainIntrinsicWithGenTypeParameters(name);
 			return Tribool::Value::no;
 		}
 		// checking if one parameter was already flag as 'error'
 		for (uint32_t i = 0u; i != pushedparams.func.indexed.size(); ++i) {
-			if (unlikely(not frame->verify(pushedparams.func.indexed[i].lvid)))
+			if (unlikely(not frame.verify(pushedparams.func.indexed[i].lvid)))
 				return Tribool::Value::no;
 		}
 	}
 	if (name.first() == '_')
-		return instanciateBuiltinIntrinsicSpecific(name, lvid, canProduceError);
+		return intrinsic::nanycSpecifics(analyzer, name, lvid, produceError);
 	auto it = builtinDispatch.find(name);
 	if (unlikely(it == builtinDispatch.end())) {
-		if (canProduceError)
+		if (produceError)
 			complain::unknownIntrinsic(name);
 		return Tribool::Value::indeterminate;
 	}
 	// checking for parameters
 	uint32_t count = it->second.first;
-	if (unlikely(not checkForIntrinsicParamCount(name, count)))
+	if (unlikely(not analyzer.checkForIntrinsicParamCount(name, count)))
 		return Tribool::Value::no;
-	frame->lvids(lvid).synthetic = false;
+	frame.lvids(lvid).synthetic = false;
 	// intrinsic builtin found !
-	return ((it->second.second))(*this, lvid) ? Tribool::Value::yes : Tribool::Value::no;
+	return ((it->second.second))(analyzer, lvid) ? Tribool::Value::yes : Tribool::Value::no;
 }
 
 
+} // namespace intrinsic
 } // namespace semantic
 } // namespace ny
