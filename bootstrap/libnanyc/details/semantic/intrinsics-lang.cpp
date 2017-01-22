@@ -953,22 +953,21 @@ Tribool::Value Analyzer::instanciateBuiltinIntrinsic(const AnyString& name, uint
 				return Tribool::Value::no;
 		}
 	}
-	if (name.first() != '_') {
-		auto it = builtinDispatch.find(name);
-		if (unlikely(it == builtinDispatch.end())) {
-			if (canProduceError)
-				complain::unknownIntrinsic(name);
-			return Tribool::Value::indeterminate;
-		}
-		// checking for parameters
-		uint32_t count = it->second.first;
-		if (unlikely(not checkForIntrinsicParamCount(name, count)))
-			return Tribool::Value::no;
-		frame->lvids(lvid).synthetic = false;
-		// intrinsic builtin found !
-		return ((it->second.second))(*this, lvid) ? Tribool::Value::yes : Tribool::Value::no;
+	if (name.first() == '_')
+		return instanciateBuiltinIntrinsicSpecific(name, lvid, canProduceError);
+	auto it = builtinDispatch.find(name);
+	if (unlikely(it == builtinDispatch.end())) {
+		if (canProduceError)
+			complain::unknownIntrinsic(name);
+		return Tribool::Value::indeterminate;
 	}
-	return instanciateBuiltinIntrinsicSpecific(name, lvid, canProduceError);
+	// checking for parameters
+	uint32_t count = it->second.first;
+	if (unlikely(not checkForIntrinsicParamCount(name, count)))
+		return Tribool::Value::no;
+	frame->lvids(lvid).synthetic = false;
+	// intrinsic builtin found !
+	return ((it->second.second))(*this, lvid) ? Tribool::Value::yes : Tribool::Value::no;
 }
 
 
