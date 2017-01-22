@@ -6,8 +6,7 @@ using namespace Yuni;
 
 
 namespace ny {
-namespace Pass {
-namespace Instanciate {
+namespace semantic {
 namespace complain {
 
 
@@ -617,6 +616,5 @@ void SequenceBuilder::complainInvalidParametersAfterSignatureMatching(Atom& atom
 }
 
 
-} // namespace Instanciate
-} // namespace Pass
+} // namespace semantic
 } // namespace ny

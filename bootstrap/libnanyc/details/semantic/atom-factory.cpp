@@ -15,8 +15,7 @@ using namespace Yuni;
 
 
 namespace ny {
-namespace Pass {
-namespace Instanciate {
+namespace semantic {
 
 
 namespace {
@@ -216,13 +215,13 @@ bool instanciateRecursiveAtom(InstanciateData& info) {
 bool resolveTypesBeforeBodyStart(Build& build, Atom& atom, InstanciateData* originalInfo) {
 	ClassdefTableView cdeftblView{build.cdeftable};
 	if (not (originalInfo and atom.isTypeAlias())) {
-		using ParamList = decltype(Pass::Instanciate::FuncOverloadMatch::result.params);
+		using ParamList = decltype(ny::semantic::FuncOverloadMatch::result.params);
 		ParamList params; // input parameters (won't be used)
 		ParamList tmplparams;
 		std::shared_ptr<Logs::Message> newReport;
 		ny::Logs::Report report{*build.messages.get()};
-		Pass::Instanciate::InstanciateData info{newReport, atom, cdeftblView, build, params, tmplparams};
-		bool success = Pass::Instanciate::instanciateAtomParameterTypes(info);
+		ny::semantic::InstanciateData info{newReport, atom, cdeftblView, build, params, tmplparams};
+		bool success = ny::semantic::instanciateAtomParameterTypes(info);
 		if (not success)
 			report.appendEntry(newReport);
 		return success;
@@ -404,11 +403,11 @@ Atom* SequenceBuilder::instanciateAtomClass(Atom& atom) {
 	params.swap(overloadMatch.result.params);
 	tmplparams.swap(overloadMatch.result.tmplparams);
 	std::shared_ptr<Logs::Message> newReport;
-	Pass::Instanciate::InstanciateData info{newReport, atom, cdeftable, build, params, tmplparams};
+	ny::semantic::InstanciateData info{newReport, atom, cdeftable, build, params, tmplparams};
 	info.parentAtom = &(frame->atom);
 	info.shouldMergeLayer = true;
 	info.parent = this;
-	bool instanciated = Pass::Instanciate::instanciateAtom(info);
+	bool instanciated = ny::semantic::instanciateAtom(info);
 	report.subgroup().appendEntry(newReport);
 	// !! The target atom may have changed here
 	// (for any non contextual atoms, generic classes, anonymous classes...)
@@ -647,6 +646,5 @@ bool instanciateAtom(InstanciateData& info) {
 }
 
 
-} // namespace Instanciate
-} // namespace Pass
+} // namespace semantic
 } // namespace ny

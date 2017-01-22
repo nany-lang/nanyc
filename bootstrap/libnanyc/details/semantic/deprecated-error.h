@@ -11,8 +11,7 @@
 
 
 namespace ny {
-namespace Pass {
-namespace Instanciate {
+namespace semantic {
 
 class OverloadedFuncCallResolver;
 
@@ -103,6 +102,5 @@ bool multipleOverloads(uint32_t lvid, const std::vector<std::reference_wrapper<A
 
 
 } // namespace complain
-} // namespace Instanciate
-} // namespace Pass
+} // namespace semantic
 } // namespace ny

@@ -13,8 +13,7 @@ using namespace Yuni;
 
 
 namespace ny {
-namespace Pass {
-namespace Instanciate {
+namespace semantic {
 
 namespace {
 
@@ -973,6 +972,5 @@ Tribool::Value SequenceBuilder::instanciateBuiltinIntrinsic(const AnyString& nam
 }
 
 
-} // namespace Instanciate
-} // namespace Pass
+} // namespace semantic
 } // namespace ny

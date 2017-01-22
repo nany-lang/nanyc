@@ -4,8 +4,7 @@ using namespace Yuni;
 
 
 namespace ny {
-namespace Pass {
-namespace Instanciate {
+namespace semantic {
 
 
 namespace {
@@ -54,6 +53,5 @@ void updateTypesInAllStackallocOp(ir::Sequence& out, ClassdefTableView& table, u
 }
 
 
-} // namespace Instanciate
-} // namespace Pass
+} // namespace semantic
 } // namespace ny

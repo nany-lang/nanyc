@@ -6,8 +6,7 @@ using namespace Yuni;
 
 
 namespace ny {
-namespace Pass {
-namespace Instanciate {
+namespace semantic {
 
 
 void SequenceBuilder::declareNamedVariable(const AnyString& name, uint32_t lvid, bool autoreleased) {
@@ -48,6 +47,5 @@ void SequenceBuilder::declareNamedVariable(const AnyString& name, uint32_t lvid,
 // inline void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::namealias>& operands)
 // see .h
 
-} // namespace Instanciate
-} // namespace Pass
+} // namespace semantic
 } // namespace ny

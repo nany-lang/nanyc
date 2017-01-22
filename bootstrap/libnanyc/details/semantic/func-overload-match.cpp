@@ -11,8 +11,7 @@ using namespace Yuni;
 
 
 namespace ny {
-namespace Pass {
-namespace Instanciate {
+namespace semantic {
 
 
 FuncOverloadMatch::FuncOverloadMatch(SequenceBuilder* seq)
@@ -331,6 +330,5 @@ TypeCheck::Match FuncOverloadMatch::validateWithErrReport(Atom& atom, bool allow
 }
 
 
-} // namespace Instanciate
-} // namespace Pass
+} // namespace semantic
 } // namespace ny

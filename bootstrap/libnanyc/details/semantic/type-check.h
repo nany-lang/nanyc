@@ -3,12 +3,9 @@
 
 
 namespace ny {
-namespace Pass {
-namespace Instanciate {
-
+namespace semantic {
 
 struct SequenceBuilder;
-
 
 namespace TypeCheck {
 
@@ -22,7 +19,6 @@ enum class Match {
 };
 
 
-
 /*!
 ** \brief Try to tell if 2 types are similar
 **
@@ -34,10 +30,6 @@ enum class Match {
 Match isSimilarTo(SequenceBuilder&, const Classdef& A, const Classdef& B, bool allowImplicit = false);
 
 
-
-
-
 } // namespace TypeCheck
-} // namespace Instanciate
-} // namespace Pass
+} // namespace semantic
 } // namespace ny

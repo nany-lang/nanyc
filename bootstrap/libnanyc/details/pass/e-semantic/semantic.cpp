@@ -10,7 +10,7 @@ namespace ny {
 
 
 bool Build::resolveStrictParameterTypes(Atom& atom) {
-	return Pass::Instanciate::resolveStrictParameterTypes(*this, atom);
+	return ny::semantic::resolveStrictParameterTypes(*this, atom);
 }
 
 
@@ -39,14 +39,14 @@ bool Build::instanciate(const AnyString& entrypoint, const nytype_t* args, uint3
 		report.error() << "failed to instanciate '" << entrypoint << e.what();
 		return false;
 	}
-	decltype(Pass::Instanciate::FuncOverloadMatch::result.params) params;
-	decltype(Pass::Instanciate::FuncOverloadMatch::result.params) tmplparams;
+	decltype(ny::semantic::FuncOverloadMatch::result.params) params;
+	decltype(ny::semantic::FuncOverloadMatch::result.params) tmplparams;
 	std::shared_ptr<Logs::Message> newReport;
 	ClassdefTableView cdeftblView{cdeftable};
-	Pass::Instanciate::InstanciateData info {
+	ny::semantic::InstanciateData info {
 		newReport, *entrypointAtom, cdeftblView, *this, params, tmplparams
 	};
-	bool instanciated = Pass::Instanciate::instanciateAtom(info);
+	bool instanciated = ny::semantic::instanciateAtom(info);
 	report.appendEntry(newReport);
 	if (config::traces::atomTable)
 		cdeftable.atoms.root.printTree(cdeftable);

@@ -11,10 +11,8 @@
 #include <vector>
 
 
-
 namespace ny {
-namespace Pass {
-namespace Instanciate {
+namespace semantic {
 
 
 struct SequenceBuilder;
@@ -96,10 +94,5 @@ private:
 }; // class OverloadedFuncCallResolver
 
 
-
-
-
-
-} // namespace Instanciate
-} // namespace Pass
+} // namespace semantic
 } // namespace ny

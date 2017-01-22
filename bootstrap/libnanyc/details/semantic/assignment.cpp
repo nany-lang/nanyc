@@ -6,8 +6,7 @@ using namespace Yuni;
 
 
 namespace ny {
-namespace Pass {
-namespace Instanciate {
+namespace semantic {
 
 
 bool SequenceBuilder::instanciateAssignment(AtomStackFrame& frame, uint32_t lhs, uint32_t rhs,
@@ -245,6 +244,5 @@ bool SequenceBuilder::instanciateAssignment(const ir::isa::Operand<ir::isa::Op::
 }
 
 
-} // namespace Instanciate
-} // namespace Pass
+} // namespace semantic
 } // namespace ny

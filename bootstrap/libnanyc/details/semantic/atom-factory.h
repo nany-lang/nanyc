@@ -6,10 +6,8 @@
 #include "func-overload-match.h"
 
 
-
 namespace ny {
-namespace Pass {
-namespace Instanciate {
+namespace semantic {
 
 
 struct SequenceBuilder;
@@ -95,6 +93,5 @@ void updateTypesInAllStackallocOp(ir::Sequence&, ClassdefTableView&, uint32_t at
 bool resolveStrictParameterTypes(Build&, Atom& atom, InstanciateData* = nullptr);
 
 
-} // namespace Instanciate
-} // namespace Pass
+} // namespace semantic
 } // namespace ny
