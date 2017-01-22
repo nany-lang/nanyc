@@ -44,18 +44,10 @@ struct NamedParameter final {
 
 
 struct SequenceBuilder final {
-	//! \name Constructor & Destructor
-	//@{
-	//! Default constructor (importSignature must be called after)
 	SequenceBuilder(Logs::Report, ClassdefTableView&, Build&,
 		ir::Sequence* out, ir::Sequence&, SequenceBuilder* parent = nullptr);
-
-	//! Destructor
 	~SequenceBuilder();
-	//@}
 
-	//! \name Visitors for all supported opcodes
-	//@{
 	void visit(const ir::isa::Operand<ir::isa::Op::scope>&);
 	void visit(const ir::isa::Operand<ir::isa::Op::end>&);
 	void visit(const ir::isa::Operand<ir::isa::Op::ret>&);
@@ -92,12 +84,9 @@ struct SequenceBuilder final {
 	void visit(const ir::isa::Operand<ir::isa::Op::jnz>&);
 	void visit(const ir::isa::Operand<ir::isa::Op::comment>&);
 	void visit(const ir::isa::Operand<ir::isa::Op::commontype>&);
-	//! visitor - fallback
 	template<ir::isa::Op O> void visit(const ir::isa::Operand<O>&);
 
-	//! Walk through all opcodes generated from the AST
 	bool translateOpcodes(uint32_t offset);
-	//@}
 
 
 	//! \name Type checking
@@ -302,7 +291,6 @@ public:
 		uint32_t to = 0;
 	}
 	mappingBlueprintAtomID;
-	//! cursor
 	ir::Instruction** cursor = nullptr;
 
 }; // struct SequenceBuilder
