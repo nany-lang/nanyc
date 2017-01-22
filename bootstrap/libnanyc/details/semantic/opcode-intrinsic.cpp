@@ -37,19 +37,18 @@ bool translateIntrinsic(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::intri
 		return (error() << "invalid empty intrinsic name");
 	if (unlikely(not verifyParameters(seq, name)))
 		return false;
+	// official nanyc lang intrinsics
+	switch (seq.instanciateBuiltinIntrinsic(name, operands.lvid, false)) {
+		case Tribool::Value::yes:
+			return true;
+		case Tribool::Value::indeterminate:
+			break; // not found
+		case Tribool::Value::no:
+			return false; // an error has occured
+	}
 	// trying user-defined intrinsic
 	auto* intrinsic = seq.intrinsics.find(name);
-	// if not found, this could be a compiler intrinsic
 	if (!intrinsic) {
-		switch (seq.instanciateBuiltinIntrinsic(name, operands.lvid, false)) {
-			case Tribool::Value::indeterminate:
-				break; // not found
-			case Tribool::Value::yes:
-				return true;
-			case Tribool::Value::no:
-				return false; // an error has occured
-		}
-		// intrinsic not found, trying discover mode
 		if (seq.build.cf.on_binding_discovery) {
 			auto retry = seq.build.cf.on_binding_discovery(seq.build.self(), name.c_str(), name.size());
 			if (retry == nytrue)
