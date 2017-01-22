@@ -156,13 +156,13 @@ bool emitFuncCall(SequenceBuilder& seq, const ir::isa::Operand<ir::isa::Op::call
 	}
 	if (atom->builtinalias.empty()) { // normal func call
 		std::shared_ptr<Logs::Message> subreport;
-		Settings info{subreport, *atom, cdeftable, seq.build, params, tmplparams};
-		if (not seq.doInstanciateAtomFunc(subreport, info, lvid)) // instanciate the called func
+		Settings settings{subreport, *atom, cdeftable, seq.build, params, tmplparams};
+		if (not seq.doInstanciateAtomFunc(subreport, settings, lvid)) // instanciate the called func
 			return false;
 		if (seq.canGenerateCode()) {
 			for (auto& element : params) // push all parameters
 				ir::emit::push(seq.out, element.clid.lvid());
-			ir::emit::call(seq.out, lvid, atom->atomid, info.instanceid);
+			ir::emit::call(seq.out, lvid, atom->atomid, settings.instanceid);
 		}
 		return true;
 	}
@@ -296,13 +296,13 @@ bool emitPropsetCall(SequenceBuilder& seq, const ir::isa::Operand<ir::isa::Op::c
 	// get new parameters
 	params.swap(overloadMatch.result.params);
 	tmplparams.swap(overloadMatch.result.tmplparams);
-	Settings info{subreport, *atom, seq.cdeftable, seq.build, params, tmplparams};
-	if (not seq.doInstanciateAtomFunc(subreport, info, lvid))
+	Settings settings{subreport, *atom, seq.cdeftable, seq.build, params, tmplparams};
+	if (not seq.doInstanciateAtomFunc(subreport, settings, lvid))
 		return false;
 	if (seq.canGenerateCode()) {
 		for (auto& param : params)
 			ir::emit::push(seq.out, param.clid.lvid());
-		ir::emit::call(seq.out, lvid, atom->atomid, info.instanceid);
+		ir::emit::call(seq.out, lvid, atom->atomid, settings.instanceid);
 	}
 	return true;
 }

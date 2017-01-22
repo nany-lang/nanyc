@@ -141,13 +141,13 @@ bool emitIdentifyForProperty(SequenceBuilder& seq, const ir::isa::Operand<ir::is
 	// get new parameters
 	params.swap(overloadMatch.result.params);
 	tmplparams.swap(overloadMatch.result.tmplparams);
-	Settings info{subreport, propatom, seq.cdeftable, seq.build, params, tmplparams};
-	if (not seq.doInstanciateAtomFunc(subreport, info, lvid))
+	Settings settings{subreport, propatom, seq.cdeftable, seq.build, params, tmplparams};
+	if (not seq.doInstanciateAtomFunc(subreport, settings, lvid))
 		return false;
 	if (seq.canGenerateCode()) {
 		for (auto& param : params)
 			ir::emit::push(seq.out, param.clid.lvid());
-		ir::emit::call(seq.out, lvid, propatom.atomid, info.instanceid);
+		ir::emit::call(seq.out, lvid, propatom.atomid, settings.instanceid);
 	}
 	return true;
 }
