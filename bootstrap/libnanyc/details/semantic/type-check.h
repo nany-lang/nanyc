@@ -5,7 +5,7 @@
 namespace ny {
 namespace semantic {
 
-struct SequenceBuilder;
+struct Analyzer;
 
 namespace TypeCheck {
 
@@ -27,7 +27,7 @@ enum class Match {
 ** \return 'none' if not equal, othe
 ** \note B: Only a well-known classdef, with no interface and no follow-ups (and a valid atom)
 */
-Match isSimilarTo(SequenceBuilder&, const Classdef& A, const Classdef& B, bool allowImplicit = false);
+Match isSimilarTo(Analyzer&, const Classdef& A, const Classdef& B, bool allowImplicit = false);
 
 
 } // namespace TypeCheck

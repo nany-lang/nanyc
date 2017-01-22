@@ -43,10 +43,10 @@ struct NamedParameter final {
 };
 
 
-struct SequenceBuilder final {
-	SequenceBuilder(Logs::Report, ClassdefTableView&, Build&,
-		ir::Sequence* out, ir::Sequence&, SequenceBuilder* parent = nullptr);
-	~SequenceBuilder();
+struct Analyzer final {
+	Analyzer(Logs::Report, ClassdefTableView&, Build&,
+		ir::Sequence* out, ir::Sequence&, Analyzer* parent = nullptr);
+	~Analyzer();
 
 	void visit(const ir::isa::Operand<ir::isa::Op::scope>&);
 	void visit(const ir::isa::Operand<ir::isa::Op::end>&);
@@ -274,7 +274,7 @@ public:
 	mutable bool success = true;
 
 	//! Previous sequence builder
-	SequenceBuilder* parent = nullptr;
+	Analyzer* parent = nullptr;
 	//! Error reporting
 	Logs::Handler localErrorHandler;
 	Logs::MetadataHandler localMetadataHandler;
@@ -285,7 +285,7 @@ public:
 	bool signatureOnly = false;
 	ir::Instruction** cursor = nullptr;
 
-}; // struct SequenceBuilder
+}; // struct Analyzer
 
 
 } // namespace semantic

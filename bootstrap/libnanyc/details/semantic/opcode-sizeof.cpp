@@ -8,7 +8,7 @@ namespace ny {
 namespace semantic {
 
 
-void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::classdefsizeof>& operands) {
+void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::classdefsizeof>& operands) {
 	if (canGenerateCode()) {
 		if (not frame->verify(operands.type))
 			return frame->invalidate(operands.lvid);

@@ -9,7 +9,7 @@ namespace ny {
 namespace semantic {
 
 
-bool SequenceBuilder::instanciateAssignment(AtomStackFrame& frame, uint32_t lhs, uint32_t rhs,
+bool Analyzer::instanciateAssignment(AtomStackFrame& frame, uint32_t lhs, uint32_t rhs,
 		bool canDisposeLHS,
 		bool checktype, bool forceDeepcopy) {
 	// lhs and rhs can not be null, but they can be identical, to force a clone
@@ -204,7 +204,7 @@ bool SequenceBuilder::instanciateAssignment(AtomStackFrame& frame, uint32_t lhs,
 }
 
 
-bool SequenceBuilder::instanciateAssignment(const ir::isa::Operand<ir::isa::Op::call>& operands) {
+bool Analyzer::instanciateAssignment(const ir::isa::Operand<ir::isa::Op::call>& operands) {
 	assert(frame != nullptr);
 	if (unlikely(pushedparams.func.indexed.size() != 1))
 		return (ice() << "assignment: invalid number of pushed parameters");

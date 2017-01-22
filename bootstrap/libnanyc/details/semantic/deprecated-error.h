@@ -61,7 +61,7 @@ bool typesDoNotMatch(const Classdef& from, const Classdef& to);
 bool selfMissingForPropertyCall(const Atom& property, uint32_t self);
 
 //! Parameter type has vanished for some reason...
-bool parameterTypeHasVanished(const SequenceBuilder&, uint32_t);
+bool parameterTypeHasVanished(const Analyzer&, uint32_t);
 
 
 //! Return type mismatch

@@ -13,7 +13,7 @@ namespace semantic {
 namespace {
 
 
-bool bodyStart(SequenceBuilder& seq) {
+bool bodyStart(Analyzer& seq) {
 	assert(seq.frame != nullptr);
 	assert(not seq.signatureOnly);
 	assert(seq.codeGenerationLock == 0 and "any good reason to not generate code ?");
@@ -78,7 +78,7 @@ bool bodyStart(SequenceBuilder& seq) {
 }
 
 
-void codegen(SequenceBuilder& seq, bool onoff) {
+void codegen(Analyzer& seq, bool onoff) {
 	auto& refcount = seq.codeGenerationLock;
 	if (onoff) {
 		if (refcount > 0) // re-enable code generation
@@ -89,7 +89,7 @@ void codegen(SequenceBuilder& seq, bool onoff) {
 }
 
 
-void blueprintSize(SequenceBuilder& seq, uint32_t opcodeCount) {
+void blueprintSize(Analyzer& seq, uint32_t opcodeCount) {
 	if (0 == seq.layerDepthLimit) {
 		// ignore the current blueprint
 		//*cursor += operands.value.blueprintsize;
@@ -105,7 +105,7 @@ void blueprintSize(SequenceBuilder& seq, uint32_t opcodeCount) {
 }
 
 
-void shortcircuitMutateToBool(SequenceBuilder& seq, const ir::isa::Operand<ir::isa::Op::pragma>& operands) {
+void shortcircuitMutateToBool(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::pragma>& operands) {
 	uint32_t lvid = operands.value.shortcircuitMutate.lvid;
 	uint32_t source = operands.value.shortcircuitMutate.source;
 	seq.frame->lvids(lvid).synthetic = false;
@@ -134,7 +134,7 @@ void shortcircuitMutateToBool(SequenceBuilder& seq, const ir::isa::Operand<ir::i
 } // anonymous namespace
 
 
-void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::pragma>& operands) {
+void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::pragma>& operands) {
 	switch (operands.pragma) {
 		case ir::isa::Pragma::codegen: {
 			codegen(*this, operands.value.codegen != 0);

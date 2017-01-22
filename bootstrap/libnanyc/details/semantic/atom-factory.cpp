@@ -129,7 +129,7 @@ ir::Sequence* translateAndInstanciateASTIRCode(Settings& settings, Signature& si
 	Logs::Report report{*settings.report};
 	auto& irin = *(atom.opcodes.ircode);
 	auto& irout = instance.ircode();
-	auto builder = std::make_unique<SequenceBuilder>(report.subgroup(), newView, settings.build, &irout, irin, settings.parent);
+	auto builder = std::make_unique<Analyzer>(report.subgroup(), newView, settings.build, &irout, irin, settings.parent);
 	if (config::traces::sourceOpcodeSequence)
 		debugPrintSourceOpcodeSequence(settings.cdeftable, settings.atom.get(), "[ir-from-ast] ");
 	substituteParameterTypes(builder->cdeftable, atom, signature);
@@ -284,7 +284,7 @@ bool resolveStrictParameterTypes(Build& build, Atom& atom, Settings* originalInf
 }
 
 
-bool SequenceBuilder::instanciateAtomClassClone(Atom& atom, uint32_t lvid, uint32_t rhs) {
+bool Analyzer::instanciateAtomClassClone(Atom& atom, uint32_t lvid, uint32_t rhs) {
 	assert(not signatureOnly);
 	assert(atom.isClass());
 	if (unlikely(atom.flags(Atom::Flags::error)))
@@ -326,7 +326,7 @@ bool SequenceBuilder::instanciateAtomClassClone(Atom& atom, uint32_t lvid, uint3
 }
 
 
-bool SequenceBuilder::instanciateAtomClassDestructor(Atom& atom, uint32_t lvid) {
+bool Analyzer::instanciateAtomClassDestructor(Atom& atom, uint32_t lvid) {
 	assert(not signatureOnly);
 	// if the ir code produced when transforming the AST is invalid,
 	// a common scenario is that the code tries to destroy something (via unref)
@@ -373,7 +373,7 @@ bool SequenceBuilder::instanciateAtomClassDestructor(Atom& atom, uint32_t lvid) 
 }
 
 
-Atom* SequenceBuilder::instanciateAtomClass(Atom& atom) {
+Atom* Analyzer::instanciateAtomClass(Atom& atom) {
 	assert(atom.isClass());
 	// mark the atom being instanciated as 'instanciated'. For classes with gen. type parameters
 	// a new atom will be created and only this one will be marked
@@ -418,7 +418,7 @@ Atom* SequenceBuilder::instanciateAtomClass(Atom& atom) {
 }
 
 
-bool SequenceBuilder::instanciateAtomFunc(uint32_t& instanceid, Atom& funcAtom, uint32_t retlvid, uint32_t p1,
+bool Analyzer::instanciateAtomFunc(uint32_t& instanceid, Atom& funcAtom, uint32_t retlvid, uint32_t p1,
 		uint32_t p2) {
 	assert(funcAtom.isFunction() or funcAtom.isTypeAlias());
 	assert(frame != nullptr);
@@ -458,7 +458,7 @@ bool SequenceBuilder::instanciateAtomFunc(uint32_t& instanceid, Atom& funcAtom, 
 }
 
 
-bool SequenceBuilder::doInstanciateAtomFunc(std::shared_ptr<Logs::Message>& subreport, Settings& settings,
+bool Analyzer::doInstanciateAtomFunc(std::shared_ptr<Logs::Message>& subreport, Settings& settings,
 		uint32_t retlvid) {
 	// even within a typeof, any new instanciation must see their code generated
 	// (and its errors generated)
@@ -492,10 +492,10 @@ bool SequenceBuilder::doInstanciateAtomFunc(std::shared_ptr<Logs::Message>& subr
 }
 
 
-bool SequenceBuilder::getReturnTypeForRecursiveFunc(const Atom& atom, Classdef& rettype) const {
+bool Analyzer::getReturnTypeForRecursiveFunc(const Atom& atom, Classdef& rettype) const {
 	// looking for the parent sequence builder currently generating ir for this atom
 	// since the func is not fully instanciated yet, the real types are kept by cdeftable
-	const SequenceBuilder* parentBuilder = nullptr;
+	const Analyzer* parentBuilder = nullptr;
 	auto atomid = atom.atomid;
 	for (auto* sb = this; sb != nullptr; ) {
 		auto* builderIT = sb;
@@ -572,7 +572,7 @@ bool instanciateAtomParameterTypes(Settings& settings) {
 	ClassdefTableView newview{settings.cdeftable, atom.atomid, signature.parameters.size()};
 	auto& irin = *(atom.opcodes.ircode);
 	auto* irout = (ir::Sequence*) nullptr;
-	auto builder = std::make_unique<SequenceBuilder>(report.subgroup(), newview, settings.build, irout, irin, settings.parent);
+	auto builder = std::make_unique<Analyzer>(report.subgroup(), newview, settings.build, irout, irin, settings.parent);
 	builder->layerDepthLimit = 2; // allow the first blueprint to be instanciated
 	builder->signatureOnly = true;
 	builder->codeGenerationLock = 666; // arbitrary value != 0 to prevent from code generation

@@ -9,7 +9,7 @@ namespace ny {
 namespace semantic {
 
 
-void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::ret>& operands) {
+void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::ret>& operands) {
 	// current frame
 	if (unlikely(frame->atom.type != Atom::Type::funcdef)) // just in case
 		return (void)(error() << "return values are only accepted in functions");

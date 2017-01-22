@@ -8,7 +8,7 @@ namespace ny {
 namespace semantic {
 
 
-void SequenceBuilder::captureVariables(Atom& atom) {
+void Analyzer::captureVariables(Atom& atom) {
 	// Try to capture variables from a list of potentiel candidates created by the mapping
 	// get the ownership of the container to release it
 	assert(atom.candidatesForCapture != nullptr);
@@ -122,7 +122,7 @@ void SequenceBuilder::captureVariables(Atom& atom) {
 }
 
 
-bool SequenceBuilder::pushCapturedVarsAsParameters(const Atom& atomclass) {
+bool Analyzer::pushCapturedVarsAsParameters(const Atom& atomclass) {
 	atomclass.eachChild([&](Atom & child) -> bool {
 		if (child.isCapturedVariable()) {
 			AnyString varname{child.name(), /*offset*/ (uint32_t)::strlen("^trap^")};
@@ -149,7 +149,7 @@ bool SequenceBuilder::pushCapturedVarsAsParameters(const Atom& atomclass) {
 }
 
 
-bool SequenceBuilder::identifyCapturedVar(const ir::isa::Operand<ir::isa::Op::identify>& operands,
+bool Analyzer::identifyCapturedVar(const ir::isa::Operand<ir::isa::Op::identify>& operands,
 		const AnyString& name) {
 	AnyString captureName;
 	{

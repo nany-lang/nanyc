@@ -44,7 +44,7 @@ bool fetchPushedParameters(const P& pushedparams, O& overloadMatch, const AtomSt
 }
 
 
-bool emitFuncCall(SequenceBuilder& seq, const ir::isa::Operand<ir::isa::Op::call>& operands) {
+bool emitFuncCall(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::call>& operands) {
 	// alias (to make it local)
 	uint32_t lvid = operands.lvid;
 	auto& frame = *seq.frame;
@@ -188,7 +188,7 @@ bool emitFuncCall(SequenceBuilder& seq, const ir::isa::Operand<ir::isa::Op::call
 
 
 //! Generate short circuit jumps
-bool generateShortCircuitInstrs(SequenceBuilder& seq, uint32_t retlvid) {
+bool generateShortCircuitInstrs(Analyzer& seq, uint32_t retlvid) {
 	assert(seq.canGenerateCode());
 	// insert some code after the computation of the first argument but before
 	// the computation of the second one to achieve minimal evaluation
@@ -246,7 +246,7 @@ bool generateShortCircuitInstrs(SequenceBuilder& seq, uint32_t retlvid) {
 }
 
 
-bool emitPropsetCall(SequenceBuilder& seq, const ir::isa::Operand<ir::isa::Op::call>& operands) {
+bool emitPropsetCall(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::call>& operands) {
 	if (unlikely(seq.pushedparams.func.indexed.size() != 1))
 		return (ice() << "calling a property setter with more than one value");
 	if (unlikely(not seq.pushedparams.func.named.empty()))
@@ -311,7 +311,7 @@ bool emitPropsetCall(SequenceBuilder& seq, const ir::isa::Operand<ir::isa::Op::c
 } // anonymous namespace
 
 
-void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::call>& operands) {
+void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::call>& operands) {
 	// A 'call' can represent several language features.
 	// after AST transformation, assignments are method calls
 	// ('a = b' have been transformed into 'a.=(b)'). However this is not

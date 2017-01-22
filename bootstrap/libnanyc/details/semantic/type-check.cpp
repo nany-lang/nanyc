@@ -12,7 +12,7 @@ namespace TypeCheck {
 namespace { // anonymous
 
 
-Match isAtomSimilarTo(SequenceBuilder& seq, Atom& atom, Atom& to) {
+Match isAtomSimilarTo(Analyzer& seq, Atom& atom, Atom& to) {
 	if (&atom == &to) // identity
 		return Match::strictEqual;
 	if (atom.type != to.type) // can not be similar to a different type
@@ -89,7 +89,7 @@ Match isAtomSimilarTo(SequenceBuilder& seq, Atom& atom, Atom& to) {
 } // anonymous namespace
 
 
-Match isSimilarTo(SequenceBuilder& seq, const Classdef& from, const Classdef& to, bool allowImplicit) {
+Match isSimilarTo(Analyzer& seq, const Classdef& from, const Classdef& to, bool allowImplicit) {
 	// identity
 	// (note: comparing only the address of 'from' and 'to' is not good enough
 	//   since symlink may exist in the table.classdef table)

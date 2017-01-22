@@ -8,7 +8,7 @@ namespace ny {
 namespace semantic {
 
 
-void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::ensureresolved>& operands) {
+void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::ensureresolved>& operands) {
 	bool ok = [&]() -> bool {
 		assert(frame != nullptr);
 		if (not frame->verify(operands.lvid))

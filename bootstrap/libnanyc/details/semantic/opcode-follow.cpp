@@ -7,7 +7,7 @@ namespace ny {
 namespace semantic {
 
 
-void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::follow>& operands) {
+void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::follow>& operands) {
 	// in 'signature only' mode (resolving defined parameter types), all
 	// types must be gathered
 	if (not operands.symlink or signatureOnly) {

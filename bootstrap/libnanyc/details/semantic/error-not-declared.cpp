@@ -74,7 +74,7 @@ bool notDeclaredInThisScope(const Atom* self, const Atom& atom, const AnyString&
 	if (name.first() == '%') // generated variable namie - already reported
 		return false;
 	auto err = error();
-	auto* seq = Logs::userHandler<SequenceBuilder>();
+	auto* seq = Logs::userHandler<Analyzer>();
 	if (!seq) {
 		err << "not declared in scope <invalid sequence builder>";
 		return false;

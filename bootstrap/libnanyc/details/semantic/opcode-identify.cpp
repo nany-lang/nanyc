@@ -27,7 +27,7 @@ bool tryFindProperties(const ir::isa::Operand<ir::isa::Op::identify>& operands,
 }
 
 
-bool emitIdentifyForSingleResult(SequenceBuilder& seq, bool isLocalVar, const Classdef& cdef,
+bool emitIdentifyForSingleResult(Analyzer& seq, bool isLocalVar, const Classdef& cdef,
 		const ir::isa::Operand<ir::isa::Op::identify>& operands, const AnyString& name) {
 	auto& resultAtom = seq.multipleResults[0].get();
 	const Classdef* cdefTypedef = nullptr;
@@ -116,7 +116,7 @@ bool emitIdentifyForSingleResult(SequenceBuilder& seq, bool isLocalVar, const Cl
 }
 
 
-bool emitIdentifyForProperty(SequenceBuilder& seq, const ir::isa::Operand<ir::isa::Op::identify>& operands,
+bool emitIdentifyForProperty(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::identify>& operands,
 		Atom& propatom, uint32_t self) {
 	// report for instanciation
 	std::shared_ptr<Logs::Message> subreport;
@@ -153,7 +153,7 @@ bool emitIdentifyForProperty(SequenceBuilder& seq, const ir::isa::Operand<ir::is
 }
 
 
-bool identifyByPointerAssignment(SequenceBuilder& seq, const AnyString& name,
+bool identifyByPointerAssignment(Analyzer& seq, const AnyString& name,
 		const ir::isa::Operand<ir::isa::Op::identify>& operands) {
 	// since self was marked as an 'assignment', we're trying to resolve here '^()'
 	if (unlikely(name != "^()")) {
@@ -177,7 +177,7 @@ bool identifyByPointerAssignment(SequenceBuilder& seq, const AnyString& name,
 } // namespace
 
 
-Atom& SequenceBuilder::resolveTypeAlias(Atom& original, const Classdef*& resultcdef) {
+Atom& Analyzer::resolveTypeAlias(Atom& original, const Classdef*& resultcdef) {
 	assert(original.isTypeAlias());
 	assert(resultcdef == nullptr); // a null value will indicate a fail
 	// trying a direct resolution
@@ -224,7 +224,7 @@ Atom& SequenceBuilder::resolveTypeAlias(Atom& original, const Classdef*& resultc
 }
 
 
-bool SequenceBuilder::identify(const ir::isa::Operand<ir::isa::Op::identify>& operands,
+bool Analyzer::identify(const ir::isa::Operand<ir::isa::Op::identify>& operands,
 		const AnyString& name, bool firstChance) {
 	// target lvid
 	uint32_t lvid = operands.lvid;
@@ -503,7 +503,7 @@ bool SequenceBuilder::identify(const ir::isa::Operand<ir::isa::Op::identify>& op
 }
 
 
-void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::identify>& operands) {
+void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::identify>& operands) {
 	assert(frame != nullptr);
 	AnyString name = currentSequence.stringrefs[operands.text];
 	bool ok = identify(operands, name);
@@ -513,7 +513,7 @@ void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::identify>& opera
 }
 
 
-void SequenceBuilder::visit(const ir::isa::Operand<ir::isa::Op::identifyset>& operands) {
+void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::identifyset>& operands) {
 	auto& newopc = ir::Instruction::fromOpcode(operands).to<ir::isa::Op::identify>();
 	visit(newopc);
 }
