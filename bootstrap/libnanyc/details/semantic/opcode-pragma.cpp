@@ -2,6 +2,7 @@
 #include "details/ir/emit.h"
 #include "deprecated-error.h"
 #include "ref-unref.h"
+#include "member-variable.h"
 
 using namespace Yuni;
 
@@ -63,15 +64,15 @@ bool bodyStart(Analyzer& seq) {
 	if (atom.isSpecial() and generateCode and success) {
 		if (seq.generateClassVarsAutoInit) { // ctor
 			seq.generateClassVarsAutoInit = false;
-			seq.generateMemberVarDefaultInitialization();
+			produceMemberVarDefaultInitialization(seq);
 		}
 		if (seq.generateClassVarsAutoRelease) { // dtor
 			seq.generateClassVarsAutoRelease = false;
-			seq.generateMemberVarDefaultDispose();
+			produceMemberVarDefaultDispose(seq);
 		}
 		if (seq.generateClassVarsAutoClone) { // deep copy (ctor)
 			seq.generateClassVarsAutoClone = false;
-			seq.generateMemberVarDefaultClone();
+			produceMemberVarDefaultClone(seq);
 		}
 	}
 	return success;

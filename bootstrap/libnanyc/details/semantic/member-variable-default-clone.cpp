@@ -1,4 +1,5 @@
 #include "semantic-analysis.h"
+#include "member-variable.h"
 #include "ref-unref.h"
 
 using namespace Yuni;
@@ -8,16 +9,17 @@ namespace ny {
 namespace semantic {
 
 
-void Analyzer::generateMemberVarDefaultClone() {
-	assert(frame != nullptr);
-	assert(canGenerateCode());
-	assert(frame->offsetOpcodeStacksize != (uint32_t) - 1);
+void produceMemberVarDefaultClone(Analyzer& analyzer) {
+	assert(analyzer.canGenerateCode());
+	assert(analyzer.frame != nullptr);
+	auto& frame = *analyzer.frame;
+	assert(frame.offsetOpcodeStacksize != (uint32_t) - 1);
 	// special location: in a constructor - initializing all variables with their def value
 	// note: do not keep a reference on 'out->at...', since the internal buffer might be reized
-	auto& parentAtom = *(frame->atom.parent);
+	auto& parentAtom = *(frame.atom.parent);
 	// do not warn about rhs (unused). The parameter is used, but not via its name
 	// reminder: 1-based, 1: returntype, 2: self, 3: first parameter rhs
-	frame->lvids(3).warning.unused = false;
+	frame.lvids(3).warning.unused = false;
 	// looking for all members to clone
 	std::vector<std::reference_wrapper<Atom>> atomvars;
 	Atom* userDefinedClone = nullptr;
@@ -34,9 +36,11 @@ void Analyzer::generateMemberVarDefaultClone() {
 	});
 	if (atomvars.empty() and userDefinedClone == nullptr)
 		return;
+	auto& cdeftable = analyzer.cdeftable;
+	auto& out = analyzer.out;
 	// create new local variables for performing the cline
 	uint32_t more = (uint32_t)atomvars.size() * 2 + (userDefinedClone ? 1 : 0);
-	uint32_t lvid = createLocalVariables(more);
+	uint32_t lvid = analyzer.createLocalVariables(more);
 	for (auto& subatomref : atomvars) {
 		auto& subatom = subatomref.get();
 		auto& cdef    = cdeftable.classdef(subatom.returnType.clid); // type of the var member
@@ -47,7 +51,7 @@ void Analyzer::generateMemberVarDefaultClone() {
 			case nyt_any: {
 				uint32_t rhsptr = lvid++; // rhs value, from the object being cloned
 				uint32_t lhsptr = lvid++; // the target local value
-				auto& origin  = frame->lvids(rhsptr).origin.varMember;
+				auto& origin  = frame.lvids(rhsptr).origin.varMember;
 				origin.self   = 2;
 				origin.atomid = subatom.atomid;
 				origin.field  = subatom.varinfo.effectiveFieldIndex;
@@ -60,12 +64,12 @@ void Analyzer::generateMemberVarDefaultClone() {
 				// fetching the rhs value, from the object being copied
 				ir::emit::fieldget(out, rhsptr, /*rhs*/ 3, subatom.varinfo.effectiveFieldIndex);
 				// perform a deep copy to the local variable
-				instanciateAssignment(*frame, lhsptr, rhsptr, false);
+				analyzer.instanciateAssignment(frame, lhsptr, rhsptr, false);
 				// .. copied to the member
 				ir::emit::fieldset(out, lhsptr, /*self*/ 2, subatom.varinfo.effectiveFieldIndex);
 				// prevent the cloned object from being released at the end of the scope
-				assert(canBeAcquired(*this, lhsptr));
-				frame->lvids(lhsptr).autorelease = false;
+				assert(canBeAcquired(analyzer, lhsptr));
+				frame.lvids(lhsptr).autorelease = false;
 				break;
 			}
 			case nyt_void: {
