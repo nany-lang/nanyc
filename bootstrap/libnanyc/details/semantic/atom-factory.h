@@ -13,8 +13,8 @@ namespace semantic {
 struct SequenceBuilder;
 
 
-struct InstanciateData final {
-	InstanciateData(std::shared_ptr<Logs::Message>& report, Atom& atom, ClassdefTableView& cdeftable, Build& build,
+struct Settings final {
+	Settings(std::shared_ptr<Logs::Message>& report, Atom& atom, ClassdefTableView& cdeftable, Build& build,
 			decltype(FuncOverloadMatch::result.params)& params,
 			decltype(FuncOverloadMatch::result.params)& tmplparams)
 		: cdeftable(cdeftable)
@@ -56,15 +56,15 @@ struct InstanciateData final {
 	std::shared_ptr<Logs::Message>& report;
 	bool signatureOnly = false;
 
-}; // struct InstanciateData
+}; // struct Settings
 
 
 /*!
 ** \brief Instanciate atom
 */
-bool instanciateAtom(InstanciateData& info);
+bool instanciateAtom(Settings& info);
 
-bool instanciateAtomParameterTypes(InstanciateData& info);
+bool instanciateAtomParameterTypes(Settings& info);
 
 
 /*!
@@ -83,7 +83,7 @@ void updateTypesInAllStackallocOp(ir::Sequence&, ClassdefTableView&, uint32_t at
 **   func foo(p1, p2: StrictTypeP2) // Here, TypeP2 must be resolved
 ** This is required for func overloading deduction
 */
-bool resolveStrictParameterTypes(Build&, Atom& atom, InstanciateData* = nullptr);
+bool resolveStrictParameterTypes(Build&, Atom& atom, Settings* = nullptr);
 
 
 } // namespace semantic

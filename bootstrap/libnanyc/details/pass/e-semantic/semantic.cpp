@@ -43,7 +43,7 @@ bool Build::instanciate(const AnyString& entrypoint, const nytype_t* args, uint3
 	decltype(ny::semantic::FuncOverloadMatch::result.params) tmplparams;
 	std::shared_ptr<Logs::Message> newReport;
 	ClassdefTableView cdeftblView{cdeftable};
-	ny::semantic::InstanciateData info {
+	ny::semantic::Settings info {
 		newReport, *entrypointAtom, cdeftblView, *this, params, tmplparams
 	};
 	bool instanciated = ny::semantic::instanciateAtom(info);

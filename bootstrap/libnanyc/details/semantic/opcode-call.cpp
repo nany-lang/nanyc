@@ -156,7 +156,7 @@ bool emitFuncCall(SequenceBuilder& seq, const ir::isa::Operand<ir::isa::Op::call
 	}
 	if (atom->builtinalias.empty()) { // normal func call
 		std::shared_ptr<Logs::Message> subreport;
-		InstanciateData info{subreport, *atom, cdeftable, seq.build, params, tmplparams};
+		Settings info{subreport, *atom, cdeftable, seq.build, params, tmplparams};
 		if (not seq.doInstanciateAtomFunc(subreport, info, lvid)) // instanciate the called func
 			return false;
 		if (seq.canGenerateCode()) {
@@ -296,7 +296,7 @@ bool emitPropsetCall(SequenceBuilder& seq, const ir::isa::Operand<ir::isa::Op::c
 	// get new parameters
 	params.swap(overloadMatch.result.params);
 	tmplparams.swap(overloadMatch.result.tmplparams);
-	InstanciateData info{subreport, *atom, seq.cdeftable, seq.build, params, tmplparams};
+	Settings info{subreport, *atom, seq.cdeftable, seq.build, params, tmplparams};
 	if (not seq.doInstanciateAtomFunc(subreport, info, lvid))
 		return false;
 	if (seq.canGenerateCode()) {

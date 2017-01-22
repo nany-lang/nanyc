@@ -21,7 +21,7 @@ namespace semantic {
 namespace {
 
 
-void prepareSignature(Signature& signature, InstanciateData& info) {
+void prepareSignature(Signature& signature, Settings& info) {
 	uint32_t count = static_cast<uint32_t>(info.params.size());
 	if (count != 0) {
 		signature.parameters.resize(count);
@@ -52,7 +52,7 @@ void prepareSignature(Signature& signature, InstanciateData& info) {
 }
 
 
-bool duplicateAtomForSpecialization(InstanciateData& info, Atom& atom) {
+bool duplicateAtomForSpecialization(Settings& info, Atom& atom) {
 	// create a new atom with non-generic parameters / from a contextual atom
 	// (generic or anonymous class) and re-map from the parent
 	//auto* ircode = atom.opcodes.ircode;
@@ -104,7 +104,7 @@ void substituteParameterTypes(ClassdefTableView& cdeftable, Atom& atom, const Si
 }
 
 
-ir::Sequence* translateAndInstanciateASTIRCode(InstanciateData& info, Signature& signature) {
+ir::Sequence* translateAndInstanciateASTIRCode(Settings& info, Signature& signature) {
 	auto& atomRequested = info.atom.get();
 	if (unlikely(!atomRequested.opcodes.ircode or !atomRequested.parent)) {
 		ny::complain::invalidAtom("ast ir code translation");
@@ -193,7 +193,7 @@ ir::Sequence* translateAndInstanciateASTIRCode(InstanciateData& info, Signature&
 }
 
 
-bool instanciateRecursiveAtom(InstanciateData& info) {
+bool instanciateRecursiveAtom(Settings& info) {
 	Atom& atom = info.atom.get();
 	if (unlikely(not atom.isFunction()))
 		return ny::complain::invalidRecursiveAtom(atom.caption());
@@ -209,7 +209,7 @@ bool instanciateRecursiveAtom(InstanciateData& info) {
 }
 
 
-bool resolveTypesBeforeBodyStart(Build& build, Atom& atom, InstanciateData* originalInfo) {
+bool resolveTypesBeforeBodyStart(Build& build, Atom& atom, Settings* originalInfo) {
 	ClassdefTableView cdeftblView{build.cdeftable};
 	if (not (originalInfo and atom.isTypeAlias())) {
 		using ParamList = decltype(ny::semantic::FuncOverloadMatch::result.params);
@@ -217,7 +217,7 @@ bool resolveTypesBeforeBodyStart(Build& build, Atom& atom, InstanciateData* orig
 		ParamList tmplparams;
 		std::shared_ptr<Logs::Message> newReport;
 		ny::Logs::Report report{*build.messages.get()};
-		ny::semantic::InstanciateData info{newReport, atom, cdeftblView, build, params, tmplparams};
+		ny::semantic::Settings info{newReport, atom, cdeftblView, build, params, tmplparams};
 		bool success = ny::semantic::instanciateAtomParameterTypes(info);
 		if (not success)
 			report.appendEntry(newReport);
@@ -242,7 +242,7 @@ bool resolveTypesBeforeBodyStart(Build& build, Atom& atom, InstanciateData* orig
 } // anonymous namespace
 
 
-bool resolveStrictParameterTypes(Build& build, Atom& atom, InstanciateData* originalInfo) {
+bool resolveStrictParameterTypes(Build& build, Atom& atom, Settings* originalInfo) {
 	switch (atom.type) {
 		case Atom::Type::funcdef:
 		case Atom::Type::typealias: {
@@ -400,7 +400,7 @@ Atom* SequenceBuilder::instanciateAtomClass(Atom& atom) {
 	params.swap(overloadMatch.result.params);
 	tmplparams.swap(overloadMatch.result.tmplparams);
 	std::shared_ptr<Logs::Message> newReport;
-	ny::semantic::InstanciateData info{newReport, atom, cdeftable, build, params, tmplparams};
+	ny::semantic::Settings info{newReport, atom, cdeftable, build, params, tmplparams};
 	info.parentAtom = &(frame->atom);
 	info.shouldMergeLayer = true;
 	info.parent = this;
@@ -449,7 +449,7 @@ bool SequenceBuilder::instanciateAtomFunc(uint32_t& instanceid, Atom& funcAtom, 
 	tmplparams.swap(overloadMatch.result.tmplparams);
 	// instanciate the called func
 	std::shared_ptr<Logs::Message> subreport;
-	InstanciateData info{subreport, funcAtom, cdeftable, build, params, tmplparams};
+	Settings info{subreport, funcAtom, cdeftable, build, params, tmplparams};
 	bool instok = doInstanciateAtomFunc(subreport, info, retlvid);
 	instanceid = info.instanceid;
 	if (unlikely(not instok and retlvid != 0))
@@ -458,7 +458,7 @@ bool SequenceBuilder::instanciateAtomFunc(uint32_t& instanceid, Atom& funcAtom, 
 }
 
 
-bool SequenceBuilder::doInstanciateAtomFunc(std::shared_ptr<Logs::Message>& subreport, InstanciateData& info,
+bool SequenceBuilder::doInstanciateAtomFunc(std::shared_ptr<Logs::Message>& subreport, Settings& info,
 		uint32_t retlvid) {
 	// even within a typeof, any new instanciation must see their code generated
 	// (and its errors generated)
@@ -549,7 +549,7 @@ bool SequenceBuilder::getReturnTypeForRecursiveFunc(const Atom& atom, Classdef& 
 }
 
 
-bool instanciateAtomParameterTypes(InstanciateData& info) {
+bool instanciateAtomParameterTypes(Settings& info) {
 	// Despite the location of this code, no real code instanciation
 	// of any sort will be done (the code is the same, that's why).
 	// This pass only intends to resolve user-given types for parameters
@@ -602,7 +602,7 @@ bool instanciateAtomParameterTypes(InstanciateData& info) {
 }
 
 
-bool instanciateAtom(InstanciateData& info) {
+bool instanciateAtom(Settings& info) {
 	try {
 		Signature signature;
 		prepareSignature(signature, info);
