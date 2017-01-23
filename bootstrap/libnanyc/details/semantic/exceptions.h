@@ -1,6 +1,6 @@
 #pragma once
 #include "semantic-analysis.h"
-#include "details/errors/complain.h"
+#include "details/errors/exception.h"
 
 
 namespace ny {
