@@ -15,12 +15,14 @@ struct Error: std::exception {
 	Error() = default;
 	Error(const AnyString&);
 	const char* what() const noexcept override { return msg.c_str(); }
+	virtual void complain() const;
 	yuni::String msg;
 };
 
 
 struct ICE: public Error {
 	using Error::Error;
+	void complain() const override;
 };
 
 
@@ -31,6 +33,7 @@ struct Opcode: Error {
 
 struct SilentFall final: std::exception {
 	const char* what() const noexcept override { return "error silently ignored"; }
+	void complain() const override {}
 };
 
 
