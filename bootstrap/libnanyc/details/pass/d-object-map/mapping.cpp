@@ -1,6 +1,7 @@
 #include "mapping.h"
 #include "details/atom/classdef-table-view.h"
 #include "details/ir/sequence.h"
+#include "details/errors/exception.h"
 #include "details/errors/complain.h"
 
 using namespace Yuni;
