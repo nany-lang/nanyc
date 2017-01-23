@@ -31,7 +31,7 @@ struct Opcode: Error {
 };
 
 
-struct SilentFall final: std::exception {
+struct SilentFall final: Error {
 	const char* what() const noexcept override { return "error silently ignored"; }
 	void complain() const override {}
 };
