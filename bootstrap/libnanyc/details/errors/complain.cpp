@@ -46,6 +46,16 @@ bool inconsistentGenericTypeParameterIndex() {
 }
 
 
+void Error::complain() const {
+	error() << msg;
+}
+
+
+void ICE::complain() const {
+	ice() << msg;
+}
+
+
 Error::Error(const AnyString& msg)
 	: msg{msg} {
 }
