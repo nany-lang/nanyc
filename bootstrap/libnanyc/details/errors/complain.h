@@ -11,18 +11,18 @@ namespace ny {
 namespace complain {
 
 
-struct Exception: std::exception {
+struct Error: std::exception {
 	const char* what() const noexcept override { return msg.c_str(); }
 	yuni::String msg;
 };
 
 
-struct ICE: public Exception {
-	using Exception::Exception;
+struct ICE: public Error {
+	using Error::Error;
 };
 
 
-struct Opcode: Exception {
+struct Opcode: Error {
 	Opcode(const ny::ir::Sequence&, const ir::Instruction&, const AnyString&);
 };
 
