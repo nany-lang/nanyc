@@ -46,6 +46,11 @@ bool inconsistentGenericTypeParameterIndex() {
 }
 
 
+Error::Error(const AnyString& msg)
+	: msg{msg} {
+}
+
+
 Opcode::Opcode(const ny::ir::Sequence& ircode, const ir::Instruction& operands, const AnyString& usermsg) {
 	// ICE: unknown opcode 'resolveAttribute': from 'ref %4 = resolve %3."()"'
 	if (not usermsg.empty())

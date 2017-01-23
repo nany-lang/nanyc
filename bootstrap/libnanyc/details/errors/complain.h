@@ -12,6 +12,8 @@ namespace complain {
 
 
 struct Error: std::exception {
+	Error() = default;
+	Error(const AnyString&);
 	const char* what() const noexcept override { return msg.c_str(); }
 	yuni::String msg;
 };
