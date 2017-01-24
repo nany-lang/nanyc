@@ -69,24 +69,20 @@ bool foreach(Analyzer& analyzer, uint32_t lvid) {
 		auto* cbackAtom = cdeftable.findClassdefAtom(cbackCdef);
 		if (unlikely(!cbackAtom))
 			return (ice() << "cxx::reflect::foreach");
-		Atom* functor = nullptr;
-		switch (cbackAtom->findFuncAtom(functor, "^()")) {
-			case 1: break;
-			case 0: return (error() << "callback must be a functor");
-			default: return (error() << "multiple operator () not supported for callback");
-		}
 		auto count = atom.childrenCount();
 		if (!count)
 			return true;
-		IndexedParameter indexedParam{0, analyzer.currentLine, analyzer.currentOffset};
-		uint32_t lvid = analyzer.createLocalVariables(count);
+		auto& reflectCall = *cdeftable.atoms().core.reflection.call;
+		IndexedParameter paramTmpl{0, analyzer.currentLine, analyzer.currentOffset};
+		IndexedParameter paramCallback{cbackLvid, analyzer.currentLine, analyzer.currentOffset};
+		uint32_t lvid = analyzer.createLocalVariables(count * 2);
 		atom.eachChild([&](Atom& child) -> bool {
 			cdeftable.substitute(lvid).mutateToAtom(&child);
+			paramTmpl.lvid = lvid++;
 			analyzer.pushedparams.clear();
-			indexedParam.lvid = lvid;
-			analyzer.pushedparams.gentypes.indexed.emplace_back(indexedParam);
-			auto* typeinfo = analyzer.instanciateAtomClass(*cdeftable.atoms().core.typeinfo);
-			++lvid;
+			analyzer.pushedparams.gentypes.indexed.emplace_back(paramTmpl);
+			analyzer.pushedparams.func.indexed.emplace_back(paramCallback);
+			//auto* typeinfo = analyzer.instanciateAtomFunc(reflectCall);
 			return true;
 		});
 		return true;
