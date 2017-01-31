@@ -202,6 +202,7 @@ private:
 	void emitTmplParametersIfAny();
 	void doEmitTmplParameters();
 	void emitExprAttributes(uint32_t& localvar);
+	bool fetchAttributes(AST::Node&);
 
 }; // class Scope
 
