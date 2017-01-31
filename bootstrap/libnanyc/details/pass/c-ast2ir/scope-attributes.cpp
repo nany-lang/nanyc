@@ -28,6 +28,14 @@ struct AttributeContext final {
 };
 
 
+inline AST::Node* getNodeValue(AST::Node& node) {
+	switch (node.children.size()) {
+		case 1: return nullptr;
+		case 2: return &(node.children[1]);
+	}
+	throw UnexpectedNode(node, "invalid attribute parameter node");
+}
+
 } // namespace
 
 
@@ -39,17 +47,7 @@ bool Scope::fetchAttributes(AST::Node& node) {
 			// checking for node type
 			if (unlikely(child.rule != AST::rgAttributesParameter))
 				throw UnexpectedNode(child, "invalid node, not attribute parameter");
-			AST::Node* nodevalue;
-			switch (child.children.size()) {
-				case 1:
-					nodevalue = nullptr;
-					break;
-				case 2:
-					nodevalue = &(child.children[1]);
-					break;
-				default:
-					throw UnexpectedNode(child, "invalid attribute parameter node");
-			}
+			AST::Node* nodevalue = getNodeValue(child);
 			AST::Node& nodekey = child.children[0];
 			if (unlikely(nodekey.rule != AST::rgEntity))
 				throw UnexpectedNode(child, "invalid attribute parameter name type");
