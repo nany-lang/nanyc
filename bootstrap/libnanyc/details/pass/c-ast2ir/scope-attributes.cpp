@@ -12,17 +12,29 @@ namespace ir {
 namespace Producer {
 
 
+namespace {
+
+
+struct AttributeContext final {
+	AttributeContext(AST::Node& node)
+		: storage{std::make_unique<Attributes>(node)}
+		, attributes(*storage)
+	{}
+	ShortString32 name;
+	ShortString32 value;
+	std::unique_ptr<Attributes> storage;
+	Attributes& attributes;
+};
+
+
+} // namespace
+
+
 bool Scope::visitASTAttributes(AST::Node& node) {
 	assert(node.rule == AST::rgAttributes);
 	if (unlikely(node.children.empty()))
 		return true;
-	// instanciate attributes
-	attributes = std::make_unique<Attributes>(node);
-	auto& attrs = *attributes;
-	// attribute name
-	ShortString32& attrname = context.reuse.attributes.attrname;
-	// temporary buffer for value interpretation
-	ShortString32& value = context.reuse.attributes.value;
+	AttributeContext ctx{node};
 	for (auto& child : node.children) {
 		// checking for node type
 		if (unlikely(child.rule != AST::rgAttributesParameter))
@@ -43,98 +55,99 @@ bool Scope::visitASTAttributes(AST::Node& node) {
 			return unexpectedNode(child, "invalid attribute parameter name type");
 		if (nodevalue) {
 			if (unlikely(nodevalue->rule != AST::rgEntity))
-				return (error(child) << "unsupported expression for attribute value");
+				return (error(child) << "unsupported expression for attribute ctx.value");
 		}
-		attrname.clear();
-		value.clear();
-		if (not AST::appendEntityAsString(attrname, nodekey))
+		ctx.name.clear();
+		ctx.value.clear();
+		if (not AST::appendEntityAsString(ctx.name, nodekey))
 			return unexpectedNode(child, "invalid entity");
-		switch (attrname[0]) {
+		switch (ctx.name[0]) {
 			case 'n': {
-				if (attrname == "nodiscard") {
+				if (ctx.name == "nodiscard") {
 					if (unlikely(nodevalue))
-						return (error(child) << "no value expected for attribute '" << attrname << '\'');
+						return (error(child) << "no ctx.value expected for attribute '" << ctx.name << '\'');
 					break;
 				}
 			}
 			// [[fallthru]]
 			case 'p': {
-				if (attrname == "per") {
+				if (ctx.name == "per") {
 					if (unlikely(!nodevalue))
-						return (error(child) << "value expected for attribute '" << attrname << '\'');
-					AST::appendEntityAsString(value, *nodevalue);
-					if (value == "thread")
+						return (error(child) << "ctx.value expected for attribute '" << ctx.name << '\'');
+					AST::appendEntityAsString(ctx.value, *nodevalue);
+					if (ctx.value == "thread")
 						warning(child) << "ignored attribute 'per: thread'";
-					else if (value == "process")
+					else if (ctx.value == "process")
 						warning(child) << "ignored attribute 'per: process'";
 					else
-						return (error(child) << "invalid 'per' value");
+						return (error(child) << "invalid 'per' ctx.value");
 					break;
 				}
 			}
 			// [[fallthru]]
 			case 's': {
-				if (attrname == "nosuggest") {
-					attrs.flags += Attributes::Flag::doNotSuggest;
+				if (ctx.name == "nosuggest") {
+					ctx.attributes.flags += Attributes::Flag::doNotSuggest;
 					if (unlikely(nodevalue))
-						return (error(child) << "the attribute '" << attrname << "' does not accept values");
+						return (error(child) << "the attribute '" << ctx.name << "' does not accept ctx.values");
 					break;
 				}
 			}
 			// [[fallthru]]
 			case 't': {
-				if (attrname == "threadproc") {
-					attrs.flags += Attributes::Flag::threadproc;
+				if (ctx.name == "threadproc") {
+					ctx.attributes.flags += Attributes::Flag::threadproc;
 					if (unlikely(nodevalue))
-						return (error(child) << "the attribute '" << attrname << "' does not accept values");
+						return (error(child) << "the attribute '" << ctx.name << "' does not accept ctx.values");
 					break;
 				}
 			}
 			// [[fallthru]]
 			case '_': {
-				if (attrname == "__nanyc_builtinalias") {
+				if (ctx.name == "__nanyc_builtinalias") {
 					if (unlikely(!nodevalue))
-						return (error(child) << "value expected for attribute '" << attrname << '\'');
-					attrs.builtinAlias = nodevalue;
-					attrs.flags += Attributes::Flag::builtinAlias;
+						return (error(child) << "ctx.value expected for attribute '" << ctx.name << '\'');
+					ctx.attributes.builtinAlias = nodevalue;
+					ctx.attributes.flags += Attributes::Flag::builtinAlias;
 					break;
 				}
-				if (attrname == "__nanyc_shortcircuit") {
+				if (ctx.name == "__nanyc_shortcircuit") {
 					if (unlikely(!nodevalue))
-						return (error(child) << "value expected for attribute '" << attrname << '\'');
-					AST::appendEntityAsString(value, *nodevalue);
-					bool isTrue = (value == "__true");
-					if (not isTrue and (value.empty() or value != "__false")) {
-						error(child.children[1]) << "invalid shortcircuit value, expected '__false' or '__true', got '"
-												 << value << "'";
+						return (error(child) << "ctx.value expected for attribute '" << ctx.name << '\'');
+					AST::appendEntityAsString(ctx.value, *nodevalue);
+					bool isTrue = (ctx.value == "__true");
+					if (not isTrue and (ctx.value.empty() or ctx.value != "__false")) {
+						error(child.children[1]) << "invalid shortcircuit ctx.value, expected '__false' or '__true', got '"
+												 << ctx.value << "'";
 						return false;
 					}
 					if (isTrue)
-						attrs.flags += Attributes::Flag::shortcircuit;
+						ctx.attributes.flags += Attributes::Flag::shortcircuit;
 					break;
 				}
-				if (attrname == "__nanyc_synthetic") {
-					attrs.flags += Attributes::Flag::pushSynthetic;
+				if (ctx.name == "__nanyc_synthetic") {
+					ctx.attributes.flags += Attributes::Flag::pushSynthetic;
 					if (unlikely(nodevalue))
-						return (error(child) << "the attribute '" << attrname << "' does not accept values");
+						return (error(child) << "the attribute '" << ctx.name << "' does not accept ctx.values");
 					break;
 				}
 				// [FALLBACK]
 				// ignore vendor specific attributes (starting by '__')
-				if (attrname.size() > 2 and attrname[1] == '_') {
+				if (ctx.name.size() > 2 and ctx.name[1] == '_') {
 					// emit a warning for the unsupported specific nany attributes
-					if (unlikely(attrname.startsWith("__nanyc_")))
-						warning(child) << "unknown nanyc attribute '" << attrname << "'";
+					if (unlikely(ctx.name.startsWith("__nanyc_")))
+						warning(child) << "unknown nanyc attribute '" << ctx.name << "'";
 					break;
 				}
 			}
 			// [[fallthru]]
 			default: {
-				error(child) << "unknown attribute '" << attrname << '\'';
+				error(child) << "unknown attribute '" << ctx.name << '\'';
 				return false;
 			}
 		}
 	}
+	attributes = std::move(ctx.storage);
 	return true;
 }
 
