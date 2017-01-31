@@ -30,10 +30,8 @@ struct AttributeContext final {
 } // namespace
 
 
-bool Scope::visitASTAttributes(AST::Node& node) {
+bool Scope::fetchAttributes(AST::Node& node) {
 	assert(node.rule == AST::rgAttributes);
-	if (unlikely(node.children.empty()))
-		return true;
 	AttributeContext ctx{node};
 	for (auto& child : node.children) {
 		// checking for node type

@@ -151,6 +151,11 @@ inline void Scope::moveAttributes(Scope& scope) {
 }
 
 
+inline bool Scope::visitASTAttributes(AST::Node& node) {
+	return node.children.empty() or fetchAttributes(node);
+}
+
+
 } // namespace Producer
 } // namespace ir
 } // namespace ny
