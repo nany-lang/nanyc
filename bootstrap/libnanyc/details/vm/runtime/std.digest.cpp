@@ -2,7 +2,6 @@
 #include "details/intrinsic/catalog.h"
 #include "details/vm/context.h"
 #include <yuni/core/hash/checksum/md5.h>
-#include <iostream>
 
 using namespace Yuni;
 
