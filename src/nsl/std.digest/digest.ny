@@ -17,3 +17,19 @@ public func md5(ptr: std.c.ptr, size: std.c.u64): ref string {
 	var p = !!__nanyc_digest_md5(ptr, size);
 	return std.memory.nanyc_internal_create_string(p);
 }
+
+
+#[nosuggest] public func xxhash32(ptr: __pointer, size: __u32): u32
+	-> new u32(!!__nanyc_digest_xxhash32(ptr, size));
+
+
+public func xxhash32(ptr: __pointer, size: u32): u32
+	-> new u32(!!__nanyc_digest_xxhash32(ptr, size.pod));
+
+
+#[nosuggest] public func xxhash64(ptr: __pointer, size: __u64): u64
+	-> new u64(!!__nanyc_digest_xxhash64(ptr, size));
+
+
+public func xxhash64(ptr: __pointer, size: u64): u64
+	-> new u64(!!__nanyc_digest_xxhash64(ptr, size.pod));
