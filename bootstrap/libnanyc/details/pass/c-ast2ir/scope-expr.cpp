@@ -145,6 +145,9 @@ bool Scope::visitASTExprContinuation(AST::Node& node, uint32_t& localvar, bool a
 			case AST::rgArray:
 				success &= visitASTArray(child, localvar);
 				break;
+			case AST::rgOn:
+				success &= visitASTExprOn(child, localvar, allowScope);
+				break;
 			// scope may appear in expr (when expr are actually statements)
 			case AST::rgScope:
 				success &= visitScope(*this, child, allowScope);

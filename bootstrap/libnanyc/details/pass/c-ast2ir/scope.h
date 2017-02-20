@@ -110,6 +110,7 @@ public:
 	bool visitASTExprIn(AST::Node&, uint32_t& localvar, Yuni::ShortString128& elementname);
 	bool visitASTExprClosure(AST::Node&, uint32_t& localvar);
 	bool visitASTExprObject(AST::Node&, uint32_t& localvar);
+	bool visitASTExprOn(AST::Node&, uint32_t& localvar, bool isStmt = true);
 	bool visitASTExprTemplate(AST::Node&, uint32_t& localvar);
 	bool visitASTDeclGenericTypeParameters(AST::Node&);
 	bool visitASTUnitTest(AST::Node&);

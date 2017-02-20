@@ -169,9 +169,8 @@ bool emitVarInFunc(Scope& scope, const AnyString& varname, AST::Node& node, AST:
 			ir::emit::ref(irout, varlvid);
 		}
 	}
-	// important: the alias must be declared *after* the right value
-	// (otherwise it may be used by the code)
-	scope.emitDebugpos(node); // reset the debug position
+	// the alias must be declared *after* the expr value (or it could be used by the code)
+	scope.emitDebugpos(node);
 	ir::emit::namealias(irout, varlvid, varname);
 	return true;
 }
