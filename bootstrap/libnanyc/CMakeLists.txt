@@ -227,6 +227,7 @@ addsrc(
 	"details/pass/c-ast2ir/scope-var.cpp"
 	"details/pass/c-ast2ir/scope-class.cpp"
 	"details/pass/c-ast2ir/scope-expr.cpp"
+	"details/pass/c-ast2ir/scope-on.cpp"
 	"details/pass/c-ast2ir/scope-call.cpp"
 	"details/pass/c-ast2ir/scope-return.cpp"
 	"details/pass/c-ast2ir/scope-stmt.cpp"

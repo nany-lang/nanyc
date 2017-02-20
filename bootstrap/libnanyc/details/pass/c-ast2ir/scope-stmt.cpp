@@ -57,6 +57,10 @@ bool Scope::visitASTStmt(AST::Node& orignode) {
 						return (not attrs ? true : visitASTAttributes(*attrs)) and visitASTFunc(*child);
 					case AST::rgSwitch:
 						return (not attrs ? true : visitASTAttributes(*attrs)) and visitASTExprSwitch(*child);
+					case AST::rgOn: {
+						uint32_t localvar = 0;
+						return (not attrs ? true : visitASTAttributes(*attrs)) and visitASTExprOn(*child, localvar);
+					}
 					default: {
 					}
 				}

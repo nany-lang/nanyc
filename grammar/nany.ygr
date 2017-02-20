@@ -226,6 +226,8 @@ tk-default: notext
 tk-typeof: notext
 	'typeof' sp
 
+tk-scope: notext
+	'scope' sp
 
 
 
@@ -736,6 +738,18 @@ each: important, notext
 
 
 
+// --- ON ---
+
+on-scope: notext
+	tk-scope scope
+
+on-entry: notext hidden
+	| on-scope
+	| error-eol
+
+on: notext, important
+	tk-on on-entry (wp tk-on on-entry)*
+
 
 
 // --- TYPEDEF ---
@@ -962,6 +976,7 @@ expr-value: notext
 	| in
 	| intrinsic
 	| function
+	| on
 	| unittest
 	| ex-value
 	| scope

@@ -529,6 +529,29 @@ void Context::prepareReuseForShorthandArray() {
 }
 
 
+void Context::prepareReuseForScopeExit() {
+	//  expr
+	//      expr-value
+	//          new
+	//              type-decl
+	//                  class
+	//                      class-body
+	//                          function (+2)
+	//                              function-kind
+	//                              |   function-kind-operator
+	//                              |       function-kind-opname: dispose
+	//                              func-body
+	auto newnode = make_ref<AST::Node>(AST::rgExpr);
+	reuse.scope.exit.node = newnode;
+	auto& typeDecl = newnode->append(AST::rgExprValue, AST::rgNew, AST::rgTypeDecl);
+	auto& func = typeDecl.append(AST::rgClass, AST::rgClassBody, AST::rgFunction);
+	auto& dispose = func.append(AST::rgFunctionKind, AST::rgFunctionKindOperator, AST::rgFunctionKindOpname);
+	dispose.text = "dispose";
+	auto& body = func.append(AST::rgFuncBody);
+	reuse.scope.exit.body = &body;
+}
+
+
 } // namespace Producer
 } // namespace ir
 } // namespace ny

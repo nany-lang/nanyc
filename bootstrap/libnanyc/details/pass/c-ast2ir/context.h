@@ -78,6 +78,8 @@ public:
 	void prepareReuseForAnonymObjects();
 	//! re-use objects for shorthand arrays
 	void prepareReuseForShorthandArray();
+	//! re=use objects for executing code when exiting the scope
+	void prepareReuseForScopeExit();
 	//@}
 
 
@@ -224,6 +226,15 @@ public:
 			yuni::Ref<AST::Node> typeofcall = nullptr;
 		}
 		shorthandArray;
+
+		struct {
+			struct {
+				yuni::Ref<AST::Node> node;
+				yuni::Ref<AST::Node> body;
+			}
+			exit;
+		}
+		scope;
 	}
 	reuse;
 
