@@ -16,7 +16,7 @@ namespace {
 
 
 bool varValueInitialization(Scope& scope, uint32_t& localvar, AST::Node& varAssign,
-							AST::Node& varnodeDecl, const AnyString& varname) {
+		AST::Node& varnodeDecl, const AnyString& varname) {
 	for (auto& assignChild : varAssign.children) {
 		switch (assignChild.rule) {
 			case AST::rgExpr: {
@@ -65,7 +65,7 @@ bool generateTypeofForClassVar(Scope& scope, uint32_t& lvid, AST::Node& varAssig
 
 
 bool generateInitFuncForClassVar(Scope& scope, const AnyString& varname, uint32_t lvid,
-								 AST::Node& varAssign) {
+		AST::Node& varAssign) {
 	// name of the generated func for initialize the class variable
 	ShortString64 funcName;
 	funcName << "^default-var-%" << lvid << '-' << varname;
