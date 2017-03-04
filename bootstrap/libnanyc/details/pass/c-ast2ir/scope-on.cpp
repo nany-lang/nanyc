@@ -12,16 +12,7 @@ namespace Producer {
 namespace {
 
 
-bool onScope(Scope& scope, AST::Node& node) {
-	AST::Node* scopeNode = nullptr;
-	for (auto& child : node.children) {
-		switch (child.rule) {
-			case AST::rgScope: scopeNode = &child; break;
-			default: return unexpectedNode(child, "[on/scope]");
-		}
-	}
-	if (unlikely(scopeNode == nullptr))
-		return ice(node) << "ast node 'scope' expected";
+bool onScopeExit(Scope& scope, AST::Node& node, AST::Node& scopeNode) {
 	if (!scope.context.reuse.scope.exit.node)
 		scope.context.prepareReuseForScopeExit();
 	auto& irout = scope.ircode();
@@ -30,7 +21,7 @@ bool onScope(Scope& scope, AST::Node& node) {
 	ir::emit::type::qualifierRef(irout, varlvid, /*ref*/ true);
 	{
 		auto& body = *(scope.context.reuse.scope.exit.body);
-		body.children.push_back(scopeNode);
+		body.children.push_back(&scopeNode);
 		uint32_t rhs = 0;
 		ir::emit::ScopeLocker opscope{irout};
 		bool success = scope.visitASTExpr(*scope.context.reuse.scope.exit.node, rhs);
@@ -40,6 +31,22 @@ bool onScope(Scope& scope, AST::Node& node) {
 		ir::emit::assign(irout, varlvid, rhs, false);
 	}
 	return true;
+}
+
+
+bool onScope(Scope& scope, AST::Node& node) {
+	AST::Node* scopeNode = nullptr;
+	AST::Node* scopeFail = nullptr;
+	for (auto& child : node.children) {
+		switch (child.rule) {
+			case AST::rgScope: scopeNode = &child; break;
+			case AST::rgOnScopeFail: scopeFail = &child; break;
+			default: return unexpectedNode(child, "[on/scope]");
+		}
+	}
+	if (unlikely(scopeNode == nullptr))
+		return ice(node) << "ast node 'scope' expected";
+	return scopeFail == nullptr ? onScopeExit(scope, node, *scopeNode) : false;
 }
 
 
