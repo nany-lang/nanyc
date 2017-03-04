@@ -663,44 +663,7 @@ public:
 
 	uint64_t invoke(const ir::Sequence& callee);
 
-
-	void call(uint32_t retlvid, uint32_t atomfunc, uint32_t instanceid) {
-		assert(retlvid == 0 or retlvid < registerCount);
-		#if ny_vm_PRINT_OPCODES != 0
-		std::cout << "== ny:vm >>  registers before call\n";
-		for (uint32_t r = 0; r != registerCount; ++r)
-			std::cout << "== ny:vm >>     reg %" << r << " = " << registers[r].u64 << "\n";
-		std::cout << "== ny:vm >>  entering func atom:" << atomfunc;
-		std::cout << ", instance: " << instanceid << '\n';
-		#endif
-		// save the current stack frame
-		auto* storestackptr = registers;
-		auto storeircode = std::cref(ircode);
-		auto* storecursor = cursor;
-		#ifndef NDEBUG
-		auto  storestckfrmsize = registerCount;
-		#endif
-		auto labelid = upperLabelID;
-		uint32_t memcheckPreviousAtomid = memchecker.atomid();
-		stacktrace.push(atomfunc, instanceid);
-		retRegister = 0;
-		// call
-		uint64_t ret = invoke(map.ircode(atomfunc, instanceid));
-		// restore the previous stack frame and store the result of the call
-		upperLabelID = labelid;
-		registers = storestackptr;
-		registers[retlvid].u64 = ret;
-		ircode = std::cref(storeircode);
-		cursor = storecursor;
-		#ifndef NDEBUG
-		registerCount = storestckfrmsize;
-		#endif
-		stacktrace.pop();
-		memchecker.atomid(memcheckPreviousAtomid);
-		#if ny_vm_PRINT_OPCODES != 0
-		std::cout << "== ny:vm <<  returned from func call\n";
-		#endif
-	}
+	void call(uint32_t retlvid, uint32_t atomfunc, uint32_t instanceid);
 
 }; // struct ContextRunner
 
