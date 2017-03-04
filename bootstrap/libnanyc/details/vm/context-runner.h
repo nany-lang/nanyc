@@ -42,12 +42,9 @@ struct ContextRunner final {
 	constexpr static const int patternAlloc = 0xCD;
 	constexpr static const int patternFree = 0xCD;
 
-	struct Exception: public std::exception {
-	};
-	struct Abort final : public Exception {
-	};
-	struct DyncallError final : public Exception {
-	};
+	struct Exception: public std::exception {};
+	struct Abort final: public Exception {};
+	struct DyncallError final: public Exception {};
 
 	//! Registers for the current stack frame
 	DataRegister* registers = nullptr;
@@ -219,9 +216,9 @@ public:
 		ASSERT_LVID(opr.lvid);
 		ASSERT_LVID(opr.lhs);
 		ASSERT_LVID(opr.rhs);
-		registers[opr.lvid].u64 =
-			static_cast<uint64_t>(static_cast<int64_t>(registers[opr.lhs].u64) * static_cast<int64_t>
-				(registers[opr.rhs].u64) );
+		auto lhs = static_cast<int64_t>(registers[opr.lhs].u64);
+		auto rhs = static_cast<int64_t>(registers[opr.rhs].u64);
+		registers[opr.lvid].u64 = static_cast<uint64_t>(lhs * rhs);
 	}
 
 
@@ -426,8 +423,8 @@ public:
 	inline void visit(const ir::isa::Operand<ir::isa::Op::storeText>& opr) {
 		vm_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
-		registers[opr.lvid].u64 =
-			reinterpret_cast<uint64_t>(ircode.get().stringrefs[opr.text].c_str());
+		auto cstr = ircode.get().stringrefs[opr.text].c_str();
+		registers[opr.lvid].u64 = reinterpret_cast<uint64_t>(cstr);
 	}
 
 
