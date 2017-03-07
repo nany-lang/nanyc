@@ -18,6 +18,7 @@ set(nsl_files
 	"${nsl_root}/std.core/utils.ny"
 	"${nsl_root}/std.core/pointer.ny"
 	"${nsl_root}/std.core/ascii.ny"
+	"${nsl_root}/std.core/hash.ny"
 	"${nsl_root}/std.core/containers/array.ny"
 	"${nsl_root}/std.core/details/string.ny"
 
@@ -59,6 +60,7 @@ set(nsl_files
 
 set(nsl_files_unittest
 	"${nsl_root}/std.core/unittests/string.ny"
+	"${nsl_root}/std.core/unittests/hash.ny"
 	"${nsl_root}/std.core/unittests/closure.ny"
 	"${nsl_root}/std.core/unittests/view.ny"
 	"${nsl_root}/std.core/unittests/view-multiple-loops.ny"

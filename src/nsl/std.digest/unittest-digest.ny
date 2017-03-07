@@ -4,6 +4,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+
 unittest std.digest.md5
 {
 	var tryMD5 = func (cref text: string, cref expect: string) {
@@ -35,4 +36,22 @@ unittest std.digest.md5
 	// Home made
 	tryMD5("value", expect: "2063c1608d6e0baf80249c42e2be5804");
 	tryMD5("日本", expect: "4dbed2e657457884e67137d3514119b3");
+}
+
+
+unittest std.digest.xxhash32 {
+	assert(0u != std.digest.xxhash32(null, 0__u32));
+	assert(0u != std.digest.xxhash32(null, 0u));
+	var s = "hello world";
+	assert(0u != std.digest.xxhash32(s.data, s.size.pod));
+	assert(0u != std.digest.xxhash32(s.data, s.size));
+}
+
+
+unittest std.digest.xxhash64 {
+	assert(0u64 != std.digest.xxhash64(null, 0__u64));
+	assert(0u64 != std.digest.xxhash64(null, 0u64));
+	var s = "hello world";
+	assert(0u64 != std.digest.xxhash64(s.data, 0__u64 + s.size.pod));
+	assert(0u64 != std.digest.xxhash64(s.data, 0u64 + s.size));
 }

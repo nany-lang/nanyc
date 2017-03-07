@@ -599,6 +599,7 @@ target_compile_definitions(libnanyc PRIVATE "LIBNANYC_DLL_EXPORT=1")
 
 target_include_directories(libnanyc PRIVATE "${libnany_config_folder}")
 target_include_directories(libnanyc PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../ext/dyncall/")
+target_include_directories(libnanyc PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../ext/xxhash/include")
 target_include_directories(libnanyc PUBLIC  "${CMAKE_CURRENT_LIST_DIR}")
 target_include_directories(libnanyc PUBLIC  "${CMAKE_CURRENT_LIST_DIR}/include")
 target_include_directories(libnanyc-grammar PUBLIC "${CMAKE_CURRENT_LIST_DIR}")
