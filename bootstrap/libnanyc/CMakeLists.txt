@@ -311,6 +311,8 @@ addsrc(
 	"details/semantic/opcode-intrinsic.cpp"
 	"details/semantic/intrinsics.h"
 	"details/semantic/intrinsics-nanyc.cpp"
+	"details/semantic/intrinsics-nanyc-reflection.cpp"
+	"details/semantic/intrinsics-nanyc-reflection.h"
 	"details/semantic/intrinsics-lang.cpp")
 
 addsrc(

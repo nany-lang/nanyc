@@ -55,6 +55,27 @@ auto findBuiltinAtom(Atom& root, nytype_t kind, const AnyString& name) {
 }
 
 
+auto& findNamespace(Atom& root, const AnyString& name) {
+	auto* atom = root.findNamespaceAtom(name);
+	if (unlikely(!atom))
+		throw MissingBuiltin(name);
+	return *atom;
+}
+
+
+auto identifyAtom(Atom& root, const AnyString& name) {
+	Atom* atom = nullptr;
+	switch (root.findFuncAtom(atom, name)) {
+		case 1: {
+			assert(atom != nullptr);
+			return Ref<Atom>{atom};
+		}
+		case 0:  throw MissingBuiltin{name};
+		default: throw MultipleDefinition{name};
+	}
+}
+
+
 } // anonymous namespace
 
 
@@ -112,6 +133,13 @@ bool AtomMap::fetchAndIndexCoreObjects() {
 		core.object[nyt_f32]  = findBuiltinAtom(root, nyt_f32,  "f32");
 		core.object[nyt_f64]  = findBuiltinAtom(root, nyt_f64,  "f64");
 		core.object[nyt_ptr]  = findBuiltinAtom(root, nyt_ptr,  "pointer");
+		auto& nmstd = findNamespace(root, "std");
+		auto& nmreflect = findNamespace(nmstd, "reflection");
+		nmreflect.eachChild([](const Atom& child) -> bool {
+			trace() << "------ " << child.caption() << " | " << child.name();
+			return true;
+		});
+		core.reflection.call = identifyAtom(nmreflect, "call");
 		return true;
 	}
 	catch (const MissingBuiltin& e) {
