@@ -1,0 +1,37 @@
+stages:
+    - build
+
+variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+
+
+# build
+
+.template-debug-build-linux: &debug-build-linux
+    stage: build
+    variables:
+        BUILD_TYPE: "debug"
+    script:
+        - assets/build/build.sh
+    tags:
+        - linux
+
+~centos-7:
+    <<: *debug-build-linux
+    image: registry.gitlab.com/nany-lang/nanyc:centos-7
+
+~debian-8:
+    <<: *debug-build-linux
+    image: registry.gitlab.com/nany-lang/nanyc:debian-8
+
+~debian-9:
+    <<: *debug-build-linux
+    image: registry.gitlab.com/nany-lang/nanyc:debian-9
+
+~ubuntu-16.04:
+    <<: *debug-build-linux
+    image: registry.gitlab.com/nany-lang/nanyc:ubuntu-16.04
+
+~ubuntu-17.04:
+    <<: *debug-build-linux
+    image: registry.gitlab.com/nany-lang/nanyc:ubuntu-17.04
