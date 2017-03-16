@@ -4,7 +4,7 @@
 // <major>.<minor>.<patch>-<prerelease>+<metadata>
 // note: metadata will be set by cmake in `bootstrap`
 version_major: 0
-version_minor: 2
+version_minor: 3
 version_patch: 0
 version_prerelease: alpha
 version_metadata:
