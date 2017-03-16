@@ -48,6 +48,11 @@ variables:
         - assets/build/build.sh
     tags:
         - linux
+    artifacts:
+        paths:
+            - distrib/*.deb
+            - distrib/*.rpm
+        expire_in: 2 weeks
 
 centos-7:
     <<: *package-linux
