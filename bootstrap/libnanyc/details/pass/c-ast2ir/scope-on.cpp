@@ -46,7 +46,9 @@ bool onScope(Scope& scope, AST::Node& node) {
 	}
 	if (unlikely(scopeNode == nullptr))
 		return ice(node) << "ast node 'scope' expected";
-	return scopeFail == nullptr ? onScopeExit(scope, node, *scopeNode) : false;
+	return (scopeFail != nullptr)
+		? scope.visitASTExprOnScopeFail(*scopeNode, *scopeFail)
+		: onScopeExit(scope, node, *scopeNode);
 }
 
 

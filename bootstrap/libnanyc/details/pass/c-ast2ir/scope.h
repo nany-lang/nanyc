@@ -96,6 +96,7 @@ public:
 	bool visitASTExprNumber(AST::Node&, uint32_t& localvar);
 	bool visitASTExprObject(AST::Node&, uint32_t& localvar);
 	bool visitASTExprOn(AST::Node&, uint32_t& localvar, bool isStmt = true);
+	bool visitASTExprOnScopeFail(AST::Node& scopeNode, AST::Node& scopeFailNode);
 	bool visitASTExprReturn(AST::Node&);
 	bool visitASTExprScope(AST::Node&);
 	bool visitASTExprString(AST::Node&, uint32_t& localvar);

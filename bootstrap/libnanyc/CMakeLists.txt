@@ -277,6 +277,7 @@ add_library(libnanyc ${mode_libnany}
 	"details/pass/c-ast2ir/scope-new.cpp"
 	"details/pass/c-ast2ir/scope-number.cpp"
 	"details/pass/c-ast2ir/scope-object.cpp"
+	"details/pass/c-ast2ir/scope-on-scope-fail.cpp"
 	"details/pass/c-ast2ir/scope-on.cpp"
 	"details/pass/c-ast2ir/scope-return.cpp"
 	"details/pass/c-ast2ir/scope-scope.cpp"
