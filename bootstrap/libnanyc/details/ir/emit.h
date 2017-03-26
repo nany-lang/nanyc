@@ -552,6 +552,29 @@ inline void trace(IRCodeRef ref) {
 namespace ny {
 namespace ir {
 namespace emit {
+namespace on {
+namespace {
+
+
+inline uint32_t scopefail(IRCodeRef ref, uint32_t lvid, uint32_t label) {
+	uint32_t offset = ref.ircode.opcodeCount();
+	auto& operands = ref.ircode.emit<isa::Op::onscopefail>();
+	operands.lvid  = lvid;
+	operands.label = label;
+	return offset;
+}
+
+
+} // namespace
+} // namespace on
+} // namespace emit
+} // namespace ir
+} // namespace ny
+
+
+namespace ny {
+namespace ir {
+namespace emit {
 namespace type {
 namespace {
 

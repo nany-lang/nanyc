@@ -735,6 +735,11 @@ namespace // anonymous
 		}
 
 
+		void print(const Operand<Op::onscopefail>& operands) {
+			line() << "on scope fail %" << operands.lvid << ", jmp %" << operands.label;
+		}
+
+
 		template<ny::ir::isa::Op O> inline void visit(const Operand<O>& instr) {
 			print(instr);
 			printEOL();

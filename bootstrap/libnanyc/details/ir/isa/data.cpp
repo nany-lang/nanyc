@@ -99,6 +99,7 @@ AnyString opname(ny::ir::isa::Op opcode) {
 		case Op::negation:       return "negation";
 		case Op::neq:            return "neq";
 		case Op::nop:            return "nop";
+		case Op::onscopefail:    return "onscopefail";
 		case Op::opand:          return "opand";
 		case Op::opassert:       return "opassert";
 		case Op::opmod:          return "opmod";

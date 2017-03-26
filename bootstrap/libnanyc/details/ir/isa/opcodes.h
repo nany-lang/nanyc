@@ -114,6 +114,7 @@ enum class Op : std::uint32_t {
 	scope,          ///< begining of a new scope
 	typeisobject,   ///< check if a given type is an object
 	qualifiers,     ///< ref, conf
+	onscopefail,    ///< catch an error
 
 	end,            ///< end of scope (and the last opcode)
 };
@@ -234,6 +235,7 @@ enum class Op : std::uint32_t {
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::typeisobject) \
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::qualifiers) \
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::end) \
+			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::onscopefail) \
 			\
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::nop) \
 	} \
