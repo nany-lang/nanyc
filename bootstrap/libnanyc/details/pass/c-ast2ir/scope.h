@@ -74,47 +74,46 @@ public:
 	//! \name AST::Node visitor
 	//@{
 	bool visitAST(AST::Node&);
-	bool visitASTStmt(AST::Node&);
-	bool visitASTFunc(AST::Node&);
-	bool visitASTClass(AST::Node&, uint32_t* localvar = nullptr);
-	bool visitASTType(AST::Node&, uint32_t& localvar);
-	bool visitASTTypedef(AST::Node&);
-	bool visitASTFor(AST::Node&);
+	bool visitASTArray(AST::Node&, uint32_t& localvar);
 	bool visitASTAttributes(AST::Node&);
-	bool visitASTVar(AST::Node&);
-	bool visitASTVarInClass();
+	bool visitASTClass(AST::Node&, uint32_t* localvar = nullptr);
+	bool visitASTDeclGenericTypeParameters(AST::Node&);
 	bool visitASTExpr(AST::Node&, uint32_t& localvar, bool allowScope = false);
-	bool visitASTExprIntrinsic(AST::Node&, uint32_t& localvar);
-	bool visitASTExprReturn(AST::Node&);
+	bool visitASTExprCall(AST::Node*, uint32_t& localvar, AST::Node* parent = nullptr); // func call
+	bool visitASTExprCallParameters(AST::Node&, ShortcircuitUpdate* shortcircuit = nullptr); // parameters of a func call
+	bool visitASTExprChar(AST::Node&, uint32_t& localvar);
+	bool visitASTExprClosure(AST::Node&, uint32_t& localvar);
 	bool visitASTExprContinuation(AST::Node&, uint32_t& localvar, bool allowScope = false);
+	bool visitASTExprDoWhile(AST::Node&);
 	bool visitASTExprIdentifier(AST::Node&, uint32_t& localvar);
 	bool visitASTExprIdOperator(AST::Node& node, uint32_t& localvar);
-	bool visitASTExprCall(AST::Node*, uint32_t& localvar, AST::Node* parent = nullptr); // func call
-	bool visitASTExprCallParameters(AST::Node&,
-									ShortcircuitUpdate* shortcircuit = nullptr); // parameters of a func call
-	bool visitASTExprSubDot(AST::Node&, uint32_t& localvar);
-	bool visitASTExprScope(AST::Node&);
-	bool visitASTExprNumber(AST::Node&, uint32_t& localvar);
-	bool visitASTExprString(AST::Node&, uint32_t& localvar);
-	bool visitASTExprStringLiteral(AST::Node&, uint32_t& localvar);
-	bool visitASTExprChar(AST::Node&, uint32_t& localvar);
-	bool visitASTExprNew(AST::Node&, uint32_t& localvar);
-	bool visitASTExprTypeDecl(AST::Node&, uint32_t& localvar);
-	bool visitASTExprTypeof(AST::Node&, uint32_t& localvar);
-	bool visitASTExprIfStmt(AST::Node&);
 	bool visitASTExprIfExpr(AST::Node&, uint32_t& localvar);
-	bool visitASTExprWhile(AST::Node&);
-	bool visitASTExprDoWhile(AST::Node&);
-	bool visitASTExprSwitch(AST::Node&);
+	bool visitASTExprIfStmt(AST::Node&);
 	bool visitASTExprIn(AST::Node&, uint32_t& localvar);
 	bool visitASTExprIn(AST::Node&, uint32_t& localvar, Yuni::ShortString128& elementname);
-	bool visitASTExprClosure(AST::Node&, uint32_t& localvar);
+	bool visitASTExprIntrinsic(AST::Node&, uint32_t& localvar);
+	bool visitASTExprNew(AST::Node&, uint32_t& localvar);
+	bool visitASTExprNumber(AST::Node&, uint32_t& localvar);
 	bool visitASTExprObject(AST::Node&, uint32_t& localvar);
 	bool visitASTExprOn(AST::Node&, uint32_t& localvar, bool isStmt = true);
+	bool visitASTExprReturn(AST::Node&);
+	bool visitASTExprScope(AST::Node&);
+	bool visitASTExprString(AST::Node&, uint32_t& localvar);
+	bool visitASTExprStringLiteral(AST::Node&, uint32_t& localvar);
+	bool visitASTExprSubDot(AST::Node&, uint32_t& localvar);
+	bool visitASTExprSwitch(AST::Node&);
 	bool visitASTExprTemplate(AST::Node&, uint32_t& localvar);
-	bool visitASTDeclGenericTypeParameters(AST::Node&);
+	bool visitASTExprTypeDecl(AST::Node&, uint32_t& localvar);
+	bool visitASTExprTypeof(AST::Node&, uint32_t& localvar);
+	bool visitASTExprWhile(AST::Node&);
+	bool visitASTFor(AST::Node&);
+	bool visitASTFunc(AST::Node&);
+	bool visitASTStmt(AST::Node&);
+	bool visitASTType(AST::Node&, uint32_t& localvar);
+	bool visitASTTypedef(AST::Node&);
 	bool visitASTUnitTest(AST::Node&);
-	bool visitASTArray(AST::Node&, uint32_t& localvar);
+	bool visitASTVar(AST::Node&);
+	bool visitASTVarInClass();
 	//@}
 
 	//! \name Typeinfo / variables
