@@ -683,8 +683,10 @@ return-with-error: notext
 	wp tk-comma wp expr | error-semicolon
 
 return: notext, important
-	(tk-return | return-raise) (expr return-with-error?)?
+	tk-return (expr return-with-error?)?
 
+raise: notext, important
+	tk-raise (expr return-with-error?)?
 
 
 
@@ -980,6 +982,7 @@ expr-value: notext
 	| class
 	| typedef
 	| return
+	| raise
 	| each
 	| in
 	| intrinsic
