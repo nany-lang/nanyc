@@ -125,7 +125,7 @@ void ContextRunner::destroy(uint64_t* object, uint32_t dtorid, uint32_t instance
 
 
 void ContextRunner::visit(const ir::isa::Operand<ir::isa::Op::intrinsic>& opr) {
-	vm_PRINT_OPCODE(opr);
+	VM_PRINT_OPCODE(opr);
 	dcReset(dyncall);
 	dcArgPointer(dyncall, &cfvm);
 	auto& intrinsic = userDefinedIntrinsics[opr.iid];
@@ -221,7 +221,7 @@ void ContextRunner::visit(const ir::isa::Operand<ir::isa::Op::intrinsic>& opr) {
 
 
 void ContextRunner::visit(const ir::isa::Operand<ir::isa::Op::memalloc>& opr) {
-	vm_PRINT_OPCODE(opr);
+	VM_PRINT_OPCODE(opr);
 	ASSERT_LVID(opr.lvid);
 	ASSERT_LVID(opr.regsize);
 	size_t size = [&]() -> size_t {
@@ -245,7 +245,7 @@ void ContextRunner::visit(const ir::isa::Operand<ir::isa::Op::memalloc>& opr) {
 
 
 void ContextRunner::visit(const ir::isa::Operand<ir::isa::Op::memrealloc>& opr) {
-	vm_PRINT_OPCODE(opr);
+	VM_PRINT_OPCODE(opr);
 	ASSERT_LVID(opr.lvid);
 	ASSERT_LVID(opr.oldsize);
 	ASSERT_LVID(opr.newsize);
@@ -275,7 +275,7 @@ void ContextRunner::visit(const ir::isa::Operand<ir::isa::Op::memrealloc>& opr) 
 
 
 void ContextRunner::visit(const ir::isa::Operand<ir::isa::Op::memfree>& opr) {
-	vm_PRINT_OPCODE(opr);
+	VM_PRINT_OPCODE(opr);
 	ASSERT_LVID(opr.lvid);
 	ASSERT_LVID(opr.regsize);
 	uint64_t* object = reinterpret_cast<uint64_t*>(registers[opr.lvid].u64);
