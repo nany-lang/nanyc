@@ -679,8 +679,11 @@ return-inline: notext, important
 return-raise: notext
 	tk-raise
 
+return-with-error: notext
+	wp tk-comma wp expr | error-semicolon
+
 return: notext, important
-	(tk-return | return-raise) (expr (wp tk-comma wp expr | error-semicolon)? )?
+	(tk-return | return-raise) (expr return-with-error?)?
 
 
 
