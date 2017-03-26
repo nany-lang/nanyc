@@ -12,7 +12,7 @@
 
 
 //! Print opcodes executed by the vm
-#define ny_vm_PRINT_OPCODES 0
+#define NY_VM_PRINT_OPCODES 0
 
 
 #define VM_CHECK_POINTER(P,LVID)  if (unlikely(not memchecker.has((P)))) \
@@ -21,7 +21,7 @@
 	}
 
 
-#if ny_vm_PRINT_OPCODES != 0
+#if NY_VM_PRINT_OPCODES != 0
 #define vm_PRINT_OPCODE(O)  do { std::cout << "== ny:vm +" \
 		<< ircode.get().offsetOf(opr) << "  == "  \
 		<< ny::ir::isa::print(ircode.get(), opr, &map) << '\n';} while (0)

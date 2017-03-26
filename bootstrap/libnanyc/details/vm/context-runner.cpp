@@ -316,7 +316,7 @@ uint64_t ContextRunner::invoke(const ir::Sequence& callee) {
 
 void ContextRunner::call(uint32_t retlvid, uint32_t atomfunc, uint32_t instanceid) {
 	assert(retlvid == 0 or retlvid < registerCount);
-	#if ny_vm_PRINT_OPCODES != 0
+	#if NY_VM_PRINT_OPCODES != 0
 	std::cout << "== ny:vm >>  registers before call\n";
 	for (uint32_t r = 0; r != registerCount; ++r)
 		std::cout << "== ny:vm >>     reg %" << r << " = " << registers[r].u64 << "\n";
@@ -347,7 +347,7 @@ void ContextRunner::call(uint32_t retlvid, uint32_t atomfunc, uint32_t instancei
 	#endif
 	stacktrace.pop();
 	memchecker.atomid(memcheckPreviousAtomid);
-	#if ny_vm_PRINT_OPCODES != 0
+	#if NY_VM_PRINT_OPCODES != 0
 	std::cout << "== ny:vm <<  returned from func call\n";
 	#endif
 }
