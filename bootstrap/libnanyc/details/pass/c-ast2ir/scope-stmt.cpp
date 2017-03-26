@@ -78,6 +78,8 @@ bool Scope::visitASTStmt(AST::Node& orignode) {
 			return visitASTVar(node);
 		case AST::rgFor:
 			return visitASTFor(node);
+		case AST::rgRaise:
+			return visitASTExprRaise(node);
 		case AST::rgReturn:
 			return visitASTExprReturn(node);
 		case AST::rgClass:

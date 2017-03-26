@@ -423,6 +423,7 @@ bool ASTReplicator::duplicateNode(AST::Node& parent, const AST::Node& node) {
 				case AST::rgFor:
 				case AST::rgWhile:
 				case AST::rgDoWhile:
+				case AST::rgRaise:
 				case AST::rgReturn:
 				case AST::rgOn:
 					return duplicateNode(parent, firstChild);
