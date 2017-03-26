@@ -63,8 +63,8 @@ void ContextRunner::emitAssert() {
 }
 
 
-void ContextRunner::emitUnexpectedOpcode(const AnyString& name) {
-	ny::vm::console::unexpectedOpcode(context, name);
+void ContextRunner::emitUnexpectedOpcode(ir::isa::Op opcode) {
+	ny::vm::console::unexpectedOpcode(context, ir::isa::opname(opcode));
 	abortMission();
 }
 

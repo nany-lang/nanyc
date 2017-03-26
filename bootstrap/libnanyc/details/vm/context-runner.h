@@ -83,7 +83,7 @@ public:
 	[[noreturn]] void emitBadAlloc();
 	[[noreturn]] void emitPointerSizeMismatch(void* object, size_t size);
 	[[noreturn]] void emitAssert();
-	[[noreturn]] void emitUnexpectedOpcode(const AnyString& name);
+	[[noreturn]] void emitUnexpectedOpcode(ir::isa::Op);
 	[[noreturn]] void emitInvalidIntrinsicParamType();
 	[[noreturn]] void emitInvalidReturnType();
 	[[noreturn]] void emitDividedByZero();
@@ -657,7 +657,7 @@ public:
 	template<ir::isa::Op O> void visit(const ir::isa::Operand<O>& opr) {
 		vm_PRINT_OPCODE(opr);
 		(void) opr;
-		return emitUnexpectedOpcode(ir::isa::opname(O));
+		return emitUnexpectedOpcode(O);
 	}
 
 
