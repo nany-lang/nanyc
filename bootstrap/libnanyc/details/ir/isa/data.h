@@ -86,18 +86,12 @@ template<ny::ir::isa::Op O> struct Operand final {};
 
 
 template<> struct Operand<ny::ir::isa::Op::nop> final {
-	constexpr static const char* opname() {
-		return "nop";
-	}
 	uint32_t opcode;
 
 	template<class T> void eachLVID(T&) {}
 };
 
 template<> struct Operand<ny::ir::isa::Op::eq> final {
-	constexpr static const char* opname() {
-		return "eq";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t lhs;
@@ -109,9 +103,6 @@ template<> struct Operand<ny::ir::isa::Op::eq> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::neq> final {
-	constexpr static const char* opname() {
-		return "neq";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t lhs;
@@ -123,9 +114,6 @@ template<> struct Operand<ny::ir::isa::Op::neq> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::flt> final {
-	constexpr static const char* opname() {
-		return "flt";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t lhs;
@@ -137,9 +125,6 @@ template<> struct Operand<ny::ir::isa::Op::flt> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::flte> final {
-	constexpr static const char* opname() {
-		return "flte";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t lhs;
@@ -151,9 +136,6 @@ template<> struct Operand<ny::ir::isa::Op::flte> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::fgt> final {
-	constexpr static const char* opname() {
-		return "fgt";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t lhs;
@@ -165,9 +147,6 @@ template<> struct Operand<ny::ir::isa::Op::fgt> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::fgte> final {
-	constexpr static const char* opname() {
-		return "fgte";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t lhs;
@@ -179,9 +158,6 @@ template<> struct Operand<ny::ir::isa::Op::fgte> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::lt> final {
-	constexpr static const char* opname() {
-		return "lt";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t lhs;
@@ -193,9 +169,6 @@ template<> struct Operand<ny::ir::isa::Op::lt> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::lte> final {
-	constexpr static const char* opname() {
-		return "lte";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t lhs;
@@ -207,9 +180,6 @@ template<> struct Operand<ny::ir::isa::Op::lte> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::ilt> final {
-	constexpr static const char* opname() {
-		return "ilt";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t lhs;
@@ -221,9 +191,6 @@ template<> struct Operand<ny::ir::isa::Op::ilt> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::ilte> final {
-	constexpr static const char* opname() {
-		return "ilte";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t lhs;
@@ -235,9 +202,6 @@ template<> struct Operand<ny::ir::isa::Op::ilte> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::gt> final {
-	constexpr static const char* opname() {
-		return "gt";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t lhs;
@@ -249,9 +213,6 @@ template<> struct Operand<ny::ir::isa::Op::gt> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::gte> final {
-	constexpr static const char* opname() {
-		return "gte";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t lhs;
@@ -263,9 +224,6 @@ template<> struct Operand<ny::ir::isa::Op::gte> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::igt> final {
-	constexpr static const char* opname() {
-		return "igt";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t lhs;
@@ -277,9 +235,6 @@ template<> struct Operand<ny::ir::isa::Op::igt> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::igte> final {
-	constexpr static const char* opname() {
-		return "igte";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t lhs;
@@ -291,9 +246,6 @@ template<> struct Operand<ny::ir::isa::Op::igte> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::opand> final {
-	constexpr static const char* opname() {
-		return "and";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t lhs;
@@ -305,9 +257,6 @@ template<> struct Operand<ny::ir::isa::Op::opand> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::opor> final {
-	constexpr static const char* opname() {
-		return "or";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t lhs;
@@ -319,9 +268,6 @@ template<> struct Operand<ny::ir::isa::Op::opor> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::opxor> final {
-	constexpr static const char* opname() {
-		return "xor";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t lhs;
@@ -333,9 +279,6 @@ template<> struct Operand<ny::ir::isa::Op::opxor> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::opmod> final {
-	constexpr static const char* opname() {
-		return "mod";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t lhs;
@@ -347,9 +290,6 @@ template<> struct Operand<ny::ir::isa::Op::opmod> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::negation> final {
-	constexpr static const char* opname() {
-		return "negation";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t lhs;
@@ -360,9 +300,6 @@ template<> struct Operand<ny::ir::isa::Op::negation> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::fadd> final {
-	constexpr static const char* opname() {
-		return "fadd";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t lhs;
@@ -373,9 +310,6 @@ template<> struct Operand<ny::ir::isa::Op::fadd> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::fsub> final {
-	constexpr static const char* opname() {
-		return "fsub";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t lhs;
@@ -387,9 +321,6 @@ template<> struct Operand<ny::ir::isa::Op::fsub> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::fmul> final {
-	constexpr static const char* opname() {
-		return "fmul";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t lhs;
@@ -401,9 +332,6 @@ template<> struct Operand<ny::ir::isa::Op::fmul> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::fdiv> final {
-	constexpr static const char* opname() {
-		return "fdiv";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t lhs;
@@ -415,9 +343,6 @@ template<> struct Operand<ny::ir::isa::Op::fdiv> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::add> final {
-	constexpr static const char* opname() {
-		return "add";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t lhs;
@@ -429,9 +354,6 @@ template<> struct Operand<ny::ir::isa::Op::add> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::sub> final {
-	constexpr static const char* opname() {
-		return "sub";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t lhs;
@@ -443,9 +365,6 @@ template<> struct Operand<ny::ir::isa::Op::sub> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::mul> final {
-	constexpr static const char* opname() {
-		return "mul";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t lhs;
@@ -457,9 +376,6 @@ template<> struct Operand<ny::ir::isa::Op::mul> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::div> final {
-	constexpr static const char* opname() {
-		return "div";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t lhs;
@@ -471,9 +387,6 @@ template<> struct Operand<ny::ir::isa::Op::div> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::imul> final {
-	constexpr static const char* opname() {
-		return "imul";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t lhs;
@@ -485,9 +398,6 @@ template<> struct Operand<ny::ir::isa::Op::imul> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::idiv> final {
-	constexpr static const char* opname() {
-		return "idiv";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t lhs;
@@ -499,9 +409,6 @@ template<> struct Operand<ny::ir::isa::Op::idiv> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::fieldget> final {
-	constexpr static const char* opname() {
-		return "fieldget";
-	}
 	uint32_t opcode;
 	uint32_t lvid; // dest pointer
 	uint32_t self;
@@ -512,9 +419,6 @@ template<> struct Operand<ny::ir::isa::Op::fieldget> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::fieldset> final {
-	constexpr static const char* opname() {
-		return "fieldset";
-	}
 	uint32_t opcode;
 	uint32_t lvid; // value
 	uint32_t self;
@@ -525,27 +429,18 @@ template<> struct Operand<ny::ir::isa::Op::fieldset> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::stacksize> final {
-	constexpr static const char* opname() {
-		return "stacksize";
-	}
 	uint32_t opcode;
 	uint32_t add;
 	template<class T> void eachLVID(T&) {}
 };
 
 template<> struct Operand<ny::ir::isa::Op::comment> final {
-	constexpr static const char* opname() {
-		return "comment";
-	}
 	uint32_t opcode;
 	uint32_t text;
 	template<class T> void eachLVID(T&) {}
 };
 
 template<> struct Operand<ny::ir::isa::Op::stackalloc> final {
-	constexpr static const char* opname() {
-		return "stackalloc";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t type;    // nytype_t
@@ -556,9 +451,6 @@ template<> struct Operand<ny::ir::isa::Op::stackalloc> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::storeConstant> final {
-	constexpr static const char* opname() {
-		return "storeConstant";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	union {
@@ -571,9 +463,6 @@ template<> struct Operand<ny::ir::isa::Op::storeConstant> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::storeText> final {
-	constexpr static const char* opname() {
-		return "storeText";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t text;
@@ -583,9 +472,6 @@ template<> struct Operand<ny::ir::isa::Op::storeText> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::store> final {
-	constexpr static const char* opname() {
-		return "store";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t source;
@@ -595,9 +481,6 @@ template<> struct Operand<ny::ir::isa::Op::store> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::ret> final {
-	constexpr static const char* opname() {
-		return "ret";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t tmplvid; // unused by nyprogram_t
@@ -607,9 +490,6 @@ template<> struct Operand<ny::ir::isa::Op::ret> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::push> final {
-	constexpr static const char* opname() {
-		return "push";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t name; // if named parameter
@@ -619,9 +499,6 @@ template<> struct Operand<ny::ir::isa::Op::push> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::tpush> final {
-	constexpr static const char* opname() {
-		return "tpush";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t name; // if named parameter
@@ -631,9 +508,6 @@ template<> struct Operand<ny::ir::isa::Op::tpush> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::call> final {
-	constexpr static const char* opname() {
-		return "call";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t ptr2func; // or atomid
@@ -644,9 +518,6 @@ template<> struct Operand<ny::ir::isa::Op::call> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::intrinsic> final {
-	constexpr static const char* opname() {
-		return "intrinsic";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	//! Intrinsic ID (only valid at execution)
@@ -659,18 +530,12 @@ template<> struct Operand<ny::ir::isa::Op::intrinsic> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::debugfile> final {
-	constexpr static const char* opname() {
-		return "debugfile";
-	}
 	uint32_t opcode;
 	uint32_t filename;
 	template<class T> void eachLVID(T&) {}
 };
 
 template<> struct Operand<ny::ir::isa::Op::namealias> final {
-	constexpr static const char* opname() {
-		return "namealias";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t name;
@@ -680,9 +545,6 @@ template<> struct Operand<ny::ir::isa::Op::namealias> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::debugpos> final {
-	constexpr static const char* opname() {
-		return "debugpos";
-	}
 	uint32_t opcode;
 	uint32_t line;
 	uint32_t offset;
@@ -690,25 +552,16 @@ template<> struct Operand<ny::ir::isa::Op::debugpos> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::scope> final {
-	constexpr static const char* opname() {
-		return "scope";
-	}
 	uint32_t opcode;
 	template<class T> void eachLVID(T&) {}
 };
 
 template<> struct Operand<ny::ir::isa::Op::end> final {
-	constexpr static const char* opname() {
-		return "end";
-	}
 	uint32_t opcode;
 	template<class T> void eachLVID(T&) {}
 };
 
 template<> struct Operand<ny::ir::isa::Op::qualifiers> final {
-	constexpr static const char* opname() {
-		return "qualifiers";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	TypeQualifier qualifier;
@@ -721,9 +574,6 @@ template<> struct Operand<ny::ir::isa::Op::qualifiers> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::opassert> final {
-	constexpr static const char* opname() {
-		return "assert";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	template<class T> void eachLVID(T& c) {
@@ -732,9 +582,6 @@ template<> struct Operand<ny::ir::isa::Op::opassert> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::memcheckhold> final {
-	constexpr static const char* opname() {
-		return "memcheckhold";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t size;
@@ -744,9 +591,6 @@ template<> struct Operand<ny::ir::isa::Op::memcheckhold> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::label> final {
-	constexpr static const char* opname() {
-		return "label";
-	}
 	uint32_t opcode;
 	uint32_t label;
 	template<class T> void eachLVID(T& c) {
@@ -755,18 +599,12 @@ template<> struct Operand<ny::ir::isa::Op::label> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::jmp> final {
-	constexpr static const char* opname() {
-		return "jmp";
-	}
 	uint32_t opcode;
 	uint32_t label;
 	template<class T> void eachLVID(T&) {}
 };
 
 template<> struct Operand<ny::ir::isa::Op::jz> final {
-	constexpr static const char* opname() {
-		return "jz";
-	}
 	uint32_t opcode;
 	uint32_t lvid;   // the local variable
 	uint32_t result; // local variable to set to 1 if jump
@@ -777,9 +615,6 @@ template<> struct Operand<ny::ir::isa::Op::jz> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::jnz> final {
-	constexpr static const char* opname() {
-		return "jnz";
-	}
 	uint32_t opcode;
 	uint32_t lvid;   // the local variable
 	uint32_t result; // local variable to set to 1 if jump
@@ -790,9 +625,6 @@ template<> struct Operand<ny::ir::isa::Op::jnz> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::memalloc> final {
-	constexpr static const char* opname() {
-		return "memalloc";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t regsize;
@@ -802,9 +634,6 @@ template<> struct Operand<ny::ir::isa::Op::memalloc> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::memfree> final {
-	constexpr static const char* opname() {
-		return "memfree";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t regsize;
@@ -814,9 +643,6 @@ template<> struct Operand<ny::ir::isa::Op::memfree> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::memfill> final {
-	constexpr static const char* opname() {
-		return "memfill";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t regsize;
@@ -827,9 +653,6 @@ template<> struct Operand<ny::ir::isa::Op::memfill> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::memcopy> final {
-	constexpr static const char* opname() {
-		return "memcopy";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t srclvid;
@@ -840,9 +663,6 @@ template<> struct Operand<ny::ir::isa::Op::memcopy> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::memmove> final {
-	constexpr static const char* opname() {
-		return "memmove";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t srclvid;
@@ -853,9 +673,6 @@ template<> struct Operand<ny::ir::isa::Op::memmove> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::memcmp> final {
-	constexpr static const char* opname() {
-		return "memcmp";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t srclvid;
@@ -866,9 +683,6 @@ template<> struct Operand<ny::ir::isa::Op::memcmp> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::cstrlen> final {
-	constexpr static const char* opname() {
-		return "cstrlen";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t bits;
@@ -879,9 +693,6 @@ template<> struct Operand<ny::ir::isa::Op::cstrlen> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::load_u64> final {
-	constexpr static const char* opname() {
-		return "load_u64";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t ptrlvid;
@@ -890,9 +701,6 @@ template<> struct Operand<ny::ir::isa::Op::load_u64> final {
 	}
 };
 template<> struct Operand<ny::ir::isa::Op::load_u32> final {
-	constexpr static const char* opname() {
-		return "load_u32";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t ptrlvid;
@@ -901,9 +709,6 @@ template<> struct Operand<ny::ir::isa::Op::load_u32> final {
 	}
 };
 template<> struct Operand<ny::ir::isa::Op::load_u8> final {
-	constexpr static const char* opname() {
-		return "load_u8";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t ptrlvid;
@@ -913,9 +718,6 @@ template<> struct Operand<ny::ir::isa::Op::load_u8> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::store_u64> final {
-	constexpr static const char* opname() {
-		return "store_u64";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t ptrlvid;
@@ -924,9 +726,6 @@ template<> struct Operand<ny::ir::isa::Op::store_u64> final {
 	}
 };
 template<> struct Operand<ny::ir::isa::Op::store_u32> final {
-	constexpr static const char* opname() {
-		return "store_u32";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t ptrlvid;
@@ -935,9 +734,6 @@ template<> struct Operand<ny::ir::isa::Op::store_u32> final {
 	}
 };
 template<> struct Operand<ny::ir::isa::Op::store_u8> final {
-	constexpr static const char* opname() {
-		return "store_u8";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t ptrlvid;
@@ -947,9 +743,6 @@ template<> struct Operand<ny::ir::isa::Op::store_u8> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::memrealloc> final {
-	constexpr static const char* opname() {
-		return "memrealloc";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t oldsize;
@@ -960,9 +753,6 @@ template<> struct Operand<ny::ir::isa::Op::memrealloc> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::pragma> final {
-	constexpr static const char* opname() {
-		return "pragma";
-	}
 	uint32_t opcode;
 	Pragma pragma;
 
@@ -1019,10 +809,6 @@ template<> struct Operand<ny::ir::isa::Op::pragma> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::blueprint> final {
-	constexpr static const char* opname() {
-		return "blueprint";
-	}
-
 	uint32_t opcode;
 	//! Kind of blueprint (classdef, vardef, funcdef...)
 	//! \see enum ir::isa::Blueprint
@@ -1050,9 +836,6 @@ template<> struct Operand<ny::ir::isa::Op::blueprint> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::self> final {
-	constexpr static const char* opname() {
-		return "self";
-	}
 	uint32_t opcode;
 	uint32_t self;
 	template<class T> void eachLVID(T& c) {
@@ -1061,9 +844,6 @@ template<> struct Operand<ny::ir::isa::Op::self> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::identify> final {
-	constexpr static const char* opname() {
-		return "identify";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t self;
@@ -1073,9 +853,6 @@ template<> struct Operand<ny::ir::isa::Op::identify> final {
 	}
 };
 template<> struct Operand<ny::ir::isa::Op::identifyset> final { // MUST be identical to 'identify'
-	constexpr static const char* opname() {
-		return "identifyset";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t self;
@@ -1086,9 +863,6 @@ template<> struct Operand<ny::ir::isa::Op::identifyset> final { // MUST be ident
 };
 
 template<> struct Operand<ny::ir::isa::Op::ensureresolved> final {
-	constexpr static const char* opname() {
-		return "ensureresolved";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	template<class T> void eachLVID(T& c) {
@@ -1097,9 +871,6 @@ template<> struct Operand<ny::ir::isa::Op::ensureresolved> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::commontype> final {
-	constexpr static const char* opname() {
-		return "commontype";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t previous;
@@ -1109,9 +880,6 @@ template<> struct Operand<ny::ir::isa::Op::commontype> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::assign> final {
-	constexpr static const char* opname() {
-		return "assign";
-	}
 	uint32_t opcode;
 	uint32_t lhs;
 	uint32_t rhs;
@@ -1122,9 +890,6 @@ template<> struct Operand<ny::ir::isa::Op::assign> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::follow> final {
-	constexpr static const char* opname() {
-		return "follow";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t follower;
@@ -1135,9 +900,6 @@ template<> struct Operand<ny::ir::isa::Op::follow> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::typeisobject> final {
-	constexpr static const char* opname() {
-		return "typeisobject";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	template<class T> void eachLVID(T& c) {
@@ -1146,9 +908,6 @@ template<> struct Operand<ny::ir::isa::Op::typeisobject> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::classdefsizeof> final {
-	constexpr static const char* opname() {
-		return "classdefsizeof";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t type; // lvid or atomid
@@ -1158,9 +917,6 @@ template<> struct Operand<ny::ir::isa::Op::classdefsizeof> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::ref> final {
-	constexpr static const char* opname() {
-		return "ref";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	template<class T> void eachLVID(T& c) {
@@ -1169,9 +925,6 @@ template<> struct Operand<ny::ir::isa::Op::ref> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::unref> final {
-	constexpr static const char* opname() {
-		return "unref";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 
@@ -1186,9 +939,6 @@ template<> struct Operand<ny::ir::isa::Op::unref> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::allocate> final {
-	constexpr static const char* opname() {
-		return "allocate";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 	// atomid
@@ -1199,9 +949,6 @@ template<> struct Operand<ny::ir::isa::Op::allocate> final {
 };
 
 template<> struct Operand<ny::ir::isa::Op::dispose> final {
-	constexpr static const char* opname() {
-		return "dispose";
-	}
 	uint32_t opcode;
 	uint32_t lvid;
 
@@ -1216,6 +963,7 @@ template<> struct Operand<ny::ir::isa::Op::dispose> final {
 };
 
 
+AnyString opname(ny::ir::isa::Op opcode);
 
 Yuni::String print(const Sequence&, const ny::ir::Instruction&, const AtomMap* = nullptr);
 

@@ -657,7 +657,7 @@ public:
 	template<ir::isa::Op O> void visit(const ir::isa::Operand<O>& opr) {
 		vm_PRINT_OPCODE(opr);
 		(void) opr;
-		return emitUnexpectedOpcode(ir::isa::Operand<O>::opname());
+		return emitUnexpectedOpcode(ir::isa::opname(O));
 	}
 
 
