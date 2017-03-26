@@ -108,6 +108,7 @@ AnyString opname(ny::ir::isa::Op opcode) {
 		case Op::pragma:         return "pragma";
 		case Op::push:           return "push";
 		case Op::qualifiers:     return "qualifiers";
+		case Op::raise:          return "raise";
 		case Op::ref:            return "ref";
 		case Op::ret:            return "ret";
 		case Op::scope:          return "scope";

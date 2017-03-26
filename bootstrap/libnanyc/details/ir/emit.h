@@ -477,6 +477,11 @@ inline void ret(IRCodeRef ref, uint32_t lvid, uint32_t tmplvid) {
 }
 
 
+inline void raise(IRCodeRef ref, uint32_t lvid) {
+	ref.ircode.emit<isa::Op::raise>().lvid = lvid;
+}
+
+
 inline void assign(IRCodeRef ref, uint32_t lhs, uint32_t rhs, bool canDisposeLHS) {
 	auto& operands = ref.ircode.emit<isa::Op::assign>();
 	operands.lhs = lhs;

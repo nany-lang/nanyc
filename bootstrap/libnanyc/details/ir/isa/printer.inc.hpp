@@ -277,6 +277,12 @@ namespace // anonymous
 		}
 
 
+		void print(const Operand<Op::raise>& operands) {
+			line() << "raise %" << operands.lvid;
+		}
+
+
+
 		void print(const Operand<Op::stacksize>& operands) {
 			line() << "stack.size +" << operands.add;
 		}

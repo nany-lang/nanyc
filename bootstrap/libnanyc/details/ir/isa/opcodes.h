@@ -68,6 +68,7 @@ enum class Op : std::uint32_t {
 	call,           ///< function call
 	intrinsic,      ///< compiler intrinsic call
 	ret,            ///< return
+	raise,          ///< raise an error
 	allocate,       ///< allocate an object (memory + ctor)
 	dispose,        ///< deallocate an object (dtor + memory)
 
@@ -190,6 +191,7 @@ enum class Op : std::uint32_t {
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::call) \
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::intrinsic) \
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::ret) \
+			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::raise) \
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::allocate) \
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::dispose) \
 			\
