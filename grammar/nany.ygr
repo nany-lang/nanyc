@@ -686,7 +686,7 @@ return: notext, important
 	tk-return (expr return-with-error?)?
 
 raise: notext, important
-	tk-raise (expr return-with-error?)?
+	tk-raise expr return-with-error?
 
 
 
