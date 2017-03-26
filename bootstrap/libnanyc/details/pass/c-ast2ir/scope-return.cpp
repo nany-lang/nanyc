@@ -20,11 +20,11 @@ bool Scope::visitASTExprReturn(AST::Node& node) {
 		switch (child.rule) {
 			case AST::rgExpr: {
 				ir::emit::ScopeLocker opscope{irout};
-				uint32_t localvar = 0;
-				success &= visitASTExpr(child, localvar);
+				uint32_t retlvid = 0;
+				success &= visitASTExpr(child, retlvid);
 				// generate error on the begining of the expr and not the return itself
 				emitDebugpos(child);
-				ir::emit::ret(irout, localvar, ir::emit::alloc(irout, nextvar()));
+				ir::emit::ret(irout, retlvid, ir::emit::alloc(irout, nextvar()));
 				hasReturnValue = true;
 				break;
 			}
