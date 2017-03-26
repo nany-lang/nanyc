@@ -993,11 +993,11 @@ template<> struct Operand<ny::ir::isa::Op::pragma> final {
 	template<class T> void eachLVID(T& c) {
 		static_assert(sizeof(Operand<ny::ir::isa::Op::pragma>) <= sizeof(uint32_t) * 4, "alignment required");
 		switch (pragma) {
-			case Pragma::synthetic:                {
+			case Pragma::synthetic: {
 				c(value.synthetic.lvid);
 				break;
 			}
-			case Pragma::shortcircuitOpNopOffset:  {
+			case Pragma::shortcircuitOpNopOffset: {
 				c(value.shortcircuitMetadata.label);
 				break;
 			}
