@@ -28,6 +28,8 @@ inline Scope::~Scope() {
 		assert(parentScope != nullptr); // broadcast new values to the parent
 		parentScope->nextVarID = nextVarID;
 	}
+	if (not onScopeFailExitLabels.empty())
+		updateOnScopeFailExitLabels();
 	if (unlikely(!!attributes))
 		checkForUnknownAttributes();
 }

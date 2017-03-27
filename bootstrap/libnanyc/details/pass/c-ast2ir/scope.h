@@ -44,6 +44,18 @@ struct Attributes final {
 };
 
 
+struct OnScopeFail final {
+	OnScopeFail(AST::Node& node, uint32_t jmpOffset, uint32_t var)
+		: node(node)
+		, jmpOffset(jmpOffset)
+		, var(var) {
+	}
+	AST::Node& node;
+	uint32_t jmpOffset;
+	uint32_t var;
+};
+
+
 /*!
 ** \brief Scope for ir generation (requires a context or another scope)
 */
@@ -199,6 +211,8 @@ public:
 	Scope* parentScope = nullptr;
 	//! BroadcastNextVarID
 	bool broadcastNextVarID = true;
+	//! 'on scope fail' offsets for exit jmp
+	std::vector<OnScopeFail> onScopeFailExitLabels;
 	//! Nakama
 	friend class Context;
 
@@ -206,6 +220,7 @@ private:
 	void doEmitTmplParameters();
 	void emitExprAttributes(uint32_t& localvar);
 	bool fetchAttributes(AST::Node&);
+	void updateOnScopeFailExitLabels();
 
 }; // class Scope
 

@@ -101,6 +101,36 @@ bool Scope::visitASTExprOnScopeFail(AST::Node& scopeNode, AST::Node& scopeFailNo
 	AnyString name;
 	if (!findParameter(*this, scopeFailNode, lvidType, name))
 		return false;
+	auto& irout = ircode();
+	// skip the entire block
+	uint32_t ignJmp = ir::emit::jmp(irout);
+	// label to trigger the error handler
+	uint32_t startLabel = ir::emit::label(irout, nextvar());
+	uint32_t var = [&]() -> uint32_t {
+		if (name.empty())
+			return 0;
+		// the error itself
+		uint32_t var = ir::emit::alloc(irout, nextvar());
+		if (lvidType != 0) {
+			auto& operands    = irout.emit<isa::Op::follow>();
+			operands.follower = var;
+			operands.lvid     = lvidType;
+			operands.symlink  = 0;
+		}
+		return var;
+	}();
+	// register the 'on scope fail'
+	emitDebugpos(scopeFailNode);
+	ir::emit::on::scopefail(irout, var, startLabel);
+	{
+		if (not visitASTExprScope(scopeNode))
+			return false;
+	}
+	// jmp at the end of the original scope
+	uint32_t jmpOffset = ir::emit::jmp(irout);
+	onScopeFailExitLabels.emplace_back(scopeFailNode, jmpOffset, var);
+	// emit label to skip the entire block
+	irout.at<ir::isa::Op::jmp>(ignJmp).label = ir::emit::label(irout, nextvar());
 	return true;
 }
 
