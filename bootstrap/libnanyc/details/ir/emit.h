@@ -374,6 +374,12 @@ inline void jmp(IRCodeRef ref, uint32_t label) {
 	ref.ircode.emit<isa::Op::jmp>().label = label;
 }
 
+//! Unconditional jump
+inline uint32_t jmp(IRCodeRef ref) {
+	uint32_t offset = ref.ircode.opcodeCount();
+	ref.ircode.emit<isa::Op::jmp>().label = 0;
+	return offset;
+}
 
 //! jump if zero
 inline void jz(IRCodeRef ref, uint32_t lvid, uint32_t result, uint32_t label) {
