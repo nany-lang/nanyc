@@ -57,10 +57,6 @@ bool Scope::visitASTStmt(AST::Node& orignode) {
 						return (not attrs ? true : visitASTAttributes(*attrs)) and visitASTFunc(*child);
 					case AST::rgSwitch:
 						return (not attrs ? true : visitASTAttributes(*attrs)) and visitASTExprSwitch(*child);
-					case AST::rgOn: {
-						uint32_t localvar = 0;
-						return (not attrs ? true : visitASTAttributes(*attrs)) and visitASTExprOn(*child, localvar);
-					}
 					default: {
 					}
 				}
@@ -92,6 +88,10 @@ bool Scope::visitASTStmt(AST::Node& orignode) {
 			return true;
 		case AST::rgFunction:
 			return visitASTFunc(node);
+		case AST::rgOn: {
+			uint32_t localvar = 0;
+			return visitASTExprOn(node, localvar);
+		}
 		default:
 			return unexpectedNode(node, "[ir/stmt]");
 	}
