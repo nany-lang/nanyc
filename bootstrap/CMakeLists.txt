@@ -76,7 +76,6 @@ endif()
 add_subdirectory("ext/yuni/src")
 include_directories("ext/yuni/src")
 
-set(EXECUTABLE_OUTPUT_PATH "${CMAKE_CURRENT_BINARY_DIR}")
 
 
 if (MSVC)
