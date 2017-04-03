@@ -58,9 +58,16 @@ function (read_build_settings)
 endfunction()
 
 
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "" OR (NOT "${CMAKE_BUILD_TYPE}" STREQUAL "release" AND NOT "${CMAKE_BUILD_TYPE}" STREQUAL "debug"))
+	# release by default
+	set(CMAKE_BUILD_TYPE "debug")
+endif()
+nmessage("configuration: ${CMAKE_BUILD_TYPE}")
+
 read_build_settings()
 nmessage("") # for beauty (and to find it easily)
 nmessage("version: ${nany_version_string}")
 
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
+set(CMAKE_MACOSX_RPATH 1)

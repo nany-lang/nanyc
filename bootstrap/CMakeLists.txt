@@ -15,15 +15,8 @@ nmessage("  from '${CMAKE_COMMAND}', '${CMAKE_ROOT}'")
 nmessage("current listdir: ${CMAKE_CURRENT_LIST_DIR}")
 nmessage("")
 
-if ("${CMAKE_BUILD_TYPE}" STREQUAL "" OR (NOT "${CMAKE_BUILD_TYPE}" STREQUAL "release" AND NOT "${CMAKE_BUILD_TYPE}" STREQUAL "debug"))
-	# release by default
-	set(CMAKE_BUILD_TYPE "debug")
-endif()
-nmessage("configuration: ${CMAKE_BUILD_TYPE}")
-
 #set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 set(CMAKE_DISABLE_SOURCE_CHANGES  ON)
-set(CMAKE_MACOSX_RPATH 1)
 
 include("cmake/utils.cmake")
 include("cmake/build-settings.cmake")
