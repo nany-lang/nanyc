@@ -223,25 +223,25 @@ add_custom_target(check
 
 add_custom_target(install-libnanyc
 	DEPENDS libnanyc
-	COMMAND 
+	COMMAND
 		"${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=libnanyc"
 		-P "${CMAKE_BINARY_DIR}/cmake_install.cmake")
 
 add_custom_target(install-nany
 	DEPENDS nany
-	COMMAND 
+	COMMAND
 		"${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=nany"
 		-P "${CMAKE_BINARY_DIR}/cmake_install.cmake")
 
 add_custom_target(install-libnanyc-dev
   DEPENDS libnanyc
-  COMMAND 
+  COMMAND
       "${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=libnanyc-dev"
       -P "${CMAKE_BINARY_DIR}/cmake_install.cmake")
 
 add_custom_target(install-libnanyc-dev-tools
   DEPENDS libnanyc nanyc-check-syntax nanyc-dump-ast
-  COMMAND 
+  COMMAND
       "${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=libnanyc-dev-tools"
       -P "${CMAKE_BINARY_DIR}/cmake_install.cmake")
 
