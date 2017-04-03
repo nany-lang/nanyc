@@ -4,6 +4,7 @@ stages:
 
 variables:
     GIT_SUBMODULE_STRATEGY: recursive
+    VERBOSE: '1'
 
 
 # build
