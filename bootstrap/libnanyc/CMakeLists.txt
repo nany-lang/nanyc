@@ -26,14 +26,6 @@ else()
 	nmessage("ignoring libnanyc-traces.h ${libnany_config_folder}/libnanyc-traces.h (already exists)")
 endif()
 
-macro(addsrc)
-	set(options)
-	set(oneValueArgs NAME GROUP)
-	set(multiValueArgs FILES)
-	cmake_parse_arguments(O "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
-	set("${O_NAME}" ${O_FILES})
-endmacro()
-
 # generate nsl:std.core
 get_filename_component(nsl_stdcore_root "${CMAKE_CURRENT_LIST_DIR}/../../src/nsl/std.core/" REALPATH)
 get_filename_component(nsl_root "${CMAKE_CURRENT_LIST_DIR}/../../src/nsl/" REALPATH)
@@ -166,24 +158,15 @@ add_library(libnanyc-grammar STATIC EXCLUDE_FROM_ALL
 
 add_dependencies(libnanyc-grammar nanyc-grammar-cpp)
 
-addsrc(
-	NAME  nysrc_details_pass_build_src2ast
-	GROUP "details/pass/a-src2ast"
-	FILES
+set(mode_libnany "SHARED")
+if ("${NANY_STATIC}")
+	set(mode_libnany "STATIC")
+endif()
+
+add_library(libnanyc ${mode_libnany}
+	"libnanyc.h"
 	"details/pass/a-src2ast/ast-from-source.cpp"
-)
-
-addsrc(
-	NAME  nysrc_details_pass_ast_normalize
-	GROUP "details/pass/b-ast-normalize"
-	FILES
 	"details/pass/b-ast-normalize/normalize.cpp"
-)
-
-addsrc(
-	NAME  nysrc_details_pass_ast2ir
-	GROUP "details/pass/c-ast2ir"
-	FILES
 	"details/pass/c-ast2ir/context.cpp"
 	"details/pass/c-ast2ir/context.h"
 	"details/pass/c-ast2ir/context.hxx"
@@ -220,28 +203,10 @@ addsrc(
 	"details/pass/c-ast2ir/scope-attributes.cpp"
 	"details/pass/c-ast2ir/scope-unittest.cpp"
 	"details/pass/c-ast2ir/source-ast-to-ir.cpp"
-)
-
-addsrc(
-	NAME  nysrc_details_pass_build_attach
-	GROUP "details/pass/build-attach"
-	FILES
 	"details/pass/d-object-map/mapping.cpp"
 	"details/pass/d-object-map/mapping.h"
 	"details/pass/d-object-map/attach.cpp"
-)
-
-addsrc(
-	NAME  nysrc_details_pass_build_semantic
-	GROUP "details/pass/e-semantic"
-	FILES
 	"details/pass/e-semantic/semantic.cpp"
-)
-
-addsrc(
-	NAME  nysrc_details_semantic
-	GROUP "details/semantic"
-	FILES
 	"details/semantic/semantic-analysis.cpp"
 	"details/semantic/semantic-analysis.h"
 	"details/semantic/semantic-analysis.hxx"
@@ -294,12 +259,6 @@ addsrc(
 	"details/semantic/intrinsics.h"
 	"details/semantic/intrinsics-nanyc.cpp"
 	"details/semantic/intrinsics-lang.cpp"
-)
-
-addsrc(
-	NAME  nysrc_details_vm
-	GROUP "details/vm"
-	FILES
 	"details/vm/program.cpp"
 	"details/vm/program.hxx"
 	"details/vm/program.h"
@@ -319,12 +278,6 @@ addsrc(
 	"details/vm/stack.h"
 	"details/vm/stack.hxx"
 	"details/vm/types.h"
-)
-
-addsrc(
-	NAME  nysrc_details_utils
-	GROUP "details/utils"
-	FILES
 	"details/utils/origin.h"
 	"details/utils/stringrefs.h"
 	"details/utils/stringrefs.hxx"
@@ -336,24 +289,12 @@ addsrc(
 	"details/utils/clid.h"
 	"details/utils/clid.cpp"
 	"details/utils/clid.hxx"
-)
-
-addsrc(
-	NAME  nysrc_details_ast
-	GROUP "details/ast"
-	FILES
 	"details/ast/tree-index.h"
 	"details/ast/tree-index.hxx"
 	"details/ast/tree-index.cpp"
 	"details/ast/ast.h"
 	"details/ast/ast.hxx"
 	"details/ast/ast.cpp"
-)
-
-addsrc(
-	NAME  nysrc_details_ir
-	GROUP "details/ir"
-	FILES
 	"details/ir/ir.h"
 	"details/ir/isa/opcodes.h"
 	"details/ir/isa/data.h"
@@ -364,12 +305,6 @@ addsrc(
 	"details/ir/sequence.h"
 	"details/ir/sequence.hxx"
 	"details/ir/sequence.cpp"
-)
-
-addsrc(
-	NAME  nysrc_details_atom_classdef
-	GROUP "details/atom/classdef"
-	FILES
 	"details/atom/classdef.h"
 	"details/atom/classdef.hxx"
 	"details/atom/classdef.cpp"
@@ -385,19 +320,7 @@ addsrc(
 	"details/atom/classdef-overloads.h"
 	"details/atom/classdef-overloads.hxx"
 	"details/atom/classdef-overloads.cpp"
-)
-
-addsrc(
-	NAME nysrc_details_type_system
-	GROUP "details/type"
-	FILES
 	"details/type/builtin.h"
-)
-
-addsrc(
-	NAME  nysrc_details_atom
-	GROUP "details/atom"
-	FILES
 	"details/atom/funcdef.h"
 	"details/atom/funcdef.cpp"
 	"details/atom/funcdef.hxx"
@@ -417,40 +340,21 @@ addsrc(
 	"details/atom/signature.h"
 	"details/atom/signature.cpp"
 	"details/atom/signature.hxx"
-)
-
-addsrc(
-	NAME  nysrc_details_intrinsic
-	GROUP "details/intrinsic"
-	FILES
 	"details/intrinsic/intrinsic.h"
 	"details/intrinsic/catalog.h"
 	"details/intrinsic/catalog.hxx"
 	"details/intrinsic/catalog.cpp"
-)
-
-addsrc(
-	NAME  nysrc_details_context
-	GROUP "details/context"
-	FILES
 	"details/context/project.h"
 	"details/context/project.hxx"
 	"details/context/project.cpp"
 	"details/context/build.h"
 	"details/context/build.cpp"
-
 	"details/context/build-info.h"
 	"details/context/target.h"
 	"details/context/target.hxx"
 	"details/context/target.cpp"
 	"details/context/source.h"
 	"details/context/source.cpp"
-)
-
-addsrc(
-	NAME  nysrc_details_reporting
-	GROUP "details/reporting"
-	FILES
 	"details/reporting/fwd.h"
 	"details/reporting/message.h"
 	"details/reporting/message.cpp"
@@ -464,12 +368,6 @@ addsrc(
 	"details/errors/exception.h"
 	"details/errors/exception.cpp"
 	"details/reporting/levels.h"
-)
-
-addsrc(
-	NAME  nysrc_c_api
-	GROUP "c-api"
-	FILES
 	"details/c-api/project.cpp"
 	"details/c-api/build.cpp"
 	"details/c-api/program.cpp"
@@ -483,27 +381,9 @@ addsrc(
 	"details/c-api/memalloc.c"
 	"details/c-api/common-debuginfo.hxx"
 	"details/c-api/version.c"
-)
-
-addsrc(
-	NAME  nysrc_io_adapter
-	GROUP "IO Adapter"
-	FILES
 	"details/io-adapter/fallback.cpp"
 	"details/io-adapter/localfolder.cpp"
-)
-
-addsrc(
-	NAME  nysrc_public_headers
-	GROUP "public-headers"
-	FILES
 	"include/nany/nany.h"
-)
-
-addsrc(
-	NAME  nysrc_details_vm_runtime
-	GROUP "details/vm/runtime"
-	FILES
 	"details/vm/runtime/std.core.h"
 	"details/vm/runtime/std.core.string.cpp"
 	"details/vm/runtime/std.os.process.cpp"
@@ -512,38 +392,7 @@ addsrc(
 	"details/vm/runtime/std.console.cpp"
 	"details/vm/runtime/std.memory.cpp"
 	"details/vm/runtime/std.env.cpp"
-)
-
-set(mode_libnany "SHARED")
-if ("${NANY_STATIC}")
-	set(mode_libnany "STATIC")
-endif()
-
-add_library(libnanyc ${mode_libnany}
-	"libnanyc.h"
-	# public headers
-	${nysrc_public_headers}
-	${nysrc_c_api}
-	${nysrc_io_adapter}
-	${nysrc_details_pass_build_src2ast}
-	${nysrc_details_pass_ast_normalize}
-	${nysrc_details_pass_ast2ir}
-	${nysrc_details_pass_build_attach}
-	${nysrc_details_pass_build_semantic}
-	${nysrc_details_utils}
-	${nysrc_details_ast}
-	${nysrc_details_ir}
-	${nysrc_details_atom_classdef}
-	${nysrc_details_atom}
-	${nysrc_details_type_system}
-	${nysrc_details_intrinsic}
-	${nysrc_details_context}
-	${nysrc_details_reporting}
-	${nysrc_details_semantic}
 	${nysrc_nsl_stdcore}
-	${nysrc_details_vm}
-	${nysrc_details_vm_runtime}
-	# misc
 	"${libnany_config_folder}/libnanyc-config.h"
 	"${libnany_config_folder}/libnanyc-traces.h"
 	"${libnany_config_folder}/libnanyc-version.h"
@@ -591,7 +440,7 @@ install(
 )
 
 install(
-	FILES ${nysrc_public_headers}
+	FILES "include/nany/nany.h"
 	DESTINATION "include/libnany/${nany_version}/nany"
 	COMPONENT "libnanyc-dev"
 )
