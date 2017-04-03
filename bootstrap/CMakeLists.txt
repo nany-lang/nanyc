@@ -1,4 +1,8 @@
 cmake_minimum_required(VERSION 3.7.1)
+
+#set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
+set(CMAKE_DISABLE_SOURCE_CHANGES  ON)
+
 project(nany-bootstrap)
 
 include(CMakeParseArguments)
@@ -14,9 +18,6 @@ nmessage("cmake ${CMAKE_VERSION} in '${CMAKE_SYSTEM}' ${CMAKE_SYSTEM_PROCESSOR}"
 nmessage("  from '${CMAKE_COMMAND}', '${CMAKE_ROOT}'")
 nmessage("current listdir: ${CMAKE_CURRENT_LIST_DIR}")
 nmessage("")
-
-#set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
-set(CMAKE_DISABLE_SOURCE_CHANGES  ON)
 
 include("cmake/utils.cmake")
 include("cmake/build-settings.cmake")
