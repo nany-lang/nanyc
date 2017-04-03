@@ -159,17 +159,12 @@ set(__nsl_stdcore_cpp "${__nsl_stdcore_cpp}} // namespace ny\n")
 file(WRITE "${CMAKE_CURRENT_LIST_DIR}/details/vm/runtime/nsl2c/all.cpp" "${__nsl_stdcore_cpp}")
 list(APPEND nysrc_nsl_stdcore "${CMAKE_CURRENT_LIST_DIR}/details/vm/runtime/nsl2c/all.cpp")
 
-addsrc(
-	NAME  nysrc_grammar
-	GROUP "grammar"
-	FILES ${NANY_YGR}
+add_library(libnanyc-grammar STATIC EXCLUDE_FROM_ALL
+	${NANY_YGR}
+	${NANY_GRAMMAR_H} ${NANY_GRAMMAR_HXX} ${NANY_GRAMMAR_CPP}
 )
 
-addsrc(
-	NAME  nysrc_details_grammar
-	GROUP "details/grammar"
-	FILES ${NANY_GRAMMAR_H} ${NANY_GRAMMAR_HXX} ${NANY_GRAMMAR_CPP}
-)
+add_dependencies(libnanyc-grammar nanyc-grammar-cpp)
 
 addsrc(
 	NAME  nysrc_details_pass_build_src2ast
@@ -523,13 +518,6 @@ set(mode_libnany "SHARED")
 if ("${NANY_STATIC}")
 	set(mode_libnany "STATIC")
 endif()
-
-add_library(libnanyc-grammar STATIC EXCLUDE_FROM_ALL
-	${nysrc_grammar}
-	${nysrc_details_grammar}
-)
-
-add_dependencies(libnanyc-grammar nanyc-grammar-cpp)
 
 add_library(libnanyc ${mode_libnany}
 	"libnanyc.h"
