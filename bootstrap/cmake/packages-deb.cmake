@@ -16,7 +16,8 @@ function (generate_rules_dpk_deb)
 		DEPENDS libnanyc nanyc nanyc-check-syntax nanyc-dump-ast
 		COMMAND "${CMAKE_COMMAND}" -E copy "$<TARGET_FILE:libnanyc>" "${builddir}/usr/lib"
 		COMMAND dpkg-deb --build "${debfile}" "${CMAKE_BINARY_DIR}/../distrib"
-		VERBATIM WORKING_DIRECTORY "${builddir}/..")
+		VERBATIM WORKING_DIRECTORY "${builddir}/.."
+	)
 
 	_generate_deb_package(libnanyc-dev)
 	file(MAKE_DIRECTORY "${builddir}/usr/include/nanyc/${ver}/nany")
@@ -25,7 +26,8 @@ function (generate_rules_dpk_deb)
 	add_custom_target(package-deb-${pkgname}
 		DEPENDS libnanyc nanyc nanyc-check-syntax nanyc-dump-ast
 		COMMAND dpkg-deb --build "${debfile}" "${CMAKE_BINARY_DIR}/../distrib"
-		VERBATIM WORKING_DIRECTORY "${builddir}/..")
+		VERBATIM WORKING_DIRECTORY "${builddir}/.."
+	)
 
 	_generate_deb_package(nanyc)
 	file(MAKE_DIRECTORY "${builddir}/usr/bin")
@@ -33,7 +35,8 @@ function (generate_rules_dpk_deb)
 		DEPENDS libnanyc nanyc nanyc-check-syntax nanyc-dump-ast
 		COMMAND "${CMAKE_COMMAND}" -E copy "$<TARGET_FILE:nanyc>" "${builddir}/usr/bin"
 		COMMAND dpkg-deb --build "${debfile}" "${CMAKE_BINARY_DIR}/../distrib"
-		VERBATIM WORKING_DIRECTORY "${builddir}/..")
+		VERBATIM WORKING_DIRECTORY "${builddir}/.."
+	)
 
 	_generate_deb_package(nanyc-extras)
 	file(MAKE_DIRECTORY "${builddir}/usr/bin")
@@ -43,13 +46,15 @@ function (generate_rules_dpk_deb)
 		COMMAND "${CMAKE_COMMAND}" -E copy "$<TARGET_FILE:nanyc-dump-ast>" "${builddir}/usr/lib"
 		COMMAND "${CMAKE_COMMAND}" -E copy "$<TARGET_FILE:nanyc-unittest>" "${builddir}/usr/lib"
 		COMMAND dpkg-deb --build "${debfile}" "${CMAKE_BINARY_DIR}/../distrib"
-		VERBATIM WORKING_DIRECTORY "${builddir}/..")
+		VERBATIM WORKING_DIRECTORY "${builddir}/.."
+	)
 
 	add_custom_target(packages-deb DEPENDS
 		package-deb-libnanyc
 		package-deb-nanyc
 		package-deb-nanyc-extras
-		package-deb-libnanyc-dev)
+		package-deb-libnanyc-dev
+	)
 endfunction()
 
 

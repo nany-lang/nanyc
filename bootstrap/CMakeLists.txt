@@ -38,32 +38,36 @@ add_custom_target(check
 	DEPENDS nanyc-unittest
 	COMMAND "${CMAKE_COMMAND}" -E "echo" # for beauty
 	COMMAND "$<TARGET_FILE:nanyc-unittest>" --with-nsl "${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/empty.ny"
-	VERBATIM)
+	VERBATIM
+)
 
 add_custom_target(install-libnanyc
 	DEPENDS libnanyc
 	COMMAND
 		"${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=libnanyc"
-		-P "${CMAKE_BINARY_DIR}/cmake_install.cmake")
+		-P "${CMAKE_BINARY_DIR}/cmake_install.cmake"
+)
 
 add_custom_target(install-nany
 	DEPENDS nany
 	COMMAND
 		"${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=nany"
-		-P "${CMAKE_BINARY_DIR}/cmake_install.cmake")
+		-P "${CMAKE_BINARY_DIR}/cmake_install.cmake"
+)
 
 add_custom_target(install-libnanyc-dev
   DEPENDS libnanyc
   COMMAND
       "${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=libnanyc-dev"
-      -P "${CMAKE_BINARY_DIR}/cmake_install.cmake")
+      -P "${CMAKE_BINARY_DIR}/cmake_install.cmake"
+)
 
 add_custom_target(install-libnanyc-dev-tools
   DEPENDS libnanyc nanyc-check-syntax nanyc-dump-ast
   COMMAND
       "${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=libnanyc-dev-tools"
-      -P "${CMAKE_BINARY_DIR}/cmake_install.cmake")
-
+      -P "${CMAKE_BINARY_DIR}/cmake_install.cmake"
+)
 
 # Packages
 if (nany_os_debian)

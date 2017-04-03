@@ -26,7 +26,8 @@ function (produce_rules_dpk_msi)
 
 		COMMAND "${CMAKE_COMMAND}" "-E" echo "-- wix light ${wix_wxs}.wixobj"
 		COMMAND "C:\\Program Files (x86)\\WiX Toolset v${wix_ver}\\bin\\light.exe"
-		"-out" "nanyc-${nany_version}-${wix_arch}.msi" -ext WixUIExtension "${wix_wxs}.wixobj")
+		"-out" "nanyc-${nany_version}-${wix_arch}.msi" -ext WixUIExtension "${wix_wxs}.wixobj"
+	)
 endfunction()
 
 
