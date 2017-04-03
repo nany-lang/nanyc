@@ -12,8 +12,9 @@ variables:
 .template-debug-build-linux: &debug-build-linux
     stage: build
     script:
-        - cd bootstrap
-        - cmake . -DCMAKE_BUILD_TYPE=debug
+        - mkdir -p build/bootstrap
+        - cd build/bootstrap
+        - cmake ../../bootstrap -DCMAKE_BUILD_TYPE=debug
         - cmake --build . --config debug --target all -- -j $(nproc)
     tags:
         - linux
@@ -44,8 +45,9 @@ variables:
 .template-pkg-linux: &package-linux
     stage: packages
     script:
-        - cd bootstrap
-        - cmake . -DCMAKE_BUILD_TYPE=release
+        - mkdir -p build/bootstrap
+        - cd build/bootstrap
+        - cmake ../../bootstrap -DCMAKE_BUILD_TYPE=release
         - cmake --build . --config release --target all -- -j $(nproc)
         - ([ ! -e /etc/debian_version ] || make packages-deb)
     tags:
