@@ -4,6 +4,9 @@ if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/ext/yuni/src/CMakeLists.txt")
 	nerror("The extenal library 'yuni' is not present (submodule)")
 	message(FATAL_ERROR "aborting")
 endif()
+
+include_directories("${CMAKE_CURRENT_BINARY_DIR}/ext/yuni/src")
+
 add_subdirectory("ext/yuni/src")
 include_directories("ext/yuni/src")
 
@@ -36,3 +39,4 @@ set(CMAKE_C_FLAGS_DEBUG     "${YN_FLAGS_C_DEBUG} ${extra_flags_debug}")
 set(CMAKE_C_FLAGS_RELEASE   "${YN_FLAGS_C_RELEASE} ${extra_flags_release}")
 set(CMAKE_CXX_FLAGS_DEBUG   "${YN_FLAGS_CXX_DEBUG} ${extra_flags_debug}")
 set(CMAKE_CXX_FLAGS_RELEASE "${YN_FLAGS_CXX_RELEASE} ${extra_flags_release}")
+
