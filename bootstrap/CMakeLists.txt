@@ -28,41 +28,17 @@ include("cmake/libdyncall.cmake")
 include("cmake/libyuni.cmake")
 include("cmake/grammar.cmake")
 
-# Common Tools
-#include_directories("${CMAKE_CURRENT_BINARY_DIR}/") # include "ncs.grammar/..."
-#include_directories("${CMAKE_CURRENT_LIST_DIR}/libnanyc") # "nany/nany.h"
-
-
-# Tools
 add_subdirectory(tools)
-
-# Nany C library
 add_subdirectory("libnanyc")
-
-# tools
 add_subdirectory(src)
 
-#
-# Test
-#
 get_filename_component(nany_tests_root "${CMAKE_CURRENT_LIST_DIR}/../../tests/" REALPATH)
-#add_custom_target(check
-#	DEPENDS nanyc-check-syntax
-#	COMMAND "$<TARGET_FILE:nanyc-check-syntax>" "--use-filename-convention" "${nany_tests_root}/parsing"
-#	COMMAND "$<TARGET_FILE:nanyc-check-syntax>"
-#		"${nany_tests_root}/build"
-#		"${nany_tests_root}/contest"
-#		"${nany_tests_root}/benchmark"
-#	VERBATIM)
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/empty.ny" "func main {}\n")
 add_custom_target(check
 	DEPENDS nanyc-unittest
 	COMMAND "${CMAKE_COMMAND}" -E "echo" # for beauty
 	COMMAND "$<TARGET_FILE:nanyc-unittest>" --with-nsl "${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/empty.ny"
 	VERBATIM)
-
-
-
 
 add_custom_target(install-libnanyc
 	DEPENDS libnanyc
@@ -89,14 +65,10 @@ add_custom_target(install-libnanyc-dev-tools
       -P "${CMAKE_BINARY_DIR}/cmake_install.cmake")
 
 
-#
 # Packages
-#
 if (nany_os_debian)
 	include("cmake/packages-deb.cmake")
 endif()
 if (WIN32)
 	include("cmake/packages-msi.cmake")
 endif()
-
-# The end !

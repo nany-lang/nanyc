@@ -37,7 +37,6 @@ function (read_build_settings)
 						OUTPUT_STRIP_TRAILING_WHITESPACE)
 				endif()
 			endif()
-
 			if (NOT "${GIT_COMMIT_HASH}" STREQUAL "")
 				if (NOT "$ENV{TRAVIS_PULL_REQUEST}" STREQUAL "" AND NOT "$ENV{TRAVIS_PULL_REQUEST}" STREQUAL "false")
 					set(GIT_COMMIT_HASH "github-$ENV{TRAVIS_PULL_REQUEST}-${GIT_COMMIT_HASH}")

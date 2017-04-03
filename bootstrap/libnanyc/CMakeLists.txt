@@ -1,6 +1,5 @@
 project(libnany)
 
-
 get_filename_component(libnany_config_folder "${CMAKE_CURRENT_BINARY_DIR}" REALPATH)
 file(MAKE_DIRECTORY "${libnany_config_folder}")
 
@@ -27,22 +26,16 @@ else()
 	nmessage("ignoring libnanyc-traces.h ${libnany_config_folder}/libnanyc-traces.h (already exists)")
 endif()
 
-
 macro(addsrc)
 	set(options)
 	set(oneValueArgs NAME GROUP)
 	set(multiValueArgs FILES)
 	cmake_parse_arguments(O "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
-
 	set("${O_NAME}" ${O_FILES})
 	source_group("${O_GROUP}" FILES ${O_FILES})
 endmacro()
 
-
-
-#
 # generate nsl:std.core
-#
 get_filename_component(nsl_stdcore_root "${CMAKE_CURRENT_LIST_DIR}/../../src/nsl/std.core/" REALPATH)
 get_filename_component(nsl_root "${CMAKE_CURRENT_LIST_DIR}/../../src/nsl/" REALPATH)
 set(nsl_root "${nsl_root}" CACHE INTERNEL "NSL Root path")
@@ -136,7 +129,6 @@ endforeach()
 
 set(__nsl_stdcore_cpp "${__nsl_stdcore_cpp}}\n")
 
-
 # TESTS
 set(__nsl_stdcore_cpp "${__nsl_stdcore_cpp}\n\n")
 set(__nsl_stdcore_cpp "${__nsl_stdcore_cpp}void unittests(Project& project) {\n")
@@ -167,15 +159,6 @@ set(__nsl_stdcore_cpp "${__nsl_stdcore_cpp}} // namespace ny\n")
 file(WRITE "${CMAKE_CURRENT_LIST_DIR}/details/vm/runtime/nsl2c/all.cpp" "${__nsl_stdcore_cpp}")
 list(APPEND nysrc_nsl_stdcore "${CMAKE_CURRENT_LIST_DIR}/details/vm/runtime/nsl2c/all.cpp")
 
-
-
-
-
-
-
-
-
-
 addsrc(
 	NAME  nysrc_grammar
 	GROUP "grammar"
@@ -184,9 +167,6 @@ addsrc(
 	NAME  nysrc_details_grammar
 	GROUP "details/grammar"
 	FILES ${NANY_GRAMMAR_H} ${NANY_GRAMMAR_HXX} ${NANY_GRAMMAR_CPP})
-
-
-
 
 addsrc(
 	NAME  nysrc_details_pass_build_src2ast
@@ -287,7 +267,6 @@ addsrc(
 	"details/semantic/error-not-declared.cpp"
 	"details/semantic/exception.h"
 	"details/semantic/exception.cpp"
-
 	"details/semantic/opcode-ref-unref.cpp"
 	"details/semantic/opcode-identify.cpp"
 	"details/semantic/opcode-ensure-resolved.cpp"
@@ -517,38 +496,27 @@ addsrc(
 	"details/vm/runtime/std.memory.cpp"
 	"details/vm/runtime/std.env.cpp")
 
-
-
 set(mode_libnany "SHARED")
 if ("${NANY_STATIC}")
 	set(mode_libnany "STATIC")
 endif()
-
 
 add_library(libnanyc-grammar STATIC EXCLUDE_FROM_ALL
 	${nysrc_grammar}
 	${nysrc_details_grammar})
 add_dependencies(libnanyc-grammar nanyc-grammar-cpp)
 
-
-
-
-
 add_library(libnanyc ${mode_libnany}
 	"libnanyc.h"
-
 	# public headers
 	${nysrc_public_headers}
-
 	${nysrc_c_api}
 	${nysrc_io_adapter}
-
 	${nysrc_details_pass_build_src2ast}
 	${nysrc_details_pass_ast_normalize}
 	${nysrc_details_pass_ast2ir}
 	${nysrc_details_pass_build_attach}
 	${nysrc_details_pass_build_semantic}
-
 	${nysrc_details_utils}
 	${nysrc_details_ast}
 	${nysrc_details_ir}
@@ -559,17 +527,13 @@ add_library(libnanyc ${mode_libnany}
 	${nysrc_details_context}
 	${nysrc_details_reporting}
 	${nysrc_details_semantic}
-
 	${nysrc_nsl_stdcore}
 	${nysrc_details_vm}
 	${nysrc_details_vm_runtime}
-
 	# misc
 	"${libnany_config_folder}/libnanyc-config.h"
 	"${libnany_config_folder}/libnanyc-traces.h"
 	"${libnany_config_folder}/libnanyc-version.h")
-
-
 
 set_target_properties(libnanyc PROPERTIES
 	VERSION   "${nany_version_major}.${nany_version_minor}.${nany_version_patch}"
@@ -593,9 +557,7 @@ set_property(TARGET libnanyc-grammar PROPERTY MACOSX_RPATH true)
 set_property(TARGET libnanyc-grammar PROPERTY LIBRARY_OUTPUT_NAME "nanyc-grammar")
 set_property(TARGET libnanyc-grammar PROPERTY ARCHIVE_OUTPUT_NAME "nanyc-grammar")
 
-
 target_compile_definitions(libnanyc PRIVATE "LIBNANYC_DLL_EXPORT=1")
-
 
 target_include_directories(libnanyc PRIVATE "${libnany_config_folder}")
 target_include_directories(libnanyc PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../ext/dyncall/")
@@ -606,17 +568,14 @@ target_include_directories(libnanyc-grammar PUBLIC "${CMAKE_CURRENT_LIST_DIR}")
 add_dependencies(libnanyc nanyc-grammar-cpp)
 add_dependencies(libnanyc nyt-nanyfile-to-cstring)
 
-
-
 install(TARGETS libnanyc
 	ARCHIVE DESTINATION "lib/libnany/${nany_version}"
 	LIBRARY DESTINATION "lib/libnany/${nany_version}"
 	COMPONENT "libnanyc")
 
-install(FILES ${nysrc_public_headers} 
+install(FILES ${nysrc_public_headers}
 	DESTINATION "include/libnany/${nany_version}/nany"
 	COMPONENT "libnanyc-dev")
-
 
 if (YUNI_COMPILER_IS_CLANG)
 	function(add_clang_static_analysis target)
@@ -624,15 +583,11 @@ if (YUNI_COMPILER_IS_CLANG)
 	    add_library(${target}_analyze OBJECT EXCLUDE_FROM_ALL ${SRCs})
 		set_target_properties(${target}_analyze PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD true)
 		set_target_properties(${target}_analyze PROPERTIES COMPILE_FLAGS "--analyze")
-
 		target_include_directories(${target}_analyze PRIVATE "${libnany_config_folder}")
 		target_include_directories(${target}_analyze PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../ext/dyncall/")
 		target_include_directories(${target}_analyze PUBLIC  "${CMAKE_CURRENT_LIST_DIR}")
-
 		add_dependencies(${target}_analyze nanyc-grammar-cpp)
 		add_dependencies(${target}_analyze nyt-nanyfile-to-cstring)
 	endfunction()
-
 	add_clang_static_analysis(libnanyc)
 endif()
-

@@ -5,7 +5,6 @@ function (produce_rules_dpk_msi)
 	else()
 		set(wix_config_mode "Release")
 	endif()
-
 	if (RTC_ARCH_ARM)
 		set(wix_arch "arm")
 	elseif (RTC_ARCH_X64)
@@ -15,7 +14,6 @@ function (produce_rules_dpk_msi)
 	else()
 		set(wix_arch "unknown")
 	endif()
-
 	set(wix_ver "3.10")
 	set(wix_wxs "nanyc-${nany_version}-${wix_arch}")
 	configure_file("../distrib/wix/cmake-wix-template.cmake" "../distrib/${wix_wxs}.wxs" @ONLY)
@@ -23,10 +21,10 @@ function (produce_rules_dpk_msi)
 	add_custom_target(package-msi
 		DEPENDS libnanyc nany nanyc-check-syntax nanyc-dump-ast
 		WORKING_DIRECTORY "../distrib"
-		COMMAND "${CMAKE_COMMAND}" "-E" echo "-- wix candle ${wix_wxs}.wxs" 
+		COMMAND "${CMAKE_COMMAND}" "-E" echo "-- wix candle ${wix_wxs}.wxs"
 		COMMAND "C:\\Program Files (x86)\\WiX Toolset v${wix_ver}\\bin\\candle.exe" "${wix_wxs}.wxs"
 
-		COMMAND "${CMAKE_COMMAND}" "-E" echo "-- wix light ${wix_wxs}.wixobj" 
+		COMMAND "${CMAKE_COMMAND}" "-E" echo "-- wix light ${wix_wxs}.wixobj"
 		COMMAND "C:\\Program Files (x86)\\WiX Toolset v${wix_ver}\\bin\\light.exe"
 		"-out" "nanyc-${nany_version}-${wix_arch}.msi" -ext WixUIExtension "${wix_wxs}.wixobj")
 endfunction()

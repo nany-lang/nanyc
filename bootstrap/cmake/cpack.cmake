@@ -9,16 +9,12 @@ set(CPACK_PACKAGE_CONTACT  "${nany_contact}")
 
 include(CPack)
 
-
 cpack_add_install_type(insttype_default DISPLAY_NAME "Default")
 cpack_add_install_type(insttype_full DISPLAY_NAME "Full")
 
 cpack_add_component_group("libnany" DISPLAY_NAME "Nany Compiler Core")
 cpack_add_component_group("nany" DISPLAY_NAME "Nany Compiler" EXPANDED BOLD_TITLE)
 cpack_add_component_group("nany-dev" DISPLAY_NAME "Nany Compiler Headers")
-
-
-
 
 cpack_add_component("libnany"
 	REQUIRED
