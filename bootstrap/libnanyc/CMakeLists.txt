@@ -32,7 +32,6 @@ macro(addsrc)
 	set(multiValueArgs FILES)
 	cmake_parse_arguments(O "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 	set("${O_NAME}" ${O_FILES})
-	source_group("${O_GROUP}" FILES ${O_FILES})
 endmacro()
 
 # generate nsl:std.core
