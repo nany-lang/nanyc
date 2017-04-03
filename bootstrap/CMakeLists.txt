@@ -76,7 +76,7 @@ configure_file("cmake/you-complete-me.vim.template.cmake" ".ycm_extra_conf.py")
 #
 configure_file("cmake/yuni-profilebuild-template.cmake" "ext/yuni/src/ProfileBuild.cmake")
 
-if (NOT EXISTS "ext/yuni/src/CMakeLists.txt")
+if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/ext/yuni/src/CMakeLists.txt")
 	nerror("The extenal library 'yuni' is not present (submodule)")
 	message(FATAL_ERROR "aborting")
 endif()
