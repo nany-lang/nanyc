@@ -24,21 +24,8 @@ include("cmake/build-settings.cmake")
 include("cmake/compilation-database.cmake")
 include("cmake/arch-platform.cmake")
 
+include("cmake/libdyncall.cmake")
 include("cmake/libyuni.cmake")
-
-if (MSVC)
-	# DynCALL does not like SAFESEH on Windows x86
-	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /SAFESEH:NO")
-endif()
-
-
-#
-# -- dyncall - (Generic Dynamic FFI package / http://www.dyncall.org/)
-#
-add_subdirectory("ext/dyncall")
-
-
-
 
 #
 # -- Nany GRAMMAR - (Nany grammar to C++ translator)
