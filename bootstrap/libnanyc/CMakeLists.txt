@@ -38,6 +38,7 @@ list(LENGTH nsl_files_unittest nsl_files_unittest_count)
 nmessage("standard library: added ${nsl_files_count} files (${nsl_files_unittest_count} test files)")
 set(nysrc_nsl_stdcore)
 set(__nany_stdcore_unittest)
+set(__runtime_output_dir "${CMAKE_CURRENT_BINARY_DIR}/details/vm/runtime")
 
 macro(append_nsl_file filename istest)
 	string(REPLACE "/std." "/std" __funcname "${filename}")
@@ -55,15 +56,15 @@ macro(append_nsl_file filename istest)
 		list(APPEND __nany_stdcore "${__funcname}")
 	endif()
 
-	list(APPEND nysrc_nsl_stdcore "${CMAKE_CURRENT_LIST_DIR}/details/vm/runtime/${target_filename}")
+	list(APPEND nysrc_nsl_stdcore "${__runtime_output_dir}/${target_filename}")
 
 	set(__ref_nsl_file_${__funcname}  "${filename}")
 	add_custom_command(
-		OUTPUT  "${CMAKE_CURRENT_LIST_DIR}/details/vm/runtime/${target_filename}"
+		OUTPUT  "${__runtime_output_dir}/${target_filename}"
 		COMMAND "$<TARGET_FILE:nyt-nanyfile-to-cstring>"
 			"${__funcname}"
 			"${filename}"
-			"${CMAKE_CURRENT_LIST_DIR}/details/vm/runtime/${target_filename}"
+			"${__runtime_output_dir}/${target_filename}"
 		DEPENDS
 			nyt-nanyfile-to-cstring
 			"${filename}"
@@ -71,7 +72,8 @@ macro(append_nsl_file filename istest)
 	)
 endmacro()
 
-file(MAKE_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/details/vm/runtime/nsl2c")
+set(nsl2cdir "${__runtime_output_dir}/nsl2c")
+file(MAKE_DIRECTORY "${nsl2cdir}")
 foreach (filename ${nsl_files})
 	append_nsl_file(${filename} FALSE)
 endforeach()
@@ -148,8 +150,8 @@ set(__nsl_stdcore_cpp "${__nsl_stdcore_cpp}}\n\n\n")
 set(__nsl_stdcore_cpp "${__nsl_stdcore_cpp}} // namespace import\n")
 set(__nsl_stdcore_cpp "${__nsl_stdcore_cpp}} // namespace nsl\n")
 set(__nsl_stdcore_cpp "${__nsl_stdcore_cpp}} // namespace ny\n")
-file(WRITE "${CMAKE_CURRENT_LIST_DIR}/details/vm/runtime/nsl2c/all.cpp" "${__nsl_stdcore_cpp}")
-list(APPEND nysrc_nsl_stdcore "${CMAKE_CURRENT_LIST_DIR}/details/vm/runtime/nsl2c/all.cpp")
+file(WRITE "${nsl2cdir}/all.cpp" "${__nsl_stdcore_cpp}")
+list(APPEND nysrc_nsl_stdcore "${nsl2cdir}/all.cpp")
 
 add_library(libnanyc-grammar STATIC EXCLUDE_FROM_ALL
 	${NANY_YGR}
