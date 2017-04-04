@@ -1,6 +1,5 @@
 project(libnany)
 
-
 get_filename_component(libnany_config_folder "${CMAKE_CURRENT_BINARY_DIR}" REALPATH)
 file(MAKE_DIRECTORY "${libnany_config_folder}")
 
@@ -27,22 +26,7 @@ else()
 	nmessage("ignoring libnanyc-traces.h ${libnany_config_folder}/libnanyc-traces.h (already exists)")
 endif()
 
-
-macro(addsrc)
-	set(options)
-	set(oneValueArgs NAME GROUP)
-	set(multiValueArgs FILES)
-	cmake_parse_arguments(O "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
-
-	set("${O_NAME}" ${O_FILES})
-	source_group("${O_GROUP}" FILES ${O_FILES})
-endmacro()
-
-
-
-#
 # generate nsl:std.core
-#
 get_filename_component(nsl_stdcore_root "${CMAKE_CURRENT_LIST_DIR}/../../src/nsl/std.core/" REALPATH)
 get_filename_component(nsl_root "${CMAKE_CURRENT_LIST_DIR}/../../src/nsl/" REALPATH)
 set(nsl_root "${nsl_root}" CACHE INTERNEL "NSL Root path")
@@ -54,6 +38,7 @@ list(LENGTH nsl_files_unittest nsl_files_unittest_count)
 nmessage("standard library: added ${nsl_files_count} files (${nsl_files_unittest_count} test files)")
 set(nysrc_nsl_stdcore)
 set(__nany_stdcore_unittest)
+set(__runtime_output_dir "${CMAKE_CURRENT_BINARY_DIR}/details/vm/runtime")
 
 macro(append_nsl_file filename istest)
 	string(REPLACE "/std." "/std" __funcname "${filename}")
@@ -71,22 +56,24 @@ macro(append_nsl_file filename istest)
 		list(APPEND __nany_stdcore "${__funcname}")
 	endif()
 
-	list(APPEND nysrc_nsl_stdcore "${CMAKE_CURRENT_LIST_DIR}/details/vm/runtime/${target_filename}")
+	list(APPEND nysrc_nsl_stdcore "${__runtime_output_dir}/${target_filename}")
 
 	set(__ref_nsl_file_${__funcname}  "${filename}")
 	add_custom_command(
-		OUTPUT  "${CMAKE_CURRENT_LIST_DIR}/details/vm/runtime/${target_filename}"
+		OUTPUT  "${__runtime_output_dir}/${target_filename}"
 		COMMAND "$<TARGET_FILE:nyt-nanyfile-to-cstring>"
 			"${__funcname}"
 			"${filename}"
-			"${CMAKE_CURRENT_LIST_DIR}/details/vm/runtime/${target_filename}"
+			"${__runtime_output_dir}/${target_filename}"
 		DEPENDS
 			nyt-nanyfile-to-cstring
 			"${filename}"
-		VERBATIM)
+		VERBATIM
+	)
 endmacro()
 
-file(MAKE_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/details/vm/runtime/nsl2c")
+set(nsl2cdir "${__runtime_output_dir}/nsl2c")
+file(MAKE_DIRECTORY "${nsl2cdir}")
 foreach (filename ${nsl_files})
 	append_nsl_file(${filename} FALSE)
 endforeach()
@@ -136,7 +123,6 @@ endforeach()
 
 set(__nsl_stdcore_cpp "${__nsl_stdcore_cpp}}\n")
 
-
 # TESTS
 set(__nsl_stdcore_cpp "${__nsl_stdcore_cpp}\n\n")
 set(__nsl_stdcore_cpp "${__nsl_stdcore_cpp}void unittests(Project& project) {\n")
@@ -164,459 +150,304 @@ set(__nsl_stdcore_cpp "${__nsl_stdcore_cpp}}\n\n\n")
 set(__nsl_stdcore_cpp "${__nsl_stdcore_cpp}} // namespace import\n")
 set(__nsl_stdcore_cpp "${__nsl_stdcore_cpp}} // namespace nsl\n")
 set(__nsl_stdcore_cpp "${__nsl_stdcore_cpp}} // namespace ny\n")
-file(WRITE "${CMAKE_CURRENT_LIST_DIR}/details/vm/runtime/nsl2c/all.cpp" "${__nsl_stdcore_cpp}")
-list(APPEND nysrc_nsl_stdcore "${CMAKE_CURRENT_LIST_DIR}/details/vm/runtime/nsl2c/all.cpp")
+file(WRITE "${nsl2cdir}/all.cpp" "${__nsl_stdcore_cpp}")
+list(APPEND nysrc_nsl_stdcore "${nsl2cdir}/all.cpp")
 
+add_library(libnanyc-grammar STATIC EXCLUDE_FROM_ALL
+	${NANY_YGR}
+	${NANY_GRAMMAR_H} ${NANY_GRAMMAR_HXX} ${NANY_GRAMMAR_CPP}
+)
 
-
-
-
-
-
-
-
-
-addsrc(
-	NAME  nysrc_grammar
-	GROUP "grammar"
-	FILES ${NANY_YGR})
-addsrc(
-	NAME  nysrc_details_grammar
-	GROUP "details/grammar"
-	FILES ${NANY_GRAMMAR_H} ${NANY_GRAMMAR_HXX} ${NANY_GRAMMAR_CPP})
-
-
-
-
-addsrc(
-	NAME  nysrc_details_pass_build_src2ast
-	GROUP "details/pass/a-src2ast"
-	FILES
-	"details/pass/a-src2ast/ast-from-source.cpp")
-
-addsrc(
-	NAME  nysrc_details_pass_ast_normalize
-	GROUP "details/pass/b-ast-normalize"
-	FILES
-	"details/pass/b-ast-normalize/normalize.cpp")
-
-addsrc(
-	NAME  nysrc_details_pass_ast2ir
-	GROUP "details/pass/c-ast2ir"
-	FILES
-	"details/pass/c-ast2ir/context.cpp"
-	"details/pass/c-ast2ir/context.h"
-	"details/pass/c-ast2ir/context.hxx"
-	"details/pass/c-ast2ir/exception.h"
-	"details/pass/c-ast2ir/exception.cpp"
-	"details/pass/c-ast2ir/scope.h"
-	"details/pass/c-ast2ir/scope.hxx"
-	"details/pass/c-ast2ir/scope.cpp"
-	"details/pass/c-ast2ir/scope-array.cpp"
-	"details/pass/c-ast2ir/scope-for.cpp"
-	"details/pass/c-ast2ir/scope-in.cpp"
-	"details/pass/c-ast2ir/scope-if.cpp"
-	"details/pass/c-ast2ir/scope-while.cpp"
-	"details/pass/c-ast2ir/scope-switch.cpp"
-	"details/pass/c-ast2ir/scope-func.cpp"
-	"details/pass/c-ast2ir/scope-closure.cpp"
-	"details/pass/c-ast2ir/scope-typeof.cpp"
-	"details/pass/c-ast2ir/scope-typedef.cpp"
-	"details/pass/c-ast2ir/scope-new.cpp"
-	"details/pass/c-ast2ir/scope-object.cpp"
-	"details/pass/c-ast2ir/scope-var.cpp"
-	"details/pass/c-ast2ir/scope-class.cpp"
-	"details/pass/c-ast2ir/scope-expr.cpp"
-	"details/pass/c-ast2ir/scope-on.cpp"
-	"details/pass/c-ast2ir/scope-call.cpp"
-	"details/pass/c-ast2ir/scope-return.cpp"
-	"details/pass/c-ast2ir/scope-stmt.cpp"
-	"details/pass/c-ast2ir/scope-scope.cpp"
-	"details/pass/c-ast2ir/scope-type.cpp"
-	"details/pass/c-ast2ir/scope-number.cpp"
-	"details/pass/c-ast2ir/scope-string.cpp"
-	"details/pass/c-ast2ir/scope-intrinsic.cpp"
-	"details/pass/c-ast2ir/scope-generic-type-parameters.cpp"
-	"details/pass/c-ast2ir/scope-attributes.cpp"
-	"details/pass/c-ast2ir/scope-unittest.cpp"
-	"details/pass/c-ast2ir/source-ast-to-ir.cpp")
-
-addsrc(
-	NAME  nysrc_details_pass_build_attach
-	GROUP "details/pass/build-attach"
-	FILES
-	"details/pass/d-object-map/mapping.cpp"
-	"details/pass/d-object-map/mapping.h"
-	"details/pass/d-object-map/attach.cpp")
-
-addsrc(
-	NAME  nysrc_details_pass_build_semantic
-	GROUP "details/pass/e-semantic"
-	FILES
-	"details/pass/e-semantic/semantic.cpp")
-
-addsrc(
-	NAME  nysrc_details_semantic
-	GROUP "details/semantic"
-	FILES
-	"details/semantic/semantic-analysis.cpp"
-	"details/semantic/semantic-analysis.h"
-	"details/semantic/semantic-analysis.hxx"
-	"details/semantic/atom-factory.cpp"
-	"details/semantic/atom-factory.h"
-	"details/semantic/type-check.cpp"
-	"details/semantic/type-check.h"
-	"details/semantic/func-overload-match.cpp"
-	"details/semantic/func-overload-match.h"
-	"details/semantic/overloaded-func-call-resolution.cpp"
-	"details/semantic/overloaded-func-call-resolution.h"
-	"details/semantic/stack-frame.h"
-	"details/semantic/stack-frame.hxx"
-	"details/semantic/capture-variable.cpp"
-	"details/semantic/ref-unref.h"
-	"details/semantic/assignment.cpp"
-	"details/semantic/member-variable.h"
-	"details/semantic/member-variable-default-init.cpp"
-	"details/semantic/member-variable-default-dispose.cpp"
-	"details/semantic/member-variable-default-clone.cpp"
-	"details/semantic/update-all-stackalloc.cpp"
-	"details/semantic/debug.h"
-	"details/semantic/debug.cpp"
-	"details/semantic/deprecated-error.h"
-	"details/semantic/deprecated-error.cpp"
-	"details/semantic/error-not-declared.cpp"
-	"details/semantic/exception.h"
-	"details/semantic/exception.cpp"
-
-	"details/semantic/opcode-ref-unref.cpp"
-	"details/semantic/opcode-identify.cpp"
-	"details/semantic/opcode-ensure-resolved.cpp"
-	"details/semantic/opcode-self.cpp"
-	"details/semantic/opcode-follow.cpp"
-	"details/semantic/opcode-allocate.cpp"
-	"details/semantic/opcode-stacksize.cpp"
-	"details/semantic/opcode-alias.cpp"
-	"details/semantic/opcode-store.cpp"
-	"details/semantic/opcode-push.cpp"
-	"details/semantic/opcode-stackalloc.cpp"
-	"details/semantic/opcode-call.cpp"
-	"details/semantic/opcode-sizeof.cpp"
-	"details/semantic/opcode-return.cpp"
-	"details/semantic/opcode-scope.cpp"
-	"details/semantic/opcode-pragma.cpp"
-	"details/semantic/opcode-blueprint.cpp"
-	"details/semantic/opcode-assign.cpp"
-	"details/semantic/opcode-typeisobject.cpp"
-	"details/semantic/opcode-commontype.cpp"
-	"details/semantic/opcode-intrinsic.cpp"
-	"details/semantic/intrinsics.h"
-	"details/semantic/intrinsics-nanyc.cpp"
-	"details/semantic/intrinsics-lang.cpp")
-
-addsrc(
-	NAME  nysrc_details_vm
-	GROUP "details/vm"
-	FILES
-	"details/vm/program.cpp"
-	"details/vm/program.hxx"
-	"details/vm/program.h"
-	"details/vm/context.h"
-	"details/vm/context.hxx"
-	"details/vm/context.cpp"
-	"details/vm/context-runner.h"
-	"details/vm/context-runner.cpp"
-	"details/vm/memchecker.h"
-	"details/vm/memchecker.cpp"
-	"details/vm/console.h"
-	"details/vm/console.cpp"
-	"details/vm/stacktrace.h"
-	"details/vm/stacktrace.hxx"
-	"details/vm/stacktrace.cpp"
-	"details/vm/stack.cpp"
-	"details/vm/stack.h"
-	"details/vm/stack.hxx"
-	"details/vm/types.h")
-
-addsrc(
-	NAME  nysrc_details_utils
-	GROUP "details/utils"
-	FILES
-	"details/utils/origin.h"
-	"details/utils/stringrefs.h"
-	"details/utils/stringrefs.hxx"
-	"details/utils/stringrefs.cpp"
-	"details/utils/memory-allocator.h"
-	"details/utils/check-for-valid-identifier-name.cpp"
-	"details/utils/check-for-valid-identifier-name.h"
-	"details/utils/dataregister.h"
-	"details/utils/clid.h"
-	"details/utils/clid.cpp"
-	"details/utils/clid.hxx")
-
-addsrc(
-	NAME  nysrc_details_ast
-	GROUP "details/ast"
-	FILES
-	"details/ast/tree-index.h"
-	"details/ast/tree-index.hxx"
-	"details/ast/tree-index.cpp"
-	"details/ast/ast.h"
-	"details/ast/ast.hxx"
-	"details/ast/ast.cpp")
-
-addsrc(
-	NAME  nysrc_details_ir
-	GROUP "details/ir"
-	FILES
-	"details/ir/ir.h"
-	"details/ir/isa/opcodes.h"
-	"details/ir/isa/data.h"
-	"details/ir/isa/data.cpp"
-	"details/ir/isa/printer.inc.hpp"
-	"details/ir/instruction.h"
-	"details/ir/emit.h"
-	"details/ir/sequence.h"
-	"details/ir/sequence.hxx"
-	"details/ir/sequence.cpp")
-
-addsrc(
-	NAME  nysrc_details_atom_classdef
-	GROUP "details/atom/classdef"
-	FILES
-	"details/atom/classdef.h"
-	"details/atom/classdef.hxx"
-	"details/atom/classdef.cpp"
-	"details/atom/classdef-table.h"
-	"details/atom/classdef-table.hxx"
-	"details/atom/classdef-table.cpp"
-	"details/atom/classdef-table-view.h"
-	"details/atom/classdef-table-view.hxx"
-	"details/atom/classdef-table-view.cpp"
-	"details/atom/classdef-follow.h"
-	"details/atom/classdef-follow.hxx"
-	"details/atom/classdef-follow.cpp"
-	"details/atom/classdef-overloads.h"
-	"details/atom/classdef-overloads.hxx"
-	"details/atom/classdef-overloads.cpp")
-
-addsrc(
-	NAME nysrc_details_type_system
-	GROUP "details/type"
-	FILES
-	"details/type/builtin.h")
-
-addsrc(
-	NAME  nysrc_details_atom
-	GROUP "details/atom"
-	FILES
-	"details/atom/funcdef.h"
-	"details/atom/funcdef.cpp"
-	"details/atom/funcdef.hxx"
-	"details/atom/type.h"
-	"details/atom/qualifiers.h"
-	"details/atom/qualifiers.hxx"
-	"details/atom/interface.h"
-	"details/atom/interface.cpp"
-	"details/atom/interface.hxx"
-	"details/atom/vardef.h"
-	"details/atom/atom.h"
-	"details/atom/atom.hxx"
-	"details/atom/atom.cpp"
-	"details/atom/atom-map.h"
-	"details/atom/atom-map.hxx"
-	"details/atom/atom-map.cpp"
-	"details/atom/signature.h"
-	"details/atom/signature.cpp"
-	"details/atom/signature.hxx")
-
-addsrc(
-	NAME  nysrc_details_intrinsic
-	GROUP "details/intrinsic"
-	FILES
-	"details/intrinsic/intrinsic.h"
-	"details/intrinsic/catalog.h"
-	"details/intrinsic/catalog.hxx"
-	"details/intrinsic/catalog.cpp")
-
-addsrc(
-	NAME  nysrc_details_context
-	GROUP "details/context"
-	FILES
-	"details/context/project.h"
-	"details/context/project.hxx"
-	"details/context/project.cpp"
-	"details/context/build.h"
-	"details/context/build.cpp"
-
-	"details/context/build-info.h"
-	"details/context/target.h"
-	"details/context/target.hxx"
-	"details/context/target.cpp"
-	"details/context/source.h"
-	"details/context/source.cpp")
-
-addsrc(
-	NAME  nysrc_details_reporting
-	GROUP "details/reporting"
-	FILES
-	"details/reporting/fwd.h"
-	"details/reporting/message.h"
-	"details/reporting/message.cpp"
-	"details/reporting/report.cpp"
-	"details/reporting/report.h"
-	"details/reporting/report.hxx"
-	"details/errors/errors.h"
-	"details/errors/errors.cpp"
-	"details/errors/complain.h"
-	"details/errors/complain.cpp"
-	"details/errors/exception.h"
-	"details/errors/exception.cpp"
-	"details/reporting/levels.h")
-
-addsrc(
-	NAME  nysrc_c_api
-	GROUP "c-api"
-	FILES
-	"details/c-api/project.cpp"
-	"details/c-api/build.cpp"
-	"details/c-api/program.cpp"
-	"details/c-api/console.cpp"
-	"details/c-api/bugreport.cpp"
-	"details/c-api/validator.cpp"
-	"details/c-api/type.cpp"
-	"details/c-api/run.cpp"
-	"details/c-api/print-ast.cpp"
-	"details/c-api/visibility.cpp"
-	"details/c-api/memalloc.c"
-	"details/c-api/common-debuginfo.hxx"
-	"details/c-api/version.c")
-
-addsrc(
-	NAME  nysrc_io_adapter
-	GROUP "IO Adapter"
-	FILES
-	"details/io-adapter/fallback.cpp"
-	"details/io-adapter/localfolder.cpp")
-
-addsrc(
-	NAME  nysrc_public_headers
-	GROUP "public-headers"
-	FILES
-	"include/nany/nany.h")
-
-addsrc(
-	NAME  nysrc_details_vm_runtime
-	GROUP "details/vm/runtime"
-	FILES
-	"details/vm/runtime/std.core.h"
-	"details/vm/runtime/std.core.string.cpp"
-	"details/vm/runtime/std.os.process.cpp"
-	"details/vm/runtime/std.io.cpp"
-	"details/vm/runtime/std.digest.cpp"
-	"details/vm/runtime/std.console.cpp"
-	"details/vm/runtime/std.memory.cpp"
-	"details/vm/runtime/std.env.cpp")
-
-
+add_dependencies(libnanyc-grammar nanyc-grammar-cpp)
 
 set(mode_libnany "SHARED")
 if ("${NANY_STATIC}")
 	set(mode_libnany "STATIC")
 endif()
 
-
-add_library(libnanyc-grammar STATIC EXCLUDE_FROM_ALL
-	${nysrc_grammar}
-	${nysrc_details_grammar})
-add_dependencies(libnanyc-grammar nanyc-grammar-cpp)
-
-
-
-
-
 add_library(libnanyc ${mode_libnany}
-	"libnanyc.h"
-
-	# public headers
-	${nysrc_public_headers}
-
-	${nysrc_c_api}
-	${nysrc_io_adapter}
-
-	${nysrc_details_pass_build_src2ast}
-	${nysrc_details_pass_ast_normalize}
-	${nysrc_details_pass_ast2ir}
-	${nysrc_details_pass_build_attach}
-	${nysrc_details_pass_build_semantic}
-
-	${nysrc_details_utils}
-	${nysrc_details_ast}
-	${nysrc_details_ir}
-	${nysrc_details_atom_classdef}
-	${nysrc_details_atom}
-	${nysrc_details_type_system}
-	${nysrc_details_intrinsic}
-	${nysrc_details_context}
-	${nysrc_details_reporting}
-	${nysrc_details_semantic}
-
-	${nysrc_nsl_stdcore}
-	${nysrc_details_vm}
-	${nysrc_details_vm_runtime}
-
-	# misc
 	"${libnany_config_folder}/libnanyc-config.h"
 	"${libnany_config_folder}/libnanyc-traces.h"
-	"${libnany_config_folder}/libnanyc-version.h")
-
-
+	"${libnany_config_folder}/libnanyc-version.h"
+	"details/ast/ast.cpp"
+	"details/ast/ast.h"
+	"details/ast/ast.hxx"
+	"details/ast/tree-index.cpp"
+	"details/ast/tree-index.h"
+	"details/ast/tree-index.hxx"
+	"details/atom/atom-map.cpp"
+	"details/atom/atom-map.h"
+	"details/atom/atom-map.hxx"
+	"details/atom/atom.cpp"
+	"details/atom/atom.h"
+	"details/atom/atom.hxx"
+	"details/atom/classdef-follow.cpp"
+	"details/atom/classdef-follow.h"
+	"details/atom/classdef-follow.hxx"
+	"details/atom/classdef-overloads.cpp"
+	"details/atom/classdef-overloads.h"
+	"details/atom/classdef-overloads.hxx"
+	"details/atom/classdef-table-view.cpp"
+	"details/atom/classdef-table-view.h"
+	"details/atom/classdef-table-view.hxx"
+	"details/atom/classdef-table.cpp"
+	"details/atom/classdef-table.h"
+	"details/atom/classdef-table.hxx"
+	"details/atom/classdef.cpp"
+	"details/atom/classdef.h"
+	"details/atom/classdef.hxx"
+	"details/atom/funcdef.cpp"
+	"details/atom/funcdef.h"
+	"details/atom/funcdef.hxx"
+	"details/atom/interface.cpp"
+	"details/atom/interface.h"
+	"details/atom/interface.hxx"
+	"details/atom/qualifiers.h"
+	"details/atom/qualifiers.hxx"
+	"details/atom/signature.cpp"
+	"details/atom/signature.h"
+	"details/atom/signature.hxx"
+	"details/atom/type.h"
+	"details/atom/vardef.h"
+	"details/c-api/bugreport.cpp"
+	"details/c-api/build.cpp"
+	"details/c-api/common-debuginfo.hxx"
+	"details/c-api/console.cpp"
+	"details/c-api/memalloc.c"
+	"details/c-api/print-ast.cpp"
+	"details/c-api/program.cpp"
+	"details/c-api/project.cpp"
+	"details/c-api/run.cpp"
+	"details/c-api/type.cpp"
+	"details/c-api/validator.cpp"
+	"details/c-api/version.c"
+	"details/c-api/visibility.cpp"
+	"details/context/build-info.h"
+	"details/context/build.cpp"
+	"details/context/build.h"
+	"details/context/project.cpp"
+	"details/context/project.h"
+	"details/context/project.hxx"
+	"details/context/source.cpp"
+	"details/context/source.h"
+	"details/context/target.cpp"
+	"details/context/target.h"
+	"details/context/target.hxx"
+	"details/errors/complain.cpp"
+	"details/errors/complain.h"
+	"details/errors/errors.cpp"
+	"details/errors/errors.h"
+	"details/errors/exception.cpp"
+	"details/errors/exception.h"
+	"details/intrinsic/catalog.cpp"
+	"details/intrinsic/catalog.h"
+	"details/intrinsic/catalog.hxx"
+	"details/intrinsic/intrinsic.h"
+	"details/io-adapter/fallback.cpp"
+	"details/io-adapter/localfolder.cpp"
+	"details/ir/emit.h"
+	"details/ir/instruction.h"
+	"details/ir/ir.h"
+	"details/ir/isa/data.cpp"
+	"details/ir/isa/data.h"
+	"details/ir/isa/opcodes.h"
+	"details/ir/isa/printer.inc.hpp"
+	"details/ir/sequence.cpp"
+	"details/ir/sequence.h"
+	"details/ir/sequence.hxx"
+	"details/pass/a-src2ast/ast-from-source.cpp"
+	"details/pass/b-ast-normalize/normalize.cpp"
+	"details/pass/c-ast2ir/context.cpp"
+	"details/pass/c-ast2ir/context.h"
+	"details/pass/c-ast2ir/context.hxx"
+	"details/pass/c-ast2ir/exception.cpp"
+	"details/pass/c-ast2ir/exception.h"
+	"details/pass/c-ast2ir/scope-array.cpp"
+	"details/pass/c-ast2ir/scope-attributes.cpp"
+	"details/pass/c-ast2ir/scope-call.cpp"
+	"details/pass/c-ast2ir/scope-class.cpp"
+	"details/pass/c-ast2ir/scope-closure.cpp"
+	"details/pass/c-ast2ir/scope-expr.cpp"
+	"details/pass/c-ast2ir/scope-for.cpp"
+	"details/pass/c-ast2ir/scope-func.cpp"
+	"details/pass/c-ast2ir/scope-generic-type-parameters.cpp"
+	"details/pass/c-ast2ir/scope-if.cpp"
+	"details/pass/c-ast2ir/scope-in.cpp"
+	"details/pass/c-ast2ir/scope-intrinsic.cpp"
+	"details/pass/c-ast2ir/scope-new.cpp"
+	"details/pass/c-ast2ir/scope-number.cpp"
+	"details/pass/c-ast2ir/scope-object.cpp"
+	"details/pass/c-ast2ir/scope-on.cpp"
+	"details/pass/c-ast2ir/scope-return.cpp"
+	"details/pass/c-ast2ir/scope-scope.cpp"
+	"details/pass/c-ast2ir/scope-stmt.cpp"
+	"details/pass/c-ast2ir/scope-string.cpp"
+	"details/pass/c-ast2ir/scope-switch.cpp"
+	"details/pass/c-ast2ir/scope-type.cpp"
+	"details/pass/c-ast2ir/scope-typedef.cpp"
+	"details/pass/c-ast2ir/scope-typeof.cpp"
+	"details/pass/c-ast2ir/scope-unittest.cpp"
+	"details/pass/c-ast2ir/scope-var.cpp"
+	"details/pass/c-ast2ir/scope-while.cpp"
+	"details/pass/c-ast2ir/scope.cpp"
+	"details/pass/c-ast2ir/scope.h"
+	"details/pass/c-ast2ir/scope.hxx"
+	"details/pass/c-ast2ir/source-ast-to-ir.cpp"
+	"details/pass/d-object-map/attach.cpp"
+	"details/pass/d-object-map/mapping.cpp"
+	"details/pass/d-object-map/mapping.h"
+	"details/pass/e-semantic/semantic.cpp"
+	"details/reporting/fwd.h"
+	"details/reporting/levels.h"
+	"details/reporting/message.cpp"
+	"details/reporting/message.h"
+	"details/reporting/report.cpp"
+	"details/reporting/report.h"
+	"details/reporting/report.hxx"
+	"details/semantic/assignment.cpp"
+	"details/semantic/atom-factory.cpp"
+	"details/semantic/atom-factory.h"
+	"details/semantic/capture-variable.cpp"
+	"details/semantic/debug.cpp"
+	"details/semantic/debug.h"
+	"details/semantic/deprecated-error.cpp"
+	"details/semantic/deprecated-error.h"
+	"details/semantic/error-not-declared.cpp"
+	"details/semantic/exception.cpp"
+	"details/semantic/exception.h"
+	"details/semantic/func-overload-match.cpp"
+	"details/semantic/func-overload-match.h"
+	"details/semantic/intrinsics-lang.cpp"
+	"details/semantic/intrinsics-nanyc.cpp"
+	"details/semantic/intrinsics.h"
+	"details/semantic/member-variable-default-clone.cpp"
+	"details/semantic/member-variable-default-dispose.cpp"
+	"details/semantic/member-variable-default-init.cpp"
+	"details/semantic/member-variable.h"
+	"details/semantic/opcode-alias.cpp"
+	"details/semantic/opcode-allocate.cpp"
+	"details/semantic/opcode-assign.cpp"
+	"details/semantic/opcode-blueprint.cpp"
+	"details/semantic/opcode-call.cpp"
+	"details/semantic/opcode-commontype.cpp"
+	"details/semantic/opcode-ensure-resolved.cpp"
+	"details/semantic/opcode-follow.cpp"
+	"details/semantic/opcode-identify.cpp"
+	"details/semantic/opcode-intrinsic.cpp"
+	"details/semantic/opcode-pragma.cpp"
+	"details/semantic/opcode-push.cpp"
+	"details/semantic/opcode-ref-unref.cpp"
+	"details/semantic/opcode-return.cpp"
+	"details/semantic/opcode-scope.cpp"
+	"details/semantic/opcode-self.cpp"
+	"details/semantic/opcode-sizeof.cpp"
+	"details/semantic/opcode-stackalloc.cpp"
+	"details/semantic/opcode-stacksize.cpp"
+	"details/semantic/opcode-store.cpp"
+	"details/semantic/opcode-typeisobject.cpp"
+	"details/semantic/overloaded-func-call-resolution.cpp"
+	"details/semantic/overloaded-func-call-resolution.h"
+	"details/semantic/ref-unref.h"
+	"details/semantic/semantic-analysis.cpp"
+	"details/semantic/semantic-analysis.h"
+	"details/semantic/semantic-analysis.hxx"
+	"details/semantic/stack-frame.h"
+	"details/semantic/stack-frame.hxx"
+	"details/semantic/type-check.cpp"
+	"details/semantic/type-check.h"
+	"details/semantic/update-all-stackalloc.cpp"
+	"details/type/builtin.h"
+	"details/utils/check-for-valid-identifier-name.cpp"
+	"details/utils/check-for-valid-identifier-name.h"
+	"details/utils/clid.cpp"
+	"details/utils/clid.h"
+	"details/utils/clid.hxx"
+	"details/utils/dataregister.h"
+	"details/utils/memory-allocator.h"
+	"details/utils/origin.h"
+	"details/utils/stringrefs.cpp"
+	"details/utils/stringrefs.h"
+	"details/utils/stringrefs.hxx"
+	"details/vm/console.cpp"
+	"details/vm/console.h"
+	"details/vm/context-runner.cpp"
+	"details/vm/context-runner.h"
+	"details/vm/context.cpp"
+	"details/vm/context.h"
+	"details/vm/context.hxx"
+	"details/vm/memchecker.cpp"
+	"details/vm/memchecker.h"
+	"details/vm/program.cpp"
+	"details/vm/program.h"
+	"details/vm/program.hxx"
+	"details/vm/runtime/std.console.cpp"
+	"details/vm/runtime/std.core.h"
+	"details/vm/runtime/std.core.string.cpp"
+	"details/vm/runtime/std.digest.cpp"
+	"details/vm/runtime/std.env.cpp"
+	"details/vm/runtime/std.io.cpp"
+	"details/vm/runtime/std.memory.cpp"
+	"details/vm/runtime/std.os.process.cpp"
+	"details/vm/stack.cpp"
+	"details/vm/stack.h"
+	"details/vm/stack.hxx"
+	"details/vm/stacktrace.cpp"
+	"details/vm/stacktrace.h"
+	"details/vm/stacktrace.hxx"
+	"details/vm/types.h"
+	"include/nany/nany.h"
+	"libnanyc.h"
+	${nysrc_nsl_stdcore}
+)
 
 set_target_properties(libnanyc PROPERTIES
 	VERSION   "${nany_version_major}.${nany_version_minor}.${nany_version_patch}"
-	SOVERSION "${nany_version_major}")
+	SOVERSION "${nany_version_major}"
+)
 
 set_target_properties(libnanyc-grammar PROPERTIES
 	VERSION   "${nany_version_major}.${nany_version_minor}.${nany_version_patch}"
-	SOVERSION "${nany_version_major}")
+	SOVERSION "${nany_version_major}"
+)
 
 target_link_libraries(libnanyc-grammar PRIVATE yuni-static-core)
-target_link_libraries(libnanyc PRIVATE
-	yuni-static-core libnanyc-grammar dyncall_s) #re2
+target_link_libraries(libnanyc PRIVATE yuni-static-core libnanyc-grammar dyncall_s)
 
 set_property(TARGET libnanyc PROPERTY MACOSX_RPATH true)
 set_property(TARGET libnanyc PROPERTY LIBRARY_OUTPUT_NAME "nanyc")
 set_property(TARGET libnanyc PROPERTY ARCHIVE_OUTPUT_NAME "nanyc")
-set_property(TARGET libnanyc PROPERTY LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/../")
-set_property(TARGET libnanyc PROPERTY RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/../")
+set_property(TARGET libnanyc PROPERTY LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../")
+set_property(TARGET libnanyc PROPERTY RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../")
 
 set_property(TARGET libnanyc-grammar PROPERTY MACOSX_RPATH true)
 set_property(TARGET libnanyc-grammar PROPERTY LIBRARY_OUTPUT_NAME "nanyc-grammar")
 set_property(TARGET libnanyc-grammar PROPERTY ARCHIVE_OUTPUT_NAME "nanyc-grammar")
 
-
 target_compile_definitions(libnanyc PRIVATE "LIBNANYC_DLL_EXPORT=1")
-
 
 target_include_directories(libnanyc PRIVATE "${libnany_config_folder}")
 target_include_directories(libnanyc PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../ext/dyncall/")
 target_include_directories(libnanyc PUBLIC  "${CMAKE_CURRENT_LIST_DIR}")
+target_include_directories(libnanyc PUBLIC  "${CMAKE_CURRENT_BINARY_DIR}")
+target_include_directories(libnanyc PUBLIC  "${CMAKE_CURRENT_BINARY_DIR}/include")
 target_include_directories(libnanyc PUBLIC  "${CMAKE_CURRENT_LIST_DIR}/include")
-target_include_directories(libnanyc-grammar PUBLIC "${CMAKE_CURRENT_LIST_DIR}")
+target_include_directories(libnanyc-grammar PUBLIC "${CMAKE_CURRENT_BINARY_DIR}")
 
 add_dependencies(libnanyc nanyc-grammar-cpp)
 add_dependencies(libnanyc nyt-nanyfile-to-cstring)
 
-
-
-install(TARGETS libnanyc
+install(
+	TARGETS libnanyc
 	ARCHIVE DESTINATION "lib/libnany/${nany_version}"
 	LIBRARY DESTINATION "lib/libnany/${nany_version}"
-	COMPONENT "libnanyc")
+	COMPONENT "libnanyc"
+)
 
-install(FILES ${nysrc_public_headers} 
+install(
+	FILES "include/nany/nany.h"
 	DESTINATION "include/libnany/${nany_version}/nany"
-	COMPONENT "libnanyc-dev")
-
+	COMPONENT "libnanyc-dev"
+)
 
 if (YUNI_COMPILER_IS_CLANG)
 	function(add_clang_static_analysis target)
@@ -624,15 +455,11 @@ if (YUNI_COMPILER_IS_CLANG)
 	    add_library(${target}_analyze OBJECT EXCLUDE_FROM_ALL ${SRCs})
 		set_target_properties(${target}_analyze PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD true)
 		set_target_properties(${target}_analyze PROPERTIES COMPILE_FLAGS "--analyze")
-
 		target_include_directories(${target}_analyze PRIVATE "${libnany_config_folder}")
 		target_include_directories(${target}_analyze PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../ext/dyncall/")
 		target_include_directories(${target}_analyze PUBLIC  "${CMAKE_CURRENT_LIST_DIR}")
-
 		add_dependencies(${target}_analyze nanyc-grammar-cpp)
 		add_dependencies(${target}_analyze nyt-nanyfile-to-cstring)
 	endfunction()
-
 	add_clang_static_analysis(libnanyc)
 endif()
-

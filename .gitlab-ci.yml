@@ -4,16 +4,18 @@ stages:
 
 variables:
     GIT_SUBMODULE_STRATEGY: recursive
+    VERBOSE: '1'
 
 
 # build
 
 .template-debug-build-linux: &debug-build-linux
     stage: build
-    variables:
-        BUILD_TYPE: "debug"
     script:
-        - assets/build/build.sh
+        - mkdir -p build/bootstrap
+        - cd build/bootstrap
+        - cmake ../../bootstrap -DCMAKE_BUILD_TYPE=debug
+        - cmake --build . --config debug --target all -- -j $(nproc)
     tags:
         - linux
 
@@ -42,10 +44,12 @@ variables:
 
 .template-pkg-linux: &package-linux
     stage: packages
-    variables:
-        BUILD_TYPE: "release"
     script:
-        - assets/build/build.sh
+        - mkdir -p build/bootstrap
+        - cd build/bootstrap
+        - cmake ../../bootstrap -DCMAKE_BUILD_TYPE=release
+        - cmake --build . --config release --target all -- -j $(nproc)
+        - ([ ! -e /etc/debian_version ] || make packages-deb)
     tags:
         - linux
     artifacts:

@@ -1,6 +1,4 @@
-
-set(nany-bootstrap_error_has_occured   false)
-
+set(nany-bootstrap_error_has_occured false)
 
 macro(nmessage msg)
 	if(UNIX)
@@ -8,9 +6,7 @@ macro(nmessage msg)
 	else()
 		message(STATUS "{nany-bootstrap}  ${msg}")
 	endif()
-
 endmacro()
-
 
 macro(nwarning msg)
 	if(UNIX)
@@ -20,7 +16,6 @@ macro(nwarning msg)
 	endif()
 endmacro()
 
-
 macro(nerror msg)
 	if(UNIX)
 		message(STATUS "[1;31m{nany-bootstrap}  [error][0m ${msg}")
@@ -29,6 +24,3 @@ macro(nerror msg)
 	endif()
 	set(nany-bootstrap_error_has_occured  true)
 endmacro()
-
-
-
