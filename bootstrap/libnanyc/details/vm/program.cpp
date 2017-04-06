@@ -58,7 +58,7 @@ int Program::execute(uint32_t argc, const char** argv) {
 	if (unlikely(not success))
 		return 666;
 	uint64_t exitstatus;
-	if (context.invoke(exitstatus, ircode, atomid, instanceid)) {
+	if (context.invoke(exitstatus, ircode, atomid, instanceid) != 0) {
 		retvalue = static_cast<int>(exitstatus);
 		if (cf.on_terminate)
 			cf.on_terminate(self(), nytrue, retvalue);
