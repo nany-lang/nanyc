@@ -30,13 +30,13 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::onscopefail>& operands)
 			auto& any = onScopeFail.any();
 			if (not any.empty())
 				return (void)(error() << "error handler 'any' already defined");
-			any.reset(operands.lvid, operands.label);
+			any.reset(operands.lvid, operands.label, frame->scope);
 		}
 		else {
 			bool alreadyExists = onScopeFail.has(atomError);
 			// always keep track of the error handler and to not produce
 			// an error when deregistering later
-			auto& handler = onScopeFail.add(atomError, operands.lvid, operands.label);
+			auto& handler = onScopeFail.add(atomError, operands.lvid, operands.label, frame->scope);
 			if (unlikely(alreadyExists)) {
 				error() << "error handler '" << atomError->caption(cdeftable) << "' already defined for the scope";
 				handler.used = true; // no warning report

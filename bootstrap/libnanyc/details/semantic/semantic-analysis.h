@@ -47,15 +47,17 @@ struct NamedParameter final {
 struct OnScopeFailHandlers final {
 	struct Handler {
 		Handler() = default;
-		Handler(uint32_t lvid, uint32_t label)
+		Handler(uint32_t lvid, uint32_t label, uint32_t scope)
 			: lvid(lvid)
-			, label(label) {
+			, label(label)
+			, scope(scope) {
 		}
 
-		void reset(uint32_t newlvid, uint32_t newlabel) {
+		void reset(uint32_t newlvid, uint32_t newlabel, uint32_t newscope) {
 			lvid  = newlvid;
 			label = newlabel;
 			used  = false;
+			scope = newscope;
 		}
 		void reset() {
 			label = 0;
@@ -65,6 +67,7 @@ struct OnScopeFailHandlers final {
 		uint32_t lvid = 0;
 		uint32_t label = 0;
 		bool used = false;
+		uint32_t scope = 0;
 	};
 
 	auto& any() { return m_any; }
@@ -105,8 +108,8 @@ struct OnScopeFailHandlers final {
 		return find(atom) != nullptr;
 	}
 
-	auto& add(const Atom* atom, uint32_t lvid, uint32_t label) {
-		m_handlers.emplace_back(atom, Handler(lvid, label));
+	auto& add(const Atom* atom, uint32_t lvid, uint32_t label, uint32_t scope) {
+		m_handlers.emplace_back(atom, Handler(lvid, label, scope));
 		return std::get<Handler>(m_handlers.back());
 	}
 

@@ -18,6 +18,7 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::raise>& operands) {
 	if (onScopeFail.empty()) {
 		// not within an error handler defined by the current function
 		frame->atom.funcinfo.raisedErrors.add(*atomError, frame->atom, currentLine, currentOffset);
+		releaseScopedVariables(0 /*all scopes*/);
 	}
 	else {
 		// within an error handler defined by the function
@@ -25,6 +26,7 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::raise>& operands) {
 		if (unlikely(handler == nullptr))
 			return complainNoErrorHandler(*atomError, nullptr, {});
 		handler->used = true;
+		releaseScopedVariables(handler->scope);
 	}
 	ir::emit::raise(out, operands.lvid);
 }
