@@ -40,13 +40,10 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::ret>& operands) {
 		return (void)(error() << "return values are only accepted in functions");
 	auto* expectedType = getExpectedReturnType(frame->atom, cdeftable);
 	auto* actualType = getActualExprType(operands.lvid, frame->atomid, cdeftable);
-	// is the return value 'void' ?
-	bool retIsVoid = true;
 	// similarty between the two types to detect if an implicit convertion is required
 	auto similarity = TypeCheck::Match::strictEqual;
-	if (expectedType and actualType) {
-		// there is a return value !
-		retIsVoid = false;
+	bool hasReturnValue = expectedType and actualType;
+	if (hasReturnValue) {
 		// determining if the expression returned matched the return type of the current func
 		similarity = TypeCheck::isSimilarTo(*this, *actualType, *expectedType);
 		switch (similarity) {
@@ -105,7 +102,7 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::ret>& operands) {
 		}
 	}
 	auto& spare = cdeftable.substitute(1);
-	if (not retIsVoid) {
+	if (hasReturnValue) {
 		spare.import(*actualType);
 		if (not actualType->isBuiltinOrVoid())
 			spare.mutateToAtom(cdeftable.findClassdefAtom(*actualType));
@@ -128,7 +125,7 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::ret>& operands) {
 		}
 		case TypeCheck::Match::strictEqual: {
 			ir::emit::trace(out, "return from func");
-			if (not retIsVoid) {
+			if (hasReturnValue) {
 				uint32_t retlvid;
 				if (spare.qualifiers.ref or spare.isBuiltinOrVoid())
 					retlvid = operands.lvid;
