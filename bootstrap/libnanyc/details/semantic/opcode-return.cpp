@@ -22,6 +22,16 @@ const Classdef* getExpectedReturnType(Atom& atom, ClassdefTableView& cdeftable) 
 }
 
 
+const Classdef* getActualExprType(uint32_t lvid, uint32_t atomid, const ClassdefTableView& cdeftable) {
+	if (lvid != 0) {
+		auto& cdef = cdeftable.classdefFollowClassMember(CLID{atomid, lvid});
+		if (not cdef.isVoid())
+			return &cdef;
+	}
+	return nullptr;
+}
+
+
 } // namespace
 
 
@@ -29,25 +39,16 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::ret>& operands) {
 	if (unlikely(frame->atom.type != Atom::Type::funcdef))
 		return (void)(error() << "return values are only accepted in functions");
 	auto* expectedType = getExpectedReturnType(frame->atom, cdeftable);
-	//
-	// --- USER RETURN VALUE
-	//
-	// determining the status of the return value
-	const Classdef* usercdef = nullptr;
-	if (operands.lvid != 0) {
-		usercdef = &cdeftable.classdefFollowClassMember(CLID{frame->atomid, operands.lvid});
-		if (usercdef->isVoid())
-			usercdef = nullptr;
-	}
+	auto* actualType = getActualExprType(operands.lvid, frame->atomid, cdeftable);
 	// is the return value 'void' ?
 	bool retIsVoid = true;
 	// similarty between the two types to detect if an implicit convertion is required
 	auto similarity = TypeCheck::Match::strictEqual;
-	if (expectedType and usercdef) {
+	if (expectedType and actualType) {
 		// there is a return value !
 		retIsVoid = false;
 		// determining if the expression returned matched the return type of the current func
-		similarity = TypeCheck::isSimilarTo(*this, *usercdef, *expectedType);
+		similarity = TypeCheck::isSimilarTo(*this, *actualType, *expectedType);
 		switch (similarity) {
 			case TypeCheck::Match::strictEqual: {
 				break;
@@ -55,10 +56,10 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::ret>& operands) {
 			case TypeCheck::Match::equal: {
 				if (expectedType->isAny()) // accept implicit convertions to 'any'
 					break;
-				return (void) complain::returnTypeImplicitConversion(*expectedType, *usercdef);
+				return (void) complain::returnTypeImplicitConversion(*expectedType, *actualType);
 			}
 			case TypeCheck::Match::none: {
-				return (void) complain::returnTypeMismatch(*expectedType, *usercdef);
+				return (void) complain::returnTypeMismatch(*expectedType, *actualType);
 			}
 		}
 		// the return expr matches the return type requested by the source code
@@ -67,28 +68,28 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::ret>& operands) {
 			auto& marker = frame->returnValues.front();
 			if (not marker.clid.isVoid()) {
 				auto& cdefPreviousReturn = cdeftable.classdef(marker.clid);
-				auto prevsim = TypeCheck::isSimilarTo(*this, *usercdef, cdefPreviousReturn);
+				auto prevsim = TypeCheck::isSimilarTo(*this, *actualType, cdefPreviousReturn);
 				switch (prevsim) {
 					case TypeCheck::Match::strictEqual: {
 						break; // nice ! they share the same exact type !
 					}
 					case TypeCheck::Match::equal: {
-						return (void) complain::returnTypeImplicitConversion(cdefPreviousReturn, *usercdef, marker.line,
+						return (void) complain::returnTypeImplicitConversion(cdefPreviousReturn, *actualType, marker.line,
 								marker.offset);
 					}
 					case TypeCheck::Match::none: {
-						return (void) complain::returnMultipleTypes(cdefPreviousReturn, *usercdef, marker.line, marker.offset);
+						return (void) complain::returnMultipleTypes(cdefPreviousReturn, *actualType, marker.line, marker.offset);
 					}
 				}
 			}
 			else {
 				// can not be void
-				return (void) complain::returnTypeMissing(nullptr, usercdef);
+				return (void) complain::returnTypeMissing(nullptr, actualType);
 			}
 		}
 	}
 	else {
-		if (!usercdef and !expectedType) {
+		if (!actualType and !expectedType) {
 			// both void
 		}
 		else {
@@ -98,16 +99,16 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::ret>& operands) {
 			}
 			else {
 				// one of the values are 'null'
-				if (unlikely(usercdef != nullptr or expectedType != nullptr))
-					return (void) complain::returnTypeMissing(expectedType, usercdef);
+				if (unlikely(actualType != nullptr or expectedType != nullptr))
+					return (void) complain::returnTypeMissing(expectedType, actualType);
 			}
 		}
 	}
 	auto& spare = cdeftable.substitute(1);
 	if (not retIsVoid) {
-		spare.import(*usercdef);
-		if (not usercdef->isBuiltinOrVoid())
-			spare.mutateToAtom(cdeftable.findClassdefAtom(*usercdef));
+		spare.import(*actualType);
+		if (not actualType->isBuiltinOrVoid())
+			spare.mutateToAtom(cdeftable.findClassdefAtom(*actualType));
 	}
 	else {
 		spare.mutateToVoid();
@@ -115,7 +116,7 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::ret>& operands) {
 	}
 	// the return valus is accepted
 	frame->returnValues.emplace_back(ReturnValueMarker {
-		(usercdef ? usercdef->clid : CLID{}), currentLine, currentOffset
+		(actualType ? actualType->clid : CLID{}), currentLine, currentOffset
 	});
 	if (unlikely(not canGenerateCode()))
 		return;
