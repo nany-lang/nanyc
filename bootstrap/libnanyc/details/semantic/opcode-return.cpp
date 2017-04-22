@@ -109,45 +109,45 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::ret>& operands) {
 	frame->returnValues.emplace_back(ReturnValueMarker {
 		(usercdef ? usercdef->clid : CLID{}), currentLine, currentOffset
 	});
-	if (canGenerateCode()) {
-		switch (similarity) {
-			case TypeCheck::Match::equal: {
-				// implicit convertion
-				// not currently supported
-				// - fallthru
-			}
-			case TypeCheck::Match::strictEqual: {
-				ir::emit::trace(out, "return from func");
-				if (not retIsVoid) {
-					uint32_t retlvid;
-					if (spare.qualifiers.ref or spare.isBuiltinOrVoid())
-						retlvid = operands.lvid;
-					else {
-						// a copy seems necessary...
-						retlvid = operands.tmplvid;
-						// trying to copy the value first
-						if (unlikely(not frame->verify(retlvid)))
-							return frame->invalidate(retlvid);
-						auto& spareTmp = cdeftable.substitute(operands.tmplvid);
-						spareTmp.import(spare);
-						spareTmp.qualifiers.merge(spare.qualifiers);
-						frame->lvids(operands.tmplvid).synthetic = false;
-						bool r = instanciateAssignment(*frame, retlvid, operands.lvid, false);
-						if (unlikely(not r))
-							return frame->invalidate(retlvid);
-					}
-					tryToAcquireObject(*this, retlvid, spare);
-					releaseScopedVariables(0 /*all scopes*/);
-					ir::emit::ret(out, retlvid, 0);
-				}
+	if (unlikely(not canGenerateCode()))
+		return;
+	switch (similarity) {
+		case TypeCheck::Match::equal: {
+			// implicit convertion
+			// not currently supported
+			// - fallthru
+		}
+		case TypeCheck::Match::strictEqual: {
+			ir::emit::trace(out, "return from func");
+			if (not retIsVoid) {
+				uint32_t retlvid;
+				if (spare.qualifiers.ref or spare.isBuiltinOrVoid())
+					retlvid = operands.lvid;
 				else {
-					releaseScopedVariables(0 /*all scopes*/);
-					ir::emit::ret(out);
+					// a copy seems necessary...
+					retlvid = operands.tmplvid;
+					// trying to copy the value first
+					if (unlikely(not frame->verify(retlvid)))
+						return frame->invalidate(retlvid);
+					auto& spareTmp = cdeftable.substitute(operands.tmplvid);
+					spareTmp.import(spare);
+					spareTmp.qualifiers.merge(spare.qualifiers);
+					frame->lvids(operands.tmplvid).synthetic = false;
+					bool r = instanciateAssignment(*frame, retlvid, operands.lvid, false);
+					if (unlikely(not r))
+						return frame->invalidate(retlvid);
 				}
-				break;
+				tryToAcquireObject(*this, retlvid, spare);
+				releaseScopedVariables(0 /*all scopes*/);
+				ir::emit::ret(out, retlvid, 0);
 			}
-			case TypeCheck::Match::none: {
+			else {
+				releaseScopedVariables(0 /*all scopes*/);
+				ir::emit::ret(out);
 			}
+			break;
+		}
+		case TypeCheck::Match::none: {
 		}
 	}
 }
