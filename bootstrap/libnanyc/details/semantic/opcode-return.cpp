@@ -9,18 +9,26 @@ namespace ny {
 namespace semantic {
 
 
+namespace {
+
+
+const Classdef* getExpectedReturnType(Atom& atom, ClassdefTableView& cdeftable) {
+	if (not atom.returnType.clid.isVoid()) {
+		auto* cdef = &cdeftable.classdefFollowClassMember(atom.returnType.clid);
+		if (not cdef->isVoid())
+			return cdef;
+	}
+	return nullptr;
+}
+
+
+} // namespace
+
+
 void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::ret>& operands) {
 	if (unlikely(frame->atom.type != Atom::Type::funcdef))
 		return (void)(error() << "return values are only accepted in functions");
-	//
-	// --- EXPECTED RETURN TYPE
-	//
-	const Classdef* expectedcdef = nullptr;
-	if (not frame->atom.returnType.clid.isVoid()) {
-		expectedcdef = &cdeftable.classdefFollowClassMember(frame->atom.returnType.clid);
-		if (expectedcdef->isVoid())
-			expectedcdef = nullptr; // void
-	}
+	auto* expectedType = getExpectedReturnType(frame->atom, cdeftable);
 	//
 	// --- USER RETURN VALUE
 	//
@@ -35,27 +43,27 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::ret>& operands) {
 	bool retIsVoid = true;
 	// similarty between the two types to detect if an implicit convertion is required
 	auto similarity = TypeCheck::Match::strictEqual;
-	if (expectedcdef and usercdef) {
+	if (expectedType and usercdef) {
 		// there is a return value !
 		retIsVoid = false;
 		// determining if the expression returned matched the return type of the current func
-		similarity = TypeCheck::isSimilarTo(*this, *usercdef, *expectedcdef);
+		similarity = TypeCheck::isSimilarTo(*this, *usercdef, *expectedType);
 		switch (similarity) {
 			case TypeCheck::Match::strictEqual: {
 				break;
 			}
 			case TypeCheck::Match::equal: {
-				if (expectedcdef->isAny()) // accept implicit convertions to 'any'
+				if (expectedType->isAny()) // accept implicit convertions to 'any'
 					break;
-				return (void) complain::returnTypeImplicitConversion(*expectedcdef, *usercdef);
+				return (void) complain::returnTypeImplicitConversion(*expectedType, *usercdef);
 			}
 			case TypeCheck::Match::none: {
-				return (void) complain::returnTypeMismatch(*expectedcdef, *usercdef);
+				return (void) complain::returnTypeMismatch(*expectedType, *usercdef);
 			}
 		}
 		// the return expr matches the return type requested by the source code
 		// if this type is any, checking for previous return types
-		if (expectedcdef->isAny() and not frame->returnValues.empty()) {
+		if (expectedType->isAny() and not frame->returnValues.empty()) {
 			auto& marker = frame->returnValues.front();
 			if (not marker.clid.isVoid()) {
 				auto& cdefPreviousReturn = cdeftable.classdef(marker.clid);
@@ -80,18 +88,18 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::ret>& operands) {
 		}
 	}
 	else {
-		if (!usercdef and !expectedcdef) {
+		if (!usercdef and !expectedType) {
 			// both void
 		}
 		else {
-			if (expectedcdef and expectedcdef->isAny()) {
+			if (expectedType and expectedType->isAny()) {
 				// accept the following:
 				//    func foo: any { return; }
 			}
 			else {
 				// one of the values are 'null'
-				if (unlikely(usercdef != nullptr or expectedcdef != nullptr))
-					return (void) complain::returnTypeMissing(expectedcdef, usercdef);
+				if (unlikely(usercdef != nullptr or expectedType != nullptr))
+					return (void) complain::returnTypeMissing(expectedType, usercdef);
 			}
 		}
 	}
