@@ -47,8 +47,7 @@ Analyzer::~Analyzer() {
 		for (auto* f = frame; f != nullptr; f = f->previous)
 			debugPrintClassdefs(*f, cdeftable);
 	}
-	auto* frm = frame;
-	while (frm) {
+	for (auto* frm = frame; frm != nullptr; ) {
 		auto* previous = frm->previous;
 		build.deallocate(frm);
 		frm = previous;
