@@ -33,6 +33,10 @@ void raisedErrorsFromFuncCall(Analyzer& seq, Atom& funccall) {
 		error() << "raised errors are only allowed in functions";
 		return;
 	}
+	if (unlikely(localfunc.isDtor())) {
+		error() << "raised errors not allowed in 'operator dispose'";
+		return;
+	}
 	bool hasErrorHandler = not seq.onScopeFail.empty();
 	if (hasErrorHandler)
 		markLocalErrorHandlersAsUsed(seq, funccall);

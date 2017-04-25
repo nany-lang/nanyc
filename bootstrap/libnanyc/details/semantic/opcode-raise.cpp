@@ -11,6 +11,8 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::raise>& operands) {
 	auto& localfunc = frame->atom;
 	if (unlikely(not localfunc.isFunction()))
 		return (void)(error() << "errors can only be raised from a function body");
+	if (unlikely(localfunc.isDtor()))
+		return (void)(error() << "'raise' not allowed in destructor");
 	auto& cdef  = cdeftable.classdef(CLID{frame->atomid, operands.lvid});
 	auto* atomError = cdeftable.findClassdefAtom(cdef);
 	if (atomError == nullptr)
