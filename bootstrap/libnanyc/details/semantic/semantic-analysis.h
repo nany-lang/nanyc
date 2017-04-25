@@ -9,6 +9,7 @@
 #include "stack-frame.h"
 #include "func-overload-match.h"
 #include <vector>
+#include <tuple>
 
 
 namespace ny { class Build; }
@@ -43,6 +44,94 @@ struct NamedParameter final {
 };
 
 
+struct OnScopeFailHandlers final {
+	struct Handler {
+		Handler() = default;
+		Handler(uint32_t lvid, uint32_t label)
+			: lvid(lvid)
+			, label(label) {
+		}
+
+		void reset(uint32_t newlvid, uint32_t newlabel) {
+			lvid  = newlvid;
+			label = newlabel;
+			used  = false;
+		}
+		void reset() {
+			label = 0;
+		}
+		bool empty() const { return label == 0; }
+
+		uint32_t lvid = 0;
+		uint32_t label = 0;
+		bool used = false;
+	};
+
+	auto& any() { return m_any; }
+	auto& any() const { return m_any; }
+
+	bool empty() const {
+		return m_handlers.empty() and m_any.empty();
+	}
+
+	Handler* find(const Atom* atom) {
+		if (empty())
+			return nullptr;
+		auto it = std::find_if(m_handlers.begin(), m_handlers.end(), [&](auto& item) {
+			return std::get<const Atom*>(item) == atom;
+		});
+		return it != m_handlers.end() ? &std::get<Handler>(*it) : (m_any.empty() ? nullptr : &m_any);
+	}
+
+	const Handler* find(const Atom* atom) const {
+		if (empty())
+			return nullptr;
+		auto it = std::find_if(m_handlers.begin(), m_handlers.end(), [&](auto& item) {
+			return std::get<const Atom*>(item) == atom;
+		});
+		return it != m_handlers.end() ? &std::get<Handler>(*it) : (m_any.empty() ? nullptr : &m_any);
+	}
+
+	bool markAsUsed(const Atom& atom) {
+		auto* handler = find(&atom);
+		if (likely(handler != nullptr)) {
+			handler->used = true;
+			return true;
+		}
+		return false;
+	}
+
+	bool has(const Atom* atom) const {
+		return find(atom) != nullptr;
+	}
+
+	auto& add(const Atom* atom, uint32_t lvid, uint32_t label) {
+		m_handlers.emplace_back(atom, Handler(lvid, label));
+		return std::get<Handler>(m_handlers.back());
+	}
+
+	auto& back() {
+		assert(not m_handlers.empty());
+		return std::get<Handler>(m_handlers.back());
+	}
+
+	void pop_back() {
+		m_handlers.pop_back();
+	}
+
+	bool hasBackTypedHandler(const Atom* atom) const {
+		return not m_handlers.empty()
+			and std::get<const Atom*>(m_handlers.back()) == atom;
+	}
+
+private:
+	// all typed errors handlers
+	std::vector<std::tuple<const Atom*, Handler>> m_handlers;
+	//! Label for any error handler
+	Handler m_any;
+};
+
+
 struct Analyzer final {
 	Analyzer(Logs::Report, ClassdefTableView&, Build&,
 		ir::Sequence* out, ir::Sequence&, Analyzer* parent = nullptr);
@@ -69,6 +158,7 @@ struct Analyzer final {
 	void visit(const ir::isa::Operand<ir::isa::Op::label>&);
 	void visit(const ir::isa::Operand<ir::isa::Op::namealias>&);
 	void visit(const ir::isa::Operand<ir::isa::Op::nop>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::onscopefail>&);
 	void visit(const ir::isa::Operand<ir::isa::Op::pragma>&);
 	void visit(const ir::isa::Operand<ir::isa::Op::push>&);
 	void visit(const ir::isa::Operand<ir::isa::Op::qualifiers>&);
@@ -255,6 +345,8 @@ public:
 		bool memberVarsClone = false;
 	}
 	bodystart;
+
+	OnScopeFailHandlers onScopeFail;
 
 	struct {
 		uint32_t label = 0;
