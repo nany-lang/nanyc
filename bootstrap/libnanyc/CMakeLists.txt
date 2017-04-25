@@ -355,6 +355,7 @@ add_library(libnanyc ${mode_libnany}
 	"details/semantic/semantic-analysis.cpp"
 	"details/semantic/semantic-analysis.h"
 	"details/semantic/semantic-analysis.hxx"
+	"details/semantic/stack-frame.cpp"
 	"details/semantic/stack-frame.h"
 	"details/semantic/stack-frame.hxx"
 	"details/semantic/type-check.cpp"

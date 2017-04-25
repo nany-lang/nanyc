@@ -12,6 +12,30 @@ namespace ny {
 namespace semantic {
 
 
+struct DelayedReportOnRaise final {
+	struct RaiseOrigins final {
+		struct Origin {
+			yuni::String atomname;
+			yuni::String filename;
+			uint32_t line = 0;
+			uint32_t offset = 0;
+		};
+		yuni::String atomname;
+		uint32_t line = 0;
+		uint32_t offset = 0;
+		std::vector<Origin> origins;
+	};
+
+	DelayedReportOnRaise(Atom&);
+	void addRaisedErrors(yuni::String&& type, DelayedReportOnRaise::RaiseOrigins&&);
+	void produceErrors() const;
+
+private:
+	Atom& m_atom;
+	std::unordered_map<yuni::String, std::vector<RaiseOrigins>> m_noHandlerPerTypename;
+};
+
+
 struct ReturnValueMarker {
 	ReturnValueMarker(const CLID& clid, uint32_t line, uint32_t offset)
 		: clid(clid), line(line), offset(offset) {
@@ -101,6 +125,7 @@ public:
 //! A single element within the stack for analysing opcodes
 struct AtomStackFrame final {
 	explicit AtomStackFrame(Atom& atom, AtomStackFrame* previous);
+	~AtomStackFrame();
 	uint32_t localVariablesCount() const;
 	uint32_t findLocalVariable(const AnyString& name) const;
 	void resizeRegisterCount(uint32_t count, ClassdefTableView& table);
@@ -108,6 +133,7 @@ struct AtomStackFrame final {
 	void invalidate(uint32_t lvid);
 	LVIDInfo& lvids(uint32_t);
 	const LVIDInfo& lvids(uint32_t) const;
+	void addRaisedErrors(yuni::String&& type, DelayedReportOnRaise::RaiseOrigins&&);
 
 public:
 	//! The atom
@@ -134,6 +160,7 @@ public:
 private:
 	//! Information on local registers
 	std::vector<LVIDInfo> m_locallvids;
+	std::unique_ptr<DelayedReportOnRaise> m_delayedErrorsOnRaise;
 };
 
 
