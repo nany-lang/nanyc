@@ -340,6 +340,7 @@ add_library(libnanyc ${mode_libnany}
 	"details/semantic/opcode-intrinsic.cpp"
 	"details/semantic/opcode-pragma.cpp"
 	"details/semantic/opcode-push.cpp"
+	"details/semantic/opcode-raise.cpp"
 	"details/semantic/opcode-ref-unref.cpp"
 	"details/semantic/opcode-return.cpp"
 	"details/semantic/opcode-scope.cpp"

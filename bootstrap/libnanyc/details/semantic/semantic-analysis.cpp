@@ -218,5 +218,32 @@ void Analyzer::PushedParameters::clear() {
 }
 
 
+void Analyzer::complainNoErrorHandler(const Atom& type, const Atom* call, const std::vector<AtomRaisedErrors::Origin>& origins) {
+	if (unlikely(frame == nullptr)) {
+		ice() << "missing error handler: invalid frame for complaining about missing error handler";
+		return;
+	}
+	yuni::String typenm;
+	typenm << type.keyword() << ' ' << type.caption(cdeftable);
+	DelayedReportOnRaise::RaiseOrigins report;
+	if (call)
+		report.atomname << call->keyword() << ' ' << call->caption(cdeftable);
+	else
+		report.atomname = "raise";
+	report.line = currentLine;
+	report.offset = currentOffset;
+	for (auto& origin: origins) {
+		using Origin = decltype(report.origins)::value_type;
+		Origin o;
+		o.atomname << origin.atom.keyword() << ' ' << origin.atom.caption(cdeftable);
+		o.filename = origin.atom.origin.filename;
+		o.line = origin.line;
+		o.offset = origin.column;
+		report.origins.emplace_back(std::move(o));
+	}
+	frame->addRaisedErrors(std::move(typenm), std::move(report));
+}
+
+
 } // namespace semantic
 } // namespace ny

@@ -162,6 +162,7 @@ struct Analyzer final {
 	void visit(const ir::isa::Operand<ir::isa::Op::pragma>&);
 	void visit(const ir::isa::Operand<ir::isa::Op::push>&);
 	void visit(const ir::isa::Operand<ir::isa::Op::qualifiers>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::raise>&);
 	void visit(const ir::isa::Operand<ir::isa::Op::ref>&);
 	void visit(const ir::isa::Operand<ir::isa::Op::ret>&);
 	void visit(const ir::isa::Operand<ir::isa::Op::scope>&);
@@ -252,6 +253,7 @@ struct Analyzer final {
 
 	//! \name Errors
 	//@{
+	void complainNoErrorHandler(const Atom& type, const Atom* call, const std::vector<AtomRaisedErrors::Origin>&);
 	bool checkForIntrinsicParamCount(const AnyString& name, uint32_t count);
 	bool complainInvalidType(const char* origin, const Classdef& from, const Classdef& to);
 	void complainReturnTypeMultiple(const Classdef& expected, const Classdef& usertype, uint32_t line = 0,
