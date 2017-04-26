@@ -14,6 +14,13 @@ namespace Producer {
 namespace {
 
 
+bool isShortcircuit(AST::Node& node, AST::Node* parent) {
+	return parent != nullptr and parent->rule == AST::rgIdentifier
+		and node.children.size() == 2
+		and (parent->text == "^and" or parent->text == "^or");
+}
+
+
 bool emitFunCallNoParameter(Scope& scope, uint32_t functor, uint32_t& localvar) {
 	auto& irout = scope.ircode();
 	auto callret = ir::emit::alloc(irout, scope.nextvar());
@@ -198,12 +205,9 @@ bool Scope::visitASTExprCall(AST::Node* node, uint32_t& localvar, AST::Node* par
 	// but the code for minimal evaluation can not be determined yet (some
 	// member may have to be read, or maybe it should not be done at all)
 	// this flag will only prepare some room for additional opcodes if required
-	bool shortcircuit = (parent != nullptr and parent->rule == AST::rgIdentifier)
-		and (node->children.size() == 2)
-		and (parent->text == "^and" or parent->text == "^or");
-	if (not shortcircuit)
-		return emitFuncCallWithParameters(*this, func, localvar, *node);
-	return emitShortCircuitFuncCall(*this, func, localvar, *node);
+	return not isShortcircuit(*node, parent)
+		? emitFuncCallWithParameters(*this, func, localvar, *node)
+		: emitShortCircuitFuncCall(*this, func, localvar, *node);
 }
 
 
