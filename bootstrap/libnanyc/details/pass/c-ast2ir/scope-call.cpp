@@ -121,7 +121,8 @@ bool Scope::visitASTExprCall(AST::Node* node, uint32_t& localvar, AST::Node* par
 	// ask to resolve the call to operator ()
 	auto func = ir::emit::alloc(irout, nextvar());
 	ir::emit::identify(irout, func, "^()", localvar);
-	if (!node or node->children.empty()) {
+	bool hasParameters = node and not node->children.empty();
+	if (not hasParameters) {
 		auto callret = ir::emit::alloc(irout, nextvar());
 		localvar = callret; // the new expression value
 		// no pushed parameter - direct call - no need for scopes or something else
