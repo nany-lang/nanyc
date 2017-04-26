@@ -196,18 +196,18 @@ bool Scope::visitASTExprCall(AST::Node* node, uint32_t& localvar, AST::Node* par
 	emitDebugpos(node ? node : parent);
 	auto& irout = ircode();
 	// ask to resolve the call to operator ()
-	auto func = ir::emit::alloc(irout, nextvar());
-	ir::emit::identify(irout, func, "^()", localvar);
+	auto functor = ir::emit::alloc(irout, nextvar());
+	ir::emit::identify(irout, functor, "^()", localvar);
 	bool hasParameters = node and not node->children.empty();
 	if (not hasParameters)
-		return emitFunCallNoParameter(*this, func, localvar);
+		return emitFunCallNoParameter(*this, functor, localvar);
 	// short-circuit only applies to func call with 2 parameters
 	// but the code for minimal evaluation can not be determined yet (some
 	// member may have to be read, or maybe it should not be done at all)
 	// this flag will only prepare some room for additional opcodes if required
 	return not isShortcircuit(*node, parent)
-		? emitFuncCallWithParameters(*this, func, localvar, *node)
-		: emitShortCircuitFuncCall(*this, func, localvar, *node);
+		? emitFuncCallWithParameters(*this, functor, localvar, *node)
+		: emitShortCircuitFuncCall(*this, functor, localvar, *node);
 }
 
 
