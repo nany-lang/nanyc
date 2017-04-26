@@ -172,6 +172,8 @@ public:
 	void checkForUnknownAttributes() const;
 	//@}
 
+	void emitTmplParametersIfAny();
+
 	//! \name Operators
 	//@{
 	//! assignment
@@ -199,7 +201,6 @@ public:
 	friend class Context;
 
 private:
-	void emitTmplParametersIfAny();
 	void doEmitTmplParameters();
 	void emitExprAttributes(uint32_t& localvar);
 	bool fetchAttributes(AST::Node&);
