@@ -30,14 +30,9 @@ Sequence::Sequence(const Sequence& other, uint32_t offset)
 	assert(offset < other.m_size);
 	uint32_t size = other.m_size - offset;
 	if (size != 0) {
-		uint32_t capacity = calculateCapacity(0, size);
-		auto* body = (Instruction*) malloc(sizeof(Instruction) * capacity);
-		if (!body)
-			throw std::bad_alloc();
-		YUNI_MEMCPY(body, sizeof(Instruction) * capacity, other.m_body + offset, size * sizeof(Instruction));
+		grow(size);
 		m_size = size;
-		m_capacity = capacity;
-		m_body = body;
+		YUNI_MEMCPY(m_body, sizeof(Instruction) * m_capacity, other.m_body + offset, size * sizeof(Instruction));
 	}
 }
 
