@@ -59,10 +59,10 @@ void Sequence::moveCursorFromBlueprintToEnd(Instruction*& cursor) const {
 
 void Sequence::clear() {
 	m_size = 0;
-	stringrefs.clear();
 	free(m_body);
 	m_capacity = 0;
 	m_body = nullptr;
+	stringrefs.clear();
 }
 
 
