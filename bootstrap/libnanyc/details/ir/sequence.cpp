@@ -136,12 +136,14 @@ struct WalkerIncreaseLVID final {
 		if (lvid > greaterThan)
 			lvid += inc;
 	}
+
 	inline void operator () (uint32_t& lvid1, uint32_t& lvid2) const {
 		if (lvid1 > greaterThan)
 			lvid1 += inc;
 		if (lvid2 > greaterThan)
 			lvid2 += inc;
 	}
+
 	inline void operator () (uint32_t& lvid1, uint32_t& lvid2, uint32_t& lvid3) const {
 		if (lvid1 > greaterThan)
 			lvid1 += inc;
