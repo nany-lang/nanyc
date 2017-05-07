@@ -374,6 +374,12 @@ inline void jmp(IRCodeRef ref, uint32_t label) {
 	ref.ircode.emit<isa::Op::jmp>().label = label;
 }
 
+//! Unconditional jump
+inline uint32_t jmp(IRCodeRef ref) {
+	uint32_t offset = ref.ircode.opcodeCount();
+	ref.ircode.emit<isa::Op::jmp>().label = 0;
+	return offset;
+}
 
 //! jump if zero
 inline void jz(IRCodeRef ref, uint32_t lvid, uint32_t result, uint32_t label) {
@@ -477,6 +483,11 @@ inline void ret(IRCodeRef ref, uint32_t lvid, uint32_t tmplvid) {
 }
 
 
+inline void raise(IRCodeRef ref, uint32_t lvid) {
+	ref.ircode.emit<isa::Op::raise>().lvid = lvid;
+}
+
+
 inline void assign(IRCodeRef ref, uint32_t lhs, uint32_t rhs, bool canDisposeLHS) {
 	auto& operands = ref.ircode.emit<isa::Op::assign>();
 	operands.lhs = lhs;
@@ -544,6 +555,29 @@ inline void trace(IRCodeRef ref) {
 
 
 } // namespace
+} // namespace emit
+} // namespace ir
+} // namespace ny
+
+
+namespace ny {
+namespace ir {
+namespace emit {
+namespace on {
+namespace {
+
+
+inline uint32_t scopefail(IRCodeRef ref, uint32_t lvid, uint32_t label) {
+	uint32_t offset = ref.ircode.opcodeCount();
+	auto& operands = ref.ircode.emit<isa::Op::onscopefail>();
+	operands.lvid  = lvid;
+	operands.label = label;
+	return offset;
+}
+
+
+} // namespace
+} // namespace on
 } // namespace emit
 } // namespace ir
 } // namespace ny

@@ -62,8 +62,6 @@ int Program::execute(uint32_t argc, const char** argv) {
 		retvalue = static_cast<int>(exitstatus);
 		if (cf.on_terminate)
 			cf.on_terminate(self(), nytrue, retvalue);
-		// always flush to make sure that the listener will update the output
-		// (especially useful when embedded into a C/C++ application)
 		flushAll(cf.console);
 		return retvalue;
 	}

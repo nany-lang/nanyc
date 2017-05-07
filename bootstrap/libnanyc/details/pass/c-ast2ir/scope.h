@@ -44,6 +44,18 @@ struct Attributes final {
 };
 
 
+struct OnScopeFail final {
+	OnScopeFail(AST::Node& node, uint32_t jmpOffset, uint32_t var)
+		: node(node)
+		, jmpOffset(jmpOffset)
+		, var(var) {
+	}
+	AST::Node& node;
+	uint32_t jmpOffset;
+	uint32_t var;
+};
+
+
 /*!
 ** \brief Scope for ir generation (requires a context or another scope)
 */
@@ -96,6 +108,8 @@ public:
 	bool visitASTExprNumber(AST::Node&, uint32_t& localvar);
 	bool visitASTExprObject(AST::Node&, uint32_t& localvar);
 	bool visitASTExprOn(AST::Node&, uint32_t& localvar, bool isStmt = true);
+	bool visitASTExprOnScopeFail(AST::Node& scopeNode, AST::Node& scopeFailNode);
+	bool visitASTExprRaise(AST::Node&);
 	bool visitASTExprReturn(AST::Node&);
 	bool visitASTExprScope(AST::Node&);
 	bool visitASTExprString(AST::Node&, uint32_t& localvar);
@@ -197,6 +211,8 @@ public:
 	Scope* parentScope = nullptr;
 	//! BroadcastNextVarID
 	bool broadcastNextVarID = true;
+	//! 'on scope fail' offsets for exit jmp
+	std::vector<OnScopeFail> onScopeFailExitLabels;
 	//! Nakama
 	friend class Context;
 
@@ -204,6 +220,7 @@ private:
 	void doEmitTmplParameters();
 	void emitExprAttributes(uint32_t& localvar);
 	bool fetchAttributes(AST::Node&);
+	void updateOnScopeFailExitLabels();
 
 }; // class Scope
 

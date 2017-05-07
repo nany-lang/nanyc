@@ -14,6 +14,37 @@ namespace semantic {
 namespace {
 
 
+void markLocalErrorHandlersAsUsed(Analyzer& seq, Atom& funccall) {
+	funccall.funcinfo.raisedErrors.each([&](const Atom& type, auto& origins) {
+		if (unlikely(not seq.onScopeFail.markAsUsed(type)))
+			seq.complainNoErrorHandler(type, &funccall, origins);
+	});
+}
+
+
+void propagateRaisedErrors(Atom& localfunc, Atom& funccal) {
+	localfunc.funcinfo.raisedErrors.add(funccal.funcinfo.raisedErrors);
+}
+
+
+void raisedErrorsFromFuncCall(Analyzer& seq, Atom& funccall) {
+	auto& localfunc = seq.frame->atom;
+	if (unlikely(not localfunc.isFunction())) {
+		error() << "raised errors are only allowed in functions";
+		return;
+	}
+	if (unlikely(localfunc.isDtor())) {
+		error() << "raised errors not allowed in 'operator dispose'";
+		return;
+	}
+	bool hasErrorHandler = not seq.onScopeFail.empty();
+	if (hasErrorHandler)
+		markLocalErrorHandlersAsUsed(seq, funccall);
+	else
+		propagateRaisedErrors(localfunc, funccall);
+}
+
+
 template<class P, class O>
 bool fetchPushedParameters(const P& pushedparams, O& overloadMatch, const AtomStackFrame& frame) {
 	uint32_t atomid = frame.atomid;
@@ -164,6 +195,8 @@ bool emitFuncCall(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::call>& oper
 			for (auto& element : params) // push all parameters
 				ir::emit::push(seq.out, element.clid.lvid());
 			ir::emit::call(seq.out, lvid, atom->atomid, settings.instanceid);
+			if (not atom->funcinfo.raisedErrors.empty())
+				raisedErrorsFromFuncCall(seq, *atom);
 		}
 		return true;
 	}
@@ -304,6 +337,8 @@ bool emitPropsetCall(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::call>& o
 		for (auto& param : params)
 			ir::emit::push(seq.out, param.clid.lvid());
 		ir::emit::call(seq.out, lvid, atom->atomid, settings.instanceid);
+		if (not atom->funcinfo.raisedErrors.empty())
+			raisedErrorsFromFuncCall(seq, *atom);
 	}
 	return true;
 }

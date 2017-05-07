@@ -33,6 +33,30 @@ namespace ir { struct Sequence; }
 namespace ny {
 
 
+struct AtomRaisedErrors final {
+	struct Origin final {
+		Origin(const Atom& atom, uint32_t line, uint32_t column)
+			: atom(atom)
+			, line(line)
+			, column(column) {
+		}
+		const Atom& atom;
+		uint32_t line;
+		uint32_t column;
+	};
+
+	bool empty() const;
+	void add(const Atom& type, const Atom& from, uint32_t line, uint32_t column);
+	void add(const Atom& type, const std::vector<Origin>&);
+	void add(const AtomRaisedErrors&);
+
+	template<class T> void each(T&&) const;
+
+private:
+	std::unordered_map<const Atom*, std::vector<Origin>> m_byType;
+};
+
+
 //! Definition of a single class or function
 struct Atom final
 	: public Yuni::IIntrusiveSmartPtr<Atom, false, Yuni::Policy::SingleThreaded>
@@ -454,6 +478,12 @@ public:
 		} clone;
 	}
 	classinfo;
+
+	struct {
+		//! All errors that the function may report
+		AtomRaisedErrors raisedErrors;
+	}
+	funcinfo;
 
 	//! Flag to determine whether this entry is a blueprint or a namespace
 	const Type type;

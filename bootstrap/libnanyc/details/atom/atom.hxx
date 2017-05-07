@@ -5,6 +5,38 @@
 namespace ny {
 
 
+inline bool AtomRaisedErrors::empty() const {
+	return m_byType.empty();
+}
+
+
+inline void AtomRaisedErrors::add(const Atom& type, const Atom& from, uint32_t line, uint32_t column) {
+	auto& origins = m_byType[&type];
+	origins.emplace_back(from, line, column);
+}
+
+
+inline void AtomRaisedErrors::add(const Atom& type, const std::vector<AtomRaisedErrors::Origin>& origins) {
+	auto& details = m_byType[&type];
+	for (auto& origin: origins)
+		details.emplace_back(origin);
+}
+
+
+inline void AtomRaisedErrors::add(const AtomRaisedErrors& other) {
+	other.each([this](const Atom& type, auto& origin) {
+		add(type, origin);
+	});
+}
+
+
+template<class T>
+inline void AtomRaisedErrors::each(T&& callback) const {
+	for (auto& pair: m_byType)
+		callback(*pair.first, pair.second);
+}
+
+
 inline uint32_t Atom::Instances::size() const {
 	return static_cast<uint32_t>(m_instances.size());
 }

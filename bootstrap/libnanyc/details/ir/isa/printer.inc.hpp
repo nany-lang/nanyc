@@ -277,6 +277,12 @@ namespace // anonymous
 		}
 
 
+		void print(const Operand<Op::raise>& operands) {
+			line() << "raise %" << operands.lvid;
+		}
+
+
+
 		void print(const Operand<Op::stacksize>& operands) {
 			line() << "stack.size +" << operands.add;
 		}
@@ -732,6 +738,11 @@ namespace // anonymous
 					break;
 				}
 			}
+		}
+
+
+		void print(const Operand<Op::onscopefail>& operands) {
+			line() << "on scope fail %" << operands.lvid << ", jmp %" << operands.label;
 		}
 
 

@@ -677,6 +677,8 @@ struct OpcodeReader final {
 			case ir::isa::Op::jnz:
 			case ir::isa::Op::nop:
 			case ir::isa::Op::commontype:
+			case ir::isa::Op::onscopefail:
+			case ir::isa::Op::raise:
 				break;
 			// error for all the other ones
 			default:

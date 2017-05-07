@@ -77,6 +77,22 @@ void Scope::checkForUnknownAttributes() const {
 }
 
 
+void Scope::updateOnScopeFailExitLabels() {
+	auto& irout = ircode();
+	uint32_t label = ir::emit::label(irout, nextvar());
+	for (auto it = onScopeFailExitLabels.rbegin(); it != onScopeFailExitLabels.rend(); ++it) {
+		auto& details = *it;
+		emitDebugpos(details.node);
+		// unregister the 'on scope fail'
+		ir::emit::on::scopefail(irout, details.var, 0);
+		// update label to jump at the end of the scope
+		irout.at<ir::isa::Op::jmp>(details.jmpOffset).label = label;
+	}
+	onScopeFailExitLabels.clear();
+	onScopeFailExitLabels.shrink_to_fit();
+}
+
+
 } // namespace Producer
 } // namespace ir
 } // namespace ny

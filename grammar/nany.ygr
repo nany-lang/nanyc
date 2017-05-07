@@ -229,6 +229,9 @@ tk-typeof: notext
 tk-scope: notext
 	'scope' sp
 
+tk-fail: notext
+	'fail' sp
+
 
 
 const: notext
@@ -676,9 +679,14 @@ return-inline: notext, important
 return-raise: notext
 	tk-raise
 
-return: notext, important
-	(tk-return | return-raise) (expr (wp tk-comma wp expr | error-semicolon)? )?
+return-with-error: notext
+	wp tk-comma wp expr | error-semicolon
 
+return: notext, important
+	tk-return (expr return-with-error?)?
+
+raise: notext, important
+	tk-raise expr return-with-error?
 
 
 
@@ -739,9 +747,11 @@ each: important, notext
 
 
 // --- ON ---
+on-scope-fail: notext
+	tk-fail func-params? wp
 
 on-scope: notext
-	tk-scope scope
+	tk-scope on-scope-fail? scope
 
 on-entry: notext hidden
 	| on-scope
@@ -972,6 +982,7 @@ expr-value: notext
 	| class
 	| typedef
 	| return
+	| raise
 	| each
 	| in
 	| intrinsic
