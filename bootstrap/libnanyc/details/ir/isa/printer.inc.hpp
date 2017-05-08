@@ -279,6 +279,8 @@ namespace // anonymous
 
 		void print(const Operand<Op::raise>& operands) {
 			line() << "raise %" << operands.lvid;
+			if (operands.label != 0)
+				out << ", jmp %" << operands.label;
 		}
 
 
