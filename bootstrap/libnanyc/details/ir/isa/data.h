@@ -601,7 +601,9 @@ template<> struct Operand<ny::ir::isa::Op::label> final {
 template<> struct Operand<ny::ir::isa::Op::jmp> final {
 	uint32_t opcode;
 	uint32_t label;
-	template<class T> void eachLVID(T&) {}
+	template<class T> void eachLVID(T& c) {
+		c(label);
+	}
 };
 
 template<> struct Operand<ny::ir::isa::Op::jz> final {
@@ -610,7 +612,7 @@ template<> struct Operand<ny::ir::isa::Op::jz> final {
 	uint32_t result; // local variable to set to 1 if jump
 	uint32_t label;
 	template<class T> void eachLVID(T& c) {
-		c(lvid, result);
+		c(lvid, result, label);
 	}
 };
 
@@ -620,7 +622,7 @@ template<> struct Operand<ny::ir::isa::Op::jnz> final {
 	uint32_t result; // local variable to set to 1 if jump
 	uint32_t label;
 	template<class T> void eachLVID(T& c) {
-		c(lvid, result);
+		c(lvid, result, label);
 	}
 };
 
