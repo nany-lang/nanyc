@@ -17,6 +17,7 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::raise>& operands) {
 	auto* atomError = cdeftable.findClassdefAtom(cdef);
 	if (atomError == nullptr)
 		return (void)(error() << "only user-defined classes can be used for raising an error");
+	ir::emit::ref(out, operands.lvid);
 	if (onScopeFail.empty()) {
 		// not within an error handler defined by the current function
 		frame->atom.funcinfo.raisedErrors.add(*atomError, frame->atom, currentLine, currentOffset);
