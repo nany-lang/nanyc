@@ -79,6 +79,7 @@ AnyString opname(ny::ir::isa::Op opcode) {
 		case Op::jmp:            return "jmp";
 		case Op::jnz:            return "jnz";
 		case Op::jz:             return "jz";
+		case Op::jzraise:        return "jzraise";
 		case Op::label:          return "label";
 		case Op::load_u32:       return "load_u32";
 		case Op::load_u64:       return "load_u64";

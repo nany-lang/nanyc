@@ -424,6 +424,11 @@ namespace // anonymous
 		}
 
 
+		void print(const Operand<Op::jzraise>& operands) {
+			line() << "jzraise goto lbl " << operands.label;
+		}
+
+
 		void print(const Operand<Op::scope>&) {
 			line() << '{';
 			indent();

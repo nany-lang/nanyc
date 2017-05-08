@@ -626,6 +626,14 @@ template<> struct Operand<ny::ir::isa::Op::jnz> final {
 	}
 };
 
+template<> struct Operand<ny::ir::isa::Op::jzraise> final {
+	uint32_t opcode;
+	uint32_t label;
+	template<class T> void eachLVID(T& c) {
+		c(label);
+	}
+};
+
 template<> struct Operand<ny::ir::isa::Op::memalloc> final {
 	uint32_t opcode;
 	uint32_t lvid;
