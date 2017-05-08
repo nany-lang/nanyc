@@ -28,7 +28,7 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::raise>& operands) {
 		if (unlikely(handler == nullptr))
 			return complainNoErrorHandler(*atomError, nullptr, {});
 		handler->used = true;
-		releaseScopedVariables(handler->scope);
+		releaseScopedVariables(handler->scope, /*forget*/ true);
 	}
 	ir::emit::raise(out, operands.lvid);
 }
