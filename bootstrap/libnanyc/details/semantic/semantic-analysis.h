@@ -217,6 +217,9 @@ struct Analyzer final {
 	** \param forget Flag to avoid (or not) to release those variables again
 	*/
 	void releaseScopedVariables(int scope, bool forget = false);
+
+	//! Emit 'unred' opcodes for all variables available in all scopes
+	void releaseAllScopedVariables();
 	//@}
 
 

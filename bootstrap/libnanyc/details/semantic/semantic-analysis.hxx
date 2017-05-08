@@ -31,5 +31,10 @@ inline bool Analyzer::checkForIntrinsicParamCount(const AnyString& name, uint32_
 }
 
 
+inline void Analyzer::releaseAllScopedVariables() {
+	releaseScopedVariables(0 /*all scopes*/);
+}
+
+
 } // namespace semantic
 } // namespace ny
