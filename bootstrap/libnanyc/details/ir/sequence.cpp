@@ -10,34 +10,14 @@ namespace ny {
 namespace ir {
 
 
-namespace {
-
-
-inline uint32_t calculateCapacity(uint32_t capacity, uint32_t minimum) {
-	do {
-		capacity += 1000u;
-	}
-	while (capacity < minimum);
-	return capacity;
-}
-
-
-} // namespace
-
-
 Sequence::Sequence(const Sequence& other, uint32_t offset)
 		: stringrefs(other.stringrefs) {
 	assert(offset < other.m_size);
 	uint32_t size = other.m_size - offset;
 	if (size != 0) {
-		uint32_t capacity = calculateCapacity(0, size);
-		auto* body = (Instruction*) malloc(sizeof(Instruction) * capacity);
-		if (!body)
-			throw std::bad_alloc();
-		YUNI_MEMCPY(body, sizeof(Instruction) * capacity, other.m_body + offset, size * sizeof(Instruction));
+		grow(size);
 		m_size = size;
-		m_capacity = capacity;
-		m_body = body;
+		YUNI_MEMCPY(m_body, sizeof(Instruction) * m_capacity, other.m_body + offset, size * sizeof(Instruction));
 	}
 }
 
@@ -79,16 +59,20 @@ void Sequence::moveCursorFromBlueprintToEnd(Instruction*& cursor) const {
 
 void Sequence::clear() {
 	m_size = 0;
-	stringrefs.clear();
 	free(m_body);
 	m_capacity = 0;
 	m_body = nullptr;
+	stringrefs.clear();
 }
 
 
 void Sequence::grow(uint32_t count) {
 	assert(count > 0);
-	auto newCapacity = calculateCapacity(m_capacity, count);
+	uint32_t newCapacity = m_capacity;
+	do {
+		newCapacity += 1000u;
+	}
+	while (newCapacity < count);
 	auto* newbody = (Instruction*) realloc(m_body, sizeof(Instruction) * newCapacity);
 	if (unlikely(nullptr == newbody))
 		throw std::bad_alloc();
@@ -152,12 +136,14 @@ struct WalkerIncreaseLVID final {
 		if (lvid > greaterThan)
 			lvid += inc;
 	}
+
 	inline void operator () (uint32_t& lvid1, uint32_t& lvid2) const {
 		if (lvid1 > greaterThan)
 			lvid1 += inc;
 		if (lvid2 > greaterThan)
 			lvid2 += inc;
 	}
+
 	inline void operator () (uint32_t& lvid1, uint32_t& lvid2, uint32_t& lvid3) const {
 		if (lvid1 > greaterThan)
 			lvid1 += inc;
