@@ -362,8 +362,8 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::call>& operands) {
 	if (0 == frame->lvids(operands.ptr2func).propsetCallSelf) {
 		// normal function call, or assignment
 		callSuccess = ((not frame->lvids(operands.ptr2func).pointerAssignment)
-					   ? emitFuncCall(*this, operands)
-					   : instanciateAssignment(operands));
+			? emitFuncCall(*this, operands)
+			: instanciateAssignment(operands));
 		if (shortcircuit.label != 0) {
 			if (callSuccess and canGenerateCode())
 				callSuccess = generateShortCircuitInstrs(*this, operands.lvid);
