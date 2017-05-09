@@ -29,6 +29,7 @@ bool emitFunCallNoParameter(Scope& scope, uint32_t functor, uint32_t& localvar) 
 	// ... but template parameters if any
 	scope.emitTmplParametersIfAny();
 	ir::emit::call(irout, callret, functor);
+	ir::emit::jzraise(irout, scope.nextvar());
 	return true;
 }
 
@@ -37,11 +38,16 @@ bool emitFuncCallWithParameters(Scope& scope, uint32_t functor, uint32_t& localv
 	auto& irout = scope.ircode();
 	auto callret = ir::emit::alloc(irout, scope.nextvar());
 	localvar = callret; // the new expression value
-	ir::emit::ScopeLocker opscope{irout};
-	bool success = scope.visitASTExprCallParameters(node);
-	scope.emitTmplParametersIfAny();
-	scope.emitDebugpos(node);
-	ir::emit::call(irout, callret, functor);
+	bool success = false;
+	{
+		ir::emit::ScopeLocker opscope{irout};
+		success = scope.visitASTExprCallParameters(node);
+		scope.emitTmplParametersIfAny();
+		scope.emitDebugpos(node);
+		ir::emit::call(irout, callret, functor);
+	}
+	// 'jzraise' after the scope since parameters must always be unref
+	ir::emit::jzraise(irout, scope.nextvar());
 	return success;
 }
 

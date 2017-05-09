@@ -650,6 +650,13 @@ public:
 			return emitAssert();
 	}
 
+
+	void visit(const ir::isa::Operand<ir::isa::Op::jzraise>& opr) {
+		VM_PRINT_OPCODE(opr);
+		gotoLabel(opr.label);
+	}
+
+
 	template<ir::isa::Op O> void visit(const ir::isa::Operand<O>& opr) {
 		VM_PRINT_OPCODE(opr);
 		(void) opr;
