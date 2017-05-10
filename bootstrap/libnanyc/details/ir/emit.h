@@ -404,6 +404,13 @@ inline void jzraise(IRCodeRef ref, uint32_t labelid) {
 }
 
 
+inline void jmperrhandler(IRCodeRef ref, uint32_t atomid, uint32_t label) {
+	auto& opc  = ref.ircode.emit<isa::Op::jmperrhandler>();
+	opc.atomid = atomid;
+	opc.label  = label;
+}
+
+
 inline void identify(IRCodeRef ref, uint32_t lvid, const AnyString& name, uint32_t self) {
 	auto& operands = ref.ircode.emit<isa::Op::identify>();
 	operands.lvid  = lvid;

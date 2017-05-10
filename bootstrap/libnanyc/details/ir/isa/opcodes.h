@@ -62,6 +62,7 @@ enum class Op : std::uint32_t {
 	jz,             ///< jump if local variable is zero
 	jnz,            ///< jump if local variable is not zero
 	jzraise,        ///< jump if no error currently set
+	jmperrhandler,  ///< jump to label if raised error matches the given type
 
 	ref,            ///< increment the reference count
 	unref,          ///< decrement the reference count (release it if reaches 0)
@@ -185,6 +186,7 @@ enum class Op : std::uint32_t {
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::jz) \
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::jnz) \
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::jzraise) \
+			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::jmperrhandler) \
 			\
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::ref) \
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::unref) \

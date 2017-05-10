@@ -429,6 +429,22 @@ namespace // anonymous
 		}
 
 
+		void print(const Operand<Op::jmperrhandler>& operands) {
+			line() << "jmp " << operands.label << " if raise type ";
+			if (operands.atomid != 0) {
+				out << operands.atomid;
+				if (atommap) {
+					out << " // ";
+					auto atom = atommap->findAtom(operands.atomid);
+					if (atom)
+						out << " '" << atom->caption() << '\'';
+				}
+			}
+			else
+				out << "<any>";
+		}
+
+
 		void print(const Operand<Op::scope>&) {
 			line() << '{';
 			indent();

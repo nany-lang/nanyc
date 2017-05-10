@@ -77,6 +77,7 @@ AnyString opname(ny::ir::isa::Op opcode) {
 		case Op::imul:           return "imul";
 		case Op::intrinsic:      return "intrinsic";
 		case Op::jmp:            return "jmp";
+		case Op::jmperrhandler:  return "jmperrhandler";
 		case Op::jnz:            return "jnz";
 		case Op::jz:             return "jz";
 		case Op::jzraise:        return "jzraise";
