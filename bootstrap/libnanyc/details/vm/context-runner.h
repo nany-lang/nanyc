@@ -65,6 +65,8 @@ struct ContextRunner final {
 	MemChecker<true> memchecker;
 	//! upper label id encountered so far
 	uint32_t upperLabelID = 0;
+	void* raisedError = nullptr;
+	uint32_t raisedErrorAtomid = 0;
 	const AtomMap& map;
 	std::reference_wrapper<const ir::Sequence> ircode;
 	const ny::intrinsic::Catalog& userDefinedIntrinsics;
@@ -655,6 +657,9 @@ public:
 		VM_PRINT_OPCODE(opr);
 		gotoLabel(opr.label);
 	}
+
+
+	void visit(const ir::isa::Operand<ir::isa::Op::raise>&);
 
 
 	template<ir::isa::Op O> void visit(const ir::isa::Operand<O>& opr) {

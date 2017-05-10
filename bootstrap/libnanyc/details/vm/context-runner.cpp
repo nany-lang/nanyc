@@ -292,6 +292,18 @@ void ContextRunner::visit(const ir::isa::Operand<ir::isa::Op::memfree>& opr) {
 }
 
 
+void ContextRunner::visit(const ir::isa::Operand<ir::isa::Op::raise>& opr) {
+	VM_PRINT_OPCODE(opr);
+	ASSERT_LVID(opr.lvid);
+	raisedError = reinterpret_cast<uint64_t*>(registers[opr.lvid].u64);
+	raisedErrorAtomid = opr.atomid;
+	if (opr.label == 0)
+		returnFromCurrentFunc();
+	else
+		gotoLabel(opr.label);
+}
+
+
 uint64_t ContextRunner::invoke(const ir::Sequence& callee) {
 	const uint32_t framesize = callee.at<ir::isa::Op::stacksize>(0).add;
 	#ifndef NDEBUG
