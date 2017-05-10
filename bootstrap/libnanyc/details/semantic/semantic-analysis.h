@@ -355,6 +355,7 @@ public:
 	bodystart;
 
 	OnScopeFailHandlers onScopeFail;
+	Atom* lastCallWithRaisedError = nullptr;
 
 	struct {
 		uint32_t label = 0;

@@ -37,6 +37,7 @@ void raisedErrorsFromFuncCall(Analyzer& seq, Atom& funccall) {
 		error() << "raised errors not allowed in 'operator dispose'";
 		return;
 	}
+	seq.lastCallWithRaisedError = &funccall;
 	bool hasErrorHandler = not seq.onScopeFail.empty();
 	if (hasErrorHandler)
 		markLocalErrorHandlersAsUsed(seq, funccall);
@@ -357,6 +358,7 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::call>& operands) {
 	// but the input parameters can be slighty different
 	// the result is no longer a synthetic object
 	frame->lvids(operands.lvid).synthetic = false;
+	lastCallWithRaisedError = nullptr;
 	// resul of the operation
 	bool callSuccess;
 	if (0 == frame->lvids(operands.ptr2func).propsetCallSelf) {
