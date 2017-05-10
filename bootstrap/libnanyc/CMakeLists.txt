@@ -338,6 +338,7 @@ add_library(libnanyc ${mode_libnany}
 	"details/semantic/opcode-follow.cpp"
 	"details/semantic/opcode-identify.cpp"
 	"details/semantic/opcode-intrinsic.cpp"
+	"details/semantic/opcode-jzraise.cpp"
 	"details/semantic/opcode-onscopefail.cpp"
 	"details/semantic/opcode-pragma.cpp"
 	"details/semantic/opcode-push.cpp"
