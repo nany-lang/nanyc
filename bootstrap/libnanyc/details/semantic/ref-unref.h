@@ -77,7 +77,7 @@ inline void tryUnrefObject(Analyzer& sb, uint32_t lvid) {
 			assert(atom->classinfo.dtor.atomid != 0);
 		}
 		if (sb.canGenerateCode())
-			ir::emit::unref(sb.out, lvid, atom->classinfo.dtor.atomid, atom->classinfo.dtor.instanceid);
+			ir::emit::unref(sb.out, lvid, atom->classinfo.dtor.atomid);
 	}
 }
 

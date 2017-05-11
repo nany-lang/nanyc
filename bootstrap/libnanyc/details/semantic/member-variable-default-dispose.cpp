@@ -78,7 +78,7 @@ void produceMemberVarDefaultDispose(Analyzer& analyzer) {
 				continue;
 		}
 		auto& classinfo = typeAtom->classinfo;
-		ir::emit::unref(out, reglvid, classinfo.dtor.atomid, classinfo.dtor.instanceid);
+		ir::emit::unref(out, reglvid, classinfo.dtor.atomid);
 	}
 }
 

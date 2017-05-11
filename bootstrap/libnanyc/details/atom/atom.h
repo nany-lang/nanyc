@@ -468,7 +468,6 @@ public:
 		//! Direct access to the destructor (used for reduce compilation time)
 		struct {
 			uint32_t atomid = 0;
-			uint32_t instanceid = (uint32_t) - 1;
 		} dtor;
 
 		//! Direct access to the clone func (used to reduce compilation time)

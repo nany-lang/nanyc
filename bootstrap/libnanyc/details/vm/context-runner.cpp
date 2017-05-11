@@ -100,7 +100,7 @@ void ContextRunner::emitLabelError(uint32_t label) {
 }
 
 
-void ContextRunner::destroy(uint64_t* object, uint32_t dtorid, uint32_t instanceid) {
+void ContextRunner::destroy(uint64_t* object, uint32_t dtorid) {
 	auto& dtor = *map.findAtom(dtorid);
 	if (false) {
 		std::cout << " .. DESTROY " << (void*) object << " aka '"
@@ -112,11 +112,10 @@ void ContextRunner::destroy(uint64_t* object, uint32_t dtorid, uint32_t instance
 	assert(classobject != nullptr);
 	uint64_t classsizeof = classobject->runtimeSizeof();
 	classsizeof += config::extraObjectSize;
-	if (instanceid != (uint32_t) - 1) {
-		funcparamCount = 1;
-		funcparams[0].u64 = reinterpret_cast<uint64_t>(object); // self
-		call(0, dtor.atomid, instanceid);
-	}
+	funcparamCount = 1;
+	funcparams[0].u64 = reinterpret_cast<uint64_t>(object); // self
+	uint32_t instanceid = 0; // always only one version of the dtor
+	call(0, dtor.atomid, instanceid);
 	if (debugmode)
 		memset(object, patternFree, classsizeof);
 	deallocate(object, static_cast<size_t>(classsizeof));

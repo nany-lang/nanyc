@@ -357,8 +357,9 @@ bool Analyzer::instanciateAtomClassDestructor(Atom& atom, uint32_t lvid) {
 			assert(dtor != nullptr);
 			uint32_t instanceid = static_cast<uint32_t>(-1);
 			if (instanciateAtomFunc(instanceid, (*dtor), /*void*/0, /*self*/lvid)) {
+				if (unlikely(instanceid != 0))
+					return (ice() << "invalid instanceid for a dtor");
 				atom.classinfo.dtor.atomid     = dtor->atomid;
-				atom.classinfo.dtor.instanceid = instanceid;
 				return true;
 			}
 			break;

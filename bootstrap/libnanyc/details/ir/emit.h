@@ -345,11 +345,10 @@ inline void ref(IRCodeRef ref, uint32_t lvid) {
 }
 
 
-inline void unref(IRCodeRef ref, uint32_t lvid, uint32_t atomid, uint32_t instanceid) {
+inline void unref(IRCodeRef ref, uint32_t lvid, uint32_t atomid) {
 	auto& operands = ref.ircode.emit<isa::Op::unref>();
 	operands.lvid = lvid;
 	operands.atomid = atomid;
-	operands.instanceid = instanceid;
 }
 
 

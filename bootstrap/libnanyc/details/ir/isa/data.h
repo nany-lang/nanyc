@@ -927,10 +927,7 @@ template<> struct Operand<ny::ir::isa::Op::ref> final {
 template<> struct Operand<ny::ir::isa::Op::unref> final {
 	uint32_t opcode;
 	uint32_t lvid;
-	// atomid
-	uint32_t atomid; // or atomid
-	// destructor to call
-	uint32_t instanceid;
+	uint32_t atomid;
 
 	template<class T> void eachLVID(T& c) {
 		c(lvid);

@@ -102,7 +102,7 @@ public:
 	}
 
 
-	void destroy(uint64_t* object, uint32_t dtorid, uint32_t instanceid);
+	void destroy(uint64_t* object, uint32_t dtorid);
 
 
 	void gotoLabel(uint32_t label) {
@@ -508,7 +508,7 @@ public:
 		uint64_t* object = reinterpret_cast<uint64_t*>(registers[opr.lvid].u64);
 		VM_CHECK_POINTER(object, opr);
 		if (0 == --(object[0])) // -unref
-			destroy(object, opr.atomid, opr.instanceid);
+			destroy(object, opr.atomid);
 	}
 
 
