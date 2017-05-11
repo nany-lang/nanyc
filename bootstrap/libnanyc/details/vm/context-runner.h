@@ -512,15 +512,6 @@ public:
 	}
 
 
-	void visit(const ir::isa::Operand<ir::isa::Op::dispose>& opr) {
-		VM_PRINT_OPCODE(opr);
-		ASSERT_LVID(opr.lvid);
-		uint64_t* object = reinterpret_cast<uint64_t*>(registers[opr.lvid].u64);
-		VM_CHECK_POINTER(object, opr);
-		destroy(object, opr.atomid, opr.instanceid);
-	}
-
-
 	void visit(const ir::isa::Operand<ir::isa::Op::stackalloc>& opr) {
 		VM_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);

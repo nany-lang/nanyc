@@ -552,15 +552,6 @@ namespace // anonymous
 		}
 
 
-		void print(const Operand<Op::dispose>& operands) {
-			line() << "dispose %" << operands.lvid;
-			if (operands.atomid != 0) {
-				out << " {atom id:";
-				out << operands.atomid << " #" << operands.instanceid << '}';
-			}
-		}
-
-
 		void print(const Operand<Op::typeisobject>& operands) {
 			line() << "type is object %" << operands.lvid;
 		}

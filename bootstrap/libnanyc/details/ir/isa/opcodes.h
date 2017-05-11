@@ -70,7 +70,6 @@ enum class Op : std::uint32_t {
 	ret,            ///< return
 	raise,          ///< raise an error
 	allocate,       ///< allocate an object (memory + ctor)
-	dispose,        ///< deallocate an object (dtor + memory)
 
 	stacksize,      ///< define the stack size for the current blueprint
 	pragma,         ///< metadata for blueprints
@@ -193,7 +192,6 @@ enum class Op : std::uint32_t {
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::ret) \
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::raise) \
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::allocate) \
-			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::dispose) \
 			\
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::stacksize) \
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::pragma) \
