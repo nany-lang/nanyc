@@ -547,16 +547,7 @@ namespace // anonymous
 			line() << "-unref %" << operands.lvid;
 			if (operands.atomid != 0) {
 				out << " {atom id:";
-				out << operands.atomid << " #" << operands.instanceid << '}';
-			}
-		}
-
-
-		void print(const Operand<Op::dispose>& operands) {
-			line() << "dispose %" << operands.lvid;
-			if (operands.atomid != 0) {
-				out << " {atom id:";
-				out << operands.atomid << " #" << operands.instanceid << '}';
+				out << operands.atomid << '}';
 			}
 		}
 

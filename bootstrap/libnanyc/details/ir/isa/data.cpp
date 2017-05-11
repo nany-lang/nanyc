@@ -50,7 +50,6 @@ AnyString opname(ny::ir::isa::Op opcode) {
 		case Op::cstrlen:        return "cstrlen";
 		case Op::debugfile:      return "debugfile";
 		case Op::debugpos:       return "debugpos";
-		case Op::dispose:        return "dispose";
 		case Op::div:            return "div";
 		case Op::end:            return "end";
 		case Op::ensureresolved: return "ensureresolved";
