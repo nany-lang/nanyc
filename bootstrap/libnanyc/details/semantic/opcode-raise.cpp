@@ -1,4 +1,5 @@
 #include "semantic-analysis.h"
+#include "details/semantic/ref-unref.h"
 
 using namespace Yuni;
 
@@ -33,6 +34,9 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::raise>& operands) {
 		labelid = handler->label;
 		releaseScopedVariables(handler->scope, /*forget*/ true);
 	}
+	++codeGenerationLock;
+	tryUnrefObject(*this, operands.lvid); // ensure the presence of the dtor in 'Atom::classinfo'
+	--codeGenerationLock;
 	ir::emit::raise(out, operands.lvid, labelid);
 }
 
