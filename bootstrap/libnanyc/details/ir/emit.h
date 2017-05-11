@@ -495,10 +495,11 @@ inline void ret(IRCodeRef ref, uint32_t lvid, uint32_t tmplvid) {
 }
 
 
-inline void raise(IRCodeRef ref, uint32_t lvid, uint32_t labelid = 0) {
+inline void raise(IRCodeRef ref, uint32_t lvid, uint32_t labelid = 0, uint32_t atomid = 0) {
 	auto& operands = ref.ircode.emit<isa::Op::raise>();
 	operands.lvid  = lvid;
 	operands.label = labelid;
+	operands.atomid = atomid;
 }
 
 

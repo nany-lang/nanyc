@@ -976,6 +976,7 @@ template<> struct Operand<ny::ir::isa::Op::raise> final {
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t label;
+	uint32_t atomid;
 	template<class T> void eachLVID(T& c) {
 		c(lvid, label);
 	}

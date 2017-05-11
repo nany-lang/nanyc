@@ -37,7 +37,7 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::raise>& operands) {
 	++codeGenerationLock;
 	tryUnrefObject(*this, operands.lvid); // ensure the presence of the dtor in 'Atom::classinfo'
 	--codeGenerationLock;
-	ir::emit::raise(out, operands.lvid, labelid);
+	ir::emit::raise(out, operands.lvid, labelid, atomError->atomid);
 }
 
 
