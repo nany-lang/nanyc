@@ -660,6 +660,12 @@ public:
 	}
 
 
+	void visit(const ir::isa::Operand<ir::isa::Op::jmperrhandler>& opr) {
+		if (opr.atomid == raisedErrorAtomid or opr.atomid == 0)
+			gotoLabel(opr.label);
+	}
+
+
 	void visit(const ir::isa::Operand<ir::isa::Op::raise>&);
 
 
