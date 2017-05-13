@@ -655,7 +655,8 @@ public:
 
 	void visit(const ir::isa::Operand<ir::isa::Op::jzraise>& opr) {
 		VM_PRINT_OPCODE(opr);
-		gotoLabel(opr.label);
+		if (raisedError == nullptr)
+			gotoLabel(opr.label);
 	}
 
 
