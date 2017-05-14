@@ -297,10 +297,14 @@ void ContextRunner::visit(const ir::isa::Operand<ir::isa::Op::raise>& opr) {
 	ASSERT_LVID(opr.lvid);
 	raisedError = reinterpret_cast<uint64_t*>(registers[opr.lvid].u64);
 	raisedErrorAtomid = opr.atomid;
-	if (opr.label == 0)
+	if (opr.label == 0) {
+		unwindRaisedError = true;
 		returnFromCurrentFunc();
-	else
+	}
+	else {
+		unwindRaisedError = false;
 		gotoLabel(opr.label);
+	}
 }
 
 

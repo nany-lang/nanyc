@@ -65,6 +65,7 @@ struct ContextRunner final {
 	MemChecker<true> memchecker;
 	//! upper label id encountered so far
 	uint32_t upperLabelID = 0;
+	bool unwindRaisedError = false;
 	void* raisedError = nullptr;
 	uint32_t raisedErrorAtomid = 0;
 	const AtomMap& map;
@@ -655,14 +656,16 @@ public:
 
 	void visit(const ir::isa::Operand<ir::isa::Op::jzraise>& opr) {
 		VM_PRINT_OPCODE(opr);
-		if (raisedError == nullptr)
+		if (not unwindRaisedError)
 			gotoLabel(opr.label);
 	}
 
 
 	void visit(const ir::isa::Operand<ir::isa::Op::jmperrhandler>& opr) {
-		if (opr.atomid == raisedErrorAtomid or opr.atomid == 0)
+		if (opr.atomid == raisedErrorAtomid or opr.atomid == 0) {
+			unwindRaisedError = false;
 			gotoLabel(opr.label);
+		}
 	}
 
 
