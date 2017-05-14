@@ -664,7 +664,10 @@ public:
 
 	void visit(const ir::isa::Operand<ir::isa::Op::jmperrhandler>& opr) {
 		if (opr.atomid == raisedErrorAtomid or opr.atomid == 0) {
-			if (opr.atomid == 0) {
+			if (opr.atomid != 0) {
+				registers[opr.label + 1].u64 = reinterpret_cast<uint64_t>(raisedError);
+			}
+			else {
 				auto* atom = reinterpret_cast<Atom*>(raisedError);
 				Atom* dtor = nullptr;
 				atom->findFuncAtom(dtor, "^dispose");

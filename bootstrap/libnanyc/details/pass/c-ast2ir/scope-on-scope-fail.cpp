@@ -111,6 +111,7 @@ bool Scope::visitASTExprOnScopeFail(AST::Node& scopeNode, AST::Node& scopeFailNo
 		if (name.empty())
 			return 0;
 		// the error itself
+		// lvid always 'startLabel + 1'
 		uint32_t var = ir::emit::alloc(irout, nextvar());
 		if (lvidType != 0) {
 			auto& operands    = irout.emit<isa::Op::follow>();
