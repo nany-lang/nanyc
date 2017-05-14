@@ -78,6 +78,18 @@ void unexpectedOpcode(const Context& context, const AnyString& name) noexcept {
 }
 
 
+void invalidDtor(const Context& context, const Atom* atom) noexcept {
+	String msg;
+	msg << "invalid destructor for atom '";
+	if (atom)
+		msg << atom->caption();
+	else
+		msg << "<null-pointer>";
+	msg << '\'';
+	exception(context, msg);
+}
+
+
 } // namespace console
 } // namespace vm
 } // namespace ny

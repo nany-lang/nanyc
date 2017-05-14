@@ -92,6 +92,7 @@ public:
 	[[noreturn]] void emitDividedByZero();
 	[[noreturn]] void emitUnknownPointer(void* p);
 	[[noreturn]] void emitLabelError(uint32_t label);
+	[[noreturn]] void emitInvalidDtor(const Atom*);
 
 
 	template<class T> T* allocateraw(size_t size) {
@@ -663,6 +664,14 @@ public:
 
 	void visit(const ir::isa::Operand<ir::isa::Op::jmperrhandler>& opr) {
 		if (opr.atomid == raisedErrorAtomid or opr.atomid == 0) {
+			if (opr.atomid == 0) {
+				auto* atom = reinterpret_cast<Atom*>(raisedError);
+				Atom* dtor = nullptr;
+				atom->findFuncAtom(dtor, "^dispose");
+				if (unlikely(dtor == nullptr))
+					emitInvalidDtor(atom);
+				destroy(reinterpret_cast<uint64_t*>(raisedError), dtor->atomid);
+			}
 			unwindRaisedError = false;
 			gotoLabel(opr.label);
 		}

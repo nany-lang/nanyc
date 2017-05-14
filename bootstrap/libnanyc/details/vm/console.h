@@ -35,6 +35,7 @@ void invalidLabel(const Context&, uint32_t label, uint32_t upperLabel, uint32_t 
 void invalidReturnType(const Context&) noexcept;
 void invalidIntrinsicParameterType(const Context&) noexcept;
 void unexpectedOpcode(const Context&, const AnyString& name) noexcept;
+void invalidDtor(const Context&, const Atom*) noexcept;
 
 
 } // namespace console

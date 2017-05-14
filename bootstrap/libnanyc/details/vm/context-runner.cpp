@@ -100,6 +100,12 @@ void ContextRunner::emitLabelError(uint32_t label) {
 }
 
 
+void ContextRunner::emitInvalidDtor(const Atom* atom) {
+	ny::vm::console::invalidDtor(context, atom);
+	abortMission();
+}
+
+
 void ContextRunner::destroy(uint64_t* object, uint32_t dtorid) {
 	auto& dtor = *map.findAtom(dtorid);
 	if (false) {
