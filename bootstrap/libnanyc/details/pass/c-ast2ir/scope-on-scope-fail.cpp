@@ -120,13 +120,11 @@ bool Scope::visitASTExprOnScopeFail(AST::Node& scopeNode, AST::Node& scopeFailNo
 		}
 		return var;
 	}();
-	// register the 'on scope fail'
+	if (not visitASTExprScope(scopeNode))
+		return false;
+	// register the 'on scope fail' after the code for the error handler to not be reused
 	emitDebugpos(scopeFailNode);
 	ir::emit::on::scopefail(irout, var, startLabel);
-	{
-		if (not visitASTExprScope(scopeNode))
-			return false;
-	}
 	// jmp at the end of the original scope
 	uint32_t jmpOffset = ir::emit::jmp(irout);
 	onScopeFailExitLabels.emplace_back(scopeFailNode, jmpOffset, var);
