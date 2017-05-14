@@ -15,15 +15,15 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::onscopefail>& operands)
 	bool hasTypedParameter = operands.lvid != 0;
 	if (hasTypedParameter) {
 		auto& cdef  = cdeftable.classdef(CLID{frame->atomid, operands.lvid});
-		if (not cdef.isAny()) {
-			if (unlikely(cdef.isVoid()))
-				return (void)(error() << "'on scope fail' does not accept void");
-			if (unlikely(cdef.isBuiltin()))
-				return (void)(error() << "'on scope fail' does not accept builtin types");
-			atomError = cdeftable.findClassdefAtom(cdef);
-			if (atomError == nullptr)
-				return (void)(ice() << "'on scope fail' with null atom");
-		}
+		if (cdef.isAny()) {
+			return (void)(error() << "'on scope fail' does not accept 'any' parameter. Type required.");
+		if (unlikely(cdef.isVoid()))
+			return (void)(error() << "'on scope fail' does not accept void");
+		if (unlikely(cdef.isBuiltin()))
+			return (void)(error() << "'on scope fail' does not accept builtin types");
+		atomError = cdeftable.findClassdefAtom(cdef);
+		if (atomError == nullptr)
+			return (void)(ice() << "'on scope fail' with null atom");
 	}
 	bool registering = operands.label != 0;
 	if (registering) {
