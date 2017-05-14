@@ -128,6 +128,8 @@ bool Scope::visitASTExprOnScopeFail(AST::Node& scopeNode, AST::Node& scopeFailNo
 	// jmp at the end of the original scope
 	uint32_t jmpOffset = ir::emit::jmp(irout);
 	onScopeFailExitLabels.emplace_back(scopeFailNode, jmpOffset, var);
+	if (var != 0)
+		ir::emit::unref(irout, var, 0);
 	// emit label to skip the entire block
 	irout.at<ir::isa::Op::jmp>(ignJmp).label = ir::emit::label(irout, nextvar());
 	ir::emit::trace(irout, "end 'on scope fail'");

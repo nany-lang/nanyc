@@ -36,6 +36,7 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::onscopefail>& operands)
 				error() << "error handler '" << atomError->caption(cdeftable) << "' already defined for the scope";
 				handler.used = true; // no warning report
 			}
+			frame->lvids(operands.lvid).autorelease = false;
 		}
 		else {
 			auto& any = onScopeFail.any();
