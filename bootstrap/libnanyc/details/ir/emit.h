@@ -582,12 +582,10 @@ namespace on {
 namespace {
 
 
-inline uint32_t scopefail(IRCodeRef ref, uint32_t lvid, uint32_t label) {
-	uint32_t offset = ref.ircode.opcodeCount();
+inline void scopefail(IRCodeRef ref, uint32_t lvid, uint32_t label) {
 	auto& operands = ref.ircode.emit<isa::Op::onscopefail>();
 	operands.lvid  = lvid;
 	operands.label = label;
-	return offset;
 }
 
 
