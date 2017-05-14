@@ -15,7 +15,7 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::onscopefail>& operands)
 	bool hasTypedParameter = operands.lvid != 0;
 	if (hasTypedParameter) {
 		auto& cdef  = cdeftable.classdef(CLID{frame->atomid, operands.lvid});
-		if (cdef.isAny()) {
+		if (cdef.isAny())
 			return (void)(error() << "'on scope fail' does not accept 'any' parameter. Type required.");
 		if (unlikely(cdef.isVoid()))
 			return (void)(error() << "'on scope fail' does not accept void");
@@ -27,13 +27,7 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::onscopefail>& operands)
 	}
 	bool registering = operands.label != 0;
 	if (registering) {
-		if (atomError == nullptr) {
-			auto& any = onScopeFail.any();
-			if (not any.empty())
-				return (void)(error() << "error handler 'any' already defined");
-			any.reset(operands.lvid, operands.label, frame->scope);
-		}
-		else {
+		if (hasTypedParameter) {
 			bool alreadyExists = onScopeFail.has(atomError);
 			// always keep track of the error handler and to not produce
 			// an error when deregistering later
@@ -43,22 +37,27 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::onscopefail>& operands)
 				handler.used = true; // no warning report
 			}
 		}
+		else {
+			auto& any = onScopeFail.any();
+			if (not any.empty())
+				return (void)(error() << "error handler 'any' already defined");
+			any.reset(operands.lvid, operands.label, frame->scope);
+		}
 	}
 	else {
-		if (atomError == nullptr) {
-			auto& any = onScopeFail.any();
-			if (unlikely(not any.used))
-				warning() << "unused error handler for 'any'";
-			any.reset();
-		}
-		else {
-			if (unlikely(not onScopeFail.hasBackTypedHandler(atomError))) {
+		if (hasTypedParameter) {
+			if (unlikely(not onScopeFail.hasBackTypedHandler(atomError)))
 				ice() << "the error '" << atomError->caption(cdeftable) << "' was not registered";
-			}
 			auto& handler = onScopeFail.back();
 			if (unlikely(not handler.used))
 				warning() << "unused error handler for '" << atomError->keyword() << ' ' << atomError->caption(cdeftable) << '\'';
 			onScopeFail.pop_back();
+		}
+		else {
+			auto& any = onScopeFail.any();
+			if (unlikely(not any.used))
+				warning() << "unused error handler for 'any'";
+			any.reset();
 		}
 	}
 }
