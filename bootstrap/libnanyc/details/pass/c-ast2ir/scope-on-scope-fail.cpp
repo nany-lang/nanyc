@@ -102,6 +102,7 @@ bool Scope::visitASTExprOnScopeFail(AST::Node& scopeNode, AST::Node& scopeFailNo
 	if (!findParameter(*this, scopeFailNode, lvidType, name))
 		return false;
 	auto& irout = ircode();
+	ir::emit::trace(irout, "begin 'on scope fail'");
 	// skip the entire block
 	uint32_t ignJmp = ir::emit::jmp(irout);
 	// label to trigger the error handler
@@ -131,6 +132,7 @@ bool Scope::visitASTExprOnScopeFail(AST::Node& scopeNode, AST::Node& scopeFailNo
 	onScopeFailExitLabels.emplace_back(scopeFailNode, jmpOffset, var);
 	// emit label to skip the entire block
 	irout.at<ir::isa::Op::jmp>(ignJmp).label = ir::emit::label(irout, nextvar());
+	ir::emit::trace(irout, "end 'on scope fail'");
 	return true;
 }
 

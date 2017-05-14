@@ -18,6 +18,7 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::raise>& operands) {
 	auto* atomError = cdeftable.findClassdefAtom(cdef);
 	if (atomError == nullptr)
 		return (void)(error() << "only user-defined classes can be used for raising an error");
+	ir::emit::trace(out, "begin 'raise'");
 	ir::emit::ref(out, operands.lvid);
 	uint32_t labelid = 0;
 	if (onScopeFail.empty()) {
