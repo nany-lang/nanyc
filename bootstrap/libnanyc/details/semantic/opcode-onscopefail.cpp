@@ -12,7 +12,8 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::onscopefail>& operands)
 	if (unlikely(frame->atom.type != Atom::Type::funcdef))
 		return (void)(error() << "error handlers can only be defined in a function body");
 	Atom* atomError = nullptr;
-	if (operands.lvid != 0) {
+	bool hasTypedParameter = operands.lvid != 0;
+	if (hasTypedParameter) {
 		auto& cdef  = cdeftable.classdef(CLID{frame->atomid, operands.lvid});
 		if (not cdef.isAny()) {
 			if (unlikely(cdef.isVoid()))
