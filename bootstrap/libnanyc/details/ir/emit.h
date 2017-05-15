@@ -419,10 +419,11 @@ inline void identify(IRCodeRef ref, uint32_t lvid, const AnyString& name, uint32
 }
 
 
-inline void namealias(IRCodeRef ref, uint32_t lvid, const AnyString& name) {
+inline void namealias(IRCodeRef ref, uint32_t lvid, const AnyString& name, bool forceNonSynthetic = false) {
 	auto& operands = ref.ircode.emit<isa::Op::namealias>();
 	operands.lvid  = lvid;
 	operands.name  = ref.ircode.stringrefs.ref(name);
+	operands.forceNonSynthetic = forceNonSynthetic ? 1 : 0;
 }
 
 

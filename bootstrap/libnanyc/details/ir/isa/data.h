@@ -539,6 +539,7 @@ template<> struct Operand<ny::ir::isa::Op::namealias> final {
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t name;
+	uint32_t forceNonSynthetic;
 	template<class T> void eachLVID(T& c) {
 		c(lvid);
 	}
