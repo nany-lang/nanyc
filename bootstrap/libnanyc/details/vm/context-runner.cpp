@@ -309,6 +309,7 @@ void ContextRunner::visit(const ir::isa::Operand<ir::isa::Op::raise>& opr) {
 	}
 	else {
 		unwindRaisedError = false;
+		registers[opr.label + 1].u64 = reinterpret_cast<uint64_t>(raisedError);
 		gotoLabel(opr.label);
 	}
 }
