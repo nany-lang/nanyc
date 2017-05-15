@@ -119,6 +119,7 @@ bool Scope::visitASTExprOnScopeFail(AST::Node& scopeNode, AST::Node& scopeFailNo
 			operands.follower = var;
 			operands.lvid     = lvidType;
 			operands.symlink  = 0;
+			ir::emit::namealias(irout, var, name, true);
 		}
 		return var;
 	}();

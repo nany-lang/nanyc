@@ -38,6 +38,10 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::onscopefail>& operands)
 			}
 			frame->lvids(operands.lvid).synthetic = false;
 			frame->lvids(operands.lvid).autorelease = false;
+			// 'onscopefail' is emitted *after* the code for the error handler
+			// but the variable is should no longer be accessible
+			frame->lvids(operands.lvid).userDefinedName.clear();
+			frame->lvids(operands.lvid).scope = -1;
 		}
 		else {
 			auto& any = onScopeFail.any();
