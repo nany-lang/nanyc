@@ -105,6 +105,12 @@ public:
 	void destroy(uint64_t* object, uint32_t dtorid);
 
 
+	void returnFromCurrentFunc(uint64_t retval = 0) {
+		retRegister = retval;
+		ircode.get().invalidateCursor(*cursor);
+	}
+
+
 	void gotoLabel(uint32_t label) {
 		bool jmpsuccess = (label > upperLabelID)
 			? ircode.get().jumpToLabelForward(*cursor, label)
@@ -407,8 +413,7 @@ public:
 	void visit(const ir::isa::Operand<ir::isa::Op::ret>& opr) {
 		VM_PRINT_OPCODE(opr);
 		assert(opr.lvid == 0 or opr.lvid < registerCount);
-		retRegister = registers[opr.lvid].u64;
-		ircode.get().invalidateCursor(*cursor);
+		returnFromCurrentFunc(registers[opr.lvid].u64);
 	}
 
 
