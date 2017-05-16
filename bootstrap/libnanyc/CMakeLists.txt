@@ -344,7 +344,7 @@ add_library(libnanyc ${mode_libnany}
 	"details/semantic/opcode-raise.cpp"
 	"details/semantic/opcode-ref-unref.cpp"
 	"details/semantic/opcode-return.cpp"
-	"details/semantic/opcode-scope.cpp"
+	"details/semantic/opcode-scope-end.cpp"
 	"details/semantic/opcode-self.cpp"
 	"details/semantic/opcode-sizeof.cpp"
 	"details/semantic/opcode-stackalloc.cpp"

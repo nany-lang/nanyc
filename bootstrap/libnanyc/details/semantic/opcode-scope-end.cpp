@@ -8,6 +8,7 @@ using namespace Yuni;
 namespace ny {
 namespace semantic {
 
+
 void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::scope>& /*operands*/) {
 	if (frame != nullptr)
 		++(frame->scope);
