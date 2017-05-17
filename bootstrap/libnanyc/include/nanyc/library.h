@@ -57,6 +57,23 @@ NY_EXPORT const char* libnanyc_version_commit_sha();
 */
 NY_EXPORT const char* libnanyc_website_url();
 
+/*!
+** \brief Export some essential information about the library for easy bugreporting
+** \param[out] length The length of the returned c-string [optional]
+** \return multiline c-string (in markdown format) or NULL (must be deallocated by free())
+**
+** Example of output:
+** \code
+** > nanyc {c++/bootstrap} v0.3.0-alpha+805b182 {debug}
+** > compiled with GCC (GNU Compiler Collection) 6.3.0 20170415
+** > config: params:7, pushedparams:32, nmspc depth:32, symbol:63, nsl:true
+** > os:  Debian GNU/Linux 9, Linux 4.9.0-2-amd64 (x86_64)
+** > cpu: Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz (8 cpu(s)/core(s))
+** > mem: 58.7 GiB free / 60 GiB
+** \endcode
+*/
+NY_EXPORT char* libnanyc_get_bugreportdetails(uint32_t* length);
+
 
 #ifdef __cplusplus
 }

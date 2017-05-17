@@ -409,6 +409,7 @@ add_library(libnanyc ${mode_libnany}
 	"libnanyc.h"
 	${nysrc_nsl_stdcore}
 	#
+	"bugreport.cpp"
 	"library.c"
 )
 
