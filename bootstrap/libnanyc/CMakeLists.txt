@@ -404,9 +404,12 @@ add_library(libnanyc ${mode_libnany}
 	"details/vm/stacktrace.hxx"
 	"details/vm/types.h"
 	"include/nany/nany.h"
+	"include/nanyc/library.h"
 	"include/nanyc/types.h"
 	"libnanyc.h"
 	${nysrc_nsl_stdcore}
+	#
+	"library.c"
 )
 
 set_target_properties(libnanyc PROPERTIES
