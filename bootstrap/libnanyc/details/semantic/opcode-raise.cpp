@@ -33,7 +33,7 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::raise>& operands) {
 			return complainNoErrorHandler(*atomError, nullptr, {});
 		handler->used = true;
 		labelid = handler->label;
-		releaseScopedVariables(handler->scope, /*forget*/ true);
+		releaseScopedVariables(handler->scope);
 	}
 	++codeGenerationLock;
 	tryUnrefObject(*this, operands.lvid); // ensure the presence of the dtor in 'Atom::classinfo'
