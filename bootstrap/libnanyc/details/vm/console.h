@@ -26,7 +26,7 @@ void color(const Context&, nyconsole_output_t, nycolor_t) noexcept;
 
 
 void exception(const Context&, const AnyString&) noexcept;
-void unknownPointer(const Context&, void* ptr, uint32_t opcodeOffset = 0) noexcept;
+void unknownPointer(const Context&, void* ptr, uint32_t opcodeOffset = 0, uint32_t lvid = 0) noexcept;
 void assertFailed(const Context&) noexcept;
 void invalidPointerSize(const Context&, void*, size_t got, size_t expected) noexcept;
 void badAlloc(const Context&) noexcept;
@@ -35,6 +35,7 @@ void invalidLabel(const Context&, uint32_t label, uint32_t upperLabel, uint32_t 
 void invalidReturnType(const Context&) noexcept;
 void invalidIntrinsicParameterType(const Context&) noexcept;
 void unexpectedOpcode(const Context&, const AnyString& name) noexcept;
+void invalidDtor(const Context&, const Atom*) noexcept;
 
 
 } // namespace console

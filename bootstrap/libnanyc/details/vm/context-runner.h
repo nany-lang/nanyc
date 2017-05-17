@@ -17,7 +17,7 @@
 
 #define VM_CHECK_POINTER(P,LVID)  if (unlikely(not memchecker.has((P)))) \
 	{ \
-		emitUnknownPointer((P)); /*assert(false and "invalid pointer");*/ \
+		emitUnknownPointer((P), (LVID)); /*assert(false and "invalid pointer");*/ \
 	}
 
 
@@ -65,6 +65,9 @@ struct ContextRunner final {
 	MemChecker<true> memchecker;
 	//! upper label id encountered so far
 	uint32_t upperLabelID = 0;
+	bool unwindRaisedError = false;
+	void* raisedError = nullptr;
+	uint32_t raisedErrorAtomid = 0;
 	const AtomMap& map;
 	std::reference_wrapper<const ir::Sequence> ircode;
 	const ny::intrinsic::Catalog& userDefinedIntrinsics;
@@ -87,8 +90,9 @@ public:
 	[[noreturn]] void emitInvalidIntrinsicParamType();
 	[[noreturn]] void emitInvalidReturnType();
 	[[noreturn]] void emitDividedByZero();
-	[[noreturn]] void emitUnknownPointer(void* p);
+	[[noreturn]] void emitUnknownPointer(void* p, uint32_t lvid);
 	[[noreturn]] void emitLabelError(uint32_t label);
+	[[noreturn]] void emitInvalidDtor(const Atom*);
 
 
 	template<class T> T* allocateraw(size_t size) {
@@ -103,6 +107,12 @@ public:
 
 
 	void destroy(uint64_t* object, uint32_t dtorid);
+
+
+	void returnFromCurrentFunc(uint64_t retval = 0) {
+		retRegister = retval;
+		ircode.get().invalidateCursor(*cursor);
+	}
 
 
 	void gotoLabel(uint32_t label) {
@@ -407,8 +417,7 @@ public:
 	void visit(const ir::isa::Operand<ir::isa::Op::ret>& opr) {
 		VM_PRINT_OPCODE(opr);
 		assert(opr.lvid == 0 or opr.lvid < registerCount);
-		retRegister = registers[opr.lvid].u64;
-		ircode.get().invalidateCursor(*cursor);
+		returnFromCurrentFunc(registers[opr.lvid].u64);
 	}
 
 
@@ -454,7 +463,7 @@ public:
 		assert(opr.self < registerCount);
 		ASSERT_LVID(opr.lvid);
 		uint64_t* object = reinterpret_cast<uint64_t*>(registers[opr.self].u64);
-		VM_CHECK_POINTER(object, opr);
+		VM_CHECK_POINTER(object, opr.self);
 		object[1 + opr.var] = registers[opr.lvid].u64;
 	}
 
@@ -463,7 +472,7 @@ public:
 		ASSERT_LVID(opr.self);
 		ASSERT_LVID(opr.lvid);
 		uint64_t* object = reinterpret_cast<uint64_t*>(registers[opr.self].u64);
-		VM_CHECK_POINTER(object, opr);
+		VM_CHECK_POINTER(object, opr.self);
 		registers[opr.lvid].u64 = object[1 + opr.var];
 	}
 
@@ -497,7 +506,7 @@ public:
 		VM_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		uint64_t* object = reinterpret_cast<uint64_t*>(registers[opr.lvid].u64);
-		VM_CHECK_POINTER(object, opr);
+		VM_CHECK_POINTER(object, opr.lvid);
 		++(object[0]); // +ref
 	}
 
@@ -506,7 +515,7 @@ public:
 		VM_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		uint64_t* object = reinterpret_cast<uint64_t*>(registers[opr.lvid].u64);
-		VM_CHECK_POINTER(object, opr);
+		VM_CHECK_POINTER(object, opr.lvid);
 		if (0 == --(object[0])) // -unref
 			destroy(object, opr.atomid);
 	}
@@ -644,6 +653,36 @@ public:
 		if (unlikely(registers[opr.lvid].u64 == 0))
 			return emitAssert();
 	}
+
+
+	void visit(const ir::isa::Operand<ir::isa::Op::jzraise>& opr) {
+		VM_PRINT_OPCODE(opr);
+		if (not unwindRaisedError)
+			gotoLabel(opr.label);
+	}
+
+
+	void visit(const ir::isa::Operand<ir::isa::Op::jmperrhandler>& opr) {
+		if (opr.atomid == raisedErrorAtomid or opr.atomid == 0) {
+			if (opr.atomid != 0) {
+				registers[opr.label + 1].u64 = reinterpret_cast<uint64_t>(raisedError);
+			}
+			else {
+				auto* atom = reinterpret_cast<Atom*>(raisedError);
+				Atom* dtor = nullptr;
+				atom->findFuncAtom(dtor, "^dispose");
+				if (unlikely(dtor == nullptr))
+					emitInvalidDtor(atom);
+				destroy(reinterpret_cast<uint64_t*>(raisedError), dtor->atomid);
+			}
+			unwindRaisedError = false;
+			gotoLabel(opr.label);
+		}
+	}
+
+
+	void visit(const ir::isa::Operand<ir::isa::Op::raise>&);
+
 
 	template<ir::isa::Op O> void visit(const ir::isa::Operand<O>& opr) {
 		VM_PRINT_OPCODE(opr);

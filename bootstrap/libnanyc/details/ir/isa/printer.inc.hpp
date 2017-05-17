@@ -279,6 +279,8 @@ namespace // anonymous
 
 		void print(const Operand<Op::raise>& operands) {
 			line() << "raise %" << operands.lvid;
+			if (operands.label != 0)
+				out << ", jmp %" << operands.label;
 		}
 
 
@@ -421,6 +423,27 @@ namespace // anonymous
 		void print(const Operand<Op::jnz>& operands) {
 			line() << "jnz %" << operands.lvid << " != 0, %" << operands.result;
 			out << ", goto lbl " << operands.label;
+		}
+
+
+		void print(const Operand<Op::jzraise>& operands) {
+			line() << "jzraise goto lbl " << operands.label;
+		}
+
+
+		void print(const Operand<Op::jmperrhandler>& operands) {
+			line() << "jmp " << operands.label << " if raise type ";
+			if (operands.atomid != 0) {
+				out << operands.atomid;
+				if (atommap) {
+					out << " // ";
+					auto atom = atommap->findAtom(operands.atomid);
+					if (atom)
+						out << " '" << atom->caption() << '\'';
+				}
+			}
+			else
+				out << "<any>";
 		}
 
 

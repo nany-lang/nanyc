@@ -144,11 +144,11 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::ret>& operands) {
 						return frame->invalidate(retlvid);
 				}
 				tryToAcquireObject(*this, retlvid, spare);
-				releaseScopedVariables(0 /*all scopes*/);
+				releaseAllScopedVariables();
 				ir::emit::ret(out, retlvid, 0);
 			}
 			else {
-				releaseScopedVariables(0 /*all scopes*/);
+				releaseAllScopedVariables();
 				ir::emit::ret(out);
 			}
 			break;

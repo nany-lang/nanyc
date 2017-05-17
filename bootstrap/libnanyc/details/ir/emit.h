@@ -398,6 +398,19 @@ inline void jnz(IRCodeRef ref, uint32_t lvid, uint32_t result, uint32_t label) {
 }
 
 
+inline void jzraise(IRCodeRef ref, uint32_t labelid) {
+	auto& opc = ref.ircode.emit<isa::Op::jzraise>();
+	opc.label = labelid;
+}
+
+
+inline void jmperrhandler(IRCodeRef ref, uint32_t atomid, uint32_t label) {
+	auto& opc  = ref.ircode.emit<isa::Op::jmperrhandler>();
+	opc.atomid = atomid;
+	opc.label  = label;
+}
+
+
 inline void identify(IRCodeRef ref, uint32_t lvid, const AnyString& name, uint32_t self) {
 	auto& operands = ref.ircode.emit<isa::Op::identify>();
 	operands.lvid  = lvid;
@@ -406,10 +419,11 @@ inline void identify(IRCodeRef ref, uint32_t lvid, const AnyString& name, uint32
 }
 
 
-inline void namealias(IRCodeRef ref, uint32_t lvid, const AnyString& name) {
+inline void namealias(IRCodeRef ref, uint32_t lvid, const AnyString& name, bool forceNonSynthetic = false) {
 	auto& operands = ref.ircode.emit<isa::Op::namealias>();
 	operands.lvid  = lvid;
 	operands.name  = ref.ircode.stringrefs.ref(name);
+	operands.forceNonSynthetic = forceNonSynthetic ? 1 : 0;
 }
 
 
@@ -482,8 +496,11 @@ inline void ret(IRCodeRef ref, uint32_t lvid, uint32_t tmplvid) {
 }
 
 
-inline void raise(IRCodeRef ref, uint32_t lvid) {
-	ref.ircode.emit<isa::Op::raise>().lvid = lvid;
+inline void raise(IRCodeRef ref, uint32_t lvid, uint32_t labelid = 0, uint32_t atomid = 0) {
+	auto& operands = ref.ircode.emit<isa::Op::raise>();
+	operands.lvid  = lvid;
+	operands.label = labelid;
+	operands.atomid = atomid;
 }
 
 
@@ -566,12 +583,10 @@ namespace on {
 namespace {
 
 
-inline uint32_t scopefail(IRCodeRef ref, uint32_t lvid, uint32_t label) {
-	uint32_t offset = ref.ircode.opcodeCount();
+inline void scopefail(IRCodeRef ref, uint32_t lvid, uint32_t label) {
 	auto& operands = ref.ircode.emit<isa::Op::onscopefail>();
 	operands.lvid  = lvid;
 	operands.label = label;
-	return offset;
 }
 
 

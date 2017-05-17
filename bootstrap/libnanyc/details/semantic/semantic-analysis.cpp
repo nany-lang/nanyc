@@ -122,6 +122,8 @@ uint32_t Analyzer::createLocalVariables(uint32_t count) {
 inline void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::namealias>& operands) {
 	const auto& name = currentSequence.stringrefs[operands.name];
 	declareNamedVariable(name, operands.lvid);
+	if (operands.forceNonSynthetic != 0)
+		frame->lvids(operands.lvid).synthetic = false;
 }
 
 

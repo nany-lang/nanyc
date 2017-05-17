@@ -102,6 +102,8 @@ bool Scope::visitASTExprOnScopeFail(AST::Node& scopeNode, AST::Node& scopeFailNo
 	if (!findParameter(*this, scopeFailNode, lvidType, name))
 		return false;
 	auto& irout = ircode();
+	ir::emit::trace(irout, "begin 'on scope fail'");
+	ir::emit::scopeBegin(irout); // closed when unregistering the error handler
 	// skip the entire block
 	uint32_t ignJmp = ir::emit::jmp(irout);
 	// label to trigger the error handler
@@ -110,27 +112,31 @@ bool Scope::visitASTExprOnScopeFail(AST::Node& scopeNode, AST::Node& scopeFailNo
 		if (name.empty())
 			return 0;
 		// the error itself
+		// lvid always 'startLabel + 1'
 		uint32_t var = ir::emit::alloc(irout, nextvar());
+		ir::emit::type::qualifierRef(irout, var, true);
 		if (lvidType != 0) {
 			auto& operands    = irout.emit<isa::Op::follow>();
 			operands.follower = var;
 			operands.lvid     = lvidType;
 			operands.symlink  = 0;
+			ir::emit::namealias(irout, var, name, true);
 		}
 		return var;
 	}();
-	// register the 'on scope fail'
+	if (not visitASTExprScope(scopeNode))
+		return false;
+	// register the 'on scope fail' after the code for the error handler to not be reused
 	emitDebugpos(scopeFailNode);
 	ir::emit::on::scopefail(irout, var, startLabel);
-	{
-		if (not visitASTExprScope(scopeNode))
-			return false;
-	}
+	if (var != 0)
+		ir::emit::unref(irout, var, 0);
 	// jmp at the end of the original scope
 	uint32_t jmpOffset = ir::emit::jmp(irout);
 	onScopeFailExitLabels.emplace_back(scopeFailNode, jmpOffset, var);
 	// emit label to skip the entire block
 	irout.at<ir::isa::Op::jmp>(ignJmp).label = ir::emit::label(irout, nextvar());
+	ir::emit::trace(irout, "end 'on scope fail'");
 	return true;
 }
 

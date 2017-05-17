@@ -19,11 +19,14 @@ void exception(const Context& context, const AnyString& string) noexcept {
 }
 
 
-void unknownPointer(const Context& context, void* ptr, uint32_t opcodeOffset) noexcept {
+void unknownPointer(const Context& context, void* ptr, uint32_t opcodeOffset, uint32_t lvid) noexcept {
 	ShortString128 msg; // no memory allocation
-	msg << "unknown pointer " << ptr;
-	if (opcodeOffset != 0)
-		msg << ", opcode: +" << opcodeOffset;
+	msg << "unknown pointer ";
+	if (opcodeOffset != 0) {
+		msg << '%' << lvid << " = " << ptr << ", opcode offset +" << opcodeOffset;
+	}
+	else
+		msg << ptr;
 	exception(context, msg);
 }
 
@@ -74,6 +77,18 @@ void invalidIntrinsicParameterType(const Context& context) noexcept {
 void unexpectedOpcode(const Context& context, const AnyString& name) noexcept {
 	ShortString64 msg;
 	msg << "unexpected opcode '" << name << '\'';
+	exception(context, msg);
+}
+
+
+void invalidDtor(const Context& context, const Atom* atom) noexcept {
+	String msg;
+	msg << "invalid destructor for atom '";
+	if (atom)
+		msg << atom->caption();
+	else
+		msg << "<null-pointer>";
+	msg << '\'';
 	exception(context, msg);
 }
 

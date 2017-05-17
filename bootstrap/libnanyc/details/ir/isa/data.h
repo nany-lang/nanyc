@@ -539,6 +539,7 @@ template<> struct Operand<ny::ir::isa::Op::namealias> final {
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t name;
+	uint32_t forceNonSynthetic;
 	template<class T> void eachLVID(T& c) {
 		c(lvid);
 	}
@@ -623,6 +624,23 @@ template<> struct Operand<ny::ir::isa::Op::jnz> final {
 	uint32_t label;
 	template<class T> void eachLVID(T& c) {
 		c(lvid, result, label);
+	}
+};
+
+template<> struct Operand<ny::ir::isa::Op::jzraise> final {
+	uint32_t opcode;
+	uint32_t label;
+	template<class T> void eachLVID(T& c) {
+		c(label);
+	}
+};
+
+template<> struct Operand<ny::ir::isa::Op::jmperrhandler> final {
+	uint32_t opcode;
+	uint32_t atomid;
+	uint32_t label;
+	template<class T> void eachLVID(T& c) {
+		c(label);
 	}
 };
 
@@ -958,8 +976,10 @@ template<> struct Operand<ny::ir::isa::Op::onscopefail> final {
 template<> struct Operand<ny::ir::isa::Op::raise> final {
 	uint32_t opcode;
 	uint32_t lvid;
+	uint32_t label;
+	uint32_t atomid;
 	template<class T> void eachLVID(T& c) {
-		c(lvid);
+		c(lvid, label);
 	}
 };
 

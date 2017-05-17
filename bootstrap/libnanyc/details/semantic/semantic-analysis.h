@@ -127,6 +127,16 @@ struct OnScopeFailHandlers final {
 			and std::get<const Atom*>(m_handlers.back()) == atom;
 	}
 
+	uint32_t scope() const {
+		assert(not m_handlers.empty());
+		return std::get<Handler>(m_handlers[0]).scope;
+	}
+
+	template<class T> void eachTypedErrorHandler(const T& callback) const {
+		for (auto& item: m_handlers)
+			callback(std::get<Handler>(item), std::get<const Atom*>(item));
+	}
+
 private:
 	// all typed errors handlers
 	std::vector<std::tuple<const Atom*, Handler>> m_handlers;
@@ -158,6 +168,7 @@ struct Analyzer final {
 	void visit(const ir::isa::Operand<ir::isa::Op::jmp>&);
 	void visit(const ir::isa::Operand<ir::isa::Op::jnz>&);
 	void visit(const ir::isa::Operand<ir::isa::Op::jz>&);
+	void visit(const ir::isa::Operand<ir::isa::Op::jzraise>&);
 	void visit(const ir::isa::Operand<ir::isa::Op::label>&);
 	void visit(const ir::isa::Operand<ir::isa::Op::namealias>&);
 	void visit(const ir::isa::Operand<ir::isa::Op::nop>&);
@@ -217,6 +228,9 @@ struct Analyzer final {
 	** \param forget Flag to avoid (or not) to release those variables again
 	*/
 	void releaseScopedVariables(int scope, bool forget = false);
+
+	//! Emit 'unred' opcodes for all variables available in all scopes
+	void releaseAllScopedVariables();
 	//@}
 
 
@@ -352,6 +366,7 @@ public:
 	bodystart;
 
 	OnScopeFailHandlers onScopeFail;
+	Atom* lastCallWithRaisedError = nullptr;
 
 	struct {
 		uint32_t label = 0;

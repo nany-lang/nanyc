@@ -675,6 +675,7 @@ struct OpcodeReader final {
 			case ir::isa::Op::jmp:
 			case ir::isa::Op::jz:
 			case ir::isa::Op::jnz:
+			case ir::isa::Op::jzraise:
 			case ir::isa::Op::nop:
 			case ir::isa::Op::commontype:
 			case ir::isa::Op::onscopefail:

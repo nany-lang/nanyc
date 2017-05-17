@@ -1,4 +1,5 @@
 #include "semantic-analysis.h"
+#include "details/semantic/ref-unref.h"
 
 using namespace Yuni;
 
@@ -17,10 +18,13 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::raise>& operands) {
 	auto* atomError = cdeftable.findClassdefAtom(cdef);
 	if (atomError == nullptr)
 		return (void)(error() << "only user-defined classes can be used for raising an error");
+	ir::emit::trace(out, "begin 'raise'");
+	ir::emit::ref(out, operands.lvid);
+	uint32_t labelid = 0;
 	if (onScopeFail.empty()) {
 		// not within an error handler defined by the current function
 		frame->atom.funcinfo.raisedErrors.add(*atomError, frame->atom, currentLine, currentOffset);
-		releaseScopedVariables(0 /*all scopes*/);
+		releaseAllScopedVariables();
 	}
 	else {
 		// within an error handler defined by the function
@@ -28,9 +32,13 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::raise>& operands) {
 		if (unlikely(handler == nullptr))
 			return complainNoErrorHandler(*atomError, nullptr, {});
 		handler->used = true;
+		labelid = handler->label;
 		releaseScopedVariables(handler->scope);
 	}
-	ir::emit::raise(out, operands.lvid);
+	++codeGenerationLock;
+	tryUnrefObject(*this, operands.lvid); // ensure the presence of the dtor in 'Atom::classinfo'
+	--codeGenerationLock;
+	ir::emit::raise(out, operands.lvid, labelid, atomError->atomid);
 }
 
 
