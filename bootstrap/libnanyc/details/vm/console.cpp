@@ -19,11 +19,14 @@ void exception(const Context& context, const AnyString& string) noexcept {
 }
 
 
-void unknownPointer(const Context& context, void* ptr, uint32_t opcodeOffset) noexcept {
+void unknownPointer(const Context& context, void* ptr, uint32_t opcodeOffset, uint32_t lvid) noexcept {
 	ShortString128 msg; // no memory allocation
-	msg << "unknown pointer " << ptr;
-	if (opcodeOffset != 0)
-		msg << ", opcode: +" << opcodeOffset;
+	msg << "unknown pointer ";
+	if (opcodeOffset != 0) {
+		msg << '%' << lvid << " = " << ptr << ", opcode offset +" << opcodeOffset;
+	}
+	else
+		msg << ptr;
 	exception(context, msg);
 }
 

@@ -87,8 +87,8 @@ void ContextRunner::emitDividedByZero() {
 }
 
 
-void ContextRunner::emitUnknownPointer(void* p) {
-	ny::vm::console::unknownPointer(context, p, ircode.get().offsetOf(**cursor));
+void ContextRunner::emitUnknownPointer(void* p, uint32_t lvid) {
+	ny::vm::console::unknownPointer(context, p, ircode.get().offsetOf(**cursor), lvid);
 	abortMission();
 }
 
@@ -260,7 +260,7 @@ void ContextRunner::visit(const ir::isa::Operand<ir::isa::Op::memrealloc>& opr) 
 	oldsize += config::extraObjectSize;
 	newsize += config::extraObjectSize;
 	if (object) {
-		VM_CHECK_POINTER(object, opr);
+		VM_CHECK_POINTER(object, opr.lvid);
 		if (unlikely(not memchecker.checkObjectSize(object, static_cast<size_t>(oldsize))))
 			return emitPointerSizeMismatch(object, oldsize);
 		memchecker.forget(object);
@@ -285,7 +285,7 @@ void ContextRunner::visit(const ir::isa::Operand<ir::isa::Op::memfree>& opr) {
 	ASSERT_LVID(opr.regsize);
 	uint64_t* object = reinterpret_cast<uint64_t*>(registers[opr.lvid].u64);
 	if (object) {
-		VM_CHECK_POINTER(object, opr);
+		VM_CHECK_POINTER(object, opr.lvid);
 		size_t size = static_cast<size_t>(registers[opr.regsize].u64);
 		size += config::extraObjectSize;
 		if (unlikely(not memchecker.checkObjectSize(object, static_cast<size_t>(size))))

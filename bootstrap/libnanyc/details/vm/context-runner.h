@@ -17,7 +17,7 @@
 
 #define VM_CHECK_POINTER(P,LVID)  if (unlikely(not memchecker.has((P)))) \
 	{ \
-		emitUnknownPointer((P)); /*assert(false and "invalid pointer");*/ \
+		emitUnknownPointer((P), (LVID)); /*assert(false and "invalid pointer");*/ \
 	}
 
 
@@ -90,7 +90,7 @@ public:
 	[[noreturn]] void emitInvalidIntrinsicParamType();
 	[[noreturn]] void emitInvalidReturnType();
 	[[noreturn]] void emitDividedByZero();
-	[[noreturn]] void emitUnknownPointer(void* p);
+	[[noreturn]] void emitUnknownPointer(void* p, uint32_t lvid);
 	[[noreturn]] void emitLabelError(uint32_t label);
 	[[noreturn]] void emitInvalidDtor(const Atom*);
 
@@ -463,7 +463,7 @@ public:
 		assert(opr.self < registerCount);
 		ASSERT_LVID(opr.lvid);
 		uint64_t* object = reinterpret_cast<uint64_t*>(registers[opr.self].u64);
-		VM_CHECK_POINTER(object, opr);
+		VM_CHECK_POINTER(object, opr.self);
 		object[1 + opr.var] = registers[opr.lvid].u64;
 	}
 
@@ -472,7 +472,7 @@ public:
 		ASSERT_LVID(opr.self);
 		ASSERT_LVID(opr.lvid);
 		uint64_t* object = reinterpret_cast<uint64_t*>(registers[opr.self].u64);
-		VM_CHECK_POINTER(object, opr);
+		VM_CHECK_POINTER(object, opr.self);
 		registers[opr.lvid].u64 = object[1 + opr.var];
 	}
 
@@ -506,7 +506,7 @@ public:
 		VM_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		uint64_t* object = reinterpret_cast<uint64_t*>(registers[opr.lvid].u64);
-		VM_CHECK_POINTER(object, opr);
+		VM_CHECK_POINTER(object, opr.lvid);
 		++(object[0]); // +ref
 	}
 
@@ -515,7 +515,7 @@ public:
 		VM_PRINT_OPCODE(opr);
 		ASSERT_LVID(opr.lvid);
 		uint64_t* object = reinterpret_cast<uint64_t*>(registers[opr.lvid].u64);
-		VM_CHECK_POINTER(object, opr);
+		VM_CHECK_POINTER(object, opr.lvid);
 		if (0 == --(object[0])) // -unref
 			destroy(object, opr.atomid);
 	}
