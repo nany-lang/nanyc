@@ -103,6 +103,7 @@ bool Scope::visitASTExprOnScopeFail(AST::Node& scopeNode, AST::Node& scopeFailNo
 		return false;
 	auto& irout = ircode();
 	ir::emit::trace(irout, "begin 'on scope fail'");
+	ir::emit::scopeBegin(irout); // closed when unregistering the error handler
 	// skip the entire block
 	uint32_t ignJmp = ir::emit::jmp(irout);
 	// label to trigger the error handler

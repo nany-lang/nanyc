@@ -85,6 +85,7 @@ void Scope::updateOnScopeFailExitLabels() {
 		emitDebugpos(details.node);
 		// unregister the 'on scope fail'
 		ir::emit::on::scopefail(irout, details.var, 0);
+		ir::emit::scopeEnd(irout);
 		// update label to jump at the end of the scope
 		irout.at<ir::isa::Op::jmp>(details.jmpOffset).label = label;
 	}
