@@ -128,8 +128,9 @@ struct OnScopeFailHandlers final {
 	}
 
 	uint32_t scope() const {
-		assert(not m_handlers.empty());
-		return std::get<Handler>(m_handlers[0]).scope;
+		assert(not empty());
+		auto& handler = (not m_any.empty()) ?  m_any : std::get<Handler>(m_handlers[0]);
+		return handler.scope;
 	}
 
 	template<class T> void eachTypedErrorHandler(const T& callback) const {
