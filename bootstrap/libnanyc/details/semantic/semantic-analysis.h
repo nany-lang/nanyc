@@ -64,6 +64,14 @@ struct OnScopeFailHandlers final {
 		}
 		bool empty() const { return label == 0; }
 
+		bool operator != (const Handler& other) const {
+			return  lvid != other.lvid;
+		}
+
+		bool operator == (const Handler& other) const {
+			return  lvid == other.lvid;
+		}
+
 		uint32_t lvid = 0;
 		uint32_t label = 0;
 		bool used = false;

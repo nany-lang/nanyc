@@ -19,11 +19,11 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::raise>& operands) {
 	if (atomError == nullptr)
 		return (void)(error() << "only user-defined classes can be used for raising an error");
 	ir::emit::trace(out, "begin 'raise'");
-	ir::emit::ref(out, operands.lvid);
 	uint32_t labelid = 0;
 	if (onScopeFail.empty()) {
 		// not within an error handler defined by the current function
 		frame->atom.funcinfo.raisedErrors.add(*atomError, frame->atom, currentLine, currentOffset);
+		ir::emit::ref(out, operands.lvid);
 		releaseAllScopedVariables();
 	}
 	else {
@@ -33,6 +33,8 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::raise>& operands) {
 			return complainNoErrorHandler(*atomError, nullptr, {});
 		handler->used = true;
 		labelid = handler->label;
+		if (*handler != onScopeFail.any())
+			ir::emit::ref(out, operands.lvid);
 		releaseScopedVariables(handler->scope);
 	}
 	++codeGenerationLock;
