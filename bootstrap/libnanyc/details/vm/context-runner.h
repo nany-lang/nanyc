@@ -664,17 +664,19 @@ public:
 
 	void visit(const ir::isa::Operand<ir::isa::Op::jmperrhandler>& opr) {
 		if (opr.atomid == raisedErrorAtomid or opr.atomid == 0) {
+			assert(raisedError != nullptr);
 			if (opr.atomid != 0) {
 				registers[opr.label + 1].u64 = reinterpret_cast<uint64_t>(raisedError);
 			}
 			else {
-				auto* atom = reinterpret_cast<Atom*>(raisedError);
+				auto atom = map.findAtom(raisedErrorAtomid);
 				Atom* dtor = nullptr;
 				atom->findFuncAtom(dtor, "^dispose");
 				if (unlikely(dtor == nullptr))
-					emitInvalidDtor(atom);
+					emitInvalidDtor(&*atom);
 				destroy(reinterpret_cast<uint64_t*>(raisedError), dtor->atomid);
 			}
+			raisedError = nullptr;
 			unwindRaisedError = false;
 			gotoLabel(opr.label);
 		}

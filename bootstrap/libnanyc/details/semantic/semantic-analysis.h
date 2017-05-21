@@ -64,6 +64,14 @@ struct OnScopeFailHandlers final {
 		}
 		bool empty() const { return label == 0; }
 
+		bool operator != (const Handler& other) const {
+			return  lvid != other.lvid;
+		}
+
+		bool operator == (const Handler& other) const {
+			return  lvid == other.lvid;
+		}
+
 		uint32_t lvid = 0;
 		uint32_t label = 0;
 		bool used = false;
@@ -128,8 +136,9 @@ struct OnScopeFailHandlers final {
 	}
 
 	uint32_t scope() const {
-		assert(not m_handlers.empty());
-		return std::get<Handler>(m_handlers[0]).scope;
+		assert(not empty());
+		auto& handler = (not m_any.empty()) ?  m_any : std::get<Handler>(m_handlers[0]);
+		return handler.scope;
 	}
 
 	template<class T> void eachTypedErrorHandler(const T& callback) const {
