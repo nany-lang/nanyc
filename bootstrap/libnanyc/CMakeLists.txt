@@ -406,11 +406,13 @@ add_library(libnanyc ${mode_libnany}
 	"include/nany/nany.h"
 	"include/nanyc/library.h"
 	"include/nanyc/types.h"
+	"include/nanyc/console.h"
 	"libnanyc.h"
 	${nysrc_nsl_stdcore}
 	#
 	"bugreport.cpp"
 	"library.c"
+	"console.cpp"
 )
 
 set_target_properties(libnanyc PROPERTIES
