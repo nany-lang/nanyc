@@ -8,6 +8,7 @@
 #define __LIBNANYC_TYPES_H__
 
 #include <stdint.h>
+#include <stdlib.h> /* size_t */
 
 #ifdef __cplusplus
 extern "C" {
