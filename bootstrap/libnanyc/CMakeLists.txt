@@ -404,15 +404,17 @@ add_library(libnanyc ${mode_libnany}
 	"details/vm/stacktrace.hxx"
 	"details/vm/types.h"
 	"include/nany/nany.h"
+	"include/nanyc/allocator.h"
+	"include/nanyc/console.h"
 	"include/nanyc/library.h"
 	"include/nanyc/types.h"
-	"include/nanyc/console.h"
 	"libnanyc.h"
 	${nysrc_nsl_stdcore}
 	#
+	"allocator.cpp"
 	"bugreport.cpp"
-	"library.c"
 	"console.cpp"
+	"library.c"
 )
 
 set_target_properties(libnanyc PROPERTIES
