@@ -51,6 +51,13 @@ typedef enum nybool_t {
 nybool_t;
 
 
+typedef struct nyanystr_t {
+	const char* c_str;
+	size_t len;
+}
+nyanystr_t;
+
+
 #ifdef __cplusplus
 }
 #endif
