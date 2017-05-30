@@ -298,6 +298,7 @@ add_library(libnanyc ${mode_libnany}
 	"details/pass/d-object-map/mapping.cpp"
 	"details/pass/d-object-map/mapping.h"
 	"details/pass/e-semantic/semantic.cpp"
+	"details/program/program.h"
 	"details/reporting/fwd.h"
 	"details/reporting/levels.h"
 	"details/reporting/message.cpp"
@@ -407,6 +408,7 @@ add_library(libnanyc ${mode_libnany}
 	"include/nanyc/allocator.h"
 	"include/nanyc/console.h"
 	"include/nanyc/library.h"
+	"include/nanyc/program.h"
 	"include/nanyc/types.h"
 	"libnanyc.h"
 	${nysrc_nsl_stdcore}
@@ -415,6 +417,7 @@ add_library(libnanyc ${mode_libnany}
 	"bugreport.cpp"
 	"console.cpp"
 	"library.c"
+	"program.cpp"
 )
 
 set_target_properties(libnanyc PROPERTIES
