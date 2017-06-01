@@ -42,6 +42,8 @@ extern "C" {
 #   define NY_EXPORT LIBNANYC_VISIBILITY_IMPORT
 #endif
 
+#define LIBNANYC_NYBOOL_T   /* avoid redeclaration with deprecated header */
+#define LIBNANYC_NYANYSTR_T /* avoid redeclaration with deprecated header */
 
 /*! Boolean values */
 typedef enum nybool_t {
