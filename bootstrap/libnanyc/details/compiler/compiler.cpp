@@ -15,6 +15,11 @@ Logs::Report buildGenerateReport(void* ptr, Logs::Level level) {
 	return (*((ny::Logs::Report*) ptr)).fromErrLevel(level);
 }
 
+nyprogram_t* complainNoSource(ny::Logs::Report& report) {
+	report.error() << "no input source code";
+	return nullptr;
+}
+
 } // namespace
 
 inline Compiler::Compiler(const nycompile_opts_t& opts)
@@ -24,6 +29,8 @@ inline Compiler::Compiler(const nycompile_opts_t& opts)
 inline nyprogram_t* Compiler::compile() {
 	ny::Logs::Report report{messages};
 	Logs::Handler errorHandler{&report, &buildGenerateReport};
+	if (unlikely(opts.sources.count == 0))
+		return complainNoSource(report);
 	auto program = std::make_unique<ny::Program>();
 	return ny::Program::pointer(program.release());
 }
