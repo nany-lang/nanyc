@@ -39,11 +39,14 @@ void copySourceOpts(ny::compiler::Source& source, const nysource_opts_t& opts) {
 }
 
 void compileSource(ny::compiler::Source& source) {
+	bool compiled = true;
+	compiled &= makeASTFromSource(source);
+	return compiled;
 }
 
-void importSourceAndCompile(ny::compiler::Source& source, const nysource_opts_t& opts) {
+bool importSourceAndCompile(ny::compiler::Source& source, const nysource_opts_t& opts) {
 	copySourceOpts(source, opts);
-	compileSource(source);
+	return compileSource(source);
 }
 
 } // namespace
@@ -55,15 +58,30 @@ inline Compiler::Compiler(const nycompile_opts_t& opts)
 inline nyprogram_t* Compiler::compile() {
 	ny::Logs::Report report{messages};
 	Logs::Handler errorHandler{&report, &buildGenerateReport};
-	uint32_t scount = opts.sources.count;
-	if (unlikely(scount == 0))
-		return complainNoSource(report);
-	sources.count = scount;
-	sources.items = std::make_unique<Source[]>(scount);
-	for (uint32_t i = 0; i != opts.sources.count; ++i)
-		importSourceAndCompile(sources[i], opts.sources.items[i]);
-	auto program = std::make_unique<ny::Program>();
-	return ny::Program::pointer(program.release());
+	try {
+		uint32_t scount = opts.sources.count;
+		if (unlikely(scount == 0))
+			return complainNoSource(report);
+		sources.count = scount;
+		sources.items = std::make_unique<Source[]>(scount);
+		for (uint32_t i = 0; i != opts.sources.count; ++i)
+			importSourceAndCompile(sources[i], opts.sources.items[i]);
+		auto program = std::make_unique<ny::Program>();
+		return ny::Program::pointer(program.release());
+	}
+	catch (const std::bad_alloc& e) {
+		report.ice() << "not enough memory when compiling";
+	}
+	catch (const std::exception& e) {
+		report.ice() << "exception: " << e.what();
+	}
+	catch (const char* e) {
+		report.error() << e;
+	}
+	catch (...) {
+		report.ice() << "uncaught exception when compiling";
+	}
+	return nullptr;
 }
 
 nyprogram_t* compile(nycompile_opts_t& opts) {
