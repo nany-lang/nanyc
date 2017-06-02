@@ -3,6 +3,7 @@
 #include "details/program/program.h"
 #include "details/reporting/report.h"
 #include "details/errors/errors.h"
+#include "details/pass/a-src2ast/ast-from-source.h"
 #include <yuni/io/file.h>
 #include <libnanyc.h>
 #include <utility>

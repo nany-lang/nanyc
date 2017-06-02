@@ -1,6 +1,9 @@
 #pragma once
 #include <nanyc/program.h>
 #include "details/reporting/message.h"
+#include "details/grammar/nany.h"
+#include "details/ast/tree-index.h"
+#include "details/ir/sequence.h"
 #include <memory>
 #include <cassert>
 
@@ -8,6 +11,20 @@ namespace ny {
 namespace compiler {
 
 struct Source final {
+	struct {
+		//! ny parser for the current content
+		AST::Parser parser;
+		//! Namespace of the file
+		std::pair<YString, AST::Node*> nmspc;
+		//! AST manipulation
+		ASTHelper ast;
+		//! Root node
+		yuni::Ref<AST::Node> rootnode;
+		//! The original sequence, generated from the normalized AST
+		ir::Sequence ircode;
+	}
+	parsing;
+
 	yuni::String content;
 	yuni::String filename;
 };

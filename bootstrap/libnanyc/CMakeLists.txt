@@ -259,6 +259,7 @@ add_library(libnanyc ${mode_libnany}
 	"details/ir/sequence.h"
 	"details/ir/sequence.hxx"
 	"details/pass/a-src2ast/ast-from-source.cpp"
+	"details/pass/a-src2ast/ast-from-source.h"
 	"details/pass/b-ast-normalize/normalize.cpp"
 	"details/pass/c-ast2ir/context.cpp"
 	"details/pass/c-ast2ir/context.h"
