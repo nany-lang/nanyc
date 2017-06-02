@@ -38,15 +38,18 @@ void copySourceOpts(ny::compiler::Source& source, const nysource_opts_t& opts) {
 	}
 }
 
-void compileSource(ny::compiler::Source& source) {
+bool compileSource(ny::Logs::Report& mainreport, ny::compiler::Source& source) {
+	auto report = mainreport.subgroup();
+	report.data().origins.location.filename = source.filename;
+	report.data().origins.location.target.clear();
 	bool compiled = true;
 	compiled &= makeASTFromSource(source);
 	return compiled;
 }
 
-bool importSourceAndCompile(ny::compiler::Source& source, const nysource_opts_t& opts) {
+bool importSourceAndCompile(ny::Logs::Report& mainreport, ny::compiler::Source& source, const nysource_opts_t& opts) {
 	copySourceOpts(source, opts);
-	return compileSource(source);
+	return compileSource(mainreport, source);
 }
 
 } // namespace
@@ -64,10 +67,13 @@ inline nyprogram_t* Compiler::compile() {
 			return complainNoSource(report);
 		sources.count = scount;
 		sources.items = std::make_unique<Source[]>(scount);
+		bool compiled = true;
 		for (uint32_t i = 0; i != opts.sources.count; ++i)
-			importSourceAndCompile(sources[i], opts.sources.items[i]);
-		auto program = std::make_unique<ny::Program>();
-		return ny::Program::pointer(program.release());
+			compiled &= importSourceAndCompile(report, sources[i], opts.sources.items[i]);
+		if (compiled) {
+			auto program = std::make_unique<ny::Program>();
+			return ny::Program::pointer(program.release());
+		}
 	}
 	catch (const std::bad_alloc& e) {
 		report.ice() << "not enough memory when compiling";
