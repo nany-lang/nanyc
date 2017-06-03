@@ -5,6 +5,7 @@
 #include "details/ast/tree-index.h"
 #include "details/ir/sequence.h"
 #include "details/atom/classdef-table.h"
+#include "details/intrinsic/catalog.h"
 #include <memory>
 #include <cassert>
 
@@ -38,6 +39,7 @@ struct Compiler final {
 
 	yuni::Mutex mutex;
 	ClassdefTable cdeftable;
+	intrinsic::Catalog intrinsics;
 	const nycompile_opts_t& opts;
 	Logs::Message messages{Logs::Level::none};
 	struct final {

@@ -7,6 +7,8 @@
 #include "details/pass/b-ast-normalize/normalize.h"
 #include "details/pass/c-ast2ir/source-ast-to-ir.h"
 #include "details/pass/d-object-map/attach.h"
+#include "details/vm/runtime/std.core.h"
+#include "libnanyc-config.h"
 #include <yuni/io/file.h>
 #include <libnanyc.h>
 #include <utility>
@@ -41,6 +43,16 @@ void copySourceOpts(ny::compiler::Source& source, const nysource_opts_t& opts) {
 	}
 }
 
+void importCompilerIntrinsics(intrinsic::Catalog& intrinsics) {
+	nsl::import::string(intrinsics);
+	nsl::import::process(intrinsics);
+	nsl::import::env(intrinsics);
+	nsl::import::io(intrinsics);
+	nsl::import::memory(intrinsics);
+	nsl::import::console(intrinsics);
+	nsl::import::digest(intrinsics);
+}
+
 bool compileSource(ny::Logs::Report& mainreport, ny::compiler::Compiler& compiler, ny::compiler::Source& source) {
 	auto report = mainreport.subgroup();
 	report.data().origins.location.filename = source.filename;
@@ -71,6 +83,8 @@ inline nyprogram_t* Compiler::compile() {
 		uint32_t scount = opts.sources.count;
 		if (unlikely(scount == 0))
 			return complainNoSource(report);
+		if (config::importNSL)
+			importCompilerIntrinsics(intrinsics);
 		sources.count = scount;
 		sources.items = std::make_unique<Source[]>(scount);
 		bool compiled = true;
