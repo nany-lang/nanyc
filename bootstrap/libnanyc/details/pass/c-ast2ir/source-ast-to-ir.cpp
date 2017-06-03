@@ -17,8 +17,9 @@ bool Source::passTransformASTToIR(Logs::Report& report) {
 	if (unlikely(astnodes.empty()))
 		return true;
 	auto& irout = buildinfo.parsing.ircode;
+	bool ignoreAtoms = buildinfo.cf.ignore_atoms != nyfalse;
 	// helper for generating IR code
-	auto producer = std::make_unique<ir::Producer::Context>(buildinfo.cf, m_filename, irout, report);
+	auto producer = std::make_unique<ir::Producer::Context>(buildinfo.cf, m_filename, irout, report, ignoreAtoms);
 	// generate namespace-related opcodes
 	producer->useNamespace(buildinfo.parsing.nmspc.first);
 	// map code offset (in bytes) with line numbers (from source input)

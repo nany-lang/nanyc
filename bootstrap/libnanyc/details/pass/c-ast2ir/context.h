@@ -31,7 +31,7 @@ public:
 	//! \name Constructor & Destructor
 	//@{
 	//! Default constructor
-	explicit Context(nybuild_cf_t&, AnyString filename, Sequence&, Logs::Report);
+	explicit Context(nybuild_cf_t&, AnyString filename, Sequence&, Logs::Report, bool ignoreAtoms);
 	//@}
 
 
