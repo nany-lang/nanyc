@@ -22,15 +22,6 @@ Context::Context(nybuild_cf_t& cf, AnyString filename, Sequence& ircode, Logs::R
 
 Logs::Report Context::emitReportEntry(void* self, Logs::Level level) {
 	auto& ctx = *(reinterpret_cast<Context*>(self));
-	switch (level) {
-		default:
-			break;
-		case Logs::Level::warning: {
-			if (ctx.cf.warnings_into_errors != nyfalse)
-				level = Logs::Level::error;
-			break;
-		}
-	}
 	return ctx.report.fromErrLevel(level);
 }
 
