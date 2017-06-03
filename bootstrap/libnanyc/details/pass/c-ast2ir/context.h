@@ -241,6 +241,12 @@ public:
 	//! Debug current source filename
 	AnyString dbgSourceFilename;
 
+	struct final {
+		void* userdata = nullptr;
+		void (*on_unittest)(void* userdata, const char* mod, uint32_t mlen, const char* name, uint32_t nlen) = nullptr;
+	}
+	event;
+
 private:
 	friend class Scope;
 	static Logs::Report emitReportEntry(void*, Logs::Level level);
