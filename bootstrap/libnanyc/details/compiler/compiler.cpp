@@ -5,6 +5,7 @@
 #include "details/errors/errors.h"
 #include "details/pass/a-src2ast/ast-from-source.h"
 #include "details/pass/b-ast-normalize/normalize.h"
+#include "details/pass/c-ast2ir/source-ast-to-ir.h"
 #include <yuni/io/file.h>
 #include <libnanyc.h>
 #include <utility>
@@ -46,6 +47,7 @@ bool compileSource(ny::Logs::Report& mainreport, ny::compiler::Source& source) {
 	bool compiled = true;
 	compiled &= makeASTFromSource(source);
 	compiled &= passDuplicateAndNormalizeAST(source, report);
+	compiled &= passTransformASTToIR(source, report);
 	return compiled;
 }
 

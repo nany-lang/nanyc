@@ -299,6 +299,7 @@ add_library(libnanyc ${mode_libnany}
 	"details/pass/c-ast2ir/scope.h"
 	"details/pass/c-ast2ir/scope.hxx"
 	"details/pass/c-ast2ir/source-ast-to-ir.cpp"
+	"details/pass/c-ast2ir/source-ast-to-ir.h"
 	"details/pass/d-object-map/attach.cpp"
 	"details/pass/d-object-map/mapping.cpp"
 	"details/pass/d-object-map/mapping.h"
