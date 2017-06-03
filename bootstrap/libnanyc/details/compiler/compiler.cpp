@@ -6,6 +6,7 @@
 #include "details/pass/a-src2ast/ast-from-source.h"
 #include "details/pass/b-ast-normalize/normalize.h"
 #include "details/pass/c-ast2ir/source-ast-to-ir.h"
+#include "details/pass/d-object-map/attach.h"
 #include <yuni/io/file.h>
 #include <libnanyc.h>
 #include <utility>
@@ -40,7 +41,7 @@ void copySourceOpts(ny::compiler::Source& source, const nysource_opts_t& opts) {
 	}
 }
 
-bool compileSource(ny::Logs::Report& mainreport, ny::compiler::Source& source) {
+bool compileSource(ny::Logs::Report& mainreport, ny::compiler::Compiler& compiler, ny::compiler::Source& source) {
 	auto report = mainreport.subgroup();
 	report.data().origins.location.filename = source.filename;
 	report.data().origins.location.target.clear();
@@ -48,12 +49,13 @@ bool compileSource(ny::Logs::Report& mainreport, ny::compiler::Source& source) {
 	compiled &= makeASTFromSource(source);
 	compiled &= passDuplicateAndNormalizeAST(source, report);
 	compiled &= passTransformASTToIR(source, report);
+	compiled  = compiled and attach(compiler, source);
 	return compiled;
 }
 
-bool importSourceAndCompile(ny::Logs::Report& mainreport, ny::compiler::Source& source, const nysource_opts_t& opts) {
+bool importSourceAndCompile(ny::Logs::Report& mainreport, ny::compiler::Compiler& compiler, ny::compiler::Source& source, const nysource_opts_t& opts) {
 	copySourceOpts(source, opts);
-	return compileSource(mainreport, source);
+	return compileSource(mainreport, compiler, source);
 }
 
 } // namespace
@@ -73,7 +75,7 @@ inline nyprogram_t* Compiler::compile() {
 		sources.items = std::make_unique<Source[]>(scount);
 		bool compiled = true;
 		for (uint32_t i = 0; i != opts.sources.count; ++i)
-			compiled &= importSourceAndCompile(report, sources[i], opts.sources.items[i]);
+			compiled &= importSourceAndCompile(report, *this, sources[i], opts.sources.items[i]);
 		if (compiled) {
 			auto program = std::make_unique<ny::Program>();
 			return ny::Program::pointer(program.release());

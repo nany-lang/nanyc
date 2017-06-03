@@ -4,6 +4,7 @@
 #include "details/grammar/nany.h"
 #include "details/ast/tree-index.h"
 #include "details/ir/sequence.h"
+#include "details/atom/classdef-table.h"
 #include <memory>
 #include <cassert>
 
@@ -27,12 +28,16 @@ struct Source final {
 
 	yuni::String content;
 	yuni::String filename;
+
+	ir::Sequence& sequence() { return parsing.ircode; }
 };
 
 struct Compiler final {
 	Compiler(const nycompile_opts_t&);
 	nyprogram_t* compile();
 
+	yuni::Mutex mutex;
+	ClassdefTable cdeftable;
 	const nycompile_opts_t& opts;
 	Logs::Message messages{Logs::Level::none};
 	struct final {
