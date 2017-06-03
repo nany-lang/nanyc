@@ -9,9 +9,8 @@ namespace ir {
 namespace Producer {
 
 
-Context::Context(nybuild_cf_t& cf, AnyString filename, Sequence& ircode, Logs::Report report, bool ignoreAtoms)
+Context::Context(AnyString filename, Sequence& ircode, Logs::Report report, bool ignoreAtoms)
 	: ignoreAtoms(ignoreAtoms)
-	, cf(cf)
 	, ircode(ircode)
 	, report(report)
 	, dbgSourceFilename(filename)

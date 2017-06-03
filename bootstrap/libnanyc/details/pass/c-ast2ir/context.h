@@ -31,7 +31,7 @@ public:
 	//! \name Constructor & Destructor
 	//@{
 	//! Default constructor
-	explicit Context(nybuild_cf_t&, AnyString filename, Sequence&, Logs::Report, bool ignoreAtoms);
+	explicit Context(AnyString filename, Sequence&, Logs::Report, bool ignoreAtoms);
 	//@}
 
 
@@ -89,9 +89,6 @@ public:
 public:
 	//! Discard ir code generation for atoms
 	bool ignoreAtoms = false;
-
-	//! Information about the current build
-	nybuild_cf_t& cf;
 	//! Linked ir code
 	Sequence& ircode;
 	//! Reporting

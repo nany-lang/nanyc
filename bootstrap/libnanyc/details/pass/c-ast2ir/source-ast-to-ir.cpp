@@ -19,7 +19,7 @@ bool Source::passTransformASTToIR(Logs::Report& report) {
 	auto& irout = buildinfo.parsing.ircode;
 	bool ignoreAtoms = buildinfo.cf.ignore_atoms != nyfalse;
 	// helper for generating IR code
-	auto producer = std::make_unique<ir::Producer::Context>(buildinfo.cf, m_filename, irout, report, ignoreAtoms);
+	auto producer = std::make_unique<ir::Producer::Context>(m_filename, irout, report, ignoreAtoms);
 	producer->event.userdata = buildinfo.cf.userdata;
 	producer->event.on_unittest = buildinfo.cf.on_unittest;
 	// generate namespace-related opcodes
