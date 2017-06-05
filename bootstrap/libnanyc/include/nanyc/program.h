@@ -41,6 +41,7 @@ typedef struct nycompile_opts_t {
 	void* (*on_build_start)(void* userdata);
 	void (*on_build_stop)(void* userdata, nybool_t success);
 	void (*on_file_eaccess)(void*, const nysource_opts_t*);
+	void (*on_unittest)(void* userdata, const char* mod, uint32_t mlen, const char* name, uint32_t nlen);
 }
 nycompile_opts_t;
 

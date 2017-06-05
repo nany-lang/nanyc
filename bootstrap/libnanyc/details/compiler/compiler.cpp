@@ -53,21 +53,21 @@ void importCompilerIntrinsics(intrinsic::Catalog& intrinsics) {
 	nsl::import::digest(intrinsics);
 }
 
-bool compileSource(ny::Logs::Report& mainreport, ny::compiler::Compiler& compiler, ny::compiler::Source& source) {
+bool compileSource(ny::Logs::Report& mainreport, ny::compiler::Compiler& compiler, ny::compiler::Source& source, const nycompile_opts_t& gopts) {
 	auto report = mainreport.subgroup();
 	report.data().origins.location.filename = source.filename;
 	report.data().origins.location.target.clear();
 	bool compiled = true;
 	compiled &= makeASTFromSource(source);
 	compiled &= passDuplicateAndNormalizeAST(source, report);
-	compiled &= passTransformASTToIR(source, report);
+	compiled &= passTransformASTToIR(source, report, gopts);
 	compiled  = compiled and attach(compiler, source);
 	return compiled;
 }
 
-bool importSourceAndCompile(ny::Logs::Report& mainreport, ny::compiler::Compiler& compiler, ny::compiler::Source& source, const nysource_opts_t& opts) {
+bool importSourceAndCompile(ny::Logs::Report& mainreport, ny::compiler::Compiler& compiler, ny::compiler::Source& source, const nycompile_opts_t& gopts, const nysource_opts_t& opts) {
 	copySourceOpts(source, opts);
-	return compileSource(mainreport, compiler, source);
+	return compileSource(mainreport, compiler, source, gopts);
 }
 
 } // namespace
@@ -89,8 +89,8 @@ inline nyprogram_t* Compiler::compile() {
 		sources.items = std::make_unique<Source[]>(scount);
 		bool compiled = true;
 		for (uint32_t i = 0; i != opts.sources.count; ++i)
-			compiled &= importSourceAndCompile(report, *this, sources[i], opts.sources.items[i]);
-		if (compiled) {
+			compiled &= importSourceAndCompile(report, *this, sources[i], opts, opts.sources.items[i]);
+		if (compiled and !opts.on_unittest) {
 			auto program = std::make_unique<ny::Program>();
 			return ny::Program::pointer(program.release());
 		}

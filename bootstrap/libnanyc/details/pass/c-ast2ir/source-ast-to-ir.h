@@ -5,7 +5,7 @@
 namespace ny {
 namespace compiler {
 
-bool passTransformASTToIR(ny::compiler::Source&, Logs::Report&);
+bool passTransformASTToIR(ny::compiler::Source&, Logs::Report&, const nycompile_opts_t&);
 
 } // namespace compiler
 } // namespace ny

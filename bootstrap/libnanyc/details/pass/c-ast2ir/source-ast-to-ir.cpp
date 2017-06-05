@@ -54,18 +54,18 @@ bool Source::passTransformASTToIR(Logs::Report& report) {
 namespace ny {
 namespace compiler {
 
-bool passTransformASTToIR(ny::compiler::Source& source, Logs::Report& report) {
+bool passTransformASTToIR(ny::compiler::Source& source, Logs::Report& report, const nycompile_opts_t& opts) {
 	if (unlikely(!source.parsing.rootnode))
 		return false;
 	auto& astnodes = source.parsing.rootnode->children;
 	if (unlikely(astnodes.empty()))
 		return true;
 	auto& irout = source.parsing.ircode;
-	bool ignoreAtoms = false;
+	bool ignoreAtoms = opts.on_unittest != nullptr;
 	// helper for generating IR code
 	auto producer = std::make_unique<ir::Producer::Context>(source.filename, irout, report, ignoreAtoms);
-	producer->event.userdata = nullptr;
-	producer->event.on_unittest = nullptr;
+	producer->event.userdata = opts.userdata;
+	producer->event.on_unittest = opts.on_unittest;
 	// generate namespace-related opcodes
 	producer->useNamespace(source.parsing.nmspc.first);
 	// map code offset (in bytes) with line numbers (from source input)
