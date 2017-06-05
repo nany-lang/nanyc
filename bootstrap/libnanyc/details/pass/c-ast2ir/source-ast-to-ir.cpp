@@ -20,15 +20,15 @@ bool Source::passTransformASTToIR(Logs::Report& report) {
 	auto& irout = buildinfo.parsing.ircode;
 	bool ignoreAtoms = buildinfo.cf.ignore_atoms != nyfalse;
 	// helper for generating IR code
-	auto producer = std::make_unique<ir::Producer::Context>(m_filename, irout, report, ignoreAtoms);
-	producer->event.userdata = buildinfo.cf.userdata;
-	producer->event.on_unittest = buildinfo.cf.on_unittest;
+	ir::Producer::Context producer(m_filename, irout, report, ignoreAtoms);
+	producer.event.userdata = buildinfo.cf.userdata;
+	producer.event.on_unittest = buildinfo.cf.on_unittest;
 	// generate namespace-related opcodes
-	producer->useNamespace(buildinfo.parsing.nmspc.first);
+	producer.useNamespace(buildinfo.parsing.nmspc.first);
 	// map code offset (in bytes) with line numbers (from source input)
-	producer->generateLineIndexes(m_content);
+	producer.generateLineIndexes(m_content);
 	// generate IR code for all AST nodes
-	ir::Producer::Scope scope{*producer};
+	ir::Producer::Scope scope{producer};
 	ir::emit::dbginfo::filename(irout, scope.context.dbgSourceFilename);
 	uint32_t bpoffset = ir::emit::blueprint::unit(irout, m_filename);
 	uint32_t bpoffsiz = ir::emit::pragma::blueprintSize(irout);
@@ -63,15 +63,15 @@ bool passTransformASTToIR(ny::compiler::Source& source, Logs::Report& report, co
 	auto& irout = source.parsing.ircode;
 	bool ignoreAtoms = opts.on_unittest != nullptr;
 	// helper for generating IR code
-	auto producer = std::make_unique<ir::Producer::Context>(source.filename, irout, report, ignoreAtoms);
-	producer->event.userdata = opts.userdata;
-	producer->event.on_unittest = opts.on_unittest;
+	ir::Producer::Context producer(source.filename, irout, report, ignoreAtoms);
+	producer.event.userdata = opts.userdata;
+	producer.event.on_unittest = opts.on_unittest;
 	// generate namespace-related opcodes
-	producer->useNamespace(source.parsing.nmspc.first);
+	producer.useNamespace(source.parsing.nmspc.first);
 	// map code offset (in bytes) with line numbers (from source input)
-	producer->generateLineIndexes(source.parsing.parser.firstSourceContent());
+	producer.generateLineIndexes(source.parsing.parser.firstSourceContent());
 	// generate IR code for all AST nodes
-	ir::Producer::Scope scope{*producer};
+	ir::Producer::Scope scope{producer};
 	ir::emit::dbginfo::filename(irout, scope.context.dbgSourceFilename);
 	uint32_t bpoffset = ir::emit::blueprint::unit(irout, source.filename);
 	uint32_t bpoffsiz = ir::emit::pragma::blueprintSize(irout);
