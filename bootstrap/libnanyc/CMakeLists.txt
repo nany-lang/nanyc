@@ -474,6 +474,7 @@ target_include_directories(libnanyc PUBLIC  "${CMAKE_CURRENT_LIST_DIR}")
 target_include_directories(libnanyc PUBLIC  "${CMAKE_CURRENT_BINARY_DIR}")
 target_include_directories(libnanyc PUBLIC  "${CMAKE_CURRENT_BINARY_DIR}/include")
 target_include_directories(libnanyc PUBLIC  "${CMAKE_CURRENT_LIST_DIR}/include")
+target_include_directories(libnanyc PRIVATE "${__embed_nsl_hxx_dir}")
 target_include_directories(libnanyc-grammar PUBLIC "${CMAKE_CURRENT_BINARY_DIR}")
 
 add_dependencies(libnanyc nanyc-grammar-cpp)

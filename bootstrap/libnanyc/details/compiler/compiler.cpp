@@ -9,6 +9,7 @@
 #include "details/pass/d-object-map/attach.h"
 #include "details/vm/runtime/std.core.h"
 #include "libnanyc-config.h"
+#include "embed-nsl.hxx" // generated
 #include <yuni/io/file.h>
 #include <libnanyc.h>
 #include <utility>
@@ -85,12 +86,30 @@ inline nyprogram_t* Compiler::compile() {
 			return complainNoSource(report);
 		if (config::importNSL)
 			importCompilerIntrinsics(intrinsics);
+		bool withUnittests = (opts.on_unittest != nullptr);
+		if (config::importNSL)
+			scount += corefilesCount;
+		if (unlikely(withUnittests))
+			scount += unittestCount;
 		sources.count = scount;
 		sources.items = std::make_unique<Source[]>(scount);
 		bool compiled = true;
-		for (uint32_t i = 0; i != opts.sources.count; ++i)
-			compiled &= importSourceAndCompile(report, *this, sources[i], opts, opts.sources.items[i]);
-		if (compiled and !opts.on_unittest) {
+		uint32_t offset = 0;
+		if (config::importNSL) {
+			registerNSLCoreFiles(sources, offset, [&](ny::compiler::Source& source) {
+				compiled &= compileSource(report, *this, source, opts);
+			});
+		}
+		if (withUnittests) {
+			registerUnittestFiles(sources, offset, [&](ny::compiler::Source& source) {
+				compiled &= compileSource(report, *this, source, opts);
+			});
+		}
+		for (uint32_t i = 0; i != opts.sources.count; ++i) {
+			auto& source = sources[offset + i];
+			compiled &= importSourceAndCompile(report, *this, source, opts, opts.sources.items[i]);
+		}
+		if (compiled and not withUnittests) {
 			auto program = std::make_unique<ny::Program>();
 			return ny::Program::pointer(program.release());
 		}
