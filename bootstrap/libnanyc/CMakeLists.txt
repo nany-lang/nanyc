@@ -33,6 +33,22 @@ set(nsl_root "${nsl_root}" CACHE INTERNEL "NSL Root path")
 
 include("${nsl_root}/nsl.cmake")
 
+set(__embed_nsl_hxx_dir "${CMAKE_CURRENT_BINARY_DIR}/details/compiler")
+set(__embed_nsl_hxx "${__embed_nsl_hxx_dir}/embed-nsl.hxx")
+add_custom_command(
+	OUTPUT  "${__embed_nsl_hxx}"
+	COMMAND "$<TARGET_FILE:nyt-index-generator>"
+		-o "${__embed_nsl_hxx}"
+		-d "${nsl_root}"
+		-f "${nsl_files}"
+		-u "${nsl_files_unittest}"
+	DEPENDS
+		nyt-index-generator
+		${nsl_files}
+		${nsl_files_unittest}
+	VERBATIM
+)
+
 list(LENGTH nsl_files nsl_files_count)
 list(LENGTH nsl_files_unittest nsl_files_unittest_count)
 nmessage("standard library: added ${nsl_files_count} files (${nsl_files_unittest_count} test files)")
@@ -169,6 +185,7 @@ add_library(libnanyc ${mode_libnany}
 	"${libnany_config_folder}/libnanyc-config.h"
 	"${libnany_config_folder}/libnanyc-traces.h"
 	"${libnany_config_folder}/libnanyc-version.h"
+	"${__embed_nsl_hxx}"
 	"details/ast/ast.cpp"
 	"details/ast/ast.h"
 	"details/ast/ast.hxx"
