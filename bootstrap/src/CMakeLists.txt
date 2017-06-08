@@ -20,6 +20,14 @@ set_target_properties(nanyc-unittest
 	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/.."
 )
 
+### nanyc-unittest
+add_executable(nanyc-unittest-new "nanyc-unittest.cpp")
+target_link_libraries(nanyc-unittest-new PRIVATE libnanyc yuni-static-core)
+set_target_properties(nanyc-unittest-new
+	PROPERTIES VERSION "${nany_version_major}.${nany_version_minor}.${nany_version_patch}"
+	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/.."
+)
+
 
 ### nanyc-dump-ast
 # note: this executable does not rely on `libnanyc` library on purpose
