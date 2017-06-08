@@ -15,23 +15,39 @@ namespace ny {
 namespace unittests {
 namespace {
 
+struct Entry final {
+	yuni::String module;
+	yuni::String name;
+};
+
 struct App final {
 	App();
 	App(App&&) = default;
 	~App();
 
 	void importFilenames(const std::vector<AnyString>&);
+	void fetch();
 
 	nycompile_opts_t opts;
+	std::vector<Entry> unittests;
 	std::vector<yuni::String> filenames;
 };
 
 App::App() {
 	memset(&opts, 0x0, sizeof(opts));
+	opts.userdata = this;;
 }
 
 App::~App() {
 	free(opts.sources.items);
+}
+
+bool operator < (const Entry& a, const Entry& b) {
+	return std::tie(a.module, a.name) < std::tie(b.module, b.name);
+}
+
+const char* plurals(auto count, const char* single, const char* many) {
+	return (count <= 1) ? single : many;
 }
 
 void App::importFilenames(const std::vector<AnyString>& list) {
@@ -48,6 +64,22 @@ void App::importFilenames(const std::vector<AnyString>& list) {
 		opts.sources.items[i].filename.len = filenames[i].size();
 		opts.sources.items[i].filename.c_str = filenames[i].c_str();
 	}
+}
+
+void App::fetch() {
+	unittests.reserve(512); // arbitrary
+	opts.on_unittest = [](void* userdata, const char* mod, uint32_t mlen, const char* name, uint32_t nlen) {
+		auto& self = *reinterpret_cast<App*>(userdata);
+		self.unittests.emplace_back();
+		auto& entry = self.unittests.back();
+		entry.module.assign(mod, mlen);
+		entry.name.assign(name, nlen);
+	};
+	std::cout << "searching for unittests in all source files...\n";
+	nyprogram_compile(&opts);
+	opts.on_unittest = nullptr;
+	std::sort(std::begin(unittests), std::end(unittests));
+	std::cout << unittests.size() << ' ' << plurals(unittests.size(), "test", "tests") << " found\n";
 }
 
 int printVersion() {
@@ -87,6 +119,7 @@ App prepare(int argc, char** argv) {
 	if (unlikely(bugreport))
 		throw printBugreport();
 	app.importFilenames(filenames);
+	app.fetch();
 	return app;
 }
 
