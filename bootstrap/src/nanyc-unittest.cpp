@@ -1,4 +1,5 @@
 #include <nanyc/library.h>
+#include <nanyc/program.h>
 #include <yuni/yuni.h>
 #include <yuni/core/getopt.h>
 #include <iostream>
@@ -10,7 +11,14 @@ namespace unittests {
 namespace {
 
 struct App final {
+	App();
+
+	nycompile_opts_t opts;
 };
+
+App::App() {
+	memset(&opts, 0x0, sizeof(opts));
+}
 
 int printVersion() {
 	std::cout << libnanyc_version_to_cstr() << '\n';
