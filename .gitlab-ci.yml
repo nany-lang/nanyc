@@ -16,6 +16,7 @@ variables:
         - cd build/bootstrap
         - cmake ../../bootstrap -DCMAKE_BUILD_TYPE=debug
         - cmake --build . --config debug --target all -- -j $(nproc)
+        - cmake --build . --config debug --target check
     tags:
         - linux
 
@@ -49,6 +50,7 @@ variables:
         - cd build/bootstrap
         - cmake ../../bootstrap -DCMAKE_BUILD_TYPE=release
         - cmake --build . --config release --target all -- -j $(nproc)
+        - cmake --build . --config release --target check
         - ([ ! -e /etc/debian_version ] || make packages-deb)
     tags:
         - linux
