@@ -30,7 +30,14 @@ struct App final {
 	void fetch(bool nsl);
 	void run(const Entry&);
 	int run();
+	void statstics(int64_t duration) const;
 
+	struct final {
+		uint32_t total = 0;
+		uint32_t passing = 0;
+		uint32_t failed = 0;
+	}
+	stats;
 	nycompile_opts_t opts;
 	bool interactive = true;
 	std::vector<Entry> unittests;
@@ -107,6 +114,8 @@ void App::startEntry(const Entry& entry) {
 }
 
 void App::endEntry(const Entry& entry, bool success, int64_t duration) {
+	++stats.total;
+	++(success ? stats.passing : stats.failed);
 	if (interactive)
 		std::cout << '\r'; // back to begining of the line
 	if (success) {
@@ -124,6 +133,19 @@ void App::endEntry(const Entry& entry, bool success, int64_t duration) {
 	std::cout << '\n';
 }
 
+void App::statstics(int64_t duration) const {
+	std::cout << "\n       " << stats.total << ' ' << plurals(stats.total, "test", "tests");
+	std::cout << ", " << stats.passing << " passing";
+	if (stats.failed)
+		std::cout << ", " << stats.failed << " failed";
+	std::cout << "  (";
+	if (duration < 10000)
+		std::cout << duration << "ms)";
+	else
+		std::cout << (duration / 1000) << "s)";
+	std::cout << "\n\n";
+}
+
 void App::run(const Entry& entry) {
 	startEntry(entry);
 	auto start = now();
@@ -138,9 +160,16 @@ void App::run(const Entry& entry) {
 
 int App::run() {
 	std::cout << '\n';
-	for (auto& entry: unittests)
+	auto start = now();
+	for (auto& entry: unittests) {
 		run(entry);
-	return EXIT_SUCCESS;
+		if (stats.total > 3)
+			break;
+	}
+	auto duration = now() - start;
+	statstics(duration);
+	bool success = stats.failed == 0 and stats.total != 0;
+	return success ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
 int printVersion() {
