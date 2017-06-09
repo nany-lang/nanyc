@@ -9,6 +9,7 @@
 #include <vector>
 #include <algorithm>
 #include <memory>
+#include <random>
 #include "libnanyc.h"
 
 
@@ -41,6 +42,7 @@ struct App final {
 	nycompile_opts_t opts;
 	bool interactive = true;
 	uint32_t loops = 1;
+	bool shuffle = false;
 	std::vector<Entry> unittests;
 	std::vector<yuni::String> filenames;
 
@@ -159,10 +161,19 @@ void App::run(const Entry& entry) {
 	endEntry(entry, success, duration);
 }
 
+void shuffleDeck(std::vector<Entry>& unittests) {
+	std::cout << "shuffling the tests...\n" << std::flush;
+	auto seed = now();
+	auto useed = static_cast<uint32_t>(seed);
+	std::shuffle(unittests.begin(), unittests.end(), std::default_random_engine(useed));
+}
+
 int App::run() {
 	std::cout << '\n';
 	auto start = now();
 	for (uint32_t l = 0; l != loops; ++l) {
+		if (unlikely(shuffle))
+			shuffleDeck(unittests);
 		for (auto& entry: unittests)
 			run(entry);
 	}
@@ -199,6 +210,7 @@ App prepare(int argc, char** argv) {
 	options.addFlag(nsl, ' ', "nsl", "Import NSL unittests");
 	options.addParagraph("\nEntropy");
 	options.addFlag(app.loops, 'l', "loops", "Number of loops (default: 1)");
+	options.addFlag(app.shuffle, 's', "shuffle", "Randomly rearrange the unittests");
 	options.addParagraph("\nHelp");
 	options.addFlag(bugreport, 'b', "bugreport", "Display some useful information to report a bug");
 	options.addFlag(version, ' ', "version", "Print the version");
