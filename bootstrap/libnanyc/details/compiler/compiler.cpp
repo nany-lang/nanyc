@@ -88,10 +88,9 @@ inline nyprogram_t* Compiler::compile() {
 			return complainNoSource(report);
 		if (config::importNSL)
 			importCompilerIntrinsics(intrinsics);
-		bool withUnittests = (opts.on_unittest != nullptr);
 		if (config::importNSL)
 			scount += corefilesCount;
-		if (unlikely(withUnittests))
+		if (unlikely(opts.with_nsl_unittests == nytrue))
 			scount += unittestCount;
 		sources.count = scount;
 		sources.items = std::make_unique<Source[]>(scount);
@@ -102,7 +101,7 @@ inline nyprogram_t* Compiler::compile() {
 				compiled &= compileSource(report, *this, source, opts);
 			});
 		}
-		if (withUnittests) {
+		if (opts.with_nsl_unittests == nytrue) {
 			registerUnittestFiles(sources, offset, [&](ny::compiler::Source& source) {
 				compiled &= compileSource(report, *this, source, opts);
 			});
@@ -111,7 +110,7 @@ inline nyprogram_t* Compiler::compile() {
 			auto& source = sources[offset + i];
 			compiled &= importSourceAndCompile(report, *this, source, opts, opts.sources.items[i]);
 		}
-		if (compiled and not withUnittests) {
+		if (compiled and (opts.with_nsl_unittests == nyfalse)) {
 			auto program = std::make_unique<ny::Program>();
 			return ny::Program::pointer(program.release());
 		}

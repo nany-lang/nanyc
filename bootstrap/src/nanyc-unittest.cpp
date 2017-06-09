@@ -27,11 +27,18 @@ struct App final {
 	~App();
 
 	void importFilenames(const std::vector<AnyString>&);
-	void fetch();
+	void fetch(bool nsl);
+	void run(const Entry&);
+	int run();
 
 	nycompile_opts_t opts;
+	bool interactive = true;
 	std::vector<Entry> unittests;
 	std::vector<yuni::String> filenames;
+
+private:
+	void startEntry(const Entry&);
+	void endEntry(const Entry&, bool, int64_t);
 };
 
 App::App() {
@@ -71,8 +78,9 @@ void App::importFilenames(const std::vector<AnyString>& list) {
 	}
 }
 
-void App::fetch() {
+void App::fetch(bool nsl) {
 	unittests.reserve(512); // arbitrary
+	opts.with_nsl_unittests = nsl ? nytrue : nyfalse;
 	opts.on_unittest = [](void* userdata, const char* mod, uint32_t mlen, const char* name, uint32_t nlen) {
 		auto& self = *reinterpret_cast<App*>(userdata);
 		self.unittests.emplace_back();
@@ -88,6 +96,51 @@ void App::fetch() {
 	auto duration = now() - start;
 	std::cout << unittests.size() << ' ' << plurals(unittests.size(), "test", "tests");
 	std::cout << " found (in " << duration << "ms)\n";
+}
+
+void App::startEntry(const Entry& entry) {
+	if (interactive) {
+		std::cout << "       running ";
+		std::cout << entry.module << '/' << entry.name;
+		std::cout << "... " << std::flush;
+	}
+}
+
+void App::endEntry(const Entry& entry, bool success, int64_t duration) {
+	if (interactive)
+		std::cout << '\r'; // back to begining of the line
+	if (success) {
+		#ifndef YUNI_OS_WINDOWS
+		std::cout << "    \u2713  ";
+		#else
+		std::cout << "   OK  ";
+		#endif
+	}
+	else {
+		std::cout << "  ERR  ";
+	}
+	std::cout << entry.module << '/' << entry.name;
+	std::cout << "  (" << duration << "ms)    ";
+	std::cout << '\n';
+}
+
+void App::run(const Entry& entry) {
+	startEntry(entry);
+	auto start = now();
+	auto* program = nyprogram_compile(&opts);
+	bool success = program != nullptr;
+	if (program) {
+		nyprogram_free(program);
+	}
+	auto duration = now() - start;
+	endEntry(entry, success, duration);
+}
+
+int App::run() {
+	std::cout << '\n';
+	for (auto& entry: unittests)
+		run(entry);
+	return EXIT_SUCCESS;
 }
 
 int printVersion() {
@@ -110,9 +163,11 @@ App prepare(int argc, char** argv) {
 	App app;
 	bool version = false;
 	bool bugreport = false;
+	bool nsl = false;
 	std::vector<AnyString> filenames;
 	yuni::GetOpt::Parser options;
 	options.addFlag(filenames, 'i', "", "Input nanyc source files");
+	options.addFlag(nsl, ' ', "nsl", "Import NSL unittests");
 	options.addParagraph("\nHelp");
 	options.addFlag(bugreport, 'b', "bugreport", "Display some useful information to report a bug");
 	options.addFlag(version, ' ', "version", "Print the version");
@@ -127,7 +182,7 @@ App prepare(int argc, char** argv) {
 	if (unlikely(bugreport))
 		throw printBugreport();
 	app.importFilenames(filenames);
-	app.fetch();
+	app.fetch(nsl);
 	return app;
 }
 
@@ -138,7 +193,7 @@ App prepare(int argc, char** argv) {
 int main(int argc, char** argv) {
 	try {
 		auto app = ny::unittests::prepare(argc, argv);
-		return EXIT_SUCCESS;
+		return app.run();
 	}
 	catch (const std::exception& e) {
 		std::cerr << "exception: " << e.what() << '\n';
