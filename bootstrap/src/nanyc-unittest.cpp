@@ -204,6 +204,7 @@ App prepare(int argc, char** argv) {
 	bool version = false;
 	bool bugreport = false;
 	bool nsl = false;
+	bool verbose = false;
 	std::vector<AnyString> filenames;
 	yuni::GetOpt::Parser options;
 	options.addFlag(filenames, 'i', "", "Input nanyc source files");
@@ -212,6 +213,7 @@ App prepare(int argc, char** argv) {
 	options.addFlag(app.loops, 'l', "loops", "Number of loops (default: 1)");
 	options.addFlag(app.shuffle, 's', "shuffle", "Randomly rearrange the unittests");
 	options.addParagraph("\nHelp");
+	options.addFlag(verbose, 'v', "verbose", "More stuff on the screen");
 	options.addFlag(bugreport, 'b', "bugreport", "Display some useful information to report a bug");
 	options.addFlag(version, ' ', "version", "Print the version");
 	options.remainingArguments(filenames);
@@ -224,6 +226,8 @@ App prepare(int argc, char** argv) {
 		throw printVersion();
 	if (unlikely(bugreport))
 		throw printBugreport();
+	if (unlikely(verbose))
+		printBugreport();
 	app.importFilenames(filenames);
 	app.fetch(nsl);
 	return app;
