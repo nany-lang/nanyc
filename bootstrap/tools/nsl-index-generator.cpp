@@ -73,8 +73,8 @@ public:
 			prettyname.consume(rootdir.size() + 1);
 			hxx << "	{\n";
 			hxx << "		auto& source = allsources[i];\n";
-			hxx << "		source.filename.assign(\"" << prefix << prettyname << "\", " << (prettyname.size() + prefix.size()) << ");\n";
-			hxx << "		source.content.assign(\"" << filecontent << "\", " << filecontent.size() << ");\n";
+			hxx << "		source.filename.adapt(\"" << prefix << prettyname << "\", " << (prettyname.size() + prefix.size()) << ");\n";
+			hxx << "		source.content.adapt(\"" << filecontent << "\", " << filecontent.size() << ");\n";
 			hxx << "		callback(source);\n";
 			hxx << "		++i;\n";
 			hxx << "	}\n";

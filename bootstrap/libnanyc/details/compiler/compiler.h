@@ -27,8 +27,10 @@ struct Source final {
 	}
 	parsing;
 
-	yuni::String content;
-	yuni::String filename;
+	AnyString content;
+	AnyString filename;
+	yuni::String storageContent;  // only used when owning the data
+	yuni::String storageFilename; // (same)
 
 	ir::Sequence& sequence() { return parsing.ircode; }
 };

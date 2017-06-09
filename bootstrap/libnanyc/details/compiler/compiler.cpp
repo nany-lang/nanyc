@@ -35,12 +35,14 @@ void copySourceOpts(ny::compiler::Source& source, const nysource_opts_t& opts) {
 	if (opts.filename.len != 0) {
 		if (unlikely(opts.filename.len > memoryHardlimit))
 			throw "input filename bigger than internal limit";
-		yuni::IO::Canonicalize(source.filename, AnyString{opts.filename.c_str, static_cast<uint32_t>(opts.filename.len)});
+		yuni::IO::Canonicalize(source.storageFilename, AnyString{opts.filename.c_str, static_cast<uint32_t>(opts.filename.len)});
+		source.filename = source.storageFilename;
 	}
 	if (opts.content.len != 0) {
 		if (unlikely(opts.content.len > memoryHardlimit))
 			throw "input source content bigger than internal limit";
-		source.content.assign(opts.content.c_str, static_cast<uint32_t>(opts.content.len));
+		source.storageContent.assign(opts.content.c_str, static_cast<uint32_t>(opts.content.len));
+		source.content = source.storageContent;
 	}
 }
 
