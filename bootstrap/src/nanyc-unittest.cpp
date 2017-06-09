@@ -40,6 +40,7 @@ struct App final {
 	stats;
 	nycompile_opts_t opts;
 	bool interactive = true;
+	uint32_t loops = 1;
 	std::vector<Entry> unittests;
 	std::vector<yuni::String> filenames;
 
@@ -161,10 +162,9 @@ void App::run(const Entry& entry) {
 int App::run() {
 	std::cout << '\n';
 	auto start = now();
-	for (auto& entry: unittests) {
-		run(entry);
-		if (stats.total > 3)
-			break;
+	for (uint32_t l = 0; l != loops; ++l) {
+		for (auto& entry: unittests)
+			run(entry);
 	}
 	auto duration = now() - start;
 	statstics(duration);
@@ -197,6 +197,8 @@ App prepare(int argc, char** argv) {
 	yuni::GetOpt::Parser options;
 	options.addFlag(filenames, 'i', "", "Input nanyc source files");
 	options.addFlag(nsl, ' ', "nsl", "Import NSL unittests");
+	options.addParagraph("\nEntropy");
+	options.addFlag(app.loops, 'l', "loops", "Number of loops (default: 1)");
 	options.addParagraph("\nHelp");
 	options.addFlag(bugreport, 'b', "bugreport", "Display some useful information to report a bug");
 	options.addFlag(version, ' ', "version", "Print the version");
