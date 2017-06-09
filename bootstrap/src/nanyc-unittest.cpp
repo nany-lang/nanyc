@@ -4,6 +4,7 @@
 #include <yuni/core/getopt.h>
 #include <yuni/core/string.h>
 #include <yuni/io/filename-manipulation.h>
+#include <yuni/datetime/timestamp.h>
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -42,6 +43,10 @@ App::~App() {
 	free(opts.sources.items);
 }
 
+auto now() {
+	return yuni::DateTime::NowMilliSeconds();
+}
+
 bool operator < (const Entry& a, const Entry& b) {
 	return std::tie(a.module, a.name) < std::tie(b.module, b.name);
 }
@@ -76,10 +81,13 @@ void App::fetch() {
 		entry.name.assign(name, nlen);
 	};
 	std::cout << "searching for unittests in all source files...\n";
+	auto start = now();
 	nyprogram_compile(&opts);
 	opts.on_unittest = nullptr;
 	std::sort(std::begin(unittests), std::end(unittests));
-	std::cout << unittests.size() << ' ' << plurals(unittests.size(), "test", "tests") << " found\n";
+	auto duration = now() - start;
+	std::cout << unittests.size() << ' ' << plurals(unittests.size(), "test", "tests");
+	std::cout << " found (in " << duration << "ms)\n";
 }
 
 int printVersion() {
