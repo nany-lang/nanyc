@@ -236,6 +236,7 @@ App prepare(int argc, char** argv) {
 	bool bugreport = false;
 	bool nsl = false;
 	bool verbose = false;
+	bool nocolors = false;
 	std::vector<AnyString> filenames;
 	yuni::GetOpt::Parser options;
 	options.addFlag(filenames, 'i', "", "Input nanyc source files");
@@ -243,6 +244,8 @@ App prepare(int argc, char** argv) {
 	options.addParagraph("\nEntropy");
 	options.addFlag(app.loops, 'l', "loops", "Number of loops (default: 1)");
 	options.addFlag(app.shuffle, 's', "shuffle", "Randomly rearrange the unittests");
+	options.addParagraph("\nDisplay");
+	options.addFlag(nocolors, ' ', "no-colors", "Disable color output");
 	options.addParagraph("\nHelp");
 	options.addFlag(verbose, 'v', "verbose", "More stuff on the screen");
 	options.addFlag(bugreport, 'b', "bugreport", "Display some useful information to report a bug");
@@ -259,7 +262,8 @@ App prepare(int argc, char** argv) {
 		throw printBugreport();
 	if (unlikely(verbose))
 		printBugreport();
-	app.colors = yuni::System::Console::IsStdoutTTY();
+	app.interactive = yuni::System::Console::IsStdoutTTY();
+	app.colors = (not nocolors) and app.interactive;
 	app.importFilenames(filenames);
 	app.fetch(nsl);
 	return app;
