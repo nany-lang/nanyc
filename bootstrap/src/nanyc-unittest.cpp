@@ -5,6 +5,7 @@
 #include <yuni/core/string.h>
 #include <yuni/io/filename-manipulation.h>
 #include <yuni/datetime/timestamp.h>
+#include <yuni/core/system/console/console.h>
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -32,6 +33,8 @@ struct App final {
 	void run(const Entry&);
 	int run();
 	void statstics(int64_t duration) const;
+	void setcolor(yuni::System::Console::Color) const;
+	void resetcolor() const;
 
 	struct final {
 		uint32_t total = 0;
@@ -41,6 +44,7 @@ struct App final {
 	stats;
 	nycompile_opts_t opts;
 	bool interactive = true;
+	bool colors = true;
 	uint32_t loops = 1;
 	bool shuffle = false;
 	std::vector<Entry> unittests;
@@ -58,6 +62,16 @@ App::App() {
 
 App::~App() {
 	free(opts.sources.items);
+}
+
+void App::setcolor(yuni::System::Console::Color c) const {
+	if (colors)
+		yuni::System::Console::SetTextColor(std::cout, c);
+}
+
+void App::resetcolor() const {
+	if (colors)
+		yuni::System::Console::ResetTextColor(std::cout);
 }
 
 auto now() {
@@ -110,7 +124,9 @@ void App::fetch(bool nsl) {
 
 void App::startEntry(const Entry& entry) {
 	if (interactive) {
+		setcolor(yuni::System::Console::bold);
 		std::cout << "       running ";
+		resetcolor();
 		std::cout << entry.module << '/' << entry.name;
 		std::cout << "... " << std::flush;
 	}
@@ -122,25 +138,40 @@ void App::endEntry(const Entry& entry, bool success, int64_t duration) {
 	if (interactive)
 		std::cout << '\r'; // back to begining of the line
 	if (success) {
+		setcolor(yuni::System::Console::green);
 		#ifndef YUNI_OS_WINDOWS
 		std::cout << "    \u2713  ";
 		#else
 		std::cout << "   OK  ";
 		#endif
+		resetcolor();
 	}
 	else {
+		setcolor(yuni::System::Console::red);
 		std::cout << "  ERR  ";
+		resetcolor();
 	}
 	std::cout << entry.module << '/' << entry.name;
-	std::cout << "  (" << duration << "ms)    ";
-	std::cout << '\n';
+	setcolor(yuni::System::Console::lightblue);
+	std::cout << "  (" << duration << "ms)";
+	resetcolor();
+	std::cout << "    \n";
 }
 
 void App::statstics(int64_t duration) const {
 	std::cout << "\n       " << stats.total << ' ' << plurals(stats.total, "test", "tests");
-	std::cout << ", " << stats.passing << " passing";
-	if (stats.failed)
-		std::cout << ", " << stats.failed << " failed";
+	if (stats.passing != 0) {
+		std::cout << ", ";
+		setcolor(yuni::System::Console::red);
+		std::cout << stats.passing << " passing";
+		resetcolor();
+	}
+	if (stats.failed) {
+		std::cout << ", ";
+		setcolor(yuni::System::Console::red);
+		std::cout << stats.failed << " failed";
+		resetcolor();
+	}
 	std::cout << "  (";
 	if (duration < 10000)
 		std::cout << duration << "ms)";
@@ -228,6 +259,7 @@ App prepare(int argc, char** argv) {
 		throw printBugreport();
 	if (unlikely(verbose))
 		printBugreport();
+	app.colors = yuni::System::Console::IsStdoutTTY();
 	app.importFilenames(filenames);
 	app.fetch(nsl);
 	return app;
