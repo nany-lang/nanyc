@@ -33,6 +33,22 @@ set(nsl_root "${nsl_root}" CACHE INTERNEL "NSL Root path")
 
 include("${nsl_root}/nsl.cmake")
 
+set(__embed_nsl_hxx_dir "${CMAKE_CURRENT_BINARY_DIR}/details/compiler")
+set(__embed_nsl_hxx "${__embed_nsl_hxx_dir}/embed-nsl.hxx")
+add_custom_command(
+	OUTPUT  "${__embed_nsl_hxx}"
+	COMMAND "$<TARGET_FILE:nyt-index-generator>"
+		-o "${__embed_nsl_hxx}"
+		-d "${nsl_root}"
+		-f "${nsl_files}"
+		-u "${nsl_files_unittest}"
+	DEPENDS
+		nyt-index-generator
+		${nsl_files}
+		${nsl_files_unittest}
+	VERBATIM
+)
+
 list(LENGTH nsl_files nsl_files_count)
 list(LENGTH nsl_files_unittest nsl_files_unittest_count)
 nmessage("standard library: added ${nsl_files_count} files (${nsl_files_unittest_count} test files)")
@@ -169,6 +185,7 @@ add_library(libnanyc ${mode_libnany}
 	"${libnany_config_folder}/libnanyc-config.h"
 	"${libnany_config_folder}/libnanyc-traces.h"
 	"${libnany_config_folder}/libnanyc-version.h"
+	"${__embed_nsl_hxx}"
 	"details/ast/ast.cpp"
 	"details/ast/ast.h"
 	"details/ast/ast.hxx"
@@ -222,6 +239,9 @@ add_library(libnanyc ${mode_libnany}
 	"details/c-api/validator.cpp"
 	"details/c-api/version.c"
 	"details/c-api/visibility.cpp"
+	"details/compiler/compile.h"
+	"details/compiler/compiler.cpp"
+	"details/compiler/compiler.h"
 	"details/context/build-info.h"
 	"details/context/build.cpp"
 	"details/context/build.h"
@@ -256,7 +276,9 @@ add_library(libnanyc ${mode_libnany}
 	"details/ir/sequence.h"
 	"details/ir/sequence.hxx"
 	"details/pass/a-src2ast/ast-from-source.cpp"
+	"details/pass/a-src2ast/ast-from-source.h"
 	"details/pass/b-ast-normalize/normalize.cpp"
+	"details/pass/b-ast-normalize/normalize.h"
 	"details/pass/c-ast2ir/context.cpp"
 	"details/pass/c-ast2ir/context.h"
 	"details/pass/c-ast2ir/context.hxx"
@@ -294,10 +316,12 @@ add_library(libnanyc ${mode_libnany}
 	"details/pass/c-ast2ir/scope.h"
 	"details/pass/c-ast2ir/scope.hxx"
 	"details/pass/c-ast2ir/source-ast-to-ir.cpp"
+	"details/pass/c-ast2ir/source-ast-to-ir.h"
 	"details/pass/d-object-map/attach.cpp"
 	"details/pass/d-object-map/mapping.cpp"
 	"details/pass/d-object-map/mapping.h"
 	"details/pass/e-semantic/semantic.cpp"
+	"details/program/program.h"
 	"details/reporting/fwd.h"
 	"details/reporting/levels.h"
 	"details/reporting/message.cpp"
@@ -404,8 +428,19 @@ add_library(libnanyc ${mode_libnany}
 	"details/vm/stacktrace.hxx"
 	"details/vm/types.h"
 	"include/nany/nany.h"
+	"include/nanyc/allocator.h"
+	"include/nanyc/console.h"
+	"include/nanyc/library.h"
+	"include/nanyc/program.h"
+	"include/nanyc/types.h"
 	"libnanyc.h"
 	${nysrc_nsl_stdcore}
+	#
+	"allocator.cpp"
+	"bugreport.cpp"
+	"console.cpp"
+	"library.c"
+	"program.cpp"
 )
 
 set_target_properties(libnanyc PROPERTIES
@@ -439,6 +474,7 @@ target_include_directories(libnanyc PUBLIC  "${CMAKE_CURRENT_LIST_DIR}")
 target_include_directories(libnanyc PUBLIC  "${CMAKE_CURRENT_BINARY_DIR}")
 target_include_directories(libnanyc PUBLIC  "${CMAKE_CURRENT_BINARY_DIR}/include")
 target_include_directories(libnanyc PUBLIC  "${CMAKE_CURRENT_LIST_DIR}/include")
+target_include_directories(libnanyc PRIVATE "${__embed_nsl_hxx_dir}")
 target_include_directories(libnanyc-grammar PUBLIC "${CMAKE_CURRENT_BINARY_DIR}")
 
 add_dependencies(libnanyc nanyc-grammar-cpp)

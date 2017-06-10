@@ -38,9 +38,9 @@ bool Scope::visitASTUnitTest(AST::Node& node) {
 		return (ice(node) << "invalid unittest ast declaration");
 	if (unlikely(testname.empty()))
 		return (error(node) << "invalid empty unittest name");
-	if (context.cf.on_unittest) {
+	if (context.event.on_unittest) {
 		AnyString name{testname, 17};
-		context.cf.on_unittest(context.cf.userdata, "<nomodule>", 10, name.c_str(), name.size());
+		context.event.on_unittest(context.event.userdata, "<nomodule>", 10, name.c_str(), name.size());
 	}
 	if (unlikely(context.ignoreAtoms))
 		return true;

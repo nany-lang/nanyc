@@ -1,3 +1,4 @@
+#include "attach.h"
 #include "details/context/build.h"
 #include "details/atom/classdef-table.h"
 #include "details/reporting/report.h"
@@ -20,4 +21,18 @@ bool Build::attach(ir::Sequence& sequence, bool owned) {
 }
 
 
+} // namespace ny
+
+namespace ny {
+namespace compiler {
+
+bool attach(ny::compiler::Compiler& compiler, ny::compiler::Source& source) {
+	auto& sequence = source.sequence();
+	auto& cdeftable = compiler.cdeftable;
+	auto& mutex = compiler.mutex;
+	Pass::MappingOptions options;
+	return Pass::map(cdeftable.atoms.root, cdeftable, mutex, sequence, options);
+}
+
+} // namespace compiler
 } // namespace ny

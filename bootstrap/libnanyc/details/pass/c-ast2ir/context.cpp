@@ -9,9 +9,8 @@ namespace ir {
 namespace Producer {
 
 
-Context::Context(nybuild_cf_t& cf, AnyString filename, Sequence& ircode, Logs::Report report)
-	: ignoreAtoms(cf.ignore_atoms != nyfalse)
-	, cf(cf)
+Context::Context(AnyString filename, Sequence& ircode, Logs::Report report, bool ignoreAtoms)
+	: ignoreAtoms(ignoreAtoms)
 	, ircode(ircode)
 	, report(report)
 	, dbgSourceFilename(filename)
@@ -22,15 +21,6 @@ Context::Context(nybuild_cf_t& cf, AnyString filename, Sequence& ircode, Logs::R
 
 Logs::Report Context::emitReportEntry(void* self, Logs::Level level) {
 	auto& ctx = *(reinterpret_cast<Context*>(self));
-	switch (level) {
-		default:
-			break;
-		case Logs::Level::warning: {
-			if (ctx.cf.warnings_into_errors != nyfalse)
-				level = Logs::Level::error;
-			break;
-		}
-	}
 	return ctx.report.fromErrLevel(level);
 }
 

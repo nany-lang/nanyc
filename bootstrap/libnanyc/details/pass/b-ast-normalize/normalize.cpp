@@ -1,3 +1,4 @@
+#include "normalize.h"
 #include "details/context/source.h"
 #include "details/ast/ast.h"
 #include "details/context/build-info.h"
@@ -580,4 +581,28 @@ bool Source::passDuplicateAndNormalizeAST(Logs::Report& report) {
 }
 
 
+} // namespace ny
+
+namespace ny {
+namespace compiler {
+
+bool passDuplicateAndNormalizeAST(ny::compiler::Source& source, Logs::Report& report) {
+	auto& parser = source.parsing.parser;
+	auto& ast    = source.parsing.ast;
+	//! Reset the root node
+	source.parsing.rootnode = make_ref<AST::Node>(AST::rgStart);
+	if (!parser.root or (parser.root->rule != AST::rgStart))
+		return false;
+	if (config::traces::astBeforeNormalize)
+		dumpAST(report, *parser.root, "before normalization");
+	ASTReplicator cloner(ast, report);
+	bool success = cloner.run(*parser.root, *(source.parsing.rootnode));
+	// retrieve data
+	source.parsing.nmspc.swap(cloner.nmspc);
+	if (config::traces::astAfterNormalize)
+		dumpAST(report, *(source.parsing.rootnode), "after normalization");
+	return success;
+}
+
+} // namespace compiler
 } // namespace ny
