@@ -6,6 +6,10 @@
 #include <yuni/io/filename-manipulation.h>
 #include <yuni/datetime/timestamp.h>
 #include <yuni/core/system/console/console.h>
+#include <yuni/core/process/program.h>
+#include <yuni/core/system/cpu.h>
+#include <yuni/job/queue/service.h>
+#include <yuni/thread/utility.h>
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -18,9 +22,17 @@ namespace ny {
 namespace unittests {
 namespace {
 
+constexpr const char runningText[] = "running ";
+
 struct Entry final {
 	yuni::String module;
 	yuni::String name;
+};
+
+struct Result final {
+	Entry entry;
+	bool success;
+	int64_t duration_ms;
 };
 
 struct App final {
@@ -32,9 +44,10 @@ struct App final {
 	void fetch(bool nsl);
 	void run(const Entry&);
 	int run();
-	void statstics(int64_t duration) const;
+	bool statstics(int64_t duration);
 	void setcolor(yuni::System::Console::Color) const;
 	void resetcolor() const;
+	bool inExecutorMode() const;
 
 	struct final {
 		uint32_t total = 0;
@@ -45,14 +58,27 @@ struct App final {
 	nycompile_opts_t opts;
 	bool interactive = true;
 	bool colors = true;
+	bool verbose = false;
 	uint32_t loops = 1;
 	bool shuffle = false;
+	uint32_t timeout_s = 30;
 	std::vector<Entry> unittests;
 	std::vector<yuni::String> filenames;
+	std::vector<Result> results;
+	uint32_t jobs = 0;
+	yuni::Mutex mutex;
+
+	Entry execinfo;
+	AnyString argv0;
 
 private:
 	void startEntry(const Entry&);
 	void endEntry(const Entry&, bool, int64_t);
+	bool execute(const Entry& entry);
+	bool writeProgress();
+
+	yuni::String runningMsg;
+	const Entry* latestRunningUnittest = nullptr;
 };
 
 App::App() {
@@ -74,6 +100,10 @@ void App::resetcolor() const {
 		yuni::System::Console::ResetTextColor(std::cout);
 }
 
+bool App::inExecutorMode() const {
+	return not execinfo.name.empty();
+}
+
 auto now() {
 	return yuni::DateTime::NowMilliSeconds();
 }
@@ -84,6 +114,15 @@ bool operator < (const Entry& a, const Entry& b) {
 
 const char* plurals(auto count, const char* single, const char* many) {
 	return (count <= 1) ? single : many;
+}
+
+uint32_t numberOfJobs(uint32_t jobs) {
+	if (jobs == 0) {
+		jobs = yuni::System::CPU::Count();
+	}
+	else if (jobs > 256) // arbitrary
+		jobs = 256;
+	return jobs;
 }
 
 void App::importFilenames(const std::vector<AnyString>& list) {
@@ -124,41 +163,79 @@ void App::fetch(bool nsl) {
 
 void App::startEntry(const Entry& entry) {
 	if (interactive) {
-		setcolor(yuni::System::Console::bold);
-		std::cout << "       running ";
-		resetcolor();
-		std::cout << entry.module << '/' << entry.name;
-		std::cout << "... " << std::flush;
+		yuni::MutexLocker locker(mutex);
+		latestRunningUnittest = &entry;
 	}
 }
 
 void App::endEntry(const Entry& entry, bool success, int64_t duration) {
-	++stats.total;
-	++(success ? stats.passing : stats.failed);
-	if (interactive)
-		std::cout << '\r'; // back to begining of the line
-	if (success) {
-		setcolor(yuni::System::Console::green);
-		#ifndef YUNI_OS_WINDOWS
-		std::cout << "    \u2713  ";
-		#else
-		std::cout << "   OK  ";
-		#endif
-		resetcolor();
-	}
-	else {
-		setcolor(yuni::System::Console::red);
-		std::cout << "  ERR  ";
-		resetcolor();
-	}
-	std::cout << entry.module << '/' << entry.name;
-	setcolor(yuni::System::Console::lightblue);
-	std::cout << "  (" << duration << "ms)";
-	resetcolor();
-	std::cout << "    \n";
+	Result result;
+	result.entry = entry;
+	result.success = success;
+	result.duration_ms = duration;
+	yuni::MutexLocker locker(mutex);
+	results.emplace_back(std::move(result));
 }
 
-void App::statstics(int64_t duration) const {
+bool App::writeProgress() {
+	size_t achieved = 0;
+	const Entry* latestEntry = nullptr;
+	{
+		yuni::MutexLocker locker(mutex);
+		achieved = results.size();
+		latestEntry = latestRunningUnittest;
+	}
+	if (unlikely(!latestEntry))
+		return true;
+	auto& entry = *latestEntry;
+	uint32_t progress = static_cast<uint32_t>((100. / stats.total) * static_cast<uint32_t>(achieved));
+	if (progress > 99)
+		progress = 99;
+	if (progress < 10)
+		std::cout << "   ";
+	else
+		std::cout << "  ";
+	std::cout << static_cast<uint32_t>(progress) << "% - ";
+	setcolor(yuni::System::Console::bold);
+	std::cout << runningText;
+	resetcolor();
+	auto previousLength = runningMsg.size();
+	runningMsg.clear();
+	runningMsg << entry.module << '/' << entry.name << "... ";
+	if (runningMsg.size() < previousLength)
+		runningMsg.resize(previousLength, " ");
+	std::cout << runningMsg << '\r' << std::flush;
+	return true;
+}
+
+bool App::statstics(int64_t duration) {
+	if (interactive) {
+		runningMsg.resize(runningMsg.size() + AnyString(runningText).size() + 8 /*%*/);
+		runningMsg.fill(' ');
+		std::cout << runningMsg << '\r';
+	}
+	for (auto& result: results) {
+		++(result.success ? stats.passing : stats.failed);
+		if (result.success) {
+			setcolor(yuni::System::Console::green);
+			#ifndef YUNI_OS_WINDOWS
+			std::cout << "    \u2713  ";
+			#else
+			std::cout << "   OK  ";
+			#endif
+			resetcolor();
+		}
+		else {
+			setcolor(yuni::System::Console::red);
+			std::cout << "  ERR  ";
+			resetcolor();
+		}
+		std::cout << result.entry.module << '/' << result.entry.name;
+		setcolor(yuni::System::Console::lightblue);
+		std::cout << "  (" << result.duration_ms << "ms)";
+		resetcolor();
+		std::cout << '\n';
+	}
 	std::cout << "\n       " << stats.total << ' ' << plurals(stats.total, "test", "tests");
 	if (stats.passing != 0) {
 		std::cout << ", ";
@@ -178,16 +255,32 @@ void App::statstics(int64_t duration) const {
 	else
 		std::cout << (duration / 1000) << "s)";
 	std::cout << "\n\n";
+	return stats.failed == 0 and stats.total != 0;
 }
 
-void App::run(const Entry& entry) {
-	startEntry(entry);
-	auto start = now();
+bool App::execute(const Entry& entry) {
 	auto* program = nyprogram_compile(&opts);
 	bool success = program != nullptr;
 	if (program) {
 		nyprogram_free(program);
 	}
+	return success;
+}
+
+void App::run(const Entry& entry) {
+	startEntry(entry);
+	yuni::Process::Program program;
+	program.durationPrecision(yuni::Process::Program::dpMilliseconds);
+	program.program(argv0);
+	program.argumentAdd("--executor-module");
+	program.argumentAdd(entry.module);
+	program.argumentAdd("--executor-name");
+	program.argumentAdd(entry.name);
+	for (auto& filename: filenames)
+		program.argumentAdd(filename);
+	auto start = now();
+	bool success = program.execute(timeout_s);
+	success = success and (program.wait() == 0);
 	auto duration = now() - start;
 	endEntry(entry, success, duration);
 }
@@ -200,17 +293,40 @@ void shuffleDeck(std::vector<Entry>& unittests) {
 }
 
 int App::run() {
-	std::cout << '\n';
-	auto start = now();
-	for (uint32_t l = 0; l != loops; ++l) {
-		if (unlikely(shuffle))
-			shuffleDeck(unittests);
-		for (auto& entry: unittests)
-			run(entry);
+	bool success;
+	if (not inExecutorMode()) {
+		if (verbose or not interactive) {
+			std::cout << '\n';
+			setcolor(yuni::System::Console::bold);
+			std::cout << "running all tests (" << jobs << " concurrent " << plurals(jobs, "job", "jobs") << ")...";
+			resetcolor();
+			std::cout << '\n';
+		}
+		stats.total = static_cast<uint32_t>(loops * unittests.size());
+		results.reserve(stats.total);
+		std::cout << '\n';
+		yuni::Job::QueueService queueservice;
+		queueservice.maximumThreadCount(jobs);
+		queueservice.minimumThreadCount(jobs);
+		for (uint32_t l = 0; l != loops; ++l) {
+			if (unlikely(shuffle))
+				shuffleDeck(unittests);
+			for (auto& entry: unittests)
+				yuni::async(queueservice, [=] { run(entry); });
+		}
+		auto start = now();
+		auto duration = start;
+		{
+			auto progress = yuni::every(150 /*ms*/, [&] { return writeProgress(); });
+			queueservice.start();
+			queueservice.wait(yuni::qseIdle);
+			duration = now() - start;
+		}
+		success = statstics(duration);
 	}
-	auto duration = now() - start;
-	statstics(duration);
-	bool success = stats.failed == 0 and stats.total != 0;
+	else {
+		success = execute(execinfo);
+	}
 	return success ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
@@ -235,19 +351,23 @@ App prepare(int argc, char** argv) {
 	bool version = false;
 	bool bugreport = false;
 	bool nsl = false;
-	bool verbose = false;
 	bool nocolors = false;
+	bool nointeractive = false;
 	std::vector<AnyString> filenames;
 	yuni::GetOpt::Parser options;
-	options.addFlag(filenames, 'i', "", "Input nanyc source files");
+	options.add(filenames, 'i', "", "Input nanyc source files");
 	options.addFlag(nsl, ' ', "nsl", "Import NSL unittests");
-	options.addParagraph("\nEntropy");
-	options.addFlag(app.loops, 'l', "loops", "Number of loops (default: 1)");
+	options.add(app.timeout_s, 't', "timeout", "Timeout for executing an unittest (seconds)");
+	options.add(app.jobs, 'j', "jobs", "Number of concurrent jobs (default: auto)");
+	options.add(app.execinfo.module, ' ', "executor-module", "Executor mode, module name (internal use)", false);
+	options.add(app.execinfo.name, ' ', "executor-name", "Executor mode, unittest (internal use)", false);
+	options.add(app.loops, 'n', "loops", "Number of loops (default: 1)");
 	options.addFlag(app.shuffle, 's', "shuffle", "Randomly rearrange the unittests");
 	options.addParagraph("\nDisplay");
 	options.addFlag(nocolors, ' ', "no-colors", "Disable color output");
+	options.addFlag(nointeractive, ' ', "no-progress", "Disable progression reporting");
 	options.addParagraph("\nHelp");
-	options.addFlag(verbose, 'v', "verbose", "More stuff on the screen");
+	options.addFlag(app.verbose, 'v', "verbose", "More stuff on the screen");
 	options.addFlag(bugreport, 'b', "bugreport", "Display some useful information to report a bug");
 	options.addFlag(version, ' ', "version", "Print the version");
 	options.remainingArguments(filenames);
@@ -260,12 +380,21 @@ App prepare(int argc, char** argv) {
 		throw printVersion();
 	if (unlikely(bugreport))
 		throw printBugreport();
-	if (unlikely(verbose))
+	if (unlikely(app.verbose))
 		printBugreport();
-	app.interactive = yuni::System::Console::IsStdoutTTY();
-	app.colors = (not nocolors) and app.interactive;
 	app.importFilenames(filenames);
-	app.fetch(nsl);
+	if (not app.inExecutorMode()) {
+		if (unlikely(app.loops > 100))
+			throw "number of loops greater than hard-limit '100'";
+		if (unlikely(app.timeout_s == 0))
+			throw "invalid null timeout (-t,--timeout)";
+		bool istty = yuni::System::Console::IsStdoutTTY();
+		app.interactive = not nointeractive and istty;
+		app.colors = (not nocolors) and istty;
+		app.argv0 = argv[0];
+		app.jobs = numberOfJobs(app.jobs);
+		app.fetch(nsl);
+	}
 	return app;
 }
 
@@ -277,6 +406,9 @@ int main(int argc, char** argv) {
 	try {
 		auto app = ny::unittests::prepare(argc, argv);
 		return app.run();
+	}
+	catch (const char* e) {
+		std::cerr << "error: " << e << '\n';
 	}
 	catch (const std::exception& e) {
 		std::cerr << "exception: " << e.what() << '\n';
