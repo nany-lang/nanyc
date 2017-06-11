@@ -323,6 +323,8 @@ App prepare(int argc, char** argv) {
 		printBugreport();
 	app.importFilenames(filenames);
 	if (not app.inExecutorMode()) {
+		if (unlikely(app.loops > 100))
+			throw "number of loops greater than hard-limit '100'";
 		app.interactive = yuni::System::Console::IsStdoutTTY();
 		app.colors = (not nocolors) and app.interactive;
 		app.argv0 = argv[0];
@@ -339,6 +341,9 @@ int main(int argc, char** argv) {
 	try {
 		auto app = ny::unittests::prepare(argc, argv);
 		return app.run();
+	}
+	catch (const char* e) {
+		std::cerr << "error: " << e << '\n';
 	}
 	catch (const std::exception& e) {
 		std::cerr << "exception: " << e.what() << '\n';
