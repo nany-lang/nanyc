@@ -24,6 +24,12 @@ struct Entry final {
 	yuni::String name;
 };
 
+struct Result final {
+	Entry entry;
+	bool success;
+	int64_t duration_ms;
+};
+
 struct App final {
 	App();
 	App(App&&) = default;
@@ -51,6 +57,7 @@ struct App final {
 	bool shuffle = false;
 	std::vector<Entry> unittests;
 	std::vector<yuni::String> filenames;
+	std::vector<Result> results;
 
 	Entry execinfo;
 	AnyString argv0;
@@ -166,6 +173,11 @@ void App::endEntry(const Entry& entry, bool success, int64_t duration) {
 	std::cout << "  (" << duration << "ms)";
 	resetcolor();
 	std::cout << "    \n";
+	Result result;
+	result.entry = entry;
+	result.success = success;
+	result.duration_ms = duration;
+	results.emplace_back(std::move(result));
 }
 
 void App::statstics(int64_t duration) const {
@@ -227,6 +239,7 @@ void shuffleDeck(std::vector<Entry>& unittests) {
 int App::run() {
 	bool success;
 	if (not inExecutorMode()) {
+		results.reserve(loops * unittests.size());
 		std::cout << '\n';
 		auto start = now();
 		for (uint32_t l = 0; l != loops; ++l) {
