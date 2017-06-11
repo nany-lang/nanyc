@@ -295,10 +295,10 @@ void shuffleDeck(std::vector<Entry>& unittests) {
 int App::run() {
 	bool success;
 	if (not inExecutorMode()) {
-		if (not interactive) {
+		if (verbose or not interactive) {
 			std::cout << '\n';
 			setcolor(yuni::System::Console::bold);
-			std::cout << "running all tests...";
+			std::cout << "running all tests (" << jobs << " concurrent " << plurals(jobs, "job", "jobs") << ")...";
 			resetcolor();
 			std::cout << '\n';
 		}
