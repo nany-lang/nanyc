@@ -39,7 +39,7 @@ struct App final {
 	void fetch(bool nsl);
 	void run(const Entry&);
 	int run();
-	void statstics(int64_t duration) const;
+	bool statstics(int64_t duration) const;
 	void setcolor(yuni::System::Console::Color) const;
 	void resetcolor() const;
 	bool inExecutorMode() const;
@@ -150,8 +150,6 @@ void App::startEntry(const Entry& entry) {
 }
 
 void App::endEntry(const Entry& entry, bool success, int64_t duration) {
-	++stats.total;
-	++(success ? stats.passing : stats.failed);
 	Result result;
 	result.entry = entry;
 	result.success = success;
@@ -159,10 +157,11 @@ void App::endEntry(const Entry& entry, bool success, int64_t duration) {
 	results.emplace_back(std::move(result));
 }
 
-void App::statstics(int64_t duration) const {
+bool App::statstics(int64_t duration) const {
 	if (interactive)
 		std::cout << '\r';
 	for (auto& result: results) {
+		++(result.success ? stats.passing : stats.failed);
 		if (result.success) {
 			setcolor(yuni::System::Console::green);
 			#ifndef YUNI_OS_WINDOWS
@@ -202,6 +201,7 @@ void App::statstics(int64_t duration) const {
 	else
 		std::cout << (duration / 1000) << "s)";
 	std::cout << "\n\n";
+	return stats.failed == 0 and stats.total != 0;
 }
 
 bool App::execute(const Entry& entry) {
@@ -241,7 +241,8 @@ void shuffleDeck(std::vector<Entry>& unittests) {
 int App::run() {
 	bool success;
 	if (not inExecutorMode()) {
-		results.reserve(loops * unittests.size());
+		stats.total = static_cast<uint32_t>(loops * unittests.size());
+		results.reserve(stats.total);
 		std::cout << '\n';
 		auto start = now();
 		for (uint32_t l = 0; l != loops; ++l) {
@@ -251,8 +252,7 @@ int App::run() {
 				run(entry);
 		}
 		auto duration = now() - start;
-		statstics(duration);
-		success = stats.failed == 0 and stats.total != 0;
+		success = statstics(duration);
 	}
 	else {
 		success = execute(execinfo);
