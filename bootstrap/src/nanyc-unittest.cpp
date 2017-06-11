@@ -57,6 +57,7 @@ struct App final {
 	bool colors = true;
 	uint32_t loops = 1;
 	bool shuffle = false;
+	uint32_t timeout_s = 30;
 	std::vector<Entry> unittests;
 	std::vector<yuni::String> filenames;
 	std::vector<Result> results;
@@ -244,7 +245,7 @@ void App::run(const Entry& entry) {
 	for (auto& filename: filenames)
 		program.argumentAdd(filename);
 	auto start = now();
-	bool success = program.execute();
+	bool success = program.execute(timeout_s);
 	success = success and (program.wait() == 0);
 	auto duration = now() - start;
 	endEntry(entry, success, duration);
@@ -314,6 +315,7 @@ App prepare(int argc, char** argv) {
 	yuni::GetOpt::Parser options;
 	options.add(filenames, 'i', "", "Input nanyc source files");
 	options.addFlag(nsl, ' ', "nsl", "Import NSL unittests");
+	options.add(app.timeout_s, 't', "timeout", "Timeout for executing an unittest (seconds)");
 	options.add(app.execinfo.module, ' ', "executor-module", "Executor mode, module name (internal use)", false);
 	options.add(app.execinfo.name, ' ', "executor-name", "Executor mode, unittest (internal use)", false);
 	options.addParagraph("\nEntropy");
@@ -342,6 +344,8 @@ App prepare(int argc, char** argv) {
 	if (not app.inExecutorMode()) {
 		if (unlikely(app.loops > 100))
 			throw "number of loops greater than hard-limit '100'";
+		if (unlikely(app.timeout_s == 0))
+			throw "invalid null timeout (-t,--timeout)";
 		bool istty = yuni::System::Console::IsStdoutTTY();
 		app.interactive = not nointeractive and istty;
 		app.colors = (not nocolors) and istty;
