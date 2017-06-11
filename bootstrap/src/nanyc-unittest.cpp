@@ -301,6 +301,7 @@ App prepare(int argc, char** argv) {
 	bool nsl = false;
 	bool verbose = false;
 	bool nocolors = false;
+	bool nointeractive = false;
 	std::vector<AnyString> filenames;
 	yuni::GetOpt::Parser options;
 	options.add(filenames, 'i', "", "Input nanyc source files");
@@ -312,6 +313,7 @@ App prepare(int argc, char** argv) {
 	options.addFlag(app.shuffle, 's', "shuffle", "Randomly rearrange the unittests");
 	options.addParagraph("\nDisplay");
 	options.addFlag(nocolors, ' ', "no-colors", "Disable color output");
+	options.addFlag(nointeractive, ' ', "no-progress", "Disable progression reporting");
 	options.addParagraph("\nHelp");
 	options.addFlag(verbose, 'v', "verbose", "More stuff on the screen");
 	options.addFlag(bugreport, 'b', "bugreport", "Display some useful information to report a bug");
@@ -333,7 +335,7 @@ App prepare(int argc, char** argv) {
 		if (unlikely(app.loops > 100))
 			throw "number of loops greater than hard-limit '100'";
 		bool istty = yuni::System::Console::IsStdoutTTY();
-		app.interactive = istty;
+		app.interactive = not nointeractive and istty;
 		app.colors = (not nocolors) and istty;
 		app.argv0 = argv[0];
 		app.fetch(nsl);
