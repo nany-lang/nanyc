@@ -53,6 +53,7 @@ struct App final {
 private:
 	void startEntry(const Entry&);
 	void endEntry(const Entry&, bool, int64_t);
+	bool execute(const Entry& entry);
 };
 
 App::App() {
@@ -180,14 +181,19 @@ void App::statstics(int64_t duration) const {
 	std::cout << "\n\n";
 }
 
-void App::run(const Entry& entry) {
-	startEntry(entry);
-	auto start = now();
+bool App::execute(const Entry& entry) {
 	auto* program = nyprogram_compile(&opts);
 	bool success = program != nullptr;
 	if (program) {
 		nyprogram_free(program);
 	}
+	return success;
+}
+
+void App::run(const Entry& entry) {
+	startEntry(entry);
+	auto start = now();
+	bool success = execute(entry);
 	auto duration = now() - start;
 	endEntry(entry, success, duration);
 }
