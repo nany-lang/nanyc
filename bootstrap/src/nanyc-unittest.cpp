@@ -52,6 +52,7 @@ struct App final {
 	std::vector<yuni::String> filenames;
 
 	Entry execinfo;
+	AnyString argv0;
 
 private:
 	void startEntry(const Entry&);
@@ -289,6 +290,8 @@ App prepare(int argc, char** argv) {
 		app.colors = (not nocolors) and app.interactive;
 		app.fetch(nsl);
 	}
+	else
+		app.argv0 = argv[0];
 	return app;
 }
 
