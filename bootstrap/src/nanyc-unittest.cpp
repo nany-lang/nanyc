@@ -6,6 +6,7 @@
 #include <yuni/io/filename-manipulation.h>
 #include <yuni/datetime/timestamp.h>
 #include <yuni/core/system/console/console.h>
+#include <yuni/core/process/program.h>
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -200,8 +201,18 @@ bool App::execute(const Entry& entry) {
 
 void App::run(const Entry& entry) {
 	startEntry(entry);
+	yuni::Process::Program program;
+	program.durationPrecision(yuni::Process::Program::dpMilliseconds);
+	program.program(argv0);
+	program.argumentAdd("--executor-module");
+	program.argumentAdd(entry.module);
+	program.argumentAdd("--executor-name");
+	program.argumentAdd(entry.name);
+	for (auto& filename: filenames)
+		program.argumentAdd(filename);
 	auto start = now();
-	bool success = execute(entry);
+	bool success = program.execute();
+	success = success and (program.wait() == 0);
 	auto duration = now() - start;
 	endEntry(entry, success, duration);
 }
@@ -288,10 +299,9 @@ App prepare(int argc, char** argv) {
 	if (not app.inExecutorMode()) {
 		app.interactive = yuni::System::Console::IsStdoutTTY();
 		app.colors = (not nocolors) and app.interactive;
+		app.argv0 = argv[0];
 		app.fetch(nsl);
 	}
-	else
-		app.argv0 = argv[0];
 	return app;
 }
 
