@@ -252,6 +252,13 @@ void shuffleDeck(std::vector<Entry>& unittests) {
 int App::run() {
 	bool success;
 	if (not inExecutorMode()) {
+		if (not interactive) {
+			std::cout << '\n';
+			setcolor(yuni::System::Console::bold);
+			std::cout << "running all tests...";
+			resetcolor();
+			std::cout << '\n';
+		}
 		stats.total = static_cast<uint32_t>(loops * unittests.size());
 		results.reserve(stats.total);
 		std::cout << '\n';
@@ -325,8 +332,9 @@ App prepare(int argc, char** argv) {
 	if (not app.inExecutorMode()) {
 		if (unlikely(app.loops > 100))
 			throw "number of loops greater than hard-limit '100'";
-		app.interactive = yuni::System::Console::IsStdoutTTY();
-		app.colors = (not nocolors) and app.interactive;
+		bool istty = yuni::System::Console::IsStdoutTTY();
+		app.interactive = istty;
+		app.colors = (not nocolors) and istty;
 		app.argv0 = argv[0];
 		app.fetch(nsl);
 	}
