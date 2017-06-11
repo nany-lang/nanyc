@@ -361,7 +361,6 @@ App prepare(int argc, char** argv) {
 	options.add(app.jobs, 'j', "jobs", "Number of concurrent jobs (default: auto)");
 	options.add(app.execinfo.module, ' ', "executor-module", "Executor mode, module name (internal use)", false);
 	options.add(app.execinfo.name, ' ', "executor-name", "Executor mode, unittest (internal use)", false);
-	options.addParagraph("\nEntropy");
 	options.add(app.loops, 'n', "loops", "Number of loops (default: 1)");
 	options.addFlag(app.shuffle, 's', "shuffle", "Randomly rearrange the unittests");
 	options.addParagraph("\nDisplay");
