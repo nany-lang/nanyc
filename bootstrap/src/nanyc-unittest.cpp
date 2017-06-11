@@ -8,6 +8,8 @@
 #include <yuni/core/system/console/console.h>
 #include <yuni/core/process/program.h>
 #include <yuni/core/system/cpu.h>
+#include <yuni/job/queue/service.h>
+#include <yuni/thread/utility.h>
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -63,6 +65,7 @@ struct App final {
 	std::vector<yuni::String> filenames;
 	std::vector<Result> results;
 	uint32_t jobs = 0;
+	yuni::Mutex mutex;
 
 	Entry execinfo;
 	AnyString argv0;
@@ -157,6 +160,7 @@ void App::fetch(bool nsl) {
 
 void App::startEntry(const Entry& entry) {
 	if (interactive) {
+		yuni::MutexLocker locker(mutex);
 		uint32_t progress = static_cast<uint32_t>((100. / stats.total) * static_cast<uint32_t>(results.size()));
 		if (progress > 99)
 			progress = 99;
@@ -182,6 +186,7 @@ void App::endEntry(const Entry& entry, bool success, int64_t duration) {
 	result.entry = entry;
 	result.success = success;
 	result.duration_ms = duration;
+	yuni::MutexLocker locker(mutex);
 	results.emplace_back(std::move(result));
 }
 
@@ -282,13 +287,18 @@ int App::run() {
 		stats.total = static_cast<uint32_t>(loops * unittests.size());
 		results.reserve(stats.total);
 		std::cout << '\n';
-		auto start = now();
+		yuni::Job::QueueService queueservice;
+		queueservice.maximumThreadCount(jobs);
+		queueservice.minimumThreadCount(jobs);
 		for (uint32_t l = 0; l != loops; ++l) {
 			if (unlikely(shuffle))
 				shuffleDeck(unittests);
 			for (auto& entry: unittests)
-				run(entry);
+				yuni::async(queueservice, [=] { run(entry); });
 		}
+		auto start = now();
+		queueservice.start();
+		queueservice.wait(yuni::qseIdle);
 		auto duration = now() - start;
 		success = statstics(duration);
 	}
