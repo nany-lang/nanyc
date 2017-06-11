@@ -76,6 +76,7 @@ private:
 	bool execute(const Entry& entry);
 
 	yuni::String runningMsg;
+	const Entry* latestRunningUnittest = nullptr;
 };
 
 App::App() {
@@ -161,6 +162,7 @@ void App::fetch(bool nsl) {
 void App::startEntry(const Entry& entry) {
 	if (interactive) {
 		yuni::MutexLocker locker(mutex);
+		latestRunningUnittest = &entry;
 		uint32_t progress = static_cast<uint32_t>((100. / stats.total) * static_cast<uint32_t>(results.size()));
 		if (progress > 99)
 			progress = 99;
