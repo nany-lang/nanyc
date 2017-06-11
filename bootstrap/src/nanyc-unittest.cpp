@@ -19,7 +19,7 @@ namespace ny {
 namespace unittests {
 namespace {
 
-constexpr const char runningText[] = "    running ";
+constexpr const char runningText[] = "running ";
 
 struct Entry final {
 	yuni::String module;
@@ -145,6 +145,14 @@ void App::fetch(bool nsl) {
 
 void App::startEntry(const Entry& entry) {
 	if (interactive) {
+		uint32_t progress = static_cast<uint32_t>((100. / stats.total) * static_cast<uint32_t>(results.size()));
+		if (progress > 99)
+			progress = 99;
+		if (progress < 10)
+			std::cout << "   ";
+		else
+			std::cout << "  ";
+		std::cout << static_cast<uint32_t>(progress) << "% - ";
 		setcolor(yuni::System::Console::bold);
 		std::cout << runningText;
 		resetcolor();
@@ -167,7 +175,7 @@ void App::endEntry(const Entry& entry, bool success, int64_t duration) {
 
 bool App::statstics(int64_t duration) {
 	if (interactive) {
-		runningMsg.resize(runningMsg.size() + AnyString(runningText).size());
+		runningMsg.resize(runningMsg.size() + AnyString(runningText).size() + 8 /*%*/);
 		runningMsg.fill(' ');
 		std::cout << runningMsg << '\r';
 	}
