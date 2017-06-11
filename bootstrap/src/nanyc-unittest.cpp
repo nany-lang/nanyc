@@ -74,6 +74,7 @@ private:
 	void startEntry(const Entry&);
 	void endEntry(const Entry&, bool, int64_t);
 	bool execute(const Entry& entry);
+	bool writeProgress();
 
 	yuni::String runningMsg;
 	const Entry* latestRunningUnittest = nullptr;
@@ -163,23 +164,6 @@ void App::startEntry(const Entry& entry) {
 	if (interactive) {
 		yuni::MutexLocker locker(mutex);
 		latestRunningUnittest = &entry;
-		uint32_t progress = static_cast<uint32_t>((100. / stats.total) * static_cast<uint32_t>(results.size()));
-		if (progress > 99)
-			progress = 99;
-		if (progress < 10)
-			std::cout << "   ";
-		else
-			std::cout << "  ";
-		std::cout << static_cast<uint32_t>(progress) << "% - ";
-		setcolor(yuni::System::Console::bold);
-		std::cout << runningText;
-		resetcolor();
-		auto previousLength = runningMsg.size();
-		runningMsg.clear();
-		runningMsg << entry.module << '/' << entry.name << "... ";
-		if (runningMsg.size() < previousLength)
-			runningMsg.resize(previousLength, " ");
-		std::cout << runningMsg << '\r' << std::flush;
 	}
 }
 
@@ -190,6 +174,37 @@ void App::endEntry(const Entry& entry, bool success, int64_t duration) {
 	result.duration_ms = duration;
 	yuni::MutexLocker locker(mutex);
 	results.emplace_back(std::move(result));
+}
+
+bool App::writeProgress() {
+	size_t achieved = 0;
+	const Entry* latestEntry = nullptr;
+	{
+		yuni::MutexLocker locker(mutex);
+		achieved = results.size();
+		latestEntry = latestRunningUnittest;
+	}
+	if (unlikely(!latestEntry))
+		return true;
+	auto& entry = *latestEntry;
+	uint32_t progress = static_cast<uint32_t>((100. / stats.total) * static_cast<uint32_t>(achieved));
+	if (progress > 99)
+		progress = 99;
+	if (progress < 10)
+		std::cout << "   ";
+	else
+		std::cout << "  ";
+	std::cout << static_cast<uint32_t>(progress) << "% - ";
+	setcolor(yuni::System::Console::bold);
+	std::cout << runningText;
+	resetcolor();
+	auto previousLength = runningMsg.size();
+	runningMsg.clear();
+	runningMsg << entry.module << '/' << entry.name << "... ";
+	if (runningMsg.size() < previousLength)
+		runningMsg.resize(previousLength, " ");
+	std::cout << runningMsg << '\r' << std::flush;
+	return true;
 }
 
 bool App::statstics(int64_t duration) {
@@ -299,9 +314,13 @@ int App::run() {
 				yuni::async(queueservice, [=] { run(entry); });
 		}
 		auto start = now();
-		queueservice.start();
-		queueservice.wait(yuni::qseIdle);
-		auto duration = now() - start;
+		auto duration = start;
+		{
+			auto progress = yuni::every(150 /*ms*/, [&] { return writeProgress(); });
+			queueservice.start();
+			queueservice.wait(yuni::qseIdle);
+			duration = now() - start;
+		}
 		success = statstics(duration);
 	}
 	else {
