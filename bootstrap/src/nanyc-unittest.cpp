@@ -262,9 +262,9 @@ App prepare(int argc, char** argv) {
 		throw printBugreport();
 	if (unlikely(verbose))
 		printBugreport();
+	app.importFilenames(filenames);
 	app.interactive = yuni::System::Console::IsStdoutTTY();
 	app.colors = (not nocolors) and app.interactive;
-	app.importFilenames(filenames);
 	app.fetch(nsl);
 	return app;
 }
