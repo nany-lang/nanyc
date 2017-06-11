@@ -35,6 +35,7 @@ struct App final {
 	void statstics(int64_t duration) const;
 	void setcolor(yuni::System::Console::Color) const;
 	void resetcolor() const;
+	bool inExecutorMode() const;
 
 	struct final {
 		uint32_t total = 0;
@@ -49,6 +50,8 @@ struct App final {
 	bool shuffle = false;
 	std::vector<Entry> unittests;
 	std::vector<yuni::String> filenames;
+
+	Entry execinfo;
 
 private:
 	void startEntry(const Entry&);
@@ -73,6 +76,10 @@ void App::setcolor(yuni::System::Console::Color c) const {
 void App::resetcolor() const {
 	if (colors)
 		yuni::System::Console::ResetTextColor(std::cout);
+}
+
+bool App::inExecutorMode() const {
+	return not execinfo.name.empty();
 }
 
 auto now() {
@@ -206,17 +213,23 @@ void shuffleDeck(std::vector<Entry>& unittests) {
 }
 
 int App::run() {
-	std::cout << '\n';
-	auto start = now();
-	for (uint32_t l = 0; l != loops; ++l) {
-		if (unlikely(shuffle))
-			shuffleDeck(unittests);
-		for (auto& entry: unittests)
-			run(entry);
+	bool success;
+	if (not inExecutorMode()) {
+		std::cout << '\n';
+		auto start = now();
+		for (uint32_t l = 0; l != loops; ++l) {
+			if (unlikely(shuffle))
+				shuffleDeck(unittests);
+			for (auto& entry: unittests)
+				run(entry);
+		}
+		auto duration = now() - start;
+		statstics(duration);
+		success = stats.failed == 0 and stats.total != 0;
 	}
-	auto duration = now() - start;
-	statstics(duration);
-	bool success = stats.failed == 0 and stats.total != 0;
+	else {
+		success = execute(execinfo);
+	}
 	return success ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
@@ -247,6 +260,8 @@ App prepare(int argc, char** argv) {
 	yuni::GetOpt::Parser options;
 	options.addFlag(filenames, 'i', "", "Input nanyc source files");
 	options.addFlag(nsl, ' ', "nsl", "Import NSL unittests");
+	options.add(app.execinfo.module, ' ', "executor-module", "Executor mode, module name (internal use)", false);
+	options.add(app.execinfo.name, ' ', "executor-name", "Executor mode, unittest (internal use)", false);
 	options.addParagraph("\nEntropy");
 	options.addFlag(app.loops, 'l', "loops", "Number of loops (default: 1)");
 	options.addFlag(app.shuffle, 's', "shuffle", "Randomly rearrange the unittests");
@@ -269,9 +284,11 @@ App prepare(int argc, char** argv) {
 	if (unlikely(verbose))
 		printBugreport();
 	app.importFilenames(filenames);
-	app.interactive = yuni::System::Console::IsStdoutTTY();
-	app.colors = (not nocolors) and app.interactive;
-	app.fetch(nsl);
+	if (not app.inExecutorMode()) {
+		app.interactive = yuni::System::Console::IsStdoutTTY();
+		app.colors = (not nocolors) and app.interactive;
+		app.fetch(nsl);
+	}
 	return app;
 }
 
