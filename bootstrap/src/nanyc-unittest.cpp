@@ -7,6 +7,7 @@
 #include <yuni/datetime/timestamp.h>
 #include <yuni/core/system/console/console.h>
 #include <yuni/core/process/program.h>
+#include <yuni/core/system/cpu.h>
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -61,6 +62,7 @@ struct App final {
 	std::vector<Entry> unittests;
 	std::vector<yuni::String> filenames;
 	std::vector<Result> results;
+	uint32_t jobs = 0;
 
 	Entry execinfo;
 	AnyString argv0;
@@ -106,6 +108,15 @@ bool operator < (const Entry& a, const Entry& b) {
 
 const char* plurals(auto count, const char* single, const char* many) {
 	return (count <= 1) ? single : many;
+}
+
+uint32_t numberOfJobs(uint32_t jobs) {
+	if (jobs == 0) {
+		jobs = yuni::System::CPU::Count();
+	}
+	else if (jobs > 256) // arbitrary
+		jobs = 256;
+	return jobs;
 }
 
 void App::importFilenames(const std::vector<AnyString>& list) {
@@ -316,6 +327,7 @@ App prepare(int argc, char** argv) {
 	options.add(filenames, 'i', "", "Input nanyc source files");
 	options.addFlag(nsl, ' ', "nsl", "Import NSL unittests");
 	options.add(app.timeout_s, 't', "timeout", "Timeout for executing an unittest (seconds)");
+	options.add(app.jobs, 'j', "jobs", "Number of concurrent jobs (default: auto)");
 	options.add(app.execinfo.module, ' ', "executor-module", "Executor mode, module name (internal use)", false);
 	options.add(app.execinfo.name, ' ', "executor-name", "Executor mode, unittest (internal use)", false);
 	options.addParagraph("\nEntropy");
@@ -350,6 +362,7 @@ App prepare(int argc, char** argv) {
 		app.interactive = not nointeractive and istty;
 		app.colors = (not nocolors) and istty;
 		app.argv0 = argv[0];
+		app.jobs = numberOfJobs(app.jobs);
 		app.fetch(nsl);
 	}
 	return app;
