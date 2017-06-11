@@ -58,6 +58,7 @@ struct App final {
 	nycompile_opts_t opts;
 	bool interactive = true;
 	bool colors = true;
+	bool verbose = false;
 	uint32_t loops = 1;
 	bool shuffle = false;
 	uint32_t timeout_s = 30;
@@ -350,7 +351,6 @@ App prepare(int argc, char** argv) {
 	bool version = false;
 	bool bugreport = false;
 	bool nsl = false;
-	bool verbose = false;
 	bool nocolors = false;
 	bool nointeractive = false;
 	std::vector<AnyString> filenames;
@@ -368,7 +368,7 @@ App prepare(int argc, char** argv) {
 	options.addFlag(nocolors, ' ', "no-colors", "Disable color output");
 	options.addFlag(nointeractive, ' ', "no-progress", "Disable progression reporting");
 	options.addParagraph("\nHelp");
-	options.addFlag(verbose, 'v', "verbose", "More stuff on the screen");
+	options.addFlag(app.verbose, 'v', "verbose", "More stuff on the screen");
 	options.addFlag(bugreport, 'b', "bugreport", "Display some useful information to report a bug");
 	options.addFlag(version, ' ', "version", "Print the version");
 	options.remainingArguments(filenames);
@@ -381,7 +381,7 @@ App prepare(int argc, char** argv) {
 		throw printVersion();
 	if (unlikely(bugreport))
 		throw printBugreport();
-	if (unlikely(verbose))
+	if (unlikely(app.verbose))
 		printBugreport();
 	app.importFilenames(filenames);
 	if (not app.inExecutorMode()) {
