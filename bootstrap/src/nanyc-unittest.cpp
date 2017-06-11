@@ -142,7 +142,7 @@ void App::fetch(bool nsl) {
 void App::startEntry(const Entry& entry) {
 	if (interactive) {
 		setcolor(yuni::System::Console::bold);
-		std::cout << "       running ";
+		std::cout << "\r  running ";
 		resetcolor();
 		std::cout << entry.module << '/' << entry.name;
 		std::cout << "... " << std::flush;
@@ -152,27 +152,6 @@ void App::startEntry(const Entry& entry) {
 void App::endEntry(const Entry& entry, bool success, int64_t duration) {
 	++stats.total;
 	++(success ? stats.passing : stats.failed);
-	if (interactive)
-		std::cout << '\r'; // back to begining of the line
-	if (success) {
-		setcolor(yuni::System::Console::green);
-		#ifndef YUNI_OS_WINDOWS
-		std::cout << "    \u2713  ";
-		#else
-		std::cout << "   OK  ";
-		#endif
-		resetcolor();
-	}
-	else {
-		setcolor(yuni::System::Console::red);
-		std::cout << "  ERR  ";
-		resetcolor();
-	}
-	std::cout << entry.module << '/' << entry.name;
-	setcolor(yuni::System::Console::lightblue);
-	std::cout << "  (" << duration << "ms)";
-	resetcolor();
-	std::cout << "    \n";
 	Result result;
 	result.entry = entry;
 	result.success = success;
@@ -181,6 +160,29 @@ void App::endEntry(const Entry& entry, bool success, int64_t duration) {
 }
 
 void App::statstics(int64_t duration) const {
+	if (interactive)
+		std::cout << '\r';
+	for (auto& result: results) {
+		if (result.success) {
+			setcolor(yuni::System::Console::green);
+			#ifndef YUNI_OS_WINDOWS
+			std::cout << "    \u2713  ";
+			#else
+			std::cout << "   OK  ";
+			#endif
+			resetcolor();
+		}
+		else {
+			setcolor(yuni::System::Console::red);
+			std::cout << "  ERR  ";
+			resetcolor();
+		}
+		std::cout << result.entry.module << '/' << result.entry.name;
+		setcolor(yuni::System::Console::lightblue);
+		std::cout << "  (" << result.duration_ms << "ms)";
+		resetcolor();
+		std::cout << '\n';
+	}
 	std::cout << "\n       " << stats.total << ' ' << plurals(stats.total, "test", "tests");
 	if (stats.passing != 0) {
 		std::cout << ", ";
