@@ -19,6 +19,8 @@ namespace ny {
 namespace unittests {
 namespace {
 
+constexpr const char runningText[] = "    running ";
+
 struct Entry final {
 	yuni::String module;
 	yuni::String name;
@@ -39,7 +41,7 @@ struct App final {
 	void fetch(bool nsl);
 	void run(const Entry&);
 	int run();
-	bool statstics(int64_t duration) const;
+	bool statstics(int64_t duration);
 	void setcolor(yuni::System::Console::Color) const;
 	void resetcolor() const;
 	bool inExecutorMode() const;
@@ -66,6 +68,8 @@ private:
 	void startEntry(const Entry&);
 	void endEntry(const Entry&, bool, int64_t);
 	bool execute(const Entry& entry);
+
+	yuni::String runningMsg;
 };
 
 App::App() {
@@ -142,10 +146,14 @@ void App::fetch(bool nsl) {
 void App::startEntry(const Entry& entry) {
 	if (interactive) {
 		setcolor(yuni::System::Console::bold);
-		std::cout << "\r  running ";
+		std::cout << runningText;
 		resetcolor();
-		std::cout << entry.module << '/' << entry.name;
-		std::cout << "... " << std::flush;
+		auto previousLength = runningMsg.size();
+		runningMsg.clear();
+		runningMsg << entry.module << '/' << entry.name << "... ";
+		if (runningMsg.size() < previousLength)
+			runningMsg.resize(previousLength, " ");
+		std::cout << runningMsg << '\r' << std::flush;
 	}
 }
 
@@ -157,9 +165,12 @@ void App::endEntry(const Entry& entry, bool success, int64_t duration) {
 	results.emplace_back(std::move(result));
 }
 
-bool App::statstics(int64_t duration) const {
-	if (interactive)
-		std::cout << '\r';
+bool App::statstics(int64_t duration) {
+	if (interactive) {
+		runningMsg.resize(runningMsg.size() + AnyString(runningText).size());
+		runningMsg.fill(' ');
+		std::cout << runningMsg << '\r';
+	}
 	for (auto& result: results) {
 		++(result.success ? stats.passing : stats.failed);
 		if (result.success) {
