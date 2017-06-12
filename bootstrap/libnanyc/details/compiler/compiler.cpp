@@ -110,6 +110,8 @@ inline nyprogram_t* Compiler::compile() {
 			auto& source = sources[offset + i];
 			compiled &= importSourceAndCompile(report, *this, source, opts, opts.sources.items[i]);
 		}
+		compiled = compiled
+			and cdeftable.atoms.fetchAndIndexCoreObjects(); // indexing bool, u32, f64...
 		if (unlikely(not compiled))
 			return nullptr;
 		auto program = std::make_unique<ny::Program>();
