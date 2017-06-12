@@ -110,10 +110,10 @@ inline nyprogram_t* Compiler::compile() {
 			auto& source = sources[offset + i];
 			compiled &= importSourceAndCompile(report, *this, source, opts, opts.sources.items[i]);
 		}
-		if (compiled) {
-			auto program = std::make_unique<ny::Program>();
-			return ny::Program::pointer(program.release());
-		}
+		if (unlikely(not compiled))
+			return nullptr;
+		auto program = std::make_unique<ny::Program>();
+		return ny::Program::pointer(program.release());
 	}
 	catch (const std::bad_alloc& e) {
 		report.ice() << "not enough memory when compiling";
