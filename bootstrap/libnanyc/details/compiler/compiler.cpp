@@ -94,7 +94,7 @@ inline nyprogram_t* Compiler::compile() {
 			scount += unittestCount;
 		sources.count = scount;
 		sources.items = std::make_unique<Source[]>(scount);
-		bool compiled = true;
+		bool compiled = opts.with_nsl_unittests == nyfalse;
 		uint32_t offset = 0;
 		if (config::importNSL) {
 			registerNSLCoreFiles(sources, offset, [&](ny::compiler::Source& source) {
@@ -110,7 +110,7 @@ inline nyprogram_t* Compiler::compile() {
 			auto& source = sources[offset + i];
 			compiled &= importSourceAndCompile(report, *this, source, opts, opts.sources.items[i]);
 		}
-		if (compiled and (opts.with_nsl_unittests == nyfalse)) {
+		if (compiled) {
 			auto program = std::make_unique<ny::Program>();
 			return ny::Program::pointer(program.release());
 		}
