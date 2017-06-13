@@ -8,14 +8,14 @@ namespace semantic {
 
 
 inline void Analyzer::pushNewFrame(Atom& atom) {
-	auto* newframe = build.allocate<AtomStackFrame>(atom, frame);
+	auto* newframe = new AtomStackFrame(atom, frame);
 	frame = newframe;
 }
 
 
 inline void Analyzer::popFrame() {
 	auto* previous = frame->previous;
-	build.deallocate(frame);
+	delete frame;
 	frame = previous;
 }
 

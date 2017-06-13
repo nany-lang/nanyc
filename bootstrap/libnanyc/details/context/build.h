@@ -70,16 +70,6 @@ public:
 	*/
 	void cerrColor(nycolor_t);
 
-
-	//! Allocate a new object
-	template<class T, typename... Args> T* allocate(Args&& ... args);
-	//! Allocate a new memory region
-	template<class T> T* allocateraw(size_t size);
-	//! delete an object
-	template<class T> void deallocate(T* object);
-	//! delete a memory region
-	void deallocate(void* object, size_t size);
-
 	//! Get the equivalent C pointer
 	nybuild_t* self();
 	//! Get the equivalent C pointer (const)

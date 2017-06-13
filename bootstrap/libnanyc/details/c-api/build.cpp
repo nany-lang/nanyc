@@ -41,15 +41,9 @@ extern "C" void nybuild_print_report_to_console(nybuild_t* ptr, nybool_t print_h
 }
 
 
-extern "C" void nybuild_cf_init(nybuild_cf_t* cf, const nyproject_t* project) {
+extern "C" void nybuild_cf_init(nybuild_cf_t* cf) {
 	assert(cf != NULL);
 	memset(cf, 0x0, sizeof(nybuild_cf_t));
-	if (project) {
-		auto& prj = *(reinterpret_cast<const ny::Project*>(project));
-		nany_memalloc_copy(&cf->allocator, &prj.cf.allocator);
-	}
-	else
-		nany_memalloc_set_default(&(cf->allocator));
 	nyconsole_cf_set_stdcout(&cf->console);
 	// default entrypoint
 	cf->entrypoint.size  = 4;
@@ -70,7 +64,7 @@ extern "C" nybuild_t* nybuild_prepare(nyproject_t* ptr, const nybuild_cf_t* cf) 
 			}
 			else {
 				nybuild_cf_t ncf;
-				nybuild_cf_init(&ncf, ptr);
+				nybuild_cf_init(&ncf);
 				build = std::make_unique<ny::Build>(&project, ncf, async);
 			}
 			// making sure that user-events do not destroy the project by mistake

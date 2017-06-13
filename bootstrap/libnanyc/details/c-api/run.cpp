@@ -70,12 +70,11 @@ std::unique_ptr<nyprogram_t> build(const nyrun_cf_t* const runcf, std::unique_pt
 	if (runcf) {
 		verbose = (runcf->verbose != nyfalse);
 		memcpy(&(cf),           &(runcf->build),     sizeof(nybuild_cf_t));
-		memcpy(&(cf.allocator), &(runcf->allocator), sizeof(nyallocator_t));
 		memcpy(&(cf.console),   &(runcf->console),   sizeof(nyconsole_t));
 	}
 	else {
 		verbose = false;
-		nybuild_cf_init(&cf, project.get());
+		nybuild_cf_init(&cf);
 	}
 	auto buildinfo = make_unique_from_ptr<nybuild_t>(nybuild_prepare(project.get(), &cf));
 	auto bStatus = nybuild(buildinfo.get());
@@ -87,6 +86,7 @@ std::unique_ptr<nyprogram_t> build(const nyrun_cf_t* const runcf, std::unique_pt
 	if (unlikely(verbose))
 		nybuild_print_report_to_console(buildinfo.get(), nytrue);
 	nyprogram_cf_t pcf;
+	nany_memalloc_set_default(&(pcf.allocator));
 	if (runcf) {
 		memcpy(&(pcf),           &(runcf->program),   sizeof(nyprogram_cf_t));
 		memcpy(&(pcf.allocator), &(runcf->allocator), sizeof(nyallocator_t));

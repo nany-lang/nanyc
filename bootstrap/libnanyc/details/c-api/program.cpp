@@ -8,14 +8,11 @@ using namespace Yuni;
 extern "C" void nyprogram_cf_init(nyprogram_cf_t* cf, const nybuild_cf_t* buildcf) {
 	assert(cf != NULL);
 	memset(cf, 0x0, sizeof(nyprogram_cf_t));
-	if (nullptr == buildcf) {
-		nany_memalloc_set_default(&(cf->allocator));
+	nany_memalloc_set_default(&(cf->allocator));
+	if (nullptr == buildcf)
 		nyconsole_cf_set_stdcout(&cf->console);
-	}
-	else {
-		nany_memalloc_copy(&(cf->allocator), &(buildcf->allocator));
+	else
 		nyconsole_cf_copy(&(cf->console), &(buildcf->console));
-	}
 	cf->entrypoint = buildcf->entrypoint;
 }
 

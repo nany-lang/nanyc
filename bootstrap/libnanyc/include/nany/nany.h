@@ -421,8 +421,6 @@ NY_EXPORT nybool_t nyproject_trylock(const nyproject_t*);
 /*@{*/
 /*! Project Configuration */
 typedef struct nybuild_cf_t {
-	/*! Memory allocator */
-	nyallocator_t allocator;
 	/*! Console output */
 	nyconsole_t console;
 
@@ -489,7 +487,7 @@ NY_EXPORT void nybuild_ref(nybuild_t* build);
 NY_EXPORT void nybuild_unref(nybuild_t* build);
 
 /*! Initialize a project configuration */
-NY_EXPORT void nybuild_cf_init(nybuild_cf_t* cf, const nyproject_t* project);
+NY_EXPORT void nybuild_cf_init(nybuild_cf_t* cf);
 /*@}*/
 
 

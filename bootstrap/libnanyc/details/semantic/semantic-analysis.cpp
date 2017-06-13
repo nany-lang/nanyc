@@ -49,7 +49,7 @@ Analyzer::~Analyzer() {
 	}
 	for (auto* frm = frame; frm != nullptr; ) {
 		auto* previous = frm->previous;
-		build.deallocate(frm);
+		delete frm;
 		frm = previous;
 	}
 }
