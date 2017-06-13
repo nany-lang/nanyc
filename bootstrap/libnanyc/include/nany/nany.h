@@ -424,8 +424,6 @@ typedef struct nybuild_cf_t {
 	/*! Console output */
 	nyconsole_t console;
 
-	/*! Make all warnings into errors */
-	nybool_t warnings_into_errors;
 	/*! Entry point to compile (ex: "main") */
 	nyanystr_t entrypoint;
 	/*! Ignore atoms when parsing - do not produce any IR code for atoms */

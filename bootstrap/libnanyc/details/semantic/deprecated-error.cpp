@@ -393,11 +393,6 @@ Logs::Report emitReportEntry(void* self, Logs::Level level) {
 	switch (level) {
 		default:
 			break;
-		case Logs::Level::warning: {
-			if (nyfalse == sb.build.cf.warnings_into_errors)
-				break;
-			level = Logs::Level::error;
-		}
 		// [[fallthru]]
 		case Logs::Level::error:
 		case Logs::Level::ICE: {
