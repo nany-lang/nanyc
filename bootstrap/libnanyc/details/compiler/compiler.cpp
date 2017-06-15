@@ -75,10 +75,6 @@ bool importSourceAndCompile(ny::Logs::Report& mainreport, ny::compiler::Compdb& 
 
 } // namespace
 
-inline Compdb::Compdb(const nycompile_opts_t& opts)
-	: opts(opts) {
-}
-
 inline nyprogram_t* Compdb::compile() {
 	ny::Logs::Report report{messages};
 	Logs::Handler errorHandler{&report, &buildGenerateReport};
