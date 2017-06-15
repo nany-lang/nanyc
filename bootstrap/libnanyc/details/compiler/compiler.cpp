@@ -10,6 +10,7 @@
 #include "details/semantic/atom-factory.h"
 #include "details/vm/runtime/std.core.h"
 #include "libnanyc-config.h"
+#include "libnanyc-traces.h"
 #include "embed-nsl.hxx" // generated
 #include <yuni/io/file.h>
 #include <libnanyc.h>
@@ -112,6 +113,8 @@ nyprogram_t* compile(ny::compiler::Compdb& compdb) {
 			and ny::semantic::resolveStrictParameterTypes(compdb, compdb.cdeftable.atoms.root); // typedef
 		if (unlikely(not compiled))
 			return nullptr;
+		if (config::traces::preAtomTable)
+			compdb.cdeftable.atoms.root.printTree(ClassdefTableView{compdb.cdeftable});
 		auto program = std::make_unique<ny::Program>();
 		return ny::Program::pointer(program.release());
 	}
