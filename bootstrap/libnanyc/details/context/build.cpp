@@ -32,6 +32,7 @@ Build::AttachedSequenceRef::~AttachedSequenceRef() {
 Build::Build(Ref<Project> project, const nybuild_cf_t& cf, bool async)
 	: cf(cf)
 	, project(project)
+	, compdb(opts)
 	, isAsync(async) {
 	if (not m_targets.empty()) { // big cleanup
 		m_targets.clear();
@@ -42,14 +43,12 @@ Build::Build(Ref<Project> project, const nybuild_cf_t& cf, bool async)
 		m_attachedIRCodes.shrink_to_fit();
 		duration = 0;
 		buildtime = 0;
-		messages = nullptr;
 	}
 	m_targets.reserve(project->targets.all.size());
 	m_sources.reserve(32); // arbitrary, at least more than 20 source files from nsl
 	success = true;
 	// keeping our own list of targets / sources to be completely
 	// isolated from the project
-	messages = std::make_unique<Logs::Message>(Logs::Level::none);
 	for (auto& pair : project->targets.all) {
 		auto newtarget = make_ref<CTarget>(project->self(), *pair.second);
 		newtarget->eachSource([&](Source & source) {
@@ -58,6 +57,7 @@ Build::Build(Ref<Project> project, const nybuild_cf_t& cf, bool async)
 		m_targets.emplace_back(newtarget);
 	}
 	if (config::importNSL) {
+		auto& intrinsics = compdb.intrinsics;
 		nsl::import::string(intrinsics);
 		nsl::import::process(intrinsics);
 		nsl::import::env(intrinsics);
@@ -78,7 +78,7 @@ Build::~Build() {
 
 
 bool Build::compile() {
-	ny::Logs::Report report{*messages.get()};
+	ny::Logs::Report report{compdb.messages};
 	Logs::Handler newHandler{&report, &buildGenerateReport};
 	success = true;
 	buildtime = DateTime::NowMilliSeconds();
@@ -87,15 +87,15 @@ bool Build::compile() {
 			success &= src.get().build(*this);
 		if (cf.ignore_atoms == nyfalse) {
 			// Indexing Core Objects (bool, u32, u64, f32, ...)
-			success = success and cdeftable.atoms.fetchAndIndexCoreObjects();
+			success = success and compdb.cdeftable.atoms.fetchAndIndexCoreObjects();
 			// Resolve strict parameter types
 			// ex: func foo(p1, p2: TypeP2) // Here TypeP2 must be resolved
 			// This will be used for deduce func overloading
-			success = success and resolveStrictParameterTypes(cdeftable.atoms.root);
+			success = success and resolveStrictParameterTypes(compdb.cdeftable.atoms.root);
 			if (config::traces::preAtomTable)
-				cdeftable.atoms.root.printTree(ClassdefTableView{cdeftable});
+				compdb.cdeftable.atoms.root.printTree(ClassdefTableView{compdb.cdeftable});
 			const nytype_t* argtypes = nullptr;
-			AnyString entrypoint{cf.entrypoint.c_str, cf.entrypoint.len};
+			AnyString entrypoint{cf.entrypoint.c_str, static_cast<uint32_t>(cf.entrypoint.len)};
 			if (not entrypoint.empty())
 				success = success and instanciate(entrypoint, argtypes, main.atomid, main.instanceid);
 		}

@@ -33,8 +33,7 @@ extern "C" void nybuild_print_report_to_console(nybuild_t* ptr, nybool_t print_h
 		try {
 			if (YUNI_UNLIKELY(print_header != nyfalse))
 				nybuild_print_compiler_info_to_console(build);
-			if (!!build.messages)
-				build.messages->print(build.cf.console, false);
+			build.compdb.messages.print(build.cf.console, false);
 		}
 		catch (...) {}
 	}

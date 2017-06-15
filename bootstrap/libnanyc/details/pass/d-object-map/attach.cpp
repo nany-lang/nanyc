@@ -17,7 +17,7 @@ bool Build::attach(ir::Sequence& sequence, bool owned) {
 		m_attachedIRCodes.push_back(AttachedSequenceRef{&sequence, owned});
 	}
 	Pass::MappingOptions options;
-	return Pass::map(cdeftable.atoms.root, cdeftable, mutex, sequence, options);
+	return Pass::map(compdb.cdeftable.atoms.root, compdb.cdeftable, mutex, sequence, options);
 }
 
 

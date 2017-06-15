@@ -1,4 +1,5 @@
 #pragma once
+#include "details/compiler/compdb.h"
 #include "nany/nany.h"
 #include <yuni/core/smartptr/intrusive.h>
 #include <yuni/core/atomic/bool.h>
@@ -87,14 +88,8 @@ public:
 	//! Canceled flag
 	Yuni::Atomic::Bool canceled;
 
-	//! The datatype matrix
-	ClassdefTable cdeftable;
-
-	//! All intrinsics
-	intrinsic::Catalog intrinsics;
-
-	//! All report messages
-	std::unique_ptr<Logs::Message> messages;
+	nycompile_opts_t opts; // just for compilation
+	ny::compiler::Compdb compdb;
 
 	//! Build time
 	int64_t buildtime = 0;

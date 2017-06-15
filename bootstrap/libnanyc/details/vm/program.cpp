@@ -26,7 +26,7 @@ void flushAll(nyconsole_t& console) {
 Program::Program(const nyprogram_cf_t& cf, nybuild_t* build)
 	: cf(cf)
 	, build(build)
-	, map(ref(build).cdeftable.atoms) {
+	, map(ref(build).compdb.cdeftable.atoms) {
 	ref(build).addRef(); // nany_build_ref()
 }
 

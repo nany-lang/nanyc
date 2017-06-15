@@ -14,7 +14,7 @@ ContextRunner::ContextRunner(Context& context, const ir::Sequence& callee)
 	, context(context)
 	, map(context.program.map)
 	, ircode(std::cref(callee))
-	, userDefinedIntrinsics(ny::ref(context.program.build).intrinsics) {
+	, userDefinedIntrinsics(ny::ref(context.program.build).compdb.intrinsics) {
 }
 
 

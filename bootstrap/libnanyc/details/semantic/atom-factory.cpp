@@ -210,13 +210,13 @@ bool instanciateRecursiveAtom(Settings& settings) {
 
 
 bool resolveTypesBeforeBodyStart(Build& build, Atom& atom, Settings* originalInfo) {
-	ClassdefTableView cdeftblView{build.cdeftable};
+	ClassdefTableView cdeftblView{build.compdb.cdeftable};
 	if (not (originalInfo and atom.isTypeAlias())) {
 		using ParamList = decltype(ny::semantic::FuncOverloadMatch::result.params);
 		ParamList params; // input parameters (won't be used)
 		ParamList tmplparams;
 		std::shared_ptr<Logs::Message> newReport;
-		ny::Logs::Report report{*build.messages.get()};
+		ny::Logs::Report report{build.compdb.messages};
 		ny::semantic::Settings settings{newReport, atom, cdeftblView, build, params, tmplparams};
 		bool success = ny::semantic::instanciateAtomParameterTypes(settings);
 		if (not success)
@@ -230,8 +230,8 @@ bool resolveTypesBeforeBodyStart(Build& build, Atom& atom, Settings* originalInf
 		if (unlikely(not (pindex < tmplparams.size())))
 			return ny::complain::inconsistentGenericTypeParameterIndex();
 		atom.returnType.clid = CLID::AtomMapID(atom.atomid);
-		auto& srccdef = build.cdeftable.classdef(tmplparams[pindex].clid);
-		auto& rawcdef = build.cdeftable.rawclassdef(CLID::AtomMapID(atom.atomid));
+		auto& srccdef = build.compdb.cdeftable.classdef(tmplparams[pindex].clid);
+		auto& rawcdef = build.compdb.cdeftable.rawclassdef(CLID::AtomMapID(atom.atomid));
 		rawcdef.import(srccdef);
 		rawcdef.qualifiers.merge(srccdef.qualifiers);
 		return true;

@@ -27,7 +27,7 @@ Analyzer::Analyzer(Logs::Report report, ClassdefTableView& cdeftable, Build& bui
 	, out(out)
 	, currentSequence(sequence)
 	, build(build)
-	, intrinsics(build.intrinsics)
+	, intrinsics(build.compdb.intrinsics)
 	, overloadMatch(this)
 	, parent(parent)
 	, localErrorHandler(this, &emitReportEntry)
