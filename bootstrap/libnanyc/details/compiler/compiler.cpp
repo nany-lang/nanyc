@@ -1,5 +1,5 @@
-#include "details/compiler/compile.h"
 #include "details/compiler/compiler.h"
+#include "details/compiler/compdb.h"
 #include "details/program/program.h"
 #include "details/reporting/report.h"
 #include "details/errors/errors.h"
@@ -46,7 +46,7 @@ void copySourceOpts(ny::compiler::Source& source, const nysource_opts_t& opts) {
 	}
 }
 
-void importCompilerIntrinsics(intrinsic::Catalog& intrinsics) {
+void importcompdbIntrinsics(intrinsic::Catalog& intrinsics) {
 	nsl::import::string(intrinsics);
 	nsl::import::process(intrinsics);
 	nsl::import::env(intrinsics);
@@ -56,7 +56,7 @@ void importCompilerIntrinsics(intrinsic::Catalog& intrinsics) {
 	nsl::import::digest(intrinsics);
 }
 
-bool compileSource(ny::Logs::Report& mainreport, ny::compiler::Compiler& compiler, ny::compiler::Source& source, const nycompile_opts_t& gopts) {
+bool compileSource(ny::Logs::Report& mainreport, ny::compiler::Compdb& compdb, ny::compiler::Source& source, const nycompile_opts_t& gopts) {
 	auto report = mainreport.subgroup();
 	report.data().origins.location.filename = source.filename;
 	report.data().origins.location.target.clear();
@@ -64,22 +64,22 @@ bool compileSource(ny::Logs::Report& mainreport, ny::compiler::Compiler& compile
 	compiled &= makeASTFromSource(source);
 	compiled &= passDuplicateAndNormalizeAST(source, report);
 	compiled &= passTransformASTToIR(source, report, gopts);
-	compiled  = compiled and attach(compiler, source);
+	compiled  = compiled and attach(compdb, source);
 	return compiled;
 }
 
-bool importSourceAndCompile(ny::Logs::Report& mainreport, ny::compiler::Compiler& compiler, ny::compiler::Source& source, const nycompile_opts_t& gopts, const nysource_opts_t& opts) {
+bool importSourceAndCompile(ny::Logs::Report& mainreport, ny::compiler::Compdb& compdb, ny::compiler::Source& source, const nycompile_opts_t& gopts, const nysource_opts_t& opts) {
 	copySourceOpts(source, opts);
-	return compileSource(mainreport, compiler, source, gopts);
+	return compileSource(mainreport, compdb, source, gopts);
 }
 
 } // namespace
 
-inline Compiler::Compiler(const nycompile_opts_t& opts)
+inline Compdb::Compdb(const nycompile_opts_t& opts)
 	: opts(opts) {
 }
 
-inline nyprogram_t* Compiler::compile() {
+inline nyprogram_t* Compdb::compile() {
 	ny::Logs::Report report{messages};
 	Logs::Handler errorHandler{&report, &buildGenerateReport};
 	try {
@@ -87,7 +87,7 @@ inline nyprogram_t* Compiler::compile() {
 		if (unlikely(scount == 0))
 			return complainNoSource(report);
 		if (config::importNSL)
-			importCompilerIntrinsics(intrinsics);
+			importcompdbIntrinsics(intrinsics);
 		if (config::importNSL)
 			scount += corefilesCount;
 		if (unlikely(opts.with_nsl_unittests == nytrue))
@@ -136,7 +136,7 @@ nyprogram_t* compile(nycompile_opts_t& opts) {
 	try {
 		if (opts.on_build_start)
 			opts.userdata = opts.on_build_start(opts.userdata);
-		auto* program = Compiler{opts}.compile();
+		auto* program = ny::compiler::Compdb{opts}.compile();
 		if (opts.on_build_stop)
 			opts.on_build_stop(opts.userdata, (program ? nytrue : nyfalse));
 		return program;

@@ -1,6 +1,6 @@
 #include <nanyc/program.h>
 #include "details/program/program.h"
-#include "details/compiler/compile.h"
+#include "details/compiler/compiler.h"
 #include "libnanyc.h"
 #include <cstring>
 

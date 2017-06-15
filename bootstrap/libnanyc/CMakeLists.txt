@@ -239,7 +239,7 @@ add_library(libnanyc ${mode_libnany}
 	"details/c-api/validator.cpp"
 	"details/c-api/version.c"
 	"details/c-api/visibility.cpp"
-	"details/compiler/compile.h"
+	"details/compiler/compdb.h"
 	"details/compiler/compiler.cpp"
 	"details/compiler/compiler.h"
 	"details/context/build-info.h"

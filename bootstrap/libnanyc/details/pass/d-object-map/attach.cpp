@@ -26,10 +26,10 @@ bool Build::attach(ir::Sequence& sequence, bool owned) {
 namespace ny {
 namespace compiler {
 
-bool attach(ny::compiler::Compiler& compiler, ny::compiler::Source& source) {
+bool attach(ny::compiler::Compdb& compdb, ny::compiler::Source& source) {
 	auto& sequence = source.sequence();
-	auto& cdeftable = compiler.cdeftable;
-	auto& mutex = compiler.mutex;
+	auto& cdeftable = compdb.cdeftable;
+	auto& mutex = compdb.mutex;
 	Pass::MappingOptions options;
 	return Pass::map(cdeftable.atoms.root, cdeftable, mutex, sequence, options);
 }
