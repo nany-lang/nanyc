@@ -37,7 +37,6 @@ struct Source final {
 
 struct Compdb final {
 	Compdb(const nycompile_opts_t& opts): opts(opts) {}
-	nyprogram_t* compile();
 
 	yuni::Mutex mutex;
 	ClassdefTable cdeftable;

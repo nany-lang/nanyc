@@ -73,41 +73,41 @@ bool importSourceAndCompile(ny::Logs::Report& mainreport, ny::compiler::Compdb& 
 	return compileSource(mainreport, compdb, source, gopts);
 }
 
-} // namespace
-
-inline nyprogram_t* Compdb::compile() {
-	ny::Logs::Report report{messages};
+nyprogram_t* compile(ny::compiler::Compdb& compdb) {
+	ny::Logs::Report report{compdb.messages};
 	Logs::Handler errorHandler{&report, &buildGenerateReport};
 	try {
+		auto& opts = compdb.opts;
 		uint32_t scount = opts.sources.count;
 		if (unlikely(scount == 0))
 			return complainNoSource(report);
 		if (config::importNSL)
-			importcompdbIntrinsics(intrinsics);
+			importcompdbIntrinsics(compdb.intrinsics);
 		if (config::importNSL)
 			scount += corefilesCount;
 		if (unlikely(opts.with_nsl_unittests == nytrue))
 			scount += unittestCount;
+		auto& sources = compdb.sources;
 		sources.count = scount;
 		sources.items = std::make_unique<Source[]>(scount);
 		bool compiled = opts.with_nsl_unittests == nyfalse;
 		uint32_t offset = 0;
 		if (config::importNSL) {
 			registerNSLCoreFiles(sources, offset, [&](ny::compiler::Source& source) {
-				compiled &= compileSource(report, *this, source, opts);
+				compiled &= compileSource(report, compdb, source, opts);
 			});
 		}
 		if (opts.with_nsl_unittests == nytrue) {
 			registerUnittestFiles(sources, offset, [&](ny::compiler::Source& source) {
-				compiled &= compileSource(report, *this, source, opts);
+				compiled &= compileSource(report, compdb, source, opts);
 			});
 		}
 		for (uint32_t i = 0; i != opts.sources.count; ++i) {
 			auto& source = sources[offset + i];
-			compiled &= importSourceAndCompile(report, *this, source, opts, opts.sources.items[i]);
+			compiled &= importSourceAndCompile(report, compdb, source, opts, opts.sources.items[i]);
 		}
 		compiled = compiled
-			and cdeftable.atoms.fetchAndIndexCoreObjects(); // indexing bool, u32, f64...
+			and compdb.cdeftable.atoms.fetchAndIndexCoreObjects(); // indexing bool, u32, f64...
 		if (unlikely(not compiled))
 			return nullptr;
 		auto program = std::make_unique<ny::Program>();
@@ -128,11 +128,14 @@ inline nyprogram_t* Compdb::compile() {
 	return nullptr;
 }
 
+} // namespace
+
 nyprogram_t* compile(nycompile_opts_t& opts) {
 	try {
 		if (opts.on_build_start)
 			opts.userdata = opts.on_build_start(opts.userdata);
-		auto* program = ny::compiler::Compdb{opts}.compile();
+		ny::compiler::Compdb compdb{opts};
+		auto* program = compile(compdb);
 		if (opts.on_build_stop)
 			opts.on_build_stop(opts.userdata, (program ? nytrue : nyfalse));
 		return program;
