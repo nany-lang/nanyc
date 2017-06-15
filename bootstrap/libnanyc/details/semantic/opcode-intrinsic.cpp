@@ -48,15 +48,8 @@ bool translateIntrinsic(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::intri
 	}
 	// trying user-defined intrinsic
 	auto* intrinsic = seq.intrinsics.find(name);
-	if (!intrinsic) {
-		if (seq.build.cf.on_binding_discovery) {
-			auto retry = seq.build.cf.on_binding_discovery(seq.build.self(), name.c_str(), name.size());
-			if (retry == nytrue)
-				intrinsic = seq.intrinsics.find(name);
-		}
-		if (unlikely(!intrinsic))
-			return complain::unknownIntrinsic(name);
-	}
+	if (!intrinsic)
+		return complain::unknownIntrinsic(name);
 	if (unlikely(not seq.checkForIntrinsicParamCount(name, intrinsic->paramcount)))
 		return false;
 	auto& frame = *seq.frame;

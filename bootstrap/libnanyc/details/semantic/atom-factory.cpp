@@ -76,7 +76,7 @@ bool duplicateAtomForSpecialization(Settings& settings, Atom& atom) {
 	newAtom.tmplparamsForPrinting.swap(newAtom.tmplparams);
 	newAtom.classinfo.isInstanciated = true;
 	settings.shouldMergeLayer = true;
-	return resolveStrictParameterTypes(settings.build, newAtom, &settings);
+	return resolveStrictParameterTypes(settings.compdb, newAtom, &settings);
 }
 
 
@@ -129,7 +129,7 @@ ir::Sequence* translateAndInstanciateASTIRCode(Settings& settings, Signature& si
 	Logs::Report report{*settings.report};
 	auto& irin = *(atom.opcodes.ircode);
 	auto& irout = instance.ircode();
-	auto builder = std::make_unique<Analyzer>(report.subgroup(), newView, settings.build, &irout, irin, settings.parent);
+	auto builder = std::make_unique<Analyzer>(report.subgroup(), newView, settings.compdb, &irout, irin, settings.parent);
 	if (config::traces::sourceOpcodeSequence)
 		debugPrintSourceOpcodeSequence(settings.cdeftable, settings.atom.get(), "[ir-from-ast] ");
 	substituteParameterTypes(builder->cdeftable, atom, signature);
@@ -209,15 +209,15 @@ bool instanciateRecursiveAtom(Settings& settings) {
 }
 
 
-bool resolveTypesBeforeBodyStart(Build& build, Atom& atom, Settings* originalInfo) {
-	ClassdefTableView cdeftblView{build.compdb.cdeftable};
+bool resolveTypesBeforeBodyStart(ny::compiler::Compdb& compdb, Atom& atom, Settings* originalInfo) {
+	ClassdefTableView cdeftblView{compdb.cdeftable};
 	if (not (originalInfo and atom.isTypeAlias())) {
 		using ParamList = decltype(ny::semantic::FuncOverloadMatch::result.params);
 		ParamList params; // input parameters (won't be used)
 		ParamList tmplparams;
 		std::shared_ptr<Logs::Message> newReport;
-		ny::Logs::Report report{build.compdb.messages};
-		ny::semantic::Settings settings{newReport, atom, cdeftblView, build, params, tmplparams};
+		ny::Logs::Report report{compdb.messages};
+		ny::semantic::Settings settings{newReport, atom, cdeftblView, compdb, params, tmplparams};
 		bool success = ny::semantic::instanciateAtomParameterTypes(settings);
 		if (not success)
 			report.appendEntry(newReport);
@@ -230,8 +230,8 @@ bool resolveTypesBeforeBodyStart(Build& build, Atom& atom, Settings* originalInf
 		if (unlikely(not (pindex < tmplparams.size())))
 			return ny::complain::inconsistentGenericTypeParameterIndex();
 		atom.returnType.clid = CLID::AtomMapID(atom.atomid);
-		auto& srccdef = build.compdb.cdeftable.classdef(tmplparams[pindex].clid);
-		auto& rawcdef = build.compdb.cdeftable.rawclassdef(CLID::AtomMapID(atom.atomid));
+		auto& srccdef = compdb.cdeftable.classdef(tmplparams[pindex].clid);
+		auto& rawcdef = compdb.cdeftable.rawclassdef(CLID::AtomMapID(atom.atomid));
 		rawcdef.import(srccdef);
 		rawcdef.qualifiers.merge(srccdef.qualifiers);
 		return true;
@@ -242,7 +242,7 @@ bool resolveTypesBeforeBodyStart(Build& build, Atom& atom, Settings* originalInf
 } // anonymous namespace
 
 
-bool resolveStrictParameterTypes(Build& build, Atom& atom, Settings* originalInfo) {
+bool resolveStrictParameterTypes(ny::compiler::Compdb& compdb, Atom& atom, Settings* originalInfo) {
 	switch (atom.type) {
 		case Atom::Type::funcdef:
 		case Atom::Type::typealias: {
@@ -250,7 +250,7 @@ bool resolveStrictParameterTypes(Build& build, Atom& atom, Settings* originalInf
 			// typedef (since can be used as parameter type)
 			bool resolveTypes = not atom.parameters.empty() or atom.isTypeAlias();
 			if (resolveTypes)
-				return resolveTypesBeforeBodyStart(build, atom, originalInfo);
+				return resolveTypesBeforeBodyStart(compdb, atom, originalInfo);
 			break;
 		}
 		case Atom::Type::classdef: {
@@ -271,13 +271,13 @@ bool resolveStrictParameterTypes(Build& build, Atom& atom, Settings* originalInf
 	// try to resolve all typedefs first
 	atom.eachChild([&](Atom & subatom) -> bool {
 		if (subatom.isTypeAlias())
-			success &= resolveStrictParameterTypes(build, subatom, originalInfo);
+			success &= resolveStrictParameterTypes(compdb, subatom, originalInfo);
 		return true;
 	});
 	// .. everything else then
 	atom.eachChild([&](Atom & subatom) -> bool {
 		if (not subatom.isTypeAlias())
-			success &= resolveStrictParameterTypes(build, subatom);
+			success &= resolveStrictParameterTypes(compdb, subatom);
 		return true;
 	});
 	return success;
@@ -401,7 +401,7 @@ Atom* Analyzer::instanciateAtomClass(Atom& atom) {
 	params.swap(overloadMatch.result.params);
 	tmplparams.swap(overloadMatch.result.tmplparams);
 	std::shared_ptr<Logs::Message> newReport;
-	ny::semantic::Settings settings{newReport, atom, cdeftable, build, params, tmplparams};
+	ny::semantic::Settings settings{newReport, atom, cdeftable, compdb, params, tmplparams};
 	settings.parentAtom = &(frame->atom);
 	settings.shouldMergeLayer = true;
 	settings.parent = this;
@@ -450,7 +450,7 @@ bool Analyzer::instanciateAtomFunc(uint32_t& instanceid, Atom& funcAtom, uint32_
 	tmplparams.swap(overloadMatch.result.tmplparams);
 	// instanciate the called func
 	std::shared_ptr<Logs::Message> subreport;
-	Settings settings{subreport, funcAtom, cdeftable, build, params, tmplparams};
+	Settings settings{subreport, funcAtom, cdeftable, compdb, params, tmplparams};
 	bool instok = doInstanciateAtomFunc(subreport, settings, retlvid);
 	instanceid = settings.instanceid;
 	if (unlikely(not instok and retlvid != 0))
@@ -573,7 +573,7 @@ bool instanciateAtomParameterTypes(Settings& settings) {
 	ClassdefTableView newview{settings.cdeftable, atom.atomid, signature.parameters.size()};
 	auto& irin = *(atom.opcodes.ircode);
 	auto* irout = (ir::Sequence*) nullptr;
-	auto builder = std::make_unique<Analyzer>(report.subgroup(), newview, settings.build, irout, irin, settings.parent);
+	auto builder = std::make_unique<Analyzer>(report.subgroup(), newview, settings.compdb, irout, irin, settings.parent);
 	builder->layerDepthLimit = 2; // allow the first blueprint to be instanciated
 	builder->signatureOnly = true;
 	builder->codeGenerationLock = 666; // arbitrary value != 0 to prevent from code generation

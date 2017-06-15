@@ -21,13 +21,13 @@ Logs::Report emitReportEntry(void* self, Logs::Level);
 void retriveReportMetadata(void* self, Logs::Level, const AST::Node*, Yuni::String&, uint32_t&, uint32_t&);
 
 
-Analyzer::Analyzer(Logs::Report report, ClassdefTableView& cdeftable, Build& build,
+Analyzer::Analyzer(Logs::Report report, ClassdefTableView& cdeftable, ny::compiler::Compdb& compdb,
 		 ir::Sequence* out, ir::Sequence& sequence, Analyzer* parent)
 	: cdeftable(cdeftable)
 	, out(out)
 	, currentSequence(sequence)
-	, build(build)
-	, intrinsics(build.compdb.intrinsics)
+	, compdb(compdb)
+	, intrinsics(compdb.intrinsics)
 	, overloadMatch(this)
 	, parent(parent)
 	, localErrorHandler(this, &emitReportEntry)

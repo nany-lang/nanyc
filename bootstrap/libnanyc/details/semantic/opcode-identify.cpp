@@ -141,7 +141,7 @@ bool emitIdentifyForProperty(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::
 	// get new parameters
 	params.swap(overloadMatch.result.params);
 	tmplparams.swap(overloadMatch.result.tmplparams);
-	Settings settings{subreport, propatom, seq.cdeftable, seq.build, params, tmplparams};
+	Settings settings{subreport, propatom, seq.cdeftable, seq.compdb, params, tmplparams};
 	if (not seq.doInstanciateAtomFunc(subreport, settings, lvid))
 		return false;
 	if (seq.canGenerateCode()) {

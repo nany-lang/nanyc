@@ -10,7 +10,7 @@ namespace ny {
 
 
 bool Build::resolveStrictParameterTypes(Atom& atom) {
-	return ny::semantic::resolveStrictParameterTypes(*this, atom);
+	return ny::semantic::resolveStrictParameterTypes(compdb, atom);
 }
 
 
@@ -44,7 +44,7 @@ bool Build::instanciate(const AnyString& entrypoint, const nytype_t* args, uint3
 	std::shared_ptr<Logs::Message> newReport;
 	ClassdefTableView cdeftblView{compdb.cdeftable};
 	ny::semantic::Settings settings {
-		newReport, *entrypointAtom, cdeftblView, *this, params, tmplparams
+		newReport, *entrypointAtom, cdeftblView, compdb, params, tmplparams
 	};
 	bool instanciated = ny::semantic::instanciateAtom(settings);
 	report.appendEntry(newReport);

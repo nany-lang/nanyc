@@ -164,7 +164,7 @@ bool emitFuncCall(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::call>& oper
 		auto& solutions = it->second;
 		if (unlikely(solutions.empty()))
 			return seq.complainOperand(ir::Instruction::fromOpcode(operands), "no solution available");
-		OverloadedFuncCallResolver resolver{&seq, seq.report, overloadMatch, cdeftable, seq.build};
+		OverloadedFuncCallResolver resolver{&seq, seq.report, overloadMatch, cdeftable, seq.compdb};
 		if (unlikely(not resolver.resolve(solutions)))
 			return complain::multipleOverloads(operands.ptr2func, solutions, resolver);
 		assert(resolver.atom != nullptr and "atom not properly initialized");
@@ -189,7 +189,7 @@ bool emitFuncCall(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::call>& oper
 	}
 	if (atom->builtinalias.empty()) { // normal func call
 		std::shared_ptr<Logs::Message> subreport;
-		Settings settings{subreport, *atom, cdeftable, seq.build, params, tmplparams};
+		Settings settings{subreport, *atom, cdeftable, seq.compdb, params, tmplparams};
 		if (not seq.doInstanciateAtomFunc(subreport, settings, lvid)) // instanciate the called func
 			return false;
 		if (seq.canGenerateCode()) {
@@ -331,7 +331,7 @@ bool emitPropsetCall(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::call>& o
 	// get new parameters
 	params.swap(overloadMatch.result.params);
 	tmplparams.swap(overloadMatch.result.tmplparams);
-	Settings settings{subreport, *atom, seq.cdeftable, seq.build, params, tmplparams};
+	Settings settings{subreport, *atom, seq.cdeftable, seq.compdb, params, tmplparams};
 	if (not seq.doInstanciateAtomFunc(subreport, settings, lvid))
 		return false;
 	if (seq.canGenerateCode()) {

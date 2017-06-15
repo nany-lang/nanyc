@@ -1,6 +1,6 @@
 #pragma once
 #include "libnanyc.h"
-#include "details/context/build.h"
+#include "details/compiler/compdb.h"
 #include "details/reporting/report.h"
 #include "details/atom/atom.h"
 #include "func-overload-match.h"
@@ -14,12 +14,13 @@ struct Analyzer;
 
 
 struct Settings final {
-	Settings(std::shared_ptr<Logs::Message>& report, Atom& atom, ClassdefTableView& cdeftable, Build& build,
+	Settings(std::shared_ptr<Logs::Message>& report, Atom& atom, ClassdefTableView& cdeftable,
+			ny::compiler::Compdb& compdb,
 			decltype(FuncOverloadMatch::result.params)& params,
 			decltype(FuncOverloadMatch::result.params)& tmplparams)
 		: cdeftable(cdeftable)
 		, atom(atom)
-		, build(build)
+		, compdb(compdb)
 		, params(params)
 		, tmplparams(tmplparams)
 		, report(report) {
@@ -36,8 +37,7 @@ struct Settings final {
 	Atom* parentAtom = nullptr;
 	//! Instance
 	uint32_t instanceid = (uint32_t) - 1;
-	//! Context
-	Build& build;
+	ny::compiler::Compdb& compdb;
 	//! Parameters used for instanciation
 	decltype(FuncOverloadMatch::result.params)& params;
 	//! Template parameters
@@ -83,7 +83,7 @@ void updateTypesInAllStackallocOp(ir::Sequence&, ClassdefTableView&, uint32_t at
 **   func foo(p1, p2: StrictTypeP2) // Here, TypeP2 must be resolved
 ** This is required for func overloading deduction
 */
-bool resolveStrictParameterTypes(Build&, Atom& atom, Settings* = nullptr);
+bool resolveStrictParameterTypes(ny::compiler::Compdb&, Atom& atom, Settings* = nullptr);
 
 
 } // namespace semantic

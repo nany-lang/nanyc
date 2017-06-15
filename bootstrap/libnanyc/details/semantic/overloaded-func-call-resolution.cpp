@@ -137,7 +137,7 @@ bool OverloadedFuncCallResolver::resolve(const std::vector<std::reference_wrappe
 				auto& solutionAtom = solutions[r].get();
 				// trying to instanciate the solution
 				ny::semantic::Settings settings {
-					newReport, solutionAtom, cdeftable, build, parameters[r].first, parameters[r].second
+					newReport, solutionAtom, cdeftable, compdb, parameters[r].first, parameters[r].second
 				};
 				settings.canGenerateCode = canGenerateCode;
 				settings.canGenerateErrors = canGenerateErrors;
