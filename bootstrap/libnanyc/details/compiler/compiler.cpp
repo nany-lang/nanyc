@@ -7,6 +7,7 @@
 #include "details/pass/b-ast-normalize/normalize.h"
 #include "details/pass/c-ast2ir/source-ast-to-ir.h"
 #include "details/pass/d-object-map/attach.h"
+#include "details/semantic/atom-factory.h"
 #include "details/vm/runtime/std.core.h"
 #include "libnanyc-config.h"
 #include "embed-nsl.hxx" // generated
@@ -107,7 +108,8 @@ nyprogram_t* compile(ny::compiler::Compdb& compdb) {
 			compiled &= importSourceAndCompile(report, compdb, source, opts, opts.sources.items[i]);
 		}
 		compiled = compiled
-			and compdb.cdeftable.atoms.fetchAndIndexCoreObjects(); // indexing bool, u32, f64...
+			and compdb.cdeftable.atoms.fetchAndIndexCoreObjects() // indexing bool, u32, f64...
+			and ny::semantic::resolveStrictParameterTypes(compdb, compdb.cdeftable.atoms.root); // typedef
 		if (unlikely(not compiled))
 			return nullptr;
 		auto program = std::make_unique<ny::Program>();
