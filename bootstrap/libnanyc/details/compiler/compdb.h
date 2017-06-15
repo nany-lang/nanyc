@@ -38,7 +38,6 @@ struct Source final {
 struct Compdb final {
 	Compdb(const nycompile_opts_t& opts): opts(opts) {}
 
-	yuni::Mutex mutex;
 	ClassdefTable cdeftable;
 	intrinsic::Catalog intrinsics;
 	const nycompile_opts_t& opts;
@@ -49,6 +48,7 @@ struct Compdb final {
 		Source& operator [] (uint32_t i) { assert(i < count); return items[i]; }
 	}
 	sources;
+	yuni::Mutex mutex;
 };
 
 } // namespace compiler
