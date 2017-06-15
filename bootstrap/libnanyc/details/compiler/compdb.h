@@ -37,6 +37,10 @@ struct Source final {
 
 struct Compdb final {
 	Compdb(const nycompile_opts_t& opts): opts(opts) {}
+	Compdb(const Compdb&) = delete;
+	Compdb(Compdb&&) = delete;
+	Compdb& operator = (const Compdb&) = delete;
+	Compdb& operator = (Compdb&&) = delete;
 
 	ClassdefTable cdeftable;
 	intrinsic::Catalog intrinsics;
