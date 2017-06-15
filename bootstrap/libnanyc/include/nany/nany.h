@@ -6,43 +6,10 @@
 */
 #ifndef __LIBNANYC_NANY_C_H__
 #define __LIBNANYC_NANY_C_H__
+#include "../nanyc/types.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
-
-#if defined(_WIN32) || defined(__CYGWIN__)
-#  ifdef __GNUC__
-#    define LIBNANYC_VISIBILITY_EXPORT   __attribute__ ((dllexport))
-#    define LIBNANYC_VISIBILITY_IMPORT   __attribute__ ((dllimport))
-#  else
-#    define LIBNANYC_VISIBILITY_EXPORT   __declspec(dllexport) /* note: actually gcc seems to also supports this syntax */
-#    define LIBNANYC_VISIBILITY_IMPORT   __declspec(dllimport) /* note: actually gcc seems to also supports this syntax */
-#  endif
-#else
-#  define LIBNANYC_VISIBILITY_EXPORT     __attribute__((visibility("default")))
-#  define LIBNANYC_VISIBILITY_IMPORT     __attribute__((visibility("default")))
-#endif
-
-#if defined(_DLL) && !defined(LIBNANYC_DLL_EXPORT)
-#  define LIBNANYC_DLL_EXPORT
-#endif
-
-/*!
-** \macro NY_EXPORT
-** \brief Export / import a libnany symbol (function)
-*/
-#if defined(LIBNANYC_DLL_EXPORT)
-#   define NY_EXPORT LIBNANYC_VISIBILITY_EXPORT
-#else
-#   define NY_EXPORT LIBNANYC_VISIBILITY_IMPORT
-#endif
-
-
-
-
-
-
-
 
 #ifdef __cplusplus
 extern "C" {
@@ -105,21 +72,8 @@ NY_EXPORT int nylib_check_compatible_version(uint32_t major, uint32_t minor);
 
 /*! \name Types */
 /*@{*/
-#ifndef LIBNANYC_NYBOOL_T
-#define LIBNANYC_NYBOOL_T
-/*! Boolean type */
-typedef enum nybool_t {nyfalse = 0, nytrue} nybool_t;
-#endif
-
-
 #ifndef LIBNANYC_NYANYSTR_T
 #define LIBNANYC_NYANYSTR_T
-typedef struct {
-	uint32_t size;
-	const char* c_str;
-}
-nyanystr_t;
-
 /*! Create an nyanystr_t from a c-string */
 static inline nyanystr_t nyanystr(const char* const text) {
 	nyanystr_t s = {((text) ? (uint32_t) strlen(text) : 0), text};

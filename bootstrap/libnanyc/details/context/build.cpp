@@ -95,7 +95,7 @@ bool Build::compile() {
 			if (config::traces::preAtomTable)
 				cdeftable.atoms.root.printTree(ClassdefTableView{cdeftable});
 			const nytype_t* argtypes = nullptr;
-			AnyString entrypoint{cf.entrypoint.c_str, cf.entrypoint.size};
+			AnyString entrypoint{cf.entrypoint.c_str, cf.entrypoint.len};
 			if (not entrypoint.empty())
 				success = success and instanciate(entrypoint, argtypes, main.atomid, main.instanceid);
 		}

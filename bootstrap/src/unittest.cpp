@@ -120,9 +120,9 @@ void printPassInfo(const Settings& settings, uint32_t pass) {
 
 void fetchUnittestList(nyrun_cf_t& runcf, std::vector<String>& torun, const char** filelist, uint32_t count) {
 	std::cout << "searching for unittests in all source files...\n" << std::flush;
-	runcf.build.entrypoint.size = 0; // disable any compilation by default
+	runcf.build.entrypoint.len = 0; // disable any compilation by default
 	runcf.build.entrypoint.c_str = nullptr;
-	runcf.program.entrypoint.size = 0;
+	runcf.program.entrypoint.len = 0;
 	runcf.program.entrypoint.c_str = nullptr;
 	runcf.build.ignore_atoms = nytrue;
 	runcf.build.userdata = &torun;
@@ -147,9 +147,9 @@ void fetchUnittestList(nyrun_cf_t& runcf, std::vector<String>& torun, const char
 
 void listAllUnittests(nyrun_cf_t& runcf, const Settings& settings, const char** filelist, uint32_t count) {
 	std::set<std::pair<String, String>> alltests;
-	runcf.build.entrypoint.size  = 0; // disable any compilation by default
+	runcf.build.entrypoint.len  = 0; // disable any compilation by default
 	runcf.build.entrypoint.c_str = nullptr;
-	runcf.program.entrypoint.size = 0;
+	runcf.program.entrypoint.len = 0;
 	runcf.program.entrypoint.c_str = nullptr;
 	runcf.build.ignore_atoms = nytrue;
 	runcf.build.userdata = &alltests;
@@ -208,7 +208,7 @@ bool runtest(nyrun_cf_t& originalRuncf, const Settings& settings, const String& 
 	entry.replace("<nomodule>", "module");
 	bool interactive = (settings.colors.out and settings.jobs == 1);
 	auto runcf = originalRuncf;
-	runcf.build.entrypoint.size  = entry.size();
+	runcf.build.entrypoint.len  = entry.size();
 	runcf.build.entrypoint.c_str = entry.c_str();
 	runcf.program.entrypoint = runcf.build.entrypoint;
 	runcf.build.ignore_atoms = nyfalse;

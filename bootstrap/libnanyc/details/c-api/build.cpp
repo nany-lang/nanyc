@@ -46,7 +46,7 @@ extern "C" void nybuild_cf_init(nybuild_cf_t* cf) {
 	memset(cf, 0x0, sizeof(nybuild_cf_t));
 	nyconsole_cf_set_stdcout(&cf->console);
 	// default entrypoint
-	cf->entrypoint.size  = 4;
+	cf->entrypoint.len  = 4;
 	cf->entrypoint.c_str = "main";
 }
 

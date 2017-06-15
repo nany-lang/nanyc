@@ -239,7 +239,7 @@ extern "C" void nyrun_cf_init(nyrun_cf_t* cf) {
 			nany_memalloc_set_default(&(cf->allocator));
 		else
 			nany_memalloc_set_with_limit(&(cf->allocator), limit);
-		cf->build.entrypoint.size  = 4;
+		cf->build.entrypoint.len  = 4;
 		cf->build.entrypoint.c_str = "main";
 		cf->program.entrypoint = cf->build.entrypoint;
 		// default output
