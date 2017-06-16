@@ -52,6 +52,11 @@ struct Compdb final {
 		Source& operator [] (uint32_t i) { assert(i < count); return items[i]; }
 	}
 	sources;
+	struct Entrypoint final {
+		uint32_t atomid = (uint32_t) -1;
+		uint32_t instanceid = (uint32_t) -1;
+	}
+	entrypoint;
 	yuni::Mutex mutex;
 };
 

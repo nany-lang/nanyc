@@ -16,6 +16,7 @@
 #include <libnanyc.h>
 #include <utility>
 #include <memory>
+#include <iostream>
 
 namespace ny {
 namespace compiler {
@@ -75,6 +76,48 @@ bool importSourceAndCompile(ny::Logs::Report& mainreport, ny::compiler::Compdb& 
 	return compileSource(mainreport, compdb, source, gopts);
 }
 
+Atom& findEntrypointAtom(Atom& root, const AnyString& entrypoint) {
+	Atom* atom = nullptr;
+	root.eachChild(entrypoint, [&](Atom & child) -> bool {
+		if (unlikely(atom != nullptr))
+			throw "': multiple entry points found";
+		atom = &child;
+		return true;
+	});
+	if (unlikely(!atom))
+		throw "()': function not found";
+	if (unlikely(not atom->isFunction() or atom->isClassMember()))
+		throw "': the atom is not a function";
+	return *atom;
+}
+
+bool instanciate(ny::compiler::Compdb& compdb, ny::Logs::Report& report, AnyString entrypoint) {
+	using ParameterList = decltype(ny::semantic::FuncOverloadMatch::result.params);
+	try {
+		auto& atom = findEntrypointAtom(compdb.cdeftable.atoms.root, entrypoint);
+		ParameterList params;
+		ParameterList tmplparams;
+		std::shared_ptr<Logs::Message> newReport;
+		ClassdefTableView cdeftblView{compdb.cdeftable};
+		ny::semantic::Settings settings(newReport, atom, cdeftblView, compdb, params, tmplparams);
+		bool instanciated = ny::semantic::instanciateAtom(settings);
+		report.appendEntry(newReport);
+		if (config::traces::atomTable)
+			compdb.cdeftable.atoms.root.printTree(compdb.cdeftable);
+		if (likely(instanciated)) {
+			compdb.entrypoint.atomid = atom.atomid;
+			compdb.entrypoint.instanceid = settings.instanceid;
+			return true;
+		}
+	}
+	catch (const char* e) {
+		report.error() << "failed to instanciate '" << entrypoint << e;
+	}
+	compdb.entrypoint.atomid = (uint32_t) -1;
+	compdb.entrypoint.instanceid = (uint32_t) -1;
+	return false;
+}
+
 nyprogram_t* compile(ny::compiler::Compdb& compdb) {
 	ny::Logs::Report report{compdb.messages};
 	Logs::Handler errorHandler{&report, &buildGenerateReport};
@@ -92,7 +135,7 @@ nyprogram_t* compile(ny::compiler::Compdb& compdb) {
 		auto& sources = compdb.sources;
 		sources.count = scount;
 		sources.items = std::make_unique<Source[]>(scount);
-		bool compiled = opts.with_nsl_unittests == nyfalse;
+		bool compiled = true;
 		uint32_t offset = 0;
 		if (config::importNSL) {
 			registerNSLCoreFiles(sources, offset, [&](ny::compiler::Source& source) {
@@ -115,6 +158,12 @@ nyprogram_t* compile(ny::compiler::Compdb& compdb) {
 			return nullptr;
 		if (config::traces::preAtomTable)
 			compdb.cdeftable.atoms.root.printTree(ClassdefTableView{compdb.cdeftable});
+		auto& entrypoint = compdb.opts.entrypoint;
+		if (unlikely(entrypoint.len == 0))
+			return nullptr;
+		bool epinst = instanciate(compdb, report, AnyString(entrypoint.c_str, static_cast<uint32_t>(entrypoint.len)));
+		if (unlikely(not epinst))
+			return nullptr;
 		auto program = std::make_unique<ny::Program>();
 		return ny::Program::pointer(program.release());
 	}

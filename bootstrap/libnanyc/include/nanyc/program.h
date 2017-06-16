@@ -39,6 +39,7 @@ typedef struct nycompile_opts_t {
 	nysourcelist_opts_t sources;
 	nybool_t verbose;
 	nybool_t with_nsl_unittests;
+	nyanystr_t entrypoint; /*default: main*/
 	void* (*on_build_start)(void* userdata);
 	void (*on_build_stop)(void* userdata, nybool_t success);
 	void (*on_file_eaccess)(void*, const nysource_opts_t*);

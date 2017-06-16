@@ -151,6 +151,7 @@ void App::fetch(bool nsl) {
 		entry.module.assign(mod, mlen);
 		entry.name.assign(name, nlen);
 	};
+	opts.entrypoint.len = 0;
 	std::cout << "searching for unittests in all source files...\n";
 	auto start = now();
 	nyprogram_compile(&opts);
@@ -259,6 +260,8 @@ bool App::statstics(int64_t duration) {
 }
 
 bool App::execute(const Entry& entry) {
+	opts.entrypoint.c_str = entry.name.c_str();
+	opts.entrypoint.len = entry.name.size();
 	auto* program = nyprogram_compile(&opts);
 	bool success = program != nullptr;
 	if (program) {
