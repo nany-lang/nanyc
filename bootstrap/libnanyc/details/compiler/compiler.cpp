@@ -154,10 +154,10 @@ nyprogram_t* compile(ny::compiler::Compdb& compdb) {
 		compiled = compiled
 			and compdb.cdeftable.atoms.fetchAndIndexCoreObjects() // indexing bool, u32, f64...
 			and ny::semantic::resolveStrictParameterTypes(compdb, compdb.cdeftable.atoms.root); // typedef
-		if (unlikely(not compiled))
-			return nullptr;
 		if (config::traces::preAtomTable)
 			compdb.cdeftable.atoms.root.printTree(ClassdefTableView{compdb.cdeftable});
+		if (unlikely(not compiled))
+			return nullptr;
 		auto& entrypoint = compdb.opts.entrypoint;
 		if (unlikely(entrypoint.len == 0))
 			return nullptr;
