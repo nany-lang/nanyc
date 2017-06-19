@@ -17,7 +17,7 @@ namespace { // anonymous
 
 namespace {
 
-void printMessageRecursive(nyconsole_t& out, const ny::Logs::Message& message, bool unify, String& xx,
+void printMessageRecursive(nyoldconsole_t& out, const ny::Logs::Message& message, bool unify, String& xx,
 		uint32_t indent = 0) {
 	MutexLocker locker{message.m_mutex};
 	// which output ?
@@ -173,7 +173,7 @@ void printMessageRecursive(nyconsole_t& out, const ny::Logs::Message& message, b
 		printMessageRecursive(out, *ptr, unify, xx, indent);
 }
 
-void print(ny::Logs::Message& message, nyconsole_t& out, bool unify) {
+void print(ny::Logs::Message& message, nyoldconsole_t& out, bool unify) {
 	assert(out.set_color);
 	if (out.set_color and out.write_stderr and out.write_stdout) {
 		String tmp;

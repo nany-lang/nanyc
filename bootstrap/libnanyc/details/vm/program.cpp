@@ -12,7 +12,7 @@ namespace vm {
 namespace {
 
 
-void flushAll(nyconsole_t& console) {
+void flushAll(nyoldconsole_t& console) {
 	if (console.flush) {
 		console.flush(console.internal, nycerr);
 		console.flush(console.internal, nycout);

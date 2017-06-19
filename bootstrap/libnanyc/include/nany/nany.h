@@ -276,7 +276,7 @@ enum {
 };
 
 
-typedef struct nyconsole_t {
+typedef struct nyoldconsole_t {
 	/*! Write some data to STDOUT */
 	void (*write_stdout)(void*, const char* text, size_t length);
 	/*! Write some data to STDERR */
@@ -291,14 +291,14 @@ typedef struct nyconsole_t {
 	/*! Internal opaque pointer*/
 	void* internal;
 	/*! Flush STDERR */
-	void (*release)(const struct nyconsole_t*);
+	void (*release)(const struct nyoldconsole_t*);
 }
-nyconsole_t;
+nyoldconsole_t;
 
 /*! Initialize a project configuration */
-NY_EXPORT void nyconsole_cf_set_stdcout(nyconsole_t*);
+NY_EXPORT void nyconsole_cf_set_stdcout(nyoldconsole_t*);
 
-void nyconsole_cf_copy(nyconsole_t* out, const nyconsole_t* const src);
+void nyconsole_cf_copy(nyoldconsole_t* out, const nyoldconsole_t* const src);
 /*@}*/
 
 
@@ -376,7 +376,7 @@ NY_EXPORT nybool_t nyproject_trylock(const nyproject_t*);
 /*! Project Configuration */
 typedef struct nybuild_cf_t {
 	/*! Console output */
-	nyconsole_t console;
+	nyoldconsole_t console;
 
 	/*! Entry point to compile (ex: "main") */
 	nyanystr_t entrypoint;
@@ -649,7 +649,7 @@ typedef struct nyprogram_cf_t {
 	/*! Memory allocator */
 	nyallocator_t allocator;
 	/*! Console output */
-	nyconsole_t console;
+	nyoldconsole_t console;
 
 	/*!
 	** \brief A new program has been started
@@ -694,7 +694,7 @@ typedef struct nyvm_t {
 	/*! Current thread */
 	nytctx_t* tctx;
 	/*! Console */
-	nyconsole_t* console;
+	nyoldconsole_t* console;
 }
 nyvm_t;
 
@@ -840,7 +840,7 @@ typedef struct nyrun_cf_t {
 	/*! Memory allocator */
 	nyallocator_t allocator;
 	/*! Console */
-	nyconsole_t console;
+	nyoldconsole_t console;
 	/*! Default prject settings */
 	nyproject_cf_t project;
 	/*! Default build settings */

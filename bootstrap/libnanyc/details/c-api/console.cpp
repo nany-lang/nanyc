@@ -85,7 +85,7 @@ static nybool_t nyconsole_has_color(void* internal, nyconsole_output_t out) {
 }
 
 
-extern "C" void nyconsole_cf_set_stdcout(nyconsole_t* cf) {
+extern "C" void nyconsole_cf_set_stdcout(nyoldconsole_t* cf) {
 	if (cf) {
 		cf->write_stdout = &nyconsole_stdcout;
 		cf->write_stderr = &nyconsole_stderr;
@@ -104,7 +104,7 @@ extern "C" void nyconsole_cf_set_stdcout(nyconsole_t* cf) {
 }
 
 
-extern "C" void nyconsole_cf_copy(nyconsole_t* out, const nyconsole_t* const src) {
+extern "C" void nyconsole_cf_copy(nyoldconsole_t* out, const nyoldconsole_t* const src) {
 	if (out)
-		memcpy(out, src, sizeof(nyconsole_t));
+		memcpy(out, src, sizeof(nyoldconsole_t));
 }

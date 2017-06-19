@@ -70,7 +70,7 @@ std::unique_ptr<nyprogram_t> build(const nyrun_cf_t* const runcf, std::unique_pt
 	if (runcf) {
 		verbose = (runcf->verbose != nyfalse);
 		memcpy(&(cf),           &(runcf->build),     sizeof(nybuild_cf_t));
-		memcpy(&(cf.console),   &(runcf->console),   sizeof(nyconsole_t));
+		memcpy(&(cf.console),   &(runcf->console),   sizeof(nyoldconsole_t));
 	}
 	else {
 		verbose = false;
@@ -90,7 +90,7 @@ std::unique_ptr<nyprogram_t> build(const nyrun_cf_t* const runcf, std::unique_pt
 	if (runcf) {
 		memcpy(&(pcf),           &(runcf->program),   sizeof(nyprogram_cf_t));
 		memcpy(&(pcf.allocator), &(runcf->allocator), sizeof(nyallocator_t));
-		memcpy(&(pcf.console),   &(runcf->console),   sizeof(nyconsole_t));
+		memcpy(&(pcf.console),   &(runcf->console),   sizeof(nyoldconsole_t));
 	}
 	else
 		nyprogram_cf_init(&pcf, &cf);
