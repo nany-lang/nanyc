@@ -215,11 +215,10 @@ bool resolveTypesBeforeBodyStart(ny::compiler::Compdb& compdb, Atom& atom, Setti
 		using ParamList = decltype(ny::semantic::FuncOverloadMatch::result.params);
 		ParamList params; // input parameters (won't be used)
 		ParamList tmplparams;
-		ny::Logs::Report report{compdb.messages};
 		ny::semantic::Settings settings{atom, cdeftblView, compdb, params, tmplparams};
 		bool success = ny::semantic::instanciateAtomParameterTypes(settings);
 		if (not success)
-			report.appendEntry(settings.report);
+			compdb.messages.appendEntry(settings.report);
 		return success;
 	}
 	else {
