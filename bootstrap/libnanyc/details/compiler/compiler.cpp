@@ -192,6 +192,8 @@ nyprogram_t* compile(nycompile_opts_t& opts) {
 		auto* program = compile(compdb);
 		if (opts.on_build_stop)
 			opts.on_build_stop(opts.userdata, (program ? nytrue : nyfalse));
+		if (opts.on_report and not compdb.messages.entries.empty())
+			opts.on_report(opts.userdata, reinterpret_cast<const nyreport_t*>(&compdb.messages));
 		return program;
 	}
 	catch (...) {

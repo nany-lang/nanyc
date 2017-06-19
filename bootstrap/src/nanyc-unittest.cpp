@@ -259,9 +259,14 @@ bool App::statstics(int64_t duration) {
 	return stats.failed == 0 and stats.total != 0;
 }
 
+void report(void*, const nyreport_t* report) {
+	nyreport_print_stdout(report);
+}
+
 bool App::execute(const Entry& entry) {
 	opts.entrypoint.c_str = entry.name.c_str();
 	opts.entrypoint.len = entry.name.size();
+	opts.on_report = &report;
 	auto* program = nyprogram_compile(&opts);
 	bool success = program != nullptr;
 	if (program) {
