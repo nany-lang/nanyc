@@ -69,7 +69,7 @@ public:
 	/*!
 	** \brief Print a message on the console
 	*/
-	void cerrColor(nycolor_t);
+	void cerrColor(nyoldcolor_t);
 
 	//! Get the equivalent C pointer
 	nybuild_t* self();

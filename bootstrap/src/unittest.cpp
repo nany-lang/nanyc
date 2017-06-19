@@ -218,7 +218,7 @@ bool runtest(nyrun_cf_t& originalRuncf, const Settings& settings, const String& 
 	runcf.console.release = nullptr;
 	runcf.console.internal = &console;
 	runcf.console.flush = [](void*, nyconsole_output_t) {};
-	runcf.console.set_color = [](void*, nyconsole_output_t, nycolor_t) {};
+	runcf.console.set_color = [](void*, nyconsole_output_t, nyoldcolor_t) {};
 	runcf.console.has_color = [](void*, nyconsole_output_t) {
 		return nyfalse;
 	};

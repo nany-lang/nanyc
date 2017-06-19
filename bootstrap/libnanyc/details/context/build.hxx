@@ -29,7 +29,7 @@ inline void Build::printStderr(const AnyString& msg) {
 	cf.console.write_stderr(cf.console.internal, msg.c_str(), msg.size());
 }
 
-inline void Build::cerrColor(nycolor_t color) {
+inline void Build::cerrColor(nyoldcolor_t color) {
 	cf.console.set_color(cf.console.internal, nycerr, color);
 }
 

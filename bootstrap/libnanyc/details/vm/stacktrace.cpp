@@ -41,10 +41,10 @@ void Stacktrace<true>::dump(const nyprogram_cf_t& cf, const AtomMap& map) const 
 	auto cerr = [&cf](const AnyString& string) {
 		ny::vm::console::cerr(cf, string);
 	};
-	auto color = [&cf](nycolor_t cl) {
+	auto color = [&cf](nyoldcolor_t cl) {
 		ny::vm::console::color(cf, nycerr, cl);
 	};
-	color(nyc_none);
+	color(nycold_none);
 	cerr("\nstack trace:\n");
 	uint32_t i = 0;
 	ShortString64 tmp;
@@ -52,14 +52,14 @@ void Stacktrace<true>::dump(const nyprogram_cf_t& cf, const AtomMap& map) const 
 		auto& frame = *pointer;
 		try {
 			cerr("    ");
-			color(nyc_lightblue);
+			color(nycold_lightblue);
 			cerr(tmp.clear() << '#' << i);
-			color(nyc_none);
+			color(nycold_none);
 			cerr(" in '");
 			auto caption = map.symbolname(frame.atomidInstance[0], frame.atomidInstance[1]);
-			color(nyc_white);
+			color(nycold_white);
 			cerr(caption);
-			color(nyc_none);
+			color(nycold_none);
 			cerr("' at '");
 			auto atom = map.findAtom(frame.atomidInstance[0]);
 			if (!!atom) {

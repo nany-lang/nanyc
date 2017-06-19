@@ -32,67 +32,67 @@ void printMessageRecursive(nyoldconsole_t& out, const ny::Logs::Message& message
 	if (message.level != ny::Logs::Level::none) {
 		switch (message.level) {
 			case ny::Logs::Level::error: {
-				out.set_color(out.internal, omode, nyc_red);
+				out.set_color(out.internal, omode, nycold_red);
 				print("   error" SEP);
-				out.set_color(out.internal, omode, nyc_none);
+				out.set_color(out.internal, omode, nycold_none);
 				break;
 			}
 			case ny::Logs::Level::warning: {
-				out.set_color(out.internal, omode, nyc_yellow);
+				out.set_color(out.internal, omode, nycold_yellow);
 				print(" warning" SEP);
-				out.set_color(out.internal, omode, nyc_none);
+				out.set_color(out.internal, omode, nycold_none);
 				break;
 			}
 			case ny::Logs::Level::info: {
 				if (message.section.empty()) {
-					out.set_color(out.internal, omode, nyc_none);
+					out.set_color(out.internal, omode, nycold_none);
 					print("        " SEP);
 				}
 				else {
-					out.set_color(out.internal, omode, nyc_lightblue);
+					out.set_color(out.internal, omode, nycold_lightblue);
 					xx = "        ";
 					xx.overwriteRight(message.section);
 					xx << SEP;
 					print(xx);
-					out.set_color(out.internal, omode, nyc_none);
+					out.set_color(out.internal, omode, nycold_none);
 				}
 				break;
 			}
 			case ny::Logs::Level::hint:
 			case ny::Logs::Level::suggest: {
-				out.set_color(out.internal, omode, nyc_none);
+				out.set_color(out.internal, omode, nycold_none);
 				print("        " SEP);
-				out.set_color(out.internal, omode, nyc_none);
+				out.set_color(out.internal, omode, nycold_none);
 				break;
 			}
 			case ny::Logs::Level::success: {
-				out.set_color(out.internal, omode, nyc_green);
+				out.set_color(out.internal, omode, nycold_green);
 				#ifndef YUNI_OS_WINDOWS
 				print("      \u2713 " SEP);
 				#else
 				print("      ok" SEP);
 				#endif
-				out.set_color(out.internal, omode, nyc_none);
+				out.set_color(out.internal, omode, nycold_none);
 				break;
 			}
 			case ny::Logs::Level::trace: {
-				out.set_color(out.internal, omode, nyc_purple);
+				out.set_color(out.internal, omode, nycold_purple);
 				print("      ::");
-				out.set_color(out.internal, omode, nyc_none);
+				out.set_color(out.internal, omode, nycold_none);
 				print(SEP);
 				break;
 			}
 			case ny::Logs::Level::verbose: {
-				out.set_color(out.internal, omode, nyc_green);
+				out.set_color(out.internal, omode, nycold_green);
 				print("      ::");
-				out.set_color(out.internal, omode, nyc_none);
+				out.set_color(out.internal, omode, nycold_none);
 				print(SEP);
 				break;
 			}
 			case ny::Logs::Level::ICE: {
-				out.set_color(out.internal, omode, nyc_red);
+				out.set_color(out.internal, omode, nycold_red);
 				print("     ICE" SEP);
-				out.set_color(out.internal, omode, nyc_none);
+				out.set_color(out.internal, omode, nycold_none);
 				break;
 			}
 			case ny::Logs::Level::none: {
@@ -107,19 +107,19 @@ void printMessageRecursive(nyoldconsole_t& out, const ny::Logs::Message& message
 			print(xx);
 		}
 		if (not message.prefix.empty()) {
-			out.set_color(out.internal, omode, nyc_white);
+			out.set_color(out.internal, omode, nycold_white);
 			print(message.prefix);
-			out.set_color(out.internal, omode, nyc_none);
+			out.set_color(out.internal, omode, nycold_none);
 		}
 		if (message.level == ny::Logs::Level::suggest) {
-			out.set_color(out.internal, omode, nyc_lightblue);
+			out.set_color(out.internal, omode, nycold_lightblue);
 			print("suggest: ");
-			out.set_color(out.internal, omode, nyc_none);
+			out.set_color(out.internal, omode, nycold_none);
 		}
 		else if (message.level == ny::Logs::Level::hint) {
-			out.set_color(out.internal, omode, nyc_lightblue);
+			out.set_color(out.internal, omode, nycold_lightblue);
 			print("hint: ");
-			out.set_color(out.internal, omode, nyc_none);
+			out.set_color(out.internal, omode, nycold_none);
 		}
 		if (not message.origins.location.target.empty()) {
 			print("{");
@@ -127,7 +127,7 @@ void printMessageRecursive(nyoldconsole_t& out, const ny::Logs::Message& message
 			print("} ");
 		}
 		if (not message.origins.location.filename.empty()) {
-			out.set_color(out.internal, omode, nyc_white);
+			out.set_color(out.internal, omode, nycold_white);
 			xx = message.origins.location.filename;
 			if (message.origins.location.pos.line > 0) {
 				xx << ':';
@@ -143,7 +143,7 @@ void printMessageRecursive(nyoldconsole_t& out, const ny::Logs::Message& message
 			}
 			xx << ": ";
 			print(xx);
-			out.set_color(out.internal, omode, nyc_none);
+			out.set_color(out.internal, omode, nycold_none);
 		}
 		if (not message.message.empty()) {
 			String msg{message.message};

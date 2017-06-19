@@ -46,7 +46,7 @@ static void nyconsole_flush(void*, nyconsole_output_t out) {
 }
 
 
-constexpr static const System::Console::Color color2yunicolor[nyc_count] = {
+constexpr static const System::Console::Color color2yunicolor[nycold_count] = {
 	System::Console::none, // none
 	System::Console::black,
 	System::Console::red,
@@ -60,7 +60,7 @@ constexpr static const System::Console::Color color2yunicolor[nyc_count] = {
 };
 
 
-static void nyconsole_set_color(void* internal, nyconsole_output_t out, nycolor_t color) {
+static void nyconsole_set_color(void* internal, nyconsole_output_t out, nyoldcolor_t color) {
 	assert(internal != nullptr);
 	assert((uint32_t) out == nycout or (uint32_t) out == nycerr);
 	internal_t flags;
@@ -68,7 +68,7 @@ static void nyconsole_set_color(void* internal, nyconsole_output_t out, nycolor_
 	if (flags.colors[out] != 0) {
 		// which output
 		auto& o = (out == nycout) ? std::cout : std::cerr;
-		if (color == nyc_none)
+		if (color == nycold_none)
 			System::Console::ResetTextColor(o);
 		else
 			System::Console::SetTextColor(o, color2yunicolor[color]);

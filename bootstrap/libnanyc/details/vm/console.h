@@ -20,9 +20,9 @@ void cout(const Context&, const AnyString&) noexcept;
 void cerr(const Context&, const AnyString&) noexcept;
 
 //! Set the console text color (nycout / nycerr)
-void color(const nyprogram_cf_t&, nyconsole_output_t, nycolor_t) noexcept;
+void color(const nyprogram_cf_t&, nyconsole_output_t, nyoldcolor_t) noexcept;
 //! Set the console text color (nycout / nycerr)
-void color(const Context&, nyconsole_output_t, nycolor_t) noexcept;
+void color(const Context&, nyconsole_output_t, nyoldcolor_t) noexcept;
 
 
 void exception(const Context&, const AnyString&) noexcept;

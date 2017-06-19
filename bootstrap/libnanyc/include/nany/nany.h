@@ -246,33 +246,33 @@ nyconsole_output_t;
 
 
 /*! Color constants */
-typedef enum nycolor_t {
+typedef enum nyoldcolor_t {
 	/*! None / reset */
-	nyc_none = 0,
+	nycold_none = 0,
 	/*! Black */
-	nyc_black,
+	nycold_black,
 	/*! Red */
-	nyc_red,
+	nycold_red,
 	/*! Green */
-	nyc_green,
+	nycold_green,
 	/*! Yellow */
-	nyc_yellow,
+	nycold_yellow,
 	/*! Dark Blue */
-	nyc_blue,
+	nycold_blue,
 	/*! Purple */
-	nyc_purple,
+	nycold_purple,
 	/*! Gray */
-	nyc_gray,
+	nycold_gray,
 	/*! White */
-	nyc_white,
+	nycold_white,
 	/*! Light blue */
-	nyc_lightblue
+	nycold_lightblue
 }
-nycolor_t;
+nyoldcolor_t;
 
 enum {
 	/*! The total number of colors */
-	nyc_count = nyc_lightblue + 1
+	nycold_count = nycold_lightblue + 1
 };
 
 
@@ -284,7 +284,7 @@ typedef struct nyoldconsole_t {
 	/*! Flush output */
 	void (*flush)(void*, nyconsole_output_t);
 	/*! Set the text color */
-	void (*set_color)(void*, nyconsole_output_t, nycolor_t);
+	void (*set_color)(void*, nyconsole_output_t, nyoldcolor_t);
 	/*! Set the text color */
 	nybool_t (*has_color)(void*, nyconsole_output_t);
 
