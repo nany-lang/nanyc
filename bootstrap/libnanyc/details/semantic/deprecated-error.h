@@ -96,7 +96,7 @@ bool redeclared(const AnyString& name, uint32_t previousDeclaration);
 bool multipleOverloads(uint32_t lvid);
 
 bool multipleOverloads(uint32_t lvid, const std::vector<std::reference_wrapper<Atom>>& solutions
-	, const OverloadedFuncCallResolver& resolver);
+	, OverloadedFuncCallResolver& resolver);
 
 
 

@@ -309,7 +309,7 @@ struct Analyzer final {
 
 
 public:
-	bool doInstanciateAtomFunc(std::shared_ptr<Logs::Message>& subreport, Settings& info, uint32_t retlvid);
+	bool doInstanciateAtomFunc(std::unique_ptr<Logs::Message>& subreport, Settings& info, uint32_t retlvid);
 	void pushNewFrame(Atom& atom);
 	void popFrame();
 

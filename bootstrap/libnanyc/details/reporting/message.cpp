@@ -17,12 +17,12 @@ Message& Message::createEntry(Level level) {
 }
 
 
-void Message::appendEntry(const std::shared_ptr<Message>& entry) {
+void Message::appendEntry(std::unique_ptr<Message>& entry) {
 	if (!!entry) {
 		if (not (entry->entries.empty() and entry->level == Level::none)) {
 			MutexLocker locker{m_mutex};
-			entries.push_back(entry);
 			hasErrors &= entry->hasErrors;
+			entries.emplace_back(entry.release());
 		}
 	}
 }

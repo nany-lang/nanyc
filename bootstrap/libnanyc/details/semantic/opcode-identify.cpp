@@ -118,8 +118,6 @@ bool emitIdentifyForSingleResult(Analyzer& seq, bool isLocalVar, const Classdef&
 
 bool emitIdentifyForProperty(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::identify>& operands,
 		Atom& propatom, uint32_t self) {
-	// report for instanciation
-	std::shared_ptr<Logs::Message> subreport;
 	// all pushed parameters
 	decltype(FuncOverloadMatch::result.params) params;
 	// all pushed template parameters
@@ -141,8 +139,8 @@ bool emitIdentifyForProperty(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::
 	// get new parameters
 	params.swap(overloadMatch.result.params);
 	tmplparams.swap(overloadMatch.result.tmplparams);
-	Settings settings{subreport, propatom, seq.cdeftable, seq.compdb, params, tmplparams};
-	if (not seq.doInstanciateAtomFunc(subreport, settings, lvid))
+	Settings settings{propatom, seq.cdeftable, seq.compdb, params, tmplparams};
+	if (not seq.doInstanciateAtomFunc(settings.report, settings, lvid))
 		return false;
 	if (seq.canGenerateCode()) {
 		for (auto& param : params)

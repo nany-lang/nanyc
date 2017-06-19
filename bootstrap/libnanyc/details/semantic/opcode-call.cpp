@@ -188,9 +188,8 @@ bool emitFuncCall(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::call>& oper
 		tmplparams.swap(overloadMatch.result.tmplparams);
 	}
 	if (atom->builtinalias.empty()) { // normal func call
-		std::shared_ptr<Logs::Message> subreport;
-		Settings settings{subreport, *atom, cdeftable, seq.compdb, params, tmplparams};
-		if (not seq.doInstanciateAtomFunc(subreport, settings, lvid)) // instanciate the called func
+		Settings settings{*atom, cdeftable, seq.compdb, params, tmplparams};
+		if (not seq.doInstanciateAtomFunc(settings.report, settings, lvid)) // instanciate the called func
 			return false;
 		if (seq.canGenerateCode()) {
 			for (auto& element : params) // push all parameters
@@ -293,8 +292,6 @@ bool emitPropsetCall(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::call>& o
 	uint32_t atomid = frame.atomid;
 	// result of the func call
 	uint32_t lvid = operands.lvid;
-	// report for instanciation
-	std::shared_ptr<Logs::Message> subreport;
 	// all pushed parameters
 	decltype(FuncOverloadMatch::result.params) params;
 	// all pushed template parameters
@@ -331,8 +328,8 @@ bool emitPropsetCall(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::call>& o
 	// get new parameters
 	params.swap(overloadMatch.result.params);
 	tmplparams.swap(overloadMatch.result.tmplparams);
-	Settings settings{subreport, *atom, seq.cdeftable, seq.compdb, params, tmplparams};
-	if (not seq.doInstanciateAtomFunc(subreport, settings, lvid))
+	Settings settings{*atom, seq.cdeftable, seq.compdb, params, tmplparams};
+	if (not seq.doInstanciateAtomFunc(settings.report, settings, lvid))
 		return false;
 	if (seq.canGenerateCode()) {
 		for (auto& param : params)

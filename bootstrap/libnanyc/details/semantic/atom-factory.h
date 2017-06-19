@@ -14,7 +14,7 @@ struct Analyzer;
 
 
 struct Settings final {
-	Settings(std::shared_ptr<Logs::Message>& report, Atom& atom, ClassdefTableView& cdeftable,
+	Settings(Atom& atom, ClassdefTableView& cdeftable,
 			ny::compiler::Compdb& compdb,
 			decltype(FuncOverloadMatch::result.params)& params,
 			decltype(FuncOverloadMatch::result.params)& tmplparams)
@@ -23,10 +23,8 @@ struct Settings final {
 		, compdb(compdb)
 		, params(params)
 		, tmplparams(tmplparams)
-		, report(report) {
+		, report(std::make_unique<Logs::Message>(Logs::Level::none)) {
 		returnType.mutateToAny();
-		if (!report)
-			report = std::make_shared<Logs::Message>(Logs::Level::none);
 	}
 
 	//! The original view to the classdef table
@@ -53,7 +51,7 @@ struct Settings final {
 	//! Parent
 	Analyzer* parent = nullptr;
 	//! Error reporting
-	std::shared_ptr<Logs::Message>& report;
+	std::unique_ptr<Logs::Message> report;
 	bool signatureOnly = false;
 
 }; // struct Settings

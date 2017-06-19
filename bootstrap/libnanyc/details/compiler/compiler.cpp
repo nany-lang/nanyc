@@ -97,11 +97,10 @@ bool instanciate(ny::compiler::Compdb& compdb, ny::Logs::Report& report, AnyStri
 		auto& atom = findEntrypointAtom(compdb.cdeftable.atoms.root, entrypoint);
 		ParameterList params;
 		ParameterList tmplparams;
-		std::shared_ptr<Logs::Message> newReport;
 		ClassdefTableView cdeftblView{compdb.cdeftable};
-		ny::semantic::Settings settings(newReport, atom, cdeftblView, compdb, params, tmplparams);
+		ny::semantic::Settings settings(atom, cdeftblView, compdb, params, tmplparams);
 		bool instanciated = ny::semantic::instanciateAtom(settings);
-		report.appendEntry(newReport);
+		report.appendEntry(settings.report);
 		if (config::traces::atomTable)
 			compdb.cdeftable.atoms.root.printTree(compdb.cdeftable);
 		if (likely(instanciated)) {

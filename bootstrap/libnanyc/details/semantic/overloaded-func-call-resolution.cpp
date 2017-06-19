@@ -133,15 +133,15 @@ bool OverloadedFuncCallResolver::resolve(const std::vector<std::reference_wrappe
 				if (not suitable[r])
 					continue;
 				// reporting for the instanciation (may or may not be created by `instanciateAtom`)
-				std::shared_ptr<Logs::Message> newReport;
 				auto& solutionAtom = solutions[r].get();
 				// trying to instanciate the solution
 				ny::semantic::Settings settings {
-					newReport, solutionAtom, cdeftable, compdb, parameters[r].first, parameters[r].second
+					solutionAtom, cdeftable, compdb, parameters[r].first, parameters[r].second
 				};
 				settings.canGenerateCode = canGenerateCode;
 				settings.canGenerateErrors = canGenerateErrors;
 				settings.parent = parent;
+				auto& newReport = settings.report;
 				if (instanciateAtom(settings)) {
 					// nice, it works ! Keeping it (as the last good solution)
 					++instanceSuccessCount;

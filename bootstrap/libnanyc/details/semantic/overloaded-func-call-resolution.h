@@ -74,7 +74,7 @@ public:
 	std::vector<uint32_t> scores;
 
 	//! All subreports for suitable solutions
-	std::vector<std::shared_ptr<Logs::Message>> subreports;
+	std::vector<std::unique_ptr<Logs::Message>> subreports;
 
 private:
 	FuncOverloadMatch& overloadMatch;

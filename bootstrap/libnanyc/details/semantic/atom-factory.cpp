@@ -215,12 +215,11 @@ bool resolveTypesBeforeBodyStart(ny::compiler::Compdb& compdb, Atom& atom, Setti
 		using ParamList = decltype(ny::semantic::FuncOverloadMatch::result.params);
 		ParamList params; // input parameters (won't be used)
 		ParamList tmplparams;
-		std::shared_ptr<Logs::Message> newReport;
 		ny::Logs::Report report{compdb.messages};
-		ny::semantic::Settings settings{newReport, atom, cdeftblView, compdb, params, tmplparams};
+		ny::semantic::Settings settings{atom, cdeftblView, compdb, params, tmplparams};
 		bool success = ny::semantic::instanciateAtomParameterTypes(settings);
 		if (not success)
-			report.appendEntry(newReport);
+			report.appendEntry(settings.report);
 		return success;
 	}
 	else {
@@ -400,13 +399,12 @@ Atom* Analyzer::instanciateAtomClass(Atom& atom) {
 	decltype(FuncOverloadMatch::result.params) tmplparams;
 	params.swap(overloadMatch.result.params);
 	tmplparams.swap(overloadMatch.result.tmplparams);
-	std::shared_ptr<Logs::Message> newReport;
-	ny::semantic::Settings settings{newReport, atom, cdeftable, compdb, params, tmplparams};
+	ny::semantic::Settings settings{atom, cdeftable, compdb, params, tmplparams};
 	settings.parentAtom = &(frame->atom);
 	settings.shouldMergeLayer = true;
 	settings.parent = this;
 	bool instanciated = ny::semantic::instanciateAtom(settings);
-	report.subgroup().appendEntry(newReport);
+	report.subgroup().appendEntry(settings.report);
 	// !! The target atom may have changed here
 	// (for any non contextual atoms, generic classes, anonymous classes...)
 	auto& resAtom = settings.atom.get();
@@ -449,9 +447,8 @@ bool Analyzer::instanciateAtomFunc(uint32_t& instanceid, Atom& funcAtom, uint32_
 	params.swap(overloadMatch.result.params);
 	tmplparams.swap(overloadMatch.result.tmplparams);
 	// instanciate the called func
-	std::shared_ptr<Logs::Message> subreport;
-	Settings settings{subreport, funcAtom, cdeftable, compdb, params, tmplparams};
-	bool instok = doInstanciateAtomFunc(subreport, settings, retlvid);
+	Settings settings{funcAtom, cdeftable, compdb, params, tmplparams};
+	bool instok = doInstanciateAtomFunc(settings.report, settings, retlvid);
 	instanceid = settings.instanceid;
 	if (unlikely(not instok and retlvid != 0))
 		frame->invalidate(retlvid);
@@ -459,7 +456,7 @@ bool Analyzer::instanciateAtomFunc(uint32_t& instanceid, Atom& funcAtom, uint32_
 }
 
 
-bool Analyzer::doInstanciateAtomFunc(std::shared_ptr<Logs::Message>& subreport, Settings& settings,
+bool Analyzer::doInstanciateAtomFunc(std::unique_ptr<Logs::Message>& subreport, Settings& settings,
 		uint32_t retlvid) {
 	// even within a typeof, any new instanciation must see their code generated
 	// (and its errors generated)
