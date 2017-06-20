@@ -41,7 +41,7 @@ struct App final {
 	~App();
 
 	void importFilenames(const std::vector<AnyString>&);
-	void fetch(bool nsl);
+	void fetch();
 	void run(const Entry&);
 	int run();
 	bool statstics(int64_t duration);
@@ -141,9 +141,8 @@ void App::importFilenames(const std::vector<AnyString>& list) {
 	}
 }
 
-void App::fetch(bool nsl) {
+void App::fetch() {
 	unittests.reserve(512); // arbitrary
-	opts.with_nsl_unittests = nsl ? nytrue : nyfalse;
 	opts.on_unittest = [](void* userdata, const char* mod, uint32_t mlen, const char* name, uint32_t nlen) {
 		auto& self = *reinterpret_cast<App*>(userdata);
 		self.unittests.emplace_back();
@@ -391,6 +390,7 @@ App prepare(int argc, char** argv) {
 	if (unlikely(app.verbose))
 		printBugreport();
 	app.importFilenames(filenames);
+	app.opts.with_nsl_unittests = nsl ? nytrue : nyfalse;
 	if (not app.inExecutorMode()) {
 		if (unlikely(app.loops > 100))
 			throw "number of loops greater than hard-limit '100'";
@@ -401,7 +401,7 @@ App prepare(int argc, char** argv) {
 		app.colors = (not nocolors) and istty;
 		app.argv0 = argv[0];
 		app.jobs = numberOfJobs(app.jobs);
-		app.fetch(nsl);
+		app.fetch();
 	}
 	return app;
 }
