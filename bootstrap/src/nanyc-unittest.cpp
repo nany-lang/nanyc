@@ -59,6 +59,7 @@ struct App final {
 	bool interactive = true;
 	bool colors = true;
 	bool verbose = false;
+	bool withnsl = false;
 	uint32_t loops = 1;
 	bool shuffle = false;
 	uint32_t timeout_s = 30;
@@ -285,6 +286,8 @@ void App::run(const Entry& entry) {
 	program.argumentAdd(entry.module);
 	program.argumentAdd("--executor-name");
 	program.argumentAdd(entry.name);
+	if (withnsl)
+		program.argumentAdd("--nsl");
 	for (auto& filename: filenames)
 		program.argumentAdd(filename);
 	auto start = now();
@@ -359,13 +362,12 @@ App prepare(int argc, char** argv) {
 	App app;
 	bool version = false;
 	bool bugreport = false;
-	bool nsl = false;
 	bool nocolors = false;
 	bool nointeractive = false;
 	std::vector<AnyString> filenames;
 	yuni::GetOpt::Parser options;
 	options.add(filenames, 'i', "", "Input nanyc source files");
-	options.addFlag(nsl, ' ', "nsl", "Import NSL unittests");
+	options.addFlag(app.withnsl, ' ', "nsl", "Import NSL unittests");
 	options.add(app.timeout_s, 't', "timeout", "Timeout for executing an unittest (seconds)");
 	options.add(app.jobs, 'j', "jobs", "Number of concurrent jobs (default: auto)");
 	options.add(app.execinfo.module, ' ', "executor-module", "Executor mode, module name (internal use)", false);
@@ -392,7 +394,7 @@ App prepare(int argc, char** argv) {
 	if (unlikely(app.verbose))
 		printBugreport();
 	app.importFilenames(filenames);
-	app.opts.with_nsl_unittests = nsl ? nytrue : nyfalse;
+	app.opts.with_nsl_unittests = app.withnsl ? nytrue : nyfalse;
 	if (not app.inExecutorMode()) {
 		if (unlikely(app.loops > 100))
 			throw "number of loops greater than hard-limit '100'";
