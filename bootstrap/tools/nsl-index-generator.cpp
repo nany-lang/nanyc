@@ -74,7 +74,9 @@ public:
 			hxx << "	{\n";
 			hxx << "		auto& source = allsources[i];\n";
 			hxx << "		source.filename.adapt(\"" << prefix << prettyname << "\", " << (prettyname.size() + prefix.size()) << ");\n";
-			hxx << "		source.content.adapt(\"" << filecontent << "\", " << filecontent.size() << ");\n";
+			hxx << "		constexpr const char text[] = \"" << filecontent << "\";\n";
+			hxx << "		uint32_t textlen = static_cast<uint32_t>(strlen(text));\n";
+			hxx << "		source.content.adapt(text, textlen);\n";
 			hxx << "		callback(source);\n";
 			hxx << "		++i;\n";
 			hxx << "	}\n";
