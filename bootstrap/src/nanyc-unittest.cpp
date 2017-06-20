@@ -240,7 +240,7 @@ bool App::statstics(int64_t duration) {
 	std::cout << "\n       " << stats.total << ' ' << plurals(stats.total, "test", "tests");
 	if (stats.passing != 0) {
 		std::cout << ", ";
-		setcolor(yuni::System::Console::red);
+		setcolor(yuni::System::Console::green);
 		std::cout << stats.passing << " passing";
 		resetcolor();
 	}
