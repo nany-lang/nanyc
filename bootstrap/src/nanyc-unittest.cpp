@@ -263,8 +263,10 @@ void report(void*, const nyreport_t* report) {
 }
 
 bool App::execute(const Entry& entry) {
-	opts.entrypoint.c_str = entry.name.c_str();
-	opts.entrypoint.len = entry.name.size();
+	yuni::ShortString128 name;
+	name << "^unittest^module:" << entry.name;
+	opts.entrypoint.c_str = name.c_str();
+	opts.entrypoint.len = name.size();
 	opts.on_report = &report;
 	auto* program = nyprogram_compile(&opts);
 	bool success = program != nullptr;
