@@ -6,43 +6,10 @@
 */
 #ifndef __LIBNANYC_NANY_C_H__
 #define __LIBNANYC_NANY_C_H__
+#include "../nanyc/types.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
-
-#if defined(_WIN32) || defined(__CYGWIN__)
-#  ifdef __GNUC__
-#    define LIBNANYC_VISIBILITY_EXPORT   __attribute__ ((dllexport))
-#    define LIBNANYC_VISIBILITY_IMPORT   __attribute__ ((dllimport))
-#  else
-#    define LIBNANYC_VISIBILITY_EXPORT   __declspec(dllexport) /* note: actually gcc seems to also supports this syntax */
-#    define LIBNANYC_VISIBILITY_IMPORT   __declspec(dllimport) /* note: actually gcc seems to also supports this syntax */
-#  endif
-#else
-#  define LIBNANYC_VISIBILITY_EXPORT     __attribute__((visibility("default")))
-#  define LIBNANYC_VISIBILITY_IMPORT     __attribute__((visibility("default")))
-#endif
-
-#if defined(_DLL) && !defined(LIBNANYC_DLL_EXPORT)
-#  define LIBNANYC_DLL_EXPORT
-#endif
-
-/*!
-** \macro NY_EXPORT
-** \brief Export / import a libnany symbol (function)
-*/
-#if defined(LIBNANYC_DLL_EXPORT)
-#   define NY_EXPORT LIBNANYC_VISIBILITY_EXPORT
-#else
-#   define NY_EXPORT LIBNANYC_VISIBILITY_IMPORT
-#endif
-
-
-
-
-
-
-
 
 #ifdef __cplusplus
 extern "C" {
@@ -105,21 +72,8 @@ NY_EXPORT int nylib_check_compatible_version(uint32_t major, uint32_t minor);
 
 /*! \name Types */
 /*@{*/
-#ifndef LIBNANYC_NYBOOL_T
-#define LIBNANYC_NYBOOL_T
-/*! Boolean type */
-typedef enum nybool_t {nyfalse = 0, nytrue} nybool_t;
-#endif
-
-
 #ifndef LIBNANYC_NYANYSTR_T
 #define LIBNANYC_NYANYSTR_T
-typedef struct {
-	uint32_t size;
-	const char* c_str;
-}
-nyanystr_t;
-
 /*! Create an nyanystr_t from a c-string */
 static inline nyanystr_t nyanystr(const char* const text) {
 	nyanystr_t s = {((text) ? (uint32_t) strlen(text) : 0), text};
@@ -292,37 +246,37 @@ nyconsole_output_t;
 
 
 /*! Color constants */
-typedef enum nycolor_t {
+typedef enum nyoldcolor_t {
 	/*! None / reset */
-	nyc_none = 0,
+	nycold_none = 0,
 	/*! Black */
-	nyc_black,
+	nycold_black,
 	/*! Red */
-	nyc_red,
+	nycold_red,
 	/*! Green */
-	nyc_green,
+	nycold_green,
 	/*! Yellow */
-	nyc_yellow,
+	nycold_yellow,
 	/*! Dark Blue */
-	nyc_blue,
+	nycold_blue,
 	/*! Purple */
-	nyc_purple,
+	nycold_purple,
 	/*! Gray */
-	nyc_gray,
+	nycold_gray,
 	/*! White */
-	nyc_white,
+	nycold_white,
 	/*! Light blue */
-	nyc_lightblue
+	nycold_lightblue
 }
-nycolor_t;
+nyoldcolor_t;
 
 enum {
 	/*! The total number of colors */
-	nyc_count = nyc_lightblue + 1
+	nycold_count = nycold_lightblue + 1
 };
 
 
-typedef struct nyconsole_t {
+typedef struct nyoldconsole_t {
 	/*! Write some data to STDOUT */
 	void (*write_stdout)(void*, const char* text, size_t length);
 	/*! Write some data to STDERR */
@@ -330,21 +284,21 @@ typedef struct nyconsole_t {
 	/*! Flush output */
 	void (*flush)(void*, nyconsole_output_t);
 	/*! Set the text color */
-	void (*set_color)(void*, nyconsole_output_t, nycolor_t);
+	void (*set_color)(void*, nyconsole_output_t, nyoldcolor_t);
 	/*! Set the text color */
 	nybool_t (*has_color)(void*, nyconsole_output_t);
 
 	/*! Internal opaque pointer*/
 	void* internal;
 	/*! Flush STDERR */
-	void (*release)(const struct nyconsole_t*);
+	void (*release)(const struct nyoldconsole_t*);
 }
-nyconsole_t;
+nyoldconsole_t;
 
 /*! Initialize a project configuration */
-NY_EXPORT void nyconsole_cf_set_stdcout(nyconsole_t*);
+NY_EXPORT void nyconsole_cf_set_stdcout(nyoldconsole_t*);
 
-void nyconsole_cf_copy(nyconsole_t* out, const nyconsole_t* const src);
+void nyconsole_cf_copy(nyoldconsole_t* out, const nyoldconsole_t* const src);
 /*@}*/
 
 
@@ -421,13 +375,9 @@ NY_EXPORT nybool_t nyproject_trylock(const nyproject_t*);
 /*@{*/
 /*! Project Configuration */
 typedef struct nybuild_cf_t {
-	/*! Memory allocator */
-	nyallocator_t allocator;
 	/*! Console output */
-	nyconsole_t console;
+	nyoldconsole_t console;
 
-	/*! Make all warnings into errors */
-	nybool_t warnings_into_errors;
 	/*! Entry point to compile (ex: "main") */
 	nyanystr_t entrypoint;
 	/*! Ignore atoms when parsing - do not produce any IR code for atoms */
@@ -489,7 +439,7 @@ NY_EXPORT void nybuild_ref(nybuild_t* build);
 NY_EXPORT void nybuild_unref(nybuild_t* build);
 
 /*! Initialize a project configuration */
-NY_EXPORT void nybuild_cf_init(nybuild_cf_t* cf, const nyproject_t* project);
+NY_EXPORT void nybuild_cf_init(nybuild_cf_t* cf);
 /*@}*/
 
 
@@ -699,7 +649,7 @@ typedef struct nyprogram_cf_t {
 	/*! Memory allocator */
 	nyallocator_t allocator;
 	/*! Console output */
-	nyconsole_t console;
+	nyoldconsole_t console;
 
 	/*!
 	** \brief A new program has been started
@@ -744,7 +694,7 @@ typedef struct nyvm_t {
 	/*! Current thread */
 	nytctx_t* tctx;
 	/*! Console */
-	nyconsole_t* console;
+	nyoldconsole_t* console;
 }
 nyvm_t;
 
@@ -890,7 +840,7 @@ typedef struct nyrun_cf_t {
 	/*! Memory allocator */
 	nyallocator_t allocator;
 	/*! Console */
-	nyconsole_t console;
+	nyoldconsole_t console;
 	/*! Default prject settings */
 	nyproject_cf_t project;
 	/*! Default build settings */

@@ -52,6 +52,12 @@ typedef enum nybool_t {
 }
 nybool_t;
 
+typedef enum nyflow_t {
+	nyf_continue,
+	nyf_skip,
+	nyf_abort
+}
+nyflow_t;
 
 typedef struct nyanystr_t {
 	const char* c_str;

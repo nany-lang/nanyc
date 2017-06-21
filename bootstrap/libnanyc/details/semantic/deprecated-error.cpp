@@ -284,7 +284,7 @@ bool multipleOverloads(uint32_t lvid) {
 
 
 bool multipleOverloads(uint32_t lvid, const std::vector<std::reference_wrapper<Atom>>& solutions
-					   , const OverloadedFuncCallResolver& resolver) {
+		, OverloadedFuncCallResolver& resolver) {
 	assert(solutions.size() == resolver.suitable.size());
 	auto* seq = Logs::userHandler<Analyzer>();
 	auto* frame = seq->frame;
@@ -393,11 +393,6 @@ Logs::Report emitReportEntry(void* self, Logs::Level level) {
 	switch (level) {
 		default:
 			break;
-		case Logs::Level::warning: {
-			if (nyfalse == sb.build.cf.warnings_into_errors)
-				break;
-			level = Logs::Level::error;
-		}
 		// [[fallthru]]
 		case Logs::Level::error:
 		case Logs::Level::ICE: {

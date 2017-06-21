@@ -239,7 +239,7 @@ add_library(libnanyc ${mode_libnany}
 	"details/c-api/validator.cpp"
 	"details/c-api/version.c"
 	"details/c-api/visibility.cpp"
-	"details/compiler/compile.h"
+	"details/compiler/compdb.h"
 	"details/compiler/compiler.cpp"
 	"details/compiler/compiler.h"
 	"details/context/build-info.h"
@@ -432,6 +432,7 @@ add_library(libnanyc ${mode_libnany}
 	"include/nanyc/console.h"
 	"include/nanyc/library.h"
 	"include/nanyc/program.h"
+	"include/nanyc/report.h"
 	"include/nanyc/types.h"
 	"libnanyc.h"
 	${nysrc_nsl_stdcore}
@@ -441,6 +442,7 @@ add_library(libnanyc ${mode_libnany}
 	"console.cpp"
 	"library.c"
 	"program.cpp"
+	"report.cpp"
 )
 
 set_target_properties(libnanyc PROPERTIES

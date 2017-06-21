@@ -10,13 +10,13 @@ namespace ny {
 
 
 bool Build::resolveStrictParameterTypes(Atom& atom) {
-	return ny::semantic::resolveStrictParameterTypes(*this, atom);
+	return ny::semantic::resolveStrictParameterTypes(compdb, atom);
 }
 
 
 bool Build::instanciate(const AnyString& entrypoint, const nytype_t* args, uint32_t& atomid,
 		uint32_t& instanceid) {
-	ny::Logs::Report report{*messages.get()};
+	ny::Logs::Report report{compdb.messages};
 	if (unlikely(args)) {
 		report.error() << "arguments for atom instanciation is not supported yet";
 		return false;
@@ -24,7 +24,7 @@ bool Build::instanciate(const AnyString& entrypoint, const nytype_t* args, uint3
 	MutexLocker locker{mutex};
 	Atom* entrypointAtom = nullptr;
 	try {
-		cdeftable.atoms.root.eachChild(entrypoint, [&](Atom & child) -> bool {
+		compdb.cdeftable.atoms.root.eachChild(entrypoint, [&](Atom & child) -> bool {
 			if (unlikely(entrypointAtom != nullptr))
 				throw std::runtime_error("': multiple entry points found");
 			entrypointAtom = &child;
@@ -41,15 +41,14 @@ bool Build::instanciate(const AnyString& entrypoint, const nytype_t* args, uint3
 	}
 	decltype(ny::semantic::FuncOverloadMatch::result.params) params;
 	decltype(ny::semantic::FuncOverloadMatch::result.params) tmplparams;
-	std::shared_ptr<Logs::Message> newReport;
-	ClassdefTableView cdeftblView{cdeftable};
+	ClassdefTableView cdeftblView{compdb.cdeftable};
 	ny::semantic::Settings settings {
-		newReport, *entrypointAtom, cdeftblView, *this, params, tmplparams
+		*entrypointAtom, cdeftblView, compdb, params, tmplparams
 	};
 	bool instanciated = ny::semantic::instanciateAtom(settings);
-	report.appendEntry(newReport);
+	report.appendEntry(settings.report);
 	if (config::traces::atomTable)
-		cdeftable.atoms.root.printTree(cdeftable);
+		compdb.cdeftable.atoms.root.printTree(compdb.cdeftable);
 	if (not instanciated) {
 		atomid = (uint32_t) - 1;
 		instanceid = (uint32_t) - 1;

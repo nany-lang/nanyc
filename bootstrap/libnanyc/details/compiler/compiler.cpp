@@ -1,5 +1,5 @@
-#include "details/compiler/compile.h"
 #include "details/compiler/compiler.h"
+#include "details/compiler/compdb.h"
 #include "details/program/program.h"
 #include "details/reporting/report.h"
 #include "details/errors/errors.h"
@@ -7,13 +7,16 @@
 #include "details/pass/b-ast-normalize/normalize.h"
 #include "details/pass/c-ast2ir/source-ast-to-ir.h"
 #include "details/pass/d-object-map/attach.h"
+#include "details/semantic/atom-factory.h"
 #include "details/vm/runtime/std.core.h"
 #include "libnanyc-config.h"
+#include "libnanyc-traces.h"
 #include "embed-nsl.hxx" // generated
 #include <yuni/io/file.h>
 #include <libnanyc.h>
 #include <utility>
 #include <memory>
+#include <iostream>
 
 namespace ny {
 namespace compiler {
@@ -46,7 +49,7 @@ void copySourceOpts(ny::compiler::Source& source, const nysource_opts_t& opts) {
 	}
 }
 
-void importCompilerIntrinsics(intrinsic::Catalog& intrinsics) {
+void importcompdbIntrinsics(intrinsic::Catalog& intrinsics) {
 	nsl::import::string(intrinsics);
 	nsl::import::process(intrinsics);
 	nsl::import::env(intrinsics);
@@ -56,7 +59,7 @@ void importCompilerIntrinsics(intrinsic::Catalog& intrinsics) {
 	nsl::import::digest(intrinsics);
 }
 
-bool compileSource(ny::Logs::Report& mainreport, ny::compiler::Compiler& compiler, ny::compiler::Source& source, const nycompile_opts_t& gopts) {
+bool compileSource(ny::Logs::Report& mainreport, ny::compiler::Compdb& compdb, ny::compiler::Source& source, const nycompile_opts_t& gopts) {
 	auto report = mainreport.subgroup();
 	report.data().origins.location.filename = source.filename;
 	report.data().origins.location.target.clear();
@@ -64,56 +67,104 @@ bool compileSource(ny::Logs::Report& mainreport, ny::compiler::Compiler& compile
 	compiled &= makeASTFromSource(source);
 	compiled &= passDuplicateAndNormalizeAST(source, report);
 	compiled &= passTransformASTToIR(source, report, gopts);
-	compiled  = compiled and attach(compiler, source);
+	compiled  = compiled and attach(compdb, source);
 	return compiled;
 }
 
-bool importSourceAndCompile(ny::Logs::Report& mainreport, ny::compiler::Compiler& compiler, ny::compiler::Source& source, const nycompile_opts_t& gopts, const nysource_opts_t& opts) {
+bool importSourceAndCompile(ny::Logs::Report& mainreport, ny::compiler::Compdb& compdb, ny::compiler::Source& source, const nycompile_opts_t& gopts, const nysource_opts_t& opts) {
 	copySourceOpts(source, opts);
-	return compileSource(mainreport, compiler, source, gopts);
+	return compileSource(mainreport, compdb, source, gopts);
 }
 
-} // namespace
-
-inline Compiler::Compiler(const nycompile_opts_t& opts)
-	: opts(opts) {
+Atom& findEntrypointAtom(Atom& root, const AnyString& entrypoint) {
+	Atom* atom = nullptr;
+	root.eachChild(entrypoint, [&](Atom & child) -> bool {
+		if (unlikely(atom != nullptr))
+			throw "': multiple entry points found";
+		atom = &child;
+		return true;
+	});
+	if (unlikely(!atom))
+		throw "()': function not found";
+	if (unlikely(not atom->isFunction() or atom->isClassMember()))
+		throw "': the atom is not a function";
+	return *atom;
 }
 
-inline nyprogram_t* Compiler::compile() {
-	ny::Logs::Report report{messages};
+bool instanciate(ny::compiler::Compdb& compdb, ny::Logs::Report& report, AnyString entrypoint) {
+	using ParameterList = decltype(ny::semantic::FuncOverloadMatch::result.params);
+	try {
+		auto& atom = findEntrypointAtom(compdb.cdeftable.atoms.root, entrypoint);
+		ParameterList params;
+		ParameterList tmplparams;
+		ClassdefTableView cdeftblView{compdb.cdeftable};
+		ny::semantic::Settings settings(atom, cdeftblView, compdb, params, tmplparams);
+		bool instanciated = ny::semantic::instanciateAtom(settings);
+		report.appendEntry(settings.report);
+		if (config::traces::atomTable)
+			compdb.cdeftable.atoms.root.printTree(compdb.cdeftable);
+		if (likely(instanciated)) {
+			compdb.entrypoint.atomid = atom.atomid;
+			compdb.entrypoint.instanceid = settings.instanceid;
+			return true;
+		}
+	}
+	catch (const char* e) {
+		report.error() << "failed to instanciate '" << entrypoint << e;
+	}
+	compdb.entrypoint.atomid = (uint32_t) -1;
+	compdb.entrypoint.instanceid = (uint32_t) -1;
+	return false;
+}
+
+nyprogram_t* compile(ny::compiler::Compdb& compdb) {
+	ny::Logs::Report report{compdb.messages};
 	Logs::Handler errorHandler{&report, &buildGenerateReport};
 	try {
+		auto& opts = compdb.opts;
 		uint32_t scount = opts.sources.count;
 		if (unlikely(scount == 0))
 			return complainNoSource(report);
 		if (config::importNSL)
-			importCompilerIntrinsics(intrinsics);
+			importcompdbIntrinsics(compdb.intrinsics);
 		if (config::importNSL)
 			scount += corefilesCount;
 		if (unlikely(opts.with_nsl_unittests == nytrue))
 			scount += unittestCount;
+		auto& sources = compdb.sources;
 		sources.count = scount;
 		sources.items = std::make_unique<Source[]>(scount);
 		bool compiled = true;
 		uint32_t offset = 0;
 		if (config::importNSL) {
 			registerNSLCoreFiles(sources, offset, [&](ny::compiler::Source& source) {
-				compiled &= compileSource(report, *this, source, opts);
+				compiled &= compileSource(report, compdb, source, opts);
 			});
 		}
 		if (opts.with_nsl_unittests == nytrue) {
 			registerUnittestFiles(sources, offset, [&](ny::compiler::Source& source) {
-				compiled &= compileSource(report, *this, source, opts);
+				compiled &= compileSource(report, compdb, source, opts);
 			});
 		}
 		for (uint32_t i = 0; i != opts.sources.count; ++i) {
 			auto& source = sources[offset + i];
-			compiled &= importSourceAndCompile(report, *this, source, opts, opts.sources.items[i]);
+			compiled &= importSourceAndCompile(report, compdb, source, opts, opts.sources.items[i]);
 		}
-		if (compiled and (opts.with_nsl_unittests == nyfalse)) {
-			auto program = std::make_unique<ny::Program>();
-			return ny::Program::pointer(program.release());
-		}
+		compiled = compiled
+			and compdb.cdeftable.atoms.fetchAndIndexCoreObjects() // indexing bool, u32, f64...
+			and ny::semantic::resolveStrictParameterTypes(compdb, compdb.cdeftable.atoms.root); // typedef
+		if (config::traces::preAtomTable)
+			compdb.cdeftable.atoms.root.printTree(ClassdefTableView{compdb.cdeftable});
+		if (unlikely(not compiled))
+			return nullptr;
+		auto& entrypoint = compdb.opts.entrypoint;
+		if (unlikely(entrypoint.len == 0))
+			return nullptr;
+		bool epinst = instanciate(compdb, report, AnyString(entrypoint.c_str, static_cast<uint32_t>(entrypoint.len)));
+		if (unlikely(not epinst))
+			return nullptr;
+		auto program = std::make_unique<ny::Program>();
+		return ny::Program::pointer(program.release());
 	}
 	catch (const std::bad_alloc& e) {
 		report.ice() << "not enough memory when compiling";
@@ -130,13 +181,18 @@ inline nyprogram_t* Compiler::compile() {
 	return nullptr;
 }
 
+} // namespace
+
 nyprogram_t* compile(nycompile_opts_t& opts) {
 	try {
 		if (opts.on_build_start)
 			opts.userdata = opts.on_build_start(opts.userdata);
-		auto* program = Compiler{opts}.compile();
+		ny::compiler::Compdb compdb{opts};
+		auto* program = compile(compdb);
 		if (opts.on_build_stop)
 			opts.on_build_stop(opts.userdata, (program ? nytrue : nyfalse));
+		if (opts.on_report and not compdb.messages.entries.empty())
+			opts.on_report(opts.userdata, reinterpret_cast<const nyreport_t*>(&compdb.messages));
 		return program;
 	}
 	catch (...) {

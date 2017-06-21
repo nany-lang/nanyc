@@ -1,5 +1,5 @@
 #pragma once
-#include "details/compiler/compiler.h"
+#include "details/compiler/compdb.h"
 #include "details/reporting/report.h"
 
 namespace ny {

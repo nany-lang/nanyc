@@ -10,11 +10,11 @@ namespace console {
 
 void exception(const Context& context, const AnyString& string) noexcept {
 	cerr(context, "\n\n");
-	color(context, nycerr, nyc_red);
+	color(context, nycerr, nycold_red);
 	cerr(context, "exception: ");
-	color(context, nycerr, nyc_white);
+	color(context, nycerr, nycold_white);
 	cerr(context, string);
-	color(context, nycerr, nyc_none);
+	color(context, nycerr, nycold_none);
 	cerr(context, "\n");
 }
 

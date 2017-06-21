@@ -1,5 +1,5 @@
 #include <yuni/yuni.h>
-#include "details/context/build.h"
+#include "details/compiler/compdb.h"
 #include "details/reporting/report.h"
 #include "details/ir/sequence.h"
 #include "details/atom/atom.h"
@@ -29,11 +29,11 @@ public:
 
 public:
 	OverloadedFuncCallResolver(Analyzer* parent, Logs::Report report, FuncOverloadMatch& overloadMatch,
-			ClassdefTableView& cdeftable, Build& build)
+			ClassdefTableView& cdeftable, ny::compiler::Compdb& compdb)
 		: overloadMatch(overloadMatch)
 		, report(report)
 		, cdeftable(cdeftable)
-		, build(build)
+		, compdb(compdb)
 		, parent(parent) {
 	}
 
@@ -74,7 +74,7 @@ public:
 	std::vector<uint32_t> scores;
 
 	//! All subreports for suitable solutions
-	std::vector<std::shared_ptr<Logs::Message>> subreports;
+	std::vector<std::unique_ptr<Logs::Message>> subreports;
 
 private:
 	FuncOverloadMatch& overloadMatch;
@@ -86,8 +86,7 @@ private:
 	std::vector<bool> solutionsThatCanBeInstanciated;
 	//!
 	ClassdefTableView& cdeftable;
-	//! Parent build
-	Build& build;
+	ny::compiler::Compdb& compdb;
 	//! Parent Sequence builder, if any
 	Analyzer* parent = nullptr;;
 

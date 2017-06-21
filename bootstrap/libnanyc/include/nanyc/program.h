@@ -8,6 +8,7 @@
 #define __LIBNANYC_PROGRAM_H__
 
 #include <nanyc/types.h>
+#include <nanyc/report.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,10 +40,12 @@ typedef struct nycompile_opts_t {
 	nysourcelist_opts_t sources;
 	nybool_t verbose;
 	nybool_t with_nsl_unittests;
+	nyanystr_t entrypoint; /*default: main*/
 	void* (*on_build_start)(void* userdata);
 	void (*on_build_stop)(void* userdata, nybool_t success);
 	void (*on_file_eaccess)(void*, const nysource_opts_t*);
 	void (*on_unittest)(void* userdata, const char* mod, uint32_t mlen, const char* name, uint32_t nlen);
+	void (*on_report)(void* userdata, const nyreport_t*);
 }
 nycompile_opts_t;
 

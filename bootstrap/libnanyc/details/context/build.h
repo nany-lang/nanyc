@@ -1,4 +1,5 @@
 #pragma once
+#include "details/compiler/compdb.h"
 #include "nany/nany.h"
 #include <yuni/core/smartptr/intrusive.h>
 #include <yuni/core/atomic/bool.h>
@@ -68,17 +69,7 @@ public:
 	/*!
 	** \brief Print a message on the console
 	*/
-	void cerrColor(nycolor_t);
-
-
-	//! Allocate a new object
-	template<class T, typename... Args> T* allocate(Args&& ... args);
-	//! Allocate a new memory region
-	template<class T> T* allocateraw(size_t size);
-	//! delete an object
-	template<class T> void deallocate(T* object);
-	//! delete a memory region
-	void deallocate(void* object, size_t size);
+	void cerrColor(nyoldcolor_t);
 
 	//! Get the equivalent C pointer
 	nybuild_t* self();
@@ -97,14 +88,8 @@ public:
 	//! Canceled flag
 	Yuni::Atomic::Bool canceled;
 
-	//! The datatype matrix
-	ClassdefTable cdeftable;
-
-	//! All intrinsics
-	intrinsic::Catalog intrinsics;
-
-	//! All report messages
-	std::unique_ptr<Logs::Message> messages;
+	nycompile_opts_t opts; // just for compilation
+	ny::compiler::Compdb compdb;
 
 	//! Build time
 	int64_t buildtime = 0;

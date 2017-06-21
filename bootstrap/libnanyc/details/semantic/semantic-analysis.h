@@ -6,13 +6,11 @@
 #include "details/ir/isa/data.h"
 #include "details/ir/sequence.h"
 #include "details/errors/errors.h"
+#include "details/compiler/compdb.h"
 #include "stack-frame.h"
 #include "func-overload-match.h"
 #include <vector>
 #include <tuple>
-
-
-namespace ny { class Build; }
 
 
 namespace ny {
@@ -155,7 +153,7 @@ private:
 
 
 struct Analyzer final {
-	Analyzer(Logs::Report, ClassdefTableView&, Build&,
+	Analyzer(Logs::Report, ClassdefTableView&, ny::compiler::Compdb&,
 		ir::Sequence* out, ir::Sequence&, Analyzer* parent = nullptr);
 	~Analyzer();
 
@@ -311,7 +309,7 @@ struct Analyzer final {
 
 
 public:
-	bool doInstanciateAtomFunc(std::shared_ptr<Logs::Message>& subreport, Settings& info, uint32_t retlvid);
+	bool doInstanciateAtomFunc(std::unique_ptr<Logs::Message>& subreport, Settings& info, uint32_t retlvid);
 	void pushNewFrame(Atom& atom);
 	void popFrame();
 
@@ -328,8 +326,7 @@ public:
 	//! Flag to prevent error generation when != 0
 	uint32_t errorGenerationLock = 0;
 
-	//! Build context
-	Build& build;
+	ny::compiler::Compdb& compdb;
 	//! intrinsics
 	const ny::intrinsic::Catalog& intrinsics;
 

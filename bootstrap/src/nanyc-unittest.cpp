@@ -41,7 +41,7 @@ struct App final {
 	~App();
 
 	void importFilenames(const std::vector<AnyString>&);
-	void fetch(bool nsl);
+	void fetch();
 	void run(const Entry&);
 	int run();
 	bool statstics(int64_t duration);
@@ -59,6 +59,7 @@ struct App final {
 	bool interactive = true;
 	bool colors = true;
 	bool verbose = false;
+	bool withnsl = false;
 	uint32_t loops = 1;
 	bool shuffle = false;
 	uint32_t timeout_s = 30;
@@ -141,9 +142,8 @@ void App::importFilenames(const std::vector<AnyString>& list) {
 	}
 }
 
-void App::fetch(bool nsl) {
+void App::fetch() {
 	unittests.reserve(512); // arbitrary
-	opts.with_nsl_unittests = nsl ? nytrue : nyfalse;
 	opts.on_unittest = [](void* userdata, const char* mod, uint32_t mlen, const char* name, uint32_t nlen) {
 		auto& self = *reinterpret_cast<App*>(userdata);
 		self.unittests.emplace_back();
@@ -151,6 +151,7 @@ void App::fetch(bool nsl) {
 		entry.module.assign(mod, mlen);
 		entry.name.assign(name, nlen);
 	};
+	opts.entrypoint.len = 0;
 	std::cout << "searching for unittests in all source files...\n";
 	auto start = now();
 	nyprogram_compile(&opts);
@@ -239,7 +240,7 @@ bool App::statstics(int64_t duration) {
 	std::cout << "\n       " << stats.total << ' ' << plurals(stats.total, "test", "tests");
 	if (stats.passing != 0) {
 		std::cout << ", ";
-		setcolor(yuni::System::Console::red);
+		setcolor(yuni::System::Console::green);
 		std::cout << stats.passing << " passing";
 		resetcolor();
 	}
@@ -258,7 +259,16 @@ bool App::statstics(int64_t duration) {
 	return stats.failed == 0 and stats.total != 0;
 }
 
+void report(void*, const nyreport_t* report) {
+	nyreport_print_stdout(report);
+}
+
 bool App::execute(const Entry& entry) {
+	yuni::ShortString128 name;
+	name << "^unittest^module:" << entry.name;
+	opts.entrypoint.c_str = name.c_str();
+	opts.entrypoint.len = name.size();
+	opts.on_report = &report;
 	auto* program = nyprogram_compile(&opts);
 	bool success = program != nullptr;
 	if (program) {
@@ -276,6 +286,8 @@ void App::run(const Entry& entry) {
 	program.argumentAdd(entry.module);
 	program.argumentAdd("--executor-name");
 	program.argumentAdd(entry.name);
+	if (withnsl)
+		program.argumentAdd("--nsl");
 	for (auto& filename: filenames)
 		program.argumentAdd(filename);
 	auto start = now();
@@ -350,13 +362,12 @@ App prepare(int argc, char** argv) {
 	App app;
 	bool version = false;
 	bool bugreport = false;
-	bool nsl = false;
 	bool nocolors = false;
 	bool nointeractive = false;
 	std::vector<AnyString> filenames;
 	yuni::GetOpt::Parser options;
 	options.add(filenames, 'i', "", "Input nanyc source files");
-	options.addFlag(nsl, ' ', "nsl", "Import NSL unittests");
+	options.addFlag(app.withnsl, ' ', "nsl", "Import NSL unittests");
 	options.add(app.timeout_s, 't', "timeout", "Timeout for executing an unittest (seconds)");
 	options.add(app.jobs, 'j', "jobs", "Number of concurrent jobs (default: auto)");
 	options.add(app.execinfo.module, ' ', "executor-module", "Executor mode, module name (internal use)", false);
@@ -383,6 +394,7 @@ App prepare(int argc, char** argv) {
 	if (unlikely(app.verbose))
 		printBugreport();
 	app.importFilenames(filenames);
+	app.opts.with_nsl_unittests = app.withnsl ? nytrue : nyfalse;
 	if (not app.inExecutorMode()) {
 		if (unlikely(app.loops > 100))
 			throw "number of loops greater than hard-limit '100'";
@@ -393,7 +405,7 @@ App prepare(int argc, char** argv) {
 		app.colors = (not nocolors) and istty;
 		app.argv0 = argv[0];
 		app.jobs = numberOfJobs(app.jobs);
-		app.fetch(nsl);
+		app.fetch();
 	}
 	return app;
 }

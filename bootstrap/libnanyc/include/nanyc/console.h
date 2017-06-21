@@ -24,6 +24,7 @@ typedef enum nycolor_t {
 	nyc_magenta,
 	nyc_cyan,
 	nyc_white,
+	nyc_lightblue,
 }
 nycolor_t;
 

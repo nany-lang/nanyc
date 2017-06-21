@@ -27,12 +27,12 @@ inline void cerr(const Context& context, const AnyString& string) noexcept {
 }
 
 
-inline void color(const nyprogram_cf_t& cf, nyconsole_output_t output, nycolor_t cl) noexcept {
+inline void color(const nyprogram_cf_t& cf, nyconsole_output_t output, nyoldcolor_t cl) noexcept {
 	cf.console.set_color(cf.console.internal, output, cl);
 }
 
 
-inline void color(const Context& context, nyconsole_output_t output, nycolor_t cl) noexcept {
+inline void color(const Context& context, nyconsole_output_t output, nyoldcolor_t cl) noexcept {
 	color(context.cf, output, cl);
 }
 

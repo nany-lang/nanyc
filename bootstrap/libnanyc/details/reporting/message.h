@@ -4,7 +4,6 @@
 #include <yuni/core/noncopyable.h>
 #include <yuni/thread/mutex.h>
 #include "levels.h"
-#include "nany/nany.h"
 #include <iosfwd>
 #include <memory>
 
@@ -24,9 +23,7 @@ struct Message final: Yuni::NonCopyable<Message> {
 	//! Create a new sub-entry
 	Message& createEntry(Level level);
 
-	void appendEntry(const std::shared_ptr<Message>& message);
-
-	void print(nyconsole_t&, bool unify = false);
+	void appendEntry(std::unique_ptr<Message>& message);
 
 	bool isClassifiedAsError() const {
 		return static_cast<uint>(level) > static_cast<uint>(Level::warning);

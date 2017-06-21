@@ -92,7 +92,7 @@ bool Source::build(Build& build) {
 				if (unlikely(not success))
 					complainEAccess(build);
 			}
-			auto report = Logs::Report{*build.messages} .subgroup();
+			auto report = Logs::Report{build.compdb.messages} .subgroup();
 			report.data().origins.location.filename = m_filename;
 			report.data().origins.location.target.clear();
 			if (success) {

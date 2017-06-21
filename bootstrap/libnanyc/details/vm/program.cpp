@@ -12,7 +12,7 @@ namespace vm {
 namespace {
 
 
-void flushAll(nyconsole_t& console) {
+void flushAll(nyoldconsole_t& console) {
 	if (console.flush) {
 		console.flush(console.internal, nycerr);
 		console.flush(console.internal, nycout);
@@ -26,7 +26,7 @@ void flushAll(nyconsole_t& console) {
 Program::Program(const nyprogram_cf_t& cf, nybuild_t* build)
 	: cf(cf)
 	, build(build)
-	, map(ref(build).cdeftable.atoms) {
+	, map(ref(build).compdb.cdeftable.atoms) {
 	ref(build).addRef(); // nany_build_ref()
 }
 
@@ -39,7 +39,7 @@ Program::~Program() {
 
 
 int Program::execute(uint32_t argc, const char** argv) {
-	if (unlikely(cf.entrypoint.size == 0))
+	if (unlikely(cf.entrypoint.len == 0))
 		return 0;
 	if (cf.on_execute) {
 		if (nyfalse == cf.on_execute(self()))
@@ -53,7 +53,7 @@ int Program::execute(uint32_t argc, const char** argv) {
 	uint32_t atomid = ny::ref(build).main.atomid;
 	uint32_t instanceid = ny::ref(build).main.instanceid;
 	auto& ircode = map.ircode(atomid, instanceid);
-	Context context{*this, AnyString{cf.entrypoint.c_str, cf.entrypoint.size}};
+	Context context{*this, AnyString{cf.entrypoint.c_str, static_cast<uint32_t>(cf.entrypoint.len)}};
 	bool success = context.initializeFirstTContext();
 	if (unlikely(not success))
 		return 666;
