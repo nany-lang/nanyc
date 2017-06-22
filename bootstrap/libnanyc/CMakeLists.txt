@@ -427,6 +427,8 @@ add_library(libnanyc ${mode_libnany}
 	"details/vm/stacktrace.h"
 	"details/vm/stacktrace.hxx"
 	"details/vm/types.h"
+	"details/vm/vm.cpp"
+	"details/vm/vm.h"
 	"include/nany/nany.h"
 	"include/nanyc/allocator.h"
 	"include/nanyc/console.h"
@@ -434,6 +436,7 @@ add_library(libnanyc ${mode_libnany}
 	"include/nanyc/program.h"
 	"include/nanyc/report.h"
 	"include/nanyc/types.h"
+	"include/nanyc/vm.h"
 	"libnanyc.h"
 	${nysrc_nsl_stdcore}
 	#
@@ -443,6 +446,7 @@ add_library(libnanyc ${mode_libnany}
 	"library.c"
 	"program.cpp"
 	"report.cpp"
+	"vm.cpp"
 )
 
 set_target_properties(libnanyc PROPERTIES
