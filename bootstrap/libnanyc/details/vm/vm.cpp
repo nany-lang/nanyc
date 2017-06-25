@@ -4,7 +4,7 @@
 namespace ny {
 namespace vm {
 
-Machine::Machine(const nyvm_opts_t& opts, const ny::Program* program)
+Machine::Machine(const nyvm_opts_t& opts, const ny::Program& program)
 	: opts(opts)
 	, program(program) {
 	vmcx.opts = &this->opts;
