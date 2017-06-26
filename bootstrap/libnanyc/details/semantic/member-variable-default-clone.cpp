@@ -48,7 +48,7 @@ void produceMemberVarDefaultClone(Analyzer& analyzer) {
 			return String{"\nCLONE for '"} << subatom.name() << '\'';
 		});
 		switch (cdef.kind) {
-			case nyt_any: {
+			case CType::t_any: {
 				uint32_t rhsptr = lvid++; // rhs value, from the object being cloned
 				uint32_t lhsptr = lvid++; // the target local value
 				auto& origin  = frame.lvids(rhsptr).origin.varMember;
@@ -72,7 +72,7 @@ void produceMemberVarDefaultClone(Analyzer& analyzer) {
 				frame.lvids(lhsptr).autorelease = false;
 				break;
 			}
-			case nyt_void: {
+			case CType::t_void: {
 				ice() << "unexpected pseudo type 'void' for " << cdef.clid;
 				break;
 			}

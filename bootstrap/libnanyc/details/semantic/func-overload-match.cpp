@@ -290,7 +290,7 @@ inline TypeCheck::Match FuncOverloadMatch::validateAtom(Atom& atom, bool allowIm
 				if (atomRettype.isVoid())
 					break;
 				// The returned type can be any, which can be void then
-				if (atomRettype.kind == nyt_any and !table.findClassdefAtom(atomRettype))
+				if (atomRettype.kind == CType::t_any and !table.findClassdefAtom(atomRettype))
 					break;
 				if (withErrorReporting) {
 					auto err = (report->hint() << "returned type does not match, got '");

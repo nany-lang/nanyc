@@ -85,7 +85,7 @@ bool emitShortCircuitFuncCall(Scope& scope, uint32_t functor, uint32_t& localvar
 	if (scupdt.offsetStackalloc != 0)
 		irout.at<ir::isa::Op::stackalloc>(scupdt.offsetStackalloc).lvid = sclabel + 1;
 	ir::emit::scopeEnd(irout);
-	ir::emit::alloc(irout, scope.nextvar(), nyt_u64); // allocating for sizeof
+	ir::emit::alloc(irout, scope.nextvar(), CType::t_u64); // allocating for sizeof
 	ir::emit::pragma::shortcircuitMutateToBool(irout, callret, ret__bool);
 	return success;
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "classdef-table.h"
 #include "details/atom/atom-map.h"
+#include "details/atom/ctype.h"
 
 
 namespace ny {
@@ -32,7 +33,7 @@ struct ClassdefTableView final {
 	//! Create a new substiture in the current layer
 	Classdef& substitute(uint32_t);
 	//! Append a new substitute
-	Classdef& addSubstitute(nytype_t kind, Atom* atom, const Qualifiers& qualifiers);
+	Classdef& addSubstitute(CType kind, Atom* atom, const Qualifiers& qualifiers);
 
 	//! Get the atom id of the current layer
 	uint32_t substituteAtomID() const;

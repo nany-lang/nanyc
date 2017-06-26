@@ -21,7 +21,7 @@ namespace {
 
 
 bool intrinsicOSIsUnix(Analyzer& seq, uint32_t lvid) {
-	seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_bool);
+	seq.cdeftable.substitute(lvid).mutateToBuiltin(CType::t_bool);
 	if (seq.canGenerateCode())
 		ir::emit::constantbool(seq.out, lvid, yuni::System::unix);
 	return true;
@@ -29,7 +29,7 @@ bool intrinsicOSIsUnix(Analyzer& seq, uint32_t lvid) {
 
 
 bool intrinsicOSIsPosix(Analyzer& seq, uint32_t lvid) {
-	seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_bool);
+	seq.cdeftable.substitute(lvid).mutateToBuiltin(CType::t_bool);
 	if (seq.canGenerateCode()) {
 		#if defined(YUNI_OS_UNIX) && defined(_POSIX_VERSION)
 		ir::emit::constantbool(seq.out, lvid, true);
@@ -42,7 +42,7 @@ bool intrinsicOSIsPosix(Analyzer& seq, uint32_t lvid) {
 
 
 bool intrinsicOSIsLinux(Analyzer& seq, uint32_t lvid) {
-	seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_bool);
+	seq.cdeftable.substitute(lvid).mutateToBuiltin(CType::t_bool);
 	if (seq.canGenerateCode())
 		ir::emit::constantbool(seq.out, lvid, yuni::System::linux);
 	return true;
@@ -50,7 +50,7 @@ bool intrinsicOSIsLinux(Analyzer& seq, uint32_t lvid) {
 
 
 bool intrinsicOSIsAIX(Analyzer& seq, uint32_t lvid) {
-	seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_bool);
+	seq.cdeftable.substitute(lvid).mutateToBuiltin(CType::t_bool);
 	if (seq.canGenerateCode()) {
 		#ifdef YUNI_OS_AIX
 		ir::emit::constantbool(seq.out, lvid, true);
@@ -63,7 +63,7 @@ bool intrinsicOSIsAIX(Analyzer& seq, uint32_t lvid) {
 
 
 bool intrinsicOSIsWindows(Analyzer& seq, uint32_t lvid) {
-	seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_bool);
+	seq.cdeftable.substitute(lvid).mutateToBuiltin(CType::t_bool);
 	if (seq.canGenerateCode())
 		ir::emit::constantbool(seq.out, lvid, yuni::System::windows);
 	return true;
@@ -71,7 +71,7 @@ bool intrinsicOSIsWindows(Analyzer& seq, uint32_t lvid) {
 
 
 bool intrinsicOSIsCygwin(Analyzer& seq, uint32_t lvid) {
-	seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_bool);
+	seq.cdeftable.substitute(lvid).mutateToBuiltin(CType::t_bool);
 	if (seq.canGenerateCode()) {
 		#if defined(__CYGWIN32__) || defined(__CYGWIN__)
 		ir::emit::constantbool(seq.out, lvid, true);
@@ -84,7 +84,7 @@ bool intrinsicOSIsCygwin(Analyzer& seq, uint32_t lvid) {
 
 
 bool intrinsicOSIsMacOS(Analyzer& seq, uint32_t lvid) {
-	seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_bool);
+	seq.cdeftable.substitute(lvid).mutateToBuiltin(CType::t_bool);
 	if (seq.canGenerateCode())
 		ir::emit::constantbool(seq.out, lvid, yuni::System::macos);
 	return true;
@@ -92,7 +92,7 @@ bool intrinsicOSIsMacOS(Analyzer& seq, uint32_t lvid) {
 
 
 bool intrinsicOSIsBSD(Analyzer& seq, uint32_t lvid) {
-	seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_bool);
+	seq.cdeftable.substitute(lvid).mutateToBuiltin(CType::t_bool);
 	if (seq.canGenerateCode()) {
 		#if defined(YUNI_OS_MACOS) || defined(YUNI_OS_OPENBSD) || defined(YUNI_OS_FREEBSD) \
 			|| defined(YUNI_OS_NETBSD) || defined(YUNI_OS_DRAGONFLY)
@@ -134,7 +134,7 @@ bool intrinsicFieldset(Analyzer& seq, uint32_t lvid) {
 	if (implicitBuiltin) {
 		// checking if an implicit can be performed (if rhs is a 'builtin' type)
 		auto* atomrhs = (seq.cdeftable.findClassdefAtom(cdef));
-		implicitBuiltin = (seq.cdeftable.atoms().core.object[cdefvar.kind] == atomrhs);
+		implicitBuiltin = (seq.cdeftable.atoms().core.object[(uint32_t) cdefvar.kind] == atomrhs);
 	}
 	if (not implicitBuiltin) {
 		auto similarity = TypeCheck::isSimilarTo(seq, cdef, cdefvar);
@@ -173,7 +173,7 @@ bool intrinsicUnref(Analyzer& seq, uint32_t lvid) {
 
 
 bool intrinsicPointer(Analyzer& seq, uint32_t lvid) {
-	seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_ptr);
+	seq.cdeftable.substitute(lvid).mutateToBuiltin(CType::t_ptr);
 	if (seq.canGenerateCode()) {
 		uint32_t objlvid = seq.pushedparams.func.indexed[0].lvid;
 		if (canBeAcquired(seq, objlvid)) {
@@ -191,7 +191,7 @@ bool intrinsicPointer(Analyzer& seq, uint32_t lvid) {
 
 
 bool intrinsicSizeof(Analyzer& seq, uint32_t lvid) {
-	seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_u64);
+	seq.cdeftable.substitute(lvid).mutateToBuiltin(CType::t_u64);
 	uint32_t objlvid = seq.pushedparams.func.indexed[0].lvid;
 	auto& cdef = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, objlvid});
 	bool isBuiltinOrVoid = cdef.isBuiltinOrVoid();
@@ -209,7 +209,7 @@ bool intrinsicSizeof(Analyzer& seq, uint32_t lvid) {
 			ir::emit::type::objectSizeof(seq.out, lvid, atom->atomid);
 		}
 		else {
-			uint64_t size = nytype_sizeof(cdef.kind);
+			uint64_t size = ny::ctypeSizeof(cdef.kind);
 			ir::emit::constantu64(seq.out, lvid, size);
 		}
 	}
@@ -218,7 +218,7 @@ bool intrinsicSizeof(Analyzer& seq, uint32_t lvid) {
 
 
 bool intrinsicMemalloc(Analyzer& seq, uint32_t lvid) {
-	seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_ptr);
+	seq.cdeftable.substitute(lvid).mutateToBuiltin(CType::t_ptr);
 	uint32_t objlvid = seq.pushedparams.func.indexed[0].lvid;
 	auto& cdef = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, objlvid});
 	if (not cdef.isBuiltinU64())
@@ -230,7 +230,7 @@ bool intrinsicMemalloc(Analyzer& seq, uint32_t lvid) {
 
 
 bool intrinsicMemrealloc(Analyzer& seq, uint32_t lvid) {
-	seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_ptr);
+	seq.cdeftable.substitute(lvid).mutateToBuiltin(CType::t_ptr);
 	uint32_t ptrlvid = seq.pushedparams.func.indexed[0].lvid;
 	auto& cdefptr = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, ptrlvid});
 	if (not cdefptr.isRawPointer())
@@ -255,7 +255,7 @@ bool intrinsicMemFree(Analyzer& seq, uint32_t lvid) {
 	seq.cdeftable.substitute(lvid).mutateToVoid();
 	uint32_t objlvid = seq.pushedparams.func.indexed[0].lvid;
 	auto& cdef = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, objlvid});
-	if (cdef.kind != nyt_ptr)
+	if (cdef.kind != CType::t_ptr)
 		return seq.complainIntrinsicParameter("memory.dispose", 0, cdef, "'__u64'");
 	uint32_t size = seq.pushedparams.func.indexed[1].lvid;
 	auto& cdefsize = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, size});
@@ -271,7 +271,7 @@ bool intrinsicMemfill(Analyzer& seq, uint32_t lvid) {
 	seq.cdeftable.substitute(lvid).mutateToVoid();
 	uint32_t objlvid = seq.pushedparams.func.indexed[0].lvid;
 	auto& cdef = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, objlvid});
-	if (cdef.kind != nyt_ptr)
+	if (cdef.kind != CType::t_ptr)
 		return seq.complainIntrinsicParameter("memory.memset", 0, cdef, "'__pointer'");
 	uint32_t size = seq.pushedparams.func.indexed[1].lvid;
 	auto& cdefsize = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, size});
@@ -328,7 +328,7 @@ bool intrinsicMemMove(Analyzer& seq, uint32_t lvid) {
 
 
 bool intrinsicMemCmp(Analyzer& seq, uint32_t lvid) {
-	seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_u64);
+	seq.cdeftable.substitute(lvid).mutateToBuiltin(CType::t_u64);
 	uint32_t objlvid = seq.pushedparams.func.indexed[0].lvid;
 	auto& cdef = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, objlvid});
 	if (unlikely(not cdef.isRawPointer()))
@@ -350,7 +350,7 @@ bool intrinsicMemCmp(Analyzer& seq, uint32_t lvid) {
 
 
 bool intrinsicMemGetU64(Analyzer& seq, uint32_t lvid) {
-	seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_u64);
+	seq.cdeftable.substitute(lvid).mutateToBuiltin(CType::t_u64);
 	uint32_t ptrlvid = seq.pushedparams.func.indexed[0].lvid;
 	auto& cdef = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, ptrlvid});
 	if (unlikely(not cdef.isRawPointer()))
@@ -362,7 +362,7 @@ bool intrinsicMemGetU64(Analyzer& seq, uint32_t lvid) {
 
 
 bool intrinsicMemGetU32(Analyzer& seq, uint32_t lvid) {
-	seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_u32);
+	seq.cdeftable.substitute(lvid).mutateToBuiltin(CType::t_u32);
 	uint32_t ptrlvid = seq.pushedparams.func.indexed[0].lvid;
 	auto& cdef = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, ptrlvid});
 	if (unlikely(not cdef.isRawPointer()))
@@ -374,7 +374,7 @@ bool intrinsicMemGetU32(Analyzer& seq, uint32_t lvid) {
 
 
 bool intrinsicMemGetU8(Analyzer& seq, uint32_t lvid) {
-	seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_u8);
+	seq.cdeftable.substitute(lvid).mutateToBuiltin(CType::t_u8);
 	uint32_t ptrlvid = seq.pushedparams.func.indexed[0].lvid;
 	auto& cdef = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, ptrlvid});
 	if (unlikely(not cdef.isRawPointer()))
@@ -386,7 +386,7 @@ bool intrinsicMemGetU8(Analyzer& seq, uint32_t lvid) {
 
 
 bool intrinsicMemGetPTR(Analyzer& seq, uint32_t lvid) {
-	seq.cdeftable.substitute(lvid).mutateToBuiltin(nyt_ptr);
+	seq.cdeftable.substitute(lvid).mutateToBuiltin(CType::t_ptr);
 	uint32_t ptrlvid = seq.pushedparams.func.indexed[0].lvid;
 	auto& cdef = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, ptrlvid});
 	if (unlikely(not cdef.isRawPointer()))
@@ -471,7 +471,7 @@ bool intrinsicMemSetPTR(Analyzer& seq, uint32_t lvid) {
 
 template<class T>
 bool intrinsicStrlen(Analyzer& seq, uint32_t lvid) {
-	seq.cdeftable.substitute(lvid).mutateToBuiltin(sizeof(T) == sizeof(uint32_t) ? nyt_u32 : nyt_u64);
+	seq.cdeftable.substitute(lvid).mutateToBuiltin(sizeof(T) == sizeof(uint32_t) ? CType::t_u32 : CType::t_u64);
 	uint32_t objlvid = seq.pushedparams.func.indexed[0].lvid;
 	auto& cdef = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, objlvid});
 	if (!cdef.isRawPointer())
@@ -489,10 +489,10 @@ bool intrinsicNOT(Analyzer& seq, uint32_t lvid) {
 	uint32_t lhs  = seq.pushedparams.func.indexed[0].lvid;
 	auto& cdeflhs = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, lhs});
 	Atom* atomBuiltinCast = nullptr;
-	nytype_t builtinlhs = cdeflhs.kind;
-	if (builtinlhs == nyt_any) { // implicit access to the internal 'pod' variable
+	CType builtinlhs = cdeflhs.kind;
+	if (builtinlhs == CType::t_any) { // implicit access to the internal 'pod' variable
 		auto* atom = seq.cdeftable.findClassdefAtom(cdeflhs);
-		if (atom != nullptr and atom->builtinMapping != nyt_void) {
+		if (atom != nullptr and atom->builtinMapping != CType::t_void) {
 			atomBuiltinCast = atom;
 			builtinlhs = atom->builtinMapping;
 			uint32_t newlvid = seq.createLocalVariables();
@@ -501,16 +501,16 @@ bool intrinsicNOT(Analyzer& seq, uint32_t lvid) {
 				ir::emit::fieldget(seq.out, newlvid, lhs, 0);
 			}
 			lhs = newlvid;
-			if (builtinlhs != nyt_bool) // allow only bool for complex types
-				builtinlhs = nyt_any;
+			if (builtinlhs != CType::t_bool) // allow only bool for complex types
+				builtinlhs = CType::t_any;
 		}
 	}
-	if (unlikely(builtinlhs != nyt_bool and builtinlhs != nyt_ptr))
+	if (unlikely(builtinlhs != CType::t_bool and builtinlhs != CType::t_ptr))
 		return seq.complainIntrinsicParameter("not", 0, cdeflhs);
 	// --- result of the operator
 	if (atomBuiltinCast != nullptr) {
 		// implicit convertion from builtin __bool to object bool
-		atomBuiltinCast = Ref<Atom>::WeakPointer(seq.cdeftable.atoms().core.object[nyt_bool]);
+		atomBuiltinCast = Ref<Atom>::WeakPointer(seq.cdeftable.atoms().core.object[(uint32_t) CType::t_bool]);
 		assert(atomBuiltinCast != nullptr);
 		assert(not atomBuiltinCast->hasGenericParameters());
 		Atom* remapAtom = seq.instanciateAtomClass(*atomBuiltinCast);
@@ -524,11 +524,11 @@ bool intrinsicNOT(Analyzer& seq, uint32_t lvid) {
 			uint32_t opresult   = seq.createLocalVariables(2);
 			uint32_t sizeoflvid = opresult + 1;
 			// RESULT: opresult: the first one is the result of the operation (and, +, -...)
-			seq.cdeftable.substitute(opresult).mutateToBuiltin(nyt_bool);
+			seq.cdeftable.substitute(opresult).mutateToBuiltin(CType::t_bool);
 			ir::emit::opnot(seq.out, opresult, lhs);
 			// SIZEOF: the second variable on the stack is `sizeof(<object>)`
 			// (sizeof the object to allocate)
-			seq.cdeftable.substitute(sizeoflvid).mutateToBuiltin(nyt_u64);
+			seq.cdeftable.substitute(sizeoflvid).mutateToBuiltin(CType::t_u64);
 			ir::emit::type::objectSizeof(seq.out, sizeoflvid, atomBuiltinCast->atomid);
 			// ALLOC: memory allocation of the new temporary object
 			ir::emit::memory::allocate(seq.out, lvid, sizeoflvid);
@@ -555,10 +555,10 @@ bool intrinsicAssert(Analyzer& seq, uint32_t lvid) {
 	uint32_t lhs  = seq.pushedparams.func.indexed[0].lvid;
 	auto& cdeflhs = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, lhs});
 	Atom* atomBuiltinCast = nullptr;
-	nytype_t builtinlhs = cdeflhs.kind;
-	if (builtinlhs == nyt_any) { // implicit access to the internal 'pod' variable
+	CType builtinlhs = cdeflhs.kind;
+	if (builtinlhs == CType::t_any) { // implicit access to the internal 'pod' variable
 		auto* atom = seq.cdeftable.findClassdefAtom(cdeflhs);
-		if (atom != nullptr and atom->builtinMapping != nyt_void) {
+		if (atom != nullptr and atom->builtinMapping != CType::t_void) {
 			if (debugmode and seq.canGenerateCode())
 				ir::emit::trace(seq.out, "reading inner 'pod' variable");
 			atomBuiltinCast = atom;
@@ -570,12 +570,12 @@ bool intrinsicAssert(Analyzer& seq, uint32_t lvid) {
 			}
 		}
 	}
-	if (unlikely(builtinlhs != nyt_bool))
+	if (unlikely(builtinlhs != CType::t_bool))
 		return seq.complainIntrinsicParameter("assert", 0, cdeflhs);
 	// --- result of the operator
 	if (atomBuiltinCast != nullptr) {
 		// implicit convertion from builtin __bool to object bool
-		atomBuiltinCast = Ref<Atom>::WeakPointer(seq.cdeftable.atoms().core.object[nyt_bool]);
+		atomBuiltinCast = Ref<Atom>::WeakPointer(seq.cdeftable.atoms().core.object[(uint32_t) CType::t_bool]);
 		assert(atomBuiltinCast != nullptr);
 		assert(not atomBuiltinCast->hasGenericParameters());
 		Atom* remapAtom = seq.instanciateAtomClass(*atomBuiltinCast);
@@ -588,25 +588,25 @@ bool intrinsicAssert(Analyzer& seq, uint32_t lvid) {
 }
 
 
-constexpr static const nytype_t promotion[nyt_count][nyt_count] = {
-	/*void*/ {nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void,},
-	/*any*/  {nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void,},
-	/*ptr*/  {nyt_void, nyt_void, nyt_ptr, nyt_void, nyt_ptr, nyt_ptr, nyt_ptr, nyt_ptr, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void,},
-	/*bool*/ {nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void,},
-	/*u8 */  {nyt_void, nyt_void, nyt_ptr, nyt_void, nyt_u8,  nyt_u16, nyt_u32, nyt_u64, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void,},
-	/*u16*/  {nyt_void, nyt_void, nyt_ptr, nyt_void, nyt_u16, nyt_u16, nyt_u32, nyt_u64, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void,},
-	/*u32*/  {nyt_void, nyt_void, nyt_ptr, nyt_void, nyt_u32, nyt_u32, nyt_u32, nyt_u64, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void,},
-	/*u64*/  {nyt_void, nyt_void, nyt_ptr, nyt_void, nyt_u64, nyt_u64, nyt_u64, nyt_u64, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void,},
-	/*i8 */  {nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_i8,  nyt_i16, nyt_i32, nyt_i64, nyt_void, nyt_void,},
-	/*i16*/  {nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_i16, nyt_i16, nyt_i32, nyt_i64, nyt_void, nyt_void,},
-	/*i32*/  {nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_i32, nyt_i32, nyt_i32, nyt_i64, nyt_void, nyt_void,},
-	/*i64*/  {nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_void, nyt_i64, nyt_i64, nyt_i64, nyt_i64, nyt_void, nyt_void,},
-	/*f32*/  {nyt_void, nyt_void, nyt_void, nyt_void, nyt_f32, nyt_f32, nyt_f32, nyt_void, nyt_f32, nyt_f32, nyt_f32, nyt_void, nyt_f32, nyt_f64, },
-	/*f64*/  {nyt_void, nyt_void, nyt_void, nyt_void, nyt_f64, nyt_f64, nyt_f64, nyt_f64, nyt_f64, nyt_f64, nyt_f64, nyt_f64, nyt_f64, nyt_f64, },
+constexpr static const CType promotion[ctypeCount][ctypeCount] = {
+	/*void*/ {CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void,},
+	/*any*/  {CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void,},
+	/*ptr*/  {CType::t_void, CType::t_void, CType::t_ptr, CType::t_void, CType::t_ptr, CType::t_ptr, CType::t_ptr, CType::t_ptr, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void,},
+	/*bool*/ {CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void,},
+	/*u8 */  {CType::t_void, CType::t_void, CType::t_ptr, CType::t_void, CType::t_u8,  CType::t_u16, CType::t_u32, CType::t_u64, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void,},
+	/*u16*/  {CType::t_void, CType::t_void, CType::t_ptr, CType::t_void, CType::t_u16, CType::t_u16, CType::t_u32, CType::t_u64, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void,},
+	/*u32*/  {CType::t_void, CType::t_void, CType::t_ptr, CType::t_void, CType::t_u32, CType::t_u32, CType::t_u32, CType::t_u64, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void,},
+	/*u64*/  {CType::t_void, CType::t_void, CType::t_ptr, CType::t_void, CType::t_u64, CType::t_u64, CType::t_u64, CType::t_u64, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void,},
+	/*i8 */  {CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_i8,  CType::t_i16, CType::t_i32, CType::t_i64, CType::t_void, CType::t_void,},
+	/*i16*/  {CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_i16, CType::t_i16, CType::t_i32, CType::t_i64, CType::t_void, CType::t_void,},
+	/*i32*/  {CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_i32, CType::t_i32, CType::t_i32, CType::t_i64, CType::t_void, CType::t_void,},
+	/*i64*/  {CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_i64, CType::t_i64, CType::t_i64, CType::t_i64, CType::t_void, CType::t_void,},
+	/*f32*/  {CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_f32, CType::t_f32, CType::t_f32, CType::t_void, CType::t_f32, CType::t_f32, CType::t_f32, CType::t_void, CType::t_f32, CType::t_f64, },
+	/*f64*/  {CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_f64, CType::t_f64, CType::t_f64, CType::t_f64, CType::t_f64, CType::t_f64, CType::t_f64, CType::t_f64, CType::t_f64, CType::t_f64, },
 };
 
 
-template<nytype_t R, bool AcceptBool, bool AcceptInt, bool AcceptFloat,
+template<CType R, bool AcceptBool, bool AcceptInt, bool AcceptFloat,
 		 void (* M)(ir::emit::IRCodeRef, uint32_t, uint32_t, uint32_t)>
 inline bool emitBuiltinOperator(Analyzer& seq, uint32_t lvid, const char* const name) {
 	assert(seq.pushedparams.func.indexed.size() == 2);
@@ -614,10 +614,10 @@ inline bool emitBuiltinOperator(Analyzer& seq, uint32_t lvid, const char* const 
 	uint32_t lhs  = seq.pushedparams.func.indexed[0].lvid;
 	auto& cdeflhs = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, lhs});
 	Atom* atomBuiltinCast = nullptr;
-	nytype_t builtinlhs = cdeflhs.kind;
-	if (builtinlhs == nyt_any) { // implicit access to the internal 'pod' variable
+	CType builtinlhs = cdeflhs.kind;
+	if (builtinlhs == CType::t_any) { // implicit access to the internal 'pod' variable
 		auto* atom = seq.cdeftable.findClassdefAtom(cdeflhs);
-		if (atom != nullptr and atom->builtinMapping != nyt_void) {
+		if (atom != nullptr and atom->builtinMapping != CType::t_void) {
 			builtinlhs = atom->builtinMapping;
 			if (seq.canGenerateCode()) {
 				uint32_t newlvid = seq.createLocalVariables();
@@ -633,10 +633,10 @@ inline bool emitBuiltinOperator(Analyzer& seq, uint32_t lvid, const char* const 
 	// -- RHS - PARAMETER 1 --
 	uint32_t rhs  = seq.pushedparams.func.indexed[1].lvid;
 	auto& cdefrhs = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, rhs});
-	nytype_t builtinrhs = cdefrhs.kind;
-	if (builtinrhs == nyt_any) { // implicit access to the internal 'pod' variable
+	CType builtinrhs = cdefrhs.kind;
+	if (builtinrhs == CType::t_any) { // implicit access to the internal 'pod' variable
 		auto* atom = seq.cdeftable.findClassdefAtom(cdefrhs);
-		if (atom != nullptr and (atom->builtinMapping != nyt_void)) {
+		if (atom != nullptr and (atom->builtinMapping != CType::t_void)) {
 			builtinrhs = atom->builtinMapping;
 			if (seq.canGenerateCode()) {
 				uint32_t newlvid = seq.createLocalVariables();
@@ -651,51 +651,51 @@ inline bool emitBuiltinOperator(Analyzer& seq, uint32_t lvid, const char* const 
 	}
 	// -- implicit type promotion --
 	if (builtinlhs != builtinrhs) {
-		builtinlhs = promotion[builtinlhs][builtinrhs];
-		if (unlikely(builtinlhs == nyt_void)) {
+		builtinlhs = promotion[(uint32_t) builtinlhs][(uint32_t) builtinrhs];
+		if (unlikely(builtinlhs == CType::t_void)) {
 			seq.complainIntrinsicParameter(name, 0, cdeflhs);
 			return seq.complainIntrinsicParameter(name, 1, cdefrhs);
 		}
-		if (atomBuiltinCast != nullptr and builtinlhs != nyt_ptr)
-			atomBuiltinCast = Ref<Atom>::WeakPointer(seq.cdeftable.atoms().core.object[builtinlhs]);
+		if (atomBuiltinCast != nullptr and builtinlhs != CType::t_ptr)
+			atomBuiltinCast = Ref<Atom>::WeakPointer(seq.cdeftable.atoms().core.object[(uint32_t) builtinlhs]);
 	}
 	switch (builtinlhs) {
-		case nyt_bool: {
+		case CType::t_bool: {
 			if (not AcceptBool)
 				return seq.complainBuiltinIntrinsicDoesNotAccept(name, "booleans");
 			break;
 		}
-		case nyt_i8:
-		case nyt_i16:
-		case nyt_i32:
-		case nyt_i64:
-		case nyt_u8:
-		case nyt_u16:
-		case nyt_u32:
-		case nyt_u64:
-		case nyt_ptr: {
+		case CType::t_i8:
+		case CType::t_i16:
+		case CType::t_i32:
+		case CType::t_i64:
+		case CType::t_u8:
+		case CType::t_u16:
+		case CType::t_u32:
+		case CType::t_u64:
+		case CType::t_ptr: {
 			if (not AcceptInt)
 				return seq.complainBuiltinIntrinsicDoesNotAccept(name, "integer literals");
 			break;
 		}
-		case nyt_f32:
-		case nyt_f64: {
+		case CType::t_f32:
+		case CType::t_f64: {
 			if (not AcceptFloat)
 				return seq.complainBuiltinIntrinsicDoesNotAccept(name, "floating-point numbers");
 			break;
 		}
-		case nyt_void:
-		case nyt_any: {
+		case CType::t_void:
+		case CType::t_any: {
 			return seq.complainIntrinsicParameter(name, 0, cdeflhs);
 		}
 	}
 	// --- result of the operator
-	nytype_t rettype = (R == nyt_any) ? builtinlhs : R;
-	if (rettype != nyt_ptr and atomBuiltinCast != nullptr
+	CType rettype = (R == CType::t_any) ? builtinlhs : R;
+	if (rettype != CType::t_ptr and atomBuiltinCast != nullptr
 		and seq.shortcircuit.label == 0) { // the result is a real instance
 		// implicit convertion from builtin (__i32...) to object (i32...)
-		if (R != nyt_any) { // force the result type
-			atomBuiltinCast = Ref<Atom>::WeakPointer(seq.cdeftable.atoms().core.object[R]);
+		if (R != CType::t_any) { // force the result type
+			atomBuiltinCast = Ref<Atom>::WeakPointer(seq.cdeftable.atoms().core.object[(uint32_t) R]);
 			assert(atomBuiltinCast != nullptr);
 			assert(not atomBuiltinCast->hasGenericParameters());
 		}
@@ -717,7 +717,7 @@ inline bool emitBuiltinOperator(Analyzer& seq, uint32_t lvid, const char* const 
 			M(seq.out, opresult, lhs, rhs);
 			// SIZEOF: the second variable on the stack is `sizeof(<object>)`
 			// (sizeof the object to allocate)
-			seq.cdeftable.substitute(sizeoflvid).mutateToBuiltin(nyt_u64);
+			seq.cdeftable.substitute(sizeoflvid).mutateToBuiltin(CType::t_u64);
 			ir::emit::type::objectSizeof(seq.out, sizeoflvid, atomBuiltinCast->atomid);
 			// ALLOC: memory allocation of the new temporary object
 			ir::emit::memory::allocate(seq.out, lvid, sizeoflvid);
@@ -742,116 +742,116 @@ inline bool emitBuiltinOperator(Analyzer& seq, uint32_t lvid, const char* const 
 
 
 bool intrinsicAND(Analyzer& seq, uint32_t lvid) {
-	return emitBuiltinOperator<nyt_any, 1, 1, 0, &ir::emit::opand>(seq, lvid, "and");
+	return emitBuiltinOperator<CType::t_any, 1, 1, 0, &ir::emit::opand>(seq, lvid, "and");
 }
 
 bool intrinsicOR(Analyzer& seq, uint32_t lvid) {
-	return emitBuiltinOperator<nyt_any, 1, 1, 0, &ir::emit::opor>(seq, lvid, "or");
+	return emitBuiltinOperator<CType::t_any, 1, 1, 0, &ir::emit::opor>(seq, lvid, "or");
 }
 
 bool intrinsicXOR(Analyzer& seq, uint32_t lvid) {
-	return emitBuiltinOperator<nyt_any, 1, 1, 0, &ir::emit::opxor>(seq, lvid, "xor");
+	return emitBuiltinOperator<CType::t_any, 1, 1, 0, &ir::emit::opxor>(seq, lvid, "xor");
 }
 
 bool intrinsicMOD(Analyzer& seq, uint32_t lvid) {
-	return emitBuiltinOperator<nyt_any, 1, 1, 0, &ir::emit::opmod>(seq, lvid, "mod");
+	return emitBuiltinOperator<CType::t_any, 1, 1, 0, &ir::emit::opmod>(seq, lvid, "mod");
 }
 
 bool intrinsicADD(Analyzer& seq, uint32_t lvid) {
-	return emitBuiltinOperator<nyt_any, 0, 1, 0, &ir::emit::opadd>(seq, lvid, "add");
+	return emitBuiltinOperator<CType::t_any, 0, 1, 0, &ir::emit::opadd>(seq, lvid, "add");
 }
 
 bool intrinsicSUB(Analyzer& seq, uint32_t lvid) {
-	return emitBuiltinOperator<nyt_any, 0, 1, 0, &ir::emit::opsub>(seq, lvid, "sub");
+	return emitBuiltinOperator<CType::t_any, 0, 1, 0, &ir::emit::opsub>(seq, lvid, "sub");
 }
 
 bool intrinsicDIV(Analyzer& seq, uint32_t lvid) {
-	return emitBuiltinOperator<nyt_any, 0, 1, 0, &ir::emit::opdiv>(seq, lvid, "div");
+	return emitBuiltinOperator<CType::t_any, 0, 1, 0, &ir::emit::opdiv>(seq, lvid, "div");
 }
 
 bool intrinsicMUL(Analyzer& seq, uint32_t lvid) {
-	return emitBuiltinOperator<nyt_any, 0, 1, 0, &ir::emit::opmul>(seq, lvid, "mul");
+	return emitBuiltinOperator<CType::t_any, 0, 1, 0, &ir::emit::opmul>(seq, lvid, "mul");
 }
 
 bool intrinsicIDIV(Analyzer& seq, uint32_t lvid) {
-	return emitBuiltinOperator<nyt_any, 0, 1, 0, &ir::emit::opidiv>(seq, lvid, "idiv");
+	return emitBuiltinOperator<CType::t_any, 0, 1, 0, &ir::emit::opidiv>(seq, lvid, "idiv");
 }
 
 bool intrinsicIMUL(Analyzer& seq, uint32_t lvid) {
-	return emitBuiltinOperator<nyt_any, 0, 1, 0, &ir::emit::opimul>(seq, lvid, "imul");
+	return emitBuiltinOperator<CType::t_any, 0, 1, 0, &ir::emit::opimul>(seq, lvid, "imul");
 }
 
 bool intrinsicFADD(Analyzer& seq, uint32_t lvid) {
-	return emitBuiltinOperator<nyt_any, 0, 0, 1, &ir::emit::opfadd>(seq, lvid, "fadd");
+	return emitBuiltinOperator<CType::t_any, 0, 0, 1, &ir::emit::opfadd>(seq, lvid, "fadd");
 }
 
 bool intrinsicFSUB(Analyzer& seq, uint32_t lvid) {
-	return emitBuiltinOperator<nyt_bool, 1, 1, 1, &ir::emit::opigte>(seq, lvid, "igte");
-	return emitBuiltinOperator<nyt_any, 0, 0, 1, &ir::emit::opfsub>(seq, lvid, "fsub");
+	return emitBuiltinOperator<CType::t_bool, 1, 1, 1, &ir::emit::opigte>(seq, lvid, "igte");
+	return emitBuiltinOperator<CType::t_any, 0, 0, 1, &ir::emit::opfsub>(seq, lvid, "fsub");
 }
 
 bool intrinsicFDIV(Analyzer& seq, uint32_t lvid) {
-	return emitBuiltinOperator<nyt_any, 0, 0, 1, &ir::emit::opfdiv>(seq, lvid, "fdiv");
+	return emitBuiltinOperator<CType::t_any, 0, 0, 1, &ir::emit::opfdiv>(seq, lvid, "fdiv");
 }
 
 bool intrinsicFMUL(Analyzer& seq, uint32_t lvid) {
-	return emitBuiltinOperator<nyt_any, 0, 0, 1, &ir::emit::opfmul>(seq, lvid, "fmul");
+	return emitBuiltinOperator<CType::t_any, 0, 0, 1, &ir::emit::opfmul>(seq, lvid, "fmul");
 }
 
 bool intrinsicEQ(Analyzer& seq, uint32_t lvid) {
-	return emitBuiltinOperator<nyt_bool, 1, 1, 1, &ir::emit::opeq>(seq, lvid, "eq");
+	return emitBuiltinOperator<CType::t_bool, 1, 1, 1, &ir::emit::opeq>(seq, lvid, "eq");
 }
 
 bool intrinsicNEQ(Analyzer& seq, uint32_t lvid) {
-	return emitBuiltinOperator<nyt_bool, 1, 1, 1, &ir::emit::opneq>(seq, lvid, "neq");
+	return emitBuiltinOperator<CType::t_bool, 1, 1, 1, &ir::emit::opneq>(seq, lvid, "neq");
 }
 
 bool intrinsicFLT(Analyzer& seq, uint32_t lvid) {
-	return emitBuiltinOperator<nyt_bool, 1, 1, 1, &ir::emit::opflt>(seq, lvid, "flt");
+	return emitBuiltinOperator<CType::t_bool, 1, 1, 1, &ir::emit::opflt>(seq, lvid, "flt");
 }
 
 bool intrinsicFLTE(Analyzer& seq, uint32_t lvid) {
-	return emitBuiltinOperator<nyt_bool, 1, 1, 1, &ir::emit::opflte>(seq, lvid, "flte");
+	return emitBuiltinOperator<CType::t_bool, 1, 1, 1, &ir::emit::opflte>(seq, lvid, "flte");
 }
 
 bool intrinsicFGT(Analyzer& seq, uint32_t lvid) {
-	return emitBuiltinOperator<nyt_bool, 1, 1, 1, &ir::emit::opfgt>(seq, lvid, "fgt");
+	return emitBuiltinOperator<CType::t_bool, 1, 1, 1, &ir::emit::opfgt>(seq, lvid, "fgt");
 }
 
 bool intrinsicFGTE(Analyzer& seq, uint32_t lvid) {
-	return emitBuiltinOperator<nyt_bool, 1, 1, 1, &ir::emit::opfgte>(seq, lvid, "fgte");
+	return emitBuiltinOperator<CType::t_bool, 1, 1, 1, &ir::emit::opfgte>(seq, lvid, "fgte");
 }
 
 bool intrinsicLT(Analyzer& seq, uint32_t lvid) {
-	return emitBuiltinOperator<nyt_bool, 1, 1, 1, &ir::emit::oplt>(seq, lvid, "lt");
+	return emitBuiltinOperator<CType::t_bool, 1, 1, 1, &ir::emit::oplt>(seq, lvid, "lt");
 }
 
 bool intrinsicLTE(Analyzer& seq, uint32_t lvid) {
-	return emitBuiltinOperator<nyt_bool, 1, 1, 1, &ir::emit::oplte>(seq, lvid, "lte");
+	return emitBuiltinOperator<CType::t_bool, 1, 1, 1, &ir::emit::oplte>(seq, lvid, "lte");
 }
 
 bool intrinsicILT(Analyzer& seq, uint32_t lvid) {
-	return emitBuiltinOperator<nyt_bool, 1, 1, 1, &ir::emit::opilt>(seq, lvid, "ilt");
+	return emitBuiltinOperator<CType::t_bool, 1, 1, 1, &ir::emit::opilt>(seq, lvid, "ilt");
 }
 
 bool intrinsicILTE(Analyzer& seq, uint32_t lvid) {
-	return emitBuiltinOperator<nyt_bool, 1, 1, 1, &ir::emit::opilte>(seq, lvid, "ilte");
+	return emitBuiltinOperator<CType::t_bool, 1, 1, 1, &ir::emit::opilte>(seq, lvid, "ilte");
 }
 
 bool intrinsicGT(Analyzer& seq, uint32_t lvid) {
-	return emitBuiltinOperator<nyt_bool, 1, 1, 1, &ir::emit::opgt>(seq, lvid, "gt");
+	return emitBuiltinOperator<CType::t_bool, 1, 1, 1, &ir::emit::opgt>(seq, lvid, "gt");
 }
 
 bool intrinsicGTE(Analyzer& seq, uint32_t lvid) {
-	return emitBuiltinOperator<nyt_bool, 1, 1, 1, &ir::emit::opgte>(seq, lvid, "gte");
+	return emitBuiltinOperator<CType::t_bool, 1, 1, 1, &ir::emit::opgte>(seq, lvid, "gte");
 }
 
 bool intrinsicIGT(Analyzer& seq, uint32_t lvid) {
-	return emitBuiltinOperator<nyt_bool, 1, 1, 1, &ir::emit::opigt>(seq, lvid, "igt");
+	return emitBuiltinOperator<CType::t_bool, 1, 1, 1, &ir::emit::opigt>(seq, lvid, "igt");
 }
 
 bool intrinsicIGTE(Analyzer& seq, uint32_t lvid) {
-	return emitBuiltinOperator<nyt_bool, 1, 1, 1, &ir::emit::opigte>(seq, lvid, "igte");
+	return emitBuiltinOperator<CType::t_bool, 1, 1, 1, &ir::emit::opigte>(seq, lvid, "igte");
 }
 
 

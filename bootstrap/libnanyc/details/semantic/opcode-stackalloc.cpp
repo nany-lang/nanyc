@@ -13,12 +13,12 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::stackalloc>& operands) 
 		return;
 	auto& lvidinfo = frame->lvids(operands.lvid);
 	lvidinfo.scope = frame->scope;
-	nytype_t type  = static_cast<nytype_t>(operands.type);
+	CType type  = static_cast<CType>(operands.type);
 	// reset the underlying type, to make sure that the current layer has
 	// the accurate information
 	auto& spare = cdeftable.substitute(operands.lvid);
 	switch (type) {
-		case nyt_any: {
+		case CType::t_any: {
 			spare.mutateToAny();
 			break;
 		}
@@ -27,7 +27,7 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::stackalloc>& operands) 
 			spare.mutateToBuiltin(type);
 			break;
 		}
-		case nyt_void: {
+		case CType::t_void: {
 			spare.mutateToVoid();
 			break;
 		}

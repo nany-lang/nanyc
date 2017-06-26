@@ -244,9 +244,9 @@ bool generateShortCircuitInstrs(Analyzer& seq, uint32_t retlvid) {
 	// lvid of the first parameter
 	uint32_t lvidvalue = seq.pushedparams.func.indexed[0].lvid;
 	auto& cdef = seq.cdeftable.classdef(CLID{frame.atomid, lvidvalue});
-	if (cdef.kind != nyt_bool) {
+	if (cdef.kind != CType::t_bool) {
 		auto* atom = seq.cdeftable.findClassdefAtom(cdef);
-		if (unlikely(seq.cdeftable.atoms().core.object[nyt_bool] != atom))
+		if (unlikely(seq.cdeftable.atoms().core.object[(uint32_t) CType::t_bool] != atom))
 			return (error() << "boolean expected");
 		uint32_t newlvid = out->at<ir::isa::Op::stackalloc>(offset).lvid;
 		++offset;

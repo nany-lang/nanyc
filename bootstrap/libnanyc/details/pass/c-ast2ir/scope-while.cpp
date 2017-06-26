@@ -29,7 +29,7 @@ bool Scope::visitASTExprWhile(AST::Node& node) {
 	ir::emit::trace(irout, "while-condition");
 	// a temporary variable for the result of the condition evaluation
 	uint32_t condlvid = nextvar();
-	ir::emit::alloc(irout, condlvid, nyt_bool);
+	ir::emit::alloc(irout, condlvid, CType::t_bool);
 	// generating the code for the condition itself
 	{
 		ir::emit::ScopeLocker opscopeCond{irout};
@@ -84,7 +84,7 @@ bool Scope::visitASTExprDoWhile(AST::Node& node) {
 	ir::emit::trace(irout, "do-whilte-condition");
 	// a temporary variable for the result of the condition evaluation
 	uint32_t condlvid = nextvar();
-	ir::emit::alloc(irout, condlvid, nyt_bool);
+	ir::emit::alloc(irout, condlvid, CType::t_bool);
 	// generating the code for the condition itself
 	{
 		ir::emit::ScopeLocker opscopeCond{irout};

@@ -117,7 +117,7 @@ void shortcircuitMutateToBool(Analyzer& seq, const ir::isa::Operand<ir::isa::Op:
 		assert(instr.opcodes[0] == static_cast<uint32_t>(ir::isa::Op::stackalloc));
 		uint32_t sizeoflvid = instr.to<ir::isa::Op::stackalloc>().lvid;
 		// sizeof
-		auto& atombool = *(seq.cdeftable.atoms().core.object[nyt_bool]);
+		auto& atombool = *(seq.cdeftable.atoms().core.object[(uint32_t) CType::t_bool]);
 		ir::emit::type::objectSizeof(seq.out, sizeoflvid, atombool.atomid);
 		auto& opc = seq.cdeftable.substitute(lvid);
 		opc.mutateToAtom(&atombool);

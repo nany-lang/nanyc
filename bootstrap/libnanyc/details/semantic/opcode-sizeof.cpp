@@ -22,7 +22,7 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::classdefsizeof>& operan
 			ir::emit::type::objectSizeof(out, operands.lvid, atom->atomid);
 		}
 		else {
-			uint64_t size = nytype_sizeof(cdef.kind);
+			uint32_t size = ctypeSizeof(cdef.kind);
 			ir::emit::constantu64(out, operands.lvid, size);
 		}
 	}

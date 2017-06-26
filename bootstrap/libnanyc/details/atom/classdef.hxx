@@ -11,47 +11,47 @@ inline Classdef::Classdef()
 
 
 inline Classdef::Classdef(const CLID& clid)
-	: kind(nyt_any)
+	: kind(CType::t_any)
 	, clid(clid) {
 }
 
 
 inline bool Classdef::isBuiltin() const {
-	return (kind != nyt_void) and (kind != nyt_any);
+	return (kind != CType::t_void) and (kind != CType::t_any);
 }
 
 
 inline bool Classdef::isBuiltinOrVoid() const {
-	return kind != nyt_any;
+	return kind != CType::t_any;
 }
 
 
 inline bool Classdef::isRawPointer() const {
-	return kind == nyt_ptr and (atom == nullptr);
+	return kind == CType::t_ptr and (atom == nullptr);
 }
 
 
 inline bool Classdef::isBuiltinU64() const {
-	return kind == nyt_u64;
+	return kind == CType::t_u64;
 }
 
 
 inline bool Classdef::isBuiltinU32() const {
-	return kind == nyt_u32;
+	return kind == CType::t_u32;
 }
 
 
 inline bool Classdef::isBuiltinU8() const {
-	return kind == nyt_u8;
+	return kind == CType::t_u8;
 }
 
 
 inline bool Classdef::isBuiltingUnsigned() const {
 	switch (kind) {
-		case nyt_u8:
-		case nyt_u16:
-		case nyt_u32:
-		case nyt_u64:
+		case CType::t_u8:
+		case CType::t_u16:
+		case CType::t_u32:
+		case CType::t_u64:
 			return true;
 		default:
 			return false;
@@ -60,19 +60,19 @@ inline bool Classdef::isBuiltingUnsigned() const {
 
 
 inline bool Classdef::isVoid() const {
-	return kind == nyt_void;
+	return kind == CType::t_void;
 }
 
 
 inline bool Classdef::isLinkedToAtom() const {
-	assert((nullptr == atom or (kind == nyt_any))
+	assert((nullptr == atom or (kind == CType::t_any))
 		   and "the kind of a classdef must be 'any' if an atom is provided");
 	return nullptr != atom;
 }
 
 
 inline bool Classdef::isAny() const {
-	return (nullptr == atom) and (kind == nyt_any);
+	return (nullptr == atom) and (kind == CType::t_any);
 }
 
 
@@ -87,37 +87,37 @@ inline bool Classdef::isVariable() const {
 
 
 inline void Classdef::mutateToVoid() {
-	kind = nyt_void;
+	kind = CType::t_void;
 	atom = nullptr;
 }
 
 
-inline void Classdef::mutateToBuiltin(nytype_t newkind) {
-	assert(newkind != nyt_void and newkind != nyt_any);
+inline void Classdef::mutateToBuiltin(CType newkind) {
+	assert(newkind != CType::t_void and newkind != CType::t_any);
 	kind = newkind;
 	atom = nullptr;
 }
 
-inline void Classdef::mutateToBuiltinOrVoid(nytype_t newkind) {
-	assert(newkind != nyt_any);
+inline void Classdef::mutateToBuiltinOrVoid(CType newkind) {
+	assert(newkind != CType::t_any);
 	kind = newkind;
 	atom = nullptr;
 }
 
 inline void Classdef::mutateToAny() {
-	kind = nyt_any;
+	kind = CType::t_any;
 	atom = nullptr;
 }
 
 
 inline void Classdef::mutateToAtom(Atom* newAtom) {
-	kind = nyt_any;
+	kind = CType::t_any;
 	atom = newAtom;
 }
 
 
 inline void Classdef::mutateToPtr2Func(Atom* newAtom) {
-	kind = nyt_ptr;
+	kind = CType::t_ptr;
 	atom = newAtom;
 }
 

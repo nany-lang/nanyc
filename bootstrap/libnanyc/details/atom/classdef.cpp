@@ -28,12 +28,12 @@ inline void Classdef::doPrint(T& out, const TableT& table) const {
 	}
 	const Atom* selfAtom = table.findClassdefAtom(*this);
 	if (selfAtom) {
-		if (kind == nyt_ptr)
+		if (kind == CType::t_ptr)
 			out << "ptr -> ";
 		selfAtom->retrieveCaption(out, table);
 	}
 	else
-		out << nytype_to_cstring(kind);
+		out << toString(kind);
 	if (unlikely(qualifiers.nullable))
 		out << '?';
 }

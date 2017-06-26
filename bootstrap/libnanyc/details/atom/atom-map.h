@@ -2,6 +2,7 @@
 #include "atom.h"
 #include "details/utils/stringrefs.h"
 #include "details/ir/fwd.h"
+#include "details/atom/ctype.h"
 
 
 namespace ny {
@@ -59,7 +60,7 @@ public:
 	StringRefs& stringrefs;
 
 	struct {
-		yuni::Ref<Atom> object[nyt_count];
+		yuni::Ref<Atom> object[ctypeCount];
 	}
 	core;
 

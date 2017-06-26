@@ -99,43 +99,6 @@ static inline void nyanystr_duplicate(nyanystr_t* const out, const nyanystr_t* c
 #endif
 
 
-/*! Nany Language builtin types */
-typedef enum { /* nytype_t */
-	/*! No type */
-	nyt_void = 0,
-	/*! Custom user type */
-	nyt_any,
-	/*! Raw pointer (arch dependent) */
-	nyt_ptr,
-	/*! Boolean (nytrue/nyfalse) */
-	nyt_bool,
-	/*! Unsigned 8  bits integer */
-	nyt_u8,
-	/*! Unsigned 16 bits integer */
-	nyt_u16,
-	/*! Unsigned 32 bits integer */
-	nyt_u32,
-	/*! Unsigned 64 bits integer */
-	nyt_u64,
-	/*! Signed 8  bits integer */
-	nyt_i8,
-	/*! Signed 16 bits integer */
-	nyt_i16,
-	/*! Signed 32 bits integer */
-	nyt_i32,
-	/*! Signed 64 bits integer */
-	nyt_i64,
-	/*! Floating-point number 32 bits */
-	nyt_f32,
-	/*! Floating-point number 64 bits */
-	nyt_f64
-}
-nytype_t;
-
-enum {
-	/*! The total number of intrinsic types */
-	nyt_count = nyt_f64 + 1,
-};
 
 /*! Opaque Thread Object */
 typedef struct nythread_t nythread_t;
@@ -755,34 +718,6 @@ NY_EXPORT nybool_t nytry_parse_file(const char* const filename);
 ** \return nytrue if the file has been successfully parsed, false otherwise
 */
 NY_EXPORT nybool_t nytry_parse_file_n(const char* filename, size_t length);
-
-
-
-
-/*! \name Utilities for internal types */
-/*@{*/
-/*!
-** \brief Convert a string into the builtin type
-**
-** \param text An arbitrary text (ex: "__uint64")
-** \return The corresponding type (ex: nyt_uint64)
-*/
-NY_EXPORT nytype_t nycstring_to_type(const char* const text);
-
-/*!
-** \brief Convert a string into the builtin type (with length provided)
-**
-** \param text An arbitrary text (ex: "__uint64")
-** \return The corresponding type (ex: nyt_uint64)
-*/
-NY_EXPORT nytype_t nycstring_to_type_n(const char* const text, size_t length);
-
-/*! Convert a type into a c-string */
-NY_EXPORT const char* nytype_to_cstring(nytype_t);
-
-/*! Get the size (in bytes) of a Nany builtin type */
-NY_EXPORT uint32_t nytype_sizeof(nytype_t);
-/*@}*/
 
 
 

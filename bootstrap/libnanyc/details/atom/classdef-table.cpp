@@ -282,7 +282,7 @@ Classdef& ClassdefTable::substitute(uint32_t lvid) const {
 }
 
 
-Classdef& ClassdefTable::addSubstitute(nytype_t kind, Atom* atom, const Qualifiers& qualifiers) const {
+Classdef& ClassdefTable::addSubstitute(CType kind, Atom* atom, const Qualifiers& qualifiers) const {
 	// atom can be null
 	m_layer.flags.push_back(true);
 	m_layer.storage.emplace_back();
@@ -291,7 +291,7 @@ Classdef& ClassdefTable::addSubstitute(nytype_t kind, Atom* atom, const Qualifie
 	assert(m_layer.count == m_layer.storage.size());
 	auto& ret = m_layer.storage.back();
 	switch (kind) {
-		case nyt_any:
+		case CType::t_any:
 			ret.mutateToAtom(atom);
 			break;
 		default:

@@ -3,7 +3,7 @@
 #include "context.h"
 #include "details/ir/fwd.h"
 #include <yuni/core/flags.h>
-
+#include "details/atom/ctype.h"
 
 
 namespace ny {
@@ -133,9 +133,9 @@ public:
 	//! \name Typeinfo / variables
 	//@{
 	//! Create a new local builtin float
-	uint32_t createLocalBuiltinFloat(AST::Node&, nytype_t, double value);
+	uint32_t createLocalBuiltinFloat(AST::Node&, CType, double value);
 	//! Create a new local builtin integer
-	uint32_t createLocalBuiltinInt(AST::Node&, nytype_t, yuint64 value);
+	uint32_t createLocalBuiltinInt(AST::Node&, CType, yuint64 value);
 	//! Create a new local builtin 'void'
 	uint32_t createLocalBuiltinVoid(AST::Node&);
 	//! Create a new local variable 'any'

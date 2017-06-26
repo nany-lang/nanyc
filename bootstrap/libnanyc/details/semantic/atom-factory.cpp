@@ -31,9 +31,9 @@ void prepareSignature(Signature& signature, Settings& settings) {
 			auto& param = signature.parameters[i];
 			param.kind = cdef.kind;
 			param.qualifiers = cdef.qualifiers;
-			if (param.kind == nyt_any)
+			if (param.kind == CType::t_any)
 				param.atom = const_cast<Atom*>(settings.cdeftable.findClassdefAtom(cdef));
-			assert(param.kind != nyt_any or param.atom != nullptr);
+			assert(param.kind != CType::t_any or param.atom != nullptr);
 		}
 	}
 	count = static_cast<uint32_t>(settings.tmplparams.size());
@@ -46,7 +46,7 @@ void prepareSignature(Signature& signature, Settings& settings) {
 			param.atom = const_cast<Atom*>(settings.cdeftable.findClassdefAtom(cdef));
 			param.kind = cdef.kind;
 			param.qualifiers = cdef.qualifiers;
-			assert(param.kind != nyt_any or param.atom != nullptr);
+			assert(param.kind != CType::t_any or param.atom != nullptr);
 		}
 	}
 }
@@ -85,13 +85,13 @@ void substituteParameterTypes(ClassdefTableView& cdeftable, Atom& atom, const Si
 	// magic constant +2
 	//  * +1: all clid are 1-based (0 is reserved for the atom itself, not for an internal var)
 	//  * +1: the CLID{X, 1} is reserved for the return type
-	cdeftable.addSubstitute(nyt_void, nullptr, Qualifiers()); // unused, since 1-based
+	cdeftable.addSubstitute(CType::t_void, nullptr, Qualifiers()); // unused, since 1-based
 	auto& rettype = cdeftable.rawclassdef(CLID{atom.atomid, 1}); // return type
 	Atom* retAtom = (not rettype.isBuiltinOrVoid()) ? cdeftable.findRawClassdefAtom(rettype) : nullptr;
 	cdeftable.addSubstitute(rettype.kind, retAtom, rettype.qualifiers);
 	auto substitute = [&](auto & parameter) {
 		cdeftable.addSubstitute(parameter.kind, parameter.atom, parameter.qualifiers);
-		assert(parameter.kind != nyt_any or parameter.atom != nullptr);
+		assert(parameter.kind != CType::t_any or parameter.atom != nullptr);
 	};
 	uint32_t count = signature.parameters.size();
 	for (uint32_t i = 0; i != count; ++i)

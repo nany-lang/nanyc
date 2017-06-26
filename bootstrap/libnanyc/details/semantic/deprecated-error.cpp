@@ -522,7 +522,7 @@ void Analyzer::complainUnusedVariable(const AtomStackFrame& frame, uint32_t lvid
 }
 
 
-bool Analyzer::complainInvalidMemberRequestNonClass(const AnyString& name, nytype_t kind) const {
+bool Analyzer::complainInvalidMemberRequestNonClass(const AnyString& name, CType kind) const {
 	assert(not name.empty());
 	success = false;
 	auto e = (error() << "request member '");
@@ -530,7 +530,7 @@ bool Analyzer::complainInvalidMemberRequestNonClass(const AnyString& name, nytyp
 		e << "operator " << AnyString{name, 1, name.size() - 1};
 	else
 		e << name;
-	e << "' on a non-class type '" << nytype_to_cstring(kind) << '\'';
+	e << "' on a non-class type '" << ny::toString(kind) << '\'';
 	return false;
 }
 

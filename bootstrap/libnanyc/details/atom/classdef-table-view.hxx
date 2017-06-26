@@ -81,7 +81,7 @@ inline Classdef& ClassdefTableView::substitute(uint32_t lvid) {
 
 
 
-inline Classdef& ClassdefTableView::addSubstitute(nytype_t kind, Atom* atom, const Qualifiers& qualifiers) {
+inline Classdef& ClassdefTableView::addSubstitute(CType kind, Atom* atom, const Qualifiers& qualifiers) {
 	return table.addSubstitute(kind, atom, qualifiers);
 }
 

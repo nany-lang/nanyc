@@ -2,6 +2,7 @@
 #include "sequence.h"
 #include "details/ir/isa/data.h"
 #include "details/atom/visibility.h"
+#include "details/atom/ctype.h"
 
 
 namespace ny {
@@ -288,7 +289,7 @@ inline uint32_t constantText(IRCodeRef ref, uint32_t lvid, const AnyString& text
 
 
 //! Allocate a new variable on the stack and get the register
-inline uint32_t alloc(IRCodeRef ref, uint32_t lvid, nytype_t type = nyt_any) {
+inline uint32_t alloc(IRCodeRef ref, uint32_t lvid, CType type = CType::t_any) {
 	auto& operands  = ref.ircode.emit<isa::Op::stackalloc>();
 	operands.lvid   = lvid;
 	operands.type   = static_cast<uint32_t>(type);
@@ -298,7 +299,7 @@ inline uint32_t alloc(IRCodeRef ref, uint32_t lvid, nytype_t type = nyt_any) {
 
 
 //! Allocate a new variable on the stack and assign a value to it and get the register
-inline uint32_t allocu64(IRCodeRef ref, uint32_t lvid, nytype_t type, uint64_t value) {
+inline uint32_t allocu64(IRCodeRef ref, uint32_t lvid, CType type, uint64_t value) {
 	ir::emit::alloc(ref, lvid, type);
 	ir::emit::constantu64(ref, lvid, value);
 	return lvid;
@@ -306,7 +307,7 @@ inline uint32_t allocu64(IRCodeRef ref, uint32_t lvid, nytype_t type, uint64_t v
 
 
 //! Allocate a new variable on the stack and assign a value to it and get the register
-inline uint32_t allocf64(IRCodeRef ref, uint32_t lvid, nytype_t type, double value) {
+inline uint32_t allocf64(IRCodeRef ref, uint32_t lvid, CType type, double value) {
 	ir::emit::alloc(ref, lvid, type);
 	ir::emit::constantf64(ref, lvid, value);
 	return lvid;
@@ -315,7 +316,7 @@ inline uint32_t allocf64(IRCodeRef ref, uint32_t lvid, nytype_t type, double val
 
 //! Allocate a new variable on the stack and assign a text to it and get the register
 inline uint32_t alloctext(IRCodeRef ref, uint32_t lvid, const AnyString& text) {
-	ir::emit::alloc(ref, lvid, nyt_ptr);
+	ir::emit::alloc(ref, lvid, CType::t_ptr);
 	ir::emit::constantText(ref, lvid, text);
 	return lvid;
 }

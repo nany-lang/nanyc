@@ -290,7 +290,7 @@ bool Analyzer::identify(const ir::isa::Operand<ir::isa::Op::identify>& operands,
 				if (name == "null") {
 					frame->partiallyResolved.erase(cdef.clid); // just in case
 					auto& opc = cdeftable.substitute(lvid);
-					opc.mutateToBuiltin(nyt_ptr);
+					opc.mutateToBuiltin(CType::t_ptr);
 					opc.qualifiers.ref = false;
 					ir::emit::constantu64(out, lvid, 0);
 					frame->lvids(lvid).synthetic = false;
@@ -311,7 +311,7 @@ bool Analyzer::identify(const ir::isa::Operand<ir::isa::Op::identify>& operands,
 					frame->partiallyResolved.erase(cdef.clid); // just in case
 					if (name == "__false") {
 						auto& opc = cdeftable.substitute(lvid);
-						opc.mutateToBuiltin(nyt_bool);
+						opc.mutateToBuiltin(CType::t_bool);
 						opc.qualifiers.ref = false;
 						ir::emit::constantu64(out, lvid, 0);
 						frame->lvids(lvid).synthetic = false;
@@ -319,14 +319,14 @@ bool Analyzer::identify(const ir::isa::Operand<ir::isa::Op::identify>& operands,
 					}
 					if (name == "__true") {
 						auto& opc = cdeftable.substitute(lvid);
-						opc.mutateToBuiltin(nyt_bool);
+						opc.mutateToBuiltin(CType::t_bool);
 						opc.qualifiers.ref = false;
 						ir::emit::constantu64(out, lvid, 1);
 						frame->lvids(lvid).synthetic = false;
 						return true;
 					}
-					nytype_t type = nycstring_to_type_n(name.c_str(), name.size());
-					if (unlikely(type == nyt_void))
+					auto type = toCType(name);
+					if (unlikely(type == CType::t_void))
 						return complainUnknownBuiltinType(name);
 					cdeftable.substitute(lvid).mutateToBuiltin(type);
 					return true;

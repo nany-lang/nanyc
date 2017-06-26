@@ -59,7 +59,7 @@ public:
 	/*!
 	** \brief Try to instanciate an entry point
 	*/
-	bool instanciate(const AnyString& entrypoint, const nytype_t* args, uint32_t& atomid, uint32_t& instanceid);
+	bool instanciate(const AnyString& entrypoint, const CType* args, uint32_t& atomid, uint32_t& instanceid);
 
 
 	/*!

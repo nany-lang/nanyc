@@ -20,10 +20,10 @@ void Append<YString, ny::Signature>::Perform(String& out, const ny::Signature& r
 			if (i != 0)
 				out.write(", ", 2);
 			auto& tmplparam = rhs.tmplparams[i];
-			if (tmplparam.atom and tmplparam.kind == nyt_any)
+			if (tmplparam.atom and tmplparam.kind == ny::CType::t_any)
 				out << ny::CLID::AtomMapID(tmplparam.atom->atomid);
 			else
-				out << nytype_to_cstring(tmplparam.kind);
+				out << toString(tmplparam.kind);
 		}
 		out << ":>";
 	}
@@ -32,10 +32,10 @@ void Append<YString, ny::Signature>::Perform(String& out, const ny::Signature& r
 		if (i != 0)
 			out.write(", ", 2);
 		auto& param = rhs.parameters[i];
-		if (param.atom and param.kind == nyt_any)
+		if (param.atom and param.kind == ny::CType::t_any)
 			out << ny::CLID::AtomMapID(param.atom->atomid);
 		else
-			out << nytype_to_cstring(param.kind);
+			out << toString(param.kind);
 	}
 	out << ')';
 }

@@ -23,7 +23,7 @@ bool Scope::visitASTExprSwitch(AST::Node& node) {
 	// a temporary variable to compute if a 'case' value matches or not
 	// this variable is reused for each 'case'
 	uint32_t casecondlvid = nextvar();
-	ir::emit::alloc(irout, casecondlvid, nyt_bool);
+	ir::emit::alloc(irout, casecondlvid, CType::t_bool);
 	// the current implementation generates a 'if' statement for each 'case'
 	// these variables are for simulating an AST node
 	auto exprCase = make_ref<AST::Node>(AST::rgExpr);

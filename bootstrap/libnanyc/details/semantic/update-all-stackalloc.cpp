@@ -28,7 +28,7 @@ struct PostProcessStackAllocWalker final {
 			auto* atom = table.findClassdefAtom(cdef);
 			if (atom != nullptr) {
 				assert(opc.atomid == 0 or opc.atomid == (uint32_t) - 1 or opc.atomid == atom->atomid);
-				opc.type = static_cast<uint32_t>(nyt_ptr);
+				opc.type = static_cast<uint32_t>(CType::t_ptr);
 				opc.atomid = atom->atomid;
 			}
 		}

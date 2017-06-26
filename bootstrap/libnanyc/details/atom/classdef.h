@@ -12,6 +12,7 @@
 #include "funcdef.h"
 #include "classdef-follow.h"
 #include "details/reporting/report.h"
+#include "details/atom/ctype.h"
 
 
 namespace ny {
@@ -80,10 +81,10 @@ public:
 	void mutateToVoid();
 
 	//! Mutate the type to builtin (not void)
-	void mutateToBuiltin(nytype_t);
+	void mutateToBuiltin(CType);
 
 	//! Mutate the type to builtin (or void)
-	void mutateToBuiltinOrVoid(nytype_t);
+	void mutateToBuiltinOrVoid(CType);
 
 	//! Mutate the type to any
 	void mutateToAny();
@@ -124,8 +125,8 @@ public:
 
 
 public:
-	//! Inner builtin type (custom type if == nyt_any)
-	nytype_t kind = nyt_void;
+	//! Inner builtin type (custom type if == CType::t_any)
+	CType kind = CType::t_void;
 	//! Atom
 	Atom* atom = nullptr;
 	//! Classdef ID

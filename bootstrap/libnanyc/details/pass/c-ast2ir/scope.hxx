@@ -83,7 +83,7 @@ inline uint32_t Scope::reserveLocalVariable() {
 
 inline uint32_t Scope::createLocalBuiltinVoid(AST::Node& node) {
 	emitDebugpos(node);
-	return ir::emit::alloc(context.ircode, nextvar(), nyt_void);
+	return ir::emit::alloc(context.ircode, nextvar(), CType::t_void);
 }
 
 
@@ -93,13 +93,13 @@ inline uint32_t Scope::createLocalBuiltinAny(AST::Node& node) {
 }
 
 
-inline uint32_t Scope::createLocalBuiltinFloat(AST::Node& node, nytype_t type, double value) {
+inline uint32_t Scope::createLocalBuiltinFloat(AST::Node& node, CType type, double value) {
 	emitDebugpos(node);
 	return ir::emit::allocf64(context.ircode, nextvar(), type, value);
 }
 
 
-inline uint32_t Scope::createLocalBuiltinInt(AST::Node& node, nytype_t type, yuint64 value) {
+inline uint32_t Scope::createLocalBuiltinInt(AST::Node& node, CType type, yuint64 value) {
 	emitDebugpos(node);
 	return ir::emit::allocu64(context.ircode, nextvar(), type, value);
 }

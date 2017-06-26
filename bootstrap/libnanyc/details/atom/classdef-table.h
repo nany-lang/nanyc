@@ -129,7 +129,7 @@ struct ClassdefTable final {
 	Classdef& substitute(uint32_t) const;
 
 	//! Append a new substitute
-	Classdef& addSubstitute(nytype_t kind, Atom* atom, const Qualifiers&) const;
+	Classdef& addSubstitute(CType kind, Atom* atom, const Qualifiers&) const;
 
 	//! Get the atom id of the current layer
 	uint32_t substituteAtomID() const;

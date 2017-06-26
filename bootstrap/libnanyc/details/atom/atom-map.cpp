@@ -34,12 +34,12 @@ struct ExpectClass final: std::exception {
 
 auto createDummyAtom() {
 	auto atom = yuni::make_ref<Atom>("", Atom::Type::classdef);
-	atom->builtinMapping = nyt_void;
+	atom->builtinMapping = CType::t_void;
 	return atom;
 }
 
 
-auto findBuiltinAtom(Atom& root, nytype_t kind, const AnyString& name) {
+auto findBuiltinAtom(Atom& root, CType kind, const AnyString& name) {
 	Atom* atom = nullptr;
 	switch (root.findClassAtom(atom, name)) {
 		case 1: {
@@ -92,7 +92,7 @@ AnyString AtomMap::symbolname(uint32_t atomid, uint32_t index) const {
 
 
 bool AtomMap::fetchAndIndexCoreObjects() {
-	if (unlikely(!!core.object[nyt_bool]))
+	if (unlikely(!!core.object[(uint32_t) CType::t_bool]))
 		return true;
 	if (not config::importNSL) {
 		for (auto& object: core.object)
@@ -100,18 +100,18 @@ bool AtomMap::fetchAndIndexCoreObjects() {
 		return true;
 	}
 	try {
-		core.object[nyt_bool] = findBuiltinAtom(root, nyt_bool, "bool");
-		core.object[nyt_i8]   = findBuiltinAtom(root, nyt_i8,   "i8");
-		core.object[nyt_i16]  = findBuiltinAtom(root, nyt_i16,  "i16");
-		core.object[nyt_i32]  = findBuiltinAtom(root, nyt_i32,  "i32");
-		core.object[nyt_i64]  = findBuiltinAtom(root, nyt_i64,  "i64");
-		core.object[nyt_u8]   = findBuiltinAtom(root, nyt_u8,   "u8");
-		core.object[nyt_u16]  = findBuiltinAtom(root, nyt_u16,  "u16");
-		core.object[nyt_u32]  = findBuiltinAtom(root, nyt_u32,  "u32");
-		core.object[nyt_u64]  = findBuiltinAtom(root, nyt_u64,  "u64");
-		core.object[nyt_f32]  = findBuiltinAtom(root, nyt_f32,  "f32");
-		core.object[nyt_f64]  = findBuiltinAtom(root, nyt_f64,  "f64");
-		core.object[nyt_ptr]  = findBuiltinAtom(root, nyt_ptr,  "pointer");
+		core.object[(uint32_t) CType::t_bool] = findBuiltinAtom(root, CType::t_bool, "bool");
+		core.object[(uint32_t) CType::t_i8]   = findBuiltinAtom(root, CType::t_i8,   "i8");
+		core.object[(uint32_t) CType::t_i16]  = findBuiltinAtom(root, CType::t_i16,  "i16");
+		core.object[(uint32_t) CType::t_i32]  = findBuiltinAtom(root, CType::t_i32,  "i32");
+		core.object[(uint32_t) CType::t_i64]  = findBuiltinAtom(root, CType::t_i64,  "i64");
+		core.object[(uint32_t) CType::t_u8]   = findBuiltinAtom(root, CType::t_u8,   "u8");
+		core.object[(uint32_t) CType::t_u16]  = findBuiltinAtom(root, CType::t_u16,  "u16");
+		core.object[(uint32_t) CType::t_u32]  = findBuiltinAtom(root, CType::t_u32,  "u32");
+		core.object[(uint32_t) CType::t_u64]  = findBuiltinAtom(root, CType::t_u64,  "u64");
+		core.object[(uint32_t) CType::t_f32]  = findBuiltinAtom(root, CType::t_f32,  "f32");
+		core.object[(uint32_t) CType::t_f64]  = findBuiltinAtom(root, CType::t_f64,  "f64");
+		core.object[(uint32_t) CType::t_ptr]  = findBuiltinAtom(root, CType::t_ptr,  "pointer");
 		return true;
 	}
 	catch (const MissingBuiltin& e) {
@@ -126,7 +126,7 @@ bool AtomMap::fetchAndIndexCoreObjects() {
 	catch (const std::exception& e) {
 		ny::complain::exception(e);
 	}
-	core.object[nyt_bool] = nullptr;
+	core.object[(uint32_t) CType::t_bool] = nullptr;
 	return false;
 }
 
