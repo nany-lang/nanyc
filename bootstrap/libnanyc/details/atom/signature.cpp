@@ -1,6 +1,5 @@
 #include "signature.h"
 #include "details/atom/atom.h"
-#include "nany/nany.h"
 #include <yuni/core/stl/hash-combine.h>
 
 using namespace Yuni;

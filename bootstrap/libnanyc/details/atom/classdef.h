@@ -4,7 +4,6 @@
 #include <yuni/core/smartptr/intrusive.h>
 #include "details/ir/fwd.h"
 #include "details/utils/clid.h"
-#include "nany/nany.h"
 #include "type.h"
 #include <vector>
 #include "qualifiers.h"

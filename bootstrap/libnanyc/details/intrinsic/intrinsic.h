@@ -2,7 +2,6 @@
 #include "libnanyc.h"
 #include <yuni/string.h>
 #include <yuni/core/smartptr/intrusive.h>
-#include "nany/nany.h"
 #include "libnanyc-config.h"
 #include <array>
 #include "details/atom/ctype.h"

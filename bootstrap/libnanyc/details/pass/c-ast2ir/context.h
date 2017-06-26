@@ -5,7 +5,6 @@
 #include "details/reporting/report.h"
 #include "details/grammar/nany.h"
 #include "details/errors/errors.h"
-#include "nany/nany.h"
 #include <map>
 #include <array>
 #include <cassert>
