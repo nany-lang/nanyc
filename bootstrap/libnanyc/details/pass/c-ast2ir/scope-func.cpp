@@ -4,6 +4,7 @@
 #include "details/grammar/nany.h"
 #include "details/ast/ast.h"
 #include "details/utils/dataregister.h"
+#include "details/atom/visibility.h"
 
 using namespace Yuni;
 
@@ -65,11 +66,11 @@ bool FuncInspector::inspectVisibility(AST::Node& node) {
 	}
 	else {
 		// visibility from the node
-		nyvisibility_t visibility = nycstring_to_visibility_n(node.text.c_str(), node.text.size());
-		if (likely(visibility != nyv_undefined)) {
+		ny::Visibility visibility = ny::toVisibility(node.text);
+		if (likely(visibility != Visibility::undefined)) {
 			// in the global namespace, only 'public' and 'internal' are accepted
-			if (unlikely(visibility != nyv_public and visibility != nyv_internal)) {
-				visibility = nyv_internal;
+			if (unlikely(visibility != Visibility::vpublic and visibility != Visibility::vinternal)) {
+				visibility = Visibility::vinternal;
 				error(node) << "invalid visibility '" << node.text << "'";
 				success = false;
 			}

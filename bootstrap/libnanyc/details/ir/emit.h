@@ -1,6 +1,7 @@
 #pragma once
 #include "sequence.h"
 #include "details/ir/isa/data.h"
+#include "details/atom/visibility.h"
 
 
 namespace ny {
@@ -972,7 +973,7 @@ inline void shortcircuitMutateToBool(IRCodeRef ref, uint32_t lvid, uint32_t sour
 }
 
 
-inline void visibility(IRCodeRef ref, nyvisibility_t visibility) {
+inline void visibility(IRCodeRef ref, ny::Visibility visibility) {
 	auto& operands = pragma::make(ref, ir::isa::Pragma::visibility);
 	operands.value.visibility = static_cast<uint32_t>(visibility);
 }

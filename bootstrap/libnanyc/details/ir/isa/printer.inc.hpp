@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "details/atom/atom-map.h"
+#include "details/atom/visibility.h"
 
 
 
@@ -706,7 +707,7 @@ namespace // anonymous
 					break;
 				}
 				case Pragma::visibility: {
-					auto* text = nyvisibility_to_cstring((nyvisibility_t) operands.value.visibility);
+					auto text = ny::toString((ny::Visibility) operands.value.visibility);
 					line() << "pragma visibility " << text;
 					break;
 				}

@@ -15,6 +15,7 @@
 #include <map>
 #include "libnanyc-config.h"
 #include "details/atom/classdef.h"
+#include "details/atom/visibility.h"
 
 
 
@@ -487,7 +488,7 @@ public:
 	//! Flag to determine whether this entry is a blueprint or a namespace
 	const Type type;
 	//! Visibility
-	nyvisibility_t visibility = nyv_public;
+	Visibility visibility = Visibility::vpublic;
 	//! Parent node
 	Atom* parent = nullptr;
 
