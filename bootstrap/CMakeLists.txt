@@ -68,11 +68,3 @@ add_custom_target(install-libnanyc-dev-tools
       "${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=libnanyc-dev-tools"
       -P "${CMAKE_BINARY_DIR}/cmake_install.cmake"
 )
-
-# Packages
-if (nany_os_debian)
-	include("cmake/packages-deb.cmake")
-endif()
-if (WIN32)
-	include("cmake/packages-msi.cmake")
-endif()
