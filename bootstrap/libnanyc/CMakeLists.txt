@@ -213,6 +213,8 @@ add_library(libnanyc ${mode_libnany}
 	"details/atom/classdef.cpp"
 	"details/atom/classdef.h"
 	"details/atom/classdef.hxx"
+	"details/atom/ctype.cpp"
+	"details/atom/ctype.h"
 	"details/atom/funcdef.cpp"
 	"details/atom/funcdef.h"
 	"details/atom/funcdef.hxx"
@@ -226,6 +228,8 @@ add_library(libnanyc ${mode_libnany}
 	"details/atom/signature.hxx"
 	"details/atom/type.h"
 	"details/atom/vardef.h"
+	"details/atom/visibility.cpp"
+	"details/atom/visibility.h"
 	"details/c-api/bugreport.cpp"
 	"details/c-api/build.cpp"
 	"details/c-api/common-debuginfo.hxx"
@@ -235,10 +239,8 @@ add_library(libnanyc ${mode_libnany}
 	"details/c-api/program.cpp"
 	"details/c-api/project.cpp"
 	"details/c-api/run.cpp"
-	"details/c-api/type.cpp"
 	"details/c-api/validator.cpp"
 	"details/c-api/version.c"
-	"details/c-api/visibility.cpp"
 	"details/compiler/compdb.h"
 	"details/compiler/compiler.cpp"
 	"details/compiler/compiler.h"
@@ -400,6 +402,7 @@ add_library(libnanyc ${mode_libnany}
 	"details/utils/stringrefs.cpp"
 	"details/utils/stringrefs.h"
 	"details/utils/stringrefs.hxx"
+	"details/vm/allocator.h"
 	"details/vm/console.cpp"
 	"details/vm/console.h"
 	"details/vm/context-runner.cpp"
@@ -427,6 +430,8 @@ add_library(libnanyc ${mode_libnany}
 	"details/vm/stacktrace.h"
 	"details/vm/stacktrace.hxx"
 	"details/vm/types.h"
+	"details/vm/vm.cpp"
+	"details/vm/vm.h"
 	"include/nany/nany.h"
 	"include/nanyc/allocator.h"
 	"include/nanyc/console.h"
@@ -434,6 +439,7 @@ add_library(libnanyc ${mode_libnany}
 	"include/nanyc/program.h"
 	"include/nanyc/report.h"
 	"include/nanyc/types.h"
+	"include/nanyc/vm.h"
 	"libnanyc.h"
 	${nysrc_nsl_stdcore}
 	#
@@ -443,6 +449,7 @@ add_library(libnanyc ${mode_libnany}
 	"library.c"
 	"program.cpp"
 	"report.cpp"
+	"vm.cpp"
 )
 
 set_target_properties(libnanyc PROPERTIES

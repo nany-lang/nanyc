@@ -58,7 +58,7 @@ bool convertASTNumberToDouble(double& value, uint64 part1, const AnyString& part
 template<bool BuiltinT, class DefT>
 bool generateNumberCode(Scope& scope, uint32_t& localvar, const DefT& numdef, AST::Node& node) {
 	// checking for invalid float values
-	nytype_t type = nyt_void;
+	CType type = CType::t_void;
 	// class name
 	AnyString cn;
 	uint32_t hardcodedlvid;
@@ -67,19 +67,19 @@ bool generateNumberCode(Scope& scope, uint32_t& localvar, const DefT& numdef, AS
 		if (not numdef.isUnsigned) {
 			switch (numdef.bits) {
 				case 64:
-					type = nyt_i64;
+					type = CType::t_i64;
 					if (not BuiltinT) cn = "i64";
 					break;
 				case 32:
-					type = nyt_i32;
+					type = CType::t_i32;
 					if (not BuiltinT) cn = "i32";
 					break;
 				case 16:
-					type = nyt_i16;
+					type = CType::t_i16;
 					if (not BuiltinT) cn = "i16";
 					break;
 				case  8:
-					type = nyt_i8;
+					type = CType::t_i8;
 					if (not BuiltinT) cn = "i8";
 					break;
 			}
@@ -87,19 +87,19 @@ bool generateNumberCode(Scope& scope, uint32_t& localvar, const DefT& numdef, AS
 		else {
 			switch (numdef.bits) {
 				case 64:
-					type = nyt_u64;
+					type = CType::t_u64;
 					if (not BuiltinT) cn = "u64";
 					break;
 				case 32:
-					type = nyt_u32;
+					type = CType::t_u32;
 					if (not BuiltinT) cn = "u32";
 					break;
 				case 16:
-					type = nyt_u16;
+					type = CType::t_u16;
 					if (not BuiltinT) cn = "u16";
 					break;
 				case  8:
-					type = nyt_u8;
+					type = CType::t_u8;
 					if (not BuiltinT) cn = "u8";
 					break;
 			}
@@ -181,7 +181,7 @@ bool generateNumberCode(Scope& scope, uint32_t& localvar, const DefT& numdef, AS
 		double value;
 		if (unlikely(not convertASTNumberToDouble(value, numdef.part1, numdef.part2, numdef.sign)))
 			return (error(node) << "invalid floating point number");
-		type = (numdef.bits == 32) ? nyt_f32 : nyt_f64;
+		type = (numdef.bits == 32) ? CType::t_f32 : CType::t_f64;
 		if (not BuiltinT)
 			cn.adapt((numdef.bits == 32) ? "f32" : "f64", 3);
 		hardcodedlvid = scope.createLocalBuiltinFloat(node, type, value);

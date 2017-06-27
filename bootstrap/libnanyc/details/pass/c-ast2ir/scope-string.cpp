@@ -95,7 +95,7 @@ bool Scope::visitASTExprChar(AST::Node& node, uint32_t& localvar) {
 	}
 	if (!context.reuse.ascii.node)
 		context.prepareReuseForAsciis();
-	uint32_t hardcodedlvid = createLocalBuiltinInt(node, nyt_u8, static_cast<uint8_t>(c));
+	uint32_t hardcodedlvid = createLocalBuiltinInt(node, CType::t_u8, static_cast<uint8_t>(c));
 	ShortString16 lvidstr;
 	lvidstr = hardcodedlvid;
 	context.reuse.ascii.lvidnode->text = lvidstr;
@@ -141,8 +141,8 @@ bool Scope::visitASTExprString(AST::Node& node, uint32_t& localvar) {
 	auto flush = [&]() {
 		emitDebugpos(*firstLiteralNode);
 		uint32_t sid = ir::emit::alloctext(irout, nextvar(), context.reuse.string.text);
-		uint32_t lid = ir::emit::allocu64(irout, nextvar(), nyt_u32, context.reuse.string.text.size());
-		uint32_t ret = ir::emit::alloc(irout, nextvar(), nyt_void);
+		uint32_t lid = ir::emit::allocu64(irout, nextvar(), CType::t_u32, context.reuse.string.text.size());
+		uint32_t ret = ir::emit::alloc(irout, nextvar(), CType::t_void);
 		ir::emit::push(irout, sid); // text: __text
 		ir::emit::push(irout, lid); // size: __u64
 		ir::emit::call(irout, ret, calllvid);
@@ -175,7 +175,7 @@ bool Scope::visitASTExprString(AST::Node& node, uint32_t& localvar) {
 					if (not visitASTExpr(expr, lvid))
 						return false;
 					emitDebugpos(expr);
-					uint32_t ret = ir::emit::alloc(irout, nextvar(), nyt_void);
+					uint32_t ret = ir::emit::alloc(irout, nextvar(), CType::t_void);
 					ir::emit::push(irout, lvid);
 					ir::emit::call(irout, ret, calllvid);
 				}

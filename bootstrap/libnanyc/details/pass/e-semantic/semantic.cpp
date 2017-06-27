@@ -14,7 +14,7 @@ bool Build::resolveStrictParameterTypes(Atom& atom) {
 }
 
 
-bool Build::instanciate(const AnyString& entrypoint, const nytype_t* args, uint32_t& atomid,
+bool Build::instanciate(const AnyString& entrypoint, const CType* args, uint32_t& atomid,
 		uint32_t& instanceid) {
 	ny::Logs::Report report{compdb.messages};
 	if (unlikely(args)) {

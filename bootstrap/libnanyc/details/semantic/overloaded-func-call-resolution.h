@@ -6,7 +6,6 @@
 #include "details/atom/signature.h"
 #include "details/atom/classdef-table.h"
 #include "func-overload-match.h"
-#include "nany/nany.h"
 #include <memory>
 #include <vector>
 

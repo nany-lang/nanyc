@@ -7,7 +7,6 @@
 #include <yuni/core/tribool.h>
 #include "details/utils/clid.h"
 #include "vardef.h"
-#include "nany/nany.h"
 #include "details/ir/fwd.h"
 #include "signature.h"
 #include <unordered_map>
@@ -15,7 +14,8 @@
 #include <map>
 #include "libnanyc-config.h"
 #include "details/atom/classdef.h"
-
+#include "details/atom/visibility.h"
+#include "details/atom/ctype.h"
 
 
 namespace ny {
@@ -487,7 +487,7 @@ public:
 	//! Flag to determine whether this entry is a blueprint or a namespace
 	const Type type;
 	//! Visibility
-	nyvisibility_t visibility = nyv_public;
+	Visibility visibility = Visibility::vpublic;
 	//! Parent node
 	Atom* parent = nullptr;
 
@@ -533,7 +533,7 @@ public:
 	// \TODO builtinalias: this property is only used twice
 	AnyString builtinalias;
 	//! Builtin type (!= nyt_void if this atom represents a builtin)
-	nytype_t builtinMapping = nyt_void;
+	CType builtinMapping = CType::t_void;
 
 	//! List of potential candidates for being captured
 	std::unique_ptr<std::unordered_set<AnyString>> candidatesForCapture;

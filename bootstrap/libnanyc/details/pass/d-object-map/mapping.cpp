@@ -463,16 +463,16 @@ struct OpcodeReader final {
 		MutexLocker locker{mutex};
 		auto& cdef = cdeftable.classdef(clid);
 		resetClassdefOriginFromCurrentPosition(cdef);
-		switch ((nytype_t) operands.type) {
+		switch ((CType) operands.type) {
 			default: {
-				cdef.mutateToBuiltin((nytype_t) operands.type);
+				cdef.mutateToBuiltin((CType) operands.type);
 				cdef.instance = true; // keep somewhere that this definition is a variable instance
 				break;
 			}
-			case nyt_void:
+			case CType::t_void:
 				cdef.mutateToVoid();
 				break;
-			case nyt_any:
+			case CType::t_any:
 				cdef.mutateToAny();
 				break;
 		}

@@ -3,7 +3,6 @@
 #include <yuni/core/string.h>
 #include "classdef.h"
 #include "details/utils/stringrefs.h"
-#include "nany/nany.h"
 #include "atom-map.h"
 #include <unordered_map>
 #include <vector>
@@ -129,7 +128,7 @@ struct ClassdefTable final {
 	Classdef& substitute(uint32_t) const;
 
 	//! Append a new substitute
-	Classdef& addSubstitute(nytype_t kind, Atom* atom, const Qualifiers&) const;
+	Classdef& addSubstitute(CType kind, Atom* atom, const Qualifiers&) const;
 
 	//! Get the atom id of the current layer
 	uint32_t substituteAtomID() const;

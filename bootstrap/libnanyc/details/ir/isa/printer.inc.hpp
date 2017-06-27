@@ -4,7 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "details/atom/atom-map.h"
-
+#include "details/atom/visibility.h"
+#include "details/atom/ctype.h"
 
 
 namespace ny
@@ -238,8 +239,7 @@ namespace // anonymous
 		void print(const Operand<Op::stackalloc>& operands) {
 			line() << "alloca %" << operands.lvid;
 			out << ": ";
-			out << nytype_to_cstring((nytype_t) operands.type);
-
+			out << ny::toString((CType) operands.type);
 			if (operands.atomid != (uint32_t) -1) {
 				out << " // atom: " << operands.atomid;
 				if (atommap) {
@@ -706,7 +706,7 @@ namespace // anonymous
 					break;
 				}
 				case Pragma::visibility: {
-					auto* text = nyvisibility_to_cstring((nyvisibility_t) operands.value.visibility);
+					auto text = ny::toString((ny::Visibility) operands.value.visibility);
 					line() << "pragma visibility " << text;
 					break;
 				}

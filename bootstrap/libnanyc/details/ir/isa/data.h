@@ -1,6 +1,5 @@
 #pragma once
 #include "libnanyc.h"
-#include <nany/nany.h>
 #include "opcodes.h"
 #include <iosfwd>
 #include <yuni/core/string.h>

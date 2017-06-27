@@ -183,7 +183,7 @@ inline bool Atom::isUnittest() const {
 
 
 inline bool Atom::isPublicOrPublished() const {
-	return (visibility == nyv_public) or (visibility == nyv_published);
+	return (visibility == Visibility::vpublic) or (visibility == Visibility::vpublished);
 }
 
 

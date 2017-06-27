@@ -19,7 +19,7 @@ bool Scope::generateIfStmt(AST::Node& expr, AST::Node& thenc, AST::Node* elseptr
 	bool success = true;
 	// expression
 	// evalation of the condition
-	uint32_t condlvid = ir::emit::alloc(irout, nextvar(), nyt_bool);
+	uint32_t condlvid = ir::emit::alloc(irout, nextvar(), CType::t_bool);
 	{
 		ir::emit::trace(irout, "if-cond-stmt");
 		ir::emit::ScopeLocker opscopeCond{irout};
@@ -96,7 +96,7 @@ bool Scope::generateIfExpr(uint32_t& ifret, AST::Node& expr, AST::Node& thenc, A
 	bool success = true;
 	// expression
 	// evalation of the condition
-	uint32_t condlvid = ir::emit::alloc(irout, nextvar(), nyt_bool);
+	uint32_t condlvid = ir::emit::alloc(irout, nextvar(), CType::t_bool);
 	{
 		ir::emit::trace(irout, "if-cond-expr");
 		ir::emit::ScopeLocker opscopeCond{irout};

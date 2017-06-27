@@ -4,6 +4,7 @@
 #include "details/context/build-info.h"
 #include "details/reporting/report.h"
 #include "details/grammar/nany.h"
+#include "details/atom/visibility.h"
 #include "libnanyc-config.h"
 #include "libnanyc-traces.h"
 #include "details/utils/check-for-valid-identifier-name.h"
@@ -39,11 +40,6 @@ private:
 	void transformExprAssignmentToFuncCall(AST::Node& node);
 
 	void appendNewBoolNode(AST::Node& parent, bool onoff);
-
-private:
-	struct Frame final {
-		nyvisibility_t visibility = nyv_default;
-	};
 
 private:
 	ASTHelper& ast;

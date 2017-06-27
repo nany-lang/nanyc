@@ -43,7 +43,7 @@ bool Analyzer::instanciateAssignment(AtomStackFrame& frame, uint32_t lhs, uint32
 	if (implicitBuiltin) {
 		// checking if an implicit can be performed (if rhs is a 'builtin' type)
 		auto* atomrhs = (cdeftable.findClassdefAtom(cdefrhs));
-		if (cdeftable.atoms().core.object[cdeflhs.kind] == atomrhs) {
+		if (cdeftable.atoms().core.object[(uint32_t) cdeflhs.kind] == atomrhs) {
 			// read the first field, assuming that the first one if actually the same type
 			if (canGenerateCode())
 				ir::emit::fieldget(out, lhs, rhs, 0);
@@ -179,13 +179,13 @@ bool Analyzer::instanciateAssignment(AtomStackFrame& frame, uint32_t lhs, uint32
 				// note: do not keep a reference on 'out->at...', since the internal buffer might be reized
 				uint32_t lvid = createLocalVariables(/*count*/ 2);
 				uint32_t retcall = lvid + 1;
-				uint32_t rsizof = ir::emit::alloc(out, lvid, nyt_u64);
+				uint32_t rsizof = ir::emit::alloc(out, lvid, CType::t_u64);
 				ir::emit::type::objectSizeof(out, rsizof, rhsAtom->atomid);
 				// re-allocate some memory
 				ir::emit::memory::allocate(out, lhs, rsizof);
 				ir::emit::ref(out, lhs);
 				frame.lvids(lhs).origin.memalloc = true;
-				ir::emit::alloc(out, retcall, nyt_void);
+				ir::emit::alloc(out, retcall, CType::t_void);
 				// call operator 'clone'
 				ir::emit::push(out, lhs); // self
 				ir::emit::push(out, rhs); // the object to copy

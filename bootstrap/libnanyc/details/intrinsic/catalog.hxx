@@ -1,6 +1,7 @@
 #pragma once
 #include "catalog.h"
 #include <yuni/core/static/types.h>
+#include "details/atom/ctype.h"
 
 
 namespace ny {
@@ -11,59 +12,59 @@ template<class T> struct CTypeToNanyType {};
 
 
 template<> struct CTypeToNanyType<int8_t> final {
-	static constexpr nytype_t type = nyt_i8;
+	static constexpr CType type = CType::t_i8;
 };
 
 template<> struct CTypeToNanyType<int16_t> final {
-	static constexpr nytype_t type = nyt_i16;
+	static constexpr CType type = CType::t_i16;
 };
 
 template<> struct CTypeToNanyType<int32_t> final {
-	static constexpr nytype_t type = nyt_i32;
+	static constexpr CType type = CType::t_i32;
 };
 
 template<> struct CTypeToNanyType<int64_t> final {
-	static constexpr nytype_t type = nyt_i64;
+	static constexpr CType type = CType::t_i64;
 };
 
 template<> struct CTypeToNanyType<uint8_t> final {
-	static constexpr nytype_t type = nyt_u8;
+	static constexpr CType type = CType::t_u8;
 };
 
 template<> struct CTypeToNanyType<uint16_t> final {
-	static constexpr nytype_t type = nyt_u16;
+	static constexpr CType type = CType::t_u16;
 };
 
 template<> struct CTypeToNanyType<uint32_t> final {
-	static constexpr nytype_t type = nyt_u32;
+	static constexpr CType type = CType::t_u32;
 };
 
 template<> struct CTypeToNanyType<uint64_t> final {
-	static constexpr nytype_t type = nyt_u64;
+	static constexpr CType type = CType::t_u64;
 };
 
 template<> struct CTypeToNanyType<float> final {
-	static constexpr nytype_t type = nyt_f32;
+	static constexpr CType type = CType::t_f32;
 };
 
 template<> struct CTypeToNanyType<double> final {
-	static constexpr nytype_t type = nyt_f64;
+	static constexpr CType type = CType::t_f64;
 };
 
 template<> struct CTypeToNanyType<bool> final {
-	static constexpr nytype_t type = nyt_bool;
+	static constexpr CType type = CType::t_bool;
 };
 
 template<class P> struct CTypeToNanyType<P*> final {
-	static constexpr nytype_t type = nyt_ptr;
+	static constexpr CType type = CType::t_ptr;
 };
 
 template<class P> struct CTypeToNanyType<const P*> final {
-	static constexpr nytype_t type = nyt_ptr;
+	static constexpr CType type = CType::t_ptr;
 };
 
 template<> struct CTypeToNanyType<void> final {
-	static constexpr nytype_t type = nyt_void;
+	static constexpr CType type = CType::t_void;
 };
 
 

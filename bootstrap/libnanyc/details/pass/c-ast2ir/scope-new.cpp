@@ -78,7 +78,7 @@ bool Scope::visitASTExprNew(AST::Node& node, uint32_t& localvar) {
 		// trick: a register will be allocated even if unused for now
 		// it will be later (when instanciating the func) to put the sizeof
 		// of the object to allocate
-		ir::emit::alloc(irout, nextvar(), nyt_u64);
+		ir::emit::alloc(irout, nextvar(), CType::t_u64);
 		pointer = ir::emit::alloc(irout, nextvar());
 		ir::emit::objectAlloc(irout, pointer, rettype);
 	}
@@ -87,7 +87,7 @@ bool Scope::visitASTExprNew(AST::Node& node, uint32_t& localvar) {
 		if (not visitASTExpr(*inplace, inplaceExpr))
 			return false;
 		// intermediate pointer to force type __pointer
-		uint32_t tmpptr = ir::emit::alloc(irout, nextvar(), nyt_ptr);
+		uint32_t tmpptr = ir::emit::alloc(irout, nextvar(), CType::t_ptr);
 		ir::emit::assign(irout, tmpptr, inplaceExpr, false);
 		// promoting the given __pointer to T
 		pointer = ir::emit::alloc(irout, nextvar());

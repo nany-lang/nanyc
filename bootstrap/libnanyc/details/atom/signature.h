@@ -4,6 +4,7 @@
 #include "details/utils/clid.h"
 #include <vector>
 #include <memory>
+#include "details/atom/ctype.h"
 
 
 namespace ny {
@@ -16,7 +17,7 @@ class Signature final {
 public:
 	struct Paramtype final {
 		//! Kind of the parameter
-		nytype_t kind = nyt_any;
+		CType kind = CType::t_any;
 		//! Atom attached to it, if any (kind == nyt_any)
 		Atom* atom = nullptr;
 		//! Qualifiers (ref, const...)

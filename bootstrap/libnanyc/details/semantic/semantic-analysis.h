@@ -296,7 +296,7 @@ struct Analyzer final {
 	//! Emit a new warning/error for an unused variable
 	void complainUnusedVariable(const AtomStackFrame&, uint32_t lvid) const;
 	//! Emit a new error on a member request on a non-class type
-	bool complainInvalidMemberRequestNonClass(const AnyString& name, nytype_t) const;
+	bool complainInvalidMemberRequestNonClass(const AnyString& name, CType) const;
 	//! Unknown builtin type
 	bool complainUnknownBuiltinType(const AnyString& name) const;
 	//! invalid self reference for var assignment

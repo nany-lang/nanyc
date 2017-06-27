@@ -22,7 +22,7 @@ typedef struct nyallocator_t {
 	void (*deallocate)(nyallocator_t*, void*, size_t);
 	void* (*reallocate)(nyallocator_t*, void*, size_t old_size, size_t new_size);
 	void (*on_release)(nyallocator_t*);
-	void (*on_not_enough_memory)(nyallocator_t*, const char* msg, uint32_t msg_len);
+	void (*on_not_enough_memory)(const nyallocator_t*, const char* msg, uint32_t msg_len);
 }
 nyallocator_t;
 
@@ -32,7 +32,7 @@ struct nyallocator_opts_t {
 	void (*deallocate)(nyallocator_t*, void*, size_t);
 	void* (*reallocate)(nyallocator_t*, void*, size_t old_size, size_t new_size);
 	void (*on_release)(nyallocator_t*);
-	void (*on_not_enough_memory)(nyallocator_t*, const char* msg, uint32_t msg_len);
+	void (*on_not_enough_memory)(const nyallocator_t*, const char* msg, uint32_t msg_len);
 };
 
 /*!
