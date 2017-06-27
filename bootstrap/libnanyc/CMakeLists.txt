@@ -402,6 +402,7 @@ add_library(libnanyc ${mode_libnany}
 	"details/utils/stringrefs.cpp"
 	"details/utils/stringrefs.h"
 	"details/utils/stringrefs.hxx"
+	"details/vm/allocator.h"
 	"details/vm/console.cpp"
 	"details/vm/console.h"
 	"details/vm/context-runner.cpp"
