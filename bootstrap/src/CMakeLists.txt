@@ -9,7 +9,7 @@ set_target_properties(nanyc PROPERTIES
 	VERSION "${nany_version_major}.${nany_version_minor}.${nany_version_patch}"
 	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/.."
 )
-install(TARGETS nanyc RUNTIME DESTINATION "bin" COMPONENT "nanyc")
+install(TARGETS nanyc RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT "nanyc")
 
 
 ### nanyc-unittest
@@ -44,7 +44,7 @@ set_target_properties(nanyc-dump-ast PROPERTIES
 )
 # nanyc-dump-ast does not use libnanyc (on purpose)
 target_compile_definitions(nanyc-dump-ast PRIVATE "NANY_VERSION=${nany_version_string}")
-install(TARGETS nanyc-dump-ast RUNTIME DESTINATION "bin" COMPONENT "libnanyc-dev-tools")
+install(TARGETS nanyc-dump-ast RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT "libnanyc-dev-tools")
 
 
 ### nanyc-check-syntax
@@ -54,4 +54,4 @@ set_target_properties(nanyc-check-syntax PROPERTIES
 	VERSION "${nany_version_major}.${nany_version_minor}.${nany_version_patch}"
 	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/.."
 )
-install(TARGETS nanyc-check-syntax RUNTIME DESTINATION "bin" COMPONENT "libnanyc-dev-tools")
+install(TARGETS nanyc-check-syntax RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT "libnanyc-dev-tools")

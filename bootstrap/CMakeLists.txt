@@ -11,6 +11,7 @@ include(CMakeParseArguments)
 
 
 include("cmake/messages.cmake")
+include(GNUInstallDirs)
 
 nmessage("nany c++/bootstrap")
 nmessage("")

@@ -491,8 +491,8 @@ add_dependencies(libnanyc nyt-nanyfile-to-cstring)
 
 install(
 	TARGETS libnanyc
-	ARCHIVE DESTINATION "lib/libnany/${nany_version}"
-	LIBRARY DESTINATION "lib/libnany/${nany_version}"
+	ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+	LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
 	COMPONENT "libnanyc"
 )
 
