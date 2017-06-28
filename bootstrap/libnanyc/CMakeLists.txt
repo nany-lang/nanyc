@@ -496,12 +496,6 @@ install(
 	COMPONENT "libnanyc"
 )
 
-install(
-	FILES "include/nany/nany.h"
-	DESTINATION "include/libnany/${nany_version}/nany"
-	COMPONENT "libnanyc-dev"
-)
-
 if (YUNI_COMPILER_IS_CLANG)
 	function(add_clang_static_analysis target)
 	    get_target_property(SRCs ${target} SOURCES)
