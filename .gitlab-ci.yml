@@ -5,6 +5,7 @@ stages:
 variables:
     GIT_SUBMODULE_STRATEGY: recursive
     VERBOSE: '1'
+    NANYC_VERSION: '0.3.0'
 
 
 # build
@@ -38,4 +39,56 @@ variables:
 
 ~ubuntu-17.04:
     <<: *debug-build-linux
+    image: registry.gitlab.com/nany-lang/nanyc:ubuntu-17.04
+
+
+# packages
+
+.build-pkg-linux-deb: &build-pkg-linux-deb
+    stage: packages
+    script:
+        - ARCH=$(dpkg --print-architecture)
+        - . /etc/os-release
+        - read ID_VERSION _ <<< "$VERSION"
+        - echo "system ${ID}-${ID_VERSION} ($ARCH)"
+        - mkdir -p build/bootstrap
+        - mkdir -p build/packages
+        - cd build/bootstrap
+        - cmake ../../bootstrap -DCMAKE_BUILD_TYPE=release
+            -DWITH_PACKAGE_DEB=ON
+            -DCMAKE_INSTALL_PREFIX=/
+            -DCMAKE_INSTALL_BINDIR=usr/bin
+            -DCMAKE_INSTALL_LIBDIR=usr/lib
+            -DCMAKE_INSTALL_INCLUDEDIR=usr/include
+        - cmake --build . --config release --target all -- -j $(nproc)
+        - make_package() {
+            COM=$1;
+            target=../packages/${ID}-${ID_VERSION}/${COM}-${NANYC_VERSION}-${ARCH};
+            export DESTDIR=${target};
+            cmake -DCOMPONENT="${COM}" -P cmake_install.cmake;
+            dpkg -b ${target};
+          }
+        - make_package libnanyc
+        - make_package nanyc
+    artifacts:
+        paths:
+            - build/packages/*/*.deb
+        expire_in: 4 hours
+    tags:
+        - linux
+
+debian-8:
+    <<: *build-pkg-linux-deb
+    image: registry.gitlab.com/nany-lang/nanyc:debian-8
+
+debian-9:
+    <<: *build-pkg-linux-deb
+    image: registry.gitlab.com/nany-lang/nanyc:debian-9
+
+ubuntu-16.04:
+    <<: *build-pkg-linux-deb
+    image: registry.gitlab.com/nany-lang/nanyc:ubuntu-16.04
+
+ubuntu-17.04:
+    <<: *build-pkg-linux-deb
     image: registry.gitlab.com/nany-lang/nanyc:ubuntu-17.04
