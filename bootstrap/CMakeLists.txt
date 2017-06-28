@@ -5,6 +5,8 @@ set(CMAKE_DISABLE_SOURCE_CHANGES  ON)
 
 project(nany-bootstrap)
 
+option(WITH_PACKAGE_DEB "Build DEB control" OFF)
+
 include(CMakeParseArguments)
 
 # for information related to nany, see settings.txt
@@ -41,3 +43,7 @@ add_custom_target(check
 	COMMAND "$<TARGET_FILE:nanyc-unittest>" --with-nsl "${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/empty.ny"
 	VERBATIM
 )
+
+if (WITH_PACKAGE_DEB)
+	include("cmake/package-deb.cmake")
+endif()
