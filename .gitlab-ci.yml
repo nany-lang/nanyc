@@ -1,6 +1,7 @@
 stages:
     - build
     - packages
+    - artifacts
 
 variables:
     GIT_SUBMODULE_STRATEGY: recursive
@@ -92,3 +93,28 @@ ubuntu-16.04:
 ubuntu-17.04:
     <<: *build-pkg-linux-deb
     image: registry.gitlab.com/nany-lang/nanyc:ubuntu-17.04
+
+
+# artifacts
+
+the gathering master:
+    stage: artifacts
+    script:
+        - echo Gather all artifacts in one spot
+    only:
+        - master@nany-lang/nanyc
+    artifacts:
+        paths:
+            - build/packages/*/*.deb
+        expire_in: 3 months
+
+the gathering:
+    stage: artifacts
+    script:
+        - echo Gather all artifacts in one spot
+    except:
+        - master@nany-lang/nanyc
+    artifacts:
+        paths:
+            - build/packages/*/*.deb
+        expire_in: 1 day
