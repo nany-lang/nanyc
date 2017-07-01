@@ -57,7 +57,7 @@ struct ContextRunner final {
 
 	nyallocator_t& allocator;
 	DCCallVM* dyncall = nullptr;
-	nyvm_t cfvm;
+	nyoldvm_t cfvm;
 	nyprogram_cf_t cf;
 	Context& context;
 	Stack stack;

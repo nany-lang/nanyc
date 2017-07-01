@@ -44,7 +44,7 @@ struct IntrinsicIOIterator {
 } // anonymous namespace
 
 
-static bool nanyc_io_set_cwd(nyvm_t* vm, void* string, uint32_t size) {
+static bool nanyc_io_set_cwd(nyoldvm_t* vm, void* string, uint32_t size) {
 	assert(vm != nullptr);
 	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->tctx);
 	tc.io.cwd = AnyString{reinterpret_cast<const char*>(string), size};
@@ -52,14 +52,14 @@ static bool nanyc_io_set_cwd(nyvm_t* vm, void* string, uint32_t size) {
 }
 
 
-static const void* nanyc_io_get_cwd(nyvm_t* vm) {
+static const void* nanyc_io_get_cwd(nyoldvm_t* vm) {
 	assert(vm != nullptr);
 	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->tctx);
 	return tc.io.cwd.c_str();
 }
 
 
-static void* nanyc_io_folder_iterate(nyvm_t* vm, const char* path, uint32_t len,
+static void* nanyc_io_folder_iterate(nyoldvm_t* vm, const char* path, uint32_t len,
 									 bool recursive, bool files, bool folders) {
 	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->tctx);
 	AnyString adapterpath;
@@ -79,7 +79,7 @@ static void* nanyc_io_folder_iterate(nyvm_t* vm, const char* path, uint32_t len,
 }
 
 
-static void nanyc_io_folder_iterator_close(nyvm_t*, void* ptr) {
+static void nanyc_io_folder_iterator_close(nyoldvm_t*, void* ptr) {
 	if (ptr) {
 		auto* iterator = reinterpret_cast<IntrinsicIOIterator*>(ptr);
 		if (iterator->internal)
@@ -89,7 +89,7 @@ static void nanyc_io_folder_iterator_close(nyvm_t*, void* ptr) {
 }
 
 
-static uint64_t nanyc_io_folder_iterator_size(nyvm_t*, void* ptr) {
+static uint64_t nanyc_io_folder_iterator_size(nyoldvm_t*, void* ptr) {
 	auto* iterator = reinterpret_cast<IntrinsicIOIterator*>(ptr);
 	if (iterator and iterator->internal)
 		return iterator->adapter.folder_iterator_size(iterator->internal);
@@ -97,7 +97,7 @@ static uint64_t nanyc_io_folder_iterator_size(nyvm_t*, void* ptr) {
 }
 
 
-static const char* nanyc_io_folder_iterator_name(nyvm_t*, void* ptr) {
+static const char* nanyc_io_folder_iterator_name(nyoldvm_t*, void* ptr) {
 	auto* iterator = reinterpret_cast<IntrinsicIOIterator*>(ptr);
 	if (iterator and iterator->internal)
 		return iterator->adapter.folder_iterator_name(iterator->internal);
@@ -105,7 +105,7 @@ static const char* nanyc_io_folder_iterator_name(nyvm_t*, void* ptr) {
 }
 
 
-static const char* nanyc_io_folder_iterator_fullpath(nyvm_t*, void* ptr) {
+static const char* nanyc_io_folder_iterator_fullpath(nyoldvm_t*, void* ptr) {
 	auto* iterator = reinterpret_cast<IntrinsicIOIterator*>(ptr);
 	if (iterator and iterator->internal) {
 		// restore the initial request
@@ -123,7 +123,7 @@ static const char* nanyc_io_folder_iterator_fullpath(nyvm_t*, void* ptr) {
 }
 
 
-static bool nanyc_io_folder_iterator_next(nyvm_t*, void* ptr) {
+static bool nanyc_io_folder_iterator_next(nyoldvm_t*, void* ptr) {
 	auto* iterator = reinterpret_cast<IntrinsicIOIterator*>(ptr);
 	if (iterator and iterator->internal) {
 		nyio_iterator_t* p = iterator->adapter.folder_next(iterator->internal);
@@ -135,7 +135,7 @@ static bool nanyc_io_folder_iterator_next(nyvm_t*, void* ptr) {
 }
 
 
-static bool nanyc_io_folder_create(nyvm_t* vm, const char* path, uint32_t len) {
+static bool nanyc_io_folder_create(nyoldvm_t* vm, const char* path, uint32_t len) {
 	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->tctx);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
@@ -145,7 +145,7 @@ static bool nanyc_io_folder_create(nyvm_t* vm, const char* path, uint32_t len) {
 }
 
 
-static bool nanyc_io_folder_erase(nyvm_t* vm, const char* path, uint32_t len) {
+static bool nanyc_io_folder_erase(nyoldvm_t* vm, const char* path, uint32_t len) {
 	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->tctx);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
@@ -155,7 +155,7 @@ static bool nanyc_io_folder_erase(nyvm_t* vm, const char* path, uint32_t len) {
 }
 
 
-static bool nanyc_io_folder_clear(nyvm_t* vm, const char* path, uint32_t len) {
+static bool nanyc_io_folder_clear(nyoldvm_t* vm, const char* path, uint32_t len) {
 	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->tctx);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
@@ -165,7 +165,7 @@ static bool nanyc_io_folder_clear(nyvm_t* vm, const char* path, uint32_t len) {
 }
 
 
-static uint64_t nanyc_io_folder_size(nyvm_t* vm, const char* path, uint32_t len) {
+static uint64_t nanyc_io_folder_size(nyoldvm_t* vm, const char* path, uint32_t len) {
 	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->tctx);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
@@ -174,7 +174,7 @@ static uint64_t nanyc_io_folder_size(nyvm_t* vm, const char* path, uint32_t len)
 }
 
 
-static bool nanyc_io_folder_exists(nyvm_t* vm, const char* path, uint32_t len) {
+static bool nanyc_io_folder_exists(nyoldvm_t* vm, const char* path, uint32_t len) {
 	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->tctx);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
@@ -184,7 +184,7 @@ static bool nanyc_io_folder_exists(nyvm_t* vm, const char* path, uint32_t len) {
 }
 
 
-static bool nanyc_io_folder_copy(nyvm_t* vm, const char* path, uint32_t len, const char* to, uint32_t tolen) {
+static bool nanyc_io_folder_copy(nyoldvm_t* vm, const char* path, uint32_t len, const char* to, uint32_t tolen) {
 	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->tctx);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
@@ -204,7 +204,7 @@ static bool nanyc_io_folder_copy(nyvm_t* vm, const char* path, uint32_t len, con
 }
 
 
-static bool nanyc_io_file_exists(nyvm_t* vm, const char* path, uint32_t len) {
+static bool nanyc_io_file_exists(nyoldvm_t* vm, const char* path, uint32_t len) {
 	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->tctx);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
@@ -214,7 +214,7 @@ static bool nanyc_io_file_exists(nyvm_t* vm, const char* path, uint32_t len) {
 }
 
 
-static uint64_t nanyc_io_file_size(nyvm_t* vm, const char* path, uint32_t len) {
+static uint64_t nanyc_io_file_size(nyoldvm_t* vm, const char* path, uint32_t len) {
 	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->tctx);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
@@ -223,7 +223,7 @@ static uint64_t nanyc_io_file_size(nyvm_t* vm, const char* path, uint32_t len) {
 }
 
 
-static bool nanyc_io_file_erase(nyvm_t* vm, const char* path, uint32_t len) {
+static bool nanyc_io_file_erase(nyoldvm_t* vm, const char* path, uint32_t len) {
 	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->tctx);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
@@ -233,7 +233,7 @@ static bool nanyc_io_file_erase(nyvm_t* vm, const char* path, uint32_t len) {
 }
 
 
-static bool nanyc_io_file_resize(nyvm_t* vm, const char* path, uint32_t len, uint64_t newsize) {
+static bool nanyc_io_file_resize(nyoldvm_t* vm, const char* path, uint32_t len, uint64_t newsize) {
 	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->tctx);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
@@ -243,7 +243,7 @@ static bool nanyc_io_file_resize(nyvm_t* vm, const char* path, uint32_t len, uin
 }
 
 
-static bool nanyc_io_file_set_contents(nyvm_t* vm, const char* path, uint32_t len,
+static bool nanyc_io_file_set_contents(nyoldvm_t* vm, const char* path, uint32_t len,
 									   const char* content, uint32_t clen, bool append) {
 	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->tctx);
 	AnyString adapterPath;
@@ -259,7 +259,7 @@ static bool nanyc_io_file_set_contents(nyvm_t* vm, const char* path, uint32_t le
 }
 
 
-static void* nanyc_io_file_get_contents(nyvm_t* vm, const char* path, uint32_t len) {
+static void* nanyc_io_file_get_contents(nyoldvm_t* vm, const char* path, uint32_t len) {
 	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->tctx);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
@@ -279,7 +279,7 @@ static void* nanyc_io_file_get_contents(nyvm_t* vm, const char* path, uint32_t l
 }
 
 
-static nyfile_t* nanyc_io_file_open(nyvm_t* vm, const char* path, uint32_t len,
+static nyfile_t* nanyc_io_file_open(nyoldvm_t* vm, const char* path, uint32_t len,
 									bool readm, bool writem, bool appendm, bool truncm) {
 	assert(vm);
 	assert(path);
@@ -305,7 +305,7 @@ static nyfile_t* nanyc_io_file_open(nyvm_t* vm, const char* path, uint32_t len,
 }
 
 
-static void nanyc_io_file_close(nyvm_t* vm, nyfile_t* file) {
+static void nanyc_io_file_close(nyoldvm_t* vm, nyfile_t* file) {
 	assert(file != nullptr);
 	assert(file->adapter != nullptr);
 	// close the file handle
@@ -316,61 +316,61 @@ static void nanyc_io_file_close(nyvm_t* vm, nyfile_t* file) {
 }
 
 
-static void nanyc_io_file_flush(nyvm_t*, nyfile_t* file) {
+static void nanyc_io_file_flush(nyoldvm_t*, nyfile_t* file) {
 	assert(file != nullptr);
 	file->adapter->file_flush(file->fd);
 }
 
 
-static uint64_t nanyc_io_file_write(nyvm_t*, nyfile_t* file, const char* buffer, uint64_t size) {
+static uint64_t nanyc_io_file_write(nyoldvm_t*, nyfile_t* file, const char* buffer, uint64_t size) {
 	assert(file != nullptr);
 	assert(file->adapter != nullptr);
 	return file->adapter->file_write(file->fd, buffer, size);
 }
 
 
-static uint64_t nanyc_io_file_read(nyvm_t*, nyfile_t* file, char* buffer, uint64_t size) {
+static uint64_t nanyc_io_file_read(nyoldvm_t*, nyfile_t* file, char* buffer, uint64_t size) {
 	assert(file != nullptr);
 	assert(file->adapter != nullptr);
 	return file->adapter->file_read(file->fd, buffer, size);
 }
 
 
-static bool nanyc_io_file_eof(nyvm_t*, nyfile_t* file) {
+static bool nanyc_io_file_eof(nyoldvm_t*, nyfile_t* file) {
 	assert(file != nullptr);
 	assert(file->adapter != nullptr);
 	return (nyfalse != file->adapter->file_eof(file->fd));
 }
 
 
-static bool nanyc_io_file_seek_set(nyvm_t*, nyfile_t* file, uint64_t offset) {
+static bool nanyc_io_file_seek_set(nyoldvm_t*, nyfile_t* file, uint64_t offset) {
 	assert(file != nullptr);
 	auto err = file->adapter->file_seek(file->fd, offset);
 	return (err == nyioe_ok);
 }
 
 
-static bool nanyc_io_file_seek_from_end(nyvm_t*, nyfile_t* file, int64_t offset) {
+static bool nanyc_io_file_seek_from_end(nyoldvm_t*, nyfile_t* file, int64_t offset) {
 	assert(file != nullptr);
 	auto err = file->adapter->file_seek_from_end(file->fd, offset);
 	return (err == nyioe_ok);
 }
 
 
-static bool nanyc_io_file_seek_cur(nyvm_t*, nyfile_t* file, int64_t offset) {
+static bool nanyc_io_file_seek_cur(nyoldvm_t*, nyfile_t* file, int64_t offset) {
 	assert(file != nullptr);
 	auto err = file->adapter->file_seek_cur(file->fd, offset);
 	return (err == nyioe_ok);
 }
 
 
-static uint64_t nanyc_io_file_tell(nyvm_t*, nyfile_t* file) {
+static uint64_t nanyc_io_file_tell(nyoldvm_t*, nyfile_t* file) {
 	assert(file != nullptr);
 	return file->adapter->file_tell(file->fd);
 }
 
 
-static bool nanyc_io_mount_local(nyvm_t* vm, const char* path, uint32_t len, const char* local,
+static bool nanyc_io_mount_local(nyoldvm_t* vm, const char* path, uint32_t len, const char* local,
 		uint32_t locallen) {
 	if (path and len and local and locallen) {
 		auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->tctx);

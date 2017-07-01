@@ -4,7 +4,7 @@
 
 
 template<class T>
-static T nanyc_strlen(nyvm_t*, void* string) {
+static T nanyc_strlen(nyoldvm_t*, void* string) {
 	size_t len = string ? strlen(reinterpret_cast<const char*>(string)) : 0u;
 	return (sizeof(size_t) == sizeof(T) or len < std::numeric_limits<T>::max())
 		   ? static_cast<T>(len)

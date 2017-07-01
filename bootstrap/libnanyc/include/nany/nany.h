@@ -565,7 +565,7 @@ nyprogram_cf_t;
 
 
 /*! Context at runtime for native C calls */
-typedef struct nyvm_t {
+typedef struct nyoldvm_t {
 	/*! Allocator */
 	nyallocator_t* allocator;
 	/*! Current program */
@@ -575,7 +575,7 @@ typedef struct nyvm_t {
 	/*! Console */
 	nyoldconsole_t* console;
 }
-nyvm_t;
+nyoldvm_t;
 
 
 /*!
