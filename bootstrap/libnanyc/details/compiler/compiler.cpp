@@ -29,11 +29,6 @@ Logs::Report buildGenerateReport(void* ptr, Logs::Level level) {
 	return (*((ny::Logs::Report*) ptr)).fromErrLevel(level);
 }
 
-nyprogram_t* complainNoSource(ny::Logs::Report& report) {
-	report.error() << "no input source code";
-	return nullptr;
-}
-
 void copySourceOpts(ny::compiler::Source& source, const nysource_opts_t& opts) {
 	if (opts.filename.len != 0) {
 		if (unlikely(opts.filename.len > memoryHardlimit))
@@ -117,14 +112,14 @@ bool instanciate(ny::compiler::Compdb& compdb, ny::Logs::Report& report, AnyStri
 	return false;
 }
 
-nyprogram_t* compile(ny::compiler::Compdb& compdb) {
+std::unique_ptr<ny::Program> compile(ny::compiler::Compdb& compdb) {
 	ny::Logs::Report report{compdb.messages};
 	Logs::Handler errorHandler{&report, &buildGenerateReport};
 	try {
 		auto& opts = compdb.opts;
 		uint32_t scount = opts.sources.count;
 		if (unlikely(scount == 0))
-			return complainNoSource(report);
+			throw "no input source code";
 		if (config::importNSL)
 			importcompdbIntrinsics(compdb.intrinsics);
 		if (config::importNSL)
@@ -163,8 +158,7 @@ nyprogram_t* compile(ny::compiler::Compdb& compdb) {
 		bool epinst = instanciate(compdb, report, AnyString(entrypoint.c_str, static_cast<uint32_t>(entrypoint.len)));
 		if (unlikely(not epinst))
 			return nullptr;
-		auto program = std::make_unique<ny::Program>();
-		return ny::Program::pointer(program.release());
+		return std::make_unique<ny::Program>();
 	}
 	catch (const std::bad_alloc& e) {
 		report.ice() << "not enough memory when compiling";
@@ -187,13 +181,14 @@ nyprogram_t* compile(nycompile_opts_t& opts) {
 	try {
 		if (opts.on_build_start)
 			opts.userdata = opts.on_build_start(opts.userdata);
-		ny::compiler::Compdb compdb{opts};
-		auto* program = compile(compdb);
+		auto compdb = std::make_unique<Compdb>(opts);
+		auto program = compile(*compdb);
 		if (opts.on_build_stop)
 			opts.on_build_stop(opts.userdata, (program ? nytrue : nyfalse));
-		if (opts.on_report and not compdb.messages.entries.empty())
-			opts.on_report(opts.userdata, reinterpret_cast<const nyreport_t*>(&compdb.messages));
-		return program;
+		if (opts.on_report and not compdb->messages.entries.empty())
+			opts.on_report(opts.userdata, reinterpret_cast<const nyreport_t*>(&compdb->messages));
+		program->compdb = std::move(compdb);
+		return ny::Program::pointer(program.release());
 	}
 	catch (...) {
 	}
