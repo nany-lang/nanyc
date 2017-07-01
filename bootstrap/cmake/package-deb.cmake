@@ -18,9 +18,10 @@ function (make_debian_control)
 	set(PACKAGE_ARCH "${opts_ARCH}")
 	set(PACKAGE_SECTION "${opts_SECTION}")
 	set(PACKAGE_DEBS "")
-	configure_file("../distrib/deb-control-debian.template" "${__pkg_deb_tmp}/deb-control-${opts_COMPONENT}")
+	set(output_file "${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${__pkg_deb_tmp}/deb-control-${opts_COMPONENT}")
+	configure_file("../distrib/deb-control-debian.template" "${output_file}")
 	install(
-		FILES "${__pkg_deb_tmp}/deb-control-${opts_COMPONENT}"
+		FILES "${output_file}"
 		DESTINATION "DEBIAN"
 		RENAME "control"
 		PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ
