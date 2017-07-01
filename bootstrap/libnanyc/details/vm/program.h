@@ -38,8 +38,8 @@ public:
 	*/
 	void printStderr(const AnyString& msg);
 
-	nyprogram_t* self();
-	const nyprogram_t* self() const;
+	nyoldprogram_t* self();
+	const nyoldprogram_t* self() const;
 
 
 public:
@@ -65,9 +65,9 @@ private:
 
 
 //! Convert a nyproject_t into a ny::Project
-vm::Program& ref(nyprogram_t* const);
+vm::Program& ref(nyoldprogram_t* const);
 //! Convert a nyproject_t into a ny::Project
-const vm::Program& ref(const nyprogram_t* const);
+const vm::Program& ref(const nyoldprogram_t* const);
 
 
 } // namespace ny

@@ -5,13 +5,13 @@
 namespace ny {
 
 
-inline vm::Program& ref(nyprogram_t* const ptr) {
+inline vm::Program& ref(nyoldprogram_t* const ptr) {
 	assert(ptr != nullptr);
 	return *(reinterpret_cast<ny::vm::Program*>(ptr));
 }
 
 
-inline const vm::Program& ref(const nyprogram_t* const ptr) {
+inline const vm::Program& ref(const nyoldprogram_t* const ptr) {
 	assert(ptr != nullptr);
 	return *(reinterpret_cast<const ny::vm::Program*>(ptr));
 }
@@ -20,13 +20,13 @@ inline const vm::Program& ref(const nyprogram_t* const ptr) {
 namespace vm {
 
 
-inline nyprogram_t* Program::self() {
-	return reinterpret_cast<nyprogram_t*>(this);
+inline nyoldprogram_t* Program::self() {
+	return reinterpret_cast<nyoldprogram_t*>(this);
 }
 
 
-inline const nyprogram_t* Program::self() const {
-	return reinterpret_cast<const nyprogram_t*>(this);
+inline const nyoldprogram_t* Program::self() const {
+	return reinterpret_cast<const nyoldprogram_t*>(this);
 }
 
 

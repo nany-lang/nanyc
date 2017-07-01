@@ -57,7 +57,7 @@ typedef struct nysource_t nysource_t;
 /*! Build */
 typedef struct nybuild_t nybuild_t;
 /*! VM Program */
-typedef struct nyprogram_t nyprogram_t;
+typedef struct nyoldprogram_t nyoldprogram_t;
 /*! VM Thread Context */
 typedef struct nythread_t nytctx_t;
 /*@}*/
@@ -482,9 +482,9 @@ struct nyio_adapter_t {
 
 typedef struct nyio_cf_t {
 	/*! event: an url has been mounted */
-	nyio_err_t (*on_mount_query)(nyprogram_t*, nytctx_t*, const char* url, const char* path, uint32_t len);
+	nyio_err_t (*on_mount_query)(nyoldprogram_t*, nytctx_t*, const char* url, const char* path, uint32_t len);
 	/*! event: create an adapter from an url */
-	nyio_err_t (*on_adapter_create)(nyprogram_t*, nytctx_t*, nyio_adapter_t**, const char* url,
+	nyio_err_t (*on_adapter_create)(nyoldprogram_t*, nytctx_t*, nyio_adapter_t**, const char* url,
 		nyio_adapter_t* parent);
 
 	/*! Flag to automatically mount some standard paths */
@@ -534,26 +534,26 @@ typedef struct nyprogram_cf_t {
 	** \brief A new program has been started
 	** return nytrue to continue the execution, nyfalse to abort it
 	*/
-	nybool_t (*on_execute)(nyprogram_t*);
+	nybool_t (*on_execute)(nyoldprogram_t*);
 
 	/*!
 	** \brief A new thread is created
 	** return nytrue to continue the execution of the thread. nyfalse to abort
 	*/
-	nybool_t (*on_thread_create)(nyprogram_t*, nytctx_t*, nythread_t* parent, const char* name, uint32_t size);
+	nybool_t (*on_thread_create)(nyoldprogram_t*, nytctx_t*, nythread_t* parent, const char* name, uint32_t size);
 	/*!
 	** \brief A thread has been destroyed
 	** \note This callback won't be called if `on_thread_create` failed
 	*/
-	void (*on_thread_destroy)(nyprogram_t*, nythread_t*);
+	void (*on_thread_destroy)(nyoldprogram_t*, nythread_t*);
 
 	/*! Error has been received during the execution of the code */
-	/* wip - void (*on_error)(const nyprogram_t*, const nybacktrace_entry_t** backtrace, uint32_t bt_len); */
+	/* wip - void (*on_error)(const nyoldprogram_t*, const nybacktrace_entry_t** backtrace, uint32_t bt_len); */
 	/*!
 	** \brief The program is terminated
 	** \note This callback won't be called if `on_execute` failed
 	*/
-	void (*on_terminate)(const nyprogram_t*, nybool_t error, int exitcode);
+	void (*on_terminate)(const nyoldprogram_t*, nybool_t error, int exitcode);
 
 	/*! IO configuration */
 	nyio_cf_t io;
@@ -569,7 +569,7 @@ typedef struct nyoldvm_t {
 	/*! Allocator */
 	nyallocator_t* allocator;
 	/*! Current program */
-	nyprogram_t* program;
+	nyoldprogram_t* program;
 	/*! Current thread */
 	nytctx_t* tctx;
 	/*! Console */
@@ -583,7 +583,7 @@ nyoldvm_t;
 **
 ** \param build A build
 */
-NY_EXPORT nyprogram_t* nyprogram_prepare(nybuild_t* build, const nyprogram_cf_t* cf);
+NY_EXPORT nyoldprogram_t* nyprogram_prepare(nybuild_t* build, const nyprogram_cf_t* cf);
 
 /*!
 ** \brief Execute a Nany program
@@ -594,19 +594,19 @@ NY_EXPORT nyprogram_t* nyprogram_prepare(nybuild_t* build, const nyprogram_cf_t*
 **    to the program/script. Arguments must use the UTF8 encoding
 ** \return Exit status code
 */
-NY_EXPORT int nyprogram_main(nyprogram_t* program, uint32_t argc, const char** argv);
+NY_EXPORT int nyprogram_main(nyoldprogram_t* program, uint32_t argc, const char** argv);
 
 
 /*!
 ** \brief Acquire a program
 ** \param program program pointer (can be null)
 */
-NY_EXPORT void nyprogram_ref(nyprogram_t* program);
+NY_EXPORT void nyprogram_ref(nyoldprogram_t* program);
 /*!
 ** \brief Unref a program and destroy it if required
 ** \param program A program pointer (can be null)
 */
-NY_EXPORT void nyprogram_unref(nyprogram_t* program);
+NY_EXPORT void nyprogram_unref(nyoldprogram_t* program);
 
 /*! Initialize a project configuration */
 NY_EXPORT void nyprogram_cf_init(nyprogram_cf_t* cf, const nybuild_cf_t*);

@@ -17,7 +17,7 @@ extern "C" void nyprogram_cf_init(nyprogram_cf_t* cf, const nybuild_cf_t* buildc
 }
 
 
-extern "C" nyprogram_t* nyprogram_prepare(nybuild_t* build, const nyprogram_cf_t* cf) {
+extern "C" nyoldprogram_t* nyprogram_prepare(nybuild_t* build, const nyprogram_cf_t* cf) {
 	if (build) {
 		std::unique_ptr<ny::vm::Program> program;
 		try {
@@ -38,7 +38,7 @@ extern "C" nyprogram_t* nyprogram_prepare(nybuild_t* build, const nyprogram_cf_t
 }
 
 
-extern "C" int nyprogram_main(nyprogram_t* ptr, uint32_t argc, const char** argv) {
+extern "C" int nyprogram_main(nyoldprogram_t* ptr, uint32_t argc, const char** argv) {
 	if (ptr and argc != 0 and argv != nullptr) {
 		auto& program = ny::ref(ptr);
 		return program.execute(argc, argv);
@@ -47,13 +47,13 @@ extern "C" int nyprogram_main(nyprogram_t* ptr, uint32_t argc, const char** argv
 }
 
 
-extern "C" void nyprogram_ref(nyprogram_t* program) {
+extern "C" void nyprogram_ref(nyoldprogram_t* program) {
 	if (program)
 		ny::ref(program).addRef();
 }
 
 
-extern "C" void nyprogram_unref(nyprogram_t* ptr) {
+extern "C" void nyprogram_unref(nyoldprogram_t* ptr) {
 	if (ptr) {
 		auto& program = ny::ref(ptr);
 		if (program.release())

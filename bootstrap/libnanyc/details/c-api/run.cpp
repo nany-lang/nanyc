@@ -30,8 +30,8 @@ template<> struct default_delete<nybuild_t> final {
 };
 
 
-template<> struct default_delete<nyprogram_t> final {
-	inline void operator () (nyprogram_t* ptr) { nyprogram_unref(ptr); }
+template<> struct default_delete<nyoldprogram_t> final {
+	inline void operator () (nyoldprogram_t* ptr) { nyprogram_unref(ptr); }
 };
 
 
@@ -62,7 +62,7 @@ std::unique_ptr<nyproject_t> createProject(const nyrun_cf_t* const runcf) {
 }
 
 
-std::unique_ptr<nyprogram_t> build(const nyrun_cf_t* const runcf, std::unique_ptr<nyproject_t> project) {
+std::unique_ptr<nyoldprogram_t> build(const nyrun_cf_t* const runcf, std::unique_ptr<nyproject_t> project) {
 	if (unlikely(!project))
 		return nullptr;
 	nybuild_cf_t cf;
@@ -94,12 +94,12 @@ std::unique_ptr<nyprogram_t> build(const nyrun_cf_t* const runcf, std::unique_pt
 	}
 	else
 		nyprogram_cf_init(&pcf, &cf);
-	return make_unique_from_ptr<nyprogram_t>(nyprogram_prepare(buildinfo.get(), &pcf));
+	return make_unique_from_ptr<nyoldprogram_t>(nyprogram_prepare(buildinfo.get(), &pcf));
 }
 
 
 //! Try to compile the input script filename
-std::unique_ptr<nyprogram_t> compileFile(const nyrun_cf_t* cf, const AnyString& argv0, String& file) {
+std::unique_ptr<nyoldprogram_t> compileFile(const nyrun_cf_t* cf, const AnyString& argv0, String& file) {
 	auto project = createProject(cf);
 	IO::Canonicalize(file, argv0);
 	auto r = nyproject_add_source_from_file_n(project.get(), file.c_str(), file.size());
@@ -110,7 +110,7 @@ std::unique_ptr<nyprogram_t> compileFile(const nyrun_cf_t* cf, const AnyString& 
 
 
 //! Try to compile a list of input files
-std::unique_ptr<nyprogram_t> compileFilelist(const nyrun_cf_t* cf, const char** list, uint32_t count) {
+std::unique_ptr<nyoldprogram_t> compileFilelist(const nyrun_cf_t* cf, const char** list, uint32_t count) {
 	auto project = createProject(cf);
 	String filename;
 	filename.reserve(1024);
@@ -125,7 +125,7 @@ std::unique_ptr<nyprogram_t> compileFilelist(const nyrun_cf_t* cf, const char** 
 
 
 //! Try to compile the input source
-std::unique_ptr<nyprogram_t> compileSource(const nyrun_cf_t* cf, const AnyString& source) {
+std::unique_ptr<nyoldprogram_t> compileSource(const nyrun_cf_t* cf, const AnyString& source) {
 	auto project = createProject(cf);
 	auto r = nyproject_add_source_n(project.get(), source.c_str(), source.size());
 	if (r == nyfalse)
@@ -134,7 +134,7 @@ std::unique_ptr<nyprogram_t> compileSource(const nyrun_cf_t* cf, const AnyString
 }
 
 
-int run(nyprogram_t* const program, const char* argv0, uint32_t argc, const char** argv) {
+int run(nyoldprogram_t* const program, const char* argv0, uint32_t argc, const char** argv) {
 	int exitstatus = exitFailure;
 	if (argc == 0 or argv == nullptr) {
 		const char* nargv[] = { argv0, nullptr };
