@@ -7,12 +7,10 @@
 namespace ny {
 namespace print {
 
-
 int noInputScript(const char* const argv0) {
 	std::cerr << argv0 << ": no input script file\n";
 	return EXIT_FAILURE;
 }
-
 
 int usage(const char* const argv0) {
 	std::cout << "Usage: " << argv0 << " [options] file...\n";
@@ -23,7 +21,6 @@ int usage(const char* const argv0) {
 	std::cout << "  --version, -v     Print the version\n\n";
 	return EXIT_SUCCESS;
 }
-
 
 int bugReportInfo() {
 	uint32_t len = 0;
@@ -36,24 +33,20 @@ int bugReportInfo() {
 	return EXIT_FAILURE;
 }
 
-
 int version() {
 	std::cout << libnanyc_version_to_cstr() << '\n';
 	return EXIT_SUCCESS;
 }
-
 
 int unknownOption(const char* const argv0, const char* const name) {
 	std::cerr << argv0 << ": unknown option '" << name << "'\n";
 	return EXIT_FAILURE;
 }
 
-
 void fileAccessError(const nyproject_t*, nybuild_t*, const char* file, uint32_t length) {
 	std::cerr << "error: failed to access to '";
 	std::cerr << AnyString{file, length} << "'\n";
 }
-
 
 } // namespace print
 } // namespace ny

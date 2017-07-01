@@ -18,7 +18,6 @@ using namespace Yuni;
 
 namespace {
 
-
 bool printAST(const AnyString filename, bool unixcolors) {
 	if (filename.empty())
 		return false;
@@ -32,16 +31,13 @@ bool printAST(const AnyString filename, bool unixcolors) {
 	return success;
 }
 
-
 int printVersion() {
 	assert(strlen(YUNI_STRINGIZE(NANY_VERSION)) >= 5 and "empty version");
 	std::cout << YUNI_STRINGIZE(NANY_VERSION) << '\n';
 	return EXIT_SUCCESS;
 }
 
-
 } // namespace
-
 
 int main(int argc, char** argv) {
 	// all input filenames
