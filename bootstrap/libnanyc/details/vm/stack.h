@@ -39,7 +39,7 @@ private:
 private:
 	static_assert(sizeof(Register) == sizeof(uint64_t), "invalid register size");
 
-	struct Chunk {
+	struct Chunk final {
 		static constexpr uint32_t blockSizeWanted = 8192u;
 
 		//! The maximum number of bytes that would fit in 2 pages block
