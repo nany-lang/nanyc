@@ -1,4 +1,4 @@
-#include "vm.h"
+#include "details/vm/machine.h"
 
 
 namespace ny {

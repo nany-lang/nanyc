@@ -1,5 +1,5 @@
 #include <nanyc/vm.h>
-#include "details/vm/vm.h"
+#include "details/vm/machine.h"
 #include "libnanyc.h"
 #include <memory>
 #include <cstring>
