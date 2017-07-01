@@ -1,0 +1,10 @@
+Package: @PACKAGE_NAME@
+Version: @PACKAGE_VERSION@
+Architecture: @PACKAGE_ARCH@
+Section: @PACKAGE_SECTION@
+Priority: optional
+Maintainer: Nanyc Team <support+debpkg@nany.io>
+Depends: @PACKAGE_DEPS@
+Installed-Size: in_kb
+Homepage: http://nany.io
+Description: @PACKAGE_DESCRIPTION@

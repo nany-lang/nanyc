@@ -5,12 +5,15 @@ set(CMAKE_DISABLE_SOURCE_CHANGES  ON)
 
 project(nany-bootstrap)
 
+option(WITH_PACKAGE_DEB "Build DEB control" OFF)
+
 include(CMakeParseArguments)
 
 # for information related to nany, see settings.txt
 
 
 include("cmake/messages.cmake")
+include(GNUInstallDirs)
 
 nmessage("nany c++/bootstrap")
 nmessage("")
@@ -41,30 +44,6 @@ add_custom_target(check
 	VERBATIM
 )
 
-add_custom_target(install-libnanyc
-	DEPENDS libnanyc
-	COMMAND
-		"${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=libnanyc"
-		-P "${CMAKE_BINARY_DIR}/cmake_install.cmake"
-)
-
-add_custom_target(install-nany
-	DEPENDS nany
-	COMMAND
-		"${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=nany"
-		-P "${CMAKE_BINARY_DIR}/cmake_install.cmake"
-)
-
-add_custom_target(install-libnanyc-dev
-  DEPENDS libnanyc
-  COMMAND
-      "${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=libnanyc-dev"
-      -P "${CMAKE_BINARY_DIR}/cmake_install.cmake"
-)
-
-add_custom_target(install-libnanyc-dev-tools
-  DEPENDS libnanyc nanyc-check-syntax nanyc-dump-ast
-  COMMAND
-      "${CMAKE_COMMAND}" "-DCMAKE_INSTALL_COMPONENT=libnanyc-dev-tools"
-      -P "${CMAKE_BINARY_DIR}/cmake_install.cmake"
-)
+if (WITH_PACKAGE_DEB)
+	include("cmake/package-deb.cmake")
+endif()
