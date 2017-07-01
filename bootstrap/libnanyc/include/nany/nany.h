@@ -65,49 +65,49 @@ typedef struct nythread_t nytctx_t;
 
 /*! \name Memory allocator */
 /*@{*/
-struct nyallocator_t;
+struct nyoldalloc_t;
 
 typedef struct nyallocator_cf_t {
 	void* userdata;
 	/*! Create a multi-threaded allocator */
-	nybool_t (*create_mt)(struct nyallocator_t*, const struct nyallocator_cf_t*);
+	nybool_t (*create_mt)(struct nyoldalloc_t*, const struct nyallocator_cf_t*);
 	/*! Create a single-threaded allocator */
-	nybool_t (*create_st)(struct nyallocator_t*, const struct nyallocator_cf_t*);
+	nybool_t (*create_st)(struct nyoldalloc_t*, const struct nyallocator_cf_t*);
 	/*! event: not enough memory */
-	void (*on_not_enough_memory)(struct nyallocator_t*, nybool_t limit_reached);
+	void (*on_not_enough_memory)(struct nyoldalloc_t*, nybool_t limit_reached);
 }
 nyallocator_cf_t;
 
-typedef struct nyallocator_t {
+typedef struct nyoldalloc_t {
 	void* userdata;
 	/*! Allocates some memory */
-	void* (*allocate)(struct nyallocator_t*, size_t);
+	void* (*allocate)(struct nyoldalloc_t*, size_t);
 	/*! Re-allocate */
-	void* (*reallocate)(struct nyallocator_t*, void* ptr, size_t oldsize, size_t newsize);
+	void* (*reallocate)(struct nyoldalloc_t*, void* ptr, size_t oldsize, size_t newsize);
 	/*! free */
-	void (*deallocate)(struct nyallocator_t*, void* ptr, size_t);
+	void (*deallocate)(struct nyoldalloc_t*, void* ptr, size_t);
 	/*! Special values that may not be used directly but are here for performance reasons */
 	volatile size_t reserved_mem0;
 	/*! Memory usage limit (in bytes) */
 	size_t limit_mem_size;
 	/*! event: not enough memory */
-	void (*on_not_enough_memory)(struct nyallocator_t*, nybool_t limit_reached);
+	void (*on_not_enough_memory)(struct nyoldalloc_t*, nybool_t limit_reached);
 	/*! event: callback for aborting program execuion */
-	void (*on_internal_abort)(struct nyallocator_t*);
+	void (*on_internal_abort)(struct nyoldalloc_t*);
 	/*! Flush STDERR */
-	void (*release)(struct nyallocator_t*);
+	void (*release)(struct nyoldalloc_t*);
 }
-nyallocator_t;
+nyoldalloc_t;
 
 
 NY_EXPORT void nyallocator_cf_init(nyallocator_cf_t*);
 
 /*! Set callbacks to the standard C memory allocator */
-NY_EXPORT void nany_memalloc_set_default(nyallocator_t*);
+NY_EXPORT void nany_memalloc_set_default(nyoldalloc_t*);
 /*! Set callbacks to the std C memory allocator with bounds checking */
-NY_EXPORT void nany_memalloc_set_with_limit(nyallocator_t*, size_t limit);
+NY_EXPORT void nany_memalloc_set_with_limit(nyoldalloc_t*, size_t limit);
 /*! Copy allocator */
-void nany_memalloc_copy(nyallocator_t* out, const nyallocator_t* const src);
+void nany_memalloc_copy(nyoldalloc_t* out, const nyoldalloc_t* const src);
 /*@}*/
 
 
@@ -190,7 +190,7 @@ void nyconsole_cf_copy(nyoldconsole_t* out, const nyoldconsole_t* const src);
 /*! Project Configuration */
 typedef struct nyproject_cf_t {
 	/*! Memory allocator */
-	nyallocator_t allocator;
+	nyoldalloc_t allocator;
 	/*! A new target has been added */
 	void (*on_target_added)(nyproject_t*, nytarget_t*, const char* name, uint32_t len);
 	/*! A target has been removed */
@@ -496,7 +496,7 @@ nyio_cf_t;
 /*!
 ** \brief Create an adapter to access to a local folder
 */
-NY_EXPORT void nyio_adapter_create_from_local_folder(nyio_adapter_t*, nyallocator_t*,
+NY_EXPORT void nyio_adapter_create_from_local_folder(nyio_adapter_t*, nyoldalloc_t*,
 	const char* localfolder, size_t len);
 /*@}*/
 
@@ -526,7 +526,7 @@ nybacktrace_entry_t;
 /*! Program Configuration */
 typedef struct nyprogram_cf_t {
 	/*! Memory allocator */
-	nyallocator_t allocator;
+	nyoldalloc_t allocator;
 	/*! Console output */
 	nyoldconsole_t console;
 
@@ -567,7 +567,7 @@ nyprogram_cf_t;
 /*! Context at runtime for native C calls */
 typedef struct nyoldvm_t {
 	/*! Allocator */
-	nyallocator_t* allocator;
+	nyoldalloc_t* allocator;
 	/*! Current program */
 	nyoldprogram_t* program;
 	/*! Current thread */
@@ -621,7 +621,7 @@ NY_EXPORT void nyprogram_cf_init(nyprogram_cf_t* cf, const nybuild_cf_t*);
 /*@{*/
 typedef struct nyrun_cf_t {
 	/*! Memory allocator */
-	nyallocator_t allocator;
+	nyoldalloc_t allocator;
 	/*! Console */
 	nyoldconsole_t console;
 	/*! Default prject settings */

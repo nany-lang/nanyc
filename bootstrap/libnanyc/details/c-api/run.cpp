@@ -54,7 +54,7 @@ std::unique_ptr<nyproject_t> createProject(const nyrun_cf_t* const runcf) {
 	nyproject_cf_t cf;
 	if (runcf) {
 		memcpy(&(cf), &(runcf->project), sizeof(nyproject_cf_t));
-		memcpy(&(cf.allocator), &(runcf->allocator), sizeof(nyallocator_t));
+		memcpy(&(cf.allocator), &(runcf->allocator), sizeof(nyoldalloc_t));
 	}
 	else
 		nyproject_cf_init(&cf);
@@ -89,7 +89,7 @@ std::unique_ptr<nyoldprogram_t> build(const nyrun_cf_t* const runcf, std::unique
 	nany_memalloc_set_default(&(pcf.allocator));
 	if (runcf) {
 		memcpy(&(pcf),           &(runcf->program),   sizeof(nyprogram_cf_t));
-		memcpy(&(pcf.allocator), &(runcf->allocator), sizeof(nyallocator_t));
+		memcpy(&(pcf.allocator), &(runcf->allocator), sizeof(nyoldalloc_t));
 		memcpy(&(pcf.console),   &(runcf->console),   sizeof(nyoldconsole_t));
 	}
 	else

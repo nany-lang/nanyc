@@ -14,7 +14,7 @@ namespace { // anonymous
 
 
 struct Internal {
-	Internal(const AnyString& localfolder, nyallocator_t* allocator)
+	Internal(const AnyString& localfolder, nyoldalloc_t* allocator)
 		: allocator(allocator) {
 		if (not System::windows) {
 			if (localfolder != '/')
@@ -33,11 +33,11 @@ struct Internal {
 	//! Temporary string for ensuring zero-terminated strings
 	String tmppath;
 	//! Memory allocator
-	nyallocator_t* const allocator;
+	nyoldalloc_t* const allocator;
 };
 
 
-inline nyallocator_t& retrieveAllocator(nyio_adapter_t* adapter) {
+inline nyoldalloc_t& retrieveAllocator(nyio_adapter_t* adapter) {
 	auto& internal = *reinterpret_cast<Internal*>(adapter->internal);
 	return *(internal.allocator);
 }
@@ -492,7 +492,7 @@ nanyc_io_localfolder_file_exists(nyio_adapter_t* adapter, const char* path, uint
 }
 
 
-extern "C" void nyio_adapter_create_from_local_folder(nyio_adapter_t* adapter, nyallocator_t* allocator,
+extern "C" void nyio_adapter_create_from_local_folder(nyio_adapter_t* adapter, nyoldalloc_t* allocator,
 		const char* lfol, size_t len) {
 	assert(adapter != nullptr);
 	assert(allocator != nullptr);

@@ -55,7 +55,7 @@ struct ContextRunner final {
 	//! all pushed parameters
 	DataRegister funcparams[config::maxPushedParameters];
 
-	nyallocator_t& allocator;
+	nyoldalloc_t& allocator;
 	DCCallVM* dyncall = nullptr;
 	nyoldvm_t cfvm;
 	nyprogram_cf_t cf;

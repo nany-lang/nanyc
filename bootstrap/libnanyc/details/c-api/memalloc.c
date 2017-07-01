@@ -8,7 +8,7 @@
 #define NANY_DEBUG_ALLOCATOR_FILL 0
 
 
-static void nyallocator_abort(nyallocator_t* allocator) {
+static void nyallocator_abort(nyoldalloc_t* allocator) {
 	if (allocator->on_not_enough_memory)
 		allocator->on_not_enough_memory(allocator, nyfalse);
 	if (allocator->on_internal_abort)
@@ -16,7 +16,7 @@ static void nyallocator_abort(nyallocator_t* allocator) {
 }
 
 
-static void* nystdmalloc_alloc(nyallocator_t* allocator, size_t size) {
+static void* nystdmalloc_alloc(nyoldalloc_t* allocator, size_t size) {
 	void* p = malloc(size);
 	if (p)
 		return p;
@@ -25,7 +25,7 @@ static void* nystdmalloc_alloc(nyallocator_t* allocator, size_t size) {
 }
 
 
-static void* nystdmalloc_reallocate(nyallocator_t* allocator, void* ptr, size_t oldsize, size_t newsize) {
+static void* nystdmalloc_reallocate(nyoldalloc_t* allocator, void* ptr, size_t oldsize, size_t newsize) {
 	(void) oldsize;
 	void* p = realloc(ptr, newsize);
 	if (p)
@@ -36,15 +36,15 @@ static void* nystdmalloc_reallocate(nyallocator_t* allocator, void* ptr, size_t 
 }
 
 
-static void nystdmalloc_deallocate(nyallocator_t* allocator, void* ptr, size_t size) {
+static void nystdmalloc_deallocate(nyoldalloc_t* allocator, void* ptr, size_t size) {
 	(void) allocator;
 	(void) size;
 	free(ptr);
 }
 
 
-static nybool_t nystdmalloc_create_mt(nyallocator_t* allocator, const nyallocator_cf_t* cf) {
-	memset(allocator, 0x0, sizeof(nyallocator_t));
+static nybool_t nystdmalloc_create_mt(nyoldalloc_t* allocator, const nyallocator_cf_t* cf) {
+	memset(allocator, 0x0, sizeof(nyoldalloc_t));
 	allocator->on_not_enough_memory = cf->on_not_enough_memory;
 	allocator->allocate = &nystdmalloc_alloc;
 	allocator->reallocate = &nystdmalloc_reallocate;
@@ -62,7 +62,7 @@ void nyallocator_cf_init(nyallocator_cf_t* cf) {
 }
 
 
-static void* nany_allocate(nyallocator_t* alloc, size_t size)
+static void* nany_allocate(nyoldalloc_t* alloc, size_t size)
 {
 	assert(0 != size);
 	assert(alloc != NULL);
@@ -77,7 +77,7 @@ static void* nany_allocate(nyallocator_t* alloc, size_t size)
 }
 
 
-static void* nany_reallocate(nyallocator_t* alloc, void* ptr, size_t oldsize, size_t newsize)
+static void* nany_reallocate(nyoldalloc_t* alloc, void* ptr, size_t oldsize, size_t newsize)
 {
 	void* p;
 
@@ -92,7 +92,7 @@ static void* nany_reallocate(nyallocator_t* alloc, void* ptr, size_t oldsize, si
 }
 
 
-static void nany_free(nyallocator_t* allocator, void* ptr, size_t size)
+static void nany_free(nyoldalloc_t* allocator, void* ptr, size_t size)
 {
 	(void) allocator;
 	(void) size;
@@ -104,7 +104,7 @@ static void nany_free(nyallocator_t* allocator, void* ptr, size_t size)
 }
 
 
-void nany_memalloc_set_default(nyallocator_t* allocator)
+void nany_memalloc_set_default(nyoldalloc_t* allocator)
 {
 	if (allocator)
 	{
@@ -124,7 +124,7 @@ void nany_memalloc_set_default(nyallocator_t* allocator)
 
 
 
-static void* nyallocator_withlimit_allocate(nyallocator_t* allocator, size_t size)
+static void* nyallocator_withlimit_allocate(nyoldalloc_t* allocator, size_t size)
 {
 	void* p;
 
@@ -155,7 +155,7 @@ static void* nyallocator_withlimit_allocate(nyallocator_t* allocator, size_t siz
 }
 
 
-static void* nyallocator_withlimit_reallocate(nyallocator_t* allocator, void* ptr, size_t oldsize, size_t newsize)
+static void* nyallocator_withlimit_reallocate(nyoldalloc_t* allocator, void* ptr, size_t oldsize, size_t newsize)
 {
 	void* p;
 
@@ -199,7 +199,7 @@ static void* nyallocator_withlimit_reallocate(nyallocator_t* allocator, void* pt
 }
 
 
-static void nyallocator_withlimit_release(nyallocator_t* allocator, void* ptr, size_t size)
+static void nyallocator_withlimit_release(nyoldalloc_t* allocator, void* ptr, size_t size)
 {
 	assert(allocator != NULL);
 	if (ptr)
@@ -215,7 +215,7 @@ static void nyallocator_withlimit_release(nyallocator_t* allocator, void* ptr, s
 }
 
 
-void nany_memalloc_set_with_limit(nyallocator_t* allocator, size_t limit)
+void nany_memalloc_set_with_limit(nyoldalloc_t* allocator, size_t limit)
 {
 	if (allocator)
 	{
@@ -230,8 +230,8 @@ void nany_memalloc_set_with_limit(nyallocator_t* allocator, size_t limit)
 }
 
 
-void nany_memalloc_copy(nyallocator_t* out, const nyallocator_t* const src)
+void nany_memalloc_copy(nyoldalloc_t* out, const nyoldalloc_t* const src)
 {
 	if (out)
-		memcpy(out, src, sizeof(nyallocator_t));
+		memcpy(out, src, sizeof(nyoldalloc_t));
 }
