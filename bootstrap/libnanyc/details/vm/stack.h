@@ -20,7 +20,7 @@ public:
 	/*!
 	** \brief Push a new frame and allocates registers
 	*/
-	DataRegister* push(uint32_t count);
+	Register* push(uint32_t count);
 
 	/*!
 	** \brief Remove the last frame
@@ -37,21 +37,21 @@ private:
 	void dump(const AnyString& action, uint32_t count) const;
 
 private:
-	static_assert(sizeof(DataRegister) == sizeof(uint64_t), "invalid register size");
+	static_assert(sizeof(Register) == sizeof(uint64_t), "invalid register size");
 
 	struct Chunk {
 		static constexpr uint32_t blockSizeWanted = 8192u;
 
 		//! The maximum number of bytes that would fit in 2 pages block
 		static constexpr uint32_t blockmax =
-			static_cast<uint32_t>((blockSizeWanted - sizeof(void*) * 4) / sizeof(DataRegister));
+			static_cast<uint32_t>((blockSizeWanted - sizeof(void*) * 4) / sizeof(Register));
 
 		uint32_t remains;
 		uint32_t capacity;
 		Chunk* previous;
-		DataRegister* cursor;
+		Register* cursor;
 
-		DataRegister block[blockmax]; // [capacity]
+		Register block[blockmax]; // [capacity]
 		// warning: the size of this struct might be bigger than expected
 		// the real size of 'block' is 'capacity', which can be greater than 'blockmax'
 		// to accept legit big stack requests

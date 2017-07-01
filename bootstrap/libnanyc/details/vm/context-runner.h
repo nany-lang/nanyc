@@ -47,13 +47,13 @@ struct ContextRunner final {
 	struct DyncallError final: public Exception {};
 
 	//! Registers for the current stack frame
-	DataRegister* registers = nullptr;
+	Register* registers = nullptr;
 	//! Return value
 	uint64_t retRegister = 0;
 	//! Number of pushed parameters
 	uint32_t funcparamCount = 0; // parameters are 2-based
 	//! all pushed parameters
-	DataRegister funcparams[config::maxPushedParameters];
+	Register funcparams[config::maxPushedParameters];
 
 	nyoldalloc_t& allocator;
 	DCCallVM* dyncall = nullptr;

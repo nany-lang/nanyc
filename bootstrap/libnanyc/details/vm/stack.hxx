@@ -7,7 +7,7 @@ namespace ny {
 namespace vm {
 
 
-inline DataRegister* Stack::push(uint32_t count) {
+inline Register* Stack::push(uint32_t count) {
 	#if NANY_vm_STACK_TRACES != 0
 	++frameCount;
 	dump("push +", count);
@@ -16,9 +16,9 @@ inline DataRegister* Stack::push(uint32_t count) {
 	if (unlikely(current->remains < count))
 		pushNewChunk(count);
 	// the current
-	DataRegister* registers = current->cursor;
+	Register* registers = current->cursor;
 	if (Yuni::debugmode)
-		memset(registers, 0xDE, sizeof(DataRegister) * count);
+		memset(registers, 0xDE, sizeof(Register) * count);
 	current->cursor  += count;
 	current->remains -= count;
 	assert(registers >= current->block);
