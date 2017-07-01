@@ -7,7 +7,7 @@
 #include <yuni/io/directory/info.h>
 #include <yuni/datetime/timestamp.h>
 #include <yuni/core/logs/logs.h>
-#include "nany/nany.h"
+#include "nanyc/utils.h"
 #include <algorithm>
 #include <yuni/datetime/timestamp.h>
 #include <iostream>
@@ -197,7 +197,7 @@ bool batchCheckIfFilenamesConformToGrammar(Settings& settings) {
 		}
 		// PARSE
 		int64_t start = DateTime::NowMilliSeconds();
-		bool success = (nytrue == nytry_parse_file_n(file.c_str(), file.size()));
+		bool success = (nytrue == nyparse_check_file(file.c_str(), file.size()));
 		duration = DateTime::NowMilliSeconds() - start;
 		success = (success == expected);
 		if (success and duration < 300) {

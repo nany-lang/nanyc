@@ -617,57 +617,6 @@ NY_EXPORT void nyprogram_cf_init(nyprogram_cf_t* cf, const nybuild_cf_t*);
 
 
 
-/*! \name Utilities */
-/*@{*/
-/*!
-** \brief Print the AST of a nany source file
-**
-** \warning Writing to the same FD by multiple threads is not thread-safe on all platforms
-*/
-nybool_t nyprint_ast_from_file(const char* filename, int fd, nybool_t unixcolors);
-
-/*!
-** \brief Print the AST of a nany source file
-**
-** \warning Writing to the same FD by multiple threads is not thread-safe on all platforms
-*/
-NY_EXPORT nybool_t nyprint_ast_from_file_n(const char* filename, size_t length, int fd, nybool_t unixcolors);
-
-/*!
-** \brief Print the AST of some nany code in memory
-**
-** \warning Writing to the same FD by multiple threads is not thread-safe on all platforms
-** \param content Arbitrary utf-8 content (c-string)
-*/
-NY_EXPORT nybool_t nyprint_ast_from_memory(const char* content, int fd, nybool_t unixcolors);
-/*!
-** \brief Print the AST of some nany code in memory
-**
-** \warning Writing to the same FD by multiple threads is not thread-safe on all platforms
-** \param content Arbitrary utf-8 content (c-string)
-*/
-NY_EXPORT  nybool_t nyprint_ast_from_memory_n(const char* content, size_t length, int fd,
-	nybool_t unixcolors);
-
-/*!
-** \brief Check if a filename is a valid nany source code
-**
-** \param filename An arbitrary filename (utf-8 c-string)
-** \return nytrue if the file has been successfully parsed, false otherwise
-*/
-NY_EXPORT nybool_t nytry_parse_file(const char* const filename);
-/*!
-** \brief Check if a filename is a valid nany source code
-**
-** \param filename An arbitrary filename (utf-8 c-string)
-** \param length Length of the filename
-** \return nytrue if the file has been successfully parsed, false otherwise
-*/
-NY_EXPORT nybool_t nytry_parse_file_n(const char* filename, size_t length);
-
-
-
-
 /*! \name Convenient wrappers */
 /*@{*/
 typedef struct nyrun_cf_t {
