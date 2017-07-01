@@ -1,4 +1,5 @@
 #include "nanyc-utils.h"
+#include <nanyc/library.h>
 #include <yuni/string.h>
 #include <iostream>
 
@@ -25,13 +26,19 @@ int usage(const char* const argv0) {
 
 
 int bugReportInfo() {
-	nylib_print_info_for_bugreport();
-	return EXIT_SUCCESS;
+	uint32_t len = 0;
+	char* report = libnanyc_get_bugreportdetails(&len);
+	if (report != nullptr) {
+		std::cout.write(report, len);
+		free(report);
+		return EXIT_SUCCESS;
+	}
+	return EXIT_FAILURE;
 }
 
 
 int version() {
-	std::cout << nylib_version() << '\n';
+	std::cout << libnanyc_version_to_cstr() << '\n';
 	return EXIT_SUCCESS;
 }
 

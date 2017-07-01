@@ -230,7 +230,6 @@ add_library(libnanyc ${mode_libnany}
 	"details/atom/vardef.h"
 	"details/atom/visibility.cpp"
 	"details/atom/visibility.h"
-	"details/c-api/bugreport.cpp"
 	"details/c-api/build.cpp"
 	"details/c-api/common-debuginfo.hxx"
 	"details/c-api/console.cpp"
