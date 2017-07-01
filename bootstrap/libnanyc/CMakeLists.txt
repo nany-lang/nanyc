@@ -429,6 +429,8 @@ add_library(libnanyc ${mode_libnany}
 	"details/vm/stacktrace.cpp"
 	"details/vm/stacktrace.h"
 	"details/vm/stacktrace.hxx"
+	"details/vm/thread.cpp"
+	"details/vm/thread.h"
 	"details/vm/types.h"
 	"include/nany/nany.h"
 	"include/nanyc/allocator.h"

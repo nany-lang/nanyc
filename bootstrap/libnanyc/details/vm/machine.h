@@ -15,7 +15,6 @@ struct Machine final {
 
 	nyvm_opts_t opts;
 	const ny::Program& program;
-	nyvm_t vmcx;
 };
 
 } // namespace vm

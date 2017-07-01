@@ -17,7 +17,15 @@ extern "C" {
 #endif
 
 
-typedef struct nyvm_t nyvm_t;
+typedef struct nyvmthread_t {
+	void* userdata;
+	nyallocator_t allocator;
+	nyconsole_t cout;
+	nyconsole_t cerr;
+	const nyprogram_t* program;
+	void* internal;
+}
+nyvmthread_t;
 
 typedef struct nyvm_opts_t {
 	void* userdata;
@@ -26,11 +34,6 @@ typedef struct nyvm_opts_t {
 	nyconsole_t cerr;
 }
 nyvm_opts_t;
-
-struct nyvm_t {
-	nyvm_opts_t* opts;
-	void* internal;
-};
 
 /*!
 ** \brief Run the program
