@@ -22,25 +22,25 @@ variables:
     tags:
         - linux
 
-~centos-7:
+~centos-7.3-amd64:
     <<: *debug-build-linux
-    image: registry.gitlab.com/nany-lang/nanyc:centos-7
+    image: registry.gitlab.com/nany-lang/nanyc/build/centos:7.3-amd64
 
-~debian-8:
+~debian-8-amd64:
     <<: *debug-build-linux
-    image: registry.gitlab.com/nany-lang/nanyc:debian-8
+    image: registry.gitlab.com/nany-lang/nanyc/build/debian:8-amd64
 
-~debian-9:
+~debian-9-amd64:
     <<: *debug-build-linux
-    image: registry.gitlab.com/nany-lang/nanyc:debian-9
+    image: registry.gitlab.com/nany-lang/nanyc/build/debian:9-amd64
 
-~ubuntu-16.04:
+~ubuntu-16.04-amd64:
     <<: *debug-build-linux
-    image: registry.gitlab.com/nany-lang/nanyc:ubuntu-16.04
+    image: registry.gitlab.com/nany-lang/nanyc/build/ubuntu:16.04-amd64
 
-~ubuntu-17.04:
+~ubuntu-17.04-amd64:
     <<: *debug-build-linux
-    image: registry.gitlab.com/nany-lang/nanyc:ubuntu-17.04
+    image: registry.gitlab.com/nany-lang/nanyc/build/ubuntu:17.04-amd64
 
 
 # packages
@@ -78,21 +78,21 @@ variables:
     tags:
         - linux
 
-debian-8:
+debian-8-amd64:
     <<: *build-pkg-linux-deb
-    image: registry.gitlab.com/nany-lang/nanyc:debian-8
+    image: registry.gitlab.com/nany-lang/nanyc/build/debian:8-amd64
 
-debian-9:
+debian-9-amd64:
     <<: *build-pkg-linux-deb
-    image: registry.gitlab.com/nany-lang/nanyc:debian-9
+    image: registry.gitlab.com/nany-lang/nanyc/build/debian:9-amd64
 
-ubuntu-16.04:
+ubuntu-16.04-amd64:
     <<: *build-pkg-linux-deb
-    image: registry.gitlab.com/nany-lang/nanyc:ubuntu-16.04
+    image: registry.gitlab.com/nany-lang/nanyc/build/ubuntu:16.04-amd64
 
-ubuntu-17.04:
+ubuntu-17.04-amd64:
     <<: *build-pkg-linux-deb
-    image: registry.gitlab.com/nany-lang/nanyc:ubuntu-17.04
+    image: registry.gitlab.com/nany-lang/nanyc/build/ubuntu:17.04-amd64
 
 
 # artifacts
