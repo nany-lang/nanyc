@@ -438,6 +438,7 @@ add_library(libnanyc ${mode_libnany}
 	"include/nanyc/program.h"
 	"include/nanyc/report.h"
 	"include/nanyc/types.h"
+	"include/nanyc/utils.h"
 	"include/nanyc/vm.h"
 	"libnanyc.h"
 	${nysrc_nsl_stdcore}
@@ -448,6 +449,7 @@ add_library(libnanyc ${mode_libnany}
 	"library.c"
 	"program.cpp"
 	"report.cpp"
+	"utils.cpp"
 	"vm.cpp"
 )
 
