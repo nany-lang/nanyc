@@ -7,8 +7,6 @@
 #include <iostream>
 
 
-#define NY_VM_PRINT_OPCODES 0
-
 #if defined(__GNUC__)
 #  define NYVM_NOINLINE  __attribute__((noinline))
 #elif defined(_MSC_VER) && _MSC_VER>=1310
@@ -21,6 +19,8 @@ namespace ny {
 namespace vm {
 
 namespace {
+
+constexpr bool printOpcodes = true;
 
 struct InvalidLabel final {
 	InvalidLabel(uint32_t atomid, uint32_t label): atomid(atomid), label(label) {}
@@ -80,9 +80,7 @@ struct Executor final {
 		void registerCount(uint32_t) {}
 		constexpr uint32_t registerCount() const { return 0; }
 		#endif
-		#if NY_VM_PRINT_OPCODES != 0
 		uint32_t calldepth = 0;
-		#endif
 	}
 	dbg;
 
@@ -123,13 +121,11 @@ struct Executor final {
 	}
 
 	template<class O> void printOpcode(const O& opr) const {
-		#if NY_VM_PRINT_OPCODES != 0
-		std::cout << "== nanyc:vm d:" << dbg.calldepth << " +";
-		std::cout << ircode.get().offsetOf(opr) << "  == ";
-		std::cout << ny::ir::isa::print(ircode.get(), opr, &map) << '\n';
-		#else
-		(void) opr;
-		#endif
+		if (printOpcodes) {
+			std::cout << "== nanyc:vm d:" << dbg.calldepth << " +";
+			std::cout << ircode.get().offsetOf(opr) << "  == ";
+			std::cout << ny::ir::isa::print(ircode.get(), opr, &map) << '\n';
+		}
 	}
 
 	void returnFromCurrentFunc(uint64_t val = 0) {
@@ -735,13 +731,13 @@ void Executor::destroy(uint64_t* object, uint32_t dtorid) {
 
 void Executor::call(uint32_t retlvid, uint32_t atomfunc, uint32_t instanceid) {
 	assert(retlvid == 0 or retlvid < dbg.registerCount());
-	#if NY_VM_PRINT_OPCODES != 0
-	std::cout << "== ny:vm >>  registers before call\n";
-	for (uint32_t r = 0; r != dbg.registerCount(); ++r)
-		std::cout << "== ny:vm >>     reg %" << r << " = " << registers[r].u64 << "\n";
-	std::cout << "== ny:vm >> " << (++dbg.calldepth) << " entering func atom:" << atomfunc;
-	std::cout << ", instance: " << instanceid << '\n';
-	#endif
+	if (printOpcodes) {
+		std::cout << "== ny:vm >>  registers before call\n";
+		for (uint32_t r = 0; r != dbg.registerCount(); ++r)
+			std::cout << "== ny:vm >>     reg %" << r << " = " << registers[r].u64 << "\n";
+		std::cout << "== ny:vm >> " << (++dbg.calldepth) << " entering func atom:" << atomfunc;
+		std::cout << ", instance: " << instanceid << '\n';
+	}
 	// save the current stack frame
 	auto* storestackptr = registers;
 	auto storeircode = std::cref(ircode);
@@ -777,10 +773,10 @@ void Executor::call(uint32_t retlvid, uint32_t atomfunc, uint32_t instanceid) {
 	dbg.registerCount(storestckfrmsize);
 	stacktrace.pop();
 	allocator.tracker.atomid(memcheckPreviousAtomid);
-	#if NY_VM_PRINT_OPCODES != 0
-	std::cout << "== ny:vm << " << dbg.calldepth << " returned from func call\n";
-	--dbg.calldepth;
-	#endif
+	if (printOpcodes) {
+		std::cout << "== ny:vm << " << dbg.calldepth << " returned from func call\n";
+		--dbg.calldepth;
+	}
 }
 
 } // namespace
