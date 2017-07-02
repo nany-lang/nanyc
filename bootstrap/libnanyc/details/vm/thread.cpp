@@ -80,6 +80,9 @@ struct Executor final {
 		void registerCount(uint32_t) {}
 		constexpr uint32_t registerCount() const { return 0; }
 		#endif
+		#if NY_VM_PRINT_OPCODES != 0
+		uint32_t calldepth = 0;
+		#endif
 	}
 	dbg;
 
@@ -121,9 +124,9 @@ struct Executor final {
 
 	template<class O> void printOpcode(const O& opr) const {
 		#if NY_VM_PRINT_OPCODES != 0
-		std::cout << "== nanyc:vm +"
-			<< ircode.get().offsetOf(opr) << "  == "
-			<< ny::ir::isa::print(ircode.get(), opr, &map) << '\n';
+		std::cout << "== nanyc:vm d:" << dbg.calldepth << " +";
+		std::cout << ircode.get().offsetOf(opr) << "  == ";
+		std::cout << ny::ir::isa::print(ircode.get(), opr, &map) << '\n';
 		#else
 		(void) opr;
 		#endif
@@ -734,9 +737,9 @@ void Executor::call(uint32_t retlvid, uint32_t atomfunc, uint32_t instanceid) {
 	assert(retlvid == 0 or retlvid < dbg.registerCount());
 	#if NY_VM_PRINT_OPCODES != 0
 	std::cout << "== ny:vm >>  registers before call\n";
-	for (uint32_t r = 0; r != registerCount(); ++r)
+	for (uint32_t r = 0; r != dbg.registerCount(); ++r)
 		std::cout << "== ny:vm >>     reg %" << r << " = " << registers[r].u64 << "\n";
-	std::cout << "== ny:vm >>  entering func atom:" << atomfunc;
+	std::cout << "== ny:vm >> " << (++dbg.calldepth) << " entering func atom:" << atomfunc;
 	std::cout << ", instance: " << instanceid << '\n';
 	#endif
 	// save the current stack frame
@@ -775,7 +778,8 @@ void Executor::call(uint32_t retlvid, uint32_t atomfunc, uint32_t instanceid) {
 	stacktrace.pop();
 	allocator.tracker.atomid(memcheckPreviousAtomid);
 	#if NY_VM_PRINT_OPCODES != 0
-	std::cout << "== ny:vm <<  returned from func call\n";
+	std::cout << "== ny:vm << " << dbg.calldepth << " returned from func call\n";
+	--dbg.calldepth;
 	#endif
 }
 
