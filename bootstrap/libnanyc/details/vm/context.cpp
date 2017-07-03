@@ -74,7 +74,7 @@ bool Context::initializeFirstTContext() {
 	io.cwd = "/home";
 	// fallback filesystem
 	io.fallback.path.clear(); // just in case
-	initFallbackAdapter(io.fallback.adapter);
+	nyio_adapter_init_dummy(&io.fallback.adapter);
 	// reset mountpoints
 	io.mountpointSize = 0;
 	String path;

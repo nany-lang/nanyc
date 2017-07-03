@@ -78,10 +78,6 @@ public:
 	nyprogram_cf_t& cf;
 	//! Thread name
 	Yuni::ShortString64 name;
-
-private:
-	void initFallbackAdapter(nyio_adapter_t& adapter);
-
 }; // struct Context
 
 

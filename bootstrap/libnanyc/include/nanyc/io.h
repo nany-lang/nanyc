@@ -139,6 +139,10 @@ struct nyio_adapter_t {
 */
 NY_EXPORT void nyio_adapter_init_localfolder(nyio_adapter_t*, const char*, size_t);
 
+//! Initialize a dummy adapter
+NY_EXPORT void nyio_adapter_init_dummy(nyio_adapter_t*);
+
+
 #ifdef __cplusplus
 }
 #endif
