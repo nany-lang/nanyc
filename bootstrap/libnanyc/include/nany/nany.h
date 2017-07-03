@@ -512,8 +512,6 @@ nyprogram_cf_t;
 
 /*! Context at runtime for native C calls */
 typedef struct nyoldvm_t {
-	/*! Current program */
-	nyoldprogram_t* program;
 	/*! Current thread */
 	nytctx_t* tctx;
 	/*! Console */
