@@ -9,8 +9,7 @@ namespace vm {
 
 
 ContextRunner::ContextRunner(Context& context, const ir::Sequence& callee)
-	: allocator(context.program.cf.allocator)
-	, cf(context.program.cf)
+	: cf(context.program.cf)
 	, context(context)
 	, map(context.program.map)
 	, ircode(std::cref(callee))
@@ -23,7 +22,6 @@ void ContextRunner::initialize() {
 	if (unlikely(!dyncall))
 		throw DyncallError();
 	dcMode(dyncall, DC_CALL_C_DEFAULT);
-	cfvm.allocator = &allocator;
 	cfvm.program = context.program.self();
 	cfvm.tctx = context.self();
 	cfvm.console = &cf.console;
@@ -38,7 +36,7 @@ ContextRunner::~ContextRunner() {
 
 
 void ContextRunner::abortMission() {
-	memchecker.releaseAll(allocator); // prevent memory leak reports
+	memchecker.releaseAll(); // prevent memory leak reports
 	stacktrace.dump(context.cf, map);
 	throw Abort();
 }
@@ -265,7 +263,7 @@ void ContextRunner::visit(const ir::isa::Operand<ir::isa::Op::memrealloc>& opr) 
 			return emitPointerSizeMismatch(object, oldsize);
 		memchecker.forget(object);
 	}
-	auto* newptr = (uint64_t*) allocator.reallocate(&allocator, object, oldsize, newsize);
+	auto* newptr = (uint64_t*) realloc(object, newsize);
 	registers[opr.lvid].u64 = reinterpret_cast<uintptr_t>(newptr);
 	if (newptr) {
 		// the nointer has been successfully reallocated - keeping a reference

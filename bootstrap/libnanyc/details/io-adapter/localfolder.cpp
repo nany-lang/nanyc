@@ -14,8 +14,7 @@ namespace { // anonymous
 
 
 struct Internal {
-	Internal(const AnyString& localfolder, nyoldalloc_t* allocator)
-		: allocator(allocator) {
+	Internal(const AnyString& localfolder) {
 		if (not System::windows) {
 			if (localfolder != '/')
 				localpath = localfolder;
@@ -32,15 +31,7 @@ struct Internal {
 	String localpath;
 	//! Temporary string for ensuring zero-terminated strings
 	String tmppath;
-	//! Memory allocator
-	nyoldalloc_t* const allocator;
 };
-
-
-inline nyoldalloc_t& retrieveAllocator(nyio_adapter_t* adapter) {
-	auto& internal = *reinterpret_cast<Internal*>(adapter->internal);
-	return *(internal.allocator);
-}
 
 
 String& toLocalPath(nyio_adapter_t* adapter, const char* path, uint32_t len) {
@@ -93,7 +84,7 @@ static void nanyc_io_localfolder_clone(nyio_adapter_t* parent, nyio_adapter_t* d
 	assert(parent != nullptr);
 	memcpy(dst, parent, sizeof(nyio_adapter_t));
 	auto& internal = *reinterpret_cast<Internal*>(parent->internal);
-	dst->internal = new Internal{internal.localpath, internal.allocator};
+	dst->internal = new Internal{internal.localpath};
 }
 
 
@@ -245,10 +236,9 @@ nyio_err_t get_contents_by_small_chunks(IO::File::Stream& f, nyio_adapter_t* ada
 	constexpr static uint32_t fragmentSize = 1024;
 	uint64 readsize = 0;
 	uint64_t newcapacity = 0;
-	auto& allocator = retrieveAllocator(adapter);
 	char* buffer = nullptr;
 	do {
-		buffer = (char*) allocator.reallocate(&allocator, buffer, newcapacity, newcapacity + fragmentSize);
+		buffer = (char*) realloc(buffer, newcapacity + fragmentSize);
 		if (YUNI_UNLIKELY(!buffer))
 			return nyioe_memory;
 		uint64 numread = f.read(buffer + newcapacity, fragmentSize);
@@ -261,13 +251,13 @@ nyio_err_t get_contents_by_small_chunks(IO::File::Stream& f, nyio_adapter_t* ada
 	if (readsize != 0) {
 		// ensuring that there is enough space
 		if (newcapacity < readsize + ny::config::extraObjectSize)
-			buffer = (char*) allocator.reallocate(&allocator, buffer, newcapacity, newcapacity + fragmentSize);
+			buffer = (char*) realloc(buffer, newcapacity + fragmentSize);
 		*size = readsize;
 		*content = buffer;
 		*capacity = newcapacity;
 	}
 	else
-		allocator.deallocate(&allocator, buffer, newcapacity);
+		free(buffer);
 	return nyioe_ok;
 }
 
@@ -309,13 +299,12 @@ static nyio_err_t nanyc_io_localfolder_file_get_contents(nyio_adapter_t* adapter
 	char* buffer;
 	if (filesize < fragmentSize) {
 		newcapacity = filesize + ny::config::extraObjectSize;
-		auto& allocator = retrieveAllocator(adapter);
-		buffer = (char*) allocator.allocate(&allocator, newcapacity);
+		buffer = (char*) malloc(newcapacity);
 		if (YUNI_UNLIKELY(!buffer))
 			return nyioe_memory;
 		uint64_t numread = f.read(buffer, filesize);
 		if (numread != filesize) {
-			allocator.deallocate(&allocator, buffer, newcapacity);
+			free(buffer);
 			return nyioe_access;
 		}
 	}
@@ -326,8 +315,7 @@ static nyio_err_t nanyc_io_localfolder_file_get_contents(nyio_adapter_t* adapter
 		if (newcapacity < filesize + ny::config::extraObjectSize)
 			newcapacity += fragmentSize;
 		assert(newcapacity >= filesize);
-		auto& allocator = retrieveAllocator(adapter);
-		buffer = (char*) allocator.allocate(&allocator, newcapacity);
+		buffer = (char*) malloc(newcapacity);
 		if (YUNI_UNLIKELY(!buffer))
 			return nyioe_memory;
 		uint64_t offset = 0;
@@ -492,10 +480,9 @@ nanyc_io_localfolder_file_exists(nyio_adapter_t* adapter, const char* path, uint
 }
 
 
-extern "C" void nyio_adapter_create_from_local_folder(nyio_adapter_t* adapter, nyoldalloc_t* allocator,
+extern "C" void nyio_adapter_create_from_local_folder(nyio_adapter_t* adapter,
 		const char* lfol, size_t len) {
 	assert(adapter != nullptr);
-	assert(allocator != nullptr);
 	if (YUNI_UNLIKELY(!adapter or !adapter))
 		return;
 	memset(adapter, 0x0, sizeof(nyio_adapter_t));
@@ -504,7 +491,7 @@ extern "C" void nyio_adapter_create_from_local_folder(nyio_adapter_t* adapter, n
 		localfolder.adapt(lfol, static_cast<uint32_t>(len));
 	if (YUNI_UNLIKELY(localfolder.empty()))
 		localfolder = "/";
-	adapter->internal = new Internal{localfolder, allocator};
+	adapter->internal = new Internal{localfolder};
 	adapter->release  = nanyc_io_localfolder_release;
 	adapter->clone    = nanyc_io_localfolder_clone;
 	adapter->stat = nanyc_io_localfolder_stat;

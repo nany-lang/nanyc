@@ -26,21 +26,4 @@ inline const Project& ref(const nyproject_t* const ptr) {
 	return *(reinterpret_cast<const ny::Project*>(ptr));
 }
 
-
-template<class T, typename... Args> inline T* Project::allocate(Args&& ... args) {
-	T* object = (T*) cf.allocator.allocate(&cf.allocator, sizeof(T));
-	if (YUNI_UNLIKELY(!object))
-		throw std::bad_alloc();
-	new (object) T(std::forward<Args>(args)...);
-	return object;
-}
-
-
-template<class T> inline void Project::deallocate(T* object) {
-	assert(object != nullptr);
-	object->~T();
-	cf.allocator.deallocate(&cf.allocator, object, sizeof(T));
-}
-
-
 } // namespace ny

@@ -52,10 +52,8 @@ inline std::unique_ptr<T> make_unique_from_ptr(T* pointer) {
 //! Create a new nany project
 std::unique_ptr<nyproject_t> createProject(const nyrun_cf_t* const runcf) {
 	nyproject_cf_t cf;
-	if (runcf) {
+	if (runcf)
 		memcpy(&(cf), &(runcf->project), sizeof(nyproject_cf_t));
-		memcpy(&(cf.allocator), &(runcf->allocator), sizeof(nyoldalloc_t));
-	}
 	else
 		nyproject_cf_init(&cf);
 	return make_unique_from_ptr<nyproject_t>(nyproject_create(&cf));
@@ -86,10 +84,8 @@ std::unique_ptr<nyoldprogram_t> build(const nyrun_cf_t* const runcf, std::unique
 	if (unlikely(verbose))
 		nybuild_print_report_to_console(buildinfo.get(), nytrue);
 	nyprogram_cf_t pcf;
-	nany_memalloc_set_default(&(pcf.allocator));
 	if (runcf) {
 		memcpy(&(pcf),           &(runcf->program),   sizeof(nyprogram_cf_t));
-		memcpy(&(pcf.allocator), &(runcf->allocator), sizeof(nyoldalloc_t));
 		memcpy(&(pcf.console),   &(runcf->console),   sizeof(nyoldconsole_t));
 	}
 	else
@@ -234,11 +230,6 @@ extern "C" void nyrun_cf_init(nyrun_cf_t* cf) {
 	if (cf) {
 		// reset the whole struct
 		memset(cf, 0x0, sizeof(nyrun_cf_t));
-		size_t limit = static_cast<size_t>(System::Environment::ReadAsUInt64("NANY_MEMORY_LIMIT"));
-		if (0 == limit)
-			nany_memalloc_set_default(&(cf->allocator));
-		else
-			nany_memalloc_set_with_limit(&(cf->allocator), limit);
 		cf->build.entrypoint.len  = 4;
 		cf->build.entrypoint.c_str = "main";
 		cf->program.entrypoint = cf->build.entrypoint;
@@ -252,7 +243,5 @@ extern "C" void nyrun_cf_release(nyrun_cf_t* cf) {
 	if (cf) {
 		if (cf->console.release)
 			cf->console.release(&(cf->console));
-		if (cf->allocator.release)
-			cf->allocator.release(&(cf->allocator));
 	}
 }

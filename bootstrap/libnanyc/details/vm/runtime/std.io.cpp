@@ -293,8 +293,7 @@ static nyfile_t* nanyc_io_file_open(nyoldvm_t* vm, const char* path, uint32_t le
 								 to_nybool(readm), to_nybool(writem), to_nybool(appendm), to_nybool(truncm));
 	if (unlikely(fd == adapter.invalid_fd))
 		return nullptr;
-	auto* allocator = vm->allocator;
-	auto* f = (nyfile_t*) allocator->allocate(allocator, sizeof(struct nyfile_t));
+	auto* f = (nyfile_t*) malloc(sizeof(struct nyfile_t));
 	if (unlikely(!f)) {
 		adapter.file_close(fd);
 		return nullptr;
@@ -305,14 +304,13 @@ static nyfile_t* nanyc_io_file_open(nyoldvm_t* vm, const char* path, uint32_t le
 }
 
 
-static void nanyc_io_file_close(nyoldvm_t* vm, nyfile_t* file) {
+static void nanyc_io_file_close(nyoldvm_t* /*vm*/, nyfile_t* file) {
 	assert(file != nullptr);
 	assert(file->adapter != nullptr);
 	// close the file handle
 	file->adapter->file_close(file->fd);
 	// release internal struct
-	auto* allocator = vm->allocator;
-	allocator->deallocate(allocator, file, sizeof(struct nyfile_t));
+	free(file); // sizeof(struct nyfile_t));
 }
 
 
@@ -375,7 +373,7 @@ static bool nanyc_io_mount_local(nyoldvm_t* vm, const char* path, uint32_t len, 
 	if (path and len and local and locallen) {
 		auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->tctx);
 		nyio_adapter_t adapter;
-		nyio_adapter_create_from_local_folder(&adapter, &tc.cf.allocator, local, locallen);
+		nyio_adapter_create_from_local_folder(&adapter, local, locallen);
 		bool success = tc.io.addMountpoint(AnyString{path, len}, adapter);
 		if (adapter.release)
 			adapter.release(&adapter);

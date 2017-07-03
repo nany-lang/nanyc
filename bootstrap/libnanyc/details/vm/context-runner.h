@@ -55,7 +55,6 @@ struct ContextRunner final {
 	//! all pushed parameters
 	Register funcparams[config::maxPushedParameters];
 
-	nyoldalloc_t& allocator;
 	DCCallVM* dyncall = nullptr;
 	nyoldvm_t cfvm;
 	nyprogram_cf_t cf;
@@ -96,13 +95,13 @@ public:
 
 
 	template<class T> T* allocateraw(size_t size) {
-		return (T*) allocator.allocate(&allocator, size);
+		return (T*) malloc(size);
 	}
 
 
-	void deallocate(void* object, size_t size) {
+	void deallocate(void* object, size_t /*size*/) {
 		assert(object != nullptr);
-		allocator.deallocate(&allocator, object, size);
+		free(object);
 	}
 
 

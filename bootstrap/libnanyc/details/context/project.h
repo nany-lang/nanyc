@@ -19,12 +19,6 @@ public:
 	nyproject_t* self();
 	const nyproject_t* self() const;
 
-	//! Allocate a new object
-	template<class T, typename... Args> T* allocate(Args&& ... args);
-	//! delete an object
-	template<class T> void deallocate(T* object);
-
-
 	Project& operator = (const Project&) = delete;
 
 

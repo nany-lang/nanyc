@@ -233,7 +233,6 @@ add_library(libnanyc ${mode_libnany}
 	"details/c-api/build.cpp"
 	"details/c-api/common-debuginfo.hxx"
 	"details/c-api/console.cpp"
-	"details/c-api/memalloc.c"
 	"details/c-api/print-ast.cpp"
 	"details/c-api/program.cpp"
 	"details/c-api/project.cpp"
