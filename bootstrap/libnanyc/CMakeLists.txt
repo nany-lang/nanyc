@@ -407,6 +407,8 @@ add_library(libnanyc ${mode_libnany}
 	"details/vm/context.cpp"
 	"details/vm/context.h"
 	"details/vm/context.hxx"
+	"details/vm/io.cpp"
+	"details/vm/io.h"
 	"details/vm/machine.cpp"
 	"details/vm/machine.h"
 	"details/vm/memchecker.cpp"

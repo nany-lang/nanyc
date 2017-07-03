@@ -1,6 +1,7 @@
 #pragma once
 #include "details/vm/machine.h"
 #include "details/ir/sequence.h"
+#include "details/vm/io.h"
 #include "libnanyc-config.h"
 
 
@@ -17,6 +18,7 @@ struct Thread final {
 	void execute(const ny::ir::Sequence&);
 
 	nyvmthread_t capi;
+	ny::vm::IO io;
 	ny::vm::Machine& machine;
 };
 
