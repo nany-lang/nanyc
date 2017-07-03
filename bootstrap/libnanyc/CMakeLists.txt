@@ -434,6 +434,7 @@ add_library(libnanyc ${mode_libnany}
 	"include/nany/nany.h"
 	"include/nanyc/allocator.h"
 	"include/nanyc/console.h"
+	"include/nanyc/io.h"
 	"include/nanyc/library.h"
 	"include/nanyc/program.h"
 	"include/nanyc/report.h"
