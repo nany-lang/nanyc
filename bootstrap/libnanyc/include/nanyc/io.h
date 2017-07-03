@@ -135,9 +135,9 @@ struct nyio_adapter_t {
 };
 
 /*!
-** \brief Create an adapter to access to a local folder
+** \brief Initialize an adapter to access to a local folder
 */
-NY_EXPORT void nyio_adapter_create_from_local_folder(nyio_adapter_t*, const char*, size_t);
+NY_EXPORT void nyio_adapter_init_localfolder(nyio_adapter_t*, const char*, size_t);
 
 #ifdef __cplusplus
 }

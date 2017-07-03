@@ -373,7 +373,7 @@ static bool nanyc_io_mount_local(nyoldvm_t* vm, const char* path, uint32_t len, 
 	if (path and len and local and locallen) {
 		auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->tctx);
 		nyio_adapter_t adapter;
-		nyio_adapter_create_from_local_folder(&adapter, local, locallen);
+		nyio_adapter_init_localfolder(&adapter, local, locallen);
 		bool success = tc.io.addMountpoint(AnyString{path, len}, adapter);
 		if (adapter.release)
 			adapter.release(&adapter);

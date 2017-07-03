@@ -480,8 +480,7 @@ nanyc_io_localfolder_file_exists(nyio_adapter_t* adapter, const char* path, uint
 }
 
 
-extern "C" void nyio_adapter_create_from_local_folder(nyio_adapter_t* adapter,
-		const char* lfol, size_t len) {
+extern "C" void nyio_adapter_init_localfolder(nyio_adapter_t* adapter, const char* lfol, size_t len) {
 	assert(adapter != nullptr);
 	if (YUNI_UNLIKELY(!adapter or !adapter))
 		return;
