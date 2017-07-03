@@ -322,11 +322,6 @@ nyio_automout_flag_t;
 
 
 
-/*! Callback for iterating through the list of opened files */
-typedef nybool_t (*nyio_opened_files_it_t)(const char* vpath, uint32_t len, const char* localpath,
-	uint32_t lplen);
-
-
 /*! IO Adapter */
 typedef struct nyio_adapter_t nyio_adapter_t;
 
