@@ -5,7 +5,6 @@
 #include <yuni/io/file.h>
 #include <yuni/io/directory/info/info.h>
 #include "libnanyc-config.h"
-#include <iostream>
 
 using namespace Yuni;
 
