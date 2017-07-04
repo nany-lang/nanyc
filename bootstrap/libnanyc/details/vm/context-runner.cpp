@@ -15,6 +15,25 @@ const char* io_get_cwd(nyoldvm_t* vmtx, uint32_t* length) {
 	return tc.io.cwd.c_str();
 }
 
+nyio_adapter_t* io_resolve(nyoldvm_t* vmtx, nyanystr_t* relpath, const nyanystr_t* path) {
+	try {
+		if (path and path->len != 0 and path->c_str and path->len < 1024 * 1024) {
+			auto& thread = *reinterpret_cast<ny::vm::Context*>(vmtx->internal);
+			AnyString result;
+			AnyString pth{path->c_str, static_cast<uint32_t>(path->len)};
+			auto& adapter = thread.io.resolve(result, pth);
+			if (relpath) {
+				relpath->c_str = result.c_str();
+				relpath->len = result.size();
+			}
+			return &adapter;
+		}
+	}
+	catch (...) {
+	}
+	return nullptr;
+}
+
 ContextRunner::ContextRunner(Context& context, const ir::Sequence& callee)
 	: cf(context.program.cf)
 	, context(context)
@@ -32,6 +51,7 @@ void ContextRunner::initialize() {
 	cfvm.internal = context.self();
 	cfvm.console = &cf.console;
 	cfvm.io_get_cwd = io_get_cwd;
+	cfvm.io_resolve = io_resolve;
 }
 
 

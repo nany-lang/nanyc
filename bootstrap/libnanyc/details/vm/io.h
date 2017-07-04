@@ -51,6 +51,7 @@ struct IO final {
 	Mountpoints mountpoints;
 };
 
+nyio_adapter_t* io_resolve(nyvmthread_t* vmtx, nyanystr_t* relpath, const nyanystr_t* path);
 const char* io_get_cwd(nyvmthread_t* vmtx, uint32_t* length);
 
 } // namespace vm

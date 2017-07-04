@@ -106,6 +106,25 @@ bool Mountpoints::add(const AnyString& path, nyio_adapter_t& adapter) {
 	return false;
 }
 
+nyio_adapter_t* io_resolve(nyvmthread_t* vmtx, nyanystr_t* relpath, const nyanystr_t* path) {
+	try {
+		if (path and path->len != 0 and path->c_str and path->len < 1024 * 1024) {
+			auto& thread = *reinterpret_cast<ny::vm::Thread*>(vmtx->internal);
+			AnyString result;
+			AnyString pth{path->c_str, static_cast<uint32_t>(path->len)};
+			auto& adapter = thread.io.mountpoints.resolve(result, pth);
+			if (relpath) {
+				relpath->c_str = result.c_str();
+				relpath->len = result.size();
+			}
+			return &adapter;
+		}
+	}
+	catch (...) {
+	}
+	return nullptr;
+}
+
 const char* io_get_cwd(nyvmthread_t* vmtx, uint32_t* length) {
 	auto& thread = *reinterpret_cast<ny::vm::Thread*>(vmtx->internal);
 	auto& cwd = thread.io.cwd;

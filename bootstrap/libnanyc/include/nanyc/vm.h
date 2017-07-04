@@ -11,6 +11,7 @@
 #include <nanyc/console.h>
 #include <nanyc/allocator.h>
 #include <nanyc/program.h>
+#include <nanyc/io.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -19,6 +20,7 @@ extern "C" {
 
 typedef struct nyvmthread_t {
 	void* internal;
+	nyio_adapter_t* (*io_resolve)(nyvmthread_t*, nyanystr_t* relpath, const nyanystr_t* path);
 	const char* (*io_get_cwd)(nyvmthread_t*, uint32_t* len);
 	void* userdata;
 	nyallocator_t allocator;

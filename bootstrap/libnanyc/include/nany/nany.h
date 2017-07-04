@@ -374,6 +374,7 @@ nyprogram_cf_t;
 typedef struct nyoldvm_t {
 	/*! Current thread */
 	nytctx_t* internal;
+	nyio_adapter_t* (*io_resolve)(struct nyoldvm_t*, nyanystr_t* relpath, const nyanystr_t* path);
 	const char* (*io_get_cwd)(struct nyoldvm_t*, uint32_t* len);
 	/*! Console */
 	nyoldconsole_t* console;
