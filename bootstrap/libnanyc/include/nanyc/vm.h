@@ -19,6 +19,7 @@ extern "C" {
 
 typedef struct nyvmthread_t {
 	void* internal;
+	const char* (*io_get_cwd)(nyvmthread_t*, uint32_t* len);
 	void* userdata;
 	nyallocator_t allocator;
 	nyconsole_t cout;

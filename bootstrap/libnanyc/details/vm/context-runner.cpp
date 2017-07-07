@@ -8,6 +8,13 @@ namespace ny {
 namespace vm {
 
 
+const char* io_get_cwd(nyoldvm_t* vmtx, uint32_t* length) {
+	auto& tc = *reinterpret_cast<ny::vm::Context*>(vmtx->internal);
+	if (length)
+		*length = tc.io.cwd.size();
+	return tc.io.cwd.c_str();
+}
+
 ContextRunner::ContextRunner(Context& context, const ir::Sequence& callee)
 	: cf(context.program.cf)
 	, context(context)
@@ -24,6 +31,7 @@ void ContextRunner::initialize() {
 	dcMode(dyncall, DC_CALL_C_DEFAULT);
 	cfvm.internal = context.self();
 	cfvm.console = &cf.console;
+	cfvm.io_get_cwd = io_get_cwd;
 }
 
 

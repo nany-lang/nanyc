@@ -374,6 +374,7 @@ nyprogram_cf_t;
 typedef struct nyoldvm_t {
 	/*! Current thread */
 	nytctx_t* internal;
+	const char* (*io_get_cwd)(struct nyoldvm_t*, uint32_t* len);
 	/*! Console */
 	nyoldconsole_t* console;
 }

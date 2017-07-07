@@ -1,4 +1,5 @@
 #include "details/vm/io.h"
+#include "details/vm/thread.h"
 #include <yuni/io/directory/system.h>
 #include "libnanyc.h"
 #include <cstring>
@@ -103,6 +104,14 @@ bool Mountpoints::add(const AnyString& path, nyio_adapter_t& adapter) {
 		return true;
 	}
 	return false;
+}
+
+const char* io_get_cwd(nyvmthread_t* vmtx, uint32_t* length) {
+	auto& thread = *reinterpret_cast<ny::vm::Thread*>(vmtx->internal);
+	auto& cwd = thread.io.cwd;
+	if (length)
+		*length = cwd.size();
+	return cwd.c_str();
 }
 
 } // namespace vm

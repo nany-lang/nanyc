@@ -1,5 +1,6 @@
 #pragma once
 #include <nanyc/io.h>
+#include <nanyc/vm.h>
 #include <yuni/core/string.h>
 #include <array>
 
@@ -49,6 +50,8 @@ struct IO final {
 	//! All mountpoints
 	Mountpoints mountpoints;
 };
+
+const char* io_get_cwd(nyvmthread_t* vmtx, uint32_t* length);
 
 } // namespace vm
 } // namespace ny

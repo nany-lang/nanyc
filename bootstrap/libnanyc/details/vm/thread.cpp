@@ -789,6 +789,7 @@ Thread::Thread(Machine& machine)
 	memcpy(&capi.cerr, &machine.opts.cout, sizeof(capi.cerr));
 	capi.program = ny::Program::pointer(machine.program);
 	capi.internal = this;
+	capi.io_get_cwd = io_get_cwd;
 }
 
 void Thread::execute(const ny::ir::Sequence& sequence) {
