@@ -54,6 +54,7 @@ struct IO final {
 nyio_adapter_t* io_resolve(nyvmthread_t* vmtx, nyanystr_t* relpath, const nyanystr_t* path);
 const char* io_get_cwd(nyvmthread_t* vmtx, uint32_t* length);
 nyio_err_t io_set_cwd(nyvmthread_t*, const char*, uint32_t);
+nyio_err_t io_add_mountpoint(nyvmthread_t*, const char*, uint32_t, nyio_adapter_t*);
 
 } // namespace vm
 } // namespace ny

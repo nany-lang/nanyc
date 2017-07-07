@@ -792,6 +792,7 @@ Thread::Thread(Machine& machine)
 	capi.io_resolve = io_resolve;
 	capi.io_get_cwd = io_get_cwd;
 	capi.io_set_cwd = io_set_cwd;
+	capi.io_add_mountpoint = io_add_mountpoint;
 }
 
 void Thread::execute(const ny::ir::Sequence& sequence) {

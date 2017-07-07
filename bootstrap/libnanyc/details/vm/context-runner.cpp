@@ -43,6 +43,13 @@ nyio_err_t io_set_cwd(nyoldvm_t* vmtx, const char* path, uint32_t len) {
 	return nyioe_failed;
 }
 
+nyio_err_t io_add_mountpoint(nyoldvm_t* vmtx, const char* path, uint32_t len, nyio_adapter_t* adapter) {
+	auto& thread = *reinterpret_cast<ny::vm::Context*>(vmtx->internal);
+	bool success = (path and len != 0 and adapter)
+		and thread.io.addMountpoint(AnyString{path, len}, *adapter);
+	return success ? nyioe_ok : nyioe_failed;
+}
+
 ContextRunner::ContextRunner(Context& context, const ir::Sequence& callee)
 	: cf(context.program.cf)
 	, context(context)
@@ -62,6 +69,7 @@ void ContextRunner::initialize() {
 	cfvm.io_get_cwd = io_get_cwd;
 	cfvm.io_resolve = io_resolve;
 	cfvm.io_set_cwd = io_set_cwd;
+	cfvm.io_add_mountpoint = io_add_mountpoint;
 }
 
 

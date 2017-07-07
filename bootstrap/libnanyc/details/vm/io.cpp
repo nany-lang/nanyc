@@ -142,5 +142,12 @@ nyio_err_t io_set_cwd(nyvmthread_t* vmtx, const char* path, uint32_t len) {
 	return nyioe_failed;
 }
 
+nyio_err_t io_add_mountpoint(nyvmthread_t* vmtx, const char* path, uint32_t len, nyio_adapter_t* adapter) {
+	auto& thread = *reinterpret_cast<ny::vm::Thread*>(vmtx->internal);
+	bool success = (path and len != 0 and adapter)
+		and thread.io.mountpoints.add(AnyString{path, len}, *adapter);
+	return success ? nyioe_ok : nyioe_failed;
+}
+
 } // namespace vm
 } // namespace ny
