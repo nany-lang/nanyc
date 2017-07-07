@@ -34,6 +34,15 @@ nyio_adapter_t* io_resolve(nyoldvm_t* vmtx, nyanystr_t* relpath, const nyanystr_
 	return nullptr;
 }
 
+nyio_err_t io_set_cwd(nyoldvm_t* vmtx, const char* path, uint32_t len) {
+	if (len != 0 and path != nullptr) {
+		auto& thread = *reinterpret_cast<ny::vm::Context*>(vmtx->internal);
+		thread.io.cwd.assign(path, len);
+		return nyioe_ok;
+	}
+	return nyioe_failed;
+}
+
 ContextRunner::ContextRunner(Context& context, const ir::Sequence& callee)
 	: cf(context.program.cf)
 	, context(context)
@@ -52,6 +61,7 @@ void ContextRunner::initialize() {
 	cfvm.console = &cf.console;
 	cfvm.io_get_cwd = io_get_cwd;
 	cfvm.io_resolve = io_resolve;
+	cfvm.io_set_cwd = io_set_cwd;
 }
 
 

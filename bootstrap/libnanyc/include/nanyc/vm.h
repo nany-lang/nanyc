@@ -22,6 +22,7 @@ typedef struct nyvmthread_t {
 	void* internal;
 	nyio_adapter_t* (*io_resolve)(nyvmthread_t*, nyanystr_t* relpath, const nyanystr_t* path);
 	const char* (*io_get_cwd)(nyvmthread_t*, uint32_t* len);
+	nyio_err_t (*io_set_cwd)(nyvmthread_t*, const char*, uint32_t);
 	void* userdata;
 	nyallocator_t allocator;
 	nyconsole_t cout;

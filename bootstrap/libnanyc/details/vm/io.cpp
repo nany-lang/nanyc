@@ -133,5 +133,14 @@ const char* io_get_cwd(nyvmthread_t* vmtx, uint32_t* length) {
 	return cwd.c_str();
 }
 
+nyio_err_t io_set_cwd(nyvmthread_t* vmtx, const char* path, uint32_t len) {
+	if (len != 0 and path != nullptr) {
+		auto& thread = *reinterpret_cast<ny::vm::Thread*>(vmtx->internal);
+		thread.io.cwd.assign(path, len);
+		return nyioe_ok;
+	}
+	return nyioe_failed;
+}
+
 } // namespace vm
 } // namespace ny

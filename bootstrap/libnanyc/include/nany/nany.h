@@ -376,6 +376,7 @@ typedef struct nyoldvm_t {
 	nytctx_t* internal;
 	nyio_adapter_t* (*io_resolve)(struct nyoldvm_t*, nyanystr_t* relpath, const nyanystr_t* path);
 	const char* (*io_get_cwd)(struct nyoldvm_t*, uint32_t* len);
+	nyio_err_t (*io_set_cwd)(struct nyoldvm_t*, const char*, uint32_t);
 	/*! Console */
 	nyoldconsole_t* console;
 }

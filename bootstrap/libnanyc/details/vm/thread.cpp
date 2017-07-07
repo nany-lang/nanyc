@@ -791,6 +791,7 @@ Thread::Thread(Machine& machine)
 	capi.internal = this;
 	capi.io_resolve = io_resolve;
 	capi.io_get_cwd = io_get_cwd;
+	capi.io_set_cwd = io_set_cwd;
 }
 
 void Thread::execute(const ny::ir::Sequence& sequence) {
