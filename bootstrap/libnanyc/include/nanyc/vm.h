@@ -47,6 +47,9 @@ typedef struct nyvm_opts_t {
 }
 nyvm_opts_t;
 
+//! Init VM options with default values
+NY_EXPORT void nyvm_opts_init_defaults(nyvm_opts_t*);
+
 /*!
 ** \brief Run the program
 ** \return nyfalse if any internal error occured during runtime
