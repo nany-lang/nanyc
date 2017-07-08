@@ -20,7 +20,7 @@ namespace vm {
 
 namespace {
 
-constexpr bool printOpcodes = true;
+constexpr bool printOpcodes = false;
 
 struct InvalidLabel final {
 	InvalidLabel(uint32_t atomid, uint32_t label): atomid(atomid), label(label) {}
