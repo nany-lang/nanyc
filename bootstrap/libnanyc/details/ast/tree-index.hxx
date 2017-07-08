@@ -77,6 +77,14 @@ void ASTHelper::nodeEachItemInXPath(AST::Node& node, const T& callback) {
 	}
 }
 
+inline AST::Node* ASTHelper::nodeAppend(AST::Node& parent, enum AST::Rule rule) {
+	auto* node = new AST::Node(rule);
+	node->offset = parent.offset;
+	node->offsetEnd = parent.offsetEnd;
+	node->parent = &parent;
+	parent.children.push_back(node);
+	return node;
+}
 
 inline AST::Node*
 ASTHelper::nodeAppend(AST::Node& parent, std::initializer_list<enum AST::Rule> list) {
