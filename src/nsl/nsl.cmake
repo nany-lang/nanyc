@@ -42,6 +42,7 @@ set(nsl_files_unittest
 	"${nsl_root}/std.core/unittests/closure.ny"
 	"${nsl_root}/std.core/unittests/on-scope-fail.ny"
 	"${nsl_root}/std.core/unittests/on-scope.ny"
+	"${nsl_root}/std.core/unittests/print.ny"
 	"${nsl_root}/std.core/unittests/string.ny"
 	"${nsl_root}/std.core/unittests/view-multiple-loops.ny"
 	"${nsl_root}/std.core/unittests/view.ny"
