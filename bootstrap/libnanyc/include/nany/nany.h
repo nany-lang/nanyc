@@ -7,6 +7,7 @@
 #ifndef __LIBNANYC_NANY_C_H__
 #define __LIBNANYC_NANY_C_H__
 #include "../nanyc/types.h"
+#include "../nanyc/io.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
@@ -14,60 +15,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-
-/*! \name Information about libnany */
-/*@{*/
-/*!
-** \brief Print information about nany for bug reporting
-*/
-NY_EXPORT void nylib_print_info_for_bugreport();
-
-/*!
-** \brief Export information about nany for bug reporting
-**
-** \param[out] length Length of the returned c-string (can be null)
-** \return A C-String, which must be released by `free (3)`. NULL if an error occured
-*/
-NY_EXPORT char* nylib_get_info_for_bugreport(uint32_t* length);
-
-/*! nany's website */
-NY_EXPORT const char* nylib_website_url();
-
-/*!
-** \brief Get the version of libnany
-**
-** \param[out] major Major version (eX: 2.4.1 -> 2) (can be null)
-** \param[out] minor Minor version (eX: 2.4.1 -> 4) (can be null)
-** \param[out] patch Patch (eX: 2.4.1 -> 1) (can be null)
-** \return The full version within a single integer (ex: 2.4.1 -> 204001)
-*/
-NY_EXPORT uint32_t nylib_get_version(uint32_t* major, uint32_t* minor, uint32_t* patch);
-
-/*! Get the full version of nany (string, ex: 2.4.1-beta+2e738ae) */
-NY_EXPORT const char* nylib_version();
-/*! Get the version metadata (ex: '2e738ae', null if empty) */
-NY_EXPORT const char* nylib_version_metadata();
-/*! Get the pre-release version (ex: 'beta', null if empty) */
-NY_EXPORT const char* nylib_version_prerelease();
-
-/*!
-** \brief Check if the version is compatible with the library
-**
-** This function can be used to avoid unwanted behaviors when
-** a program is able to use several versions of libnany
-** \code
-** if (!nylib_check_compatible_version(0, 2))
-**     fprintf(stderr, "incompatible version\n");
-** \endcode
-** \return 0 when succeeded, != 0 if the version is incompatible
-*/
-NY_EXPORT int nylib_check_compatible_version(uint32_t major, uint32_t minor);
-/*@}*/
-
-
-
-
 
 
 /*! \name Types */
@@ -111,60 +58,10 @@ typedef struct nysource_t nysource_t;
 /*! Build */
 typedef struct nybuild_t nybuild_t;
 /*! VM Program */
-typedef struct nyprogram_t nyprogram_t;
+typedef struct nyoldprogram_t nyoldprogram_t;
 /*! VM Thread Context */
 typedef struct nythread_t nytctx_t;
 /*@}*/
-
-
-/*! \name Memory allocator */
-/*@{*/
-struct nyallocator_t;
-
-typedef struct nyallocator_cf_t {
-	void* userdata;
-	/*! Create a multi-threaded allocator */
-	nybool_t (*create_mt)(struct nyallocator_t*, const struct nyallocator_cf_t*);
-	/*! Create a single-threaded allocator */
-	nybool_t (*create_st)(struct nyallocator_t*, const struct nyallocator_cf_t*);
-	/*! event: not enough memory */
-	void (*on_not_enough_memory)(struct nyallocator_t*, nybool_t limit_reached);
-}
-nyallocator_cf_t;
-
-typedef struct nyallocator_t {
-	void* userdata;
-	/*! Allocates some memory */
-	void* (*allocate)(struct nyallocator_t*, size_t);
-	/*! Re-allocate */
-	void* (*reallocate)(struct nyallocator_t*, void* ptr, size_t oldsize, size_t newsize);
-	/*! free */
-	void (*deallocate)(struct nyallocator_t*, void* ptr, size_t);
-	/*! Special values that may not be used directly but are here for performance reasons */
-	volatile size_t reserved_mem0;
-	/*! Memory usage limit (in bytes) */
-	size_t limit_mem_size;
-	/*! event: not enough memory */
-	void (*on_not_enough_memory)(struct nyallocator_t*, nybool_t limit_reached);
-	/*! event: callback for aborting program execuion */
-	void (*on_internal_abort)(struct nyallocator_t*);
-	/*! Flush STDERR */
-	void (*release)(struct nyallocator_t*);
-}
-nyallocator_t;
-
-
-NY_EXPORT void nyallocator_cf_init(nyallocator_cf_t*);
-
-/*! Set callbacks to the standard C memory allocator */
-NY_EXPORT void nany_memalloc_set_default(nyallocator_t*);
-/*! Set callbacks to the std C memory allocator with bounds checking */
-NY_EXPORT void nany_memalloc_set_with_limit(nyallocator_t*, size_t limit);
-/*! Copy allocator */
-void nany_memalloc_copy(nyallocator_t* out, const nyallocator_t* const src);
-/*@}*/
-
-
 
 
 /*! \name Console */
@@ -243,8 +140,6 @@ void nyconsole_cf_copy(nyoldconsole_t* out, const nyoldconsole_t* const src);
 /*@{*/
 /*! Project Configuration */
 typedef struct nyproject_cf_t {
-	/*! Memory allocator */
-	nyallocator_t allocator;
 	/*! A new target has been added */
 	void (*on_target_added)(nyproject_t*, nytarget_t*, const char* name, uint32_t len);
 	/*! A target has been removed */
@@ -383,32 +278,6 @@ NY_EXPORT void nybuild_cf_init(nybuild_cf_t* cf);
 /*! Opaque pointer to a file */
 typedef struct nyfile_t nyfile_t;
 
-
-typedef enum nyio_type_t {
-	nyiot_failed = 0,
-	nyiot_file,
-	nyiot_folder,
-}
-nyio_type_t;
-
-
-typedef enum nyio_err_t {
-	/*! Success */
-	nyioe_ok = 0,
-	/*! Generic unknown error */
-	nyioe_failed,
-	/*! Operation not supported by the adapter */
-	nyioe_unsupported,
-	/*! Failed to allocate memory */
-	nyioe_memory,
-	/*! Do not exist or not enough permissions */
-	nyioe_access,
-	/*! Already exists */
-	nyioe_exists,
-}
-nyio_err_t;
-
-
 typedef enum nyio_automout_flag_t {
 	/*! Automount all */
 	nyioaf_all   = (uint32_t) - 1,
@@ -425,120 +294,11 @@ typedef enum nyio_automout_flag_t {
 }
 nyio_automout_flag_t;
 
-
-
-
-/*! Callback for iterating through the list of opened files */
-typedef nybool_t (*nyio_opened_files_it_t)(const char* vpath, uint32_t len, const char* localpath,
-	uint32_t lplen);
-
-
-/*! IO Adapter */
-typedef struct nyio_adapter_t nyio_adapter_t;
-
-typedef struct nyio_iterator_t nyio_iterator_t;
-
-
-/*!
-** \brief Adapter for a filesystem
-**
-** \warning The implementation MUST consider that input strings are NOT zero-terminated
-*/
-struct nyio_adapter_t {
-	/*! Internal opaque pointer */
-	void* internal;
-	/*! Value considered as invalid file descriptor */
-	void* invalid_fd;
-
-	/*! Stat a node */
-	nyio_type_t (*stat)(nyio_adapter_t*, const char* path, uint32_t len);
-	/*! Stat a node */
-	nyio_type_t (*statex)(nyio_adapter_t*, const char* path, uint32_t len, uint64_t* size, int64_t* modified);
-
-
-	/*! Read content from a file */
-	uint64_t (*file_read)(void*, void* buffer, uint64_t bufsize);
-	/*! Write content to an opened file */
-	uint64_t (*file_write)(void*, const void* buffer, uint64_t bufsize);
-	/*! Open a local file for the current thread */
-	void* (*file_open)(nyio_adapter_t*, const char* path, uint32_t len,
-					   nybool_t readm, nybool_t writem, nybool_t appendm, nybool_t truncm);
-	/*! Close a file */
-	void (*file_close)(void*);
-	/*! End of file */
-	nybool_t (*file_eof)(void*);
-
-	/*! Seek from the begining of the file */
-	nyio_err_t (*file_seek)(void*, uint64_t offset);
-	/*! Seek from the end of the file */
-	nyio_err_t (*file_seek_from_end)(void*, int64_t offset);
-	/*! Seek from the current cursor position */
-	nyio_err_t (*file_seek_cur)(void*, int64_t offset);
-	/*! Tell the current cursor position */
-	uint64_t (*file_tell)(void*);
-
-	/*! Flush a file */
-	void (*file_flush)(void*);
-
-	/*! Get the file size or the folder size (in bytes) */
-	uint64_t (*file_size)(nyio_adapter_t*, const char* path, uint32_t len);
-	/*! Get the file size or the folder size (in bytes) */
-	nyio_err_t (*file_erase)(nyio_adapter_t*, const char* path, uint32_t len);
-	/*! Get if a file exists */
-	nyio_err_t (*file_exists)(nyio_adapter_t*, const char* path, uint32_t len);
-	/*! Resize a file */
-	nyio_err_t (*file_resize)(nyio_adapter_t*, const char* path, uint32_t len, uint64_t newsize);
-
-	/*! Retrieve the content of a file */
-	nyio_err_t (*file_get_contents)(nyio_adapter_t*, char** content, uint64_t* size, uint64_t* capacity,
-									const char* path, uint32_t len);
-	/*! Set the content of a file */
-	nyio_err_t (*file_set_contents)(nyio_adapter_t*, const char* path, uint32_t len, const char* content,
-									uint32_t ctlen);
-	/*! Append the content to a file */
-	nyio_err_t (*file_append_contents)(nyio_adapter_t*, const char* path, uint32_t len, const char* content,
-									   uint32_t ctlen);
-
-
-	/*! Create a new folder */
-	nyio_err_t (*folder_create)(nyio_adapter_t*, const char* path, uint32_t len);
-	/*! Delete a folder and all its content */
-	nyio_err_t (*folder_erase)(nyio_adapter_t*, const char* path, uint32_t len);
-	/*! Delete the contents of a folder */
-	nyio_err_t (*folder_clear)(nyio_adapter_t*, const char* path, uint32_t len);
-	/*! Get the folder size (in bytes) */
-	uint64_t (*folder_size)(nyio_adapter_t*, const char* path, uint32_t len);
-	/*! Get if a folder exists */
-	nyio_err_t (*folder_exists)(nyio_adapter_t*, const char* path, uint32_t len);
-
-	/*! Iterate through folder */
-	nyio_iterator_t* (*folder_iterate)(nyio_adapter_t*, const char* path, uint32_t len,
-									   nybool_t recursive, nybool_t files, nybool_t folders);
-	/*! Go to the next element */
-	nyio_iterator_t* (*folder_next)(nyio_iterator_t*);
-	/*! Get the full path (i.e. /baz/foo,txt) of the current element */
-	const char* (*folder_iterator_fullpath)(nyio_adapter_t*, nyio_iterator_t*);
-	/*! Get the filename (i.e. foo.txt) of the current element */
-	const char* (*folder_iterator_name)(nyio_iterator_t*);
-	/*! Get the size in bytes of the current element */
-	uint64_t (*folder_iterator_size)(nyio_iterator_t*);
-	/*! Get the type of the current element */
-	nyio_type_t (*folder_iterator_type)(nyio_iterator_t*);
-	/*! Close an iterator */
-	void (*folder_iterator_close)(nyio_iterator_t*);
-
-	/*! Clone the adapter, most likely for a new thread */
-	void (*clone)(nyio_adapter_t* parent, nyio_adapter_t* dst);
-	/*! Release the adapter */
-	void (*release)(nyio_adapter_t*);
-};
-
-
 typedef struct nyio_cf_t {
 	/*! event: an url has been mounted */
-	nyio_err_t (*on_mount_query)(nyprogram_t*, nytctx_t*, const char* url, const char* path, uint32_t len);
+	nyio_err_t (*on_mount_query)(nyoldprogram_t*, nytctx_t*, const char* url, const char* path, uint32_t len);
 	/*! event: create an adapter from an url */
-	nyio_err_t (*on_adapter_create)(nyprogram_t*, nytctx_t*, nyio_adapter_t**, const char* url,
+	nyio_err_t (*on_adapter_create)(nyoldprogram_t*, nytctx_t*, nyio_adapter_t**, const char* url,
 		nyio_adapter_t* parent);
 
 	/*! Flag to automatically mount some standard paths */
@@ -546,12 +306,6 @@ typedef struct nyio_cf_t {
 	uint32_t automount_flags;
 }
 nyio_cf_t;
-
-/*!
-** \brief Create an adapter to access to a local folder
-*/
-NY_EXPORT void nyio_adapter_create_from_local_folder(nyio_adapter_t*, nyallocator_t*,
-	const char* localfolder, size_t len);
 /*@}*/
 
 
@@ -579,8 +333,6 @@ nybacktrace_entry_t;
 
 /*! Program Configuration */
 typedef struct nyprogram_cf_t {
-	/*! Memory allocator */
-	nyallocator_t allocator;
 	/*! Console output */
 	nyoldconsole_t console;
 
@@ -588,26 +340,26 @@ typedef struct nyprogram_cf_t {
 	** \brief A new program has been started
 	** return nytrue to continue the execution, nyfalse to abort it
 	*/
-	nybool_t (*on_execute)(nyprogram_t*);
+	nybool_t (*on_execute)(nyoldprogram_t*);
 
 	/*!
 	** \brief A new thread is created
 	** return nytrue to continue the execution of the thread. nyfalse to abort
 	*/
-	nybool_t (*on_thread_create)(nyprogram_t*, nytctx_t*, nythread_t* parent, const char* name, uint32_t size);
+	nybool_t (*on_thread_create)(nyoldprogram_t*, nytctx_t*, nythread_t* parent, const char* name, uint32_t size);
 	/*!
 	** \brief A thread has been destroyed
 	** \note This callback won't be called if `on_thread_create` failed
 	*/
-	void (*on_thread_destroy)(nyprogram_t*, nythread_t*);
+	void (*on_thread_destroy)(nyoldprogram_t*, nythread_t*);
 
 	/*! Error has been received during the execution of the code */
-	/* wip - void (*on_error)(const nyprogram_t*, const nybacktrace_entry_t** backtrace, uint32_t bt_len); */
+	/* wip - void (*on_error)(const nyoldprogram_t*, const nybacktrace_entry_t** backtrace, uint32_t bt_len); */
 	/*!
 	** \brief The program is terminated
 	** \note This callback won't be called if `on_execute` failed
 	*/
-	void (*on_terminate)(const nyprogram_t*, nybool_t error, int exitcode);
+	void (*on_terminate)(const nyoldprogram_t*, nybool_t error, int exitcode);
 
 	/*! IO configuration */
 	nyio_cf_t io;
@@ -619,17 +371,24 @@ nyprogram_cf_t;
 
 
 /*! Context at runtime for native C calls */
-typedef struct nyvm_t {
-	/*! Allocator */
-	nyallocator_t* allocator;
-	/*! Current program */
-	nyprogram_t* program;
+typedef struct nyoldvm_t {
 	/*! Current thread */
-	nytctx_t* tctx;
+	nytctx_t* internal;
+	nyio_adapter_t* (*io_resolve)(struct nyoldvm_t*, nyanystr_t* relpath, const nyanystr_t* path);
+	const char* (*io_get_cwd)(struct nyoldvm_t*, uint32_t* len);
+	nyio_err_t (*io_set_cwd)(struct nyoldvm_t*, const char*, uint32_t);
+	nyio_err_t (*io_add_mountpoint)(struct nyoldvm_t*, const char*, uint32_t, nyio_adapter_t*);
+	//! Temporary structure for complex return values by intrinsics
+	struct {
+		uint64_t size;
+		uint64_t capacity;
+		void* data;
+	}
+	returnValue;
 	/*! Console */
 	nyoldconsole_t* console;
 }
-nyvm_t;
+nyoldvm_t;
 
 
 /*!
@@ -637,7 +396,7 @@ nyvm_t;
 **
 ** \param build A build
 */
-NY_EXPORT nyprogram_t* nyprogram_prepare(nybuild_t* build, const nyprogram_cf_t* cf);
+NY_EXPORT nyoldprogram_t* nyprogram_prepare(nybuild_t* build, const nyprogram_cf_t* cf);
 
 /*!
 ** \brief Execute a Nany program
@@ -648,19 +407,19 @@ NY_EXPORT nyprogram_t* nyprogram_prepare(nybuild_t* build, const nyprogram_cf_t*
 **    to the program/script. Arguments must use the UTF8 encoding
 ** \return Exit status code
 */
-NY_EXPORT int nyprogram_main(nyprogram_t* program, uint32_t argc, const char** argv);
+NY_EXPORT int nyprogram_main(nyoldprogram_t* program, uint32_t argc, const char** argv);
 
 
 /*!
 ** \brief Acquire a program
 ** \param program program pointer (can be null)
 */
-NY_EXPORT void nyprogram_ref(nyprogram_t* program);
+NY_EXPORT void nyprogram_ref(nyoldprogram_t* program);
 /*!
 ** \brief Unref a program and destroy it if required
 ** \param program A program pointer (can be null)
 */
-NY_EXPORT void nyprogram_unref(nyprogram_t* program);
+NY_EXPORT void nyprogram_unref(nyoldprogram_t* program);
 
 /*! Initialize a project configuration */
 NY_EXPORT void nyprogram_cf_init(nyprogram_cf_t* cf, const nybuild_cf_t*);
@@ -671,62 +430,9 @@ NY_EXPORT void nyprogram_cf_init(nyprogram_cf_t* cf, const nybuild_cf_t*);
 
 
 
-/*! \name Utilities */
-/*@{*/
-/*!
-** \brief Print the AST of a nany source file
-**
-** \warning Writing to the same FD by multiple threads is not thread-safe on all platforms
-*/
-nybool_t nyprint_ast_from_file(const char* filename, int fd, nybool_t unixcolors);
-
-/*!
-** \brief Print the AST of a nany source file
-**
-** \warning Writing to the same FD by multiple threads is not thread-safe on all platforms
-*/
-NY_EXPORT nybool_t nyprint_ast_from_file_n(const char* filename, size_t length, int fd, nybool_t unixcolors);
-
-/*!
-** \brief Print the AST of some nany code in memory
-**
-** \warning Writing to the same FD by multiple threads is not thread-safe on all platforms
-** \param content Arbitrary utf-8 content (c-string)
-*/
-NY_EXPORT nybool_t nyprint_ast_from_memory(const char* content, int fd, nybool_t unixcolors);
-/*!
-** \brief Print the AST of some nany code in memory
-**
-** \warning Writing to the same FD by multiple threads is not thread-safe on all platforms
-** \param content Arbitrary utf-8 content (c-string)
-*/
-NY_EXPORT  nybool_t nyprint_ast_from_memory_n(const char* content, size_t length, int fd,
-	nybool_t unixcolors);
-
-/*!
-** \brief Check if a filename is a valid nany source code
-**
-** \param filename An arbitrary filename (utf-8 c-string)
-** \return nytrue if the file has been successfully parsed, false otherwise
-*/
-NY_EXPORT nybool_t nytry_parse_file(const char* const filename);
-/*!
-** \brief Check if a filename is a valid nany source code
-**
-** \param filename An arbitrary filename (utf-8 c-string)
-** \param length Length of the filename
-** \return nytrue if the file has been successfully parsed, false otherwise
-*/
-NY_EXPORT nybool_t nytry_parse_file_n(const char* filename, size_t length);
-
-
-
-
 /*! \name Convenient wrappers */
 /*@{*/
 typedef struct nyrun_cf_t {
-	/*! Memory allocator */
-	nyallocator_t allocator;
 	/*! Console */
 	nyoldconsole_t console;
 	/*! Default prject settings */

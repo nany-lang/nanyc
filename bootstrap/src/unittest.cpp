@@ -1,6 +1,7 @@
 #include <yuni/yuni.h>
 #include <yuni/core/getopt.h>
 #include <nany/nany.h>
+#include <nanyc/library.h>
 #include <yuni/datetime/timestamp.h>
 #include <yuni/core/system/cpu.h>
 #include <yuni/core/system/console/console.h>
@@ -53,6 +54,16 @@ void normalizeNumberOfParallelJobs(uint32_t& jobs) {
 		jobs = 256;
 }
 
+int printBugReport() {
+	uint32_t len = 0;
+	char* report = libnanyc_get_bugreportdetails(&len);
+	if (report != nullptr) {
+		std::cout.write(report, len);
+		free(report);
+		return EXIT_SUCCESS;
+	}
+	return EXIT_FAILURE;
+}
 
 void parseCommandLine(Settings& settings, int argc, char** argv) {
 	GetOpt::Parser options;
@@ -74,13 +85,11 @@ void parseCommandLine(Settings& settings, int argc, char** argv) {
 		throw EXIT_SUCCESS;
 	}
 	if (version) {
-		std::cout << nylib_version() << '\n';
+		std::cout << libnanyc_version_to_cstr() << '\n';
 		throw EXIT_SUCCESS;
 	}
-	if (bugreport) {
-		nylib_print_info_for_bugreport();
-		throw EXIT_SUCCESS;
-	}
+	if (bugreport)
+		throw printBugReport();
 	if (settings.remainingArgs.empty())
 		throw std::runtime_error("no input script file");
 }
@@ -89,11 +98,11 @@ void parseCommandLine(Settings& settings, int argc, char** argv) {
 void printNanycInfo(const Settings& settings) {
 	if (settings.colors.out)
 		System::Console::SetTextColor(std::cout, System::Console::bold);
-	std::cout << "nanyc C++/boostrap unittest " << nylib_version();
+	std::cout << "nanyc C++/boostrap unittest " << libnanyc_version_to_cstr();
 	if (settings.colors.out)
 		System::Console::ResetTextColor(std::cout);
 	std::cout << '\n';
-	nylib_print_info_for_bugreport();
+	printBugReport();
 	std::cout << ">\n";
 }
 

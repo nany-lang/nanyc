@@ -5,17 +5,14 @@
 #include <yuni/io/file.h>
 #include <yuni/io/directory/info/info.h>
 #include "libnanyc-config.h"
-#include <iostream>
 
 using namespace Yuni;
 
 
 namespace { // anonymous
 
-
-struct Internal {
-	Internal(const AnyString& localfolder, nyallocator_t* allocator)
-		: allocator(allocator) {
+struct Internal final {
+	Internal(const AnyString& localfolder) {
 		if (not System::windows) {
 			if (localfolder != '/')
 				localpath = localfolder;
@@ -32,16 +29,7 @@ struct Internal {
 	String localpath;
 	//! Temporary string for ensuring zero-terminated strings
 	String tmppath;
-	//! Memory allocator
-	nyallocator_t* const allocator;
 };
-
-
-inline nyallocator_t& retrieveAllocator(nyio_adapter_t* adapter) {
-	auto& internal = *reinterpret_cast<Internal*>(adapter->internal);
-	return *(internal.allocator);
-}
-
 
 String& toLocalPath(nyio_adapter_t* adapter, const char* path, uint32_t len) {
 	assert(len != 0);
@@ -78,26 +66,21 @@ String& toLocalPath(nyio_adapter_t* adapter, const char* path, uint32_t len) {
 	return internal.tmppath;
 }
 
-
-} // anonymous namespace
-
-
-static void nanyc_io_localfolder_release(nyio_adapter_t* adapter) {
+void nanyc_io_localfolder_release(nyio_adapter_t* adapter) {
 	assert(adapter != nullptr);
 	delete reinterpret_cast<Internal*>(adapter->internal);
 	adapter->internal = nullptr; // avoid misuse
 }
 
-static void nanyc_io_localfolder_clone(nyio_adapter_t* parent, nyio_adapter_t* dst) {
+void nanyc_io_localfolder_clone(nyio_adapter_t* parent, nyio_adapter_t* dst) {
 	assert(dst != nullptr);
 	assert(parent != nullptr);
 	memcpy(dst, parent, sizeof(nyio_adapter_t));
 	auto& internal = *reinterpret_cast<Internal*>(parent->internal);
-	dst->internal = new Internal{internal.localpath, internal.allocator};
+	dst->internal = new Internal{internal.localpath};
 }
 
-
-static nyio_type_t nanyc_io_localfolder_stat(nyio_adapter_t* adapter, const char* path, uint32_t len) {
+nyio_type_t nanyc_io_localfolder_stat(nyio_adapter_t* adapter, const char* path, uint32_t len) {
 	assert(adapter != nullptr);
 	uint64_t size;
 	int64_t modified;
@@ -111,8 +94,7 @@ static nyio_type_t nanyc_io_localfolder_stat(nyio_adapter_t* adapter, const char
 	}
 }
 
-
-static nyio_type_t nanyc_io_localfolder_statex(nyio_adapter_t* adapter, const char* path, uint32_t len,
+nyio_type_t nanyc_io_localfolder_statex(nyio_adapter_t* adapter, const char* path, uint32_t len,
 		uint64_t* size, int64_t* modified) {
 	assert(adapter != nullptr);
 	assert(modified);
@@ -128,20 +110,17 @@ static nyio_type_t nanyc_io_localfolder_statex(nyio_adapter_t* adapter, const ch
 	return nyiot_failed;
 }
 
-
-static uint64_t nanyc_io_localfolder_file_read(void* file, void* buffer, uint64_t bufsize) {
+uint64_t nanyc_io_localfolder_file_read(void* file, void* buffer, uint64_t bufsize) {
 	assert(file != nullptr and "invalid file pointer for file_read");
 	return (*reinterpret_cast<IO::File::Stream*>(file)).read((char*)buffer, bufsize);
 }
 
-
-static uint64_t nanyc_io_localfolder_file_write(void* file, const void* buffer, uint64_t bufsize) {
+uint64_t nanyc_io_localfolder_file_write(void* file, const void* buffer, uint64_t bufsize) {
 	assert(file != nullptr and "invalid file pointer for file_write");
 	return (*reinterpret_cast<IO::File::Stream*>(file)).write(buffer, bufsize);
 }
 
-
-static void* nanyc_io_localfolder_file_open(nyio_adapter_t* adapter, const char* path, uint32_t len,
+void* nanyc_io_localfolder_file_open(nyio_adapter_t* adapter, const char* path, uint32_t len,
 		nybool_t readm, nybool_t writem, nybool_t appendm, nybool_t truncm) {
 	assert(adapter != nullptr);
 	AnyString localpath = toLocalPath(adapter, path, len);
@@ -164,64 +143,55 @@ static void* nanyc_io_localfolder_file_open(nyio_adapter_t* adapter, const char*
 	return nullptr;
 }
 
-
-static void nanyc_io_localfolder_file_close(void* file) {
+void nanyc_io_localfolder_file_close(void* file) {
 	assert(file != nullptr);
 	delete reinterpret_cast<IO::File::Stream*>(file);
 }
 
-
-static nyio_err_t nanyc_io_localfolder_file_seek(void* file, uint64_t offset) {
+nyio_err_t nanyc_io_localfolder_file_seek(void* file, uint64_t offset) {
 	assert(file != nullptr);
 	auto& ynfile = (*reinterpret_cast<IO::File::Stream*>(file));
 	bool success = ynfile.seek(static_cast<::ssize_t>(offset), IO::File::seekOriginBegin);
 	return success ? nyioe_ok : nyioe_failed;
 }
 
-
-static uint64_t nanyc_io_localfolder_file_tell(void* file) {
+uint64_t nanyc_io_localfolder_file_tell(void* file) {
 	assert(file != nullptr);
 	auto& ynfile = (*reinterpret_cast<IO::File::Stream*>(file));
 	return static_cast<uint64_t>(ynfile.tell());
 }
 
-
-static nyio_err_t nanyc_io_localfolder_file_seek_from_end(void* file, int64_t offset) {
+nyio_err_t nanyc_io_localfolder_file_seek_from_end(void* file, int64_t offset) {
 	assert(file != nullptr);
 	auto& ynfile = (*reinterpret_cast<IO::File::Stream*>(file));
 	bool success = ynfile.seek(offset, IO::File::seekOriginEnd);
 	return success ? nyioe_ok : nyioe_failed;
 }
 
-
-static nyio_err_t nanyc_io_localfolder_file_seek_cur(void* file, int64_t offset) {
+nyio_err_t nanyc_io_localfolder_file_seek_cur(void* file, int64_t offset) {
 	assert(file != nullptr);
 	auto& ynfile = (*reinterpret_cast<IO::File::Stream*>(file));
 	bool success = ynfile.seek(offset, IO::File::seekOriginCurrent);
 	return success ? nyioe_ok : nyioe_failed;
 }
 
-
-static void nanyc_io_localfolder_file_flush(void* file) {
+void nanyc_io_localfolder_file_flush(void* file) {
 	assert(file != nullptr and "invalid file pointer for file_flush");
 	(*reinterpret_cast<IO::File::Stream*>(file)).flush();
 }
 
-
-static nybool_t nanyc_io_localfolder_file_eof(void* file) {
+nybool_t nanyc_io_localfolder_file_eof(void* file) {
 	assert(file != nullptr and "invalid file pointer for file_eof");
 	bool eof = (*reinterpret_cast<IO::File::Stream*>(file)).eof();
 	return (!eof) ? nyfalse : nytrue;
 }
 
-
-static uint64_t nanyc_io_localfolder_file_size(nyio_adapter_t* adapter, const char* path, uint32_t len) {
+uint64_t nanyc_io_localfolder_file_size(nyio_adapter_t* adapter, const char* path, uint32_t len) {
 	assert(adapter != nullptr);
 	return IO::File::Size(toLocalPath(adapter, path, len));
 }
 
-
-static nyio_err_t nanyc_io_localfolder_file_resize(nyio_adapter_t* adapter,
+nyio_err_t nanyc_io_localfolder_file_resize(nyio_adapter_t* adapter,
 		const char* path, uint32_t len, uint64_t newsize) {
 	assert(adapter != nullptr);
 	auto& localpath = toLocalPath(adapter, path, len);
@@ -229,26 +199,20 @@ static nyio_err_t nanyc_io_localfolder_file_resize(nyio_adapter_t* adapter,
 	return success ? nyioe_ok : nyioe_failed;
 }
 
-
-static nyio_err_t nanyc_io_localfolder_file_erase(nyio_adapter_t* adapter, const char* path, uint32_t len) {
+nyio_err_t nanyc_io_localfolder_file_erase(nyio_adapter_t* adapter, const char* path, uint32_t len) {
 	assert(adapter != nullptr);
 	auto err = IO::File::Delete(toLocalPath(adapter, path, len));
 	return (err == IO::errNone) ? nyioe_ok : nyioe_access;
 }
 
-
-namespace { // anonymous
-
-
 nyio_err_t get_contents_by_small_chunks(IO::File::Stream& f, nyio_adapter_t* adapter,
 		char** content, uint64_t* size, uint64_t* capacity) {
-	constexpr static uint32_t fragmentSize = 1024;
+	constexpr uint32_t fragmentSize = 1024;
 	uint64 readsize = 0;
 	uint64_t newcapacity = 0;
-	auto& allocator = retrieveAllocator(adapter);
 	char* buffer = nullptr;
 	do {
-		buffer = (char*) allocator.reallocate(&allocator, buffer, newcapacity, newcapacity + fragmentSize);
+		buffer = (char*) realloc(buffer, newcapacity + fragmentSize);
 		if (YUNI_UNLIKELY(!buffer))
 			return nyioe_memory;
 		uint64 numread = f.read(buffer + newcapacity, fragmentSize);
@@ -261,21 +225,17 @@ nyio_err_t get_contents_by_small_chunks(IO::File::Stream& f, nyio_adapter_t* ada
 	if (readsize != 0) {
 		// ensuring that there is enough space
 		if (newcapacity < readsize + ny::config::extraObjectSize)
-			buffer = (char*) allocator.reallocate(&allocator, buffer, newcapacity, newcapacity + fragmentSize);
+			buffer = (char*) realloc(buffer, newcapacity + fragmentSize);
 		*size = readsize;
 		*content = buffer;
 		*capacity = newcapacity;
 	}
 	else
-		allocator.deallocate(&allocator, buffer, newcapacity);
+		free(buffer);
 	return nyioe_ok;
 }
 
-
-} // anonymous namespace
-
-
-static nyio_err_t nanyc_io_localfolder_file_get_contents(nyio_adapter_t* adapter,
+nyio_err_t nanyc_io_localfolder_file_get_contents(nyio_adapter_t* adapter,
 		char** content, uint64_t* size, uint64_t* capacity, const char* path, uint32_t len) {
 	assert(adapter != nullptr);
 	assert(content != nullptr);
@@ -304,18 +264,17 @@ static nyio_err_t nanyc_io_localfolder_file_get_contents(nyio_adapter_t* adapter
 	// even if tempting, it is not very wise to read the file
 	// with a single read. When the file is really big, it may prevent
 	// the thread from being interruptible
-	constexpr static uint32_t fragmentSize = 1 * 1024 * 1024;
+	constexpr uint32_t fragmentSize = 1 * 1024 * 1024;
 	uint64_t newcapacity;
 	char* buffer;
 	if (filesize < fragmentSize) {
 		newcapacity = filesize + ny::config::extraObjectSize;
-		auto& allocator = retrieveAllocator(adapter);
-		buffer = (char*) allocator.allocate(&allocator, newcapacity);
+		buffer = (char*) malloc(newcapacity);
 		if (YUNI_UNLIKELY(!buffer))
 			return nyioe_memory;
 		uint64_t numread = f.read(buffer, filesize);
 		if (numread != filesize) {
-			allocator.deallocate(&allocator, buffer, newcapacity);
+			free(buffer);
 			return nyioe_access;
 		}
 	}
@@ -326,8 +285,7 @@ static nyio_err_t nanyc_io_localfolder_file_get_contents(nyio_adapter_t* adapter
 		if (newcapacity < filesize + ny::config::extraObjectSize)
 			newcapacity += fragmentSize;
 		assert(newcapacity >= filesize);
-		auto& allocator = retrieveAllocator(adapter);
-		buffer = (char*) allocator.allocate(&allocator, newcapacity);
+		buffer = (char*) malloc(newcapacity);
 		if (YUNI_UNLIKELY(!buffer))
 			return nyioe_memory;
 		uint64_t offset = 0;
@@ -346,8 +304,7 @@ static nyio_err_t nanyc_io_localfolder_file_get_contents(nyio_adapter_t* adapter
 	return nyioe_ok;
 }
 
-
-static nyio_err_t nanyc_io_localfolder_file_set_contents(nyio_adapter_t* adapter,
+nyio_err_t nanyc_io_localfolder_file_set_contents(nyio_adapter_t* adapter,
 		const char* path, uint32_t len, const char* content, uint32_t ctlen) {
 	assert(adapter != nullptr);
 	auto& localpath = toLocalPath(adapter, path, len);
@@ -355,8 +312,7 @@ static nyio_err_t nanyc_io_localfolder_file_set_contents(nyio_adapter_t* adapter
 	return (success ? nyioe_ok : nyioe_access);
 }
 
-
-static nyio_err_t nanyc_io_localfolder_file_append_contents(nyio_adapter_t* adapter,
+nyio_err_t nanyc_io_localfolder_file_append_contents(nyio_adapter_t* adapter,
 		const char* path, uint32_t len, const char* content, uint32_t ctlen) {
 	assert(adapter != nullptr);
 	auto& localpath = toLocalPath(adapter, path, len);
@@ -364,32 +320,28 @@ static nyio_err_t nanyc_io_localfolder_file_append_contents(nyio_adapter_t* adap
 	return (success ? nyioe_ok : nyioe_access);
 }
 
-
-static nyio_err_t nanyc_io_localfolder_folder_create(nyio_adapter_t* adapter, const char* path, uint32_t len) {
+nyio_err_t nanyc_io_localfolder_folder_create(nyio_adapter_t* adapter, const char* path, uint32_t len) {
 	assert(adapter != nullptr);
 	auto& localpath = toLocalPath(adapter, path, len);
 	bool success = IO::Directory::Create(localpath);
 	return (success ? nyioe_ok : nyioe_access);
 }
 
-
-static nyio_err_t nanyc_io_localfolder_folder_erase(nyio_adapter_t* adapter, const char* path, uint32_t len) {
+nyio_err_t nanyc_io_localfolder_folder_erase(nyio_adapter_t* adapter, const char* path, uint32_t len) {
 	assert(adapter != nullptr);
 	auto& localpath = toLocalPath(adapter, path, len);
 	bool success = IO::Directory::Remove(localpath);
 	return (success ? nyioe_ok : nyioe_access);
 }
 
-
-static nyio_err_t nanyc_io_localfolder_folder_exists(nyio_adapter_t* adapter, const char* path, uint32_t len) {
+nyio_err_t nanyc_io_localfolder_folder_exists(nyio_adapter_t* adapter, const char* path, uint32_t len) {
 	assert(adapter != nullptr);
 	auto& localpath = toLocalPath(adapter, path, len);
 	bool success = IO::Directory::Exists(localpath);
 	return (success ? nyioe_ok : nyioe_access);
 }
 
-
-static nyio_err_t nanyc_io_localfolder_folder_clear(nyio_adapter_t* adapter, const char* path, uint32_t len) {
+nyio_err_t nanyc_io_localfolder_folder_clear(nyio_adapter_t* adapter, const char* path, uint32_t len) {
 	assert(adapter != nullptr);
 	auto& localpath = toLocalPath(adapter, path, len);
 	bool success = false;
@@ -404,8 +356,7 @@ static nyio_err_t nanyc_io_localfolder_folder_clear(nyio_adapter_t* adapter, con
 	return (success ? nyioe_ok : nyioe_access);
 }
 
-
-static nyio_iterator_t* nanyc_io_localfolder_folder_iterate(nyio_adapter_t* adapter, const char* path,
+nyio_iterator_t* nanyc_io_localfolder_folder_iterate(nyio_adapter_t* adapter, const char* path,
 		uint32_t len,
 		nybool_t recursive, nybool_t files, nybool_t folders) {
 	assert(adapter != nullptr);
@@ -421,23 +372,20 @@ static nyio_iterator_t* nanyc_io_localfolder_folder_iterate(nyio_adapter_t* adap
 	return reinterpret_cast<nyio_iterator_t*>(data);
 }
 
-
-static void nanyc_io_localfolder_folder_iterator_close(nyio_iterator_t* it) {
+void nanyc_io_localfolder_folder_iterator_close(nyio_iterator_t* it) {
 	assert(it != nullptr);
 	auto* itdata = reinterpret_cast<Private::IO::Directory::IteratorData*>(it);
 	Private::IO::Directory::IteratorDataFree(itdata);
 }
 
-
-static nyio_iterator_t* nanyc_io_localfolder_folder_next(nyio_iterator_t* it) {
+nyio_iterator_t* nanyc_io_localfolder_folder_next(nyio_iterator_t* it) {
 	assert(it);
 	auto* itdata = reinterpret_cast<Private::IO::Directory::IteratorData*>(it);
 	itdata = Private::IO::Directory::IteratorDataNext(itdata);
 	return reinterpret_cast<nyio_iterator_t*>(itdata);
 }
 
-
-static const char* nanyc_io_localfolder_folder_iterator_fullpath(nyio_adapter_t* adapter,
+const char* nanyc_io_localfolder_folder_iterator_fullpath(nyio_adapter_t* adapter,
 		nyio_iterator_t* it) {
 	assert(it);
 	auto& internal = *reinterpret_cast<Internal*>(adapter->internal);
@@ -448,30 +396,26 @@ static const char* nanyc_io_localfolder_folder_iterator_fullpath(nyio_adapter_t*
 	return p;
 }
 
-
-static const char* nanyc_io_localfolder_folder_iterator_name(nyio_iterator_t* it) {
+const char* nanyc_io_localfolder_folder_iterator_name(nyio_iterator_t* it) {
 	assert(it);
 	auto* itdata = reinterpret_cast<Private::IO::Directory::IteratorData*>(it);
 	return Private::IO::Directory::IteratorDataName(itdata).c_str();
 }
 
-
-static uint64_t nanyc_io_localfolder_folder_iterator_size(nyio_iterator_t* it) {
+uint64_t nanyc_io_localfolder_folder_iterator_size(nyio_iterator_t* it) {
 	assert(it);
 	auto* itdata = reinterpret_cast<Private::IO::Directory::IteratorData*>(it);
 	return Private::IO::Directory::IteratorDataSize(itdata);
 }
 
-
-static nyio_type_t nanyc_io_localfolder_folder_iterator_type(nyio_iterator_t* it) {
+nyio_type_t nanyc_io_localfolder_folder_iterator_type(nyio_iterator_t* it) {
 	assert(it);
 	auto* itdata = reinterpret_cast<Private::IO::Directory::IteratorData*>(it);
 	return (Private::IO::Directory::IteratorDataIsFile(itdata))
 		   ? nyiot_file : nyiot_folder;
 }
 
-
-static uint64_t nanyc_io_localfolder_folder_size(nyio_adapter_t* adapter, const char* path, uint32_t len) {
+uint64_t nanyc_io_localfolder_folder_size(nyio_adapter_t* adapter, const char* path, uint32_t len) {
 	assert(adapter != nullptr);
 	auto& localpath = toLocalPath(adapter, path, len);
 	uint64_t bytes = 0;
@@ -482,8 +426,7 @@ static uint64_t nanyc_io_localfolder_folder_size(nyio_adapter_t* adapter, const 
 	return bytes;
 }
 
-
-static nyio_err_t
+nyio_err_t
 nanyc_io_localfolder_file_exists(nyio_adapter_t* adapter, const char* path, uint32_t len) {
 	assert(adapter != nullptr);
 	auto& localpath = toLocalPath(adapter, path, len);
@@ -491,11 +434,10 @@ nanyc_io_localfolder_file_exists(nyio_adapter_t* adapter, const char* path, uint
 	return success ? nyioe_ok : nyioe_access;
 }
 
+} // namespace
 
-extern "C" void nyio_adapter_create_from_local_folder(nyio_adapter_t* adapter, nyallocator_t* allocator,
-		const char* lfol, size_t len) {
+extern "C" void nyio_adapter_init_localfolder(nyio_adapter_t* adapter, const char* lfol, size_t len) {
 	assert(adapter != nullptr);
-	assert(allocator != nullptr);
 	if (YUNI_UNLIKELY(!adapter or !adapter))
 		return;
 	memset(adapter, 0x0, sizeof(nyio_adapter_t));
@@ -504,7 +446,7 @@ extern "C" void nyio_adapter_create_from_local_folder(nyio_adapter_t* adapter, n
 		localfolder.adapt(lfol, static_cast<uint32_t>(len));
 	if (YUNI_UNLIKELY(localfolder.empty()))
 		localfolder = "/";
-	adapter->internal = new Internal{localfolder, allocator};
+	adapter->internal = new Internal{localfolder};
 	adapter->release  = nanyc_io_localfolder_release;
 	adapter->clone    = nanyc_io_localfolder_clone;
 	adapter->stat = nanyc_io_localfolder_stat;

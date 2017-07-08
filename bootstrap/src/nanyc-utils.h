@@ -5,7 +5,6 @@
 namespace ny {
 namespace print {
 
-
 //! Help usage (always return EXIT_SUCCESS)
 int usage(const char* const argv0);
 
@@ -23,7 +22,6 @@ int unknownOption(const char* const argv0, const char* const name);
 
 //! Callback to complain on missing file
 void fileAccessError(const nyproject_t*, nybuild_t*, const char* file, uint32_t length);
-
 
 } // namespace print
 } // namespace ny

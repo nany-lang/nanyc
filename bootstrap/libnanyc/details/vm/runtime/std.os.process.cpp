@@ -5,7 +5,7 @@
 using namespace Yuni;
 
 
-static bool nanyc_os_process_execute(nyvm_t*, const char* cmd, uint32_t len, uint32_t timeout) {
+static bool nanyc_os_process_execute(nyoldvm_t*, const char* cmd, uint32_t len, uint32_t timeout) {
 	return Process::Execute(AnyString{cmd, len}, timeout);
 }
 

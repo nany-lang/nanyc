@@ -35,14 +35,14 @@ struct UnknownPointer final {
 };
 
 struct NoTracker final {
-	static constexpr void atomid(uint32_t) {}
-	static constexpr uint32_t atomid() { return 0; }
-	static constexpr void hold(const void*, size_t, uint32_t) {}
-	static constexpr void forget(const void*) {}
-	static constexpr bool checkObjectSize(const void*, size_t) { return true; }
-	static constexpr size_t fetchObjectSize(void*) { return 0; }
-	static constexpr bool has(const void*) { return true; }
-	static constexpr void releaseAll(nyallocator_t&) {}
+	static void atomid(uint32_t) {}
+	static uint32_t atomid() { return 0; }
+	static void hold(const void*, size_t, uint32_t) {}
+	static void forget(const void*) {}
+	static bool checkObjectSize(const void*, size_t) { return true; }
+	static size_t fetchObjectSize(void*) { return 0; }
+	static bool has(const void*) { return true; }
+	static void releaseAll(nyallocator_t&) {}
 };
 
 struct TrackPointer final {

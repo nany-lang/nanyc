@@ -74,7 +74,7 @@ bool Context::initializeFirstTContext() {
 	io.cwd = "/home";
 	// fallback filesystem
 	io.fallback.path.clear(); // just in case
-	initFallbackAdapter(io.fallback.adapter);
+	nyio_adapter_init_dummy(&io.fallback.adapter);
 	// reset mountpoints
 	io.mountpointSize = 0;
 	String path;
@@ -85,7 +85,7 @@ bool Context::initializeFirstTContext() {
 			return false;
 		auto& mp = io.mountpoints[io.mountpointSize++];
 		mp.path = "/home";
-		nyio_adapter_create_from_local_folder(&mp.adapter, &cf.allocator, path.c_str(), path.size());
+		nyio_adapter_init_localfolder(&mp.adapter, path.c_str(), path.size());
 	}
 	// mount tmp folder
 	{
@@ -94,13 +94,13 @@ bool Context::initializeFirstTContext() {
 			return false;
 		auto& mp = io.mountpoints[io.mountpointSize++];
 		mp.path = "/tmp";
-		nyio_adapter_create_from_local_folder(&mp.adapter, &cf.allocator, path.c_str(), path.size());
+		nyio_adapter_init_localfolder(&mp.adapter, path.c_str(), path.size());
 	}
 	// mount '/' -> '/root'
 	{
 		auto& mp = io.mountpoints[io.mountpointSize++];
 		mp.path = "/root";
-		nyio_adapter_create_from_local_folder(&mp.adapter, &cf.allocator, nullptr, 0u);
+		nyio_adapter_init_localfolder(&mp.adapter, nullptr, 0u);
 	}
 	return true;
 }

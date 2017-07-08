@@ -6,7 +6,7 @@
 namespace ny {
 namespace vm {
 
-union DataRegister {
+union Register {
 	uint64_t u64;
 	int64_t i64;
 	double f64;

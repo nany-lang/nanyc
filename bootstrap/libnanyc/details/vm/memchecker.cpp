@@ -8,10 +8,10 @@ namespace ny {
 namespace vm {
 
 
-void MemChecker<true>::releaseAll(nyallocator_t& allocator) {
+void MemChecker<true>::releaseAll() {
 	if (not ownedPointers.empty()) {
 		for (auto& pair : ownedPointers)
-			allocator.deallocate(&allocator, (void*) pair.first, pair.second.objsize);
+			free((void*) pair.first); // size: pair.second.objsize;
 		ownedPointers.clear();
 	}
 }

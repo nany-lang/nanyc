@@ -7,17 +7,16 @@
 #include <yuni/io/directory/info.h>
 #include <yuni/datetime/timestamp.h>
 #include <yuni/core/logs/logs.h>
-#include "nany/nany.h"
+#include "nanyc/utils.h"
 #include <algorithm>
 #include <yuni/datetime/timestamp.h>
 #include <iostream>
 #include <vector>
 
+
 using namespace Yuni;
 
-
 namespace {
-
 
 struct Settings {
 	//! List of filenames to verify
@@ -27,7 +26,6 @@ struct Settings {
 	// Result expected from filename convention
 	bool useFilenameConvention = false;
 };
-
 
 template<class LeftType = Logs::NullDecorator>
 struct ParseVerbosity: public LeftType {
@@ -111,10 +109,8 @@ struct ParseVerbosity: public LeftType {
 
 }; // struct VerbosityLevel
 
-
 using Logging = Logs::Logger<Logs::StdCout<>, ParseVerbosity<Logs::Message<>>>;
 static Logging logs;
-
 
 uint32_t findCommonFolderLength(const std::vector<String>& filenames) {
 	if (filenames.empty())
@@ -135,7 +131,6 @@ uint32_t findCommonFolderLength(const std::vector<String>& filenames) {
 	}
 	return len;
 }
-
 
 template<class F>
 bool IterateThroughAllFiles(const std::vector<String>& filenames, const F& callback) {
@@ -185,7 +180,6 @@ bool IterateThroughAllFiles(const std::vector<String>& filenames, const F& callb
 	return (0 == testFAILED);
 }
 
-
 bool batchCheckIfFilenamesConformToGrammar(Settings& settings) {
 	auto commonFolder = (settings.filenames.size() > 1 ? findCommonFolderLength(settings.filenames) : 0);
 	if (0 != commonFolder)
@@ -203,7 +197,7 @@ bool batchCheckIfFilenamesConformToGrammar(Settings& settings) {
 		}
 		// PARSE
 		int64_t start = DateTime::NowMilliSeconds();
-		bool success = (nytrue == nytry_parse_file_n(file.c_str(), file.size()));
+		bool success = (nytrue == nyparse_check_file(file.c_str(), file.size()));
 		duration = DateTime::NowMilliSeconds() - start;
 		success = (success == expected);
 		if (success and duration < 300) {
@@ -223,7 +217,6 @@ bool batchCheckIfFilenamesConformToGrammar(Settings& settings) {
 		return success;
 	});
 }
-
 
 std::vector<String> expandAndCanonicalizeFilenames(const std::vector<String>& filenames) {
 	std::vector<String> filelist;
@@ -257,7 +250,6 @@ std::vector<String> expandAndCanonicalizeFilenames(const std::vector<String>& fi
 	return filelist;
 }
 
-
 bool parseCommandLine(Settings& settings, int argc, char** argv) {
 	GetOpt::Parser options;
 	std::vector<String> filenames;
@@ -286,9 +278,7 @@ bool parseCommandLine(Settings& settings, int argc, char** argv) {
 	return true;
 }
 
-
 } // namespace
-
 
 int main(int argc, char** argv) {
 	try {

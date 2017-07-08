@@ -15,7 +15,7 @@ namespace {
 template<class T> uint32_t sizeFromCapacity(uint32_t capacity) {
 	uint32_t bytes = static_cast<uint32_t>(sizeof(T)); // the Chunk itself
 	bytes -= static_cast<uint32_t>(sizeof(T::block));  // minus the pseudo field 'block'
-	bytes += static_cast<uint32_t>(capacity * sizeof(DataRegister));
+	bytes += static_cast<uint32_t>(capacity * sizeof(Register));
 	return bytes;
 }
 
@@ -60,7 +60,7 @@ void Stack::dump(const AnyString& action, uint32_t count) const {
 void Stack::pushNewChunk(uint32_t count) {
 	#if NANY_vm_STACK_TRACES != 0
 	std::cout << "== stack == requires new chunk to increase stack of ";
-	std::cout << (sizeof(DataRegister) * count) << " bytes\n";
+	std::cout << (sizeof(Register) * count) << " bytes\n";
 	#endif
 	Chunk* chunk;
 	if (reserve and count <= reserve->capacity) {

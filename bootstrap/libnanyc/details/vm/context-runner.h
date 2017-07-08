@@ -47,17 +47,16 @@ struct ContextRunner final {
 	struct DyncallError final: public Exception {};
 
 	//! Registers for the current stack frame
-	DataRegister* registers = nullptr;
+	Register* registers = nullptr;
 	//! Return value
 	uint64_t retRegister = 0;
 	//! Number of pushed parameters
 	uint32_t funcparamCount = 0; // parameters are 2-based
 	//! all pushed parameters
-	DataRegister funcparams[config::maxPushedParameters];
+	Register funcparams[config::maxPushedParameters];
 
-	nyallocator_t& allocator;
 	DCCallVM* dyncall = nullptr;
-	nyvm_t cfvm;
+	nyoldvm_t cfvm;
 	nyprogram_cf_t cf;
 	Context& context;
 	Stack stack;
@@ -96,13 +95,13 @@ public:
 
 
 	template<class T> T* allocateraw(size_t size) {
-		return (T*) allocator.allocate(&allocator, size);
+		return (T*) malloc(size);
 	}
 
 
-	void deallocate(void* object, size_t size) {
+	void deallocate(void* object, size_t /*size*/) {
 		assert(object != nullptr);
-		allocator.deallocate(&allocator, object, size);
+		free(object);
 	}
 
 

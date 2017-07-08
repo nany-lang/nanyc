@@ -87,7 +87,7 @@ template<ny::ir::isa::Op O> struct Operand final {};
 template<> struct Operand<ny::ir::isa::Op::nop> final {
 	uint32_t opcode;
 
-	template<class T> void eachLVID(T&) {}
+	template<class T> void eachLVID(const T&) {}
 };
 
 template<> struct Operand<ny::ir::isa::Op::eq> final {
@@ -96,7 +96,7 @@ template<> struct Operand<ny::ir::isa::Op::eq> final {
 	uint32_t lhs;
 	uint32_t rhs;
 
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, lhs, rhs);
 	}
 };
@@ -107,7 +107,7 @@ template<> struct Operand<ny::ir::isa::Op::neq> final {
 	uint32_t lhs;
 	uint32_t rhs;
 
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, lhs, rhs);
 	}
 };
@@ -118,7 +118,7 @@ template<> struct Operand<ny::ir::isa::Op::flt> final {
 	uint32_t lhs;
 	uint32_t rhs;
 
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, lhs, rhs);
 	}
 };
@@ -129,7 +129,7 @@ template<> struct Operand<ny::ir::isa::Op::flte> final {
 	uint32_t lhs;
 	uint32_t rhs;
 
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, lhs, rhs);
 	}
 };
@@ -140,7 +140,7 @@ template<> struct Operand<ny::ir::isa::Op::fgt> final {
 	uint32_t lhs;
 	uint32_t rhs;
 
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, lhs, rhs);
 	}
 };
@@ -151,7 +151,7 @@ template<> struct Operand<ny::ir::isa::Op::fgte> final {
 	uint32_t lhs;
 	uint32_t rhs;
 
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, lhs, rhs);
 	}
 };
@@ -162,7 +162,7 @@ template<> struct Operand<ny::ir::isa::Op::lt> final {
 	uint32_t lhs;
 	uint32_t rhs;
 
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, lhs, rhs);
 	}
 };
@@ -173,7 +173,7 @@ template<> struct Operand<ny::ir::isa::Op::lte> final {
 	uint32_t lhs;
 	uint32_t rhs;
 
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, lhs, rhs);
 	}
 };
@@ -184,7 +184,7 @@ template<> struct Operand<ny::ir::isa::Op::ilt> final {
 	uint32_t lhs;
 	uint32_t rhs;
 
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, lhs, rhs);
 	}
 };
@@ -195,7 +195,7 @@ template<> struct Operand<ny::ir::isa::Op::ilte> final {
 	uint32_t lhs;
 	uint32_t rhs;
 
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, lhs, rhs);
 	}
 };
@@ -206,7 +206,7 @@ template<> struct Operand<ny::ir::isa::Op::gt> final {
 	uint32_t lhs;
 	uint32_t rhs;
 
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, lhs, rhs);
 	}
 };
@@ -217,7 +217,7 @@ template<> struct Operand<ny::ir::isa::Op::gte> final {
 	uint32_t lhs;
 	uint32_t rhs;
 
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, lhs, rhs);
 	}
 };
@@ -228,7 +228,7 @@ template<> struct Operand<ny::ir::isa::Op::igt> final {
 	uint32_t lhs;
 	uint32_t rhs;
 
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, lhs, rhs);
 	}
 };
@@ -239,7 +239,7 @@ template<> struct Operand<ny::ir::isa::Op::igte> final {
 	uint32_t lhs;
 	uint32_t rhs;
 
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, lhs, rhs);
 	}
 };
@@ -250,7 +250,7 @@ template<> struct Operand<ny::ir::isa::Op::opand> final {
 	uint32_t lhs;
 	uint32_t rhs;
 
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, lhs, rhs);
 	}
 };
@@ -261,7 +261,7 @@ template<> struct Operand<ny::ir::isa::Op::opor> final {
 	uint32_t lhs;
 	uint32_t rhs;
 
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, lhs, rhs);
 	}
 };
@@ -272,7 +272,7 @@ template<> struct Operand<ny::ir::isa::Op::opxor> final {
 	uint32_t lhs;
 	uint32_t rhs;
 
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, lhs, rhs);
 	}
 };
@@ -283,7 +283,7 @@ template<> struct Operand<ny::ir::isa::Op::opmod> final {
 	uint32_t lhs;
 	uint32_t rhs;
 
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, lhs, rhs);
 	}
 };
@@ -293,7 +293,7 @@ template<> struct Operand<ny::ir::isa::Op::negation> final {
 	uint32_t lvid;
 	uint32_t lhs;
 
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, lhs);
 	}
 };
@@ -303,7 +303,7 @@ template<> struct Operand<ny::ir::isa::Op::fadd> final {
 	uint32_t lvid;
 	uint32_t lhs;
 	uint32_t rhs;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, lhs, rhs);
 	}
 };
@@ -314,7 +314,7 @@ template<> struct Operand<ny::ir::isa::Op::fsub> final {
 	uint32_t lhs;
 	uint32_t rhs;
 
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, lhs, rhs);
 	}
 };
@@ -325,7 +325,7 @@ template<> struct Operand<ny::ir::isa::Op::fmul> final {
 	uint32_t lhs;
 	uint32_t rhs;
 
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, lhs, rhs);
 	}
 };
@@ -336,7 +336,7 @@ template<> struct Operand<ny::ir::isa::Op::fdiv> final {
 	uint32_t lhs;
 	uint32_t rhs;
 
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, lhs, rhs);
 	}
 };
@@ -347,7 +347,7 @@ template<> struct Operand<ny::ir::isa::Op::add> final {
 	uint32_t lhs;
 	uint32_t rhs;
 
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, lhs, rhs);
 	}
 };
@@ -358,7 +358,7 @@ template<> struct Operand<ny::ir::isa::Op::sub> final {
 	uint32_t lhs;
 	uint32_t rhs;
 
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, lhs, rhs);
 	}
 };
@@ -369,7 +369,7 @@ template<> struct Operand<ny::ir::isa::Op::mul> final {
 	uint32_t lhs;
 	uint32_t rhs;
 
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, lhs, rhs);
 	}
 };
@@ -380,7 +380,7 @@ template<> struct Operand<ny::ir::isa::Op::div> final {
 	uint32_t lhs;
 	uint32_t rhs;
 
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, lhs, rhs);
 	}
 };
@@ -391,7 +391,7 @@ template<> struct Operand<ny::ir::isa::Op::imul> final {
 	uint32_t lhs;
 	uint32_t rhs;
 
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, lhs, rhs);
 	}
 };
@@ -402,7 +402,7 @@ template<> struct Operand<ny::ir::isa::Op::idiv> final {
 	uint32_t lhs;
 	uint32_t rhs;
 
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, lhs, rhs);
 	}
 };
@@ -412,7 +412,7 @@ template<> struct Operand<ny::ir::isa::Op::fieldget> final {
 	uint32_t lvid; // dest pointer
 	uint32_t self;
 	uint32_t var;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, self);
 	}
 };
@@ -422,7 +422,7 @@ template<> struct Operand<ny::ir::isa::Op::fieldset> final {
 	uint32_t lvid; // value
 	uint32_t self;
 	uint32_t var;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, self);
 	}
 };
@@ -430,13 +430,13 @@ template<> struct Operand<ny::ir::isa::Op::fieldset> final {
 template<> struct Operand<ny::ir::isa::Op::stacksize> final {
 	uint32_t opcode;
 	uint32_t add;
-	template<class T> void eachLVID(T&) {}
+	template<class T> void eachLVID(const T&) {}
 };
 
 template<> struct Operand<ny::ir::isa::Op::comment> final {
 	uint32_t opcode;
 	uint32_t text;
-	template<class T> void eachLVID(T&) {}
+	template<class T> void eachLVID(const T&) {}
 };
 
 template<> struct Operand<ny::ir::isa::Op::stackalloc> final {
@@ -444,7 +444,7 @@ template<> struct Operand<ny::ir::isa::Op::stackalloc> final {
 	uint32_t lvid;
 	uint32_t type;    // nytype_t
 	uint32_t atomid;  // atom id if (type == any)
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid);
 	}
 };
@@ -456,7 +456,7 @@ template<> struct Operand<ny::ir::isa::Op::storeConstant> final {
 		uint64_t u64;
 		double f64;
 	} value;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid);
 	}
 };
@@ -465,7 +465,7 @@ template<> struct Operand<ny::ir::isa::Op::storeText> final {
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t text;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid);
 	}
 };
@@ -474,7 +474,7 @@ template<> struct Operand<ny::ir::isa::Op::store> final {
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t source;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid);
 	}
 };
@@ -483,7 +483,7 @@ template<> struct Operand<ny::ir::isa::Op::ret> final {
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t tmplvid; // unused by nyprogram_t
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, tmplvid);
 	}
 };
@@ -492,7 +492,7 @@ template<> struct Operand<ny::ir::isa::Op::push> final {
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t name; // if named parameter
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid);
 	}
 };
@@ -501,7 +501,7 @@ template<> struct Operand<ny::ir::isa::Op::tpush> final {
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t name; // if named parameter
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid);
 	}
 };
@@ -511,7 +511,7 @@ template<> struct Operand<ny::ir::isa::Op::call> final {
 	uint32_t lvid;
 	uint32_t ptr2func; // or atomid
 	uint32_t instanceid;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, ptr2func);
 	}
 };
@@ -523,7 +523,7 @@ template<> struct Operand<ny::ir::isa::Op::intrinsic> final {
 	uint32_t iid;
 	// intrinsic name
 	uint32_t intrinsic;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid);
 	}
 };
@@ -531,7 +531,7 @@ template<> struct Operand<ny::ir::isa::Op::intrinsic> final {
 template<> struct Operand<ny::ir::isa::Op::debugfile> final {
 	uint32_t opcode;
 	uint32_t filename;
-	template<class T> void eachLVID(T&) {}
+	template<class T> void eachLVID(const T&) {}
 };
 
 template<> struct Operand<ny::ir::isa::Op::namealias> final {
@@ -539,7 +539,7 @@ template<> struct Operand<ny::ir::isa::Op::namealias> final {
 	uint32_t lvid;
 	uint32_t name;
 	uint32_t forceNonSynthetic;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid);
 	}
 };
@@ -548,17 +548,17 @@ template<> struct Operand<ny::ir::isa::Op::debugpos> final {
 	uint32_t opcode;
 	uint32_t line;
 	uint32_t offset;
-	template<class T> void eachLVID(T&) {}
+	template<class T> void eachLVID(const T&) {}
 };
 
 template<> struct Operand<ny::ir::isa::Op::scope> final {
 	uint32_t opcode;
-	template<class T> void eachLVID(T&) {}
+	template<class T> void eachLVID(const T&) {}
 };
 
 template<> struct Operand<ny::ir::isa::Op::end> final {
 	uint32_t opcode;
-	template<class T> void eachLVID(T&) {}
+	template<class T> void eachLVID(const T&) {}
 };
 
 template<> struct Operand<ny::ir::isa::Op::qualifiers> final {
@@ -567,7 +567,7 @@ template<> struct Operand<ny::ir::isa::Op::qualifiers> final {
 	TypeQualifier qualifier;
 	uint32_t flag;
 
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		static_assert(sizeof(Operand<ny::ir::isa::Op::qualifiers>) <= sizeof(uint32_t) * 4, "alignment required");
 		c(lvid);
 	}
@@ -576,7 +576,7 @@ template<> struct Operand<ny::ir::isa::Op::qualifiers> final {
 template<> struct Operand<ny::ir::isa::Op::opassert> final {
 	uint32_t opcode;
 	uint32_t lvid;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid);
 	}
 };
@@ -585,7 +585,7 @@ template<> struct Operand<ny::ir::isa::Op::memcheckhold> final {
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t size;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, size);
 	}
 };
@@ -593,7 +593,7 @@ template<> struct Operand<ny::ir::isa::Op::memcheckhold> final {
 template<> struct Operand<ny::ir::isa::Op::label> final {
 	uint32_t opcode;
 	uint32_t label;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(label);
 	}
 };
@@ -601,7 +601,7 @@ template<> struct Operand<ny::ir::isa::Op::label> final {
 template<> struct Operand<ny::ir::isa::Op::jmp> final {
 	uint32_t opcode;
 	uint32_t label;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(label);
 	}
 };
@@ -611,7 +611,7 @@ template<> struct Operand<ny::ir::isa::Op::jz> final {
 	uint32_t lvid;   // the local variable
 	uint32_t result; // local variable to set to 1 if jump
 	uint32_t label;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, result, label);
 	}
 };
@@ -621,7 +621,7 @@ template<> struct Operand<ny::ir::isa::Op::jnz> final {
 	uint32_t lvid;   // the local variable
 	uint32_t result; // local variable to set to 1 if jump
 	uint32_t label;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, result, label);
 	}
 };
@@ -629,7 +629,7 @@ template<> struct Operand<ny::ir::isa::Op::jnz> final {
 template<> struct Operand<ny::ir::isa::Op::jzraise> final {
 	uint32_t opcode;
 	uint32_t label;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(label);
 	}
 };
@@ -638,7 +638,7 @@ template<> struct Operand<ny::ir::isa::Op::jmperrhandler> final {
 	uint32_t opcode;
 	uint32_t atomid;
 	uint32_t label;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(label);
 	}
 };
@@ -647,7 +647,7 @@ template<> struct Operand<ny::ir::isa::Op::memalloc> final {
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t regsize;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, regsize);
 	}
 };
@@ -656,7 +656,7 @@ template<> struct Operand<ny::ir::isa::Op::memfree> final {
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t regsize;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, regsize);
 	}
 };
@@ -666,7 +666,7 @@ template<> struct Operand<ny::ir::isa::Op::memfill> final {
 	uint32_t lvid;
 	uint32_t regsize;
 	uint32_t pattern;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, regsize);
 	}
 };
@@ -676,7 +676,7 @@ template<> struct Operand<ny::ir::isa::Op::memcopy> final {
 	uint32_t lvid;
 	uint32_t srclvid;
 	uint32_t regsize;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, srclvid, regsize);
 	}
 };
@@ -686,7 +686,7 @@ template<> struct Operand<ny::ir::isa::Op::memmove> final {
 	uint32_t lvid;
 	uint32_t srclvid;
 	uint32_t regsize;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, srclvid, regsize);
 	}
 };
@@ -696,7 +696,7 @@ template<> struct Operand<ny::ir::isa::Op::memcmp> final {
 	uint32_t lvid;
 	uint32_t srclvid;
 	uint32_t regsize; // and result as well
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, srclvid, regsize);
 	}
 };
@@ -706,7 +706,7 @@ template<> struct Operand<ny::ir::isa::Op::cstrlen> final {
 	uint32_t lvid;
 	uint32_t bits;
 	uint32_t ptr;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, ptr);
 	}
 };
@@ -715,7 +715,7 @@ template<> struct Operand<ny::ir::isa::Op::load_u64> final {
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t ptrlvid;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, ptrlvid);
 	}
 };
@@ -723,7 +723,7 @@ template<> struct Operand<ny::ir::isa::Op::load_u32> final {
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t ptrlvid;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, ptrlvid);
 	}
 };
@@ -731,7 +731,7 @@ template<> struct Operand<ny::ir::isa::Op::load_u8> final {
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t ptrlvid;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, ptrlvid);
 	}
 };
@@ -740,7 +740,7 @@ template<> struct Operand<ny::ir::isa::Op::store_u64> final {
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t ptrlvid;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, ptrlvid);
 	}
 };
@@ -748,7 +748,7 @@ template<> struct Operand<ny::ir::isa::Op::store_u32> final {
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t ptrlvid;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, ptrlvid);
 	}
 };
@@ -756,7 +756,7 @@ template<> struct Operand<ny::ir::isa::Op::store_u8> final {
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t ptrlvid;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, ptrlvid);
 	}
 };
@@ -766,7 +766,7 @@ template<> struct Operand<ny::ir::isa::Op::memrealloc> final {
 	uint32_t lvid;
 	uint32_t oldsize;
 	uint32_t newsize;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, oldsize, newsize);
 	}
 };
@@ -799,7 +799,7 @@ template<> struct Operand<ny::ir::isa::Op::pragma> final {
 	}
 	value;
 
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		static_assert(sizeof(Operand<ny::ir::isa::Op::pragma>) <= sizeof(uint32_t) * 4, "alignment required");
 		switch (pragma) {
 			case Pragma::synthetic: {
@@ -846,7 +846,7 @@ template<> struct Operand<ny::ir::isa::Op::blueprint> final {
 		} converter {newlvid};
 		lvid = converter.lvid;
 	}
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		static_assert(sizeof(Operand<ny::ir::isa::Op::blueprint>) <= sizeof(uint32_t) * 4, "alignment required");
 		uint32_t cplvid = lvid;
 		c(cplvid);
@@ -857,7 +857,7 @@ template<> struct Operand<ny::ir::isa::Op::blueprint> final {
 template<> struct Operand<ny::ir::isa::Op::self> final {
 	uint32_t opcode;
 	uint32_t self;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(self);
 	}
 };
@@ -867,7 +867,7 @@ template<> struct Operand<ny::ir::isa::Op::identify> final {
 	uint32_t lvid;
 	uint32_t self;
 	uint32_t text;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, self);
 	}
 };
@@ -876,7 +876,7 @@ template<> struct Operand<ny::ir::isa::Op::identifyset> final { // MUST be ident
 	uint32_t lvid;
 	uint32_t self;
 	uint32_t text;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, self);
 	}
 };
@@ -884,7 +884,7 @@ template<> struct Operand<ny::ir::isa::Op::identifyset> final { // MUST be ident
 template<> struct Operand<ny::ir::isa::Op::ensureresolved> final {
 	uint32_t opcode;
 	uint32_t lvid;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid);
 	}
 };
@@ -893,7 +893,7 @@ template<> struct Operand<ny::ir::isa::Op::commontype> final {
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t previous;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, previous);
 	}
 };
@@ -903,7 +903,7 @@ template<> struct Operand<ny::ir::isa::Op::assign> final {
 	uint32_t lhs;
 	uint32_t rhs;
 	uint32_t disposelhs;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lhs, rhs);
 	}
 };
@@ -913,7 +913,7 @@ template<> struct Operand<ny::ir::isa::Op::follow> final {
 	uint32_t lvid;
 	uint32_t follower;
 	uint32_t symlink;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, follower);
 	}
 };
@@ -921,7 +921,7 @@ template<> struct Operand<ny::ir::isa::Op::follow> final {
 template<> struct Operand<ny::ir::isa::Op::typeisobject> final {
 	uint32_t opcode;
 	uint32_t lvid;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid);
 	}
 };
@@ -930,7 +930,7 @@ template<> struct Operand<ny::ir::isa::Op::classdefsizeof> final {
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t type; // lvid or atomid
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, type);
 	}
 };
@@ -938,7 +938,7 @@ template<> struct Operand<ny::ir::isa::Op::classdefsizeof> final {
 template<> struct Operand<ny::ir::isa::Op::ref> final {
 	uint32_t opcode;
 	uint32_t lvid;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid);
 	}
 };
@@ -948,7 +948,7 @@ template<> struct Operand<ny::ir::isa::Op::unref> final {
 	uint32_t lvid;
 	uint32_t atomid;
 
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid);
 	}
 };
@@ -958,7 +958,7 @@ template<> struct Operand<ny::ir::isa::Op::allocate> final {
 	uint32_t lvid;
 	// atomid
 	uint32_t atomid; // or atomid
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid);
 	}
 };
@@ -967,7 +967,7 @@ template<> struct Operand<ny::ir::isa::Op::onscopefail> final {
 	uint32_t opcode;
 	uint32_t lvid;
 	uint32_t label;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, label);
 	}
 };
@@ -977,7 +977,7 @@ template<> struct Operand<ny::ir::isa::Op::raise> final {
 	uint32_t lvid;
 	uint32_t label;
 	uint32_t atomid;
-	template<class T> void eachLVID(T& c) {
+	template<class T> void eachLVID(const T& c) {
 		c(lvid, label);
 	}
 };

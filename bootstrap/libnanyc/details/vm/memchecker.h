@@ -48,7 +48,7 @@ struct MemChecker final {
 		return true;
 	}
 
-	static constexpr void releaseAll(nyallocator_t&) {}
+	static constexpr void releaseAll() {}
 };
 
 
@@ -61,7 +61,7 @@ template<> struct MemChecker<true> final {
 		return currentAtomid;
 	}
 
-	void releaseAll(nyallocator_t&);
+	void releaseAll();
 
 	void hold(const uint64_t* const pointer, size_t size, uint32_t lvid) {
 		NANY_MEMCHECK_HOLD(pointer);

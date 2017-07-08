@@ -8,9 +8,50 @@ namespace ny {
 namespace vm {
 
 
+const char* io_get_cwd(nyoldvm_t* vmtx, uint32_t* length) {
+	auto& tc = *reinterpret_cast<ny::vm::Context*>(vmtx->internal);
+	if (length)
+		*length = tc.io.cwd.size();
+	return tc.io.cwd.c_str();
+}
+
+nyio_adapter_t* io_resolve(nyoldvm_t* vmtx, nyanystr_t* relpath, const nyanystr_t* path) {
+	try {
+		if (path and path->len != 0 and path->c_str and path->len < 1024 * 1024) {
+			auto& thread = *reinterpret_cast<ny::vm::Context*>(vmtx->internal);
+			AnyString result;
+			AnyString pth{path->c_str, static_cast<uint32_t>(path->len)};
+			auto& adapter = thread.io.resolve(result, pth);
+			if (relpath) {
+				relpath->c_str = result.c_str();
+				relpath->len = result.size();
+			}
+			return &adapter;
+		}
+	}
+	catch (...) {
+	}
+	return nullptr;
+}
+
+nyio_err_t io_set_cwd(nyoldvm_t* vmtx, const char* path, uint32_t len) {
+	if (len != 0 and path != nullptr) {
+		auto& thread = *reinterpret_cast<ny::vm::Context*>(vmtx->internal);
+		thread.io.cwd.assign(path, len);
+		return nyioe_ok;
+	}
+	return nyioe_failed;
+}
+
+nyio_err_t io_add_mountpoint(nyoldvm_t* vmtx, const char* path, uint32_t len, nyio_adapter_t* adapter) {
+	auto& thread = *reinterpret_cast<ny::vm::Context*>(vmtx->internal);
+	bool success = (path and len != 0 and adapter)
+		and thread.io.addMountpoint(AnyString{path, len}, *adapter);
+	return success ? nyioe_ok : nyioe_failed;
+}
+
 ContextRunner::ContextRunner(Context& context, const ir::Sequence& callee)
-	: allocator(context.program.cf.allocator)
-	, cf(context.program.cf)
+	: cf(context.program.cf)
 	, context(context)
 	, map(context.program.map)
 	, ircode(std::cref(callee))
@@ -23,10 +64,12 @@ void ContextRunner::initialize() {
 	if (unlikely(!dyncall))
 		throw DyncallError();
 	dcMode(dyncall, DC_CALL_C_DEFAULT);
-	cfvm.allocator = &allocator;
-	cfvm.program = context.program.self();
-	cfvm.tctx = context.self();
+	cfvm.internal = context.self();
 	cfvm.console = &cf.console;
+	cfvm.io_get_cwd = io_get_cwd;
+	cfvm.io_resolve = io_resolve;
+	cfvm.io_set_cwd = io_set_cwd;
+	cfvm.io_add_mountpoint = io_add_mountpoint;
 }
 
 
@@ -38,7 +81,7 @@ ContextRunner::~ContextRunner() {
 
 
 void ContextRunner::abortMission() {
-	memchecker.releaseAll(allocator); // prevent memory leak reports
+	memchecker.releaseAll(); // prevent memory leak reports
 	stacktrace.dump(context.cf, map);
 	throw Abort();
 }
@@ -265,7 +308,7 @@ void ContextRunner::visit(const ir::isa::Operand<ir::isa::Op::memrealloc>& opr) 
 			return emitPointerSizeMismatch(object, oldsize);
 		memchecker.forget(object);
 	}
-	auto* newptr = (uint64_t*) allocator.reallocate(&allocator, object, oldsize, newsize);
+	auto* newptr = (uint64_t*) realloc(object, newsize);
 	registers[opr.lvid].u64 = reinterpret_cast<uintptr_t>(newptr);
 	if (newptr) {
 		// the nointer has been successfully reallocated - keeping a reference

@@ -6,7 +6,7 @@
 using namespace Yuni;
 
 
-static void _nanyc_env_set(nyvm_t*, void* varname, void* content) {
+static void _nanyc_env_set(nyoldvm_t*, void* varname, void* content) {
 	if (varname) {
 		AnyString name = *(reinterpret_cast<String*>(varname));
 		AnyString cont;
@@ -17,7 +17,7 @@ static void _nanyc_env_set(nyvm_t*, void* varname, void* content) {
 }
 
 
-static void _nanyc_env_unset(nyvm_t*, void* varname) {
+static void _nanyc_env_unset(nyoldvm_t*, void* varname) {
 	if (varname) {
 		AnyString name = *(reinterpret_cast<String*>(varname));
 		System::Environment::Unset(name);
@@ -25,7 +25,7 @@ static void _nanyc_env_unset(nyvm_t*, void* varname) {
 }
 
 
-static void* _nanyc_env_read(nyvm_t* vm, void* varname, void* defvalue) {
+static void* _nanyc_env_read(nyoldvm_t* vm, void* varname, void* defvalue) {
 	auto* string = vm_allocate<String>(vm);
 	if (varname) {
 		AnyString name = *(reinterpret_cast<String*>(varname));
@@ -41,7 +41,7 @@ static void* _nanyc_env_read(nyvm_t* vm, void* varname, void* defvalue) {
 }
 
 
-static bool _nanyc_env_read_as_bool(nyvm_t*, void* varname, bool defvalue) {
+static bool _nanyc_env_read_as_bool(nyoldvm_t*, void* varname, bool defvalue) {
 	if (varname) {
 		AnyString name = *(reinterpret_cast<String*>(varname));
 		return System::Environment::ReadAsBool(name, defvalue);
@@ -50,7 +50,7 @@ static bool _nanyc_env_read_as_bool(nyvm_t*, void* varname, bool defvalue) {
 }
 
 
-static int64_t _nanyc_env_read_as_i64(nyvm_t*, void* varname, int64_t defvalue) {
+static int64_t _nanyc_env_read_as_i64(nyoldvm_t*, void* varname, int64_t defvalue) {
 	if (varname) {
 		AnyString name = *(reinterpret_cast<String*>(varname));
 		return System::Environment::ReadAsInt64(name, defvalue);
@@ -59,7 +59,7 @@ static int64_t _nanyc_env_read_as_i64(nyvm_t*, void* varname, int64_t defvalue) 
 }
 
 
-static uint64_t _nanyc_env_read_as_u64(nyvm_t*, void* varname, uint64_t defvalue) {
+static uint64_t _nanyc_env_read_as_u64(nyoldvm_t*, void* varname, uint64_t defvalue) {
 	if (varname) {
 		AnyString name = *(reinterpret_cast<String*>(varname));
 		return System::Environment::ReadAsUInt64(name, defvalue);
@@ -68,7 +68,7 @@ static uint64_t _nanyc_env_read_as_u64(nyvm_t*, void* varname, uint64_t defvalue
 }
 
 
-static bool _nanyc_env_exists(nyvm_t*, void* varname) {
+static bool _nanyc_env_exists(nyoldvm_t*, void* varname) {
 	if (varname) {
 		AnyString name = *(reinterpret_cast<String*>(varname));
 		return System::Environment::Exists(name);

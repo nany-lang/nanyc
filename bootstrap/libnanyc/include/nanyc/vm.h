@@ -11,13 +11,33 @@
 #include <nanyc/console.h>
 #include <nanyc/allocator.h>
 #include <nanyc/program.h>
+#include <nanyc/io.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 
-typedef struct nyvm_t nyvm_t;
+typedef struct nyvmthread_t {
+	void* internal;
+	nyio_adapter_t* (*io_resolve)(nyvmthread_t*, nyanystr_t* relpath, const nyanystr_t* path);
+	const char* (*io_get_cwd)(nyvmthread_t*, uint32_t* len);
+	nyio_err_t (*io_set_cwd)(nyvmthread_t*, const char*, uint32_t);
+	nyio_err_t (*io_add_mountpoint)(nyvmthread_t*, const char*, uint32_t, nyio_adapter_t*);
+	//! Temporary structure for complex return values by intrinsics
+	struct {
+		uint64_t size;
+		uint64_t capacity;
+		void* data;
+	}
+	returnValue;
+	void* userdata;
+	nyallocator_t allocator;
+	nyconsole_t cout;
+	nyconsole_t cerr;
+	const nyprogram_t* program;
+}
+nyvmthread_t;
 
 typedef struct nyvm_opts_t {
 	void* userdata;
@@ -27,10 +47,8 @@ typedef struct nyvm_opts_t {
 }
 nyvm_opts_t;
 
-struct nyvm_t {
-	nyvm_opts_t* opts;
-	void* internal;
-};
+//! Init VM options with default values
+NY_EXPORT void nyvm_opts_init_defaults(nyvm_opts_t*);
 
 /*!
 ** \brief Run the program

@@ -8,7 +8,6 @@ using namespace Yuni;
 extern "C" void nyproject_cf_init(nyproject_cf_t* cf) {
 	assert(cf != NULL);
 	memset(cf, 0x0, sizeof(nyproject_cf_t));
-	nany_memalloc_set_default(&(cf->allocator));
 }
 
 

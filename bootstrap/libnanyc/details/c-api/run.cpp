@@ -30,8 +30,8 @@ template<> struct default_delete<nybuild_t> final {
 };
 
 
-template<> struct default_delete<nyprogram_t> final {
-	inline void operator () (nyprogram_t* ptr) { nyprogram_unref(ptr); }
+template<> struct default_delete<nyoldprogram_t> final {
+	inline void operator () (nyoldprogram_t* ptr) { nyprogram_unref(ptr); }
 };
 
 
@@ -52,17 +52,15 @@ inline std::unique_ptr<T> make_unique_from_ptr(T* pointer) {
 //! Create a new nany project
 std::unique_ptr<nyproject_t> createProject(const nyrun_cf_t* const runcf) {
 	nyproject_cf_t cf;
-	if (runcf) {
+	if (runcf)
 		memcpy(&(cf), &(runcf->project), sizeof(nyproject_cf_t));
-		memcpy(&(cf.allocator), &(runcf->allocator), sizeof(nyallocator_t));
-	}
 	else
 		nyproject_cf_init(&cf);
 	return make_unique_from_ptr<nyproject_t>(nyproject_create(&cf));
 }
 
 
-std::unique_ptr<nyprogram_t> build(const nyrun_cf_t* const runcf, std::unique_ptr<nyproject_t> project) {
+std::unique_ptr<nyoldprogram_t> build(const nyrun_cf_t* const runcf, std::unique_ptr<nyproject_t> project) {
 	if (unlikely(!project))
 		return nullptr;
 	nybuild_cf_t cf;
@@ -86,20 +84,18 @@ std::unique_ptr<nyprogram_t> build(const nyrun_cf_t* const runcf, std::unique_pt
 	if (unlikely(verbose))
 		nybuild_print_report_to_console(buildinfo.get(), nytrue);
 	nyprogram_cf_t pcf;
-	nany_memalloc_set_default(&(pcf.allocator));
 	if (runcf) {
 		memcpy(&(pcf),           &(runcf->program),   sizeof(nyprogram_cf_t));
-		memcpy(&(pcf.allocator), &(runcf->allocator), sizeof(nyallocator_t));
 		memcpy(&(pcf.console),   &(runcf->console),   sizeof(nyoldconsole_t));
 	}
 	else
 		nyprogram_cf_init(&pcf, &cf);
-	return make_unique_from_ptr<nyprogram_t>(nyprogram_prepare(buildinfo.get(), &pcf));
+	return make_unique_from_ptr<nyoldprogram_t>(nyprogram_prepare(buildinfo.get(), &pcf));
 }
 
 
 //! Try to compile the input script filename
-std::unique_ptr<nyprogram_t> compileFile(const nyrun_cf_t* cf, const AnyString& argv0, String& file) {
+std::unique_ptr<nyoldprogram_t> compileFile(const nyrun_cf_t* cf, const AnyString& argv0, String& file) {
 	auto project = createProject(cf);
 	IO::Canonicalize(file, argv0);
 	auto r = nyproject_add_source_from_file_n(project.get(), file.c_str(), file.size());
@@ -110,7 +106,7 @@ std::unique_ptr<nyprogram_t> compileFile(const nyrun_cf_t* cf, const AnyString& 
 
 
 //! Try to compile a list of input files
-std::unique_ptr<nyprogram_t> compileFilelist(const nyrun_cf_t* cf, const char** list, uint32_t count) {
+std::unique_ptr<nyoldprogram_t> compileFilelist(const nyrun_cf_t* cf, const char** list, uint32_t count) {
 	auto project = createProject(cf);
 	String filename;
 	filename.reserve(1024);
@@ -125,7 +121,7 @@ std::unique_ptr<nyprogram_t> compileFilelist(const nyrun_cf_t* cf, const char** 
 
 
 //! Try to compile the input source
-std::unique_ptr<nyprogram_t> compileSource(const nyrun_cf_t* cf, const AnyString& source) {
+std::unique_ptr<nyoldprogram_t> compileSource(const nyrun_cf_t* cf, const AnyString& source) {
 	auto project = createProject(cf);
 	auto r = nyproject_add_source_n(project.get(), source.c_str(), source.size());
 	if (r == nyfalse)
@@ -134,7 +130,7 @@ std::unique_ptr<nyprogram_t> compileSource(const nyrun_cf_t* cf, const AnyString
 }
 
 
-int run(nyprogram_t* const program, const char* argv0, uint32_t argc, const char** argv) {
+int run(nyoldprogram_t* const program, const char* argv0, uint32_t argc, const char** argv) {
 	int exitstatus = exitFailure;
 	if (argc == 0 or argv == nullptr) {
 		const char* nargv[] = { argv0, nullptr };
@@ -234,11 +230,6 @@ extern "C" void nyrun_cf_init(nyrun_cf_t* cf) {
 	if (cf) {
 		// reset the whole struct
 		memset(cf, 0x0, sizeof(nyrun_cf_t));
-		size_t limit = static_cast<size_t>(System::Environment::ReadAsUInt64("NANY_MEMORY_LIMIT"));
-		if (0 == limit)
-			nany_memalloc_set_default(&(cf->allocator));
-		else
-			nany_memalloc_set_with_limit(&(cf->allocator), limit);
 		cf->build.entrypoint.len  = 4;
 		cf->build.entrypoint.c_str = "main";
 		cf->program.entrypoint = cf->build.entrypoint;
@@ -252,7 +243,5 @@ extern "C" void nyrun_cf_release(nyrun_cf_t* cf) {
 	if (cf) {
 		if (cf->console.release)
 			cf->console.release(&(cf->console));
-		if (cf->allocator.release)
-			cf->allocator.release(&(cf->allocator));
 	}
 }
