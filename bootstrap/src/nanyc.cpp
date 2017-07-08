@@ -1,5 +1,5 @@
 #include "nanyc-utils.h"
-
+#include <nanyc/nanyc.h>
 
 namespace {
 
@@ -30,8 +30,8 @@ int longOptions(const char* const name, const char* const argv0) {
 int main(int argc, const char** argv) {
 	if (!(argc > 1))
 		return ny::print::noInputScript(argv[0]);
-	nyrun_cf_t runcf;
-	nyrun_cf_init(&runcf);
+	nyvm_opts_t vmopts;
+	nyvm_opts_init_defaults(&vmopts);
 	int firstarg = argc; // end of the list
 	for (int i = 1; i < argc; ++i) {
 		const char* const carg = argv[i];
@@ -39,8 +39,9 @@ int main(int argc, const char** argv) {
 			if (carg[1] != '-')
 				return shortOption(carg, argv[0]);
 			if (carg[2] != '\0') { // to handle '--' option
-				if (!strcmp(carg, "--verbose"))
-					runcf.verbose = nytrue;
+				if (!strcmp(carg, "--verbose")) {
+					ny::print::bugReportInfo();
+				}
 				else
 					return longOptions(carg, argv[0]);
 			}
@@ -57,7 +58,6 @@ int main(int argc, const char** argv) {
 	// execute the script
 	int exitstatus = EXIT_FAILURE;
 	if (firstarg < argc) {
-		runcf.build.on_error_file_eacces = &ny::print::fileAccessError;
 		// the new arguments, after removing all command line arguments
 		int nargc = argc - firstarg;
 		const char** nargv = argv + firstarg;
@@ -66,8 +66,7 @@ int main(int argc, const char** argv) {
 		--nargc;
 		uint32_t pargc = (nargc > 0) ? static_cast<uint32_t>(nargc) : 0;
 		const char** pargv = (!pargc ? nullptr : (++nargv));
-		exitstatus = nyrun_file_n(&runcf, nargv0, strlen(nargv0), pargc, pargv);
+		exitstatus = nymain(&vmopts, nargv0, strlen(nargv0), pargc, pargv);
 	}
-	nyrun_cf_release(&runcf);
 	return exitstatus;
 }
