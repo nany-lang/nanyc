@@ -4,7 +4,6 @@
 
 namespace {
 
-
 int shortOption(const char* const name, const char* const argv0) {
 	if (!strcmp(name, "-h"))
 		return ny::print::usage(argv0);
@@ -12,7 +11,6 @@ int shortOption(const char* const name, const char* const argv0) {
 		return ny::print::version();
 	return ny::print::unknownOption(argv0, name);
 }
-
 
 int longOptions(const char* const name, const char* const argv0) {
 	if (!strcmp(name, "--help"))
@@ -24,9 +22,7 @@ int longOptions(const char* const name, const char* const argv0) {
 	return ny::print::unknownOption(argv0, name);
 }
 
-
 } // namespace
-
 
 int main(int argc, const char** argv) {
 	if (!(argc > 1))

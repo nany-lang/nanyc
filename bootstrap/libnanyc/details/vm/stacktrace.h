@@ -2,10 +2,8 @@
 #include "libnanyc.h"
 #include "details/atom/atom-map.h"
 
-
 namespace ny {
 namespace vm {
-
 
 template<bool Enabled>
 struct Stacktrace final {
@@ -13,7 +11,6 @@ struct Stacktrace final {
 	static void pop() {}
 	//static void dump(nyprogram_cf_t&) {}
 };
-
 
 template<>
 struct Stacktrace<true> final {
@@ -32,7 +29,6 @@ struct Stacktrace<true> final {
 
 	Stacktrace& operator = (const Stacktrace&) = delete;
 
-
 private:
 	void grow();
 
@@ -41,7 +37,6 @@ private:
 	Frame* baseframe = nullptr;
 
 }; // class Stacktrace
-
 
 } // namespace vm
 } // namespace ny

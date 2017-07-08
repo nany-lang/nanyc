@@ -15,7 +15,6 @@ using namespace Yuni;
 #define likely(X)    YUNI_LIKELY(X)
 #define unlikely(X)  YUNI_UNLIKELY(X)
 
-
 namespace {
 
 bool printAST(const AnyString filename, bool unixcolors) {
