@@ -7,7 +7,7 @@
 using namespace Yuni;
 
 
-static void* nanyc_digest_md5(nyoldvm_t* vm, const char* string, uint64_t length) {
+static void* nanyc_digest_md5(nyvmthread_t* vm, const char* string, uint64_t length) {
 	Hash::Checksum::MD5 md5;
 	md5.fromRawData(string, length);
 	if (not md5.value().empty()) {

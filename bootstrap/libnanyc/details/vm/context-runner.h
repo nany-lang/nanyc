@@ -56,7 +56,7 @@ struct ContextRunner final {
 	Register funcparams[config::maxPushedParameters];
 
 	DCCallVM* dyncall = nullptr;
-	nyoldvm_t cfvm;
+	nyvmthread_t cfvm;
 	nyprogram_cf_t cf;
 	Context& context;
 	Stack stack;

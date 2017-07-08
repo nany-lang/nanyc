@@ -6,35 +6,35 @@
 using namespace Yuni;
 
 
-static void _nanyc_console_out(nyoldvm_t* vm, const char* text, uint32_t size) {
+static void _nanyc_console_out(nyvmthread_t* vm, const char* text, uint32_t size) {
 	assert(text and size);
-	vm->console->write_stdout(vm->console->internal, text, size);
+	vm->cout.write(&vm->cout, text, size);
 }
 
 
-static void _nanyc_console_err(nyoldvm_t* vm, const char* text, uint32_t size) {
+static void _nanyc_console_err(nyvmthread_t* vm, const char* text, uint32_t size) {
 	assert(text and size);
-	vm->console->write_stderr(vm->console->internal, text, size);
+	vm->cerr.write(&vm->cerr, text, size);
 }
 
 
-static void _nanyc_console_out_flush(nyoldvm_t* vm) {
-	vm->console->flush(vm->console->internal, nycout);
+static void _nanyc_console_out_flush(nyvmthread_t* vm) {
+	vm->cout.flush(&vm->cout);
 }
 
 
-static void _nanyc_console_err_flush(nyoldvm_t* vm) {
-	vm->console->flush(vm->console->internal, nycerr);
+static void _nanyc_console_err_flush(nyvmthread_t* vm) {
+	vm->cerr.flush(&vm->cerr);
 }
 
 
-static bool _nanyc_console_out_has_colors(nyoldvm_t* vm) {
-	return nyfalse != vm->console->has_color(vm->console->internal, nycout);
+static bool _nanyc_console_out_has_colors(nyvmthread_t*) {
+	return nyfalse;
 }
 
 
-static bool _nanyc_console_err_has_colors(nyoldvm_t* vm) {
-	return nyfalse != vm->console->has_color(vm->console->internal, nycerr);
+static bool _nanyc_console_err_has_colors(nyvmthread_t*) {
+	return nyfalse;
 }
 
 

@@ -8,14 +8,14 @@ namespace ny {
 namespace vm {
 
 
-const char* io_get_cwd(nyoldvm_t* vmtx, uint32_t* length) {
+static const char* io_get_cwd(nyvmthread_t* vmtx, uint32_t* length) {
 	auto& tc = *reinterpret_cast<ny::vm::Context*>(vmtx->internal);
 	if (length)
 		*length = tc.io.cwd.size();
 	return tc.io.cwd.c_str();
 }
 
-nyio_adapter_t* io_resolve(nyoldvm_t* vmtx, nyanystr_t* relpath, const nyanystr_t* path) {
+static nyio_adapter_t* io_resolve(nyvmthread_t* vmtx, nyanystr_t* relpath, const nyanystr_t* path) {
 	try {
 		if (path and path->len != 0 and path->c_str and path->len < 1024 * 1024) {
 			auto& thread = *reinterpret_cast<ny::vm::Context*>(vmtx->internal);
@@ -34,7 +34,7 @@ nyio_adapter_t* io_resolve(nyoldvm_t* vmtx, nyanystr_t* relpath, const nyanystr_
 	return nullptr;
 }
 
-nyio_err_t io_set_cwd(nyoldvm_t* vmtx, const char* path, uint32_t len) {
+static nyio_err_t io_set_cwd(nyvmthread_t* vmtx, const char* path, uint32_t len) {
 	if (len != 0 and path != nullptr) {
 		auto& thread = *reinterpret_cast<ny::vm::Context*>(vmtx->internal);
 		thread.io.cwd.assign(path, len);
@@ -43,7 +43,7 @@ nyio_err_t io_set_cwd(nyoldvm_t* vmtx, const char* path, uint32_t len) {
 	return nyioe_failed;
 }
 
-nyio_err_t io_add_mountpoint(nyoldvm_t* vmtx, const char* path, uint32_t len, nyio_adapter_t* adapter) {
+static nyio_err_t io_add_mountpoint(nyvmthread_t* vmtx, const char* path, uint32_t len, nyio_adapter_t* adapter) {
 	auto& thread = *reinterpret_cast<ny::vm::Context*>(vmtx->internal);
 	bool success = (path and len != 0 and adapter)
 		and thread.io.addMountpoint(AnyString{path, len}, *adapter);
@@ -64,8 +64,11 @@ void ContextRunner::initialize() {
 	if (unlikely(!dyncall))
 		throw DyncallError();
 	dcMode(dyncall, DC_CALL_C_DEFAULT);
+	memset(&cfvm, 0x0, sizeof(nyvmthread_t));
 	cfvm.internal = context.self();
-	cfvm.console = &cf.console;
+	nyallocator_init_from_malloc(&cfvm.allocator);
+	nyconsole_init_from_stdout(&cfvm.cout);
+	nyconsole_init_from_stdout(&cfvm.cerr);
 	cfvm.io_get_cwd = io_get_cwd;
 	cfvm.io_resolve = io_resolve;
 	cfvm.io_set_cwd = io_set_cwd;

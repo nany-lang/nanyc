@@ -94,7 +94,7 @@ inline void Catalog::emplace(const AnyString& name, T callback) {
 		intrinsic.rettype = CTypeToNanyType<typename B::ReturnType>::type;
 	// the first argument must be the thread context
 	static_assert(Yuni::Static::Type::Equal <
-		typename B::template Argument<0>::Type, nyoldvm_t* >::Yes, "requires 'nytctx_t*'");
+		typename B::template Argument<0>::Type, nyvmthread_t* >::Yes, "requires 'nytctx_t*'");
 	if (B::argumentCount > 1) {
 		IntrinsicPushParameter<1, B::argumentCount, B>::push(intrinsic);
 		intrinsic.paramcount = static_cast<uint32_t>(B::argumentCount - 1);

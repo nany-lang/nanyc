@@ -5,7 +5,7 @@ using namespace Yuni;
 
 
 
-static void nanyc_cout(nyoldvm_t* tctx, void* string, uint32_t length) {
+static void nanyc_cout(nyvmthread_t* tctx, void* string, uint32_t length) {
 	vm_print(tctx, AnyString{reinterpret_cast<const char*>(string), length});
 }
 
@@ -17,7 +17,7 @@ template<> struct IntCast<int16_t>  { using value = int32_t;  };
 template<> struct IntCast<uint16_t> { using value = uint32_t; };
 
 
-template<class T> static uint32_t nanyc_string_append(nyoldvm_t*, void* string, T value) {
+template<class T> static uint32_t nanyc_string_append(nyvmthread_t*, void* string, T value) {
 	ShortString64 str;
 	str << static_cast<typename IntCast<T>::value>(value);
 	memcpy(string, str.c_str(), str.size());
@@ -25,7 +25,7 @@ template<class T> static uint32_t nanyc_string_append(nyoldvm_t*, void* string, 
 }
 
 
-static uint32_t nanyc_string_append_ptr(nyoldvm_t*, void* string, void* ptr) {
+static uint32_t nanyc_string_append_ptr(nyvmthread_t*, void* string, void* ptr) {
 	ShortString32 str;
 	str << ptr;
 	memcpy(string, str.c_str(), str.size());
