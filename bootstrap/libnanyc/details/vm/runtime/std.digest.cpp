@@ -8,7 +8,6 @@ using namespace Yuni;
 
 
 static void* nanyc_digest_md5(nyoldvm_t* vm, const char* string, uint64_t length) {
-	auto& context = *reinterpret_cast<ny::vm::Context*>(vm->internal);
 	Hash::Checksum::MD5 md5;
 	md5.fromRawData(string, length);
 	if (not md5.value().empty()) {
@@ -19,10 +18,10 @@ static void* nanyc_digest_md5(nyoldvm_t* vm, const char* string, uint64_t length
 			const char* src = md5.value().c_str();
 			for (uint32_t i = 0; i != size; ++i)
 				cstr[i] = src[i];
-			context.returnValue.size     = md5.value().size();
-			context.returnValue.capacity = md5.value().size();
-			context.returnValue.data     = cstr;
-			return &context.returnValue;
+			vm->returnValue.size     = md5.value().size();
+			vm->returnValue.capacity = md5.value().size();
+			vm->returnValue.data     = cstr;
+			return &vm->returnValue;
 		}
 	}
 	return nullptr;

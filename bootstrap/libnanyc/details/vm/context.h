@@ -36,14 +36,6 @@ public:
 	//! Attached program
 	Program& program;
 
-	//! Temporary structure for complex return values by intrinsics
-	struct {
-		uint64_t size;
-		uint64_t capacity;
-		void* data;
-	}
-	returnValue;
-
 	struct IO {
 		/*!
 		** \brief Find the adapter and the relative adapter path from a virtual path

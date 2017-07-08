@@ -24,6 +24,13 @@ typedef struct nyvmthread_t {
 	const char* (*io_get_cwd)(nyvmthread_t*, uint32_t* len);
 	nyio_err_t (*io_set_cwd)(nyvmthread_t*, const char*, uint32_t);
 	nyio_err_t (*io_add_mountpoint)(nyvmthread_t*, const char*, uint32_t, nyio_adapter_t*);
+	//! Temporary structure for complex return values by intrinsics
+	struct {
+		uint64_t size;
+		uint64_t capacity;
+		void* data;
+	}
+	returnValue;
 	void* userdata;
 	nyallocator_t allocator;
 	nyconsole_t cout;
