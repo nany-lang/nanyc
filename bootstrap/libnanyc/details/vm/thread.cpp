@@ -102,6 +102,7 @@ struct Executor final {
 
 	NYVM_NOINLINE void destroy(uint64_t* object, uint32_t dtorid);
 	NYVM_NOINLINE void call(uint32_t retlvid, uint32_t atomfunc, uint32_t instanceid);
+	inline void entrypoint(uint32_t atomfunc, uint32_t instanceid);
 
 	void validateLvids(uint32_t lvid) const {
 		assert(lvid > 0 and lvid < dbg.registerCount() and "invalid lvid");
@@ -729,6 +730,14 @@ void Executor::destroy(uint64_t* object, uint32_t dtorid) {
 	allocator.deallocate(object, static_cast<size_t>(classsizeof));
 }
 
+inline void Executor::entrypoint(uint32_t atomfunc, uint32_t instanceid) {
+	uint32_t retlvid = 1;
+	dbg.registerCount(2);
+	Register localregisters[2];
+	registers = &localregisters[0];
+	call(retlvid, atomfunc, instanceid);
+}
+
 void Executor::call(uint32_t retlvid, uint32_t atomfunc, uint32_t instanceid) {
 	assert(retlvid == 0 or retlvid < dbg.registerCount());
 	if (printOpcodes) {
@@ -795,9 +804,13 @@ Thread::Thread(Machine& machine)
 	capi.io_add_mountpoint = io_add_mountpoint;
 }
 
-void Thread::execute(const ny::ir::Sequence& sequence) {
+void Thread::execute(uint32_t atomid, uint32_t instanceid) {
 	try {
-		Executor executor{*this, sequence};
+		auto& map = machine.program.compdb->cdeftable.atoms;
+		auto& ircode = map.ircode(atomid, instanceid);
+		Executor executor{*this, ircode};
+		executor.stacktrace.push(atomid, instanceid);
+		executor.entrypoint(atomid, instanceid);
 		return;
 	}
 	catch (const InvalidLabel&) {
