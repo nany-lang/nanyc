@@ -1,5 +1,5 @@
 #include <nanyc/library.h>
-#include <nanyc/program.h>
+#include <nanyc/vm.h>
 #include <yuni/yuni.h>
 #include <yuni/core/getopt.h>
 #include <yuni/core/string.h>
@@ -154,7 +154,11 @@ void App::fetch() {
 	opts.entrypoint.len = 0;
 	std::cout << "searching for unittests in all source files...\n";
 	auto start = now();
-	nyprogram_compile(&opts);
+	auto* program = nyprogram_compile(&opts);
+	if (unlikely(program)) {
+		assert(false and "no program should be created when listing unittests");
+		nyprogram_free(program);
+	}
 	opts.on_unittest = nullptr;
 	std::sort(std::begin(unittests), std::end(unittests));
 	auto duration = now() - start;
