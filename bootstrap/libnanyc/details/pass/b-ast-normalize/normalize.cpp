@@ -1,7 +1,5 @@
 #include "normalize.h"
-#include "details/context/source.h"
 #include "details/ast/ast.h"
-#include "details/context/build-info.h"
 #include "details/reporting/report.h"
 #include "details/grammar/nany.h"
 #include "details/atom/visibility.h"
@@ -15,8 +13,8 @@ using namespace Yuni;
 
 
 namespace ny {
+namespace compiler {
 namespace {
-
 
 struct ASTReplicator final {
 	explicit ASTReplicator(ASTHelper& ast, Logs::Report);
@@ -553,34 +551,7 @@ void dumpAST(Logs::Report& report, const AST::Node& node, const char* text) {
 	report.trace() << text << '\n' << out;
 }
 
-
 } // anonymous namespace
-
-
-bool Source::passDuplicateAndNormalizeAST(Logs::Report& report) {
-	auto& buildinfo = *m_details;
-	auto& parser    = buildinfo.parsing.parser;
-	auto& ast       = buildinfo.parsing.ast;
-	//! Reset the root node
-	buildinfo.parsing.rootnode = make_ref<AST::Node>(AST::rgStart);
-	if (!parser.root or (parser.root->rule != AST::rgStart))
-		return false;
-	if (config::traces::astBeforeNormalize)
-		dumpAST(report, *parser.root, "before normalization");
-	ASTReplicator cloner(ast, report);
-	bool success = cloner.run(*parser.root, *(buildinfo.parsing.rootnode));
-	// retrieve data
-	buildinfo.parsing.nmspc.swap(cloner.nmspc);
-	if (config::traces::astAfterNormalize)
-		dumpAST(report, *(buildinfo.parsing.rootnode), "after normalization");
-	return success;
-}
-
-
-} // namespace ny
-
-namespace ny {
-namespace compiler {
 
 bool passDuplicateAndNormalizeAST(ny::compiler::Source& source, Logs::Report& report) {
 	auto& parser = source.parsing.parser;

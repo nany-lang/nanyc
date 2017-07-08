@@ -1,5 +1,6 @@
 #include "nanyc-utils.h"
 #include <nanyc/nanyc.h>
+#include <cstring>
 
 namespace {
 

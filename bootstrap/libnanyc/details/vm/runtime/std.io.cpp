@@ -4,8 +4,6 @@
 #include <yuni/yuni.h>
 #include <yuni/core/string.h>
 #include <yuni/io/file.h>
-#include "details/vm/context.h"
-#include "details/vm/console.h"
 
 using namespace Yuni;
 

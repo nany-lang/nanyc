@@ -1,7 +1,6 @@
 #pragma once
 #include "libnanyc.h"
 #include "details/atom/atom-map.h"
-#include "details/context/build.h"
 
 
 namespace ny {
@@ -12,7 +11,7 @@ template<bool Enabled>
 struct Stacktrace final {
 	static void push(uint32_t, uint32_t) {}
 	static void pop() {}
-	static void dump(Build&) {}
+	//static void dump(nyprogram_cf_t&) {}
 };
 
 
@@ -29,7 +28,7 @@ struct Stacktrace<true> final {
 
 	void push(uint32_t atomid, uint32_t instanceid);
 	void pop() noexcept;
-	void dump(const nyprogram_cf_t&, const AtomMap&) const noexcept;
+	//void dump(const nyprogram_cf_t&, const AtomMap&) const noexcept;
 
 	Stacktrace& operator = (const Stacktrace&) = delete;
 
