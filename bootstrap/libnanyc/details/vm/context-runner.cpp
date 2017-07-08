@@ -22,7 +22,7 @@ void ContextRunner::initialize() {
 	if (unlikely(!dyncall))
 		throw DyncallError();
 	dcMode(dyncall, DC_CALL_C_DEFAULT);
-	cfvm.tctx = context.self();
+	cfvm.internal = context.self();
 	cfvm.console = &cf.console;
 }
 

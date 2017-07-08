@@ -46,7 +46,7 @@ struct IntrinsicIOIterator {
 
 static bool nanyc_io_set_cwd(nyoldvm_t* vm, void* string, uint32_t size) {
 	assert(vm != nullptr);
-	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->tctx);
+	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->internal);
 	tc.io.cwd = AnyString{reinterpret_cast<const char*>(string), size};
 	return true;
 }
@@ -54,14 +54,14 @@ static bool nanyc_io_set_cwd(nyoldvm_t* vm, void* string, uint32_t size) {
 
 static const void* nanyc_io_get_cwd(nyoldvm_t* vm) {
 	assert(vm != nullptr);
-	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->tctx);
+	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->internal);
 	return tc.io.cwd.c_str();
 }
 
 
 static void* nanyc_io_folder_iterate(nyoldvm_t* vm, const char* path, uint32_t len,
 									 bool recursive, bool files, bool folders) {
-	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->tctx);
+	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->internal);
 	AnyString adapterpath;
 	AnyString requestedPath{path, len};
 	auto& adapter = tc.io.resolve(adapterpath, requestedPath);
@@ -136,7 +136,7 @@ static bool nanyc_io_folder_iterator_next(nyoldvm_t*, void* ptr) {
 
 
 static bool nanyc_io_folder_create(nyoldvm_t* vm, const char* path, uint32_t len) {
-	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->tctx);
+	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->internal);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
 	auto& adapter = tc.io.resolve(adapterPath, requestedPath);
@@ -146,7 +146,7 @@ static bool nanyc_io_folder_create(nyoldvm_t* vm, const char* path, uint32_t len
 
 
 static bool nanyc_io_folder_erase(nyoldvm_t* vm, const char* path, uint32_t len) {
-	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->tctx);
+	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->internal);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
 	auto& adapter = tc.io.resolve(adapterPath, requestedPath);
@@ -156,7 +156,7 @@ static bool nanyc_io_folder_erase(nyoldvm_t* vm, const char* path, uint32_t len)
 
 
 static bool nanyc_io_folder_clear(nyoldvm_t* vm, const char* path, uint32_t len) {
-	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->tctx);
+	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->internal);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
 	auto& adapter = tc.io.resolve(adapterPath, requestedPath);
@@ -166,7 +166,7 @@ static bool nanyc_io_folder_clear(nyoldvm_t* vm, const char* path, uint32_t len)
 
 
 static uint64_t nanyc_io_folder_size(nyoldvm_t* vm, const char* path, uint32_t len) {
-	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->tctx);
+	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->internal);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
 	auto& adapter = tc.io.resolve(adapterPath, requestedPath);
@@ -175,7 +175,7 @@ static uint64_t nanyc_io_folder_size(nyoldvm_t* vm, const char* path, uint32_t l
 
 
 static bool nanyc_io_folder_exists(nyoldvm_t* vm, const char* path, uint32_t len) {
-	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->tctx);
+	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->internal);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
 	auto& adapter = tc.io.resolve(adapterPath, requestedPath);
@@ -185,7 +185,7 @@ static bool nanyc_io_folder_exists(nyoldvm_t* vm, const char* path, uint32_t len
 
 
 static bool nanyc_io_folder_copy(nyoldvm_t* vm, const char* path, uint32_t len, const char* to, uint32_t tolen) {
-	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->tctx);
+	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->internal);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
 	auto& adapter = tc.io.resolve(adapterPath, requestedPath);
@@ -205,7 +205,7 @@ static bool nanyc_io_folder_copy(nyoldvm_t* vm, const char* path, uint32_t len, 
 
 
 static bool nanyc_io_file_exists(nyoldvm_t* vm, const char* path, uint32_t len) {
-	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->tctx);
+	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->internal);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
 	auto& adapter = tc.io.resolve(adapterPath, requestedPath);
@@ -215,7 +215,7 @@ static bool nanyc_io_file_exists(nyoldvm_t* vm, const char* path, uint32_t len) 
 
 
 static uint64_t nanyc_io_file_size(nyoldvm_t* vm, const char* path, uint32_t len) {
-	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->tctx);
+	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->internal);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
 	auto& adapter = tc.io.resolve(adapterPath, requestedPath);
@@ -224,7 +224,7 @@ static uint64_t nanyc_io_file_size(nyoldvm_t* vm, const char* path, uint32_t len
 
 
 static bool nanyc_io_file_erase(nyoldvm_t* vm, const char* path, uint32_t len) {
-	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->tctx);
+	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->internal);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
 	auto& adapter = tc.io.resolve(adapterPath, requestedPath);
@@ -234,7 +234,7 @@ static bool nanyc_io_file_erase(nyoldvm_t* vm, const char* path, uint32_t len) {
 
 
 static bool nanyc_io_file_resize(nyoldvm_t* vm, const char* path, uint32_t len, uint64_t newsize) {
-	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->tctx);
+	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->internal);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
 	auto& adapter = tc.io.resolve(adapterPath, requestedPath);
@@ -245,7 +245,7 @@ static bool nanyc_io_file_resize(nyoldvm_t* vm, const char* path, uint32_t len, 
 
 static bool nanyc_io_file_set_contents(nyoldvm_t* vm, const char* path, uint32_t len,
 									   const char* content, uint32_t clen, bool append) {
-	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->tctx);
+	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->internal);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
 	auto& adapter = tc.io.resolve(adapterPath, requestedPath);
@@ -260,7 +260,7 @@ static bool nanyc_io_file_set_contents(nyoldvm_t* vm, const char* path, uint32_t
 
 
 static void* nanyc_io_file_get_contents(nyoldvm_t* vm, const char* path, uint32_t len) {
-	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->tctx);
+	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->internal);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
 	auto& adapter = tc.io.resolve(adapterPath, requestedPath);
@@ -285,7 +285,7 @@ static nyfile_t* nanyc_io_file_open(nyoldvm_t* vm, const char* path, uint32_t le
 	assert(path);
 	assert(len != 0);
 	assert(readm or writem);
-	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->tctx);
+	auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->internal);
 	AnyString adapterPath;
 	AnyString requestedPath{path, len};
 	auto& adapter = tc.io.resolve(adapterPath, requestedPath);
@@ -371,7 +371,7 @@ static uint64_t nanyc_io_file_tell(nyoldvm_t*, nyfile_t* file) {
 static bool nanyc_io_mount_local(nyoldvm_t* vm, const char* path, uint32_t len, const char* local,
 		uint32_t locallen) {
 	if (path and len and local and locallen) {
-		auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->tctx);
+		auto& tc = *reinterpret_cast<ny::vm::Context*>(vm->internal);
 		nyio_adapter_t adapter;
 		nyio_adapter_init_localfolder(&adapter, local, locallen);
 		bool success = tc.io.addMountpoint(AnyString{path, len}, adapter);

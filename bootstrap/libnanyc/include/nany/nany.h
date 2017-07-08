@@ -373,7 +373,7 @@ nyprogram_cf_t;
 /*! Context at runtime for native C calls */
 typedef struct nyoldvm_t {
 	/*! Current thread */
-	nytctx_t* tctx;
+	nytctx_t* internal;
 	/*! Console */
 	nyoldconsole_t* console;
 }
