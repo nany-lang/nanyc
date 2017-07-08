@@ -14,7 +14,7 @@ struct Thread final {
 	Thread& operator = (const Thread&) = delete;
 	Thread& operator = (Thread&&) = delete;
 
-	void execute(uint32_t atomid, uint32_t instanceid);
+	uint64_t execute(uint32_t atomid, uint32_t instanceid);
 
 	nyvmthread_t capi;
 	ny::vm::IO io;

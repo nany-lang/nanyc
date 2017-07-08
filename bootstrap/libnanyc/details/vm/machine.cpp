@@ -16,8 +16,8 @@ int Machine::run() {
 		ny::vm::Thread thread(*this);
 		uint32_t atomid = program.compdb->entrypoint.atomid;
 		uint32_t instanceid = program.compdb->entrypoint.instanceid;
-		thread.execute(atomid, instanceid);
-		exitstatus = 0;
+		auto r = thread.execute(atomid, instanceid);
+		exitstatus = static_cast<int>(r);
 	}
 	catch (...) {
 	}
