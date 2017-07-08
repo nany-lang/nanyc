@@ -18,12 +18,12 @@ extern "C" {
 
 
 typedef struct nyvmthread_t {
+	void* internal;
 	void* userdata;
 	nyallocator_t allocator;
 	nyconsole_t cout;
 	nyconsole_t cerr;
 	const nyprogram_t* program;
-	void* internal;
 }
 nyvmthread_t;
 
