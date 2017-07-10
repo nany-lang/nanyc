@@ -21,8 +21,6 @@ yuni::Ref<Node> createNodeFuncCrefParam(yuni::Ref<Node>& funcname, const AnyStri
 //! Extract the complete identifier string (from an entity node)
 template<class S> bool appendEntityAsString(S& out, const Node& node);
 
-void nodeRulePromote(AST::Node& node, enum AST::Rule);
-
 /*!
 ** \param index Child Index of \p node
 */

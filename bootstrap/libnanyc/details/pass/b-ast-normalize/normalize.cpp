@@ -97,7 +97,7 @@ void ASTReplicator::transformExprNodeToFuncCallNOT(AST::Node& node) {
 	//                - a
 	//
 	// promote the current node before any changes within the subtree
-	ny::AST::nodeRulePromote(node, AST::rgIdentifier);
+	node.rule = AST::rgIdentifier;
 	node.text = "^not";
 	// create a new subtree
 	auto call = make_ref<AST::Node>(AST::rgCall);
@@ -146,7 +146,7 @@ void ASTReplicator::transformExprNodeToFuncCall(AST::Node& node) {
 	//                - b
 	//
 	// promote the current node before any changes within the subtree
-	ny::AST::nodeRulePromote(node, AST::rgIdentifier);
+	node.rule = AST::rgIdentifier;
 	node.text = opname;
 	// create a new subtree
 	auto call = make_ref<AST::Node>(AST::rgCall);
@@ -188,8 +188,8 @@ void ASTReplicator::transformExprAssignmentToFuncCall(AST::Node& node) {
 	//              - parameter
 	//                   - rhs
 	//
-	ny::AST::nodeRulePromote(node, AST::rgExprSubDot);
-	ny::AST::nodeRulePromote(operatorNode, AST::rgIdentifier);
+	node.rule = AST::rgExprSubDot;
+	operatorNode.rule = AST::rgIdentifier;
 	// normalizing the operator
 	operatorNode.text = normalizeOperatorName(operatorNode.text);
 	auto& call = *nodeAppend(operatorNode, AST::rgCall);

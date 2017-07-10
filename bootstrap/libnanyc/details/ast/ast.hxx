@@ -95,9 +95,5 @@ void nodeEachItemInXPath(AST::Node& node, const T& callback) {
 	}
 }
 
-inline void nodeRulePromote(AST::Node& node, enum AST::Rule rule) {
-	node.rule = rule;
-}
-
 } // namespace AST
 } // namespace ny
