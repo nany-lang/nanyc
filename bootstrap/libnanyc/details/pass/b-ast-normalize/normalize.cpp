@@ -26,7 +26,7 @@ public:
 	std::pair<YString, AST::Node*> nmspc;
 
 private:
-	bool duplicateNode(AST::Node& out, const AST::Node& node);
+	bool duplicateNode(AST::Node& out, AST::Node& node);
 	void collectNamespace(const AST::Node& node);
 	bool generateErrorFromErrorNode(const AST::Node& node);
 	void normalizeExpression(AST::Node& node);
@@ -369,7 +369,7 @@ void ASTReplicator::appendNewBoolNode(AST::Node& parent, bool onoff) {
 }
 
 
-bool ASTReplicator::duplicateNode(AST::Node& parent, const AST::Node& node) {
+bool ASTReplicator::duplicateNode(AST::Node& parent, AST::Node& node) {
 	// rule of the current node
 	// [this value might be changed during the node analysis]
 	auto rule = node.rule;
@@ -494,6 +494,7 @@ bool ASTReplicator::duplicateNode(AST::Node& parent, const AST::Node& node) {
 		case AST::rgExprValue: {
 			// some expr might be statements
 			normalizeExpression(*newNode);
+			node.children.clear();
 			break;
 		}
 		case AST::rgVar: {
@@ -511,7 +512,7 @@ bool ASTReplicator::duplicateNode(AST::Node& parent, const AST::Node& node) {
 
 bool ASTReplicator::run(AST::Node& fileRootnode, AST::Node& newroot) {
 	bool success = true;
-	fileRootnode.each([&] (const AST::Node & subnode) -> bool {
+	fileRootnode.each([&] (AST::Node& subnode) -> bool {
 		success &= duplicateNode(newroot, subnode);
 		return true;
 	});
