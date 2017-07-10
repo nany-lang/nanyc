@@ -13,10 +13,11 @@ inline yuni::Ref<Node> createNodeIdentifier(const AnyString& name) {
 
 template<class S> bool appendEntityAsString(S& out, const Node& node) {
 	assert(node.rule == rgEntity);
-	assert(node.children.size() > 0);
+	uint32_t count = node.children.size();
+	assert(count > 0);
 	out += node.children.front().text;
-	if (node.children.size() != 1) {
-		for (uint32_t i = 1; i != node.children.size(); ++i) {
+	if (count != 1) {
+		for (uint32_t i = 1; i != count; ++i) {
 			auto& child = node.children[i];
 			if (YUNI_UNLIKELY(child.rule != rgIdentifier))
 				return false;
