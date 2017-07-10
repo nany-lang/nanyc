@@ -57,7 +57,7 @@ void nodeReparentAtTheBegining(AST::Node& node, AST::Node& oldParent, uint index
 }
 
 struct ASTReplicator final {
-	explicit ASTReplicator(Logs::Report);
+	explicit ASTReplicator(Logs::Report report): report(report) {}
 
 	bool run(AST::Node& fileRootnode, AST::Node& newroot);
 
@@ -85,12 +85,6 @@ private:
 
 }; // class ASTReplicator
 
-
-ASTReplicator::ASTReplicator(Logs::Report report)
-	: report(report) {
-}
-
-
 void ASTReplicator::collectNamespace(const AST::Node& node) {
 	auto* entity = node.xpath({AST::rgEntity});
 	assert(!!entity and "mismatch grammar");
@@ -104,7 +98,6 @@ void ASTReplicator::collectNamespace(const AST::Node& node) {
 		nmspc.first = "__error__";
 	}
 }
-
 
 void ASTReplicator::transformExprNodeToFuncCallNOT(AST::Node& node) {
 	// AST structure: not EXPR
@@ -134,7 +127,6 @@ void ASTReplicator::transformExprNodeToFuncCallNOT(AST::Node& node) {
 	call->parent = &node;
 	node.children.push_back(call);
 }
-
 
 void ASTReplicator::transformExprNodeToFuncCall(AST::Node& node) {
 	// AST structure: foo() < expr;  (raw output from the parser)
@@ -187,7 +179,6 @@ void ASTReplicator::transformExprNodeToFuncCall(AST::Node& node) {
 	node.children.push_back(call);
 }
 
-
 void ASTReplicator::transformExprAssignmentToFuncCall(AST::Node& node) {
 	// AST structure: foo() += expr; - or anything that should be asked to the object itself
 	//
@@ -220,7 +211,6 @@ void ASTReplicator::transformExprAssignmentToFuncCall(AST::Node& node) {
 	auto& expr = *nodeAppend(call, {AST::rgCallParameter, AST::rgExpr});
 	nodeReparentAtTheEnd(rhs, node, rhsIndex, expr);
 }
-
 
 void ASTReplicator::normalizeExprTransformOperatorsToFuncCall(AST::Node& node) {
 	// go for children, the container may change between each iteration
@@ -265,7 +255,6 @@ void ASTReplicator::normalizeExprTransformOperatorsToFuncCall(AST::Node& node) {
 	for (auto& child : node.children)
 		normalizeExprTransformOperatorsToFuncCall(child);
 }
-
 
 void ASTReplicator::normalizeExprReorderOperators(AST::Node& node) {
 	switch (node.rule) {
@@ -363,14 +352,12 @@ void ASTReplicator::normalizeExprReorderOperators(AST::Node& node) {
 		normalizeExprReorderOperators(child);
 }
 
-
 void ASTReplicator::normalizeExpression(AST::Node& node) {
 	if (likely(pDuplicationSuccess)) {
 		normalizeExprReorderOperators(node);
 		normalizeExprTransformOperatorsToFuncCall(node);
 	}
 }
-
 
 bool ASTReplicator::generateErrorFromErrorNode(const AST::Node& node) {
 	pDuplicationSuccess = false;
@@ -383,7 +370,6 @@ bool ASTReplicator::generateErrorFromErrorNode(const AST::Node& node) {
 	msg << '"';
 	return false;
 }
-
 
 void ASTReplicator::appendNewBoolNode(AST::Node& parent, bool onoff) {
 	// expr-group
@@ -405,7 +391,6 @@ void ASTReplicator::appendNewBoolNode(AST::Node& parent, bool onoff) {
 		value.text = "__true";
 	}
 }
-
 
 bool ASTReplicator::duplicateNode(AST::Node& parent, AST::Node& node) {
 	// rule of the current node
@@ -547,7 +532,6 @@ bool ASTReplicator::duplicateNode(AST::Node& parent, AST::Node& node) {
 	return true;
 }
 
-
 bool ASTReplicator::run(AST::Node& fileRootnode, AST::Node& newroot) {
 	bool success = true;
 	fileRootnode.each([&] (AST::Node& subnode) -> bool {
@@ -556,7 +540,6 @@ bool ASTReplicator::run(AST::Node& fileRootnode, AST::Node& newroot) {
 	});
 	return pDuplicationSuccess and success;
 }
-
 
 void dumpAST(Logs::Report& report, const AST::Node& node, const char* text) {
 	Clob out;
