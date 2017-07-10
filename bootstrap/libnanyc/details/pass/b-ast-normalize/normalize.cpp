@@ -17,7 +17,7 @@ namespace compiler {
 namespace {
 
 struct ASTReplicator final {
-	explicit ASTReplicator(ASTHelper& ast, Logs::Report);
+	explicit ASTReplicator(Logs::Report);
 
 	bool run(AST::Node& fileRootnode, AST::Node& newroot);
 
@@ -39,7 +39,6 @@ private:
 	void appendNewBoolNode(AST::Node& parent, bool onoff);
 
 private:
-	ASTHelper& ast;
 	Logs::Report report;
 	String errmsg;
 	bool pDuplicationSuccess = true;
@@ -47,9 +46,8 @@ private:
 }; // class ASTReplicator
 
 
-ASTReplicator::ASTReplicator(ASTHelper& ast, Logs::Report report)
-	: ast(ast)
-	, report(report) {
+ASTReplicator::ASTReplicator(Logs::Report report)
+	: report(report) {
 }
 
 
@@ -83,13 +81,13 @@ void ASTReplicator::transformExprNodeToFuncCallNOT(AST::Node& node) {
 	//                - a
 	//
 	// promote the current node before any changes within the subtree
-	ast.nodeRulePromote(node, AST::rgIdentifier);
+	ny::AST::nodeRulePromote(node, AST::rgIdentifier);
 	node.text = "^not";
 	// create a new subtree
 	auto call = make_ref<AST::Node>(AST::rgCall);
-	auto& lhs  = *ast.nodeAppend(*call, {AST::rgCallParameter, AST::rgExpr});
+	auto& lhs  = *ny::AST::nodeAppend(*call, {AST::rgCallParameter, AST::rgExpr});
 	// re-parent lhs
-	ast.nodeReparentAtTheEnd(node.children[lhsIndex], node, lhsIndex, lhs);
+	ny::AST::nodeReparentAtTheEnd(node.children[lhsIndex], node, lhsIndex, lhs);
 	// remove all remaining nodes
 	node.children.clear();
 	// re-parent the new node 'call'
@@ -132,16 +130,16 @@ void ASTReplicator::transformExprNodeToFuncCall(AST::Node& node) {
 	//                - b
 	//
 	// promote the current node before any changes within the subtree
-	ast.nodeRulePromote(node, AST::rgIdentifier);
+	ny::AST::nodeRulePromote(node, AST::rgIdentifier);
 	node.text = opname;
 	// create a new subtree
 	auto call = make_ref<AST::Node>(AST::rgCall);
-	auto& lhs = *ast.nodeAppend(*call, {AST::rgCallParameter, AST::rgExpr});
-	auto& rhs = *ast.nodeAppend(*call, {AST::rgCallParameter, AST::rgExpr});
+	auto& lhs = *ny::AST::nodeAppend(*call, {AST::rgCallParameter, AST::rgExpr});
+	auto& rhs = *ny::AST::nodeAppend(*call, {AST::rgCallParameter, AST::rgExpr});
 	// re-parent rhs first, otherwise the index will be invalidated
-	ast.nodeReparentAtTheEnd(node.children[rhsIndex], node, rhsIndex, rhs);
+	ny::AST::nodeReparentAtTheEnd(node.children[rhsIndex], node, rhsIndex, rhs);
 	// re-parent lhs
-	ast.nodeReparentAtTheEnd(node.children[lhsIndex], node, lhsIndex, lhs);
+	ny::AST::nodeReparentAtTheEnd(node.children[lhsIndex], node, lhsIndex, lhs);
 	// remove all remaining nodes
 	node.children.clear();
 	// re-parent the new node 'call'
@@ -174,13 +172,13 @@ void ASTReplicator::transformExprAssignmentToFuncCall(AST::Node& node) {
 	//              - parameter
 	//                   - rhs
 	//
-	ast.nodeRulePromote(node, AST::rgExprSubDot);
-	ast.nodeRulePromote(operatorNode, AST::rgIdentifier);
+	ny::AST::nodeRulePromote(node, AST::rgExprSubDot);
+	ny::AST::nodeRulePromote(operatorNode, AST::rgIdentifier);
 	// normalizing the operator
 	operatorNode.text = normalizeOperatorName(operatorNode.text);
-	auto& call = *ast.nodeAppend(operatorNode, AST::rgCall);
-	auto& expr = *ast.nodeAppend(call, {AST::rgCallParameter, AST::rgExpr});
-	ast.nodeReparentAtTheEnd(rhs, node, rhsIndex, expr);
+	auto& call = *ny::AST::nodeAppend(operatorNode, AST::rgCall);
+	auto& expr = *ny::AST::nodeAppend(call, {AST::rgCallParameter, AST::rgExpr});
+	ny::AST::nodeReparentAtTheEnd(rhs, node, rhsIndex, expr);
 }
 
 
@@ -254,7 +252,7 @@ void ASTReplicator::normalizeExprReorderOperators(AST::Node& node) {
 							auto& previous = node.children[i - 1];
 							switch (previous.rule) {
 								default: {
-									ast.nodeReparentAtTheBegining(previous, node, i - 1, node.children[i]);
+									ny::AST::nodeReparentAtTheBegining(previous, node, i - 1, node.children[i]);
 									--i;
 									count = node.children.size();
 									break;
@@ -308,7 +306,7 @@ void ASTReplicator::normalizeExprReorderOperators(AST::Node& node) {
 							case AST::rgCall:
 							case AST::rgExprTemplate:
 							case AST::rgExprSubArray:
-								ast.nodeReparentAtTheEnd(nextChild, node, i + 1, child);
+								ny::AST::nodeReparentAtTheEnd(nextChild, node, i + 1, child);
 								count = node.children.size();
 								break;
 							default:
@@ -356,14 +354,14 @@ void ASTReplicator::appendNewBoolNode(AST::Node& parent, bool onoff) {
 	// |           call-parameter
 	// |               expr
 	// |                   identifier: __true
-	auto& group   = *ast.nodeAppend(parent, AST::rgExprGroup);
-	auto& newnode = *ast.nodeAppend(group, AST::rgNew);
-	auto& typeDecl = *ast.nodeAppend(newnode, AST::rgTypeDecl);
-	auto& id       = *ast.nodeAppend(typeDecl, AST::rgIdentifier);
+	auto& group   = *ny::AST::nodeAppend(parent, AST::rgExprGroup);
+	auto& newnode = *ny::AST::nodeAppend(group, AST::rgNew);
+	auto& typeDecl = *ny::AST::nodeAppend(newnode, AST::rgTypeDecl);
+	auto& id       = *ny::AST::nodeAppend(typeDecl, AST::rgIdentifier);
 	id.text = "bool";
 	if (onoff) {
 		auto& value =
-			*ast.nodeAppend(newnode, {AST::rgCall, AST::rgCallParameter, AST::rgExpr, AST::rgIdentifier});
+			*ny::AST::nodeAppend(newnode, {AST::rgCall, AST::rgCallParameter, AST::rgExpr, AST::rgIdentifier});
 		value.text = "__true";
 	}
 }
@@ -467,7 +465,7 @@ bool ASTReplicator::duplicateNode(AST::Node& parent, AST::Node& node) {
 				if (node.findFirst(AST::rgReturnInline) < node.children.size()) {
 					// all conditions are met. No type is present but should be
 					auto returnType =
-						ast.nodeAppend(parent, {AST::rgFuncReturnType, AST::rgType, AST::rgTypeDecl, AST::rgIdentifier});
+						ny::AST::nodeAppend(parent, {AST::rgFuncReturnType, AST::rgType, AST::rgTypeDecl, AST::rgIdentifier});
 					returnType->text = "any";
 				}
 			}
@@ -481,8 +479,8 @@ bool ASTReplicator::duplicateNode(AST::Node& parent, AST::Node& node) {
 	//
 	// duplicating the node
 	//
-	auto* newNode = ast.nodeAppendAsOriginal(parent, rule);
-	ast.nodeCopyOffsetText(*newNode, node);
+	auto* newNode = ny::AST::nodeAppendAsOriginal(parent, rule);
+	ny::AST::nodeCopyOffsetText(*newNode, node);
 	uint32_t count = node.children.size();
 	for (uint32_t i = 0; i != count; ++i)
 		duplicateNode(*newNode, node.children[i]);
@@ -530,14 +528,13 @@ void dumpAST(Logs::Report& report, const AST::Node& node, const char* text) {
 
 bool passDuplicateAndNormalizeAST(ny::compiler::Source& source, Logs::Report& report) {
 	auto& parser = source.parsing.parser;
-	auto& ast    = source.parsing.ast;
 	//! Reset the root node
 	source.parsing.rootnode = make_ref<AST::Node>(AST::rgStart);
 	if (!parser.root or (parser.root->rule != AST::rgStart))
 		return false;
 	if (config::traces::astBeforeNormalize)
 		dumpAST(report, *parser.root, "before normalization");
-	ASTReplicator cloner(ast, report);
+	ASTReplicator cloner(report);
 	bool success = cloner.run(*parser.root, *(source.parsing.rootnode));
 	// retrieve data
 	source.parsing.nmspc.swap(cloner.nmspc);

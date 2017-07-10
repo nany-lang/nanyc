@@ -21,6 +21,39 @@ yuni::Ref<Node> createNodeFuncCrefParam(yuni::Ref<Node>& funcname, const AnyStri
 //! Extract the complete identifier string (from an entity node)
 template<class S> bool appendEntityAsString(S& out, const Node& node);
 
+//! Append a new node and append it (+metadata)
+AST::Node* nodeAppend(AST::Node& parent, enum AST::Rule);
+
+//! Append a new hierarchy of node and append it (+metadata)
+AST::Node* nodeAppend(AST::Node& parent, std::initializer_list<enum AST::Rule> list);
+
+//! Create a new node and append it (+metadata)
+AST::Node* nodeAppendAsOriginal(AST::Node& parent, enum AST::Rule);
+
+void nodeRulePromote(AST::Node& node, enum AST::Rule);
+
+/*!
+** \param index Child Index of \p node
+*/
+void nodeReparentAtTheEnd(AST::Node& node, AST::Node& oldParent, uint index, AST::Node& newParent);
+void nodeReparentAtTheBegining(AST::Node& node, AST::Node& oldParent, uint index, AST::Node& newParent);
+
+
+template<class T>
+void nodeEachParent(AST::Node& node, const T& callback);
+
+template<class T>
+void nodeEachItemInXPath(AST::Node& node, const T& callback);
+
+//! Copy the offset attributes
+void nodeCopyOffsetText(AST::Node& dest, const AST::Node& source);
+
+//! Copy the offset and originalNode attributes
+void nodeCopyOffsetAndOriginalNode(AST::Node& dest, const AST::Node& source);
+
+//! Copy the offset + text and originalNode attributes
+void nodeCopyOffsetTextAndOriginalNode(AST::Node& dest, const AST::Node& source);
+
 
 } // namespace AST
 } // namespace ny
