@@ -32,6 +32,30 @@ inline AST::Node* nodeAppend(AST::Node& parent, std::initializer_list<enum AST::
 	return node;
 }
 
+void nodeReparentAtTheEnd(AST::Node& node, AST::Node& oldParent, uint index, AST::Node& newParent) {
+	assert(&node != &newParent and "should not be similar");
+	assert(index < oldParent.children.size());
+	// acquire node pointer
+	Ref<AST::Node> ptr = &node;
+	// remove first it from the old parent
+	oldParent.children.erase(index);
+	// add the child first, to keep a reference somewhere
+	newParent.children.push_back(ptr);
+	// metadata, register the new parent
+	node.parent = &newParent;
+}
+
+void nodeReparentAtTheBegining(AST::Node& node, AST::Node& oldParent, uint index, AST::Node& newParent) {
+	assert(&node != &newParent and "should not be similar");
+	assert(index < oldParent.children.size());
+	// add the child first, to keep a reference somewhere
+	newParent.children.push_front(&node);
+	// metadata, register the new parent
+	node.parent = &newParent;
+	// remove it from the old parent
+	oldParent.children.erase(index);
+}
+
 struct ASTReplicator final {
 	explicit ASTReplicator(Logs::Report);
 
@@ -103,7 +127,7 @@ void ASTReplicator::transformExprNodeToFuncCallNOT(AST::Node& node) {
 	auto call = make_ref<AST::Node>(AST::rgCall);
 	auto& lhs  = *nodeAppend(*call, {AST::rgCallParameter, AST::rgExpr});
 	// re-parent lhs
-	ny::AST::nodeReparentAtTheEnd(node.children[lhsIndex], node, lhsIndex, lhs);
+	nodeReparentAtTheEnd(node.children[lhsIndex], node, lhsIndex, lhs);
 	// remove all remaining nodes
 	node.children.clear();
 	// re-parent the new node 'call'
@@ -153,9 +177,9 @@ void ASTReplicator::transformExprNodeToFuncCall(AST::Node& node) {
 	auto& lhs = *nodeAppend(*call, {AST::rgCallParameter, AST::rgExpr});
 	auto& rhs = *nodeAppend(*call, {AST::rgCallParameter, AST::rgExpr});
 	// re-parent rhs first, otherwise the index will be invalidated
-	ny::AST::nodeReparentAtTheEnd(node.children[rhsIndex], node, rhsIndex, rhs);
+	nodeReparentAtTheEnd(node.children[rhsIndex], node, rhsIndex, rhs);
 	// re-parent lhs
-	ny::AST::nodeReparentAtTheEnd(node.children[lhsIndex], node, lhsIndex, lhs);
+	nodeReparentAtTheEnd(node.children[lhsIndex], node, lhsIndex, lhs);
 	// remove all remaining nodes
 	node.children.clear();
 	// re-parent the new node 'call'
@@ -194,7 +218,7 @@ void ASTReplicator::transformExprAssignmentToFuncCall(AST::Node& node) {
 	operatorNode.text = normalizeOperatorName(operatorNode.text);
 	auto& call = *nodeAppend(operatorNode, AST::rgCall);
 	auto& expr = *nodeAppend(call, {AST::rgCallParameter, AST::rgExpr});
-	ny::AST::nodeReparentAtTheEnd(rhs, node, rhsIndex, expr);
+	nodeReparentAtTheEnd(rhs, node, rhsIndex, expr);
 }
 
 
@@ -268,7 +292,7 @@ void ASTReplicator::normalizeExprReorderOperators(AST::Node& node) {
 							auto& previous = node.children[i - 1];
 							switch (previous.rule) {
 								default: {
-									ny::AST::nodeReparentAtTheBegining(previous, node, i - 1, node.children[i]);
+									nodeReparentAtTheBegining(previous, node, i - 1, node.children[i]);
 									--i;
 									count = node.children.size();
 									break;
@@ -322,7 +346,7 @@ void ASTReplicator::normalizeExprReorderOperators(AST::Node& node) {
 							case AST::rgCall:
 							case AST::rgExprTemplate:
 							case AST::rgExprSubArray:
-								ny::AST::nodeReparentAtTheEnd(nextChild, node, i + 1, child);
+								nodeReparentAtTheEnd(nextChild, node, i + 1, child);
 								count = node.children.size();
 								break;
 							default:
