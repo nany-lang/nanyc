@@ -27,7 +27,6 @@ public:
 
 private:
 	bool duplicateNode(AST::Node& out, const AST::Node& node);
-	void iterateThroughChildren(const AST::Node& node, AST::Node& newNode);
 	void collectNamespace(const AST::Node& node);
 	bool generateErrorFromErrorNode(const AST::Node& node);
 	void normalizeExpression(AST::Node& node);
@@ -51,14 +50,6 @@ private:
 ASTReplicator::ASTReplicator(ASTHelper& ast, Logs::Report report)
 	: ast(ast)
 	, report(report) {
-}
-
-
-void ASTReplicator::iterateThroughChildren(const AST::Node& node, AST::Node& newNode) {
-	node.each([&] (const AST::Node & subnode) -> bool {
-		duplicateNode(newNode, subnode);
-		return true;
-	});
 }
 
 
@@ -491,24 +482,21 @@ bool ASTReplicator::duplicateNode(AST::Node& parent, const AST::Node& node) {
 	// duplicating the node
 	//
 	auto* newNode = ast.nodeAppendAsOriginal(parent, rule);
-	// transfering properties
 	ast.nodeCopyOffsetText(*newNode, node);
+	uint32_t count = node.children.size();
+	for (uint32_t i = 0; i != count; ++i)
+		duplicateNode(*newNode, node.children[i]);
 	switch (rule) {
 		default: {
-			iterateThroughChildren(node, *newNode);
 			break;
 		}
 		case AST::rgExpr:
 		case AST::rgExprValue: {
 			// some expr might be statements
-			auto& exprnode = *newNode;
-			iterateThroughChildren(node, exprnode);
-			normalizeExpression(exprnode);
+			normalizeExpression(*newNode);
 			break;
 		}
 		case AST::rgVar: {
-			// duplicate all children
-			iterateThroughChildren(node, *newNode);
 			// to avoid conflicts in the grammar, 'type-decl' does not use 'expr' for declaring
 			// a type but must be normalized as well
 			uint32_t varTypeNode = newNode->findFirst(AST::rgVarType);
