@@ -516,14 +516,6 @@ bool ASTReplicator::duplicateNode(AST::Node& parent, const AST::Node& node) {
 				normalizeExpression(newNode->children[varTypeNode]);
 			break;
 		}
-		case AST::rgFuncBody: {
-			iterateThroughChildren(node, *newNode);
-			break;
-		}
-		case AST::rgClassBody: {
-			iterateThroughChildren(node, *newNode);
-			break;
-		}
 	}
 	return true;
 }
