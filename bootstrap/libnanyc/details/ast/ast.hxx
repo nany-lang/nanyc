@@ -95,28 +95,8 @@ void nodeEachItemInXPath(AST::Node& node, const T& callback) {
 	}
 }
 
-inline AST::Node* nodeAppend(AST::Node& parent, enum AST::Rule rule) {
-	auto* node = new AST::Node(rule);
-	node->offset = parent.offset;
-	node->offsetEnd = parent.offsetEnd;
-	node->parent = &parent;
-	parent.children.push_back(node);
-	return node;
-}
-
-inline AST::Node* nodeAppend(AST::Node& parent, std::initializer_list<enum AST::Rule> list) {
-	AST::Node* node = &parent;
-	for (auto it : list)
-		node = nodeAppend(*node, it);
-	return node;
-}
-
 inline void nodeRulePromote(AST::Node& node, enum AST::Rule rule) {
 	node.rule = rule;
-}
-
-inline AST::Node* nodeAppendAsOriginal(AST::Node& parent, enum AST::Rule rule) {
-	return nodeAppend(parent, rule);
 }
 
 } // namespace AST

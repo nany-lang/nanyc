@@ -21,15 +21,6 @@ yuni::Ref<Node> createNodeFuncCrefParam(yuni::Ref<Node>& funcname, const AnyStri
 //! Extract the complete identifier string (from an entity node)
 template<class S> bool appendEntityAsString(S& out, const Node& node);
 
-//! Append a new node and append it (+metadata)
-AST::Node* nodeAppend(AST::Node& parent, enum AST::Rule);
-
-//! Append a new hierarchy of node and append it (+metadata)
-AST::Node* nodeAppend(AST::Node& parent, std::initializer_list<enum AST::Rule> list);
-
-//! Create a new node and append it (+metadata)
-AST::Node* nodeAppendAsOriginal(AST::Node& parent, enum AST::Rule);
-
 void nodeRulePromote(AST::Node& node, enum AST::Rule);
 
 /*!

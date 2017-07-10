@@ -16,6 +16,22 @@ namespace ny {
 namespace compiler {
 namespace {
 
+inline AST::Node* nodeAppend(AST::Node& parent, enum AST::Rule rule) {
+	auto* node = new AST::Node(rule);
+	node->offset = parent.offset;
+	node->offsetEnd = parent.offsetEnd;
+	node->parent = &parent;
+	parent.children.push_back(node);
+	return node;
+}
+
+inline AST::Node* nodeAppend(AST::Node& parent, std::initializer_list<enum AST::Rule> list) {
+	AST::Node* node = &parent;
+	for (auto it : list)
+		node = nodeAppend(*node, it);
+	return node;
+}
+
 struct ASTReplicator final {
 	explicit ASTReplicator(Logs::Report);
 
@@ -85,7 +101,7 @@ void ASTReplicator::transformExprNodeToFuncCallNOT(AST::Node& node) {
 	node.text = "^not";
 	// create a new subtree
 	auto call = make_ref<AST::Node>(AST::rgCall);
-	auto& lhs  = *ny::AST::nodeAppend(*call, {AST::rgCallParameter, AST::rgExpr});
+	auto& lhs  = *nodeAppend(*call, {AST::rgCallParameter, AST::rgExpr});
 	// re-parent lhs
 	ny::AST::nodeReparentAtTheEnd(node.children[lhsIndex], node, lhsIndex, lhs);
 	// remove all remaining nodes
@@ -134,8 +150,8 @@ void ASTReplicator::transformExprNodeToFuncCall(AST::Node& node) {
 	node.text = opname;
 	// create a new subtree
 	auto call = make_ref<AST::Node>(AST::rgCall);
-	auto& lhs = *ny::AST::nodeAppend(*call, {AST::rgCallParameter, AST::rgExpr});
-	auto& rhs = *ny::AST::nodeAppend(*call, {AST::rgCallParameter, AST::rgExpr});
+	auto& lhs = *nodeAppend(*call, {AST::rgCallParameter, AST::rgExpr});
+	auto& rhs = *nodeAppend(*call, {AST::rgCallParameter, AST::rgExpr});
 	// re-parent rhs first, otherwise the index will be invalidated
 	ny::AST::nodeReparentAtTheEnd(node.children[rhsIndex], node, rhsIndex, rhs);
 	// re-parent lhs
@@ -176,8 +192,8 @@ void ASTReplicator::transformExprAssignmentToFuncCall(AST::Node& node) {
 	ny::AST::nodeRulePromote(operatorNode, AST::rgIdentifier);
 	// normalizing the operator
 	operatorNode.text = normalizeOperatorName(operatorNode.text);
-	auto& call = *ny::AST::nodeAppend(operatorNode, AST::rgCall);
-	auto& expr = *ny::AST::nodeAppend(call, {AST::rgCallParameter, AST::rgExpr});
+	auto& call = *nodeAppend(operatorNode, AST::rgCall);
+	auto& expr = *nodeAppend(call, {AST::rgCallParameter, AST::rgExpr});
 	ny::AST::nodeReparentAtTheEnd(rhs, node, rhsIndex, expr);
 }
 
@@ -354,14 +370,14 @@ void ASTReplicator::appendNewBoolNode(AST::Node& parent, bool onoff) {
 	// |           call-parameter
 	// |               expr
 	// |                   identifier: __true
-	auto& group   = *ny::AST::nodeAppend(parent, AST::rgExprGroup);
-	auto& newnode = *ny::AST::nodeAppend(group, AST::rgNew);
-	auto& typeDecl = *ny::AST::nodeAppend(newnode, AST::rgTypeDecl);
-	auto& id       = *ny::AST::nodeAppend(typeDecl, AST::rgIdentifier);
+	auto& group   = *nodeAppend(parent, AST::rgExprGroup);
+	auto& newnode = *nodeAppend(group, AST::rgNew);
+	auto& typeDecl = *nodeAppend(newnode, AST::rgTypeDecl);
+	auto& id       = *nodeAppend(typeDecl, AST::rgIdentifier);
 	id.text = "bool";
 	if (onoff) {
 		auto& value =
-			*ny::AST::nodeAppend(newnode, {AST::rgCall, AST::rgCallParameter, AST::rgExpr, AST::rgIdentifier});
+			*nodeAppend(newnode, {AST::rgCall, AST::rgCallParameter, AST::rgExpr, AST::rgIdentifier});
 		value.text = "__true";
 	}
 }
@@ -465,7 +481,7 @@ bool ASTReplicator::duplicateNode(AST::Node& parent, AST::Node& node) {
 				if (node.findFirst(AST::rgReturnInline) < node.children.size()) {
 					// all conditions are met. No type is present but should be
 					auto returnType =
-						ny::AST::nodeAppend(parent, {AST::rgFuncReturnType, AST::rgType, AST::rgTypeDecl, AST::rgIdentifier});
+						nodeAppend(parent, {AST::rgFuncReturnType, AST::rgType, AST::rgTypeDecl, AST::rgIdentifier});
 					returnType->text = "any";
 				}
 			}
@@ -479,7 +495,7 @@ bool ASTReplicator::duplicateNode(AST::Node& parent, AST::Node& node) {
 	//
 	// duplicating the node
 	//
-	auto* newNode = ny::AST::nodeAppendAsOriginal(parent, rule);
+	auto* newNode = nodeAppend(parent, rule);
 	ny::AST::nodeCopyOffsetText(*newNode, node);
 	uint32_t count = node.children.size();
 	for (uint32_t i = 0; i != count; ++i)
