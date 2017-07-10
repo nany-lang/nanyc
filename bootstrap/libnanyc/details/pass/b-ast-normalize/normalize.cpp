@@ -409,8 +409,7 @@ bool ASTReplicator::duplicateNode(AST::Node& parent, const AST::Node& node) {
 		case AST::rgExpr: {
 			assert(not node.children.empty());
 			auto& firstChild = (((node.children.size() == 1 and node.firstChild().rule == AST::rgExprValue)
-								 ? node.firstChild() : node))
-							   .firstChild();
+				? node.firstChild() : node)).firstChild();
 			switch (firstChild.rule) { // avoid the creation of some useless nodes
 				case AST::rgClass:
 				case AST::rgVar:
