@@ -1,6 +1,6 @@
 #include <yuni/yuni.h>
 #include <yuni/core/system/console/console.h>
-#include "nany/nany.h"
+#include "nanyc/vm.h"
 #include <yuni/io/directory.h>
 #include <yuni/io/file.h>
 #include <yuni/io/directory/info/info.h>

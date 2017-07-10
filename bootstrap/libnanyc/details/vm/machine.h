@@ -13,6 +13,8 @@ struct Machine final {
 	Machine& operator = (const Machine&) = delete;
 	Machine& operator = (Machine&&) = delete;
 
+	int run();
+
 	nyvm_opts_t opts;
 	const ny::Program& program;
 };

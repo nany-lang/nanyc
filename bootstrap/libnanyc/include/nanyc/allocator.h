@@ -15,6 +15,7 @@ extern "C" {
 #endif
 
 typedef struct nyallocator_t nyallocator_t;
+typedef struct nyallocator_opts_t nyallocator_opts_t;
 
 typedef struct nyallocator_t {
 	void* userdata;

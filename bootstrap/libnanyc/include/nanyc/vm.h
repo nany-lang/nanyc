@@ -18,7 +18,10 @@ extern "C" {
 #endif
 
 
-typedef struct nyvmthread_t {
+typedef struct nyvmthread_t nyvmthread_t;
+typedef struct nyvm_opts_t nyvm_opts_t;
+
+struct nyvmthread_t {
 	void* internal;
 	nyio_adapter_t* (*io_resolve)(nyvmthread_t*, nyanystr_t* relpath, const nyanystr_t* path);
 	const char* (*io_get_cwd)(nyvmthread_t*, uint32_t* len);
@@ -36,16 +39,14 @@ typedef struct nyvmthread_t {
 	nyconsole_t cout;
 	nyconsole_t cerr;
 	const nyprogram_t* program;
-}
-nyvmthread_t;
+};
 
-typedef struct nyvm_opts_t {
+struct nyvm_opts_t {
 	void* userdata;
 	nyallocator_t allocator;
 	nyconsole_t cout;
 	nyconsole_t cerr;
-}
-nyvm_opts_t;
+};
 
 //! Init VM options with default values
 NY_EXPORT void nyvm_opts_init_defaults(nyvm_opts_t*);

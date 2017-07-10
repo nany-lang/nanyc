@@ -13,21 +13,12 @@ install(TARGETS nanyc RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT "n
 
 
 ### nanyc-unittest
-add_executable(nanyc-unittest "unittest.cpp")
+add_executable(nanyc-unittest "nanyc-unittest.cpp")
 target_link_libraries(nanyc-unittest PRIVATE libnanyc yuni-static-core)
 set_target_properties(nanyc-unittest
 	PROPERTIES VERSION "${nany_version_major}.${nany_version_minor}.${nany_version_patch}"
 	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/.."
 )
-
-### nanyc-unittest
-add_executable(nanyc-unittest-new "nanyc-unittest.cpp")
-target_link_libraries(nanyc-unittest-new PRIVATE libnanyc yuni-static-core)
-set_target_properties(nanyc-unittest-new
-	PROPERTIES VERSION "${nany_version_major}.${nany_version_minor}.${nany_version_patch}"
-	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/.."
-)
-
 
 ### nanyc-dump-ast
 # note: this executable does not rely on `libnanyc` library on purpose
@@ -44,7 +35,7 @@ set_target_properties(nanyc-dump-ast PROPERTIES
 )
 # nanyc-dump-ast does not use libnanyc (on purpose)
 target_compile_definitions(nanyc-dump-ast PRIVATE "NANY_VERSION=${nany_version_string}")
-install(TARGETS nanyc-dump-ast RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT "libnanyc-dev-tools")
+install(TARGETS nanyc-dump-ast RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT "nanyc-dev")
 
 
 ### nanyc-check-syntax
@@ -54,4 +45,4 @@ set_target_properties(nanyc-check-syntax PROPERTIES
 	VERSION "${nany_version_major}.${nany_version_minor}.${nany_version_patch}"
 	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/.."
 )
-install(TARGETS nanyc-check-syntax RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT "libnanyc-dev-tools")
+install(TARGETS nanyc-check-syntax RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT "nanyc-dev")

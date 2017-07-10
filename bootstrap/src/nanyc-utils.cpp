@@ -43,10 +43,5 @@ int unknownOption(const char* const argv0, const char* const name) {
 	return EXIT_FAILURE;
 }
 
-void fileAccessError(const nyproject_t*, nybuild_t*, const char* file, uint32_t length) {
-	std::cerr << "error: failed to access to '";
-	std::cerr << AnyString{file, length} << "'\n";
-}
-
 } // namespace print
 } // namespace ny

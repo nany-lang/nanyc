@@ -20,7 +20,8 @@ nybool_t nyvm_run_entrypoint(const nyvm_opts_t* opts, const nyprogram_t* program
 	try {
 		auto* prgm = reinterpret_cast<const ny::Program*>(program);
 		auto machine = std::make_unique<ny::vm::Machine>(*opts, *prgm);
-		return nytrue;
+		int exitstatus = machine->run();
+		return (exitstatus == 0) ? nytrue : nyfalse;
 	}
 	catch (...) {
 	}

@@ -1,6 +1,4 @@
 #pragma once
-#include <nany/nany.h>
-
 
 namespace ny {
 namespace print {
@@ -19,9 +17,6 @@ int version();
 
 //! Complain about an unknown command line option (always return EXIT_FAILURE)
 int unknownOption(const char* const argv0, const char* const name);
-
-//! Callback to complain on missing file
-void fileAccessError(const nyproject_t*, nybuild_t*, const char* file, uint32_t length);
 
 } // namespace print
 } // namespace ny

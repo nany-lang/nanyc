@@ -1,6 +1,4 @@
 #include "stacktrace.h"
-#include "details/context/build.h"
-#include "details/vm/console.h"
 
 using namespace Yuni;
 
@@ -37,6 +35,7 @@ void Stacktrace<true>::grow() {
 }
 
 
+/*
 void Stacktrace<true>::dump(const nyprogram_cf_t& cf, const AtomMap& map) const noexcept {
 	auto cerr = [&cf](const AnyString& string) {
 		ny::vm::console::cerr(cf, string);
@@ -76,7 +75,7 @@ void Stacktrace<true>::dump(const nyprogram_cf_t& cf, const AtomMap& map) const 
 		cerr("'\n");
 	}
 }
-
+*/
 
 } // namespace vm
 } // namespace ny

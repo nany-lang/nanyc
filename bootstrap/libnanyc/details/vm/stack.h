@@ -1,6 +1,5 @@
 #pragma once
 #include "types.h"
-#include "nany/nany.h"
 
 #define NANY_vm_STACK_TRACES 0
 

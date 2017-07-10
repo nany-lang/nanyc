@@ -2,7 +2,7 @@
 #include "libnanyc.h"
 #include <yuni/core/bind.h>
 #include "details/intrinsic/intrinsic.h"
-#include "nany/nany.h"
+#include "nanyc/vm.h"
 #include <unordered_map>
 #include <vector>
 #include <memory>
