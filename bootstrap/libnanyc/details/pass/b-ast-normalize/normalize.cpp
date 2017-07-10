@@ -495,18 +495,15 @@ bool ASTReplicator::duplicateNode(AST::Node& parent, const AST::Node& node) {
 	ast.nodeCopyOffsetText(*newNode, node);
 	switch (rule) {
 		default: {
-			if (not node.children.empty())
-				iterateThroughChildren(node, *newNode);
+			iterateThroughChildren(node, *newNode);
 			break;
 		}
 		case AST::rgExpr:
 		case AST::rgExprValue: {
 			// some expr might be statements
-			if (likely(not node.children.empty())) {
-				auto& exprnode = *newNode;
-				iterateThroughChildren(node, exprnode);
-				normalizeExpression(exprnode);
-			}
+			auto& exprnode = *newNode;
+			iterateThroughChildren(node, exprnode);
+			normalizeExpression(exprnode);
 			break;
 		}
 		case AST::rgVar: {
@@ -520,13 +517,11 @@ bool ASTReplicator::duplicateNode(AST::Node& parent, const AST::Node& node) {
 			break;
 		}
 		case AST::rgFuncBody: {
-			if (likely(not node.children.empty()))
-				iterateThroughChildren(node, *newNode);
+			iterateThroughChildren(node, *newNode);
 			break;
 		}
 		case AST::rgClassBody: {
-			if (likely(not node.children.empty()))
-				iterateThroughChildren(node, *newNode);
+			iterateThroughChildren(node, *newNode);
 			break;
 		}
 	}
