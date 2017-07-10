@@ -2,7 +2,6 @@
 #include <nanyc/program.h>
 #include "details/reporting/message.h"
 #include "details/grammar/nany.h"
-#include "details/ast/tree-index.h"
 #include "details/ir/sequence.h"
 #include "details/atom/classdef-table.h"
 #include "details/intrinsic/catalog.h"
@@ -18,8 +17,6 @@ struct Source final {
 		AST::Parser parser;
 		//! Namespace of the file
 		std::pair<YString, AST::Node*> nmspc;
-		//! AST manipulation
-		ASTHelper ast;
 		//! Root node
 		yuni::Ref<AST::Node> rootnode;
 		//! The original sequence, generated from the normalized AST

@@ -47,6 +47,5 @@ Ref<Node> createNodeFuncCrefParam(Ref<Node>& funcname, const AnyString& paramnam
 	return func;
 }
 
-
 } // namespace AST
 } // namespace ny
