@@ -23,28 +23,19 @@ template<class T> inline T* vm_allocateraw(nyvmthread_t* const /*vm*/, size_t si
 	return ptr;
 }
 
-
 template<class T> inline void vm_deallocate(nyvmthread_t* const vm, T* object) {
 	assert(object != nullptr);
 	object->~T();
 	free(object); // sizeof(T);
 }
 
-
 inline void vm_deallocate(nyvmthread_t* const /*vm*/, void* object, size_t /*size*/) {
 	assert(object != nullptr);
 	free(object);
 }
 
-
-inline void vm_print(nyvmthread_t* const vm, const AnyString& msg) {
-vm->cout.write(&vm->cout, msg.c_str(), msg.size());
-}
-
-
 inline nybool_t to_nybool(bool v) {
 	return v ? nytrue : nyfalse;
 }
 
-
-} // anonymous namespace
+} // namespace

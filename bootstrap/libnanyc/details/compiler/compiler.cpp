@@ -8,7 +8,7 @@
 #include "details/pass/c-ast2ir/source-ast-to-ir.h"
 #include "details/pass/d-object-map/attach.h"
 #include "details/semantic/atom-factory.h"
-#include "details/vm/runtime/std.core.h"
+#include "details/intrinsic/std.core.h"
 #include "libnanyc-config.h"
 #include "libnanyc-traces.h"
 #include "embed-nsl.hxx" // generated
@@ -42,16 +42,6 @@ void copySourceOpts(ny::compiler::Source& source, const nysource_opts_t& opts) {
 		source.storageContent.assign(opts.content.c_str, static_cast<uint32_t>(opts.content.len));
 		source.content = source.storageContent;
 	}
-}
-
-void importcompdbIntrinsics(intrinsic::Catalog& intrinsics) {
-	nsl::import::string(intrinsics);
-	nsl::import::process(intrinsics);
-	nsl::import::env(intrinsics);
-	nsl::import::io(intrinsics);
-	nsl::import::memory(intrinsics);
-	nsl::import::console(intrinsics);
-	nsl::import::digest(intrinsics);
 }
 
 bool compileSource(ny::Logs::Report& mainreport, ny::compiler::Compdb& compdb, ny::compiler::Source& source, const nycompile_opts_t& gopts) {
@@ -121,7 +111,7 @@ std::unique_ptr<ny::Program> compile(ny::compiler::Compdb& compdb) {
 		if (unlikely(scount == 0))
 			throw "no input source code";
 		if (config::importNSL)
-			importcompdbIntrinsics(compdb.intrinsics);
+			ny::intrinsic::import::all(compdb.intrinsics);
 		if (config::importNSL)
 			scount += corefilesCount;
 		if (unlikely(opts.with_nsl_unittests == nytrue))
