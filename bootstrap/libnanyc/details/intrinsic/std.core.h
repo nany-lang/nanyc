@@ -29,6 +29,16 @@ void console(ny::intrinsic::Catalog&);
 //! Import intrinsics related to digest
 void digest(ny::intrinsic::Catalog&);
 
+inline void all(intrinsic::Catalog& intrinsics) {
+	ny::nsl::import::string(intrinsics);
+	ny::nsl::import::process(intrinsics);
+	ny::nsl::import::env(intrinsics);
+	ny::nsl::import::io(intrinsics);
+	ny::nsl::import::memory(intrinsics);
+	ny::nsl::import::console(intrinsics);
+	ny::nsl::import::digest(intrinsics);
+}
+
 } // namespace import
 } // namespace nsl
 } // namespace ny

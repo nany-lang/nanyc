@@ -44,16 +44,6 @@ void copySourceOpts(ny::compiler::Source& source, const nysource_opts_t& opts) {
 	}
 }
 
-void importcompdbIntrinsics(intrinsic::Catalog& intrinsics) {
-	nsl::import::string(intrinsics);
-	nsl::import::process(intrinsics);
-	nsl::import::env(intrinsics);
-	nsl::import::io(intrinsics);
-	nsl::import::memory(intrinsics);
-	nsl::import::console(intrinsics);
-	nsl::import::digest(intrinsics);
-}
-
 bool compileSource(ny::Logs::Report& mainreport, ny::compiler::Compdb& compdb, ny::compiler::Source& source, const nycompile_opts_t& gopts) {
 	auto report = mainreport.subgroup();
 	report.data().origins.location.filename = source.filename;
@@ -121,7 +111,7 @@ std::unique_ptr<ny::Program> compile(ny::compiler::Compdb& compdb) {
 		if (unlikely(scount == 0))
 			throw "no input source code";
 		if (config::importNSL)
-			importcompdbIntrinsics(compdb.intrinsics);
+			ny::nsl::import::all(compdb.intrinsics);
 		if (config::importNSL)
 			scount += corefilesCount;
 		if (unlikely(opts.with_nsl_unittests == nytrue))
