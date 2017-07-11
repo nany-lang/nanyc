@@ -5,7 +5,7 @@
 
 using namespace Yuni;
 
-static void _nanyc_env_set(nyvmthread_t*, void* varname, void* content) {
+static void nyinx_env_set(nyvmthread_t*, void* varname, void* content) {
 	if (varname) {
 		AnyString name = *(reinterpret_cast<String*>(varname));
 		AnyString cont;
@@ -15,14 +15,14 @@ static void _nanyc_env_set(nyvmthread_t*, void* varname, void* content) {
 	}
 }
 
-static void _nanyc_env_unset(nyvmthread_t*, void* varname) {
+static void nyinx_env_unset(nyvmthread_t*, void* varname) {
 	if (varname) {
 		AnyString name = *(reinterpret_cast<String*>(varname));
 		System::Environment::Unset(name);
 	}
 }
 
-static void* _nanyc_env_read(nyvmthread_t* vm, void* varname, void* defvalue) {
+static void* nyinx_env_read(nyvmthread_t* vm, void* varname, void* defvalue) {
 	auto* string = vm_allocate<String>(vm);
 	if (varname) {
 		AnyString name = *(reinterpret_cast<String*>(varname));
@@ -37,7 +37,7 @@ static void* _nanyc_env_read(nyvmthread_t* vm, void* varname, void* defvalue) {
 	return string;
 }
 
-static bool _nanyc_env_read_as_bool(nyvmthread_t*, void* varname, bool defvalue) {
+static bool nyinx_env_read_as_bool(nyvmthread_t*, void* varname, bool defvalue) {
 	if (varname) {
 		AnyString name = *(reinterpret_cast<String*>(varname));
 		return System::Environment::ReadAsBool(name, defvalue);
@@ -45,7 +45,7 @@ static bool _nanyc_env_read_as_bool(nyvmthread_t*, void* varname, bool defvalue)
 	return defvalue;
 }
 
-static int64_t _nanyc_env_read_as_i64(nyvmthread_t*, void* varname, int64_t defvalue) {
+static int64_t nyinx_env_read_as_i64(nyvmthread_t*, void* varname, int64_t defvalue) {
 	if (varname) {
 		AnyString name = *(reinterpret_cast<String*>(varname));
 		return System::Environment::ReadAsInt64(name, defvalue);
@@ -53,7 +53,7 @@ static int64_t _nanyc_env_read_as_i64(nyvmthread_t*, void* varname, int64_t defv
 	return defvalue;
 }
 
-static uint64_t _nanyc_env_read_as_u64(nyvmthread_t*, void* varname, uint64_t defvalue) {
+static uint64_t nyinx_env_read_as_u64(nyvmthread_t*, void* varname, uint64_t defvalue) {
 	if (varname) {
 		AnyString name = *(reinterpret_cast<String*>(varname));
 		return System::Environment::ReadAsUInt64(name, defvalue);
@@ -61,7 +61,7 @@ static uint64_t _nanyc_env_read_as_u64(nyvmthread_t*, void* varname, uint64_t de
 	return defvalue;
 }
 
-static bool _nanyc_env_exists(nyvmthread_t*, void* varname) {
+static bool nyinx_env_exists(nyvmthread_t*, void* varname) {
 	if (varname) {
 		AnyString name = *(reinterpret_cast<String*>(varname));
 		return System::Environment::Exists(name);
@@ -74,13 +74,13 @@ namespace intrinsic {
 namespace import {
 
 void env(ny::intrinsic::Catalog& intrinsics) {
-	intrinsics.emplace("__nanyc_env_set",    _nanyc_env_set);
-	intrinsics.emplace("__nanyc_env_unset",  _nanyc_env_unset);
-	intrinsics.emplace("__nanyc_env_read",   _nanyc_env_read);
-	intrinsics.emplace("__nanyc_env_asbool", _nanyc_env_read_as_bool);
-	intrinsics.emplace("__nanyc_env_asi64",  _nanyc_env_read_as_i64);
-	intrinsics.emplace("__nanyc_env_asu64",  _nanyc_env_read_as_u64);
-	intrinsics.emplace("__nanyc_env_exists", _nanyc_env_exists);
+	intrinsics.emplace("__nanyc_env_set",    nyinx_env_set);
+	intrinsics.emplace("__nanyc_env_unset",  nyinx_env_unset);
+	intrinsics.emplace("__nanyc_env_read",   nyinx_env_read);
+	intrinsics.emplace("__nanyc_env_asbool", nyinx_env_read_as_bool);
+	intrinsics.emplace("__nanyc_env_asi64",  nyinx_env_read_as_i64);
+	intrinsics.emplace("__nanyc_env_asu64",  nyinx_env_read_as_u64);
+	intrinsics.emplace("__nanyc_env_exists", nyinx_env_exists);
 }
 
 } // namespace import
