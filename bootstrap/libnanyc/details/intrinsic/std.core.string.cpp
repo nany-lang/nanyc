@@ -1,4 +1,4 @@
-#include "runtime.h"
+#include "details/intrinsic/std.h"
 #include "details/intrinsic/catalog.h"
 
 using namespace Yuni;

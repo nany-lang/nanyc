@@ -1,4 +1,4 @@
-#include "runtime.h"
+#include "details/intrinsic/std.h"
 #include "details/intrinsic/catalog.h"
 #include <yuni/core/string.h>
 #include <yuni/core/system/environment.h>

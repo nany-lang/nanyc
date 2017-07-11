@@ -129,6 +129,7 @@ add_library(libnanyc ${mode_libnany}
 	"details/intrinsic/std.core.string.cpp"
 	"details/intrinsic/std.digest.cpp"
 	"details/intrinsic/std.env.cpp"
+	"details/intrinsic/std.h"
 	"details/intrinsic/std.io.cpp"
 	"details/intrinsic/std.memory.cpp"
 	"details/intrinsic/std.os.process.cpp"

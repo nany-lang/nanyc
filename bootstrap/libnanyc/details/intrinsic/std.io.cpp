@@ -1,5 +1,5 @@
+#include "details/intrinsic/std.h"
 #include "std.core.h"
-#include "runtime.h"
 #include "details/intrinsic/catalog.h"
 #include <yuni/yuni.h>
 #include <yuni/core/string.h>
