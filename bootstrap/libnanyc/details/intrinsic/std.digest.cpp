@@ -1,7 +1,6 @@
 #include "details/intrinsic/std.h"
 #include "details/intrinsic/catalog.h"
 #include <yuni/core/hash/checksum/md5.h>
-#include <iostream>
 
 using namespace Yuni;
 
