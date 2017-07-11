@@ -25,7 +25,7 @@ static void* nanyc_digest_md5(nyvmthread_t* vm, const char* string, uint64_t len
 }
 
 namespace ny {
-namespace nsl {
+namespace intrinsic {
 namespace import {
 
 void digest(ny::intrinsic::Catalog& intrinsics) {
@@ -33,5 +33,5 @@ void digest(ny::intrinsic::Catalog& intrinsics) {
 }
 
 } // namespace import
-} // namespace nsl
+} // namespace intrinsic
 } // namespace ny

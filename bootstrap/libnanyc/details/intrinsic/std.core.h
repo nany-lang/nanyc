@@ -5,7 +5,7 @@
 namespace ny { class Project; }
 
 namespace ny {
-namespace nsl {
+namespace intrinsic {
 namespace import {
 
 //! Import intrinsics related to string manipulation
@@ -30,15 +30,15 @@ void console(ny::intrinsic::Catalog&);
 void digest(ny::intrinsic::Catalog&);
 
 inline void all(intrinsic::Catalog& intrinsics) {
-	ny::nsl::import::string(intrinsics);
-	ny::nsl::import::process(intrinsics);
-	ny::nsl::import::env(intrinsics);
-	ny::nsl::import::io(intrinsics);
-	ny::nsl::import::memory(intrinsics);
-	ny::nsl::import::console(intrinsics);
-	ny::nsl::import::digest(intrinsics);
+	ny::intrinsic::import::string(intrinsics);
+	ny::intrinsic::import::process(intrinsics);
+	ny::intrinsic::import::env(intrinsics);
+	ny::intrinsic::import::io(intrinsics);
+	ny::intrinsic::import::memory(intrinsics);
+	ny::intrinsic::import::console(intrinsics);
+	ny::intrinsic::import::digest(intrinsics);
 }
 
 } // namespace import
-} // namespace nsl
+} // namespace intrinsic
 } // namespace ny

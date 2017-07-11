@@ -29,7 +29,7 @@ static uint32_t nanyc_string_append_ptr(nyvmthread_t*, void* string, void* ptr) 
 }
 
 namespace ny {
-namespace nsl {
+namespace intrinsic {
 namespace import {
 
 void string(ny::intrinsic::Catalog& intrinsics) {
@@ -48,5 +48,5 @@ void string(ny::intrinsic::Catalog& intrinsics) {
 }
 
 } // namespace import
-} // namespace nsl
+} // namespace intrinsic
 } // namespace ny

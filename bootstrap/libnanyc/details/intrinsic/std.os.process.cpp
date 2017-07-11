@@ -9,7 +9,7 @@ static bool nanyc_os_process_execute(nyvmthread_t*, const char* cmd, uint32_t le
 }
 
 namespace ny {
-namespace nsl {
+namespace intrinsic {
 namespace import {
 
 void process(ny::intrinsic::Catalog& intrinsics) {
@@ -17,5 +17,5 @@ void process(ny::intrinsic::Catalog& intrinsics) {
 }
 
 } // namespace import
-} // namespace nsl
+} // namespace intrinsic
 } // namespace ny

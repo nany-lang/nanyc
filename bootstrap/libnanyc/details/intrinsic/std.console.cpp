@@ -32,7 +32,7 @@ static bool _nanyc_console_err_has_colors(nyvmthread_t*) {
 }
 
 namespace ny {
-namespace nsl {
+namespace intrinsic {
 namespace import {
 
 void console(ny::intrinsic::Catalog& intrinsics) {
@@ -45,5 +45,5 @@ void console(ny::intrinsic::Catalog& intrinsics) {
 }
 
 } // namespace import
-} // namespace nsl
+} // namespace intrinsic
 } // namespace ny

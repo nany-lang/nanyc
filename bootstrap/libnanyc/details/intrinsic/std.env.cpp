@@ -70,7 +70,7 @@ static bool _nanyc_env_exists(nyvmthread_t*, void* varname) {
 }
 
 namespace ny {
-namespace nsl {
+namespace intrinsic {
 namespace import {
 
 void env(ny::intrinsic::Catalog& intrinsics) {
@@ -84,5 +84,5 @@ void env(ny::intrinsic::Catalog& intrinsics) {
 }
 
 } // namespace import
-} // namespace nsl
+} // namespace intrinsic
 } // namespace ny

@@ -356,7 +356,7 @@ static bool nanyc_io_mount_local(nyvmthread_t* vm, const char* path, uint32_t le
 }
 
 namespace ny {
-namespace nsl {
+namespace intrinsic {
 namespace import {
 
 void io(ny::intrinsic::Catalog& intrinsics) {
@@ -394,5 +394,5 @@ void io(ny::intrinsic::Catalog& intrinsics) {
 }
 
 } // namespace import
-} // namespace nsl
+} // namespace intrinsic
 } // namespace ny

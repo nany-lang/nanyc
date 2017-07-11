@@ -111,7 +111,7 @@ std::unique_ptr<ny::Program> compile(ny::compiler::Compdb& compdb) {
 		if (unlikely(scount == 0))
 			throw "no input source code";
 		if (config::importNSL)
-			ny::nsl::import::all(compdb.intrinsics);
+			ny::intrinsic::import::all(compdb.intrinsics);
 		if (config::importNSL)
 			scount += corefilesCount;
 		if (unlikely(opts.with_nsl_unittests == nytrue))

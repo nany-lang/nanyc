@@ -11,7 +11,7 @@ static T nanyc_strlen(nyvmthread_t*, void* string) {
 }
 
 namespace ny {
-namespace nsl {
+namespace intrinsic {
 namespace import {
 
 void memory(ny::intrinsic::Catalog& intrinsics) {
@@ -20,5 +20,5 @@ void memory(ny::intrinsic::Catalog& intrinsics) {
 }
 
 } // namespace import
-} // namespace nsl
+} // namespace intrinsic
 } // namespace ny
