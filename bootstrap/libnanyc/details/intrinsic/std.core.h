@@ -8,12 +8,6 @@ namespace ny {
 namespace nsl {
 namespace import {
 
-//! Import 'std.core'
-void core(Project&);
-
-//! Import tests for 'std.core'
-void unittests(Project&);
-
 //! Import intrinsics related to string manipulation
 void string(ny::intrinsic::Catalog&);
 
