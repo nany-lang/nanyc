@@ -8,7 +8,7 @@
 #include "details/pass/c-ast2ir/source-ast-to-ir.h"
 #include "details/pass/d-object-map/attach.h"
 #include "details/semantic/atom-factory.h"
-#include "details/vm/runtime/std.core.h"
+#include "details/intrinsic/std.core.h"
 #include "libnanyc-config.h"
 #include "libnanyc-traces.h"
 #include "embed-nsl.hxx" // generated
