@@ -37,11 +37,6 @@ inline void vm_deallocate(nyvmthread_t* const /*vm*/, void* object, size_t /*siz
 }
 
 
-inline void vm_print(nyvmthread_t* const vm, const AnyString& msg) {
-vm->cout.write(&vm->cout, msg.c_str(), msg.size());
-}
-
-
 inline nybool_t to_nybool(bool v) {
 	return v ? nytrue : nyfalse;
 }

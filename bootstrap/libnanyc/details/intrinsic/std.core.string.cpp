@@ -6,7 +6,8 @@ using namespace Yuni;
 
 
 static void nanyc_cout(nyvmthread_t* tctx, void* string, uint32_t length) {
-	vm_print(tctx, AnyString{reinterpret_cast<const char*>(string), length});
+	assert(length == 0 or string != nullptr);
+	tctx->cout.write(&tctx->cout, (const char*) string, length);
 }
 
 
