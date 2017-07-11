@@ -2,13 +2,11 @@
 #include "libnanyc.h"
 #include "details/intrinsic/catalog.h"
 
-
 namespace ny { class Project; }
 
 namespace ny {
 namespace nsl {
 namespace import {
-
 
 //! Import 'std.core'
 void core(Project&);
@@ -36,7 +34,6 @@ void console(ny::intrinsic::Catalog&);
 
 //! Import intrinsics related to digest
 void digest(ny::intrinsic::Catalog&);
-
 
 } // namespace import
 } // namespace nsl

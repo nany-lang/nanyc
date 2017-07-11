@@ -4,7 +4,6 @@
 
 using namespace Yuni;
 
-
 static void* nanyc_digest_md5(nyvmthread_t* vm, const char* string, uint64_t length) {
 	Hash::Checksum::MD5 md5;
 	md5.fromRawData(string, length);
@@ -25,16 +24,13 @@ static void* nanyc_digest_md5(nyvmthread_t* vm, const char* string, uint64_t len
 	return nullptr;
 }
 
-
 namespace ny {
 namespace nsl {
 namespace import {
 
-
 void digest(ny::intrinsic::Catalog& intrinsics) {
 	intrinsics.emplace("__nanyc_digest_md5",   nanyc_digest_md5);
 }
-
 
 } // namespace import
 } // namespace nsl

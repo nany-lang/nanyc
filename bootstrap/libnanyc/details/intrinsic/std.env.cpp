@@ -5,7 +5,6 @@
 
 using namespace Yuni;
 
-
 static void _nanyc_env_set(nyvmthread_t*, void* varname, void* content) {
 	if (varname) {
 		AnyString name = *(reinterpret_cast<String*>(varname));
@@ -16,14 +15,12 @@ static void _nanyc_env_set(nyvmthread_t*, void* varname, void* content) {
 	}
 }
 
-
 static void _nanyc_env_unset(nyvmthread_t*, void* varname) {
 	if (varname) {
 		AnyString name = *(reinterpret_cast<String*>(varname));
 		System::Environment::Unset(name);
 	}
 }
-
 
 static void* _nanyc_env_read(nyvmthread_t* vm, void* varname, void* defvalue) {
 	auto* string = vm_allocate<String>(vm);
@@ -40,7 +37,6 @@ static void* _nanyc_env_read(nyvmthread_t* vm, void* varname, void* defvalue) {
 	return string;
 }
 
-
 static bool _nanyc_env_read_as_bool(nyvmthread_t*, void* varname, bool defvalue) {
 	if (varname) {
 		AnyString name = *(reinterpret_cast<String*>(varname));
@@ -48,7 +44,6 @@ static bool _nanyc_env_read_as_bool(nyvmthread_t*, void* varname, bool defvalue)
 	}
 	return defvalue;
 }
-
 
 static int64_t _nanyc_env_read_as_i64(nyvmthread_t*, void* varname, int64_t defvalue) {
 	if (varname) {
@@ -58,7 +53,6 @@ static int64_t _nanyc_env_read_as_i64(nyvmthread_t*, void* varname, int64_t defv
 	return defvalue;
 }
 
-
 static uint64_t _nanyc_env_read_as_u64(nyvmthread_t*, void* varname, uint64_t defvalue) {
 	if (varname) {
 		AnyString name = *(reinterpret_cast<String*>(varname));
@@ -66,7 +60,6 @@ static uint64_t _nanyc_env_read_as_u64(nyvmthread_t*, void* varname, uint64_t de
 	}
 	return defvalue;
 }
-
 
 static bool _nanyc_env_exists(nyvmthread_t*, void* varname) {
 	if (varname) {
@@ -76,11 +69,9 @@ static bool _nanyc_env_exists(nyvmthread_t*, void* varname) {
 	return false;
 }
 
-
 namespace ny {
 namespace nsl {
 namespace import {
-
 
 void env(ny::intrinsic::Catalog& intrinsics) {
 	intrinsics.emplace("__nanyc_env_set",    _nanyc_env_set);
@@ -91,7 +82,6 @@ void env(ny::intrinsic::Catalog& intrinsics) {
 	intrinsics.emplace("__nanyc_env_asu64",  _nanyc_env_read_as_u64);
 	intrinsics.emplace("__nanyc_env_exists", _nanyc_env_exists);
 }
-
 
 } // namespace import
 } // namespace nsl
