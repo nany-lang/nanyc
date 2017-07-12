@@ -18,7 +18,7 @@ void release(nyio_adapter_t& adapter) {
 } // namespace
 
 Mountpoints::Mountpoints() {
-	nyio_adapter_init_dummy(&m_fallback.adapter);
+	nyio_adapter_init_devnull(&m_fallback.adapter);
 	yuni::String path;
 	constexpr uint32_t maxPathSize = yuni::ShortString256::chunkSize;
 	// mount home folder

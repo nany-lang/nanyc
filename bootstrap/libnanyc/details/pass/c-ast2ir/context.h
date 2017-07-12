@@ -96,7 +96,7 @@ public:
 	bool debuginfo = true;
 
 	//! Map contet offset (0-based - bytes) -> lines (1-based, from source input)
-	std::map<uint, uint> offsetToLine;
+	std::map<uint32_t, uint32_t> offsetToLine;
 
 	struct {
 		struct {

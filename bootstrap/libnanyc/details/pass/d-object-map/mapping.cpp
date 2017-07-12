@@ -51,7 +51,7 @@ struct AtomStackFrame final {
 	//! Information for capturing variables
 	struct CaptureVariables {
 		//! Get if allowed to capture variables
-		bool enabled() const { return atom; }
+		bool enabled() const { return atom != nullptr; }
 
 		void enabled(Atom& newatom) {
 			atom = &newatom;

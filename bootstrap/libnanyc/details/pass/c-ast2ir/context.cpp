@@ -64,7 +64,7 @@ void Context::generateLineIndexes(const AnyString& content) {
 	const char* end  = base + content.size();
 	for (const char* c = base; c != end; ++c) {
 		if (*c == '\n')
-			offsetToLine.emplace(c - base, ++line);
+			offsetToLine.emplace(static_cast<uint32_t>(c - base), ++line);
 	}
 }
 

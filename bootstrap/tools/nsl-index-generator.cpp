@@ -21,8 +21,8 @@ void sanitizeContent(Clob& content) {
 	content.trimRight();
 	content.replace("\\", "\\\\");
 	content.replace("\"", "\\\"");
-	content.replace("\n", "\\n");
 	content.replace("\t", "\\t");
+	content.replace("\n", "\\n\"\n\t\t\t\"");
 }
 
 

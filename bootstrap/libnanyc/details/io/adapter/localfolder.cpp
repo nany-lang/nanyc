@@ -66,13 +66,13 @@ String& toLocalPath(nyio_adapter_t* adapter, const char* path, uint32_t len) {
 	return internal.tmppath;
 }
 
-void nanyc_io_localfolder_release(nyio_adapter_t* adapter) {
+void nyinx_io_localfolder_release(nyio_adapter_t* adapter) {
 	assert(adapter != nullptr);
 	delete reinterpret_cast<Internal*>(adapter->internal);
 	adapter->internal = nullptr; // avoid misuse
 }
 
-void nanyc_io_localfolder_clone(nyio_adapter_t* parent, nyio_adapter_t* dst) {
+void nyinx_io_localfolder_clone(nyio_adapter_t* parent, nyio_adapter_t* dst) {
 	assert(dst != nullptr);
 	assert(parent != nullptr);
 	memcpy(dst, parent, sizeof(nyio_adapter_t));
@@ -80,7 +80,7 @@ void nanyc_io_localfolder_clone(nyio_adapter_t* parent, nyio_adapter_t* dst) {
 	dst->internal = new Internal{internal.localpath};
 }
 
-nyio_type_t nanyc_io_localfolder_stat(nyio_adapter_t* adapter, const char* path, uint32_t len) {
+nyio_type_t nyinx_io_localfolder_stat(nyio_adapter_t* adapter, const char* path, uint32_t len) {
 	assert(adapter != nullptr);
 	uint64_t size;
 	int64_t modified;
@@ -94,7 +94,7 @@ nyio_type_t nanyc_io_localfolder_stat(nyio_adapter_t* adapter, const char* path,
 	}
 }
 
-nyio_type_t nanyc_io_localfolder_statex(nyio_adapter_t* adapter, const char* path, uint32_t len,
+nyio_type_t nyinx_io_localfolder_statex(nyio_adapter_t* adapter, const char* path, uint32_t len,
 		uint64_t* size, int64_t* modified) {
 	assert(adapter != nullptr);
 	assert(modified);
@@ -110,17 +110,17 @@ nyio_type_t nanyc_io_localfolder_statex(nyio_adapter_t* adapter, const char* pat
 	return nyiot_failed;
 }
 
-uint64_t nanyc_io_localfolder_file_read(void* file, void* buffer, uint64_t bufsize) {
+uint64_t nyinx_io_localfolder_file_read(void* file, void* buffer, uint64_t bufsize) {
 	assert(file != nullptr and "invalid file pointer for file_read");
 	return (*reinterpret_cast<IO::File::Stream*>(file)).read((char*)buffer, bufsize);
 }
 
-uint64_t nanyc_io_localfolder_file_write(void* file, const void* buffer, uint64_t bufsize) {
+uint64_t nyinx_io_localfolder_file_write(void* file, const void* buffer, uint64_t bufsize) {
 	assert(file != nullptr and "invalid file pointer for file_write");
 	return (*reinterpret_cast<IO::File::Stream*>(file)).write(buffer, bufsize);
 }
 
-void* nanyc_io_localfolder_file_open(nyio_adapter_t* adapter, const char* path, uint32_t len,
+void* nyinx_io_localfolder_file_open(nyio_adapter_t* adapter, const char* path, uint32_t len,
 		nybool_t readm, nybool_t writem, nybool_t appendm, nybool_t truncm) {
 	assert(adapter != nullptr);
 	AnyString localpath = toLocalPath(adapter, path, len);
@@ -143,55 +143,55 @@ void* nanyc_io_localfolder_file_open(nyio_adapter_t* adapter, const char* path, 
 	return nullptr;
 }
 
-void nanyc_io_localfolder_file_close(void* file) {
+void nyinx_io_localfolder_file_close(void* file) {
 	assert(file != nullptr);
 	delete reinterpret_cast<IO::File::Stream*>(file);
 }
 
-nyio_err_t nanyc_io_localfolder_file_seek(void* file, uint64_t offset) {
+nyio_err_t nyinx_io_localfolder_file_seek(void* file, uint64_t offset) {
 	assert(file != nullptr);
 	auto& ynfile = (*reinterpret_cast<IO::File::Stream*>(file));
 	bool success = ynfile.seek(static_cast<::ssize_t>(offset), IO::File::seekOriginBegin);
 	return success ? nyioe_ok : nyioe_failed;
 }
 
-uint64_t nanyc_io_localfolder_file_tell(void* file) {
+uint64_t nyinx_io_localfolder_file_tell(void* file) {
 	assert(file != nullptr);
 	auto& ynfile = (*reinterpret_cast<IO::File::Stream*>(file));
 	return static_cast<uint64_t>(ynfile.tell());
 }
 
-nyio_err_t nanyc_io_localfolder_file_seek_from_end(void* file, int64_t offset) {
+nyio_err_t nyinx_io_localfolder_file_seek_from_end(void* file, int64_t offset) {
 	assert(file != nullptr);
 	auto& ynfile = (*reinterpret_cast<IO::File::Stream*>(file));
 	bool success = ynfile.seek(offset, IO::File::seekOriginEnd);
 	return success ? nyioe_ok : nyioe_failed;
 }
 
-nyio_err_t nanyc_io_localfolder_file_seek_cur(void* file, int64_t offset) {
+nyio_err_t nyinx_io_localfolder_file_seek_cur(void* file, int64_t offset) {
 	assert(file != nullptr);
 	auto& ynfile = (*reinterpret_cast<IO::File::Stream*>(file));
 	bool success = ynfile.seek(offset, IO::File::seekOriginCurrent);
 	return success ? nyioe_ok : nyioe_failed;
 }
 
-void nanyc_io_localfolder_file_flush(void* file) {
+void nyinx_io_localfolder_file_flush(void* file) {
 	assert(file != nullptr and "invalid file pointer for file_flush");
 	(*reinterpret_cast<IO::File::Stream*>(file)).flush();
 }
 
-nybool_t nanyc_io_localfolder_file_eof(void* file) {
+nybool_t nyinx_io_localfolder_file_eof(void* file) {
 	assert(file != nullptr and "invalid file pointer for file_eof");
 	bool eof = (*reinterpret_cast<IO::File::Stream*>(file)).eof();
 	return (!eof) ? nyfalse : nytrue;
 }
 
-uint64_t nanyc_io_localfolder_file_size(nyio_adapter_t* adapter, const char* path, uint32_t len) {
+uint64_t nyinx_io_localfolder_file_size(nyio_adapter_t* adapter, const char* path, uint32_t len) {
 	assert(adapter != nullptr);
 	return IO::File::Size(toLocalPath(adapter, path, len));
 }
 
-nyio_err_t nanyc_io_localfolder_file_resize(nyio_adapter_t* adapter,
+nyio_err_t nyinx_io_localfolder_file_resize(nyio_adapter_t* adapter,
 		const char* path, uint32_t len, uint64_t newsize) {
 	assert(adapter != nullptr);
 	auto& localpath = toLocalPath(adapter, path, len);
@@ -199,7 +199,7 @@ nyio_err_t nanyc_io_localfolder_file_resize(nyio_adapter_t* adapter,
 	return success ? nyioe_ok : nyioe_failed;
 }
 
-nyio_err_t nanyc_io_localfolder_file_erase(nyio_adapter_t* adapter, const char* path, uint32_t len) {
+nyio_err_t nyinx_io_localfolder_file_erase(nyio_adapter_t* adapter, const char* path, uint32_t len) {
 	assert(adapter != nullptr);
 	auto err = IO::File::Delete(toLocalPath(adapter, path, len));
 	return (err == IO::errNone) ? nyioe_ok : nyioe_access;
@@ -235,7 +235,7 @@ nyio_err_t get_contents_by_small_chunks(IO::File::Stream& f, nyio_adapter_t* ada
 	return nyioe_ok;
 }
 
-nyio_err_t nanyc_io_localfolder_file_get_contents(nyio_adapter_t* adapter,
+nyio_err_t nyinx_io_localfolder_file_get_contents(nyio_adapter_t* adapter,
 		char** content, uint64_t* size, uint64_t* capacity, const char* path, uint32_t len) {
 	assert(adapter != nullptr);
 	assert(content != nullptr);
@@ -304,7 +304,7 @@ nyio_err_t nanyc_io_localfolder_file_get_contents(nyio_adapter_t* adapter,
 	return nyioe_ok;
 }
 
-nyio_err_t nanyc_io_localfolder_file_set_contents(nyio_adapter_t* adapter,
+nyio_err_t nyinx_io_localfolder_file_set_contents(nyio_adapter_t* adapter,
 		const char* path, uint32_t len, const char* content, uint32_t ctlen) {
 	assert(adapter != nullptr);
 	auto& localpath = toLocalPath(adapter, path, len);
@@ -312,7 +312,7 @@ nyio_err_t nanyc_io_localfolder_file_set_contents(nyio_adapter_t* adapter,
 	return (success ? nyioe_ok : nyioe_access);
 }
 
-nyio_err_t nanyc_io_localfolder_file_append_contents(nyio_adapter_t* adapter,
+nyio_err_t nyinx_io_localfolder_file_append_contents(nyio_adapter_t* adapter,
 		const char* path, uint32_t len, const char* content, uint32_t ctlen) {
 	assert(adapter != nullptr);
 	auto& localpath = toLocalPath(adapter, path, len);
@@ -320,28 +320,28 @@ nyio_err_t nanyc_io_localfolder_file_append_contents(nyio_adapter_t* adapter,
 	return (success ? nyioe_ok : nyioe_access);
 }
 
-nyio_err_t nanyc_io_localfolder_folder_create(nyio_adapter_t* adapter, const char* path, uint32_t len) {
+nyio_err_t nyinx_io_localfolder_folder_create(nyio_adapter_t* adapter, const char* path, uint32_t len) {
 	assert(adapter != nullptr);
 	auto& localpath = toLocalPath(adapter, path, len);
 	bool success = IO::Directory::Create(localpath);
 	return (success ? nyioe_ok : nyioe_access);
 }
 
-nyio_err_t nanyc_io_localfolder_folder_erase(nyio_adapter_t* adapter, const char* path, uint32_t len) {
+nyio_err_t nyinx_io_localfolder_folder_erase(nyio_adapter_t* adapter, const char* path, uint32_t len) {
 	assert(adapter != nullptr);
 	auto& localpath = toLocalPath(adapter, path, len);
 	bool success = IO::Directory::Remove(localpath);
 	return (success ? nyioe_ok : nyioe_access);
 }
 
-nyio_err_t nanyc_io_localfolder_folder_exists(nyio_adapter_t* adapter, const char* path, uint32_t len) {
+nyio_err_t nyinx_io_localfolder_folder_exists(nyio_adapter_t* adapter, const char* path, uint32_t len) {
 	assert(adapter != nullptr);
 	auto& localpath = toLocalPath(adapter, path, len);
 	bool success = IO::Directory::Exists(localpath);
 	return (success ? nyioe_ok : nyioe_access);
 }
 
-nyio_err_t nanyc_io_localfolder_folder_clear(nyio_adapter_t* adapter, const char* path, uint32_t len) {
+nyio_err_t nyinx_io_localfolder_folder_clear(nyio_adapter_t* adapter, const char* path, uint32_t len) {
 	assert(adapter != nullptr);
 	auto& localpath = toLocalPath(adapter, path, len);
 	bool success = false;
@@ -356,7 +356,7 @@ nyio_err_t nanyc_io_localfolder_folder_clear(nyio_adapter_t* adapter, const char
 	return (success ? nyioe_ok : nyioe_access);
 }
 
-nyio_iterator_t* nanyc_io_localfolder_folder_iterate(nyio_adapter_t* adapter, const char* path,
+nyio_iterator_t* nyinx_io_localfolder_folder_iterate(nyio_adapter_t* adapter, const char* path,
 		uint32_t len,
 		nybool_t recursive, nybool_t files, nybool_t folders) {
 	assert(adapter != nullptr);
@@ -372,20 +372,20 @@ nyio_iterator_t* nanyc_io_localfolder_folder_iterate(nyio_adapter_t* adapter, co
 	return reinterpret_cast<nyio_iterator_t*>(data);
 }
 
-void nanyc_io_localfolder_folder_iterator_close(nyio_iterator_t* it) {
+void nyinx_io_localfolder_folder_iterator_close(nyio_iterator_t* it) {
 	assert(it != nullptr);
 	auto* itdata = reinterpret_cast<Private::IO::Directory::IteratorData*>(it);
 	Private::IO::Directory::IteratorDataFree(itdata);
 }
 
-nyio_iterator_t* nanyc_io_localfolder_folder_next(nyio_iterator_t* it) {
+nyio_iterator_t* nyinx_io_localfolder_folder_next(nyio_iterator_t* it) {
 	assert(it);
 	auto* itdata = reinterpret_cast<Private::IO::Directory::IteratorData*>(it);
 	itdata = Private::IO::Directory::IteratorDataNext(itdata);
 	return reinterpret_cast<nyio_iterator_t*>(itdata);
 }
 
-const char* nanyc_io_localfolder_folder_iterator_fullpath(nyio_adapter_t* adapter,
+const char* nyinx_io_localfolder_folder_iterator_fullpath(nyio_adapter_t* adapter,
 		nyio_iterator_t* it) {
 	assert(it);
 	auto& internal = *reinterpret_cast<Internal*>(adapter->internal);
@@ -396,26 +396,26 @@ const char* nanyc_io_localfolder_folder_iterator_fullpath(nyio_adapter_t* adapte
 	return p;
 }
 
-const char* nanyc_io_localfolder_folder_iterator_name(nyio_iterator_t* it) {
+const char* nyinx_io_localfolder_folder_iterator_name(nyio_iterator_t* it) {
 	assert(it);
 	auto* itdata = reinterpret_cast<Private::IO::Directory::IteratorData*>(it);
 	return Private::IO::Directory::IteratorDataName(itdata).c_str();
 }
 
-uint64_t nanyc_io_localfolder_folder_iterator_size(nyio_iterator_t* it) {
+uint64_t nyinx_io_localfolder_folder_iterator_size(nyio_iterator_t* it) {
 	assert(it);
 	auto* itdata = reinterpret_cast<Private::IO::Directory::IteratorData*>(it);
 	return Private::IO::Directory::IteratorDataSize(itdata);
 }
 
-nyio_type_t nanyc_io_localfolder_folder_iterator_type(nyio_iterator_t* it) {
+nyio_type_t nyinx_io_localfolder_folder_iterator_type(nyio_iterator_t* it) {
 	assert(it);
 	auto* itdata = reinterpret_cast<Private::IO::Directory::IteratorData*>(it);
 	return (Private::IO::Directory::IteratorDataIsFile(itdata))
 		   ? nyiot_file : nyiot_folder;
 }
 
-uint64_t nanyc_io_localfolder_folder_size(nyio_adapter_t* adapter, const char* path, uint32_t len) {
+uint64_t nyinx_io_localfolder_folder_size(nyio_adapter_t* adapter, const char* path, uint32_t len) {
 	assert(adapter != nullptr);
 	auto& localpath = toLocalPath(adapter, path, len);
 	uint64_t bytes = 0;
@@ -426,8 +426,7 @@ uint64_t nanyc_io_localfolder_folder_size(nyio_adapter_t* adapter, const char* p
 	return bytes;
 }
 
-nyio_err_t
-nanyc_io_localfolder_file_exists(nyio_adapter_t* adapter, const char* path, uint32_t len) {
+nyio_err_t nyinx_io_localfolder_file_exists(nyio_adapter_t* adapter, const char* path, uint32_t len) {
 	assert(adapter != nullptr);
 	auto& localpath = toLocalPath(adapter, path, len);
 	bool success = IO::File::Exists(localpath);
@@ -447,37 +446,37 @@ extern "C" void nyio_adapter_init_localfolder(nyio_adapter_t* adapter, const cha
 	if (YUNI_UNLIKELY(localfolder.empty()))
 		localfolder = "/";
 	adapter->internal = new Internal{localfolder};
-	adapter->release  = nanyc_io_localfolder_release;
-	adapter->clone    = nanyc_io_localfolder_clone;
-	adapter->stat = nanyc_io_localfolder_stat;
-	adapter->statex = nanyc_io_localfolder_statex;
-	adapter->file_read = nanyc_io_localfolder_file_read;
-	adapter->file_write = nanyc_io_localfolder_file_write;
-	adapter->file_open = nanyc_io_localfolder_file_open;
-	adapter->file_close = nanyc_io_localfolder_file_close;
-	adapter->file_seek_from_end = nanyc_io_localfolder_file_seek_from_end;
-	adapter->file_seek = nanyc_io_localfolder_file_seek;
-	adapter->file_seek_cur = nanyc_io_localfolder_file_seek_cur;
-	adapter->file_tell = nanyc_io_localfolder_file_tell;
-	adapter->file_flush = nanyc_io_localfolder_file_flush;
-	adapter->file_eof = nanyc_io_localfolder_file_eof;
-	adapter->file_size = nanyc_io_localfolder_file_size;
-	adapter->file_resize = nanyc_io_localfolder_file_resize;
-	adapter->file_erase = nanyc_io_localfolder_file_erase;
-	adapter->file_exists = nanyc_io_localfolder_file_exists;
-	adapter->file_get_contents = nanyc_io_localfolder_file_get_contents;
-	adapter->file_set_contents = nanyc_io_localfolder_file_set_contents;
-	adapter->file_append_contents = nanyc_io_localfolder_file_append_contents;
-	adapter->folder_create = nanyc_io_localfolder_folder_create;
-	adapter->folder_erase = nanyc_io_localfolder_folder_erase;
-	adapter->folder_clear = nanyc_io_localfolder_folder_clear;
-	adapter->folder_size = nanyc_io_localfolder_folder_size;
-	adapter->folder_exists = nanyc_io_localfolder_folder_exists;
-	adapter->folder_iterate = nanyc_io_localfolder_folder_iterate;
-	adapter->folder_next = nanyc_io_localfolder_folder_next;
-	adapter->folder_iterator_close = nanyc_io_localfolder_folder_iterator_close;
-	adapter->folder_iterator_type = nanyc_io_localfolder_folder_iterator_type;
-	adapter->folder_iterator_name = nanyc_io_localfolder_folder_iterator_name;
-	adapter->folder_iterator_size = nanyc_io_localfolder_folder_iterator_size;
-	adapter->folder_iterator_fullpath = nanyc_io_localfolder_folder_iterator_fullpath;
+	adapter->release  = nyinx_io_localfolder_release;
+	adapter->clone    = nyinx_io_localfolder_clone;
+	adapter->stat = nyinx_io_localfolder_stat;
+	adapter->statex = nyinx_io_localfolder_statex;
+	adapter->file_read = nyinx_io_localfolder_file_read;
+	adapter->file_write = nyinx_io_localfolder_file_write;
+	adapter->file_open = nyinx_io_localfolder_file_open;
+	adapter->file_close = nyinx_io_localfolder_file_close;
+	adapter->file_seek_from_end = nyinx_io_localfolder_file_seek_from_end;
+	adapter->file_seek = nyinx_io_localfolder_file_seek;
+	adapter->file_seek_cur = nyinx_io_localfolder_file_seek_cur;
+	adapter->file_tell = nyinx_io_localfolder_file_tell;
+	adapter->file_flush = nyinx_io_localfolder_file_flush;
+	adapter->file_eof = nyinx_io_localfolder_file_eof;
+	adapter->file_size = nyinx_io_localfolder_file_size;
+	adapter->file_resize = nyinx_io_localfolder_file_resize;
+	adapter->file_erase = nyinx_io_localfolder_file_erase;
+	adapter->file_exists = nyinx_io_localfolder_file_exists;
+	adapter->file_get_contents = nyinx_io_localfolder_file_get_contents;
+	adapter->file_set_contents = nyinx_io_localfolder_file_set_contents;
+	adapter->file_append_contents = nyinx_io_localfolder_file_append_contents;
+	adapter->folder_create = nyinx_io_localfolder_folder_create;
+	adapter->folder_erase = nyinx_io_localfolder_folder_erase;
+	adapter->folder_clear = nyinx_io_localfolder_folder_clear;
+	adapter->folder_size = nyinx_io_localfolder_folder_size;
+	adapter->folder_exists = nyinx_io_localfolder_folder_exists;
+	adapter->folder_iterate = nyinx_io_localfolder_folder_iterate;
+	adapter->folder_next = nyinx_io_localfolder_folder_next;
+	adapter->folder_iterator_close = nyinx_io_localfolder_folder_iterator_close;
+	adapter->folder_iterator_type = nyinx_io_localfolder_folder_iterator_type;
+	adapter->folder_iterator_name = nyinx_io_localfolder_folder_iterator_name;
+	adapter->folder_iterator_size = nyinx_io_localfolder_folder_iterator_size;
+	adapter->folder_iterator_fullpath = nyinx_io_localfolder_folder_iterator_fullpath;
 }

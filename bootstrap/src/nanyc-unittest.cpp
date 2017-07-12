@@ -37,7 +37,8 @@ struct Result final {
 
 struct App final {
 	App();
-	App(App&&) = default;
+	App(const App&) = delete;
+	App(App&&) = delete;
 	~App();
 
 	void importFilenames(const std::vector<AnyString>&);
@@ -113,7 +114,7 @@ bool operator < (const Entry& a, const Entry& b) {
 	return std::tie(a.module, a.name) < std::tie(b.module, b.name);
 }
 
-const char* plurals(auto count, const char* single, const char* many) {
+const char* plurals(size_t count, const char* single, const char* many) {
 	return (count <= 1) ? single : many;
 }
 
@@ -128,6 +129,8 @@ uint32_t numberOfJobs(uint32_t jobs) {
 
 void App::importFilenames(const std::vector<AnyString>& list) {
 	uint32_t count = static_cast<uint32_t>(list.size());
+	if (unlikely(count == 0))
+		return;
 	filenames.resize(count);
 	std::transform(std::begin(list), std::end(list), std::begin(filenames), [](auto& item) -> yuni::String {
 		return std::move(yuni::IO::Canonicalize(item));
@@ -365,8 +368,7 @@ int printBugreport() {
 	return EXIT_SUCCESS;
 }
 
-App prepare(int argc, char** argv) {
-	App app;
+void prepare(App& app, int argc, char** argv) {
 	bool version = false;
 	bool bugreport = false;
 	bool nocolors = false;
@@ -414,7 +416,6 @@ App prepare(int argc, char** argv) {
 		app.jobs = numberOfJobs(app.jobs);
 		app.fetch();
 	}
-	return app;
 }
 
 } // namespace
@@ -423,7 +424,8 @@ App prepare(int argc, char** argv) {
 
 int main(int argc, char** argv) {
 	try {
-		auto app = ny::unittests::prepare(argc, argv);
+		ny::unittests::App app;
+		ny::unittests::prepare(app, argc, argv);
 		return app.run();
 	}
 	catch (const char* e) {

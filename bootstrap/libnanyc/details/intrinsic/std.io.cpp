@@ -36,17 +36,17 @@ struct IntrinsicIOIterator {
 
 } // anonymous namespace
 
-static bool nanyc_io_set_cwd(nyvmthread_t* vm, void* string, uint32_t size) {
+static bool nyinx_io_set_cwd(nyvmthread_t* vm, void* string, uint32_t size) {
 	assert(vm != nullptr);
 	return nyioe_ok == vm->io_set_cwd(vm, (const char*)string, size);
 }
 
-static const void* nanyc_io_get_cwd(nyvmthread_t* vm) {
+static const void* nyinx_io_get_cwd(nyvmthread_t* vm) {
 	assert(vm != nullptr);
 	return vm->io_get_cwd(vm, nullptr);
 }
 
-static void* nanyc_io_folder_iterate(nyvmthread_t* vm, const char* path, uint32_t len,
+static void* nyinx_io_folder_iterate(nyvmthread_t* vm, const char* path, uint32_t len,
 		bool recursive, bool files, bool folders) {
 	AnyString adapterpath;
 	AnyString requestedPath{path, len};
@@ -68,7 +68,7 @@ static void* nanyc_io_folder_iterate(nyvmthread_t* vm, const char* path, uint32_
 	return nullptr;
 }
 
-static void nanyc_io_folder_iterator_close(nyvmthread_t*, void* ptr) {
+static void nyinx_io_folder_iterator_close(nyvmthread_t*, void* ptr) {
 	if (ptr) {
 		auto* iterator = reinterpret_cast<IntrinsicIOIterator*>(ptr);
 		if (iterator->internal)
@@ -77,21 +77,21 @@ static void nanyc_io_folder_iterator_close(nyvmthread_t*, void* ptr) {
 	}
 }
 
-static uint64_t nanyc_io_folder_iterator_size(nyvmthread_t*, void* ptr) {
+static uint64_t nyinx_io_folder_iterator_size(nyvmthread_t*, void* ptr) {
 	auto* iterator = reinterpret_cast<IntrinsicIOIterator*>(ptr);
 	if (iterator and iterator->internal)
 		return iterator->adapter.folder_iterator_size(iterator->internal);
 	return 0;
 }
 
-static const char* nanyc_io_folder_iterator_name(nyvmthread_t*, void* ptr) {
+static const char* nyinx_io_folder_iterator_name(nyvmthread_t*, void* ptr) {
 	auto* iterator = reinterpret_cast<IntrinsicIOIterator*>(ptr);
 	if (iterator and iterator->internal)
 		return iterator->adapter.folder_iterator_name(iterator->internal);
 	return nullptr;
 }
 
-static const char* nanyc_io_folder_iterator_fullpath(nyvmthread_t*, void* ptr) {
+static const char* nyinx_io_folder_iterator_fullpath(nyvmthread_t*, void* ptr) {
 	auto* iterator = reinterpret_cast<IntrinsicIOIterator*>(ptr);
 	if (iterator and iterator->internal) {
 		// restore the initial request
@@ -108,7 +108,7 @@ static const char* nanyc_io_folder_iterator_fullpath(nyvmthread_t*, void* ptr) {
 	return nullptr;
 }
 
-static bool nanyc_io_folder_iterator_next(nyvmthread_t*, void* ptr) {
+static bool nyinx_io_folder_iterator_next(nyvmthread_t*, void* ptr) {
 	auto* iterator = reinterpret_cast<IntrinsicIOIterator*>(ptr);
 	if (iterator and iterator->internal) {
 		nyio_iterator_t* p = iterator->adapter.folder_next(iterator->internal);
@@ -119,7 +119,7 @@ static bool nanyc_io_folder_iterator_next(nyvmthread_t*, void* ptr) {
 	return false;
 }
 
-static bool nanyc_io_folder_create(nyvmthread_t* vm, const char* path, uint32_t len) {
+static bool nyinx_io_folder_create(nyvmthread_t* vm, const char* path, uint32_t len) {
 	nyanystr_t adapterPath;
 	nyanystr_t requestedPath;
 	requestedPath.c_str = path;
@@ -129,7 +129,7 @@ static bool nanyc_io_folder_create(nyvmthread_t* vm, const char* path, uint32_t 
 	return (err == nyioe_ok);
 }
 
-static bool nanyc_io_folder_erase(nyvmthread_t* vm, const char* path, uint32_t len) {
+static bool nyinx_io_folder_erase(nyvmthread_t* vm, const char* path, uint32_t len) {
 	nyanystr_t adapterPath;
 	nyanystr_t requestedPath;
 	requestedPath.c_str = path;
@@ -139,7 +139,7 @@ static bool nanyc_io_folder_erase(nyvmthread_t* vm, const char* path, uint32_t l
 	return (err == nyioe_ok);
 }
 
-static bool nanyc_io_folder_clear(nyvmthread_t* vm, const char* path, uint32_t len) {
+static bool nyinx_io_folder_clear(nyvmthread_t* vm, const char* path, uint32_t len) {
 	nyanystr_t adapterPath;
 	nyanystr_t requestedPath;
 	requestedPath.c_str = path;
@@ -149,7 +149,7 @@ static bool nanyc_io_folder_clear(nyvmthread_t* vm, const char* path, uint32_t l
 	return (err == nyioe_ok);
 }
 
-static uint64_t nanyc_io_folder_size(nyvmthread_t* vm, const char* path, uint32_t len) {
+static uint64_t nyinx_io_folder_size(nyvmthread_t* vm, const char* path, uint32_t len) {
 	nyanystr_t adapterPath;
 	nyanystr_t requestedPath;
 	requestedPath.c_str = path;
@@ -158,7 +158,7 @@ static uint64_t nanyc_io_folder_size(nyvmthread_t* vm, const char* path, uint32_
 	return adapter.folder_size(&adapter, adapterPath.c_str, (uint32_t) adapterPath.len);
 }
 
-static bool nanyc_io_folder_exists(nyvmthread_t* vm, const char* path, uint32_t len) {
+static bool nyinx_io_folder_exists(nyvmthread_t* vm, const char* path, uint32_t len) {
 	nyanystr_t adapterPath;
 	nyanystr_t requestedPath;
 	requestedPath.c_str = path;
@@ -168,7 +168,7 @@ static bool nanyc_io_folder_exists(nyvmthread_t* vm, const char* path, uint32_t 
 	return (err == nyioe_ok);
 }
 
-static bool nanyc_io_folder_copy(nyvmthread_t* vm, const char* path, uint32_t len, const char* to, uint32_t tolen) {
+static bool nyinx_io_folder_copy(nyvmthread_t* vm, const char* path, uint32_t len, const char* to, uint32_t tolen) {
 	nyanystr_t adapterPath;
 	nyanystr_t requestedPath;
 	requestedPath.c_str = path;
@@ -189,7 +189,7 @@ static bool nanyc_io_folder_copy(nyvmthread_t* vm, const char* path, uint32_t le
 	return false;
 }
 
-static bool nanyc_io_file_exists(nyvmthread_t* vm, const char* path, uint32_t len) {
+static bool nyinx_io_file_exists(nyvmthread_t* vm, const char* path, uint32_t len) {
 	nyanystr_t adapterPath;
 	nyanystr_t requestedPath;
 	requestedPath.c_str = path;
@@ -199,7 +199,7 @@ static bool nanyc_io_file_exists(nyvmthread_t* vm, const char* path, uint32_t le
 	return (err == nyioe_ok);
 }
 
-static uint64_t nanyc_io_file_size(nyvmthread_t* vm, const char* path, uint32_t len) {
+static uint64_t nyinx_io_file_size(nyvmthread_t* vm, const char* path, uint32_t len) {
 	nyanystr_t adapterPath;
 	nyanystr_t requestedPath;
 	requestedPath.c_str = path;
@@ -208,7 +208,7 @@ static uint64_t nanyc_io_file_size(nyvmthread_t* vm, const char* path, uint32_t 
 	return adapter.file_size(&adapter, adapterPath.c_str, (uint32_t) adapterPath.len);
 }
 
-static bool nanyc_io_file_erase(nyvmthread_t* vm, const char* path, uint32_t len) {
+static bool nyinx_io_file_erase(nyvmthread_t* vm, const char* path, uint32_t len) {
 	nyanystr_t adapterPath;
 	nyanystr_t requestedPath;
 	requestedPath.c_str = path;
@@ -218,7 +218,7 @@ static bool nanyc_io_file_erase(nyvmthread_t* vm, const char* path, uint32_t len
 	return (err == nyioe_ok);
 }
 
-static bool nanyc_io_file_resize(nyvmthread_t* vm, const char* path, uint32_t len, uint64_t newsize) {
+static bool nyinx_io_file_resize(nyvmthread_t* vm, const char* path, uint32_t len, uint64_t newsize) {
 	nyanystr_t adapterPath;
 	nyanystr_t requestedPath;
 	requestedPath.c_str = path;
@@ -228,7 +228,7 @@ static bool nanyc_io_file_resize(nyvmthread_t* vm, const char* path, uint32_t le
 	return (err == nyioe_ok);
 }
 
-static bool nanyc_io_file_set_contents(nyvmthread_t* vm, const char* path, uint32_t len,
+static bool nyinx_io_file_set_contents(nyvmthread_t* vm, const char* path, uint32_t len,
 		const char* content, uint32_t clen, bool append) {
 	nyanystr_t adapterPath;
 	nyanystr_t requestedPath;
@@ -242,7 +242,7 @@ static bool nanyc_io_file_set_contents(nyvmthread_t* vm, const char* path, uint3
 	return (err == nyioe_ok);
 }
 
-static void* nanyc_io_file_get_contents(nyvmthread_t* vm, const char* path, uint32_t len) {
+static void* nyinx_io_file_get_contents(nyvmthread_t* vm, const char* path, uint32_t len) {
 	nyanystr_t adapterPath;
 	nyanystr_t requestedPath;
 	requestedPath.c_str = path;
@@ -262,7 +262,7 @@ static void* nanyc_io_file_get_contents(nyvmthread_t* vm, const char* path, uint
 	return nullptr;
 }
 
-static nyfile_t* nanyc_io_file_open(nyvmthread_t* vm, const char* path, uint32_t len,
+static nyfile_t* nyinx_io_file_open(nyvmthread_t* vm, const char* path, uint32_t len,
 		bool readm, bool writem, bool appendm, bool truncm) {
 	assert(vm);
 	assert(path);
@@ -287,7 +287,7 @@ static nyfile_t* nanyc_io_file_open(nyvmthread_t* vm, const char* path, uint32_t
 	return f;
 }
 
-static void nanyc_io_file_close(nyvmthread_t* /*vm*/, nyfile_t* file) {
+static void nyinx_io_file_close(nyvmthread_t* /*vm*/, nyfile_t* file) {
 	assert(file != nullptr);
 	assert(file->adapter != nullptr);
 	// close the file handle
@@ -296,53 +296,53 @@ static void nanyc_io_file_close(nyvmthread_t* /*vm*/, nyfile_t* file) {
 	free(file); // sizeof(struct nyfile_t));
 }
 
-static void nanyc_io_file_flush(nyvmthread_t*, nyfile_t* file) {
+static void nyinx_io_file_flush(nyvmthread_t*, nyfile_t* file) {
 	assert(file != nullptr);
 	file->adapter->file_flush(file->fd);
 }
 
-static uint64_t nanyc_io_file_write(nyvmthread_t*, nyfile_t* file, const char* buffer, uint64_t size) {
+static uint64_t nyinx_io_file_write(nyvmthread_t*, nyfile_t* file, const char* buffer, uint64_t size) {
 	assert(file != nullptr);
 	assert(file->adapter != nullptr);
 	return file->adapter->file_write(file->fd, buffer, size);
 }
 
-static uint64_t nanyc_io_file_read(nyvmthread_t*, nyfile_t* file, char* buffer, uint64_t size) {
+static uint64_t nyinx_io_file_read(nyvmthread_t*, nyfile_t* file, char* buffer, uint64_t size) {
 	assert(file != nullptr);
 	assert(file->adapter != nullptr);
 	return file->adapter->file_read(file->fd, buffer, size);
 }
 
-static bool nanyc_io_file_eof(nyvmthread_t*, nyfile_t* file) {
+static bool nyinx_io_file_eof(nyvmthread_t*, nyfile_t* file) {
 	assert(file != nullptr);
 	assert(file->adapter != nullptr);
 	return (nyfalse != file->adapter->file_eof(file->fd));
 }
 
-static bool nanyc_io_file_seek_set(nyvmthread_t*, nyfile_t* file, uint64_t offset) {
+static bool nyinx_io_file_seek_set(nyvmthread_t*, nyfile_t* file, uint64_t offset) {
 	assert(file != nullptr);
 	auto err = file->adapter->file_seek(file->fd, offset);
 	return (err == nyioe_ok);
 }
 
-static bool nanyc_io_file_seek_from_end(nyvmthread_t*, nyfile_t* file, int64_t offset) {
+static bool nyinx_io_file_seek_from_end(nyvmthread_t*, nyfile_t* file, int64_t offset) {
 	assert(file != nullptr);
 	auto err = file->adapter->file_seek_from_end(file->fd, offset);
 	return (err == nyioe_ok);
 }
 
-static bool nanyc_io_file_seek_cur(nyvmthread_t*, nyfile_t* file, int64_t offset) {
+static bool nyinx_io_file_seek_cur(nyvmthread_t*, nyfile_t* file, int64_t offset) {
 	assert(file != nullptr);
 	auto err = file->adapter->file_seek_cur(file->fd, offset);
 	return (err == nyioe_ok);
 }
 
-static uint64_t nanyc_io_file_tell(nyvmthread_t*, nyfile_t* file) {
+static uint64_t nyinx_io_file_tell(nyvmthread_t*, nyfile_t* file) {
 	assert(file != nullptr);
 	return file->adapter->file_tell(file->fd);
 }
 
-static bool nanyc_io_mount_local(nyvmthread_t* vm, const char* path, uint32_t len, const char* local,
+static bool nyinx_io_mount_local(nyvmthread_t* vm, const char* path, uint32_t len, const char* local,
 		uint32_t locallen) {
 	if (path and len and local and locallen) {
 		nyio_adapter_t adapter;
@@ -360,37 +360,37 @@ namespace intrinsic {
 namespace import {
 
 void io(ny::intrinsic::Catalog& intrinsics) {
-	intrinsics.emplace("__nanyc_io_set_cwd",  nanyc_io_set_cwd);
-	intrinsics.emplace("__nanyc_io_get_cwd",  nanyc_io_get_cwd);
-	intrinsics.emplace("__nanyc_io_folder_create",  nanyc_io_folder_create);
-	intrinsics.emplace("__nanyc_io_folder_erase",  nanyc_io_folder_erase);
-	intrinsics.emplace("__nanyc_io_folder_clear",  nanyc_io_folder_clear);
-	intrinsics.emplace("__nanyc_io_folder_size",  nanyc_io_folder_size);
-	intrinsics.emplace("__nanyc_io_folder_exists",  nanyc_io_folder_exists);
-	intrinsics.emplace("__nanyc_io_folder_copy",  nanyc_io_folder_copy);
-	intrinsics.emplace("__nanyc_io_folder_iterate",  nanyc_io_folder_iterate);
-	intrinsics.emplace("__nanyc_io_folder_iterator_close",  nanyc_io_folder_iterator_close);
-	intrinsics.emplace("__nanyc_io_folder_iterator_size",  nanyc_io_folder_iterator_size);
-	intrinsics.emplace("__nanyc_io_folder_iterator_name",  nanyc_io_folder_iterator_name);
-	intrinsics.emplace("__nanyc_io_folder_iterator_fullpath",  nanyc_io_folder_iterator_fullpath);
-	intrinsics.emplace("__nanyc_io_folder_iterator_next",  nanyc_io_folder_iterator_next);
-	intrinsics.emplace("__nanyc_io_file_exists", nanyc_io_file_exists);
-	intrinsics.emplace("__nanyc_io_file_size",   nanyc_io_file_size);
-	intrinsics.emplace("__nanyc_io_file_resize", nanyc_io_file_resize);
-	intrinsics.emplace("__nanyc_io_file_erase",  nanyc_io_file_erase);
-	intrinsics.emplace("__nanyc_io_file_set_contents",  nanyc_io_file_set_contents);
-	intrinsics.emplace("__nanyc_io_file_get_contents",  nanyc_io_file_get_contents);
-	intrinsics.emplace("__nanyc_io_file_open",   nanyc_io_file_open);
-	intrinsics.emplace("__nanyc_io_file_close",  nanyc_io_file_close);
-	intrinsics.emplace("__nanyc_io_file_flush",  nanyc_io_file_flush);
-	intrinsics.emplace("__nanyc_io_file_write",  nanyc_io_file_write);
-	intrinsics.emplace("__nanyc_io_file_read",   nanyc_io_file_read);
-	intrinsics.emplace("__nanyc_io_file_eof",   nanyc_io_file_eof);
-	intrinsics.emplace("__nanyc_io_file_seek",   nanyc_io_file_seek_set);
-	intrinsics.emplace("__nanyc_io_file_seek_from_end",   nanyc_io_file_seek_from_end);
-	intrinsics.emplace("__nanyc_io_file_seek_cur",   nanyc_io_file_seek_cur);
-	intrinsics.emplace("__nanyc_io_file_tell",   nanyc_io_file_tell);
-	intrinsics.emplace("__nanyc_io_mount_local",   nanyc_io_mount_local);
+	intrinsics.emplace("__nanyc_io_set_cwd",  nyinx_io_set_cwd);
+	intrinsics.emplace("__nanyc_io_get_cwd",  nyinx_io_get_cwd);
+	intrinsics.emplace("__nanyc_io_folder_create",  nyinx_io_folder_create);
+	intrinsics.emplace("__nanyc_io_folder_erase",  nyinx_io_folder_erase);
+	intrinsics.emplace("__nanyc_io_folder_clear",  nyinx_io_folder_clear);
+	intrinsics.emplace("__nanyc_io_folder_size",  nyinx_io_folder_size);
+	intrinsics.emplace("__nanyc_io_folder_exists",  nyinx_io_folder_exists);
+	intrinsics.emplace("__nanyc_io_folder_copy",  nyinx_io_folder_copy);
+	intrinsics.emplace("__nanyc_io_folder_iterate",  nyinx_io_folder_iterate);
+	intrinsics.emplace("__nanyc_io_folder_iterator_close",  nyinx_io_folder_iterator_close);
+	intrinsics.emplace("__nanyc_io_folder_iterator_size",  nyinx_io_folder_iterator_size);
+	intrinsics.emplace("__nanyc_io_folder_iterator_name",  nyinx_io_folder_iterator_name);
+	intrinsics.emplace("__nanyc_io_folder_iterator_fullpath",  nyinx_io_folder_iterator_fullpath);
+	intrinsics.emplace("__nanyc_io_folder_iterator_next",  nyinx_io_folder_iterator_next);
+	intrinsics.emplace("__nanyc_io_file_exists", nyinx_io_file_exists);
+	intrinsics.emplace("__nanyc_io_file_size",   nyinx_io_file_size);
+	intrinsics.emplace("__nanyc_io_file_resize", nyinx_io_file_resize);
+	intrinsics.emplace("__nanyc_io_file_erase",  nyinx_io_file_erase);
+	intrinsics.emplace("__nanyc_io_file_set_contents",  nyinx_io_file_set_contents);
+	intrinsics.emplace("__nanyc_io_file_get_contents",  nyinx_io_file_get_contents);
+	intrinsics.emplace("__nanyc_io_file_open",   nyinx_io_file_open);
+	intrinsics.emplace("__nanyc_io_file_close",  nyinx_io_file_close);
+	intrinsics.emplace("__nanyc_io_file_flush",  nyinx_io_file_flush);
+	intrinsics.emplace("__nanyc_io_file_write",  nyinx_io_file_write);
+	intrinsics.emplace("__nanyc_io_file_read",   nyinx_io_file_read);
+	intrinsics.emplace("__nanyc_io_file_eof",   nyinx_io_file_eof);
+	intrinsics.emplace("__nanyc_io_file_seek",   nyinx_io_file_seek_set);
+	intrinsics.emplace("__nanyc_io_file_seek_from_end",   nyinx_io_file_seek_from_end);
+	intrinsics.emplace("__nanyc_io_file_seek_cur",   nyinx_io_file_seek_cur);
+	intrinsics.emplace("__nanyc_io_file_tell",   nyinx_io_file_tell);
+	intrinsics.emplace("__nanyc_io_mount_local",   nyinx_io_mount_local);
 }
 
 } // namespace import
