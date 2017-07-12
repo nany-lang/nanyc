@@ -37,7 +37,8 @@ struct Result final {
 
 struct App final {
 	App();
-	App(App&&) = default;
+	App(const App&) = delete;
+	App(App&&) = delete;
 	~App();
 
 	void importFilenames(const std::vector<AnyString>&);
@@ -367,8 +368,7 @@ int printBugreport() {
 	return EXIT_SUCCESS;
 }
 
-App prepare(int argc, char** argv) {
-	App app;
+void prepare(App& app, int argc, char** argv) {
 	bool version = false;
 	bool bugreport = false;
 	bool nocolors = false;
@@ -416,7 +416,6 @@ App prepare(int argc, char** argv) {
 		app.jobs = numberOfJobs(app.jobs);
 		app.fetch();
 	}
-	return app;
 }
 
 } // namespace
@@ -425,7 +424,8 @@ App prepare(int argc, char** argv) {
 
 int main(int argc, char** argv) {
 	try {
-		auto app = ny::unittests::prepare(argc, argv);
+		ny::unittests::App app;
+		ny::unittests::prepare(app, argc, argv);
 		return app.run();
 	}
 	catch (const char* e) {
