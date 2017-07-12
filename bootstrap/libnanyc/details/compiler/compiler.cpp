@@ -150,7 +150,7 @@ std::unique_ptr<ny::Program> compile(ny::compiler::Compdb& compdb) {
 			return nullptr;
 		return std::make_unique<ny::Program>();
 	}
-	catch (const std::bad_alloc& e) {
+	catch (const std::bad_alloc&) {
 		report.ice() << "not enough memory when compiling";
 	}
 	catch (const std::exception& e) {
