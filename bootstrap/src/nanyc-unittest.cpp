@@ -113,7 +113,7 @@ bool operator < (const Entry& a, const Entry& b) {
 	return std::tie(a.module, a.name) < std::tie(b.module, b.name);
 }
 
-const char* plurals(auto count, const char* single, const char* many) {
+const char* plurals(size_t count, const char* single, const char* many) {
 	return (count <= 1) ? single : many;
 }
 
