@@ -1,5 +1,4 @@
 #include <nanyc/library.h>
-#include <unistd.h>
 #include <yuni/core/math.h>
 #include <yuni/core/process/program.h>
 #include <yuni/core/string.h>
