@@ -128,6 +128,8 @@ uint32_t numberOfJobs(uint32_t jobs) {
 
 void App::importFilenames(const std::vector<AnyString>& list) {
 	uint32_t count = static_cast<uint32_t>(list.size());
+	if (unlikely(count == 0))
+		return;
 	filenames.resize(count);
 	std::transform(std::begin(list), std::end(list), std::begin(filenames), [](auto& item) -> yuni::String {
 		return std::move(yuni::IO::Canonicalize(item));
