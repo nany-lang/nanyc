@@ -114,6 +114,8 @@ add_library(libnanyc ${mode_libnany}
 	"details/compiler/compdb.h"
 	"details/compiler/compiler.cpp"
 	"details/compiler/compiler.h"
+	"details/compiler/report.cpp"
+	"details/compiler/report.h"
 	"details/errors/complain.cpp"
 	"details/errors/complain.h"
 	"details/errors/errors.cpp"

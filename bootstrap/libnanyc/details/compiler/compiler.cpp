@@ -9,6 +9,7 @@
 #include "details/pass/d-object-map/attach.h"
 #include "details/semantic/atom-factory.h"
 #include "details/intrinsic/std.core.h"
+#include "details/compiler/report.h"
 #include "libnanyc-config.h"
 #include "libnanyc-traces.h"
 #include "embed-nsl.hxx" // generated
@@ -146,6 +147,8 @@ std::unique_ptr<ny::Program> compile(ny::compiler::Compdb& compdb) {
 		if (unlikely(entrypoint.len == 0))
 			return nullptr;
 		bool epinst = instanciate(compdb, report, AnyString(entrypoint.c_str, static_cast<uint32_t>(entrypoint.len)));
+		if (config::traces::raisedErrorSummary)
+			ny::compiler::report::raisedErrorsForAllAtoms(compdb, report);
 		if (unlikely(not epinst))
 			return nullptr;
 		return std::make_unique<ny::Program>();
