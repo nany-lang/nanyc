@@ -52,6 +52,12 @@ struct AtomRaisedErrors final {
 
 	template<class T> void each(T&&) const;
 
+	struct {
+		bool enabled = false;
+		std::vector<const Atom*> whitelist;
+	}
+	noleaks;
+
 private:
 	std::unordered_map<const Atom*, std::vector<Origin>> m_byType;
 };

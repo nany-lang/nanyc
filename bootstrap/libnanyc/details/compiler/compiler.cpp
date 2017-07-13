@@ -81,6 +81,7 @@ bool instanciate(ny::compiler::Compdb& compdb, ny::Logs::Report& report, AnyStri
 	using ParameterList = decltype(ny::semantic::FuncOverloadMatch::result.params);
 	try {
 		auto& atom = findEntrypointAtom(compdb.cdeftable.atoms.root, entrypoint);
+		atom.funcinfo.raisedErrors.noleaks.enabled = true;
 		ParameterList params;
 		ParameterList tmplparams;
 		ClassdefTableView cdeftblView{compdb.cdeftable};

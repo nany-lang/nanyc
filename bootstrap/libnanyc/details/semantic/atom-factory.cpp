@@ -21,6 +21,49 @@ namespace semantic {
 namespace {
 
 
+void complainMissingErrorHandlers(const Atom& atom, const ny::AtomRaisedErrors& errors) {
+	auto err = (error() << "error handlers required from definition of '");
+	err << atom.keyword() << ' ' << atom.caption() << '\'';
+	err.origins().location.filename = atom.origin.filename;
+	err.origins().location.pos.line = atom.origin.line;
+	err.origins().location.pos.offset = atom.origin.offset;
+	uint32_t whitelistCount = static_cast<uint32_t>(errors.noleaks.whitelist.size());
+	atom.funcinfo.raisedErrors.each([&](const Atom& type, auto& origins) {
+		for (uint32_t i = 0; i != whitelistCount; ++i) {
+			if (errors.noleaks.whitelist[i]->atomid == type.atomid)
+				return;
+		}
+		auto suberr = (err.error() << "no error handler provided for '");
+		suberr << type.keyword() << ' ' << type.caption() << '\'';
+		suberr.origins().location.filename = atom.origin.filename;
+		suberr.origins().location.pos.line = atom.origin.line;
+		suberr.origins().location.pos.offset = atom.origin.offset;
+		for (auto& origin: origins) {
+			auto h = (suberr.hint() << "raised from '");
+			h << origin.atom.keyword() << ' ' << origin.atom.caption() << '\'';
+			h.origins().location.filename = origin.atom.origin.filename;
+			h.origins().location.pos.line = origin.line;
+			h.origins().location.pos.offset = origin.column;
+		}
+	});
+}
+
+void checkForMissingErrorHandlers(const Atom& atom, const ny::AtomRaisedErrors& errors) {
+	try {
+		uint32_t whitelistCount = static_cast<uint32_t>(errors.noleaks.whitelist.size());
+		atom.funcinfo.raisedErrors.each([&](const Atom& type, auto&) {
+			for (uint32_t i = 0; i != whitelistCount; ++i) {
+				if (errors.noleaks.whitelist[i]->atomid == type.atomid)
+					return;
+			}
+			complainMissingErrorHandlers(atom, errors);
+			throw 1;
+		});
+	}
+	catch (int) {
+	}
+}
+
 void prepareSignature(Signature& signature, Settings& settings) {
 	uint32_t count = static_cast<uint32_t>(settings.params.size());
 	if (count != 0) {
@@ -183,6 +226,10 @@ ir::Sequence* translateAndInstanciateASTIRCode(Settings& settings, Signature& si
 		}
 		if (likely(success)) {
 			instance.update(std::move(symbolName), settings.returnType);
+			if (atomRequested.funcinfo.raisedErrors.noleaks.enabled) {
+				if (not atom.funcinfo.raisedErrors.empty())
+					checkForMissingErrorHandlers(atom, atomRequested.funcinfo.raisedErrors);
+			}
 			return &irout;
 		}
 	}
