@@ -165,6 +165,14 @@ std::unique_ptr<ny::Program> compile(ny::compiler::Compdb& compdb) {
 	return nullptr;
 }
 
+void pleaseReport(nycompile_opts_t& opts, std::unique_ptr<ny::compiler::Compdb>& compdb) {
+	auto* rp = reinterpret_cast<const nyreport_t*>(&compdb->messages);
+	if (opts.on_report)
+		opts.on_report(opts.userdata, rp);
+	else
+		nyreport_print_stdout(rp);
+}
+
 } // namespace
 
 nyprogram_t* compile(nycompile_opts_t& opts) {
@@ -175,8 +183,8 @@ nyprogram_t* compile(nycompile_opts_t& opts) {
 		auto program = compile(*compdb);
 		if (opts.on_build_stop)
 			opts.on_build_stop(opts.userdata, (program ? nytrue : nyfalse));
-		if (opts.on_report and not compdb->messages.entries.empty())
-			opts.on_report(opts.userdata, reinterpret_cast<const nyreport_t*>(&compdb->messages));
+		if (not compdb->messages.entries.empty())
+			pleaseReport(opts, compdb);
 		if (unlikely(!program))
 			return nullptr;
 		program->compdb = std::move(compdb);
