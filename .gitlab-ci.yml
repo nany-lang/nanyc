@@ -103,6 +103,8 @@ ubuntu-17.04-amd64:
 
 the gathering master:
     stage: artifacts
+    variables:
+        GIT_STRATEGY: none
     script:
         - echo Gather all artifacts in one spot
     only:
@@ -114,6 +116,8 @@ the gathering master:
 
 the gathering:
     stage: artifacts
+    variables:
+        GIT_STRATEGY: none
     script:
         - echo Gather all artifacts in one spot
     except:
