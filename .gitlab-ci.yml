@@ -1,7 +1,6 @@
 stages:
     - pre-build
     - build
-    - packages
     - artifacts
 
 variables:
@@ -22,27 +21,27 @@ variables:
     tags:
         - linux
 
-~centos-7.3-amd64:
+~~centos-7.3-amd64-debug:
     stage: build
     <<: *debug-build-linux
     image: registry.gitlab.com/nany-lang/nanyc/build/centos:7.3-amd64
 
-~debian-8-amd64:
+~~debian-8-amd64-debug:
     stage: build
     <<: *debug-build-linux
     image: registry.gitlab.com/nany-lang/nanyc/build/debian:8-amd64
 
-~debian-9-amd64:
+~~debian-9-amd64-debug:
     stage: pre-build
     <<: *debug-build-linux
     image: registry.gitlab.com/nany-lang/nanyc/build/debian:9-amd64
 
-~ubuntu-16.04-amd64:
+~~ubuntu-16.04-amd64-debug:
     stage: build
     <<: *debug-build-linux
     image: registry.gitlab.com/nany-lang/nanyc/build/ubuntu:16.04-amd64
 
-~ubuntu-17.04-amd64:
+~~ubuntu-17.04-amd64-debug:
     stage: build
     <<: *debug-build-linux
     image: registry.gitlab.com/nany-lang/nanyc/build/ubuntu:17.04-amd64
@@ -51,7 +50,7 @@ variables:
 # packages
 
 .build-pkg-linux-deb: &build-pkg-linux-deb
-    stage: packages
+    stage: build
     script:
         - ARCH=$(dpkg --print-architecture)
         - . /etc/os-release
@@ -104,6 +103,8 @@ ubuntu-17.04-amd64:
 
 the gathering master:
     stage: artifacts
+    variables:
+        GIT_STRATEGY: none
     script:
         - echo Gather all artifacts in one spot
     only:
@@ -115,6 +116,8 @@ the gathering master:
 
 the gathering:
     stage: artifacts
+    variables:
+        GIT_STRATEGY: none
     script:
         - echo Gather all artifacts in one spot
     except:
