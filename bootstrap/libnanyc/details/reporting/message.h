@@ -25,11 +25,6 @@ struct Message final: Yuni::NonCopyable<Message> {
 
 	void appendEntry(std::unique_ptr<Message>& message);
 
-	bool isClassifiedAsError() const {
-		return static_cast<uint>(level) > static_cast<uint>(Level::warning);
-	}
-
-
 public:
 	//! Error level
 	Level level = Level::error;
