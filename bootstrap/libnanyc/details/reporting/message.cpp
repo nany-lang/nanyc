@@ -7,12 +7,26 @@ using namespace Yuni;
 namespace ny {
 namespace Logs {
 
+namespace {
+
+void propagateError(Message* message) {
+	do {
+		message->hasErrors = true;
+		message = message->parent;
+	}
+	while (message != nullptr);
+}
+
+} // namespace
 
 Message& Message::createEntry(Level level) {
 	auto entry = std::make_shared<Message>(level);
 	MutexLocker locker{m_mutex};
 	entry->origins = origins;
+	entry->parent = this;
 	entries.push_back(entry);
+	if (static_cast<uint32_t>(level) <= static_cast<uint32_t>(Level::error))
+		propagateError(this);
 	return *entry;
 }
 
@@ -21,7 +35,9 @@ void Message::appendEntry(std::unique_ptr<Message>& entry) {
 	if (!!entry) {
 		if (not (entry->entries.empty() and entry->level == Level::none)) {
 			MutexLocker locker{m_mutex};
-			hasErrors &= entry->hasErrors;
+			entry->parent = this;
+			if (entry->hasErrors)
+				propagateError(this);
 			entries.emplace_back(entry.release());
 		}
 	}

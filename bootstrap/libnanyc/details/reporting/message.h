@@ -69,6 +69,7 @@ public:
 
 	//! Flag to remember if some errors or warning have occured or not
 	bool hasErrors = false;
+	Message* parent = nullptr;
 	mutable yuni::Mutex m_mutex;
 
 }; // struct Message
