@@ -50,6 +50,8 @@ static constexpr bool generatedOpcodeSequence = all or recommended or false;
 //! Additionnal traces for properties resolution
 static constexpr bool properties = all or false;
 
+//! Export all raised errors per atom
+static constexpr bool raisedErrorSummary = all or false;
 
 } // namespace traces
 } // namespace config

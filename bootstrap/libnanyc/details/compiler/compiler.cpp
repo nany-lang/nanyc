@@ -9,6 +9,7 @@
 #include "details/pass/d-object-map/attach.h"
 #include "details/semantic/atom-factory.h"
 #include "details/intrinsic/std.core.h"
+#include "details/compiler/report.h"
 #include "libnanyc-config.h"
 #include "libnanyc-traces.h"
 #include "embed-nsl.hxx" // generated
@@ -80,6 +81,7 @@ bool instanciate(ny::compiler::Compdb& compdb, ny::Logs::Report& report, AnyStri
 	using ParameterList = decltype(ny::semantic::FuncOverloadMatch::result.params);
 	try {
 		auto& atom = findEntrypointAtom(compdb.cdeftable.atoms.root, entrypoint);
+		atom.funcinfo.raisedErrors.noleaks.enabled = true;
 		ParameterList params;
 		ParameterList tmplparams;
 		ClassdefTableView cdeftblView{compdb.cdeftable};
@@ -146,6 +148,8 @@ std::unique_ptr<ny::Program> compile(ny::compiler::Compdb& compdb) {
 		if (unlikely(entrypoint.len == 0))
 			return nullptr;
 		bool epinst = instanciate(compdb, report, AnyString(entrypoint.c_str, static_cast<uint32_t>(entrypoint.len)));
+		if (config::traces::raisedErrorSummary)
+			ny::compiler::report::raisedErrorsForAllAtoms(compdb, report);
 		if (unlikely(not epinst))
 			return nullptr;
 		return std::make_unique<ny::Program>();
@@ -165,6 +169,14 @@ std::unique_ptr<ny::Program> compile(ny::compiler::Compdb& compdb) {
 	return nullptr;
 }
 
+void pleaseReport(nycompile_opts_t& opts, std::unique_ptr<ny::compiler::Compdb>& compdb) {
+	auto* rp = reinterpret_cast<const nyreport_t*>(&compdb->messages);
+	if (opts.on_report)
+		opts.on_report(opts.userdata, rp);
+	else
+		nyreport_print_stdout(rp);
+}
+
 } // namespace
 
 nyprogram_t* compile(nycompile_opts_t& opts) {
@@ -175,8 +187,8 @@ nyprogram_t* compile(nycompile_opts_t& opts) {
 		auto program = compile(*compdb);
 		if (opts.on_build_stop)
 			opts.on_build_stop(opts.userdata, (program ? nytrue : nyfalse));
-		if (opts.on_report and not compdb->messages.entries.empty())
-			opts.on_report(opts.userdata, reinterpret_cast<const nyreport_t*>(&compdb->messages));
+		if (not compdb->messages.entries.empty())
+			pleaseReport(opts, compdb);
 		if (unlikely(!program))
 			return nullptr;
 		program->compdb = std::move(compdb);
