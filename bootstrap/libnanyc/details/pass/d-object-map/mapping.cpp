@@ -187,6 +187,8 @@ struct OpcodeReader final {
 				atomStack->capture.enabled(*newatom.parent);
 				newatom.flags += Atom::Flags::captureVariables;
 			}
+			if (newatom.isUnittest())
+				newatom.funcinfo.raisedErrors.noleaks.enabled = true;
 		}
 		if (!options.firstAtomCreated)
 			rememberFirstAtomCreated(*this, newatom);
