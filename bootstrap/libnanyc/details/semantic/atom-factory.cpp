@@ -657,7 +657,7 @@ bool instanciateAtom(Settings& settings) {
 			case Tribool::Value::yes: {
 				if (unlikely(atom.flags(Atom::Flags::instanciating))) { // recursive func detected
 					if (unlikely(not instanciateRecursiveAtom(settings)))
-						return false;
+						break;
 				}
 				if (unlikely(remapAtom != nullptr)) { // the target atom may have changed (template class)
 					settings.atom = std::ref(*remapAtom);

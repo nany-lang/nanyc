@@ -17,7 +17,6 @@
 #include <libnanyc.h>
 #include <utility>
 #include <memory>
-#include <iostream>
 
 namespace ny {
 namespace compiler {
