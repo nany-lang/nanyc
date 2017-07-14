@@ -93,7 +93,7 @@ bool instanciate(ny::compiler::Compdb& compdb, ny::Logs::Report& report, AnyStri
 		if (likely(instanciated)) {
 			compdb.entrypoint.atomid = atom.atomid;
 			compdb.entrypoint.instanceid = settings.instanceid;
-			return true;
+			return not report.hasErrors();
 		}
 	}
 	catch (const char* e) {
