@@ -118,8 +118,7 @@ std::unique_ptr<ny::Program> compile(ny::compiler::Compdb& compdb) {
 		if (unlikely(opts.with_nsl_unittests == nytrue))
 			scount += unittestCount;
 		auto& sources = compdb.sources;
-		sources.count = scount;
-		sources.items = std::make_unique<Source[]>(scount);
+		sources.resize(scount);
 		bool compiled = true;
 		uint32_t offset = 0;
 		if (config::importNSL) {
