@@ -137,6 +137,7 @@ std::unique_ptr<ny::Program> compile(ny::compiler::Compdb& compdb) {
 			compiled &= importSourceAndCompile(report, compdb, source, opts, opts.sources.items[i]);
 		}
 		compiled = compiled
+			and likely(compdb.opts.on_unittest == nullptr)
 			and compdb.cdeftable.atoms.fetchAndIndexCoreObjects() // indexing bool, u32, f64...
 			and ny::semantic::resolveStrictParameterTypes(compdb, compdb.cdeftable.atoms.root); // typedef
 		if (config::traces::preAtomTable)

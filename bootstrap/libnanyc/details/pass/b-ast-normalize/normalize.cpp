@@ -87,7 +87,8 @@ private:
 
 void ASTReplicator::collectNamespace(const AST::Node& node) {
 	auto* entity = node.xpath({AST::rgEntity});
-	assert(!!entity and "mismatch grammar");
+	if (unlikely(!entity))
+		return (void)(report.error() << "parse error near 'namespace'");
 	nmspc.first.clear();
 	nmspc.second = const_cast<AST::Node*>(&node);
 	entity->extractChildText(nmspc.first, ny::AST::rgIdentifier, ".");

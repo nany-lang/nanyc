@@ -426,7 +426,7 @@ entity: notext
 // --- NAMESPACE ---
 
 namespace: notext important
-	tk-namespace (entity (wp tk-semicolon)?) | error-semicolon
+	tk-namespace (entity wp tk-semicolon) | error-semicolon
 
 
 
