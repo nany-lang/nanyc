@@ -44,23 +44,6 @@ void copySourceOpts(ny::compiler::Source& source, const nysource_opts_t& opts) {
 	}
 }
 
-bool compileSource(ny::Logs::Report& mainreport, ny::compiler::Compdb& compdb, ny::compiler::Source& source, const nycompile_opts_t& gopts) {
-	auto report = mainreport.subgroup();
-	report.data().origins.location.filename = source.filename;
-	report.data().origins.location.target.clear();
-	bool compiled = true;
-	compiled &= makeASTFromSource(source);
-	compiled &= passDuplicateAndNormalizeAST(source, report);
-	compiled &= passTransformASTToIR(source, report, gopts);
-	compiled  = compiled and attach(compdb, source);
-	return compiled;
-}
-
-bool importSourceAndCompile(ny::Logs::Report& mainreport, ny::compiler::Compdb& compdb, ny::compiler::Source& source, const nycompile_opts_t& gopts, const nysource_opts_t& opts) {
-	copySourceOpts(source, opts);
-	return compileSource(mainreport, compdb, source, gopts);
-}
-
 Atom& findEntrypointAtom(Atom& root, const AnyString& entrypoint) {
 	Atom* atom = nullptr;
 	root.eachChild(entrypoint, [&](Atom & child) -> bool {
@@ -103,8 +86,42 @@ bool instanciate(ny::compiler::Compdb& compdb, ny::Logs::Report& report, AnyStri
 	return false;
 }
 
+struct CompilerQueue final {
+	ny::compiler::Compdb& compdb;
+	ny::Logs::Report report;
+	std::vector<yuni::String> collectionSearchPaths;
+
+	CompilerQueue(ny::compiler::Compdb& compdb)
+		: compdb(compdb)
+		, report(compdb.messages) {
+		collectionSearchPaths.reserve(4);
+		collectionSearchPaths.emplace_back(ny::config::collectionSystemPath);
+	}
+
+	static void usesCollection(void* userdata, const AnyString& name) {
+	}
+
+	bool compileSource(ny::compiler::Source& source) {
+		auto subreport = report.subgroup();
+		subreport.data().origins.location.filename = source.filename;
+		subreport.data().origins.location.target.clear();
+		bool compiled = true;
+		compiled &= makeASTFromSource(source);
+		compiled &= passDuplicateAndNormalizeAST(source, subreport, &usesCollection, this);
+		compiled &= passTransformASTToIR(source, subreport, compdb.opts);
+		compiled  = compiled and attach(compdb, source);
+		return compiled;
+	}
+
+	bool importSourceAndCompile(ny::compiler::Source& source, const nysource_opts_t& opts) {
+		copySourceOpts(source, opts);
+		return compileSource(source);
+	}
+};
+
 std::unique_ptr<ny::Program> compile(ny::compiler::Compdb& compdb) {
-	ny::Logs::Report report{compdb.messages};
+	CompilerQueue queue(compdb);
+	auto& report = queue.report;
 	Logs::Handler errorHandler{&report, &buildGenerateReport};
 	try {
 		auto& opts = compdb.opts;
@@ -123,17 +140,17 @@ std::unique_ptr<ny::Program> compile(ny::compiler::Compdb& compdb) {
 		uint32_t offset = 0;
 		if (config::importNSL) {
 			registerNSLCoreFiles(sources, offset, [&](ny::compiler::Source& source) {
-				compiled &= compileSource(report, compdb, source, opts);
+				compiled &= queue.compileSource(source);
 			});
 		}
 		if (opts.with_nsl_unittests == nytrue) {
 			registerUnittestFiles(sources, offset, [&](ny::compiler::Source& source) {
-				compiled &= compileSource(report, compdb, source, opts);
+				compiled &= queue.compileSource(source);
 			});
 		}
 		for (uint32_t i = 0; i != opts.sources.count; ++i) {
 			auto& source = sources[offset + i];
-			compiled &= importSourceAndCompile(report, compdb, source, opts, opts.sources.items[i]);
+			compiled &= queue.importSourceAndCompile(source, opts.sources.items[i]);
 		}
 		compiled = compiled
 			and likely(compdb.opts.on_unittest == nullptr)
