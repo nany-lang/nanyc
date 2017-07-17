@@ -35,6 +35,7 @@ static constexpr const uint32_t extraObjectSize = (uint32_t) sizeof(uint64_t);
 //! Import the NSL
 static constexpr bool importNSL = true;
 
+static constexpr const char collectionSystemPath[] = "@NANYC_COLLECTION_SYSTEM_PATH@";
 
 } // namespace config
 } // namespace ny
