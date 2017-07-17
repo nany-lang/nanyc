@@ -17,6 +17,7 @@
 #include <libnanyc.h>
 #include <utility>
 #include <memory>
+#include <unordered_map>
 
 namespace ny {
 namespace compiler {
@@ -90,6 +91,7 @@ struct CompilerQueue final {
 	ny::compiler::Compdb& compdb;
 	ny::Logs::Report report;
 	std::vector<yuni::String> collectionSearchPaths;
+	std::unordered_set<yuni::String> collectionsLoaded;
 
 	CompilerQueue(ny::compiler::Compdb& compdb)
 		: compdb(compdb)
@@ -99,6 +101,39 @@ struct CompilerQueue final {
 	}
 
 	static void usesCollection(void* userdata, const AnyString& name) {
+		auto& queue = *(reinterpret_cast<CompilerQueue*>(userdata));
+		if (queue.collectionsLoaded.count(name) != 0)
+			return;
+		queue.collectionsLoaded.insert(name);
+		yuni::String filename;
+		yuni::String content;
+		for (auto& searchpath: queue.collectionSearchPaths) {
+			filename = searchpath;
+			filename << '/' << name << "/nanyc.collection";
+			if (yuni::IO::errNone != yuni::IO::File::LoadFromFile(content, filename))
+				continue;
+			content.words("\n", [&](AnyString line) -> bool {
+				if (not line.empty()) {
+					if (unlikely(line[0] == 'u' and line.startsWith("uses "))) {
+						line.consume(5);
+						if (not line.empty())
+							usesCollection(userdata, line);
+					}
+					else {
+						queue.compdb.sources.emplace_back();
+						auto& source = queue.compdb.sources.back();
+						source.storageFilename = searchpath;
+						source.storageFilename << '/' << name << '/' << line;
+						source.filename = source.storageFilename;
+					}
+				}
+				return true;
+			});
+			return;
+		}
+		auto err = (error() << "collection '" << name << "' not found");
+		for (auto& searchpath: queue.collectionSearchPaths)
+			err.hint() << "from path '" << searchpath << "'";
 	}
 
 	bool compileSource(ny::compiler::Source& source) {
@@ -150,6 +185,10 @@ std::unique_ptr<ny::Program> compile(ny::compiler::Compdb& compdb) {
 		for (uint32_t i = 0; i != compdb.opts.sources.count; ++i) {
 			auto& source = sources[offset + i];
 			compiled &= queue.importSourceAndCompile(source, compdb.opts.sources.items[i]);
+		}
+		for (uint32_t i = offset + compdb.opts.sources.count; i < sources.size(); ++i) {
+			auto& source = sources[i];
+			compiled &= queue.compileSource(source);
 		}
 		compiled = compiled
 			and likely(compdb.opts.on_unittest == nullptr)
