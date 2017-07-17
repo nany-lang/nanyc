@@ -5,7 +5,9 @@
 namespace ny {
 namespace compiler {
 
-bool passDuplicateAndNormalizeAST(ny::compiler::Source&, Logs::Report&);
+using UsesCallback = void (*)(void*, const AnyString&);
+
+bool passDuplicateAndNormalizeAST(ny::compiler::Source&, Logs::Report&, UsesCallback, void* userdata);
 
 } // namespace compiler
 } // namespace ny
