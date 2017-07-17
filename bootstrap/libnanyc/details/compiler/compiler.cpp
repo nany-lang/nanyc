@@ -166,8 +166,6 @@ std::unique_ptr<ny::Program> compile(ny::compiler::Compdb& compdb) {
 			ny::intrinsic::import::all(compdb.intrinsics);
 		if (config::importNSL)
 			scount += corefilesCount;
-		if (unlikely(compdb.opts.with_nsl_unittests == nytrue))
-			scount += unittestCount;
 		auto& sources = compdb.sources;
 		sources.resize(scount);
 		bool compiled = true;
@@ -177,11 +175,8 @@ std::unique_ptr<ny::Program> compile(ny::compiler::Compdb& compdb) {
 				compiled &= queue.compileSource(source);
 			});
 		}
-		if (compdb.opts.with_nsl_unittests == nytrue) {
-			registerUnittestFiles(sources, offset, [&](ny::compiler::Source& source) {
-				compiled &= queue.compileSource(source);
-			});
-		}
+		if (unlikely(compdb.opts.with_nsl_unittests == nytrue))
+			queue.usesCollection(&queue, "nsl.selftest");
 		for (uint32_t i = 0; i != compdb.opts.sources.count; ++i) {
 			auto& source = sources[offset + i];
 			compiled &= queue.importSourceAndCompile(source, compdb.opts.sources.items[i]);

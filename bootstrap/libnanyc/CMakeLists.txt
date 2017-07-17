@@ -45,17 +45,14 @@ add_custom_command(
 		-o "${__embed_nsl_hxx}"
 		-d "${nsl_root}"
 		-f "${nsl_files}"
-		-u "${nsl_files_unittest}"
 	DEPENDS
 		nyt-index-generator
 		${nsl_files}
-		${nsl_files_unittest}
 	VERBATIM
 )
 
 list(LENGTH nsl_files nsl_files_count)
-list(LENGTH nsl_files_unittest nsl_files_unittest_count)
-nmessage("standard library: ${nsl_files_count} files, (${nsl_files_unittest_count} test files)")
+nmessage("standard library: ${nsl_files_count} files")
 
 add_library(libnanyc-grammar STATIC EXCLUDE_FROM_ALL
 	${NANY_YGR}

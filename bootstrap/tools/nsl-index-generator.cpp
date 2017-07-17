@@ -44,10 +44,8 @@ public:
 
 	void parse(int argc, char* argv[]) {
 		AnyString allfilenames;
-		AnyString allunits;
 		GetOpt::Parser options;
 		options.add(allfilenames, 'f', "", "Nsl core file (';' separated)");
-		options.add(allunits, 'u', "", "Unittest files (';' separated)");
 		options.add(output, 'o', "output", "Output file");
 		options.add(rootdir, 'd', "dir", "Root directory (for pretty filenames)");
 		if (not options(argc, argv)) {
@@ -58,7 +56,6 @@ public:
 			throw EXIT_SUCCESS;
 		}
 		splitAndSort(filenames, allfilenames);
-		splitAndSort(unittests, allunits);
 	}
 
 	void writeSetOfFiles(const AnyString& funcname, const std::vector<String>& files) {
@@ -97,8 +94,6 @@ public:
 		hxx << "constexpr uint32_t unittestCount = " << unittests.size() << ";\n";
 		hxx << '\n';
 		writeSetOfFiles("registerNSLCoreFiles", filenames);
-		hxx << '\n';
-		writeSetOfFiles("registerUnittestFiles", unittests);
 		hxx << '\n';
 		hxx << "} // namespace\n";
 		hxx << "} // namespace compiler\n";

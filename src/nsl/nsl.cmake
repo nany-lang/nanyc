@@ -23,7 +23,6 @@ set(nsl_files
 	"${nsl_root}/std.core/u64.ny"
 	"${nsl_root}/std.core/u8.ny"
 	"${nsl_root}/std.core/utils.ny"
-	"${nsl_root}/std.digest/digest.ny"
 	"${nsl_root}/std.env/env.ny"
 	"${nsl_root}/std.io/file-object.ny"
 	"${nsl_root}/std.io/file.ny"
@@ -36,19 +35,4 @@ set(nsl_files
 	"${nsl_root}/std.os/os.ny"
 	"${nsl_root}/std.os/process.ny"
 	CACHE INTERNAL "Nany Standard Library - File list"
-)
-
-set(nsl_files_unittest
-	"${nsl_root}/std.core/unittests/class-anonymous-with-capture.ny"
-	"${nsl_root}/std.core/unittests/closure.ny"
-	"${nsl_root}/std.core/unittests/on-scope-fail.ny"
-	"${nsl_root}/std.core/unittests/on-scope.ny"
-	"${nsl_root}/std.core/unittests/optional.ny"
-	"${nsl_root}/std.core/unittests/print.ny"
-	"${nsl_root}/std.core/unittests/string.ny"
-	"${nsl_root}/std.core/unittests/view-multiple-loops.ny"
-	"${nsl_root}/std.core/unittests/view.ny"
-	"${nsl_root}/std.digest/unittest-digest.ny"
-	"${nsl_root}/std.io/unittests/path.ny"
-	CACHE INTERNAL "Nany Standard Library - File list unittest"
 )
