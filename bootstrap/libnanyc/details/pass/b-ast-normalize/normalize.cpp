@@ -71,6 +71,7 @@ public:
 
 private:
 	bool duplicateNode(AST::Node& out, AST::Node& node);
+	void collectUses(const AST::Node& node);
 	void collectNamespace(const AST::Node& node);
 	bool generateErrorFromErrorNode(const AST::Node& node);
 	void normalizeExpression(AST::Node& node);
@@ -90,6 +91,15 @@ private:
 	void* userdata;
 
 }; // class ASTReplicator
+
+void ASTReplicator::collectUses(const AST::Node& node) {
+	auto* entity = node.xpath({AST::rgEntity});
+	if (unlikely(!entity))
+		return (void)(report.error() << "parse error near 'uses'");
+	yuni::ShortString256 name;
+	entity->extractChildText(name, ny::AST::rgIdentifier, ".");
+	uses(userdata, name);
+}
 
 void ASTReplicator::collectNamespace(const AST::Node& node) {
 	auto* entity = node.xpath({AST::rgEntity});
@@ -505,6 +515,10 @@ bool ASTReplicator::duplicateNode(AST::Node& parent, AST::Node& node) {
 		}
 		case AST::rgNamespace: {
 			collectNamespace(node);
+			return true; // ignore the node
+		}
+		case AST::rgUses: {
+			collectUses(node);
 			return true; // ignore the node
 		}
 	}
