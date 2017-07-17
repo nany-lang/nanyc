@@ -124,15 +124,14 @@ std::unique_ptr<ny::Program> compile(ny::compiler::Compdb& compdb) {
 	auto& report = queue.report;
 	Logs::Handler errorHandler{&report, &buildGenerateReport};
 	try {
-		auto& opts = compdb.opts;
-		uint32_t scount = opts.sources.count;
+		uint32_t scount = compdb.opts.sources.count;
 		if (unlikely(scount == 0))
 			throw "no input source code";
 		if (config::importNSL)
 			ny::intrinsic::import::all(compdb.intrinsics);
 		if (config::importNSL)
 			scount += corefilesCount;
-		if (unlikely(opts.with_nsl_unittests == nytrue))
+		if (unlikely(compdb.opts.with_nsl_unittests == nytrue))
 			scount += unittestCount;
 		auto& sources = compdb.sources;
 		sources.resize(scount);
@@ -143,14 +142,14 @@ std::unique_ptr<ny::Program> compile(ny::compiler::Compdb& compdb) {
 				compiled &= queue.compileSource(source);
 			});
 		}
-		if (opts.with_nsl_unittests == nytrue) {
+		if (compdb.opts.with_nsl_unittests == nytrue) {
 			registerUnittestFiles(sources, offset, [&](ny::compiler::Source& source) {
 				compiled &= queue.compileSource(source);
 			});
 		}
-		for (uint32_t i = 0; i != opts.sources.count; ++i) {
+		for (uint32_t i = 0; i != compdb.opts.sources.count; ++i) {
 			auto& source = sources[offset + i];
-			compiled &= queue.importSourceAndCompile(source, opts.sources.items[i]);
+			compiled &= queue.importSourceAndCompile(source, compdb.opts.sources.items[i]);
 		}
 		compiled = compiled
 			and likely(compdb.opts.on_unittest == nullptr)
