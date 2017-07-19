@@ -1,3 +1,30 @@
+function (make_component_from_collection)
+	set(options)
+	set(oneValueArgs COLLECTION COMPONENT)
+	set(multiValueArgs)
+	cmake_parse_arguments(opts "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+	install(
+		DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/${opts_COLLECTION}"
+		DESTINATION "${NANYC_COLLECTION_SYSTEM_PATH}"
+		COMPONENT "${opts_COMPONENT}"
+		USE_SOURCE_PERMISSIONS
+		FILE_PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ
+		DIRECTORY_PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_EXECUTE GROUP_READ WORLD_EXECUTE WORLD_READ
+		FILES_MATCHING
+			PATTERN "*.ny"
+			PATTERN "*.collection"
+	)
+endfunction()
+
+make_component_from_collection(
+	COLLECTION nsl.selftest
+	COMPONENT  nanyc-nsl-selftest
+)
+make_component_from_collection(
+	COLLECTION std.digest.md5
+	COMPONENT  nanyc-nsl-digest-md5
+)
+
 #
 # Standard Library (NSL) for Nany C++/Bootstrap
 #

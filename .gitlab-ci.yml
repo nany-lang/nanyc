@@ -76,6 +76,8 @@ variables:
           }
         - make_package libnanyc
         - make_package nanyc
+        - make_package nanyc-nsl-digest-md5
+        - make_package nanyc-nsl-selftest
     artifacts:
         paths:
             - build/packages/*/*.deb
