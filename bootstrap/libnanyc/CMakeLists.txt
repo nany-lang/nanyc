@@ -14,6 +14,10 @@ endif()
 
 if (NOT EXISTS "${libnany_config_folder}/libnanyc-config.h")
 	nmessage("generating 'libnanyc-config.h' in ${libnany_config_folder}/libnanyc-config.h")
+	if ("${NANYC_COLLECTION_SYSTEM_PATH}" STREQUAL "")
+		get_filename_component(NANYC_COLLECTION_SYSTEM_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../src/nsl/" REALPATH)
+	endif()
+	nmessage("nsl system path: ${NANYC_COLLECTION_SYSTEM_PATH}")
 	configure_file("cmake/configure-config.h.cmake" "${libnany_config_folder}/libnanyc-config.h" @ONLY)
 else()
 	nmessage("ignoring libnanyc-config.h ${libnany_config_folder}/libnanyc-config.h (already exists)")
@@ -41,17 +45,14 @@ add_custom_command(
 		-o "${__embed_nsl_hxx}"
 		-d "${nsl_root}"
 		-f "${nsl_files}"
-		-u "${nsl_files_unittest}"
 	DEPENDS
 		nyt-index-generator
 		${nsl_files}
-		${nsl_files_unittest}
 	VERBATIM
 )
 
 list(LENGTH nsl_files nsl_files_count)
-list(LENGTH nsl_files_unittest nsl_files_unittest_count)
-nmessage("standard library: ${nsl_files_count} files, (${nsl_files_unittest_count} test files)")
+nmessage("standard library: ${nsl_files_count} files")
 
 add_library(libnanyc-grammar STATIC EXCLUDE_FROM_ALL
 	${NANY_YGR}

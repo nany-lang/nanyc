@@ -57,7 +57,11 @@ void nodeReparentAtTheBegining(AST::Node& node, AST::Node& oldParent, uint index
 }
 
 struct ASTReplicator final {
-	explicit ASTReplicator(Logs::Report report): report(report) {}
+	explicit ASTReplicator(Logs::Report report, UsesCallback uses, void* userdata)
+		: report(report)
+		, uses(uses)
+		, userdata(userdata) {
+	}
 
 	bool run(AST::Node& fileRootnode, AST::Node& newroot);
 
@@ -67,6 +71,7 @@ public:
 
 private:
 	bool duplicateNode(AST::Node& out, AST::Node& node);
+	void collectUses(const AST::Node& node);
 	void collectNamespace(const AST::Node& node);
 	bool generateErrorFromErrorNode(const AST::Node& node);
 	void normalizeExpression(AST::Node& node);
@@ -82,8 +87,19 @@ private:
 	Logs::Report report;
 	String errmsg;
 	bool pDuplicationSuccess = true;
+	UsesCallback uses;
+	void* userdata;
 
 }; // class ASTReplicator
+
+void ASTReplicator::collectUses(const AST::Node& node) {
+	auto* entity = node.xpath({AST::rgEntity});
+	if (unlikely(!entity))
+		return (void)(report.error() << "parse error near 'uses'");
+	yuni::ShortString256 name;
+	entity->extractChildText(name, ny::AST::rgIdentifier, ".");
+	uses(userdata, name);
+}
 
 void ASTReplicator::collectNamespace(const AST::Node& node) {
 	auto* entity = node.xpath({AST::rgEntity});
@@ -501,6 +517,10 @@ bool ASTReplicator::duplicateNode(AST::Node& parent, AST::Node& node) {
 			collectNamespace(node);
 			return true; // ignore the node
 		}
+		case AST::rgUses: {
+			collectUses(node);
+			return true; // ignore the node
+		}
 	}
 	//
 	// duplicating the node
@@ -550,7 +570,7 @@ void dumpAST(Logs::Report& report, const AST::Node& node, const char* text) {
 
 } // anonymous namespace
 
-bool passDuplicateAndNormalizeAST(ny::compiler::Source& source, Logs::Report& report) {
+bool passDuplicateAndNormalizeAST(ny::compiler::Source& source, Logs::Report& report, UsesCallback uses, void* userdata) {
 	auto& parser = source.parsing.parser;
 	//! Reset the root node
 	source.parsing.rootnode = make_ref<AST::Node>(AST::rgStart);
@@ -558,7 +578,7 @@ bool passDuplicateAndNormalizeAST(ny::compiler::Source& source, Logs::Report& re
 		return false;
 	if (config::traces::astBeforeNormalize)
 		dumpAST(report, *parser.root, "before normalization");
-	ASTReplicator cloner(report);
+	ASTReplicator cloner(report, uses, userdata);
 	bool success = cloner.run(*parser.root, *(source.parsing.rootnode));
 	// retrieve data
 	source.parsing.nmspc.swap(cloner.nmspc);

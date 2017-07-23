@@ -42,3 +42,17 @@ make_debian_control(
 	SECTION "devel"
 	ARCH "${deb_arch}"
 )
+
+make_debian_control(
+	COMPONENT "nanyc-nsl-selftest"
+	DESCRIPTION "Nany Standard Library / Unittests"
+	SECTION "devel"
+	ARCH "all"
+)
+
+make_debian_control(
+	COMPONENT "nanyc-nsl-digest-md5"
+	DESCRIPTION "Nany Standard Library / uses std.digest.md5"
+	SECTION "devel"
+	ARCH "all"
+)

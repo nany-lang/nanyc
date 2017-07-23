@@ -17,6 +17,7 @@
 #include <libnanyc.h>
 #include <utility>
 #include <memory>
+#include <unordered_map>
 
 namespace ny {
 namespace compiler {
@@ -42,23 +43,6 @@ void copySourceOpts(ny::compiler::Source& source, const nysource_opts_t& opts) {
 		source.storageContent.assign(opts.content.c_str, static_cast<uint32_t>(opts.content.len));
 		source.content = source.storageContent;
 	}
-}
-
-bool compileSource(ny::Logs::Report& mainreport, ny::compiler::Compdb& compdb, ny::compiler::Source& source, const nycompile_opts_t& gopts) {
-	auto report = mainreport.subgroup();
-	report.data().origins.location.filename = source.filename;
-	report.data().origins.location.target.clear();
-	bool compiled = true;
-	compiled &= makeASTFromSource(source);
-	compiled &= passDuplicateAndNormalizeAST(source, report);
-	compiled &= passTransformASTToIR(source, report, gopts);
-	compiled  = compiled and attach(compdb, source);
-	return compiled;
-}
-
-bool importSourceAndCompile(ny::Logs::Report& mainreport, ny::compiler::Compdb& compdb, ny::compiler::Source& source, const nycompile_opts_t& gopts, const nysource_opts_t& opts) {
-	copySourceOpts(source, opts);
-	return compileSource(mainreport, compdb, source, gopts);
 }
 
 Atom& findEntrypointAtom(Atom& root, const AnyString& entrypoint) {
@@ -103,38 +87,103 @@ bool instanciate(ny::compiler::Compdb& compdb, ny::Logs::Report& report, AnyStri
 	return false;
 }
 
+struct CompilerQueue final {
+	ny::compiler::Compdb& compdb;
+	ny::Logs::Report report;
+	std::vector<yuni::String> collectionSearchPaths;
+	std::unordered_set<yuni::String> collectionsLoaded;
+
+	CompilerQueue(ny::compiler::Compdb& compdb)
+		: compdb(compdb)
+		, report(compdb.messages) {
+		collectionSearchPaths.reserve(4);
+		collectionSearchPaths.emplace_back(ny::config::collectionSystemPath);
+	}
+
+	static void usesCollection(void* userdata, const AnyString& name) {
+		auto& queue = *(reinterpret_cast<CompilerQueue*>(userdata));
+		if (queue.collectionsLoaded.count(name) != 0)
+			return;
+		queue.collectionsLoaded.insert(name);
+		yuni::String filename;
+		yuni::String content;
+		for (auto& searchpath: queue.collectionSearchPaths) {
+			filename = searchpath;
+			filename << '/' << name << "/nanyc.collection";
+			if (yuni::IO::errNone != yuni::IO::File::LoadFromFile(content, filename))
+				continue;
+			content.words("\n", [&](AnyString line) -> bool {
+				if (not line.empty()) {
+					if (unlikely(line[0] == 'u' and line.startsWith("uses "))) {
+						line.consume(5);
+						if (not line.empty())
+							usesCollection(userdata, line);
+					}
+					else {
+						queue.compdb.sources.emplace_back();
+						auto& source = queue.compdb.sources.back();
+						source.storageFilename = searchpath;
+						source.storageFilename << '/' << name << '/' << line;
+						source.filename = source.storageFilename;
+					}
+				}
+				return true;
+			});
+			return;
+		}
+		auto err = (error() << "collection '" << name << "' not found");
+		for (auto& searchpath: queue.collectionSearchPaths)
+			err.hint() << "from path '" << searchpath << "'";
+	}
+
+	bool compileSource(ny::compiler::Source& source) {
+		auto subreport = report.subgroup();
+		subreport.data().origins.location.filename = source.filename;
+		subreport.data().origins.location.target.clear();
+		bool compiled = true;
+		compiled &= makeASTFromSource(source);
+		compiled &= passDuplicateAndNormalizeAST(source, subreport, &usesCollection, this);
+		compiled &= passTransformASTToIR(source, subreport, compdb.opts);
+		compiled  = compiled and attach(compdb, source);
+		return compiled;
+	}
+
+	bool importSourceAndCompile(ny::compiler::Source& source, const nysource_opts_t& opts) {
+		copySourceOpts(source, opts);
+		return compileSource(source);
+	}
+};
+
 std::unique_ptr<ny::Program> compile(ny::compiler::Compdb& compdb) {
-	ny::Logs::Report report{compdb.messages};
+	CompilerQueue queue(compdb);
+	auto& report = queue.report;
 	Logs::Handler errorHandler{&report, &buildGenerateReport};
 	try {
-		auto& opts = compdb.opts;
-		uint32_t scount = opts.sources.count;
+		uint32_t scount = compdb.opts.sources.count;
 		if (unlikely(scount == 0))
 			throw "no input source code";
 		if (config::importNSL)
 			ny::intrinsic::import::all(compdb.intrinsics);
 		if (config::importNSL)
 			scount += corefilesCount;
-		if (unlikely(opts.with_nsl_unittests == nytrue))
-			scount += unittestCount;
 		auto& sources = compdb.sources;
-		sources.count = scount;
-		sources.items = std::make_unique<Source[]>(scount);
+		sources.resize(scount);
 		bool compiled = true;
 		uint32_t offset = 0;
 		if (config::importNSL) {
 			registerNSLCoreFiles(sources, offset, [&](ny::compiler::Source& source) {
-				compiled &= compileSource(report, compdb, source, opts);
+				compiled &= queue.compileSource(source);
 			});
 		}
-		if (opts.with_nsl_unittests == nytrue) {
-			registerUnittestFiles(sources, offset, [&](ny::compiler::Source& source) {
-				compiled &= compileSource(report, compdb, source, opts);
-			});
-		}
-		for (uint32_t i = 0; i != opts.sources.count; ++i) {
+		if (unlikely(compdb.opts.with_nsl_unittests == nytrue))
+			queue.usesCollection(&queue, "nsl.selftest");
+		for (uint32_t i = 0; i != compdb.opts.sources.count; ++i) {
 			auto& source = sources[offset + i];
-			compiled &= importSourceAndCompile(report, compdb, source, opts, opts.sources.items[i]);
+			compiled &= queue.importSourceAndCompile(source, compdb.opts.sources.items[i]);
+		}
+		for (uint32_t i = offset + compdb.opts.sources.count; i < sources.size(); ++i) {
+			auto& source = sources[i];
+			compiled &= queue.compileSource(source);
 		}
 		compiled = compiled
 			and likely(compdb.opts.on_unittest == nullptr)

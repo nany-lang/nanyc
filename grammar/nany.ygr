@@ -165,8 +165,8 @@ tk-shebang: notext
 	'#!'
 tk-namespace: notext
 	'namespace' sp
-//tk-uses: notext
-//	'uses'
+tk-uses: notext
+	'uses' sp
 
 tk-brace-open: notext
 	'{'
@@ -418,10 +418,8 @@ entity: notext
 
 // --- USES ---
 
-//uses: notext important
-//	wp tk-uses sp (entity (wp tk-semicolon)?) | error-semicolon
-//uses-list: notext
-//	uses+
+uses: notext important
+	tk-uses (entity wp tk-semicolon) | error-semicolon
 
 // --- NAMESPACE ---
 
@@ -1056,7 +1054,7 @@ type-sub-dot: notext
 start: notext
 	shebang?
 	wp
-	// uses-list?
+	uses*
 	namespace?
 	(wp expr-with-semicolon)*
 	wp

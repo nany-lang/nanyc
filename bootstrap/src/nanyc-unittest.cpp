@@ -81,11 +81,15 @@ private:
 
 	yuni::String runningMsg;
 	const Entry* latestRunningUnittest = nullptr;
+	nysource_opts_t srcoptsEmpty;
 };
 
 App::App() {
 	memset(&opts, 0x0, sizeof(opts));
-	opts.userdata = this;;
+	opts.userdata = this;
+	memset(&srcoptsEmpty, 0x0, sizeof(srcoptsEmpty));
+	srcoptsEmpty.content.c_str = " ";
+	srcoptsEmpty.content.len = 1;
 }
 
 App::~App() {
@@ -154,13 +158,19 @@ void App::fetch() {
 		entry.module.assign(mod, mlen);
 		entry.name.assign(name, nlen);
 	};
+	if (opts.sources.count == 0) {
+		opts.sources.count = 1;
+		opts.sources.items = &srcoptsEmpty;
+	}
 	opts.entrypoint.len = 0;
 	std::cout << "searching for unittests in all source files...\n";
 	auto start = now();
 	auto* program = nyprogram_compile(&opts);
-	if (unlikely(program)) {
-		assert(false and "no program should be created when listing unittests");
-		nyprogram_free(program);
+	if (unlikely(program))
+		throw "expecting a null object when gathering the list of unittests";
+	if (opts.sources.items == &srcoptsEmpty) {
+		opts.sources.count = 0;
+		opts.sources.items = nullptr;
 	}
 	opts.on_unittest = nullptr;
 	std::sort(std::begin(unittests), std::end(unittests));
@@ -276,7 +286,15 @@ bool App::execute(const Entry& entry) {
 	opts.entrypoint.c_str = name.c_str();
 	opts.entrypoint.len = name.size();
 	opts.on_report = &report;
+	if (opts.sources.count == 0) {
+		opts.sources.count = 1;
+		opts.sources.items = &srcoptsEmpty;
+	}
 	auto* program = nyprogram_compile(&opts);
+	if (opts.sources.items == &srcoptsEmpty) {
+		opts.sources.count = 0;
+		opts.sources.items = nullptr;
+	}
 	if (program != nullptr) {
 		nyvm_opts_t vmopts;
 		nyvm_opts_init_defaults(&vmopts);

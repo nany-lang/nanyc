@@ -5,6 +5,7 @@
 #include "details/ir/sequence.h"
 #include "details/atom/classdef-table.h"
 #include "details/intrinsic/catalog.h"
+#include <deque>
 #include <memory>
 #include <cassert>
 
@@ -12,6 +13,10 @@ namespace ny {
 namespace compiler {
 
 struct Source final {
+	Source() = default;
+	Source(const Source&) = delete;
+	Source(Source&&) = delete;
+
 	struct {
 		//! ny parser for the current content
 		AST::Parser parser;
@@ -43,12 +48,7 @@ struct Compdb final {
 	intrinsic::Catalog intrinsics;
 	const nycompile_opts_t& opts;
 	Logs::Message messages{Logs::Level::none};
-	struct final {
-		uint32_t count = 0;
-		std::unique_ptr<Source[]> items;
-		Source& operator [] (uint32_t i) { assert(i < count); return items[i]; }
-	}
-	sources;
+	std::deque<Source> sources;
 	struct Entrypoint final {
 		uint32_t atomid = (uint32_t) -1;
 		uint32_t instanceid = (uint32_t) -1;
