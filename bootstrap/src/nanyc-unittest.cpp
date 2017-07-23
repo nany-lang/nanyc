@@ -166,10 +166,8 @@ void App::fetch() {
 	std::cout << "searching for unittests in all source files...\n";
 	auto start = now();
 	auto* program = nyprogram_compile(&opts);
-	if (unlikely(program)) {
-		assert(false and "no program should be created when listing unittests");
-		nyprogram_free(program);
-	}
+	if (unlikely(program))
+		throw "expecting a null object when gathering the list of unittests";
 	if (opts.sources.items == &srcoptsEmpty) {
 		opts.sources.count = 0;
 		opts.sources.items = nullptr;
