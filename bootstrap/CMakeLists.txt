@@ -36,11 +36,10 @@ add_subdirectory("libnanyc")
 add_subdirectory(src)
 
 get_filename_component(nany_tests_root "${CMAKE_CURRENT_LIST_DIR}/../../tests/" REALPATH)
-file(WRITE "${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/empty.ny" "func main {}\n")
 add_custom_target(check
 	DEPENDS nanyc-unittest
 	COMMAND "${CMAKE_COMMAND}" -E "echo" # for beauty
-	COMMAND "$<TARGET_FILE:nanyc-unittest>" --nsl "${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/empty.ny"
+	COMMAND "$<TARGET_FILE:nanyc-unittest>" --nsl
 	VERBATIM
 )
 
