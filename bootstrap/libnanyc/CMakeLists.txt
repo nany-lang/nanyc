@@ -343,7 +343,6 @@ target_include_directories(libnanyc PRIVATE "${__embed_nsl_hxx_dir}")
 target_include_directories(libnanyc-grammar PUBLIC "${CMAKE_CURRENT_BINARY_DIR}")
 
 add_dependencies(libnanyc nanyc-grammar-cpp)
-add_dependencies(libnanyc nyt-nanyfile-to-cstring)
 
 install(
 	TARGETS libnanyc
@@ -362,7 +361,6 @@ if (YUNI_COMPILER_IS_CLANG)
 		target_include_directories(${target}_analyze PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../ext/dyncall/")
 		target_include_directories(${target}_analyze PUBLIC  "${CMAKE_CURRENT_LIST_DIR}")
 		add_dependencies(${target}_analyze nanyc-grammar-cpp)
-		add_dependencies(${target}_analyze nyt-nanyfile-to-cstring)
 	endfunction()
 	add_clang_static_analysis(libnanyc)
 endif()
