@@ -14,8 +14,8 @@ function(make_nanyc_tool)
 endfunction()
 
 make_nanyc_tool(
-	TARGET nyt-nsl-core-generator
-	SOURCES nsl-core-generator.cpp
+	TARGET nanyc-devtool-nsl-integer-float-generator
+	SOURCES nsl-integer-float-generator.cpp
 )
 
 make_nanyc_tool(
