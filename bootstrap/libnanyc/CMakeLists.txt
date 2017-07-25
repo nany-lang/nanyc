@@ -51,6 +51,21 @@ add_custom_command(
 	VERBATIM
 )
 
+set(__nsl_update_stdcore_integer_float_srcs
+	"${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/__nsl_update_stdcore_integer_float_srcs"
+)
+add_custom_command(
+	OUTPUT "${__nsl_update_stdcore_integer_float_srcs}"
+	COMMENT "Update NSL std.core source files integer / float (i8, i16... f32, f64)"
+	COMMAND "$<TARGET_FILE:nanyc-devtool-nsl-integer-float-generator>"
+		"${CMAKE_CURRENT_SOURCE_DIR}/../../assets/license/header.ny"
+		"${CMAKE_CURRENT_SOURCE_DIR}/../../src/nsl/std.core"
+	COMMAND "${CMAKE_COMMAND}" -E touch "${__nsl_update_stdcore_integer_float_srcs}"
+	DEPENDS
+		nanyc-devtool-nsl-integer-float-generator
+	VERBATIM
+)
+
 list(LENGTH nsl_files nsl_files_count)
 nmessage("standard library: ${nsl_files_count} files")
 
@@ -71,6 +86,7 @@ add_library(libnanyc ${mode_libnany}
 	"${libnany_config_folder}/libnanyc-traces.h"
 	"${libnany_config_folder}/libnanyc-version.h"
 	"${__embed_nsl_hxx}"
+	"${__nsl_update_stdcore_integer_float_srcs}"
 	"details/ast/ast.cpp"
 	"details/ast/ast.h"
 	"details/ast/ast.hxx"
