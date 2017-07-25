@@ -1,11 +1,26 @@
 #include <yuni/yuni.h>
 #include <yuni/core/string.h>
 #include <yuni/io/file.h>
+#include <yuni/core/hash/checksum/md5.h>
 #include <iostream>
 
 using namespace Yuni;
 
 namespace {
+
+void writeFile(const AnyString& filename, const AnyString& content) {
+	yuni::Hash::Checksum::MD5 md5;
+	auto oldMD5 = md5.fromFile(filename);
+	auto newMD5 = md5.fromRawData(content.c_str(), content.sizeInBytes());
+	if (oldMD5 != newMD5) {
+		auto lines = content.countChar('\n') + 1;
+		std::cout << "updating " << filename << ": ";
+		std::cout << "writing " << content.sizeInBytes() << " bytes, " << lines << " lines\n";
+		IO::File::SetContent(filename, content);
+	}
+	else
+		std::cout << filename << " is already up to date\n";
+}
 
 void craftClassFloat(Clob& o, uint32_t bits, const AnyString& license, const AnyString& filename) {
 	o.clear();
@@ -145,7 +160,7 @@ void craftClassFloat(Clob& o, uint32_t bits, const AnyString& license, const Any
 	craft("/", "fdiv", genGlobalOperator);
 	craft("*", "fmul", genGlobalOperator);
 	o.trimRight();
-	IO::File::SetContent(filename, o);
+	writeFile(filename, o);
 }
 
 void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString& license, const AnyString& filename) {
@@ -302,7 +317,7 @@ void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString& licen
 	craft("and", "and", genGlobalOperator);
 	craft("or", "or", genGlobalOperator);
 	craft("xor", "xor", genGlobalOperator);
-	IO::File::SetContent(filename, o);
+	writeFile(filename, o);
 }
 
 } // namespace
@@ -317,6 +332,7 @@ int main(int argc, char** argv) {
 		std::cerr << "failed to load header file from '" << argv[1] << "'\n";
 		return 1;
 	}
+	std::cout  << "devtool nsl integer/float source file generator\n";
 	AnyString folder = argv[2];
 	Clob out;
 	out.reserve(1024 * 32);
