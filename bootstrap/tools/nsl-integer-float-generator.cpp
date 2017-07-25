@@ -333,7 +333,7 @@ int main(int argc, char** argv) {
 		return 1;
 	}
 	std::cout  << "devtool nsl integer/float source file generator\n";
-	AnyString folder = argv[2];
+	auto folder = yuni::IO::Canonicalize(argv[2]);
 	Clob out;
 	out.reserve(1024 * 32);
 	String filename;
