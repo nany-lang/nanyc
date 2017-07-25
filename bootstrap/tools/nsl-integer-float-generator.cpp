@@ -2,11 +2,17 @@
 #include <yuni/core/string.h>
 #include <yuni/io/file.h>
 #include <yuni/core/hash/checksum/md5.h>
+#include <yuni/core/system/environment.h>
 #include <iostream>
 
 using namespace Yuni;
 
 namespace {
+
+bool detectCI() {
+	return yuni::System::Environment::ReadAsBool("CI")
+		or yuni::System::Environment::ReadAsInt64("CI_JOB_ID");
+}
 
 void writeFile(const AnyString& filename, const AnyString& content) {
 	yuni::Hash::Checksum::MD5 md5;
@@ -16,6 +22,8 @@ void writeFile(const AnyString& filename, const AnyString& content) {
 		auto lines = content.countChar('\n') + 1;
 		std::cout << "updating " << filename << ": ";
 		std::cout << "writing " << content.sizeInBytes() << " bytes, " << lines << " lines\n";
+		if (detectCI())
+			throw "\n  NSL: source modifications not allowed from CI! Please commit the changes.\n";
 		IO::File::SetContent(filename, content);
 	}
 	else
