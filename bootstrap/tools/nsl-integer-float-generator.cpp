@@ -323,30 +323,41 @@ void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString& licen
 } // namespace
 
 int main(int argc, char** argv) {
-	if (argc != 3) {
-		std::cerr << "usage: <license-header-file> <folder>\n";
-		return 1;
+	try {
+		if (argc != 3)
+			throw "usage: <license-header-file> <folder>";
+		String license;
+		if (IO::errNone != IO::File::LoadFromFile(license, argv[1]))
+			throw yuni::String("failed to load header file from '") << argv[1] << '\'';
+		std::cout  << "devtool nsl integer/float source file generator\n";
+		auto folder = yuni::IO::Canonicalize(argv[2]);
+		Clob out;
+		out.reserve(1024 * 32);
+		String filename;
+		filename.reserve(1024);
+		for (uint32_t bits = 64; bits >= 8; bits /= 2) {
+			filename.clear() << folder << "/u" << bits << ".ny";
+			craftClassInt(out, bits, false, license, filename);
+			filename.clear() << folder << "/i" << bits << ".ny";
+			craftClassInt(out, bits, true,  license, filename);
+		}
+		for (uint32_t bits = 64; bits >= 32; bits /= 2) {
+			filename.clear() << folder << "/f" << bits << ".ny";
+			craftClassFloat(out, bits, license, filename);
+		}
+		return 0;
 	}
-	String license;
-	if (IO::errNone != IO::File::LoadFromFile(license, argv[1])) {
-		std::cerr << "failed to load header file from '" << argv[1] << "'\n";
-		return 1;
+	catch (const char* e) {
+		std::cerr << e << '\n';
 	}
-	std::cout  << "devtool nsl integer/float source file generator\n";
-	auto folder = yuni::IO::Canonicalize(argv[2]);
-	Clob out;
-	out.reserve(1024 * 32);
-	String filename;
-	filename.reserve(1024);
-	for (uint32_t bits = 64; bits >= 8; bits /= 2) {
-		filename.clear() << folder << "/u" << bits << ".ny";
-		craftClassInt(out, bits, false, license, filename);
-		filename.clear() << folder << "/i" << bits << ".ny";
-		craftClassInt(out, bits, true,  license, filename);
+	catch (const yuni::String& e) {
+		std::cerr << e << '\n';
 	}
-	for (uint32_t bits = 64; bits >= 32; bits /= 2) {
-		filename.clear() << folder << "/f" << bits << ".ny";
-		craftClassFloat(out, bits, license, filename);
+	catch (const std::bad_alloc&) {
+		std::cerr << "error: failed to allocate memory\n";
 	}
-	return 0;
+	catch (const std::exception& e) {
+		std::cerr << "exception: " << e.what() << '\n';
+	}
+	return EXIT_FAILURE;
 }
