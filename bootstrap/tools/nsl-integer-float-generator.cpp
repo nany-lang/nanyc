@@ -5,19 +5,13 @@
 
 using namespace Yuni;
 
-
-
-
 namespace {
 
-
-void craftClassFloat(Clob& o, uint32_t bits, const AnyString& license, const AnyString& filename)
-{
+void craftClassFloat(Clob& o, uint32_t bits, const AnyString& license, const AnyString& filename) {
 	o.clear();
 	ShortString16 suffix;
 	char c = 'f';
 	suffix << c << bits;
-
 	o << license;
 	o << "/// \\file    " << suffix << ".ny\n";
 	o << "/// \\brief   Implementation of the class " << suffix << ", ";
@@ -77,16 +71,12 @@ void craftClassFloat(Clob& o, uint32_t bits, const AnyString& license, const Any
 	o << "\t\treturn tmp;\n";
 	o << "\t}\n";
 	o << '\n';
-
 	auto craftOperator = [&](auto callback) {
 		callback(bits, c);
 		o << '\n';
 	};
-
-	auto craftMemberOperator = [&](const AnyString& op, const AnyString& intrinsic)
-	{
-		craftOperator([&](uint32_t b, char targetsign)
-		{
+	auto craftMemberOperator = [&](const AnyString& op, const AnyString& intrinsic) {
+		craftOperator([&](uint32_t b, char targetsign) {
 			o << "\toperator " << op << " (cref x: " << targetsign << b << "): ref " << suffix << " {\n";
 			o << "\t\tpod = !!" << intrinsic << "(pod, x.pod);\n";
 			o << "\t\treturn self;\n";
@@ -98,12 +88,10 @@ void craftClassFloat(Clob& o, uint32_t bits, const AnyString& license, const Any
 			o << "\t}\n";
 		});
 	};
-
 	craftMemberOperator("+=", "fadd");
 	craftMemberOperator("-=", "fsub");
 	craftMemberOperator("*=", "fmul");
 	craftMemberOperator("/=", "fdiv");
-
 	o.trimRight();
 	o << "\n\n";
 	o << "private:\n";
@@ -114,9 +102,7 @@ void craftClassFloat(Clob& o, uint32_t bits, const AnyString& license, const Any
 	o << '\n';
 	o << '\n';
 	o << '\n';
-
-	auto craft = [&](const AnyString& op, const AnyString& builtin, auto callback)
-	{
+	auto craft = [&](const AnyString& op, const AnyString& builtin, auto callback) {
 		char sign = 'f';
 		auto b = bits;
 		callback(op, builtin, sign, b, "cref ", "cref ");
@@ -125,10 +111,7 @@ void craftClassFloat(Clob& o, uint32_t bits, const AnyString& license, const Any
 		callback(op, builtin, sign, b, "__", "__");
 		o << '\n';
 	};
-
-
-	auto genGlobalCompareOperator = [&](AnyString op, AnyString builtin, char sign, uint32_t b, AnyString prefixA, AnyString prefixB)
-	{
+	auto genGlobalCompareOperator = [&](AnyString op, AnyString builtin, char sign, uint32_t b, AnyString prefixA, AnyString prefixB) {
 		o << "#[__nanyc_builtinalias: " << builtin;
 		if (prefixA.first() == '_' or prefixB.first() == '_')
 			o << ", nosuggest";
@@ -143,12 +126,9 @@ void craftClassFloat(Clob& o, uint32_t bits, const AnyString& license, const Any
 	craft("<=", "flte", genGlobalCompareOperator);
 	craft("==",  "eq",  genGlobalCompareOperator);
 	craft("!=",  "neq", genGlobalCompareOperator);
-
 	o << '\n';
 	o << '\n';
-
-	auto genGlobalOperator = [&](AnyString op, AnyString builtin, char sign, uint32_t b, AnyString prefixA, AnyString prefixB)
-	{
+	auto genGlobalOperator = [&](AnyString op, AnyString builtin, char sign, uint32_t b, AnyString prefixA, AnyString prefixB) {
 		bool atLeastOneBuiltin = (prefixA.first() != '_' or prefixB.first() != '_');
 		o << "#[__nanyc_builtinalias: " << builtin;
 		if (prefixA.first() == '_' or prefixB.first() == '_')
@@ -157,7 +137,6 @@ void craftClassFloat(Clob& o, uint32_t bits, const AnyString& license, const Any
 		o << op << " (a: " << prefixA << suffix << ", b: " << prefixB << sign << b << "): ";
 		o << ((atLeastOneBuiltin) ? "ref " : "__");
 		o << suffix << ";\n";
-
 		if (not atLeastOneBuiltin)
 			o << '\n';
 	};
@@ -165,41 +144,31 @@ void craftClassFloat(Clob& o, uint32_t bits, const AnyString& license, const Any
 	craft("-", "fsub", genGlobalOperator);
 	craft("/", "fdiv", genGlobalOperator);
 	craft("*", "fmul", genGlobalOperator);
-
 	o.trimRight();
 	IO::File::SetContent(filename, o);
 }
 
-
-void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString& license, const AnyString& filename)
-{
+void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString& license, const AnyString& filename) {
 	o.clear();
 	char c = (issigned) ? 'i' : 'u';
 	ShortString16 suffix;
 	suffix << c << bits;
-
 	auto craftOperator = [&](auto callback) {
 		callback(bits, c);
 		if (issigned)
 			callback(bits / 2, 'u');
 		o << '\n';
 	};
-
-	auto craft = [&](const AnyString& op, const AnyString& builtin, auto callback)
-	{
+	auto craft = [&](const AnyString& op, const AnyString& builtin, auto callback) {
 		char sign = issigned ? 'i' : 'u';
-		for (uint32_t b = 64 /*bits*/; b >= 8; b /= 2)
-		{
+		for (uint32_t b = 64 /*bits*/; b >= 8; b /= 2) {
 			callback(op, builtin, sign, b, "cref ", "cref ");
 			callback(op, builtin, sign, b, "cref ", "__");
 			callback(op, builtin, sign, b, "__", "cref ");
 			callback(op, builtin, sign, b, "__", "__");
 		}
-
 		o << '\n';
 	};
-
-
 	o << license;
 	o << "/// \\file    " << suffix << ".ny\n";
 	o << "/// \\brief   Implementation of the class " << suffix << ", ";
@@ -216,21 +185,17 @@ void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString& licen
 	o << "public class " << suffix << " {\n";
 	o << "\t//! Default constructor\n";
 	o << "\toperator new;\n\n";
-	craftOperator([&](uint32_t b, char targetsign)
-	{
-		for ( ; b >= 8; b /= 2)
-		{
+	craftOperator([&](uint32_t b, char targetsign) {
+		for ( ; b >= 8; b /= 2) {
 			o << "\toperator new (cref x: " << targetsign << b << ") {\n";
 			o << "\t\tpod = x.pod;\n";
 			o << "\t}\n";
 		}
 	});
-	craftOperator([&](uint32_t b, char targetsign)
-	{
+	craftOperator([&](uint32_t b, char targetsign) {
 		for ( ; b >= 8; b /= 2)
 			o << "\t#[nosuggest] operator new (self pod: __" << targetsign << b << ");\n";
 	});
-
 	o << '\n';
 	o << '\n';
 	o << "\toperator ++self: ref " << suffix << " {\n";
@@ -256,19 +221,14 @@ void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString& licen
 	o << "\t}\n";
 	o << '\n';
 	o << '\n';
-
-	auto craftMemberOperator = [&](const AnyString& op, const AnyString& intrinsic, bool prefix)
-	{
+	auto craftMemberOperator = [&](const AnyString& op, const AnyString& intrinsic, bool prefix) {
 		AnyString pr = (prefix and issigned) ? "i" : "";
-		craftOperator([&](uint32_t b, char targetsign)
-		{
-			for ( ; b >= 8; b /= 2)
-			{
+		craftOperator([&](uint32_t b, char targetsign) {
+			for ( ; b >= 8; b /= 2) {
 				o << "\toperator " << op << " (cref x: " << targetsign << b << "): ref " << suffix << " {\n";
 				o << "\t\tpod = !!" << pr << intrinsic << "(pod, x.pod);\n";
 				o << "\t\treturn self;\n";
 				o << "\t}\n\n";
-
 				o << "\t#[nosuggest] operator " << op << " (x: __" << targetsign << b << "): ref " << suffix << " {\n";
 				o << "\t\tpod = !!" << pr << intrinsic << "(pod, x);\n";
 				o << "\t\treturn self;\n";
@@ -277,12 +237,10 @@ void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString& licen
 		});
 		o << '\n';
 	};
-
 	craftMemberOperator("+=", "add", false);
 	craftMemberOperator("-=", "sub", false);
 	craftMemberOperator("*=", "mul", true);
 	craftMemberOperator("/=", "div", true);
-
 	o << "private:\n";
 	o << "\tvar pod = 0__" << suffix << ";\n";
 	o << '\n';
@@ -291,11 +249,8 @@ void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString& licen
 	o << '\n';
 	o << '\n';
 	o << '\n';
-
-
 	bool canBeSigned = true;
-	auto genGlobalCompareOperator = [&](AnyString op, AnyString builtin, char sign, uint32_t b, AnyString prefixA, AnyString prefixB)
-	{
+	auto genGlobalCompareOperator = [&](AnyString op, AnyString builtin, char sign, uint32_t b, AnyString prefixA, AnyString prefixB) {
 		o << "#[__nanyc_builtinalias: " << (canBeSigned and issigned ? "i" : "") << builtin;
 		if (prefixA.first() == '_' or prefixB.first() == '_')
 			o << ", nosuggest";
@@ -308,23 +263,18 @@ void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString& licen
 	craft(">=", "gte", genGlobalCompareOperator);
 	craft("<",  "lt",  genGlobalCompareOperator);
 	craft("<=", "lte", genGlobalCompareOperator);
-
 	o << '\n';
 	o << '\n';
 	o << '\n';
 	o << '\n';
-
 	canBeSigned = false;
 	craft("==",  "eq",  genGlobalCompareOperator);
 	craft("!=",  "neq", genGlobalCompareOperator);
-
 	o << '\n';
 	o << '\n';
 	o << '\n';
 	o << '\n';
-
-	auto genGlobalOperator = [&](AnyString op, AnyString builtin, char sign, uint32_t b, AnyString prefixA, AnyString prefixB)
-	{
+	auto genGlobalOperator = [&](AnyString op, AnyString builtin, char sign, uint32_t b, AnyString prefixA, AnyString prefixB) {
 		bool atLeastOneBuiltin = (prefixA.first() != '_' or prefixB.first() != '_');
 		o << "#[__nanyc_builtinalias: " << builtin;
 		if (prefixA.first() == '_' or prefixB.first() == '_')
@@ -332,76 +282,55 @@ void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString& licen
 		o << "] public operator ";
 		o << op << " (a: " << prefixA << suffix << ", b: " << prefixB << sign << b << "): ";
 		o << "any;\n";
-		//o << ((atLeastOneBuiltin) ? "ref " : "__");
-		//o << suffix << ";\n";
-
 		if (not atLeastOneBuiltin)
 			o << '\n';
 	};
 	craft("+", "add", genGlobalOperator);
 	craft("-", "sub", genGlobalOperator);
-	if (issigned)
-	{
+	if (issigned) {
 		craft("/", "idiv", genGlobalOperator);
 		craft("*", "imul", genGlobalOperator);
 	}
-	else
-	{
+	else {
 		craft("/", "div", genGlobalOperator);
 		craft("*", "mul", genGlobalOperator);
 	}
-
 	o << '\n';
 	o << '\n';
 	o << '\n';
 	o << '\n';
-
 	craft("and", "and", genGlobalOperator);
 	craft("or", "or", genGlobalOperator);
 	craft("xor", "xor", genGlobalOperator);
-
 	IO::File::SetContent(filename, o);
 }
 
-
 } // namespace
 
-
-
-
-int main(int argc, char** argv)
-{
-	if (argc != 3)
-	{
+int main(int argc, char** argv) {
+	if (argc != 3) {
 		std::cerr << "usage: <license-header-file> <folder>\n";
 		return 1;
 	}
 	String license;
-	if (IO::errNone != IO::File::LoadFromFile(license, argv[1]))
-	{
+	if (IO::errNone != IO::File::LoadFromFile(license, argv[1])) {
 		std::cerr << "failed to load header file from '" << argv[1] << "'\n";
 		return 1;
 	}
-
 	AnyString folder = argv[2];
 	Clob out;
 	out.reserve(1024 * 32);
 	String filename;
 	filename.reserve(1024);
-
-	for (uint32_t bits = 64; bits >= 8; bits /= 2)
-	{
+	for (uint32_t bits = 64; bits >= 8; bits /= 2) {
 		filename.clear() << folder << "/u" << bits << ".ny";
 		craftClassInt(out, bits, false, license, filename);
 		filename.clear() << folder << "/i" << bits << ".ny";
 		craftClassInt(out, bits, true,  license, filename);
 	}
-
-	for (uint32_t bits = 64; bits >= 32; bits /= 2)
-	{
+	for (uint32_t bits = 64; bits >= 32; bits /= 2) {
 		filename.clear() << folder << "/f" << bits << ".ny";
 		craftClassFloat(out, bits, license, filename);
 	}
-
 	return 0;
 }
