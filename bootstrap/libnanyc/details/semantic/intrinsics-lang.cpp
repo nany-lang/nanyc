@@ -10,15 +10,11 @@
 
 using namespace Yuni;
 
-
-
-
 namespace ny {
 namespace semantic {
 namespace intrinsic {
 
 namespace {
-
 
 bool intrinsicOSIsUnix(Analyzer& seq, uint32_t lvid) {
 	seq.cdeftable.substitute(lvid).mutateToBuiltin(CType::t_bool);
@@ -26,7 +22,6 @@ bool intrinsicOSIsUnix(Analyzer& seq, uint32_t lvid) {
 		ir::emit::constantbool(seq.out, lvid, yuni::System::unix);
 	return true;
 }
-
 
 bool intrinsicOSIsPosix(Analyzer& seq, uint32_t lvid) {
 	seq.cdeftable.substitute(lvid).mutateToBuiltin(CType::t_bool);
@@ -40,14 +35,12 @@ bool intrinsicOSIsPosix(Analyzer& seq, uint32_t lvid) {
 	return true;
 }
 
-
 bool intrinsicOSIsLinux(Analyzer& seq, uint32_t lvid) {
 	seq.cdeftable.substitute(lvid).mutateToBuiltin(CType::t_bool);
 	if (seq.canGenerateCode())
 		ir::emit::constantbool(seq.out, lvid, yuni::System::linux);
 	return true;
 }
-
 
 bool intrinsicOSIsAIX(Analyzer& seq, uint32_t lvid) {
 	seq.cdeftable.substitute(lvid).mutateToBuiltin(CType::t_bool);
@@ -61,14 +54,12 @@ bool intrinsicOSIsAIX(Analyzer& seq, uint32_t lvid) {
 	return true;
 }
 
-
 bool intrinsicOSIsWindows(Analyzer& seq, uint32_t lvid) {
 	seq.cdeftable.substitute(lvid).mutateToBuiltin(CType::t_bool);
 	if (seq.canGenerateCode())
 		ir::emit::constantbool(seq.out, lvid, yuni::System::windows);
 	return true;
 }
-
 
 bool intrinsicOSIsCygwin(Analyzer& seq, uint32_t lvid) {
 	seq.cdeftable.substitute(lvid).mutateToBuiltin(CType::t_bool);
@@ -82,14 +73,12 @@ bool intrinsicOSIsCygwin(Analyzer& seq, uint32_t lvid) {
 	return true;
 }
 
-
 bool intrinsicOSIsMacOS(Analyzer& seq, uint32_t lvid) {
 	seq.cdeftable.substitute(lvid).mutateToBuiltin(CType::t_bool);
 	if (seq.canGenerateCode())
 		ir::emit::constantbool(seq.out, lvid, yuni::System::macos);
 	return true;
 }
-
 
 bool intrinsicOSIsBSD(Analyzer& seq, uint32_t lvid) {
 	seq.cdeftable.substitute(lvid).mutateToBuiltin(CType::t_bool);
@@ -103,7 +92,6 @@ bool intrinsicOSIsBSD(Analyzer& seq, uint32_t lvid) {
 	}
 	return true;
 }
-
 
 bool intrinsicFieldset(Analyzer& seq, uint32_t lvid) {
 	seq.cdeftable.substitute(lvid).mutateToVoid();
@@ -155,7 +143,6 @@ bool intrinsicFieldset(Analyzer& seq, uint32_t lvid) {
 	return true;
 }
 
-
 bool intrinsicRef(Analyzer& seq, uint32_t lvid) {
 	seq.cdeftable.substitute(lvid).mutateToVoid();
 	if (seq.canGenerateCode())
@@ -163,14 +150,12 @@ bool intrinsicRef(Analyzer& seq, uint32_t lvid) {
 	return true;
 }
 
-
 bool intrinsicUnref(Analyzer& seq, uint32_t lvid) {
 	seq.cdeftable.substitute(lvid).mutateToVoid();
 	if (seq.canGenerateCode())
 		tryUnrefObject(seq, seq.pushedparams.func.indexed[0].lvid);
 	return true;
 }
-
 
 bool intrinsicPointer(Analyzer& seq, uint32_t lvid) {
 	seq.cdeftable.substitute(lvid).mutateToBuiltin(CType::t_ptr);
@@ -188,7 +173,6 @@ bool intrinsicPointer(Analyzer& seq, uint32_t lvid) {
 	}
 	return true;
 }
-
 
 bool intrinsicSizeof(Analyzer& seq, uint32_t lvid) {
 	seq.cdeftable.substitute(lvid).mutateToBuiltin(CType::t_u64);
@@ -216,7 +200,6 @@ bool intrinsicSizeof(Analyzer& seq, uint32_t lvid) {
 	return true;
 }
 
-
 bool intrinsicMemalloc(Analyzer& seq, uint32_t lvid) {
 	seq.cdeftable.substitute(lvid).mutateToBuiltin(CType::t_ptr);
 	uint32_t objlvid = seq.pushedparams.func.indexed[0].lvid;
@@ -227,7 +210,6 @@ bool intrinsicMemalloc(Analyzer& seq, uint32_t lvid) {
 		ir::emit::memory::allocate(seq.out, lvid, objlvid);
 	return true;
 }
-
 
 bool intrinsicMemrealloc(Analyzer& seq, uint32_t lvid) {
 	seq.cdeftable.substitute(lvid).mutateToBuiltin(CType::t_ptr);
@@ -250,7 +232,6 @@ bool intrinsicMemrealloc(Analyzer& seq, uint32_t lvid) {
 	return true;
 }
 
-
 bool intrinsicMemFree(Analyzer& seq, uint32_t lvid) {
 	seq.cdeftable.substitute(lvid).mutateToVoid();
 	uint32_t objlvid = seq.pushedparams.func.indexed[0].lvid;
@@ -265,7 +246,6 @@ bool intrinsicMemFree(Analyzer& seq, uint32_t lvid) {
 		ir::emit::memory::dispose(seq.out, objlvid, size);
 	return true;
 }
-
 
 bool intrinsicMemfill(Analyzer& seq, uint32_t lvid) {
 	seq.cdeftable.substitute(lvid).mutateToVoid();
@@ -286,7 +266,6 @@ bool intrinsicMemfill(Analyzer& seq, uint32_t lvid) {
 	return true;
 }
 
-
 bool intrinsicMemCopy(Analyzer& seq, uint32_t lvid) {
 	seq.cdeftable.substitute(lvid).mutateToVoid();
 	uint32_t objlvid = seq.pushedparams.func.indexed[0].lvid;
@@ -306,7 +285,6 @@ bool intrinsicMemCopy(Analyzer& seq, uint32_t lvid) {
 	return true;
 }
 
-
 bool intrinsicMemMove(Analyzer& seq, uint32_t lvid) {
 	seq.cdeftable.substitute(lvid).mutateToVoid();
 	uint32_t objlvid = seq.pushedparams.func.indexed[0].lvid;
@@ -325,7 +303,6 @@ bool intrinsicMemMove(Analyzer& seq, uint32_t lvid) {
 		ir::emit::memory::copy(seq.out, objlvid, src, size);
 	return true;
 }
-
 
 bool intrinsicMemCmp(Analyzer& seq, uint32_t lvid) {
 	seq.cdeftable.substitute(lvid).mutateToBuiltin(CType::t_u64);
@@ -348,7 +325,6 @@ bool intrinsicMemCmp(Analyzer& seq, uint32_t lvid) {
 	return true;
 }
 
-
 bool intrinsicMemGetU64(Analyzer& seq, uint32_t lvid) {
 	seq.cdeftable.substitute(lvid).mutateToBuiltin(CType::t_u64);
 	uint32_t ptrlvid = seq.pushedparams.func.indexed[0].lvid;
@@ -359,7 +335,6 @@ bool intrinsicMemGetU64(Analyzer& seq, uint32_t lvid) {
 		ir::emit::memory::loadu64(seq.out, lvid, ptrlvid);
 	return true;
 }
-
 
 bool intrinsicMemGetU32(Analyzer& seq, uint32_t lvid) {
 	seq.cdeftable.substitute(lvid).mutateToBuiltin(CType::t_u32);
@@ -372,7 +347,6 @@ bool intrinsicMemGetU32(Analyzer& seq, uint32_t lvid) {
 	return true;
 }
 
-
 bool intrinsicMemGetU8(Analyzer& seq, uint32_t lvid) {
 	seq.cdeftable.substitute(lvid).mutateToBuiltin(CType::t_u8);
 	uint32_t ptrlvid = seq.pushedparams.func.indexed[0].lvid;
@@ -383,7 +357,6 @@ bool intrinsicMemGetU8(Analyzer& seq, uint32_t lvid) {
 		ir::emit::memory::loadu8(seq.out, lvid, ptrlvid);
 	return true;
 }
-
 
 bool intrinsicMemGetPTR(Analyzer& seq, uint32_t lvid) {
 	seq.cdeftable.substitute(lvid).mutateToBuiltin(CType::t_ptr);
@@ -400,7 +373,6 @@ bool intrinsicMemGetPTR(Analyzer& seq, uint32_t lvid) {
 	return true;
 }
 
-
 bool intrinsicMemSetU64(Analyzer& seq, uint32_t lvid) {
 	seq.cdeftable.substitute(lvid).mutateToVoid();
 	uint32_t ptrlvid = seq.pushedparams.func.indexed[0].lvid;
@@ -415,7 +387,6 @@ bool intrinsicMemSetU64(Analyzer& seq, uint32_t lvid) {
 		ir::emit::memory::storeu64(seq.out, value, ptrlvid);
 	return true;
 }
-
 
 bool intrinsicMemSetU32(Analyzer& seq, uint32_t lvid) {
 	seq.cdeftable.substitute(lvid).mutateToVoid();
@@ -432,7 +403,6 @@ bool intrinsicMemSetU32(Analyzer& seq, uint32_t lvid) {
 	return true;
 }
 
-
 bool intrinsicMemSetU8(Analyzer& seq, uint32_t lvid) {
 	seq.cdeftable.substitute(lvid).mutateToVoid();
 	uint32_t ptrlvid = seq.pushedparams.func.indexed[0].lvid;
@@ -447,7 +417,6 @@ bool intrinsicMemSetU8(Analyzer& seq, uint32_t lvid) {
 		ir::emit::memory::storeu8(seq.out, value, ptrlvid);
 	return true;
 }
-
 
 bool intrinsicMemSetPTR(Analyzer& seq, uint32_t lvid) {
 	seq.cdeftable.substitute(lvid).mutateToVoid();
@@ -468,7 +437,6 @@ bool intrinsicMemSetPTR(Analyzer& seq, uint32_t lvid) {
 	return true;
 }
 
-
 template<class T>
 bool intrinsicStrlen(Analyzer& seq, uint32_t lvid) {
 	seq.cdeftable.substitute(lvid).mutateToBuiltin(sizeof(T) == sizeof(uint32_t) ? CType::t_u32 : CType::t_u64);
@@ -482,7 +450,6 @@ bool intrinsicStrlen(Analyzer& seq, uint32_t lvid) {
 	}
 	return true;
 }
-
 
 bool intrinsicNOT(Analyzer& seq, uint32_t lvid) {
 	assert(seq.pushedparams.func.indexed.size() == 1);
@@ -547,7 +514,6 @@ bool intrinsicNOT(Analyzer& seq, uint32_t lvid) {
 	return true;
 }
 
-
 bool intrinsicAssert(Analyzer& seq, uint32_t lvid) {
 	assert(seq.pushedparams.func.indexed.size() == 1);
 	// no return value
@@ -587,7 +553,6 @@ bool intrinsicAssert(Analyzer& seq, uint32_t lvid) {
 	return true;
 }
 
-
 constexpr static const CType promotion[ctypeCount][ctypeCount] = {
 	/*void*/ {CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void,},
 	/*any*/  {CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_void,},
@@ -604,7 +569,6 @@ constexpr static const CType promotion[ctypeCount][ctypeCount] = {
 	/*f32*/  {CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_f32, CType::t_f32, CType::t_f32, CType::t_void, CType::t_f32, CType::t_f32, CType::t_f32, CType::t_void, CType::t_f32, CType::t_f64, },
 	/*f64*/  {CType::t_void, CType::t_void, CType::t_void, CType::t_void, CType::t_f64, CType::t_f64, CType::t_f64, CType::t_f64, CType::t_f64, CType::t_f64, CType::t_f64, CType::t_f64, CType::t_f64, CType::t_f64, },
 };
-
 
 template<CType R, bool AcceptBool, bool AcceptInt, bool AcceptFloat,
 		 void (* M)(ir::emit::IRCodeRef, uint32_t, uint32_t, uint32_t)>
@@ -740,7 +704,6 @@ inline bool emitBuiltinOperator(Analyzer& seq, uint32_t lvid, const char* const 
 	return true;
 }
 
-
 bool intrinsicAND(Analyzer& seq, uint32_t lvid) {
 	return emitBuiltinOperator<CType::t_any, 1, 1, 0, &ir::emit::opand>(seq, lvid, "and");
 }
@@ -854,85 +817,82 @@ bool intrinsicIGTE(Analyzer& seq, uint32_t lvid) {
 	return emitBuiltinOperator<CType::t_bool, 1, 1, 1, &ir::emit::opigte>(seq, lvid, "igte");
 }
 
-
 using BuiltinIntrinsic = bool (*)(Analyzer&, uint32_t);
 
 static const std::unordered_map<AnyString, std::pair<uint32_t, BuiltinIntrinsic>> builtinDispatch = {
 	//
-	{"^fieldset",       { 2,  &intrinsicFieldset,    }},
+	{"^fieldset",       { 2,  &intrinsicFieldset }},
 	//
-	{"memory.allocate", { 1,  &intrinsicMemalloc,    }},
-	{"memory.realloc",  { 3,  &intrinsicMemrealloc,  }},
-	{"memory.dispose",  { 2,  &intrinsicMemFree,     }},
-	{"memory.fill",     { 3,  &intrinsicMemfill,     }},
-	{"memory.copy",     { 3,  &intrinsicMemCopy,     }},
-	{"memory.move",     { 3,  &intrinsicMemMove,     }},
-	{"memory.cmp",      { 3,  &intrinsicMemCmp,      }},
-	{"load.ptr",        { 1,  &intrinsicMemGetPTR,   }},
-	{"load.u64",        { 1,  &intrinsicMemGetU64,   }},
-	{"load.u32",        { 1,  &intrinsicMemGetU32,   }},
-	{"load.u8",         { 1,  &intrinsicMemGetU8,    }},
-	{"store.ptr",       { 2,  &intrinsicMemSetPTR,   }},
-	{"store.u64",       { 2,  &intrinsicMemSetU64,   }},
-	{"store.u32",       { 2,  &intrinsicMemSetU32,   }},
-	{"store.u8",        { 2,  &intrinsicMemSetU8,    }},
+	{"memory.allocate", { 1,  &intrinsicMemalloc }},
+	{"memory.realloc",  { 3,  &intrinsicMemrealloc }},
+	{"memory.dispose",  { 2,  &intrinsicMemFree }},
+	{"memory.fill",     { 3,  &intrinsicMemfill }},
+	{"memory.copy",     { 3,  &intrinsicMemCopy }},
+	{"memory.move",     { 3,  &intrinsicMemMove }},
+	{"memory.cmp",      { 3,  &intrinsicMemCmp }},
+	{"load.ptr",        { 1,  &intrinsicMemGetPTR }},
+	{"load.u64",        { 1,  &intrinsicMemGetU64 }},
+	{"load.u32",        { 1,  &intrinsicMemGetU32 }},
+	{"load.u8",         { 1,  &intrinsicMemGetU8 }},
+	{"store.ptr",       { 2,  &intrinsicMemSetPTR }},
+	{"store.u64",       { 2,  &intrinsicMemSetU64 }},
+	{"store.u32",       { 2,  &intrinsicMemSetU32 }},
+	{"store.u8",        { 2,  &intrinsicMemSetU8 }},
 	//
-	{"ref",             { 1,  &intrinsicRef,         }},
-	{"unref",           { 1,  &intrinsicUnref,       }},
-	{"sizeof",          { 1,  &intrinsicSizeof,      }},
-	{"pointer",         { 1,  &intrinsicPointer,     }},
+	{"ref",             { 1,  &intrinsicRef }},
+	{"unref",           { 1,  &intrinsicUnref }},
+	{"sizeof",          { 1,  &intrinsicSizeof }},
+	{"pointer",         { 1,  &intrinsicPointer }},
 	//
-	{"and",             { 2,  &intrinsicAND,         }},
-	{"or",              { 2,  &intrinsicOR,          }},
-	{"xor",             { 2,  &intrinsicXOR,         }},
-	{"mod",             { 2,  &intrinsicMOD,         }},
+	{"and",             { 2,  &intrinsicAND }},
+	{"or",              { 2,  &intrinsicOR }},
+	{"xor",             { 2,  &intrinsicXOR }},
+	{"mod",             { 2,  &intrinsicMOD }},
 	//
-	{"not",             { 1,  &intrinsicNOT,         }},
+	{"not",             { 1,  &intrinsicNOT }},
 	//
-	{"add",             { 2,  &intrinsicADD,         }},
-	{"sub",             { 2,  &intrinsicSUB,         }},
-	{"div",             { 2,  &intrinsicDIV,         }},
-	{"mul",             { 2,  &intrinsicMUL,         }},
-	{"idiv",            { 2,  &intrinsicIDIV,        }},
-	{"imul",            { 2,  &intrinsicIMUL,        }},
-	{"fadd",            { 2,  &intrinsicFADD,        }},
-	{"fsub",            { 2,  &intrinsicFSUB,        }},
-	{"fdiv",            { 2,  &intrinsicFDIV,        }},
-	{"fmul",            { 2,  &intrinsicFMUL,        }},
+	{"add",             { 2,  &intrinsicADD }},
+	{"sub",             { 2,  &intrinsicSUB }},
+	{"div",             { 2,  &intrinsicDIV }},
+	{"mul",             { 2,  &intrinsicMUL }},
+	{"idiv",            { 2,  &intrinsicIDIV }},
+	{"imul",            { 2,  &intrinsicIMUL }},
+	{"fadd",            { 2,  &intrinsicFADD }},
+	{"fsub",            { 2,  &intrinsicFSUB }},
+	{"fdiv",            { 2,  &intrinsicFDIV }},
+	{"fmul",            { 2,  &intrinsicFMUL }},
 	//
-	{"eq",              { 2,  &intrinsicEQ,          }},
-	{"neq",             { 2,  &intrinsicNEQ,         }},
-	{"flt",             { 2,  &intrinsicFLT,         }},
-	{"flte",            { 2,  &intrinsicFLTE,        }},
-	{"fgt",             { 2,  &intrinsicFGT,         }},
-	{"fgte",            { 2,  &intrinsicFGTE,        }},
-	{"lt",              { 2,  &intrinsicLT,          }},
-	{"lte",             { 2,  &intrinsicLTE,         }},
-	{"ilt",             { 2,  &intrinsicILT,         }},
-	{"ilte",            { 2,  &intrinsicILTE,        }},
-	{"gt",              { 2,  &intrinsicGT,          }},
-	{"gte",             { 2,  &intrinsicGTE,         }},
-	{"igt",             { 2,  &intrinsicIGT,         }},
-	{"igte",            { 2,  &intrinsicIGTE,        }},
+	{"eq",              { 2,  &intrinsicEQ }},
+	{"neq",             { 2,  &intrinsicNEQ }},
+	{"flt",             { 2,  &intrinsicFLT }},
+	{"flte",            { 2,  &intrinsicFLTE }},
+	{"fgt",             { 2,  &intrinsicFGT }},
+	{"fgte",            { 2,  &intrinsicFGTE }},
+	{"lt",              { 2,  &intrinsicLT }},
+	{"lte",             { 2,  &intrinsicLTE }},
+	{"ilt",             { 2,  &intrinsicILT }},
+	{"ilte",            { 2,  &intrinsicILTE }},
+	{"gt",              { 2,  &intrinsicGT }},
+	{"gte",             { 2,  &intrinsicGTE }},
+	{"igt",             { 2,  &intrinsicIGT }},
+	{"igte",            { 2,  &intrinsicIGTE }},
 	//
-	{"assert",          { 1,  &intrinsicAssert,      }},
+	{"assert",          { 1,  &intrinsicAssert }},
 
 	{"strlen32",        { 1,  &intrinsicStrlen<uint32_t> }},
 	{"strlen64",        { 1,  &intrinsicStrlen<uint64_t> }},
 
-	{"os.is.linux",     { 0,  &intrinsicOSIsLinux      }},
-	{"os.is.unix",      { 0,  &intrinsicOSIsUnix       }},
-	{"os.is.posix",     { 0,  &intrinsicOSIsPosix      }},
-	{"os.is.macos",     { 0,  &intrinsicOSIsMacOS      }},
-	{"os.is.bsd",       { 0,  &intrinsicOSIsBSD        }},
-	{"os.is.aix",       { 0,  &intrinsicOSIsAIX        }},
-	{"os.is.windows",   { 0,  &intrinsicOSIsWindows    }},
-	{"os.is.cygwin",    { 0,  &intrinsicOSIsCygwin     }},
+	{"os.is.linux",     { 0,  &intrinsicOSIsLinux }},
+	{"os.is.unix",      { 0,  &intrinsicOSIsUnix }},
+	{"os.is.posix",     { 0,  &intrinsicOSIsPosix }},
+	{"os.is.macos",     { 0,  &intrinsicOSIsMacOS }},
+	{"os.is.bsd",       { 0,  &intrinsicOSIsBSD }},
+	{"os.is.aix",       { 0,  &intrinsicOSIsAIX }},
+	{"os.is.windows",   { 0,  &intrinsicOSIsWindows }},
+	{"os.is.cygwin",    { 0,  &intrinsicOSIsCygwin }},
 };
 
-
 } // anonymous namespace
-
 
 Tribool::Value langOrNanycSpecifics(Analyzer& analyzer, const AnyString& name, uint32_t lvid, bool produceError) {
 	assert(not name.empty());
@@ -972,7 +932,6 @@ Tribool::Value langOrNanycSpecifics(Analyzer& analyzer, const AnyString& name, u
 	// intrinsic builtin found !
 	return ((it->second.second))(analyzer, lvid) ? Tribool::Value::yes : Tribool::Value::no;
 }
-
 
 } // namespace intrinsic
 } // namespace semantic

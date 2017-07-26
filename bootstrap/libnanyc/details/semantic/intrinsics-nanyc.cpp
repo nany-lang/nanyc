@@ -9,13 +9,11 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace semantic {
 namespace intrinsic {
 
 namespace {
-
 
 bool intrinsicReinterpret(Analyzer& seq, uint32_t lvid) {
 	assert(seq.pushedparams.func.indexed.size() == 2);
@@ -38,7 +36,6 @@ bool intrinsicReinterpret(Analyzer& seq, uint32_t lvid) {
 	return true;
 }
 
-
 bool intrinsicMemcheckerHold(Analyzer& seq, uint32_t lvid) {
 	seq.cdeftable.substitute(lvid).mutateToVoid();
 	uint32_t ptrlvid = seq.pushedparams.func.indexed[0].lvid;
@@ -54,17 +51,14 @@ bool intrinsicMemcheckerHold(Analyzer& seq, uint32_t lvid) {
 	return true;
 }
 
-
 using BuiltinIntrinsic = bool (*)(Analyzer&, uint32_t);
 
 static const std::unordered_map<AnyString, std::pair<uint32_t, BuiltinIntrinsic>> builtinDispatch = {
-	{"__reinterpret",            { 2,  &intrinsicReinterpret, }},
-	{"__nanyc_memchecker_hold",  { 2,  &intrinsicMemcheckerHold, }},
+	{"__reinterpret",            { 2, &intrinsicReinterpret }},
+	{"__nanyc_memchecker_hold",  { 2, &intrinsicMemcheckerHold }},
 };
 
-
 } // anonymous namespace
-
 
 Tribool::Value nanycSpecifics(Analyzer& analyzer, const AnyString& name, uint32_t lvid, bool produceError) {
 	assert(not name.empty());
@@ -83,7 +77,6 @@ Tribool::Value nanycSpecifics(Analyzer& analyzer, const AnyString& name, uint32_
 	// intrinsic builtin found !
 	return ((it->second.second))(analyzer, lvid) ? Tribool::Value::yes : Tribool::Value::no;
 }
-
 
 } // namespace intrinsic
 } // namespace semantic
