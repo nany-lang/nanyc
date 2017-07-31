@@ -252,6 +252,12 @@ inline void nop(IRCodeRef ref) {
 	ref.ircode.emit<isa::Op::nop>();
 }
 
+inline void as(IRCodeRef ref, uint32_t lvid, uint32_t source, CType from, CType to) {
+	auto& operands = ref.ircode.emit<isa::Op::as>();
+	operands.lvid = lvid;
+	operands.from = source;
+	operands.convert = CTypeConvertion(from, to).u32();
+}
 
 //! Copy two register
 inline void copy(IRCodeRef ref, uint32_t lvid, uint32_t source) {

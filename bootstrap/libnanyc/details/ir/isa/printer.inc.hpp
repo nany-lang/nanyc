@@ -81,6 +81,11 @@ namespace // anonymous
 			line() << '%' << operands.lvid << " = %" << operands.lhs << ' ' << opname << " %" << operands.rhs;
 		}
 
+		void print(const Operand<Op::as>& operands) {
+			auto convert = CTypeConvertion(operands.convert);
+			line() << '%' << operands.lvid << " = as %" << operands.from << ' '
+				<< ny::toString(convert.from()) << " -> " << ny::toString(convert.to());
+		}
 
 		void print(const Operand<Op::eq>& operands) {
 			printOperator(operands, "eq");

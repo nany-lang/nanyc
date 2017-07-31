@@ -36,6 +36,31 @@ enum class CType: uint32_t {
 	t_f64
 };
 
+struct CTypeConvertion final {
+	CTypeConvertion() = default;
+	CTypeConvertion(uint32_t value) {
+		data.u32 = value;
+	}
+	CTypeConvertion(CType from, CType to) {
+		assign(from, to);
+	}
+	CTypeConvertion(const CTypeConvertion&) = default;
+
+	void assign(CType from, CType to) {
+		data.fromTo[0] = static_cast<uint8_t>(from);
+		data.fromTo[1] = static_cast<uint8_t>(to);
+	}
+	CType from() const { return static_cast<CType>(data.fromTo[0]); }
+	CType to() const { return static_cast<CType>(data.fromTo[1]); }
+	uint32_t u32() const { return data.u32; }
+private:
+	union {
+		uint8_t fromTo[2];
+		uint32_t u32;
+	}
+	data;
+};
+
 constexpr uint32_t ctypeCount = static_cast<uint32_t>(CType::t_f64) + 1;
 
 CType toCType(const AnyString&);

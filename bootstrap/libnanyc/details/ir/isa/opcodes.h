@@ -57,6 +57,7 @@ enum class Op : std::uint32_t {
 	store,          ///< set a local variable
 	storeText,      ///< string literal
 	stackalloc,     ///< allocate a local variable on the stack
+	as,             ///< data convertion
 
 	jmp,            ///< unconditional jump
 	jz,             ///< jump if local variable is zero
@@ -181,6 +182,7 @@ enum class Op : std::uint32_t {
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::store) \
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::storeText) \
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::stackalloc) \
+			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::as) \
 			\
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::jmp) \
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::jz) \
