@@ -59,7 +59,7 @@ add_custom_command(
 	COMMENT "Update NSL std.core source files integer / float (i8, i16... f32, f64)"
 	COMMAND "$<TARGET_FILE:nanyc-devtool-nsl-integer-float-generator>"
 		"${CMAKE_CURRENT_SOURCE_DIR}/../../assets/license/header.ny"
-		"${CMAKE_CURRENT_SOURCE_DIR}/../../src/nsl/std.core"
+		"${CMAKE_CURRENT_SOURCE_DIR}/../../src/nsl/"
 	COMMAND "${CMAKE_COMMAND}" -E touch "${__nsl_update_stdcore_integer_float_srcs}"
 	DEPENDS
 		nanyc-devtool-nsl-integer-float-generator

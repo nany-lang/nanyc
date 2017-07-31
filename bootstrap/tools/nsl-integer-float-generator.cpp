@@ -344,13 +344,13 @@ int main(int argc, char** argv) {
 		String filename;
 		filename.reserve(1024);
 		for (uint32_t bits = 64; bits >= 8; bits /= 2) {
-			filename.clear() << folder << "/u" << bits << ".ny";
+			filename.clear() << folder << "/std.core/u" << bits << ".ny";
 			craftClassInt(out, bits, false, license, filename);
-			filename.clear() << folder << "/i" << bits << ".ny";
+			filename.clear() << folder << "/std.core/i" << bits << ".ny";
 			craftClassInt(out, bits, true,  license, filename);
 		}
 		for (uint32_t bits = 64; bits >= 32; bits /= 2) {
-			filename.clear() << folder << "/f" << bits << ".ny";
+			filename.clear() << folder << "/std.core/f" << bits << ".ny";
 			craftClassFloat(out, bits, license, filename);
 		}
 		return 0;
