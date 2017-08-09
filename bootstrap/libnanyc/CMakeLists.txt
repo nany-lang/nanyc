@@ -51,6 +51,21 @@ add_custom_command(
 	VERBATIM
 )
 
+set(__nsl_update_stdcore_integer_float_srcs
+	"${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/__nsl_update_stdcore_integer_float_srcs"
+)
+add_custom_command(
+	OUTPUT "${__nsl_update_stdcore_integer_float_srcs}"
+	COMMENT "Update NSL std.core source files integer / float (i8, i16... f32, f64)"
+	COMMAND "$<TARGET_FILE:nanyc-devtool-nsl-integer-float-generator>"
+		"${CMAKE_CURRENT_SOURCE_DIR}/../../assets/license/header.ny"
+		"${CMAKE_CURRENT_SOURCE_DIR}/../../src/nsl/"
+	COMMAND "${CMAKE_COMMAND}" -E touch "${__nsl_update_stdcore_integer_float_srcs}"
+	DEPENDS
+		nanyc-devtool-nsl-integer-float-generator
+	VERBATIM
+)
+
 list(LENGTH nsl_files nsl_files_count)
 nmessage("standard library: ${nsl_files_count} files")
 
@@ -71,6 +86,7 @@ add_library(libnanyc ${mode_libnany}
 	"${libnany_config_folder}/libnanyc-traces.h"
 	"${libnany_config_folder}/libnanyc-version.h"
 	"${__embed_nsl_hxx}"
+	"${__nsl_update_stdcore_integer_float_srcs}"
 	"details/ast/ast.cpp"
 	"details/ast/ast.h"
 	"details/ast/ast.hxx"
@@ -343,7 +359,6 @@ target_include_directories(libnanyc PRIVATE "${__embed_nsl_hxx_dir}")
 target_include_directories(libnanyc-grammar PUBLIC "${CMAKE_CURRENT_BINARY_DIR}")
 
 add_dependencies(libnanyc nanyc-grammar-cpp)
-add_dependencies(libnanyc nyt-nanyfile-to-cstring)
 
 install(
 	TARGETS libnanyc
@@ -362,7 +377,6 @@ if (YUNI_COMPILER_IS_CLANG)
 		target_include_directories(${target}_analyze PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../ext/dyncall/")
 		target_include_directories(${target}_analyze PUBLIC  "${CMAKE_CURRENT_LIST_DIR}")
 		add_dependencies(${target}_analyze nanyc-grammar-cpp)
-		add_dependencies(${target}_analyze nyt-nanyfile-to-cstring)
 	endfunction()
 	add_clang_static_analysis(libnanyc)
 endif()
