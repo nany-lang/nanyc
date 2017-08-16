@@ -245,7 +245,7 @@ bool App::statstics(int64_t duration) {
 		}
 		else {
 			setcolor(yuni::System::Console::red);
-			std::cout << "  ERR  ";
+			std::cout << "  FAIL ";
 			resetcolor();
 		}
 		std::cout << result.entry.module << '/' << result.entry.name;
