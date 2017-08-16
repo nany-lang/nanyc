@@ -4,9 +4,10 @@ stages:
     - artifacts
 
 variables:
+    CLICOLOR_FORCE: 1
     GIT_SUBMODULE_STRATEGY: recursive
-    VERBOSE: '1'
     NANYC_VERSION: '0.4.0'
+    VERBOSE: '1'
 
 
 # build
@@ -60,12 +61,12 @@ variables:
         - mkdir -p build/packages
         - cd build/bootstrap
         - cmake ../../bootstrap -DCMAKE_BUILD_TYPE=release
-            -DWITH_PACKAGE_DEB=ON
-            -DCMAKE_INSTALL_PREFIX=/
             -DCMAKE_INSTALL_BINDIR=usr/bin
-            -DCMAKE_INSTALL_LIBDIR=usr/lib
             -DCMAKE_INSTALL_INCLUDEDIR=usr/include
+            -DCMAKE_INSTALL_LIBDIR=usr/lib
+            -DCMAKE_INSTALL_PREFIX=/
             -DNANYC_COLLECTION_SYSTEM_PATH=/usr/share/nanyc/${NANYC_VERSION}/nsl
+            -DWITH_PACKAGE_DEB=ON
         - cmake --build . --config release --target all -- -j $(nproc)
         - make_package() {
             COM=$1;
