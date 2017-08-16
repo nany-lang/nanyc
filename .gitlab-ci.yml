@@ -4,6 +4,7 @@ stages:
     - artifacts
 
 variables:
+    CLICOLOR_FORCE: 1
     GIT_SUBMODULE_STRATEGY: recursive
     NANYC_VERSION: '0.4.0'
     VERBOSE: '1'
