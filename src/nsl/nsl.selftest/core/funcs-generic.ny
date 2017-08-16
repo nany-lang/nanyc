@@ -11,3 +11,23 @@ func genericFuncStandalone {
 unittest std.core.funcs.generics.standalone {
 	genericFuncStandalone();
 }
+
+class ClassWithGenericFunc {
+	func foo<:T:> {
+	}
+}
+
+unittest std.core.funcs.generics.withinClass {
+	var x = new ClassWithGenericFunc;
+	x.foo<:bool:>();
+}
+
+class GenClassWithGenericFunc<:T:> {
+	func bar<:T:> {
+	}
+}
+
+unittest std.core.funcs.generics.withinGenericClass {
+	var x = new GenClassWithGenericFunc<:bool:>;
+	x.bar<:bool:>();
+}
