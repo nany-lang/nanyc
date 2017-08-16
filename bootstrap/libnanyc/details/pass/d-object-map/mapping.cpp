@@ -244,14 +244,14 @@ struct OpcodeReader final {
 		assertLvid(operands, paramuint32_t);
 		auto kind = static_cast<ir::isa::Blueprint>(operands.kind);
 		assert(kind == ir::isa::Blueprint::param or kind == ir::isa::Blueprint::paramself
-			   or kind == ir::isa::Blueprint::gentypeparam);
+			or kind == ir::isa::Blueprint::gentypeparam);
 		bool isGenTypeParam = (kind == ir::isa::Blueprint::gentypeparam);
 		if (unlikely(not isGenTypeParam and not frame.atom.isFunction()))
 			throw EOperand(ircode, operands, "parameter for non-function");
 		CLID clid{frame.atom.atomid, paramuint32_t};
 		AnyString name = ircode.stringrefs[operands.name];
 		auto& parameters = (not isGenTypeParam)
-						   ? frame.atom.parameters : frame.atom.tmplparams;
+			? frame.atom.parameters : frame.atom.tmplparams;
 		parameters.append(clid, name);
 		if (frame.capture.enabled())
 			frame.capture.knownVars[name] = frame.scope;
