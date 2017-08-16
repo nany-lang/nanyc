@@ -291,11 +291,11 @@ bool FuncInspector::inspectParameters(AST::Node* node, AST::Node* nodeTypeParams
 	}
 	// iterating through all other user-defined parameters
 	uint32_t offset = (hasImplicitSelf) ? 1u : 0u;
-	if (paramCount - offset > 0U) {
-		// already checked before
+	bool hasParameters = paramCount - offset > 0u;
+	// declare all parameters first
+	uint32_t paramOffsets[config::maxPushedParameters];
+	if (hasParameters) {
 		assert(paramCount - offset < config::maxPushedParameters);
-		// declare all parameters first
-		uint32_t paramOffsets[config::maxPushedParameters];
 		for (uint32_t i = offset; i < paramCount; ++i) { // reserving lvid for each parameter
 			uint32_t opaddr = ir::emit::blueprint::param(irout, scope.nextvar(), nullptr);
 			paramOffsets[i - offset] = opaddr;
@@ -303,10 +303,12 @@ bool FuncInspector::inspectParameters(AST::Node* node, AST::Node* nodeTypeParams
 		// reserve registers (as many as parameters) for cloning parameters
 		for (uint32_t i = 0u; i != paramCount; ++i)
 			ir::emit::alloc(irout, scope.nextvar());
-		// Generating ir for template parameters before the ir code for parameters
-		// (especially for being able to use these types)
-		if (nodeTypeParams)
-			success &= scope.visitASTDeclGenericTypeParameters(*nodeTypeParams);
+	}
+	// Generating ir for template parameters before the ir code for parameters
+	// (especially for being able to use these types)
+	if (nodeTypeParams)
+		success &= scope.visitASTDeclGenericTypeParameters(*nodeTypeParams);
+	if (hasParameters) {
 		// inspecting each parameter
 		ir::emit::trace(irout, "function parameters");
 		// Generate ir (typing and default value) for each parameter
