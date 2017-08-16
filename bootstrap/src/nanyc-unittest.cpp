@@ -5,6 +5,7 @@
 #include <yuni/core/string.h>
 #include <yuni/core/system/console/console.h>
 #include <yuni/core/system/cpu.h>
+#include <yuni/core/system/environment.h>
 #include <yuni/datetime/timestamp.h>
 #include <yuni/io/filename-manipulation.h>
 #include <yuni/job/queue/service.h>
@@ -429,7 +430,8 @@ void prepare(App& app, int argc, char** argv) {
 			throw "invalid null timeout (-t,--timeout)";
 		bool istty = yuni::System::Console::IsStdoutTTY();
 		app.interactive = not nointeractive and istty;
-		app.colors = (not nocolors) and istty;
+		app.colors = (not nocolors)
+			and (istty or yuni::System::Environment::ReadAsBool("CLICOLOR_FORCE"));
 		app.argv0 = argv[0];
 		app.jobs = numberOfJobs(app.jobs);
 		app.fetch();
