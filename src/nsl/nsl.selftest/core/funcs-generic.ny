@@ -31,3 +31,15 @@ unittest std.core.funcs.generics.withinGenericClass {
 	var x = new GenClassWithGenericFunc<:bool:>;
 	x.bar<:bool:>();
 }
+
+func genericFuncParam<:T:>
+	-> new T;
+
+unittest std.core.funcs.generics.print.simpletype {
+	print(genericFuncParam<:u32:>());
+}
+
+unittest std.core.funcs.generics.identity {
+	32i = genericFuncParam<:i32:>();
+	32u = genericFuncParam<:u32:>();
+}
