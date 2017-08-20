@@ -6,14 +6,11 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace ir {
 namespace Producer {
 
-
 namespace {
-
 
 bool declSingleGenericTypeParameter(Scope& scope, AST::Node& node) {
 	assert(node.rule == AST::rgFuncParam);
@@ -28,13 +25,11 @@ bool declSingleGenericTypeParameter(Scope& scope, AST::Node& node) {
 				break;
 			}
 			case AST::rgVarType: {
-				error(child)
-						<< "type definition for generic type parameters is currently not supported";
+				error(child) << "type definition for generic type parameters is currently not supported";
 				return false;
 			}
 			case AST::rgVarAssign: {
-				error(child)
-						<< "default value for generic type parameters not implemented";
+				error(child) << "default value for generic type parameters not implemented";
 				return false;
 			}
 			default:
@@ -43,7 +38,6 @@ bool declSingleGenericTypeParameter(Scope& scope, AST::Node& node) {
 	}
 	return true;
 }
-
 
 bool exprTemplateParameter(Scope& scope, AST::Node& node) {
 	assert(node.rule == AST::rgCallTemplateParameter or node.rule == AST::rgCallTemplateNamedParameter);
@@ -74,9 +68,7 @@ bool exprTemplateParameter(Scope& scope, AST::Node& node) {
 	return true;
 }
 
-
 } // namespace
-
 
 bool Scope::visitASTDeclGenericTypeParameters(AST::Node& node) {
 	assert(node.rule == AST::rgClassTemplateParams);
@@ -96,7 +88,6 @@ bool Scope::visitASTDeclGenericTypeParameters(AST::Node& node) {
 	}
 	return success;
 }
-
 
 bool Scope::visitASTExprTemplate(AST::Node& node, uint32_t& localvar) {
 	assert(node.rule == AST::rgExprTemplate or node.rule == AST::rgExprTypeTemplate);
@@ -140,7 +131,6 @@ bool Scope::visitASTExprTemplate(AST::Node& node, uint32_t& localvar) {
 	}
 	return true;
 }
-
 
 } // namespace Producer
 } // namespace ir
