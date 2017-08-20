@@ -1,20 +1,16 @@
 #pragma once
 #include "atom.h"
 
-
 namespace ny {
-
 
 inline bool AtomRaisedErrors::empty() const {
 	return m_byType.empty();
 }
 
-
 inline void AtomRaisedErrors::add(const Atom& type, const Atom& from, uint32_t line, uint32_t column) {
 	auto& origins = m_byType[&type];
 	origins.emplace_back(from, line, column);
 }
-
 
 inline void AtomRaisedErrors::add(const Atom& type, const std::vector<AtomRaisedErrors::Origin>& origins) {
 	auto& details = m_byType[&type];
@@ -22,13 +18,11 @@ inline void AtomRaisedErrors::add(const Atom& type, const std::vector<AtomRaised
 		details.emplace_back(origin);
 }
 
-
 inline void AtomRaisedErrors::add(const AtomRaisedErrors& other) {
 	other.each([this](const Atom& type, auto& origin) {
 		add(type, origin);
 	});
 }
-
 
 template<class T>
 inline void AtomRaisedErrors::each(T&& callback) const {
@@ -36,11 +30,9 @@ inline void AtomRaisedErrors::each(T&& callback) const {
 		callback(*pair.first, pair.second);
 }
 
-
 inline uint32_t Atom::Instances::size() const {
 	return static_cast<uint32_t>(m_instances.size());
 }
-
 
 inline Atom* Atom::parentScope() {
 	return (!scopeForNameResolution) ? parent : scopeForNameResolution;
@@ -50,159 +42,128 @@ inline const Atom* Atom::parentScope() const {
 	return (!scopeForNameResolution) ? parent : scopeForNameResolution;
 }
 
-
 inline AnyString Atom::name() const {
 	return m_name;
 }
 
-
 inline bool Atom::canCaptureVariabes() const {
 	return flags.has(Flags::captureVariables)
-		   or (isClassMember() and parent->flags.has(Flags::captureVariables));
+		or (isClassMember() and parent->flags.has(Flags::captureVariables));
 }
-
 
 inline CLID Atom::clid() const {
 	return CLID::AtomMapID(atomid);
 }
 
-
 inline bool Atom::isNamespace() const {
 	return type == Type::namespacedef;
 }
-
 
 inline bool Atom::isClass() const {
 	return type == Type::classdef;
 }
 
-
 inline bool Atom::isAnonymousClass() const {
 	return type == Type::classdef and m_name.empty();
 }
-
 
 inline bool Atom::callable() const {
 	return isFunction() or (isClass() and hasMember("^()"));
 }
 
-
 inline bool Atom::isCtor() const {
 	return category(Category::ctor);
 }
-
 
 inline bool Atom::isDtor() const {
 	return category(Category::dtor);
 }
 
-
 inline bool Atom::isCloneCtor() const {
 	return category(Category::clone);
 }
-
 
 inline bool Atom::isUnit() const {
 	return type == Type::unit;
 }
 
-
 inline bool Atom::isTypeAlias() const {
 	return type == Type::typealias;
 }
-
 
 inline bool Atom::isFunction() const {
 	return type == Type::funcdef;
 }
 
-
 inline bool Atom::isOperator() const {
 	return category(Category::funcoperator);
 }
-
 
 inline bool Atom::isSpecial() const {
 	return category(Category::special);
 }
 
-
 inline bool Atom::isView() const {
 	return category(Category::view);
 }
-
 
 inline bool Atom::isFunctor() const {
 	return category(Category::functor);
 }
 
-
 inline bool Atom::isCapturedVariable() const {
 	return category(Category::capturedVar);
 }
-
 
 inline bool Atom::isMemberVarDefaultInit() const {
 	return category(Category::defvarInit);
 }
 
-
 inline bool Atom::isMemberVariable() const {
 	return (type == Type::vardef) and category(Category::classParent);
 }
-
 
 inline bool Atom::isClassMember() const {
 	return (type != Type::classdef) and category(Category::classParent);
 }
 
-
 inline bool Atom::isPropertyGet() const {
 	return category(Category::propget);
 }
-
 
 inline bool Atom::isPropertySet() const {
 	return category(Category::propset);
 }
 
-
 inline bool Atom::isPropertySetCustom() const {
 	return category(Category::propsetCustom);
 }
-
 
 inline bool Atom::isProperty() const {
 	return isPropertyGet() or isPropertySet() or isPropertySetCustom();
 }
 
-
 inline bool Atom::isUnittest() const {
 	return category(Category::unittest);
 }
-
 
 inline bool Atom::isPublicOrPublished() const {
 	return (visibility == Visibility::vpublic) or (visibility == Visibility::vpublished);
 }
 
-
 inline bool Atom::hasReturnType() const {
 	return not returnType.clid.isVoid();
 }
-
 
 inline bool Atom::hasGenericParameters() const {
 	return not tmplparams.empty();
 }
 
-
 inline bool Atom::isContextual() const {
 	return hasGenericParameters() // generic classes
-		   or m_name.empty() // anonymous classes
-		   or (parent and parent->isFunction()); // anything inside a func which may depend from parameters
+		or m_name.empty() // anonymous classes
+		or (parent and parent->isFunction()); // anything inside a func which may depend from parameters
 }
-
 
 template<class C>
 inline void Atom::eachChild(const C& callback) {
@@ -220,11 +181,9 @@ inline void Atom::eachChild(const C& callback) const {
 	}
 }
 
-
 inline bool Atom::hasMember(const AnyString& name) const {
 	return (m_children.count(name) != 0);
 }
-
 
 template<class C>
 inline void Atom::eachChild(const AnyString& needle, const C& callback) {
@@ -236,7 +195,6 @@ inline void Atom::eachChild(const AnyString& needle, const C& callback) {
 	}
 }
 
-
 template<class C>
 inline void Atom::eachChild(const AnyString& needle, const C& callback) const {
 	assert(not needle.empty());
@@ -247,12 +205,10 @@ inline void Atom::eachChild(const AnyString& needle, const C& callback) const {
 	}
 }
 
-
 inline void Atom::Parameters::swap(Parameters& rhs) {
 	std::swap(pData, rhs.pData);
 	std::swap(shortcircuitValue, rhs.shortcircuitValue);
 }
-
 
 template<class T>
 inline void Atom::Parameters::each(const T& callback) const {
@@ -266,88 +222,71 @@ inline void Atom::Parameters::each(const T& callback) const {
 	}
 }
 
-
 inline uint Atom::Parameters::size() const {
 	return (!!pData) ? pData.get()->count : 0;
 }
 
-
 inline bool Atom::Parameters::empty() const {
 	return !pData;
 }
-
 
 inline const AnyString& Atom::Parameters::name(uint index) const {
 	assert(!!pData and index < pData->count);
 	return pData->params[index].first;
 }
 
-
 inline const Vardef& Atom::Parameters::vardef(uint index) const {
 	assert(!!pData and index < pData->count);
 	return pData->params[index].second;
 }
-
 
 inline const std::pair<AnyString, Vardef>& Atom::Parameters::operator [] (uint index) const {
 	assert(!!pData and index < pData->count);
 	return pData->params[index];
 }
 
-
 inline uint64_t Atom::runtimeSizeof() const {
 	return classinfo.nextFieldIndex * sizeof(uint64_t);
 }
-
 
 inline uint32_t Atom::childrenCount() const {
 	return (uint32_t) m_children.size();
 }
 
-
 inline bool Atom::hasChildren() const {
 	return not m_children.empty();
 }
 
-
 inline Atom::Instances::Ref Atom::Instances::operator [] (uint32_t index) {
 	return Ref(*this, index);
 }
-
 
 inline ir::Sequence* Atom::Instances::Ref::ircodeIfExists() {
 	return (m_index < m_ref.m_instances.size())
 		   ? m_ref.m_instances[m_index].ircode.get() : nullptr;
 }
 
-
 inline ir::Sequence& Atom::Instances::Ref::ircode() {
 	assert(m_index < m_ref.m_instances.size());
 	return *(m_ref.m_instances[m_index].ircode.get());
 }
 
-
 inline AnyString Atom::Instances::Ref::symbolname() const {
 	return (m_index < m_ref.m_instances.size())
-		   ? AnyString{m_ref.m_instances[m_index].symbol} :
-		   AnyString{};
+		? AnyString{m_ref.m_instances[m_index].symbol} : AnyString{};
 }
-
 
 inline uint32_t Atom::Instances::Ref::id() const {
 	return m_index;
 }
 
-
 inline void Atom::Instances::Ref::update(YString&& symbol, const Classdef& rettype) {
 	m_ref.update(m_index, std::move(symbol), rettype);
 }
-
 
 inline uint32_t Atom::Instances::Ref::invalidate(const Signature& signature) {
 	m_ref.invalidate(m_index, signature);
 	return (uint32_t) - 1;
 }
-
 
 } // namespace ny

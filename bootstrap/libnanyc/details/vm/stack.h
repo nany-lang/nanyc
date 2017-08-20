@@ -3,29 +3,19 @@
 
 #define NANY_vm_STACK_TRACES 0
 
-
 namespace ny {
 namespace vm {
 
-/*!
-** \brief Stack implementation
-*/
+//! Stack implementation
 class Stack final {
 public:
 	Stack();
 	Stack(const Stack&) = delete;
 	~Stack();
-
-	/*!
-	** \brief Push a new frame and allocates registers
-	*/
+	//! Push a new frame and allocates registers
 	Register* push(uint32_t count);
-
-	/*!
-	** \brief Remove the last frame
-	*/
+	//! Remove the last frame
 	void pop(uint32_t count);
-
 	//! Operator =
 	Stack& operator = (const Stack&) = delete;
 
@@ -64,8 +54,6 @@ private:
 	uint32_t stacksize = 0u;
 #endif
 };
-
-
 
 } // namespace vm
 } // namespace ny

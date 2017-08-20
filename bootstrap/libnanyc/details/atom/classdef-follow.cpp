@@ -2,9 +2,7 @@
 
 using namespace Yuni;
 
-
 namespace ny {
-
 
 void ClassdefFollow::print(Yuni::String& out, bool clearBefore) const {
 	if (clearBefore)
@@ -16,6 +14,5 @@ void ClassdefFollow::print(Yuni::String& out, bool clearBefore) const {
 	for (auto& pair : pushedNamedParams)
 		out << "        follow call " << pair.first << " param \"" << pair.second << "\"\n";
 }
-
 
 } // namespace ny

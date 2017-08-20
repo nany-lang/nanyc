@@ -4,12 +4,9 @@
 #include "details/ir/fwd.h"
 #include "details/atom/ctype.h"
 
-
 namespace ny {
 
-
 struct ClassdefTable;
-
 
 /*!
 ** \brief Atoms
@@ -52,7 +49,6 @@ struct AtomMap final {
 	//! Try to retrieve the corresponding classes for core objects (bool, i32...)
 	bool fetchAndIndexCoreObjects();
 
-
 public:
 	//! The root atom (global namespace)
 	Atom root;
@@ -76,7 +72,6 @@ private:
 	friend struct ClassdefTable;
 
 }; // struct AtomMap
-
 
 } // namespace ny
 

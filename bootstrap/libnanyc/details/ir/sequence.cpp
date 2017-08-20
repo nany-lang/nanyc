@@ -5,10 +5,8 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace ir {
-
 
 Sequence::Sequence(const Sequence& other, uint32_t offset)
 		: stringrefs(other.stringrefs) {
@@ -21,11 +19,9 @@ Sequence::Sequence(const Sequence& other, uint32_t offset)
 	}
 }
 
-
 Sequence::~Sequence() {
 	free(m_body);
 }
-
 
 void Sequence::moveCursorFromBlueprintToEnd(const Instruction*& cursor) const {
 	assert((*cursor).opcodes[0] == static_cast<uint32_t>(ir::isa::Op::blueprint));
@@ -41,7 +37,6 @@ void Sequence::moveCursorFromBlueprintToEnd(const Instruction*& cursor) const {
 	}
 }
 
-
 void Sequence::moveCursorFromBlueprintToEnd(Instruction*& cursor) const {
 	assert((*cursor).opcodes[0] == static_cast<uint32_t>(ir::isa::Op::blueprint));
 	if ((*cursor).opcodes[0] == static_cast<uint32_t>(ir::isa::Op::blueprint)) {
@@ -56,7 +51,6 @@ void Sequence::moveCursorFromBlueprintToEnd(Instruction*& cursor) const {
 	}
 }
 
-
 void Sequence::clear() {
 	m_size = 0;
 	free(m_body);
@@ -64,7 +58,6 @@ void Sequence::clear() {
 	m_body = nullptr;
 	stringrefs.clear();
 }
-
 
 void Sequence::grow(uint32_t count) {
 	assert(count > 0);
@@ -80,7 +73,6 @@ void Sequence::grow(uint32_t count) {
 	m_capacity = newCapacity;
 }
 
-
 void Sequence::print(YString& out, const AtomMap* atommap, uint32_t offset) const {
 	out.reserve(out.size() + (m_size * 100)); // arbitrary
 	ir::isa::Printer<String> printer{out, *this};
@@ -89,9 +81,7 @@ void Sequence::print(YString& out, const AtomMap* atommap, uint32_t offset) cons
 	each(printer, offset);
 }
 
-
 namespace {
-
 
 struct WalkerIncreaseLVID final {
 	WalkerIncreaseLVID(ir::Sequence& ircode, uint32_t inc, uint32_t greaterThan)
@@ -160,16 +150,13 @@ struct WalkerIncreaseLVID final {
 	Sequence& ircode;
 };
 
-
 } // anonymous namespace
-
 
 void Sequence::increaseAllLVID(uint32_t inc, uint32_t greaterThan, uint32_t offset) {
 	assert(inc > 0 and "this method should not be called if nothing to do");
 	WalkerIncreaseLVID walker{*this, inc, greaterThan};
 	each(walker, offset);
 }
-
 
 } // namespace ir
 } // namespace ny

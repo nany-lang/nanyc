@@ -17,21 +17,16 @@
 #include "details/atom/visibility.h"
 #include "details/atom/ctype.h"
 
-
 namespace ny {
-
 
 struct AtomMap;
 struct ClassdefTable;
 struct ClassdefTableView;
 namespace ir { struct Sequence; }
 
-
 } // namespace ny
 
-
 namespace ny {
-
 
 struct AtomRaisedErrors final {
 	struct Origin final {
@@ -61,7 +56,6 @@ struct AtomRaisedErrors final {
 private:
 	std::unordered_map<const Atom*, std::vector<Origin>> m_byType;
 };
-
 
 //! Definition of a single class or function
 struct Atom final
@@ -553,7 +547,6 @@ private:
 	friend struct AtomMap;
 
 }; // class Atom
-
 
 } // namespace ny
 

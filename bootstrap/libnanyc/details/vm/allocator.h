@@ -3,7 +3,6 @@
 #include "libnanyc.h"
 #include <cassert>
 
-
 namespace ny {
 namespace vm {
 namespace memory {
@@ -153,6 +152,6 @@ struct Allocator final {
 	}
 };
 
-} // namespace memory
-} // namespace vm
-} // namespace
+} // memory
+} // vm
+} // ny

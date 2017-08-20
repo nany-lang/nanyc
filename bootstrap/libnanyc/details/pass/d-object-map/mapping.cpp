@@ -6,13 +6,10 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace Pass {
 
-
 namespace {
-
 
 struct EOperand final: public ny::complain::Opcode {
 	template<ir::isa::Op O>
@@ -21,14 +18,12 @@ struct EOperand final: public ny::complain::Opcode {
 	}
 };
 
-
 template<class T>
 inline void rememberFirstAtomCreated(T& mapping, Atom& atom) {
 	mapping.options.firstAtomCreated = &atom;
 	if (mapping.firstAtomOwnSequence)
 		atom.opcodes.owned = true;
 }
-
 
 //! Stack frame per atom definition (class, func)
 struct AtomStackFrame final {
@@ -98,7 +93,6 @@ struct OpcodeReader final {
 		lastPushedIndexedParameters.reserve(8);
 	}
 
-
 	template<ir::isa::Op O>
 	void assertLvid(const ir::isa::Operand<O>& operands, uint32_t lvid) {
 		if (debugmode) {
@@ -109,19 +103,16 @@ struct OpcodeReader final {
 		}
 	}
 
-
 	void pushNewFrame(Atom& atom) {
 		std::unique_ptr<AtomStackFrame> next{atomStack.release()};
 		atomStack = std::make_unique<AtomStackFrame>(atom, next);
 	}
-
 
 	void resetClassdefOriginFromCurrentPosition(Classdef& cdef) {
 		cdef.origins.filename = currentFilename;
 		cdef.origins.line     = currentLine;
 		cdef.origins.offset   = currentOffset;
 	}
-
 
 	void attachFuncCall(const ir::isa::Operand<ir::isa::Op::call>& operands) {
 		assertLvid(operands, operands.ptr2func);
@@ -153,7 +144,6 @@ struct OpcodeReader final {
 			}
 		}
 	}
-
 
 	void mapBlueprintFuncdefOrTypedef(ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
 		// functions and typedef are instanciated the sameway (with some minor differences)
@@ -203,7 +193,6 @@ struct OpcodeReader final {
 			rememberFirstAtomCreated(*this, newatom);
 	}
 
-
 	void mapBlueprintClassdef(ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
 		// registering the blueprint into the outline...
 		Atom& atom = atomStack->currentAtomNotUnit();
@@ -244,7 +233,6 @@ struct OpcodeReader final {
 			rememberFirstAtomCreated(*this, newClassAtom);
 	}
 
-
 	void mapBlueprintParam(ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
 		auto& frame = *atomStack;
 		// calculating the lvid for the current parameter
@@ -282,7 +270,6 @@ struct OpcodeReader final {
 		}
 	}
 
-
 	void mapBlueprintVardef(ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
 		// registering the blueprint into the outline...
 		Atom& atom = atomStack->currentAtomNotUnit();
@@ -301,7 +288,6 @@ struct OpcodeReader final {
 			rememberFirstAtomCreated(*this, newVarAtom);
 	}
 
-
 	void mapBlueprintNamespace(ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
 		AnyString nmname = ircode.stringrefs[operands.name];
 		Atom& parentAtom = atomStack->currentAtomNotUnit();
@@ -310,7 +296,6 @@ struct OpcodeReader final {
 		cdeftable.registerAtom(newRoot);
 		pushNewFrame(newRoot);
 	}
-
 
 	void mapBlueprintUnit(ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
 		Atom& parentAtom = atomStack->currentAtomNotUnit();
@@ -321,7 +306,6 @@ struct OpcodeReader final {
 		assert(newRoot.atomid != 0);
 		pushNewFrame(newRoot);
 	}
-
 
 	void visit(ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
 		if (unlikely(nullptr == atomStack))
@@ -357,7 +341,6 @@ struct OpcodeReader final {
 			}
 		}
 	}
-
 
 	void visit(ir::isa::Operand<ir::isa::Op::pragma>& operands) {
 		if (unlikely(nullptr == atomStack))
@@ -395,7 +378,6 @@ struct OpcodeReader final {
 		}
 	}
 
-
 	void visit(ir::isa::Operand<ir::isa::Op::stacksize>& operands) {
 		if (unlikely(nullptr == atomStack))
 			throw EOperand(ircode, operands, "invalid parent atom");
@@ -424,14 +406,12 @@ struct OpcodeReader final {
 		}
 	}
 
-
 	void visit(ir::isa::Operand<ir::isa::Op::scope>& operands) {
 		if (unlikely(nullptr == atomStack))
 			throw EOperand(ircode, operands, "invalid stack");
 		++(atomStack->scope);
 		lastuint32_t = 0;
 	}
-
 
 	void visit(ir::isa::Operand<ir::isa::Op::end>&) {
 		// reset the last lvid
@@ -465,7 +445,6 @@ struct OpcodeReader final {
 		}
 	}
 
-
 	void visit(ir::isa::Operand<ir::isa::Op::stackalloc>& operands) {
 		assertLvid(operands, operands.lvid);
 		lastuint32_t = operands.lvid;
@@ -487,7 +466,6 @@ struct OpcodeReader final {
 				break;
 		}
 	}
-
 
 	void visit(ir::isa::Operand<ir::isa::Op::self>& operands) {
 		assertLvid(operands, operands.self);
@@ -512,7 +490,6 @@ struct OpcodeReader final {
 		// fallback - complainOperand
 		throw EOperand(ircode, operands, "failed to find parent class for 'resolveAsSelf'");
 	}
-
 
 	void visit(ir::isa::Operand<ir::isa::Op::identify>& operands) {
 		assertLvid(operands, operands.lvid);
@@ -560,17 +537,14 @@ struct OpcodeReader final {
 		}
 	}
 
-
 	void visit(ir::isa::Operand<ir::isa::Op::identifyset>& operands) {
 		auto& newopc = ir::Instruction::fromOpcode(operands).to<ir::isa::Op::identify>();
 		visit(newopc);
 	}
 
-
 	void visit(ir::isa::Operand<ir::isa::Op::tpush>& operands) {
 		assertLvid(operands, operands.lvid);
 	}
-
 
 	void visit(ir::isa::Operand<ir::isa::Op::push>& operands) {
 		assertLvid(operands, operands.lvid);
@@ -585,14 +559,12 @@ struct OpcodeReader final {
 		}
 	}
 
-
 	void visit(ir::isa::Operand<ir::isa::Op::call>& operands) {
 		attachFuncCall(operands);
 		lastuint32_t = operands.lvid;
 		lastPushedIndexedParameters.clear();
 		lastPushedNamedParameters.clear();
 	}
-
 
 	void visit(ir::isa::Operand<ir::isa::Op::ret>& operands) {
 		if (operands.lvid != 0) {
@@ -604,7 +576,6 @@ struct OpcodeReader final {
 			followup.extends.push_back(classdef);
 		}
 	}
-
 
 	void visit(ir::isa::Operand<ir::isa::Op::follow>& operands) {
 		assertLvid(operands, operands.lvid);
@@ -618,11 +589,9 @@ struct OpcodeReader final {
 			cdeftable.classdef(clidFollower).followup.extends.push_back(clid);
 	}
 
-
 	void visit(ir::isa::Operand<ir::isa::Op::intrinsic>& operands) {
 		assertLvid(operands, operands.lvid);
 	}
-
 
 	void visit(ir::isa::Operand<ir::isa::Op::debugfile>& operands) {
 		currentFilename = ircode.stringrefs[operands.filename].c_str();
@@ -631,7 +600,6 @@ struct OpcodeReader final {
 			atomStack->atom.origin.filename = currentFilename;
 		}
 	}
-
 
 	void visit(ir::isa::Operand<ir::isa::Op::debugpos>& operands) {
 		currentLine = operands.line;
@@ -642,7 +610,6 @@ struct OpcodeReader final {
 			atomStack->atom.origin.offset = currentOffset;
 		}
 	}
-
 
 	void visit(ir::isa::Operand<ir::isa::Op::qualifiers>& operands) {
 		assert(static_cast<uint32_t>(operands.qualifier) < ir::isa::TypeQualifierCount);
@@ -662,9 +629,7 @@ struct OpcodeReader final {
 		}
 	}
 
-
-	template<ir::isa::Op O>
-	void visit(ir::isa::Operand<O>& operands) {
+	template<ir::isa::Op O> void visit(ir::isa::Operand<O>& operands) {
 		switch (O) {
 			// all following opcodes can be safely ignored
 			case ir::isa::Op::allocate:
@@ -697,13 +662,11 @@ struct OpcodeReader final {
 		}
 	}
 
-
 	bool operator () (Atom& parentAtom, uint32_t offset) {
 		atomStack = std::make_unique<AtomStackFrame>(parentAtom);
 		ircode.each(*this, offset);
 		return success;
 	}
-
 
 	//! The classdef table (must be protected by 'mutex' in some passes)
 	ClassdefTable& cdeftable;
@@ -731,14 +694,11 @@ struct OpcodeReader final {
 	uint32_t currentOffset = 0;
 	MappingOptions& options;
 	bool success = true;
-
 	//! cursor for iterating through all opcocdes
 	ir::Instruction** cursor = nullptr;
 };
 
-
 } // anonymous namespace
-
 
 static void retriveReportMetadata(void* self, Logs::Level level, const AST::Node*, String& filename,
 		uint32_t& line, uint32_t& offset) {
@@ -748,7 +708,6 @@ static void retriveReportMetadata(void* self, Logs::Level level, const AST::Node
 	line        = sb.currentLine;
 	offset      = sb.currentOffset;
 }
-
 
 bool map(Atom& parent, ClassdefTable& cdeftable, Mutex& mutex, ir::Sequence& ircode, MappingOptions& options) {
 	try {
@@ -762,7 +721,6 @@ bool map(Atom& parent, ClassdefTable& cdeftable, Mutex& mutex, ir::Sequence& irc
 	}
 	return false;
 }
-
 
 } // namespace Pass
 } // namespace ny

@@ -2,7 +2,6 @@
 #include "libnanyc.h"
 #include <cstring>
 
-
 namespace {
 
 nyio_type_t nyinx_io_devnull_stat(nyio_adapter_t*, const char*, uint32_t) {

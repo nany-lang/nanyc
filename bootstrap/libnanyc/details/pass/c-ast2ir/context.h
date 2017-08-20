@@ -8,9 +8,6 @@
 #include <map>
 #include <cassert>
 
-
-
-
 namespace ny {
 namespace ir {
 namespace Producer {

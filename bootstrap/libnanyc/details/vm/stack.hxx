@@ -2,10 +2,8 @@
 #include "stack.h"
 #include <cstring>
 
-
 namespace ny {
 namespace vm {
-
 
 inline Register* Stack::push(uint32_t count) {
 	#if NANY_vm_STACK_TRACES != 0
@@ -26,7 +24,6 @@ inline Register* Stack::push(uint32_t count) {
 	return registers;
 }
 
-
 inline void Stack::pop(uint32_t count) {
 	#if NANY_vm_STACK_TRACES != 0
 	--frameCount;
@@ -38,7 +35,6 @@ inline void Stack::pop(uint32_t count) {
 	if (unlikely((current->remains += count) == current->capacity))
 		popChunk();
 }
-
 
 } // namespace vm
 } // namespace ny

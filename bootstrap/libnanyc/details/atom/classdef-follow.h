@@ -4,9 +4,7 @@
 #include <vector>
 #include "details/utils/clid.h"
 
-
 namespace ny {
-
 
 struct ClassdefFollow final {
 	ClassdefFollow() = default;
@@ -23,7 +21,6 @@ public:
 	std::vector<std::pair<CLID, AnyString>> pushedNamedParams;
 
 }; // struct ClassdefFollow
-
 
 } // namespace ny
 

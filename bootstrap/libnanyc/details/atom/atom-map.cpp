@@ -5,11 +5,9 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 
 namespace {
-
 
 struct MissingBuiltin final: std::exception {
 	MissingBuiltin(AnyString name) : name{name} {}
@@ -17,13 +15,11 @@ struct MissingBuiltin final: std::exception {
 	AnyString name;
 };
 
-
 struct MultipleDefinition final: std::exception {
 	MultipleDefinition(AnyString name) : name{name} {}
 	const char* what() const noexcept override {return nullptr;}
 	AnyString name;
 };
-
 
 struct ExpectClass final: std::exception {
 	ExpectClass(AnyString name) : name{name} {}
@@ -31,13 +27,11 @@ struct ExpectClass final: std::exception {
 	AnyString name;
 };
 
-
 auto createDummyAtom() {
 	auto atom = yuni::make_ref<Atom>("", Atom::Type::classdef);
 	atom->builtinMapping = CType::t_void;
 	return atom;
 }
-
 
 auto findBuiltinAtom(Atom& root, CType kind, const AnyString& name) {
 	Atom* atom = nullptr;
@@ -54,9 +48,7 @@ auto findBuiltinAtom(Atom& root, CType kind, const AnyString& name) {
 	}
 }
 
-
 } // anonymous namespace
-
 
 AtomMap::AtomMap(StringRefs& stringrefs)
 	: root(AnyString(), Atom::Type::namespacedef) // global namespace
@@ -65,14 +57,12 @@ AtomMap::AtomMap(StringRefs& stringrefs)
 	m_byIndex.emplace_back(nullptr);
 }
 
-
 Atom& AtomMap::createNewAtom(Atom::Type type, Atom& parent, const AnyString& name) {
 	auto newnode = yuni::make_ref<Atom>(parent, stringrefs.refstr(name), type);
 	newnode->atomid = ++m_atomGrpID;
 	m_byIndex.emplace_back(newnode);
 	return *newnode;
 }
-
 
 Atom& AtomMap::createVardef(Atom& parent, const AnyString& name) {
 	assert(not name.empty());
@@ -83,13 +73,11 @@ Atom& AtomMap::createVardef(Atom& parent, const AnyString& name) {
 	return atom;
 }
 
-
 AnyString AtomMap::symbolname(uint32_t atomid, uint32_t index) const {
 	if (atomid < m_byIndex.size())
 		return m_byIndex[atomid]->instances[index].symbolname();
 	return AnyString{};
 }
-
 
 bool AtomMap::fetchAndIndexCoreObjects() {
 	if (unlikely(!!core.object[(uint32_t) CType::t_bool]))
@@ -129,6 +117,5 @@ bool AtomMap::fetchAndIndexCoreObjects() {
 	core.object[(uint32_t) CType::t_bool] = nullptr;
 	return false;
 }
-
 
 } // namespace ny

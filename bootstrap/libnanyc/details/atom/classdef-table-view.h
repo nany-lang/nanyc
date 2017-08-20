@@ -3,9 +3,7 @@
 #include "details/atom/atom-map.h"
 #include "details/atom/ctype.h"
 
-
 namespace ny {
-
 
 struct ClassdefTableView final {
 	ClassdefTableView(ClassdefTable&);
@@ -26,7 +24,6 @@ struct ClassdefTableView final {
 	** \see ny::Atom::keyword()
 	*/
 	AnyString keyword(const Atom&) const;
-
 
 	//! Get if the current view has a substitute for a given CLID
 	bool hasSubstitute(const CLID&) const;
@@ -49,7 +46,6 @@ struct ClassdefTableView final {
 	AtomMap& atoms();
 	//@}
 
-
 	//! \name Debugging
 	//@{
 	//! Print all types
@@ -64,13 +60,11 @@ struct ClassdefTableView final {
 	//! The original table
 	ClassdefTable& originalTable();
 
-
 private:
 	ClassdefTable& table;
 	ClassdefTable::LayerItem previous;
 	bool canSwap = false;
 };
-
 
 } // namespace ny
 

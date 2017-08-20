@@ -8,7 +8,6 @@
 
 using namespace Yuni;
 
-
 namespace { // anonymous
 
 struct Internal final {

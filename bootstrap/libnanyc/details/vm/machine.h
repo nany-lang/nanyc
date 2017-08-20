@@ -2,7 +2,6 @@
 #include <nanyc/vm.h>
 #include "details/program/program.h"
 
-
 namespace ny {
 namespace vm {
 

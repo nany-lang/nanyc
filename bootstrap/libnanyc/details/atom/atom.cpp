@@ -7,16 +7,13 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 
 namespace {
 
-
 inline bool isSelf(uint32_t i, const AnyString& name) {
 	return i == 0 and name == "self";
 }
-
 
 template<class OutT, class ListT, class TableT>
 void prettyPrintParameters(OutT& out, ListT& list, const TableT* table, bool avoidSelf, AnyString sepBefore,
@@ -55,7 +52,6 @@ void prettyPrintParameters(OutT& out, ListT& list, const TableT* table, bool avo
 	});
 	out << sepAfter;
 }
-
 
 Flags<Atom::Category> findCategory(Atom* parent, Atom::Type type, const AnyString& name) {
 	Flags<Atom::Category> category;
@@ -110,7 +106,6 @@ Flags<Atom::Category> findCategory(Atom* parent, Atom::Type type, const AnyStrin
 	return category;
 }
 
-
 void makeCaption(String& out, const Atom& atom, const ClassdefTableView* table, bool fullname = true) {
 	// append the name of its ancestor, with the table to resolve their specialization
 	// (for template clsses for example)
@@ -155,7 +150,6 @@ void makeCaption(String& out, const Atom& atom, const ClassdefTableView* table, 
 	}
 }
 
-
 void printTreeRecursive(const Atom& atom, const ClassdefTableView& table, uint depth = 0) {
 	auto entry = trace();
 	for (uint i = depth; i--; )
@@ -180,9 +174,7 @@ void printTreeRecursive(const Atom& atom, const ClassdefTableView& table, uint d
 		trace(); // for beauty
 }
 
-
 } // anonymous namespace
-
 
 Atom::Instances::Ref Atom::Instances::create(const Signature& signature, Atom* remapAtom) {
 	uint32_t index = size();
@@ -194,7 +186,6 @@ Atom::Instances::Ref Atom::Instances::create(const Signature& signature, Atom* r
 	return Ref{*this, index};
 }
 
-
 void Atom::Instances::update(uint32_t index, String&& symbol, const Classdef& rettype) {
 	assert(index < size());
 	auto& details = m_instances[index];
@@ -203,7 +194,6 @@ void Atom::Instances::update(uint32_t index, String&& symbol, const Classdef& re
 	details.symbol = std::move(symbol);
 }
 
-
 void Atom::Instances::invalidate(uint32_t index, const Signature& signature) {
 	assert(index < m_instances.size());
 	m_instancesIDs[signature] = (uint32_t) - 1;
@@ -211,7 +201,6 @@ void Atom::Instances::invalidate(uint32_t index, const Signature& signature) {
 	details.ircode = nullptr;
 	details.remapAtom = nullptr;
 }
-
 
 Tribool::Value Atom::Instances::isValid(const Signature& signature, uint32_t& iid, Classdef& rettype,
 		Atom*& remapAtom) const {
@@ -232,7 +221,6 @@ Tribool::Value Atom::Instances::isValid(const Signature& signature, uint32_t& ii
 	return Tribool::Value::indeterminate;
 }
 
-
 String Atom::Instances::print(const AtomMap& atommap) const {
 	String prgm;
 	String out;
@@ -247,13 +235,11 @@ String Atom::Instances::print(const AtomMap& atommap) const {
 	return out;
 }
 
-
 Atom::Atom(const AnyString& name, Atom::Type type)
 	: category{findCategory(nullptr, type, name)}
 	, type(type)
 	, m_name{name} {
 }
-
 
 Atom::Atom(Atom& rootparent, const AnyString& name, Atom::Type type)
 	: category{findCategory(&rootparent, type, name)}
@@ -263,12 +249,10 @@ Atom::Atom(Atom& rootparent, const AnyString& name, Atom::Type type)
 	rootparent.m_children.emplace(AnyString{m_name}, this);
 }
 
-
 Atom::~Atom() {
 	if (opcodes.owned)
 		delete opcodes.ircode;
 }
-
 
 bool Atom::canAccessTo(const Atom& atom) const {
 	if (atom.isNamespace()) // all namespaces are accessble
@@ -292,7 +276,6 @@ bool Atom::canAccessTo(const Atom& atom) const {
 	//  return atom.isPublicOrPublished();
 	//}
 }
-
 
 void Atom::retrieveFullname(Yuni::String& out, const ClassdefTableView* table, bool parentName) const {
 	if (!parent)
@@ -352,18 +335,15 @@ void Atom::retrieveFullname(Yuni::String& out, const ClassdefTableView* table, b
 	}
 }
 
-
 String Atom::fullname() const {
 	String out;
 	retrieveFullname(out);
 	return out;
 }
 
-
 void Atom::retrieveCaption(String& out, const ClassdefTableView& table) const {
 	makeCaption(out, *this, &table);
 }
-
 
 String Atom::caption(const ClassdefTableView& view) const {
 	String out;
@@ -371,18 +351,15 @@ String Atom::caption(const ClassdefTableView& view) const {
 	return out;
 }
 
-
 String Atom::caption() const {
 	String out;
 	makeCaption(out, *this, nullptr);
 	return out;
 }
 
-
 void Atom::printTree(const ClassdefTableView& table) const {
 	printTreeRecursive(*this, table);
 }
-
 
 bool Atom::nameLookupOnChildren(std::vector<std::reference_wrapper<Atom>>& list, const AnyString& name,
 		bool* singleHop) {
@@ -407,7 +384,6 @@ bool Atom::nameLookupOnChildren(std::vector<std::reference_wrapper<Atom>>& list,
 	}
 	return success;
 }
-
 
 bool Atom::nameLookupFromParentScope(std::vector<std::reference_wrapper<Atom>>& list, const AnyString& name) {
 	assert(not name.empty());
@@ -444,7 +420,6 @@ bool Atom::nameLookupFromParentScope(std::vector<std::reference_wrapper<Atom>>& 
 	}
 }
 
-
 bool Atom::propertyLookupOnChildren(std::vector<std::reference_wrapper<Atom>>& list,
 		const AnyString& prefix, const AnyString& name) {
 	assert(not name.empty());
@@ -459,7 +434,6 @@ bool Atom::propertyLookupOnChildren(std::vector<std::reference_wrapper<Atom>>& l
 	return success;
 }
 
-
 const Atom* Atom::findChildByMemberFieldID(uint32_t field) const {
 	const Atom* ret = nullptr;
 	eachChild([&](const Atom & child) -> bool {
@@ -471,7 +445,6 @@ const Atom* Atom::findChildByMemberFieldID(uint32_t field) const {
 	});
 	return ret;
 }
-
 
 /*static*/
 void Atom::extractNames(AnyString& keyword, AnyString& varname, const AnyString& name) {
@@ -514,7 +487,6 @@ void Atom::extractNames(AnyString& keyword, AnyString& varname, const AnyString&
 	}
 }
 
-
 AnyString Atom::keyword() const {
 	switch (type) {
 		case Type::funcdef: {
@@ -546,7 +518,6 @@ AnyString Atom::keyword() const {
 	return "auto";
 }
 
-
 uint32_t Atom::findClassAtom(Atom*& out, const AnyString& name) {
 	// first, try to find the dtor function
 	Atom* atomA = nullptr;
@@ -567,7 +538,6 @@ uint32_t Atom::findClassAtom(Atom*& out, const AnyString& name) {
 	out = atomA;
 	return atomA ? 1 : 0;
 }
-
 
 uint32_t Atom::findFuncAtom(Atom*& out, const AnyString& name) {
 	// first, try to find the dtor function
@@ -590,7 +560,6 @@ uint32_t Atom::findFuncAtom(Atom*& out, const AnyString& name) {
 	return atomA ? 1 : 0;
 }
 
-
 uint32_t Atom::findVarAtom(Atom*& out, const AnyString& name) {
 	// first, try to find the dtor function
 	Atom* atomA = nullptr;
@@ -612,7 +581,6 @@ uint32_t Atom::findVarAtom(Atom*& out, const AnyString& name) {
 	return atomA ? 1 : 0;
 }
 
-
 Atom* Atom::findNamespaceAtom(const AnyString& name) {
 	// first, try to find the dtor function
 	Atom* atomA = nullptr;
@@ -625,7 +593,6 @@ Atom* Atom::findNamespaceAtom(const AnyString& name) {
 	});
 	return atomA;
 }
-
 
 void Atom::renameChild(const AnyString& from, const AnyString& to) {
 	Ref<Atom> child;
@@ -641,7 +608,6 @@ void Atom::renameChild(const AnyString& from, const AnyString& to) {
 	m_children.emplace(AnyString{child->m_name}, child);
 }
 
-
 bool Atom::findParent(const Atom& atom) const {
 	const Atom* p = this;
 	do {
@@ -652,7 +618,6 @@ bool Atom::findParent(const Atom& atom) const {
 	while (p);
 	return false;
 }
-
 
 uint32_t Atom::Parameters::findByName(const AnyString& name, uint32_t offset) const {
 	if (!!pData) {
@@ -666,7 +631,6 @@ uint32_t Atom::Parameters::findByName(const AnyString& name, uint32_t offset) co
 	return static_cast<uint32_t>(-1);
 }
 
-
 bool Atom::Parameters::append(const CLID& clid, const AnyString& name) {
 	if (!pData)
 		pData = std::make_unique<Data>();
@@ -679,6 +643,5 @@ bool Atom::Parameters::append(const CLID& clid, const AnyString& name) {
 	}
 	return false;
 }
-
 
 } // namespace ny

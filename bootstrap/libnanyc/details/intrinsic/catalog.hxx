@@ -3,13 +3,10 @@
 #include <yuni/core/static/types.h>
 #include "details/atom/ctype.h"
 
-
 namespace ny {
 namespace intrinsic {
 
-
 template<class T> struct CTypeToNanyType {};
-
 
 template<> struct CTypeToNanyType<int8_t> final {
 	static constexpr CType type = CType::t_i8;
@@ -67,7 +64,6 @@ template<> struct CTypeToNanyType<void> final {
 	static constexpr CType type = CType::t_void;
 };
 
-
 template<uint N, uint Max, class T> struct IntrinsicPushParameter final {
 	static void push(Intrinsic& intrinsic) {
 		static_assert(N > 0, "the first param is reserved for context");
@@ -76,11 +72,9 @@ template<uint N, uint Max, class T> struct IntrinsicPushParameter final {
 	}
 };
 
-
 template<uint N, class T> struct IntrinsicPushParameter<N, N, T> final {
 	static void push(Intrinsic&) {}
 };
-
 
 template<class T>
 inline void Catalog::emplace(const AnyString& name, T callback) {
@@ -101,33 +95,27 @@ inline void Catalog::emplace(const AnyString& name, T callback) {
 	}
 }
 
-
 inline bool Catalog::exists(const AnyString& name) const {
 	return m_names.count(name) != 0;
 }
-
 
 inline bool Catalog::empty() const {
 	return m_intrinsics.empty();
 }
 
-
 inline uint32_t Catalog::size() const {
 	return static_cast<uint32_t>(m_intrinsics.size());
 }
-
 
 inline const Intrinsic* Catalog::find(const AnyString& name) const {
 	auto it = m_names.find(name);
 	return (it != m_names.end()) ? &operator[](it->second) : nullptr;
 }
 
-
 inline const Intrinsic& Catalog::operator [] (uint32_t id) const {
 	assert(id < m_intrinsics.size());
 	return m_intrinsics[id];
 }
-
 
 } // namespace intrinsic
 } // namespace ny
