@@ -1,4 +1,5 @@
 core/class-anonymous-with-capture.ny
+core/class-generic.ny
 core/closure.ny
 core/funcs-generic.ny
 core/on-scope-fail.ny
