@@ -2,20 +2,16 @@
 #include "stack-frame.h"
 #include "details/errors/errors.h"
 
-
 namespace ny {
 namespace semantic {
-
 
 DelayedReportOnRaise::DelayedReportOnRaise(Atom& atom)
 	: m_atom(atom) {
 }
 
-
 void DelayedReportOnRaise::addRaisedErrors(yuni::String&& type, DelayedReportOnRaise::RaiseOrigins&& origins) {
 	m_noHandlerPerTypename[type].emplace_back(std::move(origins));
 }
-
 
 void DelayedReportOnRaise::produceErrors() const {
 	for (auto& pair: m_noHandlerPerTypename) {
@@ -37,19 +33,16 @@ void DelayedReportOnRaise::produceErrors() const {
 	}
 }
 
-
 AtomStackFrame::~AtomStackFrame() {
 	if (unlikely(m_delayedErrorsOnRaise))
 		m_delayedErrorsOnRaise->produceErrors();
 }
-
 
 void AtomStackFrame::addRaisedErrors(yuni::String&& type, DelayedReportOnRaise::RaiseOrigins&& origins) {
 	if (!m_delayedErrorsOnRaise)
 		m_delayedErrorsOnRaise = std::make_unique<DelayedReportOnRaise>(atom);
 	m_delayedErrorsOnRaise->addRaisedErrors(std::move(type), std::move(origins));
 }
-
 
 } // namespace semantic
 } // namespace ny

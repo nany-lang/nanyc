@@ -8,13 +8,11 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace ir {
 namespace Producer {
 
 namespace {
-
 
 struct FuncInspector final : public Yuni::NonCopyable<FuncInspector> {
 	using FuncnameType = CString<config::maxSymbolNameLength, false>;
@@ -49,12 +47,10 @@ private:
 
 }; // class FuncInspector
 
-
 FuncInspector::FuncInspector(Scope& scope)
 	: scope(scope)
 	, hasImplicitSelf(scope.isWithinClass()) {
 }
-
 
 bool FuncInspector::inspectVisibility(AST::Node& node) {
 	bool success = true;
@@ -86,7 +82,6 @@ bool FuncInspector::inspectVisibility(AST::Node& node) {
 	}
 	return success;
 }
-
 
 bool FuncInspector::inspectKind(AST::Node& node) {
 	if (unlikely(node.children.size() != 1))
@@ -145,7 +140,6 @@ bool FuncInspector::inspectKind(AST::Node& node) {
 	}
 	return true;
 }
-
 
 bool FuncInspector::inspectSingleParameter(uint pindex, AST::Node& node, uint32_t paramoffset) {
 	assert(node.rule == AST::rgFuncParam and "invalid func param node");
@@ -249,7 +243,6 @@ bool FuncInspector::inspectSingleParameter(uint pindex, AST::Node& node, uint32_
 	return success;
 }
 
-
 bool FuncInspector::inspectParameters(AST::Node* node, AST::Node* nodeTypeParams) {
 	// total number of parameters
 	uint32_t paramCount;
@@ -263,19 +256,12 @@ bool FuncInspector::inspectParameters(AST::Node* node, AST::Node* nodeTypeParams
 		paramCount = 0u;
 	if (hasImplicitSelf) // implicit 'self' parameter
 		++paramCount;
-	// no parameter (not even 'self'), nothing to do here !
-	if (paramCount == 0u) {
-		// no parameters, but maybe some generic type parameters
-		if (nodeTypeParams)
-			return scope.visitASTDeclGenericTypeParameters(*nodeTypeParams);
-		return true;
-	}
 	scope.emitDebugpos(node);
 	bool success = true;
 	if (unlikely(paramCount > config::maxFuncDeclParameterCount - 1)) { // too many parameters ?
 		assert(node != nullptr);
 		error(*node) << "hard limit: too many parameters. Got "
-					 << paramCount << ", expected: " << (config::maxFuncDeclParameterCount - 1);
+			<< paramCount << ", expected: " << (config::maxFuncDeclParameterCount - 1);
 		success = false;
 		paramCount = config::maxFuncDeclParameterCount - 1;
 	}
@@ -300,10 +286,10 @@ bool FuncInspector::inspectParameters(AST::Node* node, AST::Node* nodeTypeParams
 			uint32_t opaddr = ir::emit::blueprint::param(irout, scope.nextvar(), nullptr);
 			paramOffsets[i - offset] = opaddr;
 		}
-		// reserve registers (as many as parameters) for cloning parameters
-		for (uint32_t i = 0u; i != paramCount; ++i)
-			ir::emit::alloc(irout, scope.nextvar());
 	}
+	// reserve registers (as many as parameters) for cloning parameters
+	for (uint32_t i = 0u; i != paramCount; ++i)
+		ir::emit::alloc(irout, scope.nextvar());
 	// Generating ir for template parameters before the ir code for parameters
 	// (especially for being able to use these types)
 	if (nodeTypeParams)
@@ -318,7 +304,6 @@ bool FuncInspector::inspectParameters(AST::Node* node, AST::Node* nodeTypeParams
 	}
 	return success;
 }
-
 
 bool FuncInspector::inspectReturnType(AST::Node& node) {
 	assert(node.rule == AST::rgFuncReturnType and "invalid return type node");
@@ -354,7 +339,6 @@ bool FuncInspector::inspectReturnType(AST::Node& node) {
 	return true;
 }
 
-
 bool FuncInspector::inspectAttributes(Attributes& attrs) {
 	auto& irout = scope.ircode();
 	if (attrs.flags(Attributes::Flag::shortcircuit)) {
@@ -380,7 +364,6 @@ bool FuncInspector::inspectAttributes(Attributes& attrs) {
 	}
 	return true;
 }
-
 
 bool FuncInspector::inspect(AST::Node& node) {
 	// exit status
@@ -447,9 +430,7 @@ bool FuncInspector::inspect(AST::Node& node) {
 	return success;
 }
 
-
 } // anonymous namespace
-
 
 bool Scope::visitASTFunc(AST::Node& node) {
 	assert(node.rule == AST::rgFunction);
@@ -499,7 +480,6 @@ bool Scope::visitASTFunc(AST::Node& node) {
 	irout.at<isa::Op::stacksize>(bpoffsck).add = scope.nextVarID + 1u;
 	return success;
 }
-
 
 } // namespace Producer
 } // namespace ir

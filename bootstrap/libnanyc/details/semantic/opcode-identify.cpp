@@ -7,13 +7,10 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace semantic {
 
-
 namespace {
-
 
 bool tryFindProperties(const ir::isa::Operand<ir::isa::Op::identify>& operands,
 		std::vector<std::reference_wrapper<Atom>>& multipleResults,
@@ -22,10 +19,9 @@ bool tryFindProperties(const ir::isa::Operand<ir::isa::Op::identify>& operands,
 	// that we should resolve a setter and not a getter
 	bool setter = (operands.opcode == static_cast<uint32_t>(ir::isa::Op::identifyset));
 	return (not setter)
-		   ? atom.propertyLookupOnChildren(multipleResults, "^propget^", name)
-		   : atom.propertyLookupOnChildren(multipleResults, "^propset^", name);
+		? atom.propertyLookupOnChildren(multipleResults, "^propget^", name)
+		: atom.propertyLookupOnChildren(multipleResults, "^propset^", name);
 }
-
 
 bool emitIdentifyForSingleResult(Analyzer& seq, bool isLocalVar, const Classdef& cdef,
 		const ir::isa::Operand<ir::isa::Op::identify>& operands, const AnyString& name) {
@@ -115,7 +111,6 @@ bool emitIdentifyForSingleResult(Analyzer& seq, bool isLocalVar, const Classdef&
 	return true;
 }
 
-
 bool emitIdentifyForProperty(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::identify>& operands,
 		Atom& propatom, uint32_t self) {
 	// all pushed parameters
@@ -150,7 +145,6 @@ bool emitIdentifyForProperty(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::
 	return true;
 }
 
-
 bool identifyByPointerAssignment(Analyzer& seq, const AnyString& name,
 		const ir::isa::Operand<ir::isa::Op::identify>& operands) {
 	// since self was marked as an 'assignment', we're trying to resolve here '^()'
@@ -171,9 +165,7 @@ bool identifyByPointerAssignment(Analyzer& seq, const AnyString& name,
 	return true;
 }
 
-
 } // namespace
-
 
 Atom& Analyzer::resolveTypeAlias(Atom& original, const Classdef*& resultcdef) {
 	assert(original.isTypeAlias());
@@ -220,7 +212,6 @@ Atom& Analyzer::resolveTypeAlias(Atom& original, const Classdef*& resultcdef) {
 	complain::typedefNotResolved(original);
 	return original;
 }
-
 
 bool Analyzer::identify(const ir::isa::Operand<ir::isa::Op::identify>& operands,
 		const AnyString& name, bool firstChance) {
@@ -500,7 +491,6 @@ bool Analyzer::identify(const ir::isa::Operand<ir::isa::Op::identify>& operands,
 	return false;
 }
 
-
 void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::identify>& operands) {
 	assert(frame != nullptr);
 	AnyString name = currentSequence.stringrefs[operands.text];
@@ -510,12 +500,10 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::identify>& operands) {
 	multipleResults.clear();
 }
 
-
 void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::identifyset>& operands) {
 	auto& newopc = ir::Instruction::fromOpcode(operands).to<ir::isa::Op::identify>();
 	visit(newopc);
 }
-
 
 } // namespace semantic
 } // namespace ny

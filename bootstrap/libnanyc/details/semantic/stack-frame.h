@@ -6,11 +6,8 @@
 #include <cassert>
 #include <vector>
 
-
-
 namespace ny {
 namespace semantic {
-
 
 struct DelayedReportOnRaise final {
 	struct RaiseOrigins final {
@@ -35,7 +32,6 @@ private:
 	std::unordered_map<yuni::String, std::vector<RaiseOrigins>> m_noHandlerPerTypename;
 };
 
-
 struct ReturnValueMarker {
 	ReturnValueMarker(const CLID& clid, uint32_t line, uint32_t offset)
 		: clid(clid), line(line), offset(offset) {
@@ -43,7 +39,6 @@ struct ReturnValueMarker {
 	CLID clid;
 	uint32_t line, offset;
 };
-
 
 struct LVIDInfo final {
 	//! List of referer
@@ -120,8 +115,6 @@ public:
 
 }; // class LVIDInfo
 
-
-
 //! A single element within the stack for analysing opcodes
 struct AtomStackFrame final {
 	explicit AtomStackFrame(Atom& atom, AtomStackFrame* previous);
@@ -162,7 +155,6 @@ private:
 	std::vector<LVIDInfo> m_locallvids;
 	std::unique_ptr<DelayedReportOnRaise> m_delayedErrorsOnRaise;
 };
-
 
 } // namespace semantic
 } // namespace ny
