@@ -263,13 +263,6 @@ bool FuncInspector::inspectParameters(AST::Node* node, AST::Node* nodeTypeParams
 		paramCount = 0u;
 	if (hasImplicitSelf) // implicit 'self' parameter
 		++paramCount;
-	// no parameter (not even 'self'), nothing to do here !
-	if (paramCount == 0u) {
-		// no parameters, but maybe some generic type parameters
-		if (nodeTypeParams)
-			return scope.visitASTDeclGenericTypeParameters(*nodeTypeParams);
-		return true;
-	}
 	scope.emitDebugpos(node);
 	bool success = true;
 	if (unlikely(paramCount > config::maxFuncDeclParameterCount - 1)) { // too many parameters ?
