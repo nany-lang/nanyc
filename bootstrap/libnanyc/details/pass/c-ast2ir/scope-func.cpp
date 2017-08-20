@@ -286,10 +286,10 @@ bool FuncInspector::inspectParameters(AST::Node* node, AST::Node* nodeTypeParams
 			uint32_t opaddr = ir::emit::blueprint::param(irout, scope.nextvar(), nullptr);
 			paramOffsets[i - offset] = opaddr;
 		}
-		// reserve registers (as many as parameters) for cloning parameters
-		for (uint32_t i = 0u; i != paramCount; ++i)
-			ir::emit::alloc(irout, scope.nextvar());
 	}
+	// reserve registers (as many as parameters) for cloning parameters
+	for (uint32_t i = 0u; i != paramCount; ++i)
+		ir::emit::alloc(irout, scope.nextvar());
 	// Generating ir for template parameters before the ir code for parameters
 	// (especially for being able to use these types)
 	if (nodeTypeParams)
