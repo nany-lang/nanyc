@@ -42,7 +42,6 @@ struct AtomStackFrame final {
 	Atom& atom;
 	//! The current scope depth for the current stack frame
 	uint32_t scope = 0u;
-	uint32_t parameterIndex = 0u;
 	//! Convenient classdefs alias
 	std::vector<CLID> classdefs;
 	// Next frame
@@ -72,6 +71,16 @@ struct AtomStackFrame final {
 	Atom& currentAtomNotUnit() {
 		return (not atom.isUnit()) ? atom : (*(atom.parent));
 	}
+
+	uint32_t findNextParameterLvid(bool isGenericParameter) {
+		return (not isGenericParameter)
+			? 1 + (++m_funcparamCount)
+			: 1 + (++m_funcTparamCount) + 2 * m_funcparamCount;
+	}
+
+private:
+	uint32_t m_funcparamCount = 0;
+	uint32_t m_funcTparamCount = 0;
 
 }; // struct AtomStackFrame
 
@@ -240,15 +249,14 @@ struct OpcodeReader final {
 		auto& frame = *atomStack;
 		// calculating the lvid for the current parameter
 		// (+1 since %1 is the return value/type)
-		uint paramuint32_t = (++frame.parameterIndex) + 1;
-		assertLvid(operands, paramuint32_t);
 		auto kind = static_cast<ir::isa::Blueprint>(operands.kind);
 		assert(kind == ir::isa::Blueprint::param or kind == ir::isa::Blueprint::paramself
 			or kind == ir::isa::Blueprint::gentypeparam);
 		bool isGenTypeParam = (kind == ir::isa::Blueprint::gentypeparam);
 		if (unlikely(not isGenTypeParam and not frame.atom.isFunction()))
 			throw EOperand(ircode, operands, "parameter for non-function");
-		CLID clid{frame.atom.atomid, paramuint32_t};
+		CLID clid(frame.atom.atomid, frame.findNextParameterLvid(isGenTypeParam));
+		assertLvid(operands, clid.lvid());
 		AnyString name = ircode.stringrefs[operands.name];
 		auto& parameters = (not isGenTypeParam)
 			? frame.atom.parameters : frame.atom.tmplparams;
