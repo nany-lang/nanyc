@@ -45,7 +45,7 @@ struct InvalidDtor final {
 };
 
 struct ICE final {
-	ICE(uint8_t line, const char* msg): line(line), msg(msg) {}
+	ICE(uint32_t line, const char* msg): line(line), msg(msg) {}
 	const char* file = __FILE__;
 	uint32_t line;
 	const char* msg;
