@@ -832,6 +832,12 @@ uint64_t Thread::execute(uint32_t atomid, uint32_t instanceid) {
 	catch (const ICE& e) {
 		machine.cerrexception(yuni::String("ICE '") << e.file << ':' << e.line << ": " << e.msg);
 	}
+	catch (const std::bad_alloc&) {
+		machine.cerrexception("failed to allocate memory");
+	}
+	catch (const std::exception& e) {
+		machine.cerrexception(e.what());
+	}
 	catch (...) {
 		machine.cerrexception("unhandled c++ exception");
 	}
