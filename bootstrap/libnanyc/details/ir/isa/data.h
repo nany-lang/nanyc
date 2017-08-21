@@ -479,6 +479,16 @@ template<> struct Operand<ny::ir::isa::Op::store> final {
 	}
 };
 
+template<> struct Operand<ny::ir::isa::Op::as> final {
+	uint32_t opcode;
+	uint32_t lvid;
+	uint32_t from;
+	uint32_t convert; // CTypeConvertion
+	template<class T> void eachLVID(const T& c) {
+		c(lvid, from);
+	}
+};
+
 template<> struct Operand<ny::ir::isa::Op::ret> final {
 	uint32_t opcode;
 	uint32_t lvid;

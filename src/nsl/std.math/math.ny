@@ -9,3 +9,6 @@ public func min(ref a, ref b): ref
 
 public func max(ref a, ref b): ref
 	-> if a < b then b else a;
+
+public func equals(ref a, ref b): bool
+	-> a == b;

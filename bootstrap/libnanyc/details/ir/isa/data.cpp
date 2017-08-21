@@ -44,6 +44,7 @@ AnyString opname(ny::ir::isa::Op opcode) {
 		case Op::assign:         return "assign";
 		case Op::blueprint:      return "blueprint";
 		case Op::call:           return "call";
+		case Op::as:             return "as";
 		case Op::classdefsizeof: return "classdefsizeof";
 		case Op::comment:        return "comment";
 		case Op::commontype:     return "commontype";

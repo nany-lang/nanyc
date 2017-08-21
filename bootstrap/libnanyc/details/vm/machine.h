@@ -14,6 +14,9 @@ struct Machine final {
 	Machine& operator = (Machine&&) = delete;
 
 	int run();
+	void cout(const AnyString&);
+	void cerr(const AnyString&);
+	void cerrexception(const AnyString&);
 
 	nyvm_opts_t opts;
 	const ny::Program& program;

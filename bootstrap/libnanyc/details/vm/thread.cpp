@@ -4,6 +4,7 @@
 #include "details/atom/atom.h"
 #include "details/vm/stack.h"
 #include "details/vm/stacktrace.h"
+#include "details/atom/ctype.h"
 #include <iostream>
 
 
@@ -44,11 +45,35 @@ struct InvalidDtor final {
 };
 
 struct ICE final {
-	ICE(uint8_t line, const char* msg): line(line), msg(msg) {}
+	ICE(uint32_t line, const char* msg): line(line), msg(msg) {}
 	const char* file = __FILE__;
 	uint32_t line;
 	const char* msg;
 };
+
+struct InvalidCast final {
+};
+
+template<class To, class From> To castMe(From from) {
+	return static_cast<To>(from);
+}
+
+template<class From> void castMe(ny::vm::Register& reg, ny::CType dest, From from) {
+	switch (dest) {
+		case ny::CType::t_u64: reg.u64 = castMe<uint64_t>(from); return;
+		case ny::CType::t_u32: reg.u64 = castMe<uint32_t>(from); return;
+		case ny::CType::t_u16: reg.u64 = castMe<uint16_t>(from); return;
+		case ny::CType::t_u8:  reg.u64 = castMe<uint8_t>(from); return;
+		case ny::CType::t_i64: reg.i64 = castMe<int64_t>(from); return;
+		case ny::CType::t_i32: reg.i64 = castMe<int32_t>(from); return;
+		case ny::CType::t_i16: reg.i64 = castMe<int16_t>(from); return;
+		case ny::CType::t_i8:  reg.i64 = castMe<int8_t>(from); return;
+		case ny::CType::t_f32: reg.f64 = castMe<float>(from); return;
+		case ny::CType::t_f64: reg.f64 = castMe<double>(from); return;
+		default: break;
+	}
+	throw InvalidCast();
+}
 
 struct Executor final {
 	using Allocator = ny::vm::memory::Allocator<ny::vm::memory::TrackPointer>;
@@ -243,6 +268,29 @@ struct Executor final {
 			case CType::t_any:
 				throw ICE(__LINE__, "invalid intrinsic return type");
 		}
+	}
+
+	void visit(const ir::isa::Operand<ir::isa::Op::as>& opr) {
+		auto convert = static_cast<ny::CTypeConvertion>(opr.convert);
+		auto& reg = registers[opr.lvid];
+		switch (convert.from()) {
+			case ny::CType::t_u64:
+			case ny::CType::t_u32:
+			case ny::CType::t_u16:
+			case ny::CType::t_u8:
+				return castMe(reg, convert.to(), registers[opr.from].u64);
+			case ny::CType::t_i64:
+			case ny::CType::t_i32:
+			case ny::CType::t_i16:
+			case ny::CType::t_i8:
+				return castMe(reg, convert.to(), registers[opr.from].i64);
+			case ny::CType::t_f64:
+			case ny::CType::t_f32:
+				return castMe(reg, convert.to(), registers[opr.from].f64);
+			default:
+				break;
+		}
+		throw InvalidCast();
 	}
 
 	void visit(const ir::isa::Operand<ir::isa::Op::fadd>& opr) {
@@ -814,19 +862,32 @@ uint64_t Thread::execute(uint32_t atomid, uint32_t instanceid) {
 		executor.entrypoint(atomid, instanceid);
 		return 0;
 	}
-	catch (const InvalidLabel&) {
+	catch (const InvalidLabel& e) {
+		machine.cerrexception(yuni::String("invalid label atomid: ") << e.atomid << ", label: " << e.label);
 	}
 	catch (const DivideByZero&) {
+		machine.cerrexception("division by zero");
 	}
 	catch (const Assert&) {
+		machine.cerrexception("assert failed");
 	}
-	catch (const UnexpectedOpcode&) {
+	catch (const UnexpectedOpcode& e) {
+		machine.cerrexception(yuni::String("unexpected opcode '") << e.name << "'");
 	}
 	catch (const InvalidDtor&) {
+		machine.cerrexception("invalid destructor");
 	}
-	catch (const ICE&) {
+	catch (const ICE& e) {
+		machine.cerrexception(yuni::String("ICE '") << e.file << ':' << e.line << ": " << e.msg);
+	}
+	catch (const std::bad_alloc&) {
+		machine.cerrexception("failed to allocate memory");
+	}
+	catch (const std::exception& e) {
+		machine.cerrexception(e.what());
 	}
 	catch (...) {
+		machine.cerrexception("unhandled c++ exception");
 	}
 	return 120;
 }
