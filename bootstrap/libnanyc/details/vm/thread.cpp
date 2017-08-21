@@ -814,19 +814,26 @@ uint64_t Thread::execute(uint32_t atomid, uint32_t instanceid) {
 		executor.entrypoint(atomid, instanceid);
 		return 0;
 	}
-	catch (const InvalidLabel&) {
+	catch (const InvalidLabel& e) {
+		machine.cerrexception(yuni::String("invalid label atomid: ") << e.atomid << ", label: " << e.label);
 	}
 	catch (const DivideByZero&) {
+		machine.cerrexception("division by zero");
 	}
 	catch (const Assert&) {
+		machine.cerrexception("assert failed");
 	}
-	catch (const UnexpectedOpcode&) {
+	catch (const UnexpectedOpcode& e) {
+		machine.cerrexception(yuni::String("unexpected opcode '") << e.name << "'");
 	}
 	catch (const InvalidDtor&) {
+		machine.cerrexception("invalid destructor");
 	}
-	catch (const ICE&) {
+	catch (const ICE& e) {
+		machine.cerrexception(yuni::String("ICE '") << e.file << ':' << e.line << ": " << e.msg);
 	}
 	catch (...) {
+		machine.cerrexception("unhandled c++ exception");
 	}
 	return 120;
 }
