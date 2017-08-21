@@ -24,5 +24,28 @@ int Machine::run() {
 	return exitstatus;
 }
 
+void Machine::cout(const AnyString& string) {
+	opts.cout.write(&opts.cout, string.c_str(), string.size());
+}
+
+void Machine::cerr(const AnyString& string) {
+	opts.cerr.write(&opts.cerr, string.c_str(), string.size());
+}
+
+void Machine::cerrexception(const AnyString& string) {
+	opts.cerr.write(&opts.cerr, "\n\n", 2);
+	{
+		constexpr const char prefix[] = "nanyc vm exception:";
+		opts.cerr.set_bkcolor(&opts.cerr, nyc_default);
+		opts.cerr.set_color(&opts.cerr, nyc_red);
+		opts.cerr.write(&opts.cerr, prefix, strlen(prefix));
+		opts.cerr.set_color(&opts.cerr, nyc_default);
+	}
+	opts.cerr.write(&opts.cerr, " ", 1);
+	opts.cerr.write(&opts.cerr, string.c_str(), string.size());
+	opts.cerr.write(&opts.cerr, "\n", 1);
+	opts.cerr.flush(&opts.cerr);
+}
+
 } // namespace vm
 } // namespace ny
