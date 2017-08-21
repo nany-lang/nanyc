@@ -30,6 +30,11 @@ void writeFile(const AnyString& filename, const AnyString& content) {
 		std::cout << filename << " is already up to date\n";
 }
 
+void addFuncAs(Clob& o) {
+	o << "\tfunc as<:T:>\n";
+	o << "\t\t-> new T(!!as(#[__nanyc_synthetic] typeof(std.asBuiltin(new T)), pod));\n\n";
+}
+
 void craftClassFloat(Clob& o, uint32_t bits, const AnyString& license, const AnyString& filename) {
 	o.clear();
 	ShortString16 suffix;
@@ -65,6 +70,7 @@ void craftClassFloat(Clob& o, uint32_t bits, const AnyString& license, const Any
 	o << "\t#[nosuggest] operator new(self pod: __f32);\n\n";
 	if (bits > 32)
 		o << "\t#[nosuggest] operator new(self pod: __f64);\n\n";
+	addFuncAs(o);
 	o << "\toperator ++self: ref " << suffix << " {\n";
 	o << "\t\tpod = !!finc(pod);\n";
 	o << "\t\treturn self;\n";
@@ -207,6 +213,7 @@ void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString& licen
 		for ( ; b >= 8; b /= 2)
 			o << "\t#[nosuggest] operator new (self pod: __" << targetsign << b << ");\n\n";
 	});
+	addFuncAs(o);
 	o << "\toperator ++self: ref " << suffix << " {\n";
 	o << "\t\tpod = !!inc(pod);\n";
 	o << "\t\treturn self;\n";

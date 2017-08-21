@@ -27,6 +27,9 @@ public class u16 {
 
 	#[nosuggest] operator new (self pod: __u8);
 
+	func as<:T:>
+		-> new T(!!as(#[__nanyc_synthetic] typeof(std.asBuiltin(new T)), pod));
+
 	operator ++self: ref u16 {
 		pod = !!inc(pod);
 		return self;
