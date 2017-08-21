@@ -6,6 +6,7 @@
 #include <unistd.h>
 #endif
 #include "details/ir/emit.h"
+#include "details/atom/ctype.h"
 #include "ref-unref.h"
 
 using namespace Yuni;
@@ -90,6 +91,43 @@ bool intrinsicOSIsBSD(Analyzer& seq, uint32_t lvid) {
 		ir::emit::constantbool(seq.out, lvid, false);
 		#endif
 	}
+	return true;
+}
+
+constexpr static const int8_t typeSign[ny::ctypeCount] = {
+	// void, any, ptr, bool, u8, u16, u32, u64, i8, i16, i32, i64, f32, f64
+	   0,    0,   0,   0,    1,  1,   1,   1,   -1, -1,  -1,  -1,  2,   3
+};
+
+bool intrinsicAs(Analyzer& seq, uint32_t lvid) {
+	assert(seq.pushedparams.func.indexed.size() == 2);
+	uint32_t tolvid = seq.pushedparams.func.indexed[0].lvid;
+	uint32_t fromlvid = seq.pushedparams.func.indexed[1].lvid;
+	auto& to = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, tolvid});
+	auto& from = seq.cdeftable.classdefFollowClassMember(CLID{seq.frame->atomid, fromlvid});
+	auto& ret = seq.cdeftable.substitute(lvid);
+	if (from.kind == to.kind) {
+		ret.mutateToBuiltin(to.kind);
+		if (seq.canGenerateCode())
+			ir::emit::copy(seq.out, lvid, fromlvid);
+		return true;
+	}
+	auto signFrom = typeSign[static_cast<uint8_t>(from.kind)];
+	auto signTo   = typeSign[static_cast<uint8_t>(to.kind)];
+	if (unlikely(signFrom == 0 or signTo == 0)) {
+		ret.mutateToVoid();
+		return (error() << "intrinsic 'as' requires non-void builtin types");
+	}
+	if (signFrom == signTo) {
+		if (static_cast<uint8_t>(to.kind) > static_cast<uint8_t>(from.kind)) {
+			ret.mutateToBuiltin(to.kind);
+			if (seq.canGenerateCode())
+				ir::emit::copy(seq.out, lvid, fromlvid);
+			return true;
+		}
+	}
+	ret.mutateToBuiltin(to.kind);
+	ir::emit::as(seq.out, lvid, fromlvid, from.kind, to.kind);
 	return true;
 }
 
@@ -843,6 +881,7 @@ static const std::unordered_map<AnyString, std::pair<uint32_t, BuiltinIntrinsic>
 	{"unref",           { 1,  &intrinsicUnref }},
 	{"sizeof",          { 1,  &intrinsicSizeof }},
 	{"pointer",         { 1,  &intrinsicPointer }},
+	{"as",              { 2,  &intrinsicAs }},
 	//
 	{"and",             { 2,  &intrinsicAND }},
 	{"or",              { 2,  &intrinsicOR }},
