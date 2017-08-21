@@ -4,6 +4,7 @@
 #include "details/atom/atom.h"
 #include "details/vm/stack.h"
 #include "details/vm/stacktrace.h"
+#include "details/atom/ctype.h"
 #include <iostream>
 
 
@@ -49,6 +50,30 @@ struct ICE final {
 	uint32_t line;
 	const char* msg;
 };
+
+struct InvalidCast final {
+};
+
+template<class To, class From> To castMe(From from) {
+	return static_cast<To>(from);
+}
+
+template<class From> void castMe(ny::vm::Register& reg, ny::CType dest, From from) {
+	switch (dest) {
+		case ny::CType::t_u64: reg.u64 = castMe<uint64_t>(from); return;
+		case ny::CType::t_u32: reg.u64 = castMe<uint32_t>(from); return;
+		case ny::CType::t_u16: reg.u64 = castMe<uint16_t>(from); return;
+		case ny::CType::t_u8:  reg.u64 = castMe<uint8_t>(from); return;
+		case ny::CType::t_i64: reg.i64 = castMe<int64_t>(from); return;
+		case ny::CType::t_i32: reg.i64 = castMe<int32_t>(from); return;
+		case ny::CType::t_i16: reg.i64 = castMe<int16_t>(from); return;
+		case ny::CType::t_i8:  reg.i64 = castMe<int8_t>(from); return;
+		case ny::CType::t_f32: reg.f64 = castMe<float>(from); return;
+		case ny::CType::t_f64: reg.f64 = castMe<double>(from); return;
+		default: break;
+	}
+	throw InvalidCast();
+}
 
 struct Executor final {
 	using Allocator = ny::vm::memory::Allocator<ny::vm::memory::TrackPointer>;
@@ -243,6 +268,29 @@ struct Executor final {
 			case CType::t_any:
 				throw ICE(__LINE__, "invalid intrinsic return type");
 		}
+	}
+
+	void visit(const ir::isa::Operand<ir::isa::Op::as>& opr) {
+		auto convert = static_cast<ny::CTypeConvertion>(opr.convert);
+		auto& reg = registers[opr.lvid];
+		switch (convert.from()) {
+			case ny::CType::t_u64:
+			case ny::CType::t_u32:
+			case ny::CType::t_u16:
+			case ny::CType::t_u8:
+				return castMe(reg, convert.to(), registers[opr.from].u64);
+			case ny::CType::t_i64:
+			case ny::CType::t_i32:
+			case ny::CType::t_i16:
+			case ny::CType::t_i8:
+				return castMe(reg, convert.to(), registers[opr.from].i64);
+			case ny::CType::t_f64:
+			case ny::CType::t_f32:
+				return castMe(reg, convert.to(), registers[opr.from].f64);
+			default:
+				break;
+		}
+		throw InvalidCast();
 	}
 
 	void visit(const ir::isa::Operand<ir::isa::Op::fadd>& opr) {
