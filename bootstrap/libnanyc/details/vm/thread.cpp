@@ -469,12 +469,16 @@ struct Executor final {
 	void visit(const ir::isa::Operand<ir::isa::Op::opmod>& opr) {
 		printOpcode(opr);
 		validateLvids(opr);
+		if (unlikely(registers[opr.rhs].u64 == 0))
+			throw DivideByZero();
 		registers[opr.lvid].u64 = registers[opr.lhs].u64 % registers[opr.rhs].u64;
 	}
 
 	void visit(const ir::isa::Operand<ir::isa::Op::opmodi>& opr) {
 		printOpcode(opr);
 		validateLvids(opr);
+		if (unlikely(registers[opr.rhs].i64 == 0))
+			throw DivideByZero();
 		registers[opr.lvid].i64 = registers[opr.lhs].i64 % registers[opr.rhs].i64;
 	}
 
