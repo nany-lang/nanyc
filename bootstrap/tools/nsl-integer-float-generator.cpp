@@ -316,7 +316,7 @@ void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString& licen
 	craft("and", "and", genGlobalOperator);
 	craft("or", "or", genGlobalOperator);
 	craft("xor", "xor", genGlobalOperator);
-	craft("mod", "mod", genGlobalOperator);
+	craft("mod", issigned ? "modi" : "mod", genGlobalOperator);
 	o.trimRight();
 	writeFile(filename, o);
 }

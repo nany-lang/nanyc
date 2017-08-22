@@ -472,6 +472,12 @@ struct Executor final {
 		registers[opr.lvid].u64 = registers[opr.lhs].u64 % registers[opr.rhs].u64;
 	}
 
+	void visit(const ir::isa::Operand<ir::isa::Op::opmodi>& opr) {
+		printOpcode(opr);
+		validateLvids(opr);
+		registers[opr.lvid].i64 = registers[opr.lhs].i64 % registers[opr.rhs].i64;
+	}
+
 	void visit(const ir::isa::Operand<ir::isa::Op::push>& opr) {
 		printOpcode(opr);
 		validateLvids(opr);

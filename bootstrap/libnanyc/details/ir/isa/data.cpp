@@ -105,6 +105,7 @@ AnyString opname(ny::ir::isa::Op opcode) {
 		case Op::opand:          return "opand";
 		case Op::opassert:       return "opassert";
 		case Op::opmod:          return "opmod";
+		case Op::opmodi:         return "opmodi";
 		case Op::opor:           return "opor";
 		case Op::opxor:          return "opxor";
 		case Op::pragma:         return "pragma";

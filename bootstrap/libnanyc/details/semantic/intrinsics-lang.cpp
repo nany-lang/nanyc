@@ -758,6 +758,10 @@ bool intrinsicMOD(Analyzer& seq, uint32_t lvid) {
 	return emitBuiltinOperator<CType::t_any, 1, 1, 0, &ir::emit::opmod>(seq, lvid, "mod");
 }
 
+bool intrinsicMODI(Analyzer& seq, uint32_t lvid) {
+	return emitBuiltinOperator<CType::t_any, 1, 1, 0, &ir::emit::opmodi>(seq, lvid, "modi");
+}
+
 bool intrinsicADD(Analyzer& seq, uint32_t lvid) {
 	return emitBuiltinOperator<CType::t_any, 0, 1, 0, &ir::emit::opadd>(seq, lvid, "add");
 }
@@ -887,6 +891,7 @@ static const std::unordered_map<AnyString, std::pair<uint32_t, BuiltinIntrinsic>
 	{"or",              { 2,  &intrinsicOR }},
 	{"xor",             { 2,  &intrinsicXOR }},
 	{"mod",             { 2,  &intrinsicMOD }},
+	{"modi",            { 2,  &intrinsicMODI }},
 	//
 	{"not",             { 1,  &intrinsicNOT }},
 	//

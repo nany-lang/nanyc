@@ -539,22 +539,22 @@ private:
 #[__nanyc_builtinalias: xor, nosuggest] public operator xor (a: __i32, b: __i8): any;
 
 
-#[__nanyc_builtinalias: mod] public operator mod (a: cref i32, b: cref i64): any;
-#[__nanyc_builtinalias: mod, nosuggest] public operator mod (a: cref i32, b: __i64): any;
-#[__nanyc_builtinalias: mod, nosuggest] public operator mod (a: __i32, b: cref i64): any;
-#[__nanyc_builtinalias: mod, nosuggest] public operator mod (a: __i32, b: __i64): any;
+#[__nanyc_builtinalias: modi] public operator mod (a: cref i32, b: cref i64): any;
+#[__nanyc_builtinalias: modi, nosuggest] public operator mod (a: cref i32, b: __i64): any;
+#[__nanyc_builtinalias: modi, nosuggest] public operator mod (a: __i32, b: cref i64): any;
+#[__nanyc_builtinalias: modi, nosuggest] public operator mod (a: __i32, b: __i64): any;
 
-#[__nanyc_builtinalias: mod] public operator mod (a: cref i32, b: cref i32): any;
-#[__nanyc_builtinalias: mod, nosuggest] public operator mod (a: cref i32, b: __i32): any;
-#[__nanyc_builtinalias: mod, nosuggest] public operator mod (a: __i32, b: cref i32): any;
-#[__nanyc_builtinalias: mod, nosuggest] public operator mod (a: __i32, b: __i32): any;
+#[__nanyc_builtinalias: modi] public operator mod (a: cref i32, b: cref i32): any;
+#[__nanyc_builtinalias: modi, nosuggest] public operator mod (a: cref i32, b: __i32): any;
+#[__nanyc_builtinalias: modi, nosuggest] public operator mod (a: __i32, b: cref i32): any;
+#[__nanyc_builtinalias: modi, nosuggest] public operator mod (a: __i32, b: __i32): any;
 
-#[__nanyc_builtinalias: mod] public operator mod (a: cref i32, b: cref i16): any;
-#[__nanyc_builtinalias: mod, nosuggest] public operator mod (a: cref i32, b: __i16): any;
-#[__nanyc_builtinalias: mod, nosuggest] public operator mod (a: __i32, b: cref i16): any;
-#[__nanyc_builtinalias: mod, nosuggest] public operator mod (a: __i32, b: __i16): any;
+#[__nanyc_builtinalias: modi] public operator mod (a: cref i32, b: cref i16): any;
+#[__nanyc_builtinalias: modi, nosuggest] public operator mod (a: cref i32, b: __i16): any;
+#[__nanyc_builtinalias: modi, nosuggest] public operator mod (a: __i32, b: cref i16): any;
+#[__nanyc_builtinalias: modi, nosuggest] public operator mod (a: __i32, b: __i16): any;
 
-#[__nanyc_builtinalias: mod] public operator mod (a: cref i32, b: cref i8): any;
-#[__nanyc_builtinalias: mod, nosuggest] public operator mod (a: cref i32, b: __i8): any;
-#[__nanyc_builtinalias: mod, nosuggest] public operator mod (a: __i32, b: cref i8): any;
-#[__nanyc_builtinalias: mod, nosuggest] public operator mod (a: __i32, b: __i8): any;
+#[__nanyc_builtinalias: modi] public operator mod (a: cref i32, b: cref i8): any;
+#[__nanyc_builtinalias: modi, nosuggest] public operator mod (a: cref i32, b: __i8): any;
+#[__nanyc_builtinalias: modi, nosuggest] public operator mod (a: __i32, b: cref i8): any;
+#[__nanyc_builtinalias: modi, nosuggest] public operator mod (a: __i32, b: __i8): any;

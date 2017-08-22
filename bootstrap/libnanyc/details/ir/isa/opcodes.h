@@ -25,6 +25,7 @@ enum class Op : std::uint32_t {
 	opor,           ///< or
 	opxor,          ///< xor
 	opmod,          ///< mod
+	opmodi,         ///< mod
 	eq,             ///< equal
 	neq,            ///< not equal
 	lt,             ///< less than
@@ -150,6 +151,7 @@ enum class Op : std::uint32_t {
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::opor) \
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::opxor) \
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::opmod) \
+			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::opmodi) \
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::eq) \
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::neq) \
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::lt) \

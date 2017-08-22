@@ -288,6 +288,17 @@ template<> struct Operand<ny::ir::isa::Op::opmod> final {
 	}
 };
 
+template<> struct Operand<ny::ir::isa::Op::opmodi> final {
+	uint32_t opcode;
+	uint32_t lvid;
+	uint32_t lhs;
+	uint32_t rhs;
+
+	template<class T> void eachLVID(const T& c) {
+		c(lvid, lhs, rhs);
+	}
+};
+
 template<> struct Operand<ny::ir::isa::Op::negation> final {
 	uint32_t opcode;
 	uint32_t lvid;
