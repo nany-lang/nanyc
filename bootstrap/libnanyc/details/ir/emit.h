@@ -247,6 +247,12 @@ inline void opmod(IRCodeRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
 	operands.rhs   = rhs;
 }
 
+inline void opmodi(IRCodeRef ref, uint32_t lvid, uint32_t lhs, uint32_t rhs) {
+	auto& operands = ref.ircode.emit<isa::Op::opmodi>();
+	operands.lvid  = lvid;
+	operands.lhs   = lhs;
+	operands.rhs   = rhs;
+}
 
 inline void nop(IRCodeRef ref) {
 	ref.ircode.emit<isa::Op::nop>();

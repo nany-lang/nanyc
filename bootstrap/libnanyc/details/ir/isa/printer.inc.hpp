@@ -160,6 +160,10 @@ namespace // anonymous
 			printOperator(operands, "mod");
 		}
 
+		void print(const Operand<Op::opmodi>& operands) {
+			printOperator(operands, "modi");
+		}
+
 		void print(const Operand<Op::fadd>& operands) {
 			printOperator(operands, "fadd");
 		}

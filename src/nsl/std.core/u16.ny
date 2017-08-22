@@ -399,3 +399,24 @@ private:
 #[__nanyc_builtinalias: xor, nosuggest] public operator xor (a: cref u16, b: __u8): any;
 #[__nanyc_builtinalias: xor, nosuggest] public operator xor (a: __u16, b: cref u8): any;
 #[__nanyc_builtinalias: xor, nosuggest] public operator xor (a: __u16, b: __u8): any;
+
+
+#[__nanyc_builtinalias: mod] public operator mod (a: cref u16, b: cref u64): any;
+#[__nanyc_builtinalias: mod, nosuggest] public operator mod (a: cref u16, b: __u64): any;
+#[__nanyc_builtinalias: mod, nosuggest] public operator mod (a: __u16, b: cref u64): any;
+#[__nanyc_builtinalias: mod, nosuggest] public operator mod (a: __u16, b: __u64): any;
+
+#[__nanyc_builtinalias: mod] public operator mod (a: cref u16, b: cref u32): any;
+#[__nanyc_builtinalias: mod, nosuggest] public operator mod (a: cref u16, b: __u32): any;
+#[__nanyc_builtinalias: mod, nosuggest] public operator mod (a: __u16, b: cref u32): any;
+#[__nanyc_builtinalias: mod, nosuggest] public operator mod (a: __u16, b: __u32): any;
+
+#[__nanyc_builtinalias: mod] public operator mod (a: cref u16, b: cref u16): any;
+#[__nanyc_builtinalias: mod, nosuggest] public operator mod (a: cref u16, b: __u16): any;
+#[__nanyc_builtinalias: mod, nosuggest] public operator mod (a: __u16, b: cref u16): any;
+#[__nanyc_builtinalias: mod, nosuggest] public operator mod (a: __u16, b: __u16): any;
+
+#[__nanyc_builtinalias: mod] public operator mod (a: cref u16, b: cref u8): any;
+#[__nanyc_builtinalias: mod, nosuggest] public operator mod (a: cref u16, b: __u8): any;
+#[__nanyc_builtinalias: mod, nosuggest] public operator mod (a: __u16, b: cref u8): any;
+#[__nanyc_builtinalias: mod, nosuggest] public operator mod (a: __u16, b: __u8): any;
