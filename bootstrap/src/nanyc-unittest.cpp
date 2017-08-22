@@ -353,12 +353,12 @@ int App::run() {
 			if (unlikely(shuffle))
 				shuffleDeck(unittests);
 			for (auto& entry: unittests)
-				yuni::async(queueservice, [=] { run(entry); });
+				yuni::async(queueservice, [&,this] { run(entry); });
 		}
 		auto start = now();
 		auto duration = start;
 		{
-			auto progress = yuni::every(150 /*ms*/, [&] { return writeProgress(); });
+			auto progress = yuni::every(150 /*ms*/, [this] { return writeProgress(); });
 			queueservice.start();
 			queueservice.wait(yuni::qseIdle);
 			duration = now() - start;
