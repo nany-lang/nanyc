@@ -3,6 +3,7 @@ core/class-anonymous-with-capture.ny
 core/class-generic.ny
 core/closure.ny
 core/funcs-generic.ny
+core/modulo.ny
 core/on-scope-fail.ny
 core/on-scope.ny
 core/optional.ny
