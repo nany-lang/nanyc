@@ -284,7 +284,8 @@ operator-add: // operators with priority like + - ...
 operator-factor: // operators with priority like * / ...
 	// transformed into a global func call
 	//| '!=' | '==' | '<=' | '>=' | ('<' [^<]^)  | ('>' [^>]^)
-	([*/] [^=]^) | ('mod' sp)
+	([*/] [^=]^) | ('mod' sp) | ('xor' sp)
+	
 
 operator-stream: // operators with priority like << >>
 	// transformed into a global func call
