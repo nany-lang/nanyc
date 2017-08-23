@@ -388,6 +388,17 @@ void craftUnittestsModulo(Clob& o, AnyString filename) {
 	writeFile(filename, o);
 }
 
+void craftUnittestsXOR(Clob& o, AnyString filename) {
+	setFileHeader(o);
+	o << "unittest std.core.xor {\n";
+	for (auto i: {0, 10, 255, 666, 1024, 123456, 0xFFFF}) {
+		for (auto j: {0, 10, 255, 666, 1024, 123456, 0xFFFF})
+			o << "\tassert((" << i << " xor " << j << ") == " << (i ^ j) << ");\n";
+	}
+	o << "}\n";
+	writeFile(filename, o);
+}
+
 } // namespace
 
 int main(int argc, char** argv) {
@@ -416,6 +427,8 @@ int main(int argc, char** argv) {
 		craftUnittestsCast(out, filename);
 		filename.clear() << folder << "/nsl.selftest/core/modulo.ny";
 		craftUnittestsModulo(out, filename);
+		filename.clear() << folder << "/nsl.selftest/core/xor.ny";
+		craftUnittestsXOR(out, filename);
 		return 0;
 	}
 	catch (const char* e) {
