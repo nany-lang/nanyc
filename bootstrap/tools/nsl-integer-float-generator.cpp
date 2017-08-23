@@ -378,8 +378,8 @@ void craftUnittestsModulo(Clob& o, AnyString license, AnyString filename) {
 		o << "unittest std.core.modulo." << (issigned ? "signed" : "unsigned") << " {\n";
 		char c = issigned ? 'i' : 'u';
 		for (uint32_t b = 64; b >= 8; b /= 2) {
-			for (uint32_t i = 0; i != limit; ++i) {
-				for (uint32_t j = 1; j != limit; ++j) {
+			for (uint32_t i = 0; i < static_cast<uint32_t>(limit); ++i) {
+				for (uint32_t j = 1; j < static_cast<uint32_t>(limit); ++j) {
 					o << "\tassert(";
 					o << i << c << b;
 					o << " mod ";
