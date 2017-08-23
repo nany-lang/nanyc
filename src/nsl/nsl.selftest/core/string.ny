@@ -13,7 +13,7 @@ unittest std.core.string.stayempty {
 	assert(s.blank);
 	assert(not s.contains('z'));
 	assert(not s.contains(' '));
-	assert(s.count('_') == 0u);
+	assert(s.countUp('_') == 0u);
 	assert(s.last == '\0');
 	assert(s.first == '\0');
 	assert(s.data == null);
@@ -25,7 +25,7 @@ unittest std.core.string.stayempty {
 	assert(s.blank);
 	assert(not s.contains('z'));
 	assert(not s.contains(' '));
-	assert(s.count('_') == 0u);
+	assert(s.countUp('_') == 0u);
 	assert(s.last == '\0');
 	assert(s.first == '\0');
 	assert(s.data == null);
@@ -37,7 +37,7 @@ unittest std.core.string.stayempty {
 	assert(s.blank);
 	assert(not s.contains('z'));
 	assert(not s.contains(' '));
-	assert(s.count('_') == 0u);
+	assert(s.countUp('_') == 0u);
 	assert(s.last == '\0');
 	assert(s.first == '\0');
 	assert(s.data == null);
@@ -49,7 +49,7 @@ unittest std.core.string.stayempty {
 	assert(s.blank);
 	assert(not s.contains('z'));
 	assert(not s.contains(' '));
-	assert(s.count('_') == 0u);
+	assert(s.countUp('_') == 0u);
 	assert(s.last == '\0');
 	assert(s.first == '\0');
 	assert(s.data == null);
@@ -61,7 +61,7 @@ unittest std.core.string.stayempty {
 	assert(s.blank);
 	assert(not s.contains('z'));
 	assert(not s.contains(' '));
-	assert(s.count('_') == 0u);
+	assert(s.countUp('_') == 0u);
 	assert(s.last == '\0');
 	assert(s.first == '\0');
 	assert(s.data == null);
@@ -73,7 +73,7 @@ unittest std.core.string.stayempty {
 	assert(s.blank);
 	assert(not s.contains('z'));
 	assert(not s.contains(' '));
-	assert(s.count('_') == 0u);
+	assert(s.countUp('_') == 0u);
 	assert(s.last == '\0');
 	assert(s.first == '\0');
 	assert(s.data == null);
@@ -85,7 +85,7 @@ unittest std.core.string.stayempty {
 	assert(s.blank);
 	assert(not s.contains('z'));
 	assert(not s.contains(' '));
-	assert(s.count('_') == 0u);
+	assert(s.countUp('_') == 0u);
 	assert(s.last == '\0');
 	assert(s.first == '\0');
 	assert(s.data == null);
@@ -105,9 +105,9 @@ unittest std.core.string.smallstring {
 	assert(not s.contains('z'));
 	assert(not s.contains(' '));
 	assert(s.contains('o'));
-	assert(s.count('l') == 2u);
-	assert(s.count('h') == 1u);
-	assert(s.count('o') == 1u);
+	assert(s.countUp('l') == 2u);
+	assert(s.countUp('h') == 1u);
+	assert(s.countUp('o') == 1u);
 	assert(s.last == 'o');
 	assert(s.first == 'h');
 	assert(s.data != null);
@@ -121,10 +121,10 @@ unittest std.core.string.smallstring {
 	assert(s.contains(' '));
 	assert(s.contains('o'));
 	assert(s.contains('!'));
-	assert(s.count('l') == 3u);
-	assert(s.count('h') == 1u);
-	assert(s.count('o') == 2u);
-	assert(s.count(' ') == 2u);
+	assert(s.countUp('l') == 3u);
+	assert(s.countUp('h') == 1u);
+	assert(s.countUp('o') == 2u);
+	assert(s.countUp(' ') == 2u);
 	assert(s.last == '!');
 	assert(s.first == 'h');
 	assert(s.data != null);
