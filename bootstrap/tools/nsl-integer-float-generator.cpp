@@ -15,7 +15,8 @@ bool detectCI() {
 		or yuni::System::Environment::ReadAsInt64("CI_JOB_ID");
 }
 
-void writeFile(const AnyString& filename, const AnyString& content) {
+void writeFile(const AnyString& filename, AnyString content) {
+	content.trim();
 	yuni::Hash::Checksum::MD5 md5;
 	auto oldMD5 = md5.fromFile(filename);
 	auto newMD5 = md5.fromRawData(content.c_str(), content.sizeInBytes());
@@ -166,7 +167,6 @@ void craftClassFloat(Clob& o, uint32_t bits, const AnyString& license, const Any
 	craft("-", "fsub", genGlobalOperator);
 	craft("/", "fdiv", genGlobalOperator);
 	craft("*", "fmul", genGlobalOperator);
-	o.trimRight();
 	writeFile(filename, o);
 }
 
@@ -317,7 +317,6 @@ void craftClassInt(Clob& o, uint32_t bits, bool issigned, const AnyString& licen
 	craft("or", "or", genGlobalOperator);
 	craft("xor", "xor", genGlobalOperator);
 	craft("mod", issigned ? "modi" : "mod", genGlobalOperator);
-	o.trimRight();
 	writeFile(filename, o);
 }
 
@@ -367,7 +366,6 @@ void craftUnittestsCast(Clob& o, AnyString license, AnyString filename) {
 	craftSingleUnittestsCast<int64_t>(o);
 	craftSingleUnittestsCast<float>(o);
 	craftSingleUnittestsCast<double>(o);
-	o.trimRight();
 	writeFile(filename, o);
 }
 
@@ -396,7 +394,6 @@ void craftUnittestsModulo(Clob& o, AnyString license, AnyString filename) {
 	};
 	makeUnittest(8);
 	makeUnittest(8u);
-	o.trimRight();
 	writeFile(filename, o);
 }
 
