@@ -52,7 +52,7 @@ public func unset(cref name: string)
 ** \return The value of the env variable 'name' if it exists, an empty string otherwise
 */
 public func read(cref name: string): ref string
-	-> new string(pod: !!__nanyc_env_read(name.pod, null));
+	-> new string(str: !!__nanyc_env_read(name.data, null));
 
 /*!
 ** \brief Read the value of an environment variable
@@ -62,7 +62,7 @@ public func read(cref name: string): ref string
 ** \return The value of the env variable 'name' if it exists, 'default' otherwise
 */
 public func read(cref name: string, cref default: string): ref string
-	-> new string(pod: !!__nanyc_env_read(name.pod, default.pod));
+	-> new string(str: !!__nanyc_env_read(name.data, default.data));
 
 /*!
 ** \brief Read the value of an environment variable as a flag
