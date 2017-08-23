@@ -37,14 +37,6 @@ static void* nyinx_env_read(nyvmthread_t* vm, void* varname, void* defvalue) {
 	return string;
 }
 
-static bool nyinx_env_read_as_bool(nyvmthread_t*, void* varname, bool defvalue) {
-	if (varname) {
-		AnyString name = *(reinterpret_cast<String*>(varname));
-		return System::Environment::ReadAsBool(name, defvalue);
-	}
-	return defvalue;
-}
-
 static int64_t nyinx_env_read_as_i64(nyvmthread_t*, void* varname, int64_t defvalue) {
 	if (varname) {
 		AnyString name = *(reinterpret_cast<String*>(varname));
@@ -77,7 +69,6 @@ void env(ny::intrinsic::Catalog& intrinsics) {
 	intrinsics.emplace("__nanyc_env_set",    nyinx_env_set);
 	intrinsics.emplace("__nanyc_env_unset",  nyinx_env_unset);
 	intrinsics.emplace("__nanyc_env_read",   nyinx_env_read);
-	intrinsics.emplace("__nanyc_env_asbool", nyinx_env_read_as_bool);
 	intrinsics.emplace("__nanyc_env_asi64",  nyinx_env_read_as_i64);
 	intrinsics.emplace("__nanyc_env_asu64",  nyinx_env_read_as_u64);
 	intrinsics.emplace("__nanyc_env_exists", nyinx_env_exists);

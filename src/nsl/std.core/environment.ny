@@ -73,18 +73,31 @@ public func read(cref name: string, cref default: string): ref string
 ** \return The value as a flag of the env variable 'name' if it exists, false otherwise
 */
 public func read(cref flag: string): ref bool
-	-> new bool(!!__nanyc_env_asbool(flag.pod, __false));
+	-> std.env.read(flag: flag, default: false);
 
 /*!
 ** \brief Read the value of an environment variable as a flag
 **
 ** \note The following values will be considered as 'true' (case insensitive, false otherwise):
-**       "y", "1", "true", "on"
+**       "y", "1", "yes", "on", "true"
 ** \param flag The environment variable name
 ** \return The value as a flag of the env variable 'name' if it exists, 'default' otherwise
 */
-public func read(cref flag: string, cref default: bool): ref bool
-	-> new bool(!!__nanyc_env_asbool(flag.pod, default.pod));
+public func read(cref flag: string, cref default: bool): ref bool {
+	ref value = read(name: flag);
+	if not value.empty then {
+		if value.size == 1u then
+			return value == "1" or value == "y" or value == "Y";
+		if value.size == 2u then
+			return value == "on" or value == "ON";
+		if value.size == 3u then
+			return value == "yes" or value == "YES";
+		if value.size == 4u then
+			return value == "true" or value == "TRUE";
+		return false;
+	}
+	return default;
+}
 
 /*!
 ** \brief Read the value of an environment variable as signed 64bits integer
