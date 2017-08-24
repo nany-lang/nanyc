@@ -373,11 +373,10 @@ public class string {
 		-> std.details.string.lastIndex(self, offset, ascii);
 
 	//! Get the number of ascii in the string
-	func count(cref ascii: std.Ascii): u32
-		-> std.details.string.count(self, ascii);
+	func countUp(cref ascii: std.Ascii): u32
+		-> std.details.string.countUp(self, ascii);
 
-	//! Get the total number of ascii in the string (same as 'size')
-	func count: u32
+	func countUp: u32
 		-> new u32(m_size);
 
 	//! Determines whether the string begins with the characters of another string

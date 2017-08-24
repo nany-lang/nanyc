@@ -1,6 +1,7 @@
 #include "details/intrinsic/std.h"
 #include "std.core.h"
 #include "details/intrinsic/catalog.h"
+#include "details/intrinsic/std.internals.utils.h"
 #include <yuni/yuni.h>
 #include <yuni/core/string.h>
 #include <yuni/io/file.h>
@@ -253,12 +254,8 @@ static void* nyinx_io_file_get_contents(nyvmthread_t* vm, const char* path, uint
 	uint64_t capacity = 0;
 	nyio_err_t err = adapter.file_get_contents(&adapter,
 		&content, &size, &capacity, adapterPath.c_str, (uint32_t) adapterPath.len);
-	if (err == nyioe_ok) {
-		vm->returnValue.size     = size;
-		vm->returnValue.capacity = capacity;
-		vm->returnValue.data     = content;
-		return &vm->returnValue;
-	}
+	if (err == nyioe_ok)
+		return ny::intrinsic::makeInterimNanycString(vm, content, size, capacity);
 	return nullptr;
 }
 

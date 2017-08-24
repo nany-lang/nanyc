@@ -31,7 +31,7 @@ struct nyvmthread_t {
 	struct {
 		uint64_t size;
 		uint64_t capacity;
-		void* data;
+		const void* data;
 	}
 	returnValue;
 	void* userdata;

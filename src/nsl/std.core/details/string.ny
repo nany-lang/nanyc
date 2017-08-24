@@ -114,7 +114,7 @@ func lastIndex(cref base, offset: u32, cref ascii: std.Ascii): u32 {
 	return new u32(size);
 }
 
-func count(cref base, cref ascii: std.Ascii): u32 {
+func countUp(cref base, cref ascii: std.Ascii): u32 {
 	var c = 0u;
 	if base.m_size != 0__u32 then {
 		var i = 0u;
