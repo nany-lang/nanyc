@@ -1,5 +1,6 @@
 #include <nanyc/allocator.h>
 #include "libnanyc.h"
+#include "libnanyc-config.h"
 #include <yuni/core/string.h>
 
 
@@ -10,6 +11,7 @@ void import_allocator_cf(nyallocator_t* allocator, const nyallocator_opts_t* opt
 	allocator->allocate = opts->allocate;
 	allocator->deallocate = opts->deallocate;
 	allocator->reallocate = opts->reallocate;
+	allocator->transfer_ownership_from_malloc = opts->transfer_ownership_from_malloc;
 	allocator->on_release = opts->on_release;
 	allocator->on_not_enough_memory = opts->on_not_enough_memory;
 }
@@ -41,6 +43,14 @@ void nanyc_sys_deallocate(nyallocator_t*, void* ptr, size_t /*size*/) {
 	free(ptr);
 }
 
+void* nanyc_sys_transfer_ownership_from_malloc(nyallocator_t* allocator, void* ptr, size_t size) {
+	size += ny::config::extraObjectSize;
+	void* p = realloc(ptr, size);
+	if (likely(p))
+		return p;
+	return report_not_enough_memory_for_allocation(allocator, size);
+}
+
 } // namespace
 
 nyallocator_t* nyallocator_make(const nyallocator_opts_t* opts) {
@@ -59,6 +69,7 @@ void nyallocator_init_from_malloc(nyallocator_t* allocator) {
 	allocator->allocate = &nanyc_sys_allocate;
 	allocator->deallocate = &nanyc_sys_deallocate;
 	allocator->reallocate = &nanyc_sys_reallocate;
+	allocator->transfer_ownership_from_malloc = &nanyc_sys_transfer_ownership_from_malloc;
 	allocator->on_release = nullptr;
 	allocator->on_not_enough_memory = nullptr;
 }
