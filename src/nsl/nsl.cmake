@@ -45,6 +45,7 @@ set(nsl_files
 	"${nsl_root}/std.core/i8.ny"
 	"${nsl_root}/std.core/memory.ny"
 	"${nsl_root}/std.core/optional.ny"
+	"${nsl_root}/std.core/os.ny"
 	"${nsl_root}/std.core/pointer.ny"
 	"${nsl_root}/std.core/std-utils.ny"
 	"${nsl_root}/std.core/string.ny"
