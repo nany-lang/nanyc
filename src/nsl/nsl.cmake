@@ -39,6 +39,7 @@ set(nsl_files
 	"${nsl_root}/std.core/environment.ny"
 	"${nsl_root}/std.core/f32.ny"
 	"${nsl_root}/std.core/f64.ny"
+	"${nsl_root}/std.core/hash.ny"
 	"${nsl_root}/std.core/i16.ny"
 	"${nsl_root}/std.core/i32.ny"
 	"${nsl_root}/std.core/i64.ny"
