@@ -29,10 +29,10 @@ make_component_from_collection(
 # Standard Library (NSL) for Nany C++/Bootstrap
 #
 set(nsl_files
-	"${nsl_root}/std.console/console.ny"
-	"${nsl_root}/std.console/global.ny"
 	"${nsl_root}/std.core/ascii.ny"
 	"${nsl_root}/std.core/bool.ny"
+	"${nsl_root}/std.core/console/console.ny"
+	"${nsl_root}/std.core/console/global.ny"
 	"${nsl_root}/std.core/containers/array.ny"
 	"${nsl_root}/std.core/ctypes.ny"
 	"${nsl_root}/std.core/details/string.ny"
@@ -44,6 +44,7 @@ set(nsl_files
 	"${nsl_root}/std.core/i32.ny"
 	"${nsl_root}/std.core/i64.ny"
 	"${nsl_root}/std.core/i8.ny"
+	"${nsl_root}/std.core/math.ny"
 	"${nsl_root}/std.core/memory.ny"
 	"${nsl_root}/std.core/optional.ny"
 	"${nsl_root}/std.core/os.ny"
@@ -55,12 +56,5 @@ set(nsl_files
 	"${nsl_root}/std.core/u64.ny"
 	"${nsl_root}/std.core/u8.ny"
 	"${nsl_root}/std.core/utils.ny"
-	"${nsl_root}/std.io/file-object.ny"
-	"${nsl_root}/std.io/file.ny"
-	"${nsl_root}/std.io/folder-object.ny"
-	"${nsl_root}/std.io/folder.ny"
-	"${nsl_root}/std.io/io.ny"
-	"${nsl_root}/std.io/path.ny"
-	"${nsl_root}/std.math/math.ny"
 	CACHE INTERNAL "Nany Standard Library - File list"
 )
