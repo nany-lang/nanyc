@@ -44,6 +44,7 @@ set(nsl_files
 	"${nsl_root}/std.core/i32.ny"
 	"${nsl_root}/std.core/i64.ny"
 	"${nsl_root}/std.core/i8.ny"
+	"${nsl_root}/std.core/math.ny"
 	"${nsl_root}/std.core/memory.ny"
 	"${nsl_root}/std.core/optional.ny"
 	"${nsl_root}/std.core/os.ny"
@@ -61,6 +62,5 @@ set(nsl_files
 	"${nsl_root}/std.io/folder.ny"
 	"${nsl_root}/std.io/io.ny"
 	"${nsl_root}/std.io/path.ny"
-	"${nsl_root}/std.math/math.ny"
 	CACHE INTERNAL "Nany Standard Library - File list"
 )
