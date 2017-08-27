@@ -56,11 +56,5 @@ set(nsl_files
 	"${nsl_root}/std.core/u64.ny"
 	"${nsl_root}/std.core/u8.ny"
 	"${nsl_root}/std.core/utils.ny"
-	"${nsl_root}/std.io/file-object.ny"
-	"${nsl_root}/std.io/file.ny"
-	"${nsl_root}/std.io/folder-object.ny"
-	"${nsl_root}/std.io/folder.ny"
-	"${nsl_root}/std.io/io.ny"
-	"${nsl_root}/std.io/path.ny"
 	CACHE INTERNAL "Nany Standard Library - File list"
 )
