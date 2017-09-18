@@ -13,6 +13,7 @@ variables:
 # build
 
 .debug-build-linux: &debug-build-linux
+    stage: build
     script:
         - mkdir -p build/bootstrap
         - cd build/bootstrap
@@ -23,27 +24,22 @@ variables:
         - linux
 
 ~~centos-7.3-amd64-debug:
-    stage: build
     <<: *debug-build-linux
     image: registry.gitlab.com/nany-lang/nanyc/build/centos:7.3-amd64
 
 ~~debian-8-amd64-debug:
-    stage: build
     <<: *debug-build-linux
     image: registry.gitlab.com/nany-lang/nanyc/build/debian:8-amd64
 
 ~~debian-9-amd64-debug:
-    stage: pre-build
     <<: *debug-build-linux
     image: registry.gitlab.com/nany-lang/nanyc/build/debian:9-amd64
 
 ~~ubuntu-16.04-amd64-debug:
-    stage: build
     <<: *debug-build-linux
     image: registry.gitlab.com/nany-lang/nanyc/build/ubuntu:16.04-amd64
 
 ~~ubuntu-17.04-amd64-debug:
-    stage: build
     <<: *debug-build-linux
     image: registry.gitlab.com/nany-lang/nanyc/build/ubuntu:17.04-amd64
 
