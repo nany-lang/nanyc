@@ -29,6 +29,8 @@ int main(int argc, const char** argv) {
 		return ny::print::noInputScript(argv[0]);
 	nyvm_opts_t vmopts;
 	nyvm_opts_init_defaults(&vmopts);
+	nycompile_opts_t copts;
+	memset(&copts, 0x0, sizeof(nycompile_opts_t));
 	int firstarg = argc; // end of the list
 	for (int i = 1; i < argc; ++i) {
 		const char* const carg = argv[i];
@@ -37,7 +39,7 @@ int main(int argc, const char** argv) {
 				return shortOption(carg, argv[0]);
 			if (carg[2] != '\0') { // to handle '--' option
 				if (!strcmp(carg, "--verbose")) {
-					ny::print::bugReportInfo();
+					copts.verbose = nytrue;
 				}
 				else
 					return longOptions(carg, argv[0]);
@@ -63,7 +65,7 @@ int main(int argc, const char** argv) {
 		--nargc;
 		uint32_t pargc = (nargc > 0) ? static_cast<uint32_t>(nargc) : 0;
 		const char** pargv = (!pargc ? nullptr : (++nargv));
-		exitstatus = nymain(&vmopts, nargv0, strlen(nargv0), pargc, pargv);
+		exitstatus = nyeval(&vmopts, &copts, nargv0, strlen(nargv0), pargc, pargv);
 	}
 	return exitstatus;
 }

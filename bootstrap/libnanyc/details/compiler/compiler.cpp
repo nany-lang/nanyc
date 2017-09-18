@@ -12,6 +12,7 @@
 #include "details/compiler/report.h"
 #include "libnanyc-config.h"
 #include "libnanyc-traces.h"
+#include "libnanyc-version.h"
 #include "embed-nsl.hxx" // generated
 #include <yuni/io/file.h>
 #include <libnanyc.h>
@@ -24,7 +25,12 @@ namespace compiler {
 
 namespace {
 
-constexpr uint32_t memoryHardlimit = 64 * 1024 * 1024;
+void bugReportInfo(ny::Logs::Report& report) {
+	auto e = report.info("nanyc {c++/bootstrap}") << " v" << LIBNANYC_VERSION_STR;
+	if (yuni::debugmode)
+		e << " {debug}";
+	e.message.section = "comp";
+}
 
 Logs::Report buildGenerateReport(void* ptr, Logs::Level level) {
 	return (*((ny::Logs::Report*) ptr)).fromErrLevel(level);
@@ -32,13 +38,13 @@ Logs::Report buildGenerateReport(void* ptr, Logs::Level level) {
 
 void copySourceOpts(ny::compiler::Source& source, const nysource_opts_t& opts) {
 	if (opts.filename.len != 0) {
-		if (unlikely(opts.filename.len > memoryHardlimit))
+		if (unlikely(opts.filename.len > 64 * 1024))
 			throw "input filename bigger than internal limit";
 		yuni::IO::Canonicalize(source.storageFilename, AnyString{opts.filename.c_str, static_cast<uint32_t>(opts.filename.len)});
 		source.filename = source.storageFilename;
 	}
 	if (opts.content.len != 0) {
-		if (unlikely(opts.content.len > memoryHardlimit))
+		if (unlikely(opts.content.len > 64 * 1024 * 1024))
 			throw "input source content bigger than internal limit";
 		source.storageContent.assign(opts.content.c_str, static_cast<uint32_t>(opts.content.len));
 		source.content = source.storageContent;
@@ -112,6 +118,8 @@ struct CompilerQueue final {
 			filename << '/' << name << "/nanyc.collection";
 			if (yuni::IO::errNone != yuni::IO::File::LoadFromFile(content, filename))
 				continue;
+			if (unlikely(queue.compdb.opts.verbose == nytrue))
+				info() << "uses " << name << " -> " << searchpath << '/' << name;
 			content.words("\n", [&](AnyString line) -> bool {
 				if (not line.empty()) {
 					if (unlikely(line[0] == 'u' and line.startsWith("uses "))) {
@@ -137,6 +145,8 @@ struct CompilerQueue final {
 	}
 
 	bool compileSource(ny::compiler::Source& source) {
+		if (unlikely(compdb.opts.verbose == nytrue))
+			info() << "compile " << source.filename;
 		auto subreport = report.subgroup();
 		subreport.data().origins.location.filename = source.filename;
 		subreport.data().origins.location.target.clear();
@@ -159,6 +169,8 @@ std::unique_ptr<ny::Program> compile(ny::compiler::Compdb& compdb) {
 	auto& report = queue.report;
 	Logs::Handler errorHandler{&report, &buildGenerateReport};
 	try {
+		if (unlikely(compdb.opts.verbose == nytrue))
+			bugReportInfo(report);
 		uint32_t scount = compdb.opts.sources.count;
 		if (unlikely(scount == 0))
 			throw "no input source code";
@@ -185,6 +197,8 @@ std::unique_ptr<ny::Program> compile(ny::compiler::Compdb& compdb) {
 			auto& source = sources[i];
 			compiled &= queue.compileSource(source);
 		}
+		if (unlikely(compdb.opts.verbose == nytrue))
+			report.info() << "building... ";
 		compiled = compiled
 			and likely(compdb.opts.on_unittest == nullptr)
 			and compdb.cdeftable.atoms.fetchAndIndexCoreObjects() // indexing bool, u32, f64...
