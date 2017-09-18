@@ -10,29 +10,28 @@ namespace std.c;
 
 
 //! Unsigned integer with width of exactly 8 bits
-public typedef u8: __u8;
+public typedef uint8_t: u8;
 
 //! Unsigned integer with width of exactly 16 bits
-public typedef u16: __u16;
+public typedef uint16_t: u16;
 
 //! Unsigned integer with width of exactly 32 bits
-public typedef u32: __u32;
+public typedef uint32_t: u32;
 
 //! Unsigned integer with width of exactly 64 bits
-public typedef u64: __u64;
-
+public typedef uint64_t: u64;
 
 //! Signed integer with width of exactly 8 bits
-public typedef i8: __i8;
+public typedef int8_t: i8;
 
 //! Signed integer with width of exactly 16 bits
-public typedef i16: __i16;
+public typedef int16_t: i16;
 
 //! Signed integer with width of exactly 32 bits
-public typedef i32: __i32;
+public typedef int32_t: i32;
 
 //! Signed integer with width of exactly 64 bits
-public typedef i64: __i64;
+public typedef int64_t: i64;
 
 
 
