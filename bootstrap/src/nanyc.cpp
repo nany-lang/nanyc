@@ -40,7 +40,6 @@ int main(int argc, const char** argv) {
 			if (carg[2] != '\0') { // to handle '--' option
 				if (!strcmp(carg, "--verbose")) {
 					copts.verbose = nytrue;
-					ny::print::bugReportInfo();
 				}
 				else
 					return longOptions(carg, argv[0]);

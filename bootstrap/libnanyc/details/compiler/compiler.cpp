@@ -12,6 +12,7 @@
 #include "details/compiler/report.h"
 #include "libnanyc-config.h"
 #include "libnanyc-traces.h"
+#include "libnanyc-version.h"
 #include "embed-nsl.hxx" // generated
 #include <yuni/io/file.h>
 #include <libnanyc.h>
@@ -25,6 +26,13 @@ namespace compiler {
 namespace {
 
 constexpr uint32_t memoryHardlimit = 64 * 1024 * 1024;
+
+void bugReportInfo(ny::Logs::Report& report) {
+	auto e = report.info("nanyc {c++/bootstrap}") << " v" << LIBNANYC_VERSION_STR;
+	if (yuni::debugmode)
+		e << " {debug}";
+	e.message.section = "comp";
+}
 
 Logs::Report buildGenerateReport(void* ptr, Logs::Level level) {
 	return (*((ny::Logs::Report*) ptr)).fromErrLevel(level);
@@ -163,6 +171,8 @@ std::unique_ptr<ny::Program> compile(ny::compiler::Compdb& compdb) {
 	auto& report = queue.report;
 	Logs::Handler errorHandler{&report, &buildGenerateReport};
 	try {
+		if (unlikely(compdb.opts.verbose == nytrue))
+			bugReportInfo(report);
 		uint32_t scount = compdb.opts.sources.count;
 		if (unlikely(scount == 0))
 			throw "no input source code";
