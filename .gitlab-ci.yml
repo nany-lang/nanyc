@@ -1,6 +1,6 @@
 stages:
-    - pre-build
     - build
+    - packages
     - artifacts
 
 variables:
@@ -12,7 +12,8 @@ variables:
 
 # build
 
-.template-debug-build-linux: &debug-build-linux
+.debug-build-linux: &debug-build-linux
+    stage: build
     script:
         - mkdir -p build/bootstrap
         - cd build/bootstrap
@@ -22,28 +23,23 @@ variables:
     tags:
         - linux
 
-~~centos-7.3-amd64-debug:
-    stage: build
+centos-7.3-amd64-debug:
     <<: *debug-build-linux
     image: registry.gitlab.com/nany-lang/nanyc/build/centos:7.3-amd64
 
-~~debian-8-amd64-debug:
-    stage: build
+debian-8-amd64-debug:
     <<: *debug-build-linux
     image: registry.gitlab.com/nany-lang/nanyc/build/debian:8-amd64
 
-~~debian-9-amd64-debug:
-    stage: pre-build
+debian-9-amd64-debug:
     <<: *debug-build-linux
     image: registry.gitlab.com/nany-lang/nanyc/build/debian:9-amd64
 
-~~ubuntu-16.04-amd64-debug:
-    stage: build
+ubuntu-16.04-amd64-debug:
     <<: *debug-build-linux
     image: registry.gitlab.com/nany-lang/nanyc/build/ubuntu:16.04-amd64
 
-~~ubuntu-17.04-amd64-debug:
-    stage: build
+ubuntu-17.04-amd64-debug:
     <<: *debug-build-linux
     image: registry.gitlab.com/nany-lang/nanyc/build/ubuntu:17.04-amd64
 
@@ -51,7 +47,7 @@ variables:
 # packages
 
 .build-pkg-linux-deb: &build-pkg-linux-deb
-    stage: build
+    stage: packages
     script:
         - ARCH=$(dpkg --print-architecture)
         - . /etc/os-release
