@@ -33,6 +33,11 @@ public typedef int32_t: i32;
 //! Signed integer with width of exactly 64 bits
 public typedef int64_t: i64;
 
+//! Floating Point Data Type single precision (32 bits, -3.4E38 .. 3.4E38)
+public typedef float: f32;
+
+//! Floating Point Data Type single precision (64 bits, -1.7E308 .. 1.7E308)
+public typedef double: f64;
 
 
 //! Alias for the standard C ssize_t
