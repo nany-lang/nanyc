@@ -112,6 +112,8 @@ struct CompilerQueue final {
 			filename << '/' << name << "/nanyc.collection";
 			if (yuni::IO::errNone != yuni::IO::File::LoadFromFile(content, filename))
 				continue;
+			if (unlikely(queue.compdb.opts.verbose == nytrue))
+				info() << "uses " << name << " -> " << searchpath << '/' << name;
 			content.words("\n", [&](AnyString line) -> bool {
 				if (not line.empty()) {
 					if (unlikely(line[0] == 'u' and line.startsWith("uses "))) {
@@ -137,6 +139,8 @@ struct CompilerQueue final {
 	}
 
 	bool compileSource(ny::compiler::Source& source) {
+		if (unlikely(compdb.opts.verbose == nytrue))
+			info() << "compile " << source.filename;
 		auto subreport = report.subgroup();
 		subreport.data().origins.location.filename = source.filename;
 		subreport.data().origins.location.target.clear();
@@ -185,6 +189,8 @@ std::unique_ptr<ny::Program> compile(ny::compiler::Compdb& compdb) {
 			auto& source = sources[i];
 			compiled &= queue.compileSource(source);
 		}
+		if (unlikely(compdb.opts.verbose == nytrue))
+			report.info() << "building... ";
 		compiled = compiled
 			and likely(compdb.opts.on_unittest == nullptr)
 			and compdb.cdeftable.atoms.fetchAndIndexCoreObjects() // indexing bool, u32, f64...
