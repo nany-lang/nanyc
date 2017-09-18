@@ -17,6 +17,16 @@ NY_EXPORT int nymain(const nyvm_opts_t*, const char* filename, size_t flen, uint
 
 NY_EXPORT int nymain_ex(const nyvm_opts_t*, const nyanystr_t* files, uint32_t, uint32_t argc, const char** argv);
 
+/*!
+** \warning For compiler options, `entrypoint` and `sources` will be overriden
+*/
+NY_EXPORT int nyeval(const nyvm_opts_t*, nycompile_opts_t*, const char* filename, size_t flen, uint32_t argc, const char** argv);
+
+/*!
+** \warning For compiler options, `entrypoint` and `sources` will be overriden
+*/
+NY_EXPORT int nyeval_ex(const nyvm_opts_t*, nycompile_opts_t*, const nyanystr_t* files, uint32_t, uint32_t argc, const char** argv);
+
 #ifdef __cplusplus
 }
 #endif
