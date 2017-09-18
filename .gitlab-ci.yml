@@ -12,7 +12,7 @@ variables:
 
 # build
 
-.template-debug-build-linux: &debug-build-linux
+.debug-build-linux: &debug-build-linux
     script:
         - mkdir -p build/bootstrap
         - cd build/bootstrap
