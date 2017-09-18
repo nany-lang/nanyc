@@ -39,12 +39,11 @@ public typedef float: f32;
 //! Floating Point Data Type single precision (64 bits, -1.7E308 .. 1.7E308)
 public typedef double: f64;
 
-
 //! Alias for the standard C ssize_t
-// public typedef ssize_t: __i64;
+public typedef ssize_t: typeof(!!__nanyc_type_ssize_t());
 
 //! Alias for the standard C size_t
-// public typedef size_t: __u64;
+public typedef size_t: typeof(!!__nanyc_type_size_t());
 
 //! Alias for the standard C ptrdiff_t
 // public typedef ptrdiff_t: __i64;
