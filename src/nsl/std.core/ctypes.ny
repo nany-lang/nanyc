@@ -45,12 +45,11 @@ public typedef ssize_t: typeof(!!__nanyc_type_ssize_t());
 //! Alias for the standard C size_t
 public typedef size_t: typeof(!!__nanyc_type_size_t());
 
-//! Alias for the standard C ptrdiff_t
-// public typedef ptrdiff_t: __i64;
-
 //! Alias for the standard C intptr_t
-// public typedef intptr_t: __i64;
+public typedef intptr_t: typeof(!!__nanyc_type_intptr_t()); // probably i32 or i64
 
+//! Alias for the standard C uintptr_t
+public typedef uintptr_t: typeof(!!__nanyc_type_uintptr_t()); // probably u32 or u64
 
 //! Pointer
 public typedef ptr: __pointer;
