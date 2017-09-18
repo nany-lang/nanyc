@@ -1,5 +1,6 @@
 stages:
     - build
+    - packages
     - artifacts
 
 variables:
@@ -46,7 +47,7 @@ variables:
 # packages
 
 .build-pkg-linux-deb: &build-pkg-linux-deb
-    stage: build
+    stage: packages
     script:
         - ARCH=$(dpkg --print-architecture)
         - . /etc/os-release
