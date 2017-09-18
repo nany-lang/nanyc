@@ -1,5 +1,4 @@
 stages:
-    - pre-build
     - build
     - artifacts
 
