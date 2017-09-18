@@ -25,8 +25,6 @@ namespace compiler {
 
 namespace {
 
-constexpr uint32_t memoryHardlimit = 64 * 1024 * 1024;
-
 void bugReportInfo(ny::Logs::Report& report) {
 	auto e = report.info("nanyc {c++/bootstrap}") << " v" << LIBNANYC_VERSION_STR;
 	if (yuni::debugmode)
@@ -40,13 +38,13 @@ Logs::Report buildGenerateReport(void* ptr, Logs::Level level) {
 
 void copySourceOpts(ny::compiler::Source& source, const nysource_opts_t& opts) {
 	if (opts.filename.len != 0) {
-		if (unlikely(opts.filename.len > memoryHardlimit))
+		if (unlikely(opts.filename.len > 64 * 1024))
 			throw "input filename bigger than internal limit";
 		yuni::IO::Canonicalize(source.storageFilename, AnyString{opts.filename.c_str, static_cast<uint32_t>(opts.filename.len)});
 		source.filename = source.storageFilename;
 	}
 	if (opts.content.len != 0) {
-		if (unlikely(opts.content.len > memoryHardlimit))
+		if (unlikely(opts.content.len > 64 * 1024 * 1024))
 			throw "input source content bigger than internal limit";
 		source.storageContent.assign(opts.content.c_str, static_cast<uint32_t>(opts.content.len));
 		source.content = source.storageContent;
