@@ -515,7 +515,7 @@ bool intrinsicNOT(Analyzer& seq, uint32_t lvid) {
 	// --- result of the operator
 	if (atomBuiltinCast != nullptr) {
 		// implicit convertion from builtin __bool to object bool
-		atomBuiltinCast = Ref<Atom>::WeakPointer(seq.cdeftable.atoms().core.object[(uint32_t) CType::t_bool]);
+		atomBuiltinCast = seq.cdeftable.atoms().core.object[(uint32_t) CType::t_bool].pointer();
 		assert(atomBuiltinCast != nullptr);
 		assert(not atomBuiltinCast->hasGenericParameters());
 		Atom* remapAtom = seq.instanciateAtomClass(*atomBuiltinCast);
