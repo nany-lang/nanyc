@@ -3,11 +3,9 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace ir {
 namespace Producer {
-
 
 Context::Context(AnyString filename, Sequence& ircode, Logs::Report report, bool ignoreAtoms)
 	: ignoreAtoms(ignoreAtoms)
@@ -18,12 +16,10 @@ Context::Context(AnyString filename, Sequence& ircode, Logs::Report report, bool
 	, localMetadataHandler(this, &retriveReportMetadata) {
 }
 
-
 Logs::Report Context::emitReportEntry(void* self, Logs::Level level) {
 	auto& ctx = *(reinterpret_cast<Context*>(self));
 	return ctx.report.fromErrLevel(level);
 }
-
 
 void Context::retriveReportMetadata(void* self, Logs::Level, const AST::Node* node, String& filename,
 		uint32_t& line, uint32_t& offset) {
@@ -47,7 +43,6 @@ void Context::retriveReportMetadata(void* self, Logs::Level, const AST::Node* no
 	}
 }
 
-
 void Context::useNamespace(const AnyString& nmspc) {
 	if (not nmspc.empty()) {
 		nmspc.words(".", [&](const AnyString & part) -> bool {
@@ -56,7 +51,6 @@ void Context::useNamespace(const AnyString& nmspc) {
 		});
 	}
 }
-
 
 void Context::generateLineIndexes(const AnyString& content) {
 	uint32_t line = 1;

@@ -19,38 +19,20 @@ namespace Producer {
 // forward declaration
 class Scope;
 
-
-
-
-/*!
-** \brief Context for ir generation
-*/
-class Context final : public Yuni::NonCopyable<Context> {
-public:
-	//! \name Constructor & Destructor
-	//@{
+//! Context for ir generation
+struct Context final : public Yuni::NonCopyable<Context> {
 	//! Default constructor
 	explicit Context(AnyString filename, Sequence&, Logs::Report, bool ignoreAtoms);
-	//@}
 
-
-	//! \name Utilities: ir generation
-	//@{
 	/*!
 	** \brief Generate opcode for using a namespace
 	** \param nmspc namespace (ex: std.nany.example)
 	*/
 	void useNamespace(const AnyString& nmspc);
 
-	/*!
-	** \brief Generate a mapping between input offsets and line numbers
-	*/
+	//! Generate a mapping between input offsets and line numbers
 	void generateLineIndexes(const AnyString& content);
-	//@}
 
-
-	//! \name Reuse nodes
-	//@{
 	//! re-use objects for string declaration
 	void prepareReuseForStrings();
 	//! re-use objects for ascii
@@ -79,11 +61,8 @@ public:
 	void prepareReuseForShorthandArray();
 	//! re=use objects for executing code when exiting the scope
 	void prepareReuseForScopeExit();
-	//@}
-
 
 	void invalidateLastDebugLine();
-
 
 public:
 	//! Discard ir code generation for atoms
@@ -255,13 +234,7 @@ private:
 	Logs::Handler localErrorHandler;
 	Logs::MetadataHandler localMetadataHandler;
 	AnyString pFilename;
-
-}; // class Producer
-
-
-
-
-
+}; // struct Context
 
 } // namespace Producer
 } // namespace ir
