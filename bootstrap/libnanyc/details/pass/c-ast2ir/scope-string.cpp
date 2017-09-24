@@ -94,7 +94,7 @@ bool Scope::visitASTExprChar(AST::Node& node, uint32_t& localvar) {
 			return unexpectedNode(node, "[char]");
 	}
 	if (!context.reuse.ascii.node)
-		context.prepareReuseForAsciis();
+		context.reuse.prepareReuseForAsciis();
 	uint32_t hardcodedlvid = createLocalBuiltinInt(node, CType::t_u8, static_cast<uint8_t>(c));
 	ShortString16 lvidstr;
 	lvidstr = hardcodedlvid;
@@ -127,7 +127,7 @@ bool Scope::visitASTExprString(AST::Node& node, uint32_t& localvar) {
 	//   `var w = "world"; var s = "hello \(w) another literal";` (where \(w) is an expr)
 	// create a string object
 	if (!context.reuse.string.createObject)
-		context.prepareReuseForStrings();
+		context.reuse.prepareReuseForStrings();
 	bool success = visitASTExprNew(*(context.reuse.string.createObject), localvar);
 	if (unlikely(not success))
 		return false;

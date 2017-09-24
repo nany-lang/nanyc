@@ -40,7 +40,7 @@ bool Scope::visitASTExprClosure(AST::Node& node, uint32_t& localvar) {
 	if (unlikely(!body))
 		return error(node) << "empty body not allowed in closures";
 	if (!context.reuse.closure.node)
-		context.prepareReuseForClosures();
+		context.reuse.prepareReuseForClosures();
 	emitDebugpos(node);
 	auto& expr = *context.reuse.closure.node;
 	auto& targetBody = *context.reuse.closure.funcbody;

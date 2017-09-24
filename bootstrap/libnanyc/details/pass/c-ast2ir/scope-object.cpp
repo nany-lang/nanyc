@@ -43,7 +43,7 @@ bool Scope::visitASTExprObject(AST::Node& node, uint32_t& localvar) {
 	// |                       |               return-inline
 	// |                       |                  ...
 	if (!context.reuse.object.node)
-		context.prepareReuseForAnonymObjects();
+		context.reuse.prepareReuseForAnonymObjects();
 	auto& classbody = *context.reuse.object.classbody;
 	for (auto& child : node.children) {
 		switch (child.rule) {

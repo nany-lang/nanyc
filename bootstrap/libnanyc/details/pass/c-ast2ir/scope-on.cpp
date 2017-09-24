@@ -14,7 +14,7 @@ namespace {
 
 bool onScopeExit(Scope& scope, AST::Node& node, AST::Node& scopeNode) {
 	if (!scope.context.reuse.scope.exit.node)
-		scope.context.prepareReuseForScopeExit();
+		scope.context.reuse.prepareReuseForScopeExit();
 	auto& irout = scope.ircode();
 	scope.emitDebugpos(node);
 	uint32_t varlvid = ir::emit::alloc(irout, scope.nextvar());

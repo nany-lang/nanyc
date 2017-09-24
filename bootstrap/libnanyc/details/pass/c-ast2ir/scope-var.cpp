@@ -76,7 +76,7 @@ bool generateInitFuncForClassVar(Scope& scope, const AnyString& varname, uint32_
 	// the first parameter is the result of the default value
 	// the second parameter is the register where the name of member has been stored
 	if (!scope.context.reuse.func.node)
-		scope.context.prepareReuseForVariableMembers();
+		scope.context.reuse.prepareReuseForVariableMembers();
 	scope.context.reuse.func.funcname->text = funcName;
 	scope.context.reuse.func.varname->text  = varname;
 	// Updating the EXPR
@@ -229,7 +229,7 @@ bool emitProperty(Scope& scope, const AnyString& varname, AST::Node& node, AST::
 	ShortString128 propname;
 	if (nodeGet) {
 		if (!scope.context.reuse.properties.get.node)
-			scope.context.prepareReuseForPropertiesGET();
+			scope.context.reuse.prepareReuseForPropertiesGET();
 		propname << "^propget^" << varname;
 		scope.context.reuse.properties.get.propname->text = propname;
 		auto& type = *(scope.context.reuse.properties.get.type);
@@ -250,7 +250,7 @@ bool emitProperty(Scope& scope, const AnyString& varname, AST::Node& node, AST::
 	}
 	if (nodeSet) {
 		if (!scope.context.reuse.properties.set.node)
-			scope.context.prepareReuseForPropertiesSET();
+			scope.context.reuse.prepareReuseForPropertiesSET();
 		propname.clear() << "^propset^" << varname;
 		scope.context.reuse.properties.set.propname->text = propname;
 		auto& body = *(scope.context.reuse.properties.set.body);

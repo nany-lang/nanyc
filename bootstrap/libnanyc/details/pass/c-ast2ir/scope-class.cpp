@@ -99,7 +99,7 @@ bool ClassInspector::inspect(AST::Node& node) {
 	// by the user, those functions will be renamed on the fly
 	auto& reuse = scope.context.reuse;
 	if (!reuse.operatorDefault.node)
-		scope.context.prepareReuseForClasses();
+		scope.context.reuse.prepareReuseForClasses();
 	scope.emitDebugpos(node);
 	// default constructor
 	reuse.operatorDefault.funcname->text = "^default-new";

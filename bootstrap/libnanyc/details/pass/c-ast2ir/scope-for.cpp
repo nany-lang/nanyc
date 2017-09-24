@@ -49,7 +49,7 @@ bool Scope::visitASTFor(AST::Node& node) {
 	if (unlikely(elementname.empty()))
 		return error(node) << "unnamed iterator currently not supported";
 	if (!context.reuse.loops.node)
-		context.prepareReuseForLoops();
+		context.reuse.prepareReuseForLoops();
 	emitDebugpos(node);
 	ShortString16 lvidstr;
 	lvidstr << viewlvid;

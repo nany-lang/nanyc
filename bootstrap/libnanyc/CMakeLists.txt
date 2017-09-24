@@ -173,6 +173,8 @@ add_library(libnanyc ${mode_libnany}
 	"details/pass/c-ast2ir/context.hxx"
 	"details/pass/c-ast2ir/exception.cpp"
 	"details/pass/c-ast2ir/exception.h"
+	"details/pass/c-ast2ir/reuse.cpp"
+	"details/pass/c-ast2ir/reuse.h"
 	"details/pass/c-ast2ir/scope-array.cpp"
 	"details/pass/c-ast2ir/scope-attributes.cpp"
 	"details/pass/c-ast2ir/scope-call.cpp"
