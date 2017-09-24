@@ -65,8 +65,8 @@ private:
 	static void retriveReportMetadata(void*, Logs::Level, const AST::Node*, Yuni::String&, uint32_t&, uint32_t&);
 
 private:
-	uint32_t pPreviousDbgOffset = 0;
-	uint32_t pPreviousDbgLine = 0;
+	uint32_t m_previousDbgOffset = 0;
+	uint32_t m_previousDbgLine = 0;
 	//! Error reporting
 	Logs::Handler localErrorHandler;
 	Logs::MetadataHandler localMetadataHandler;

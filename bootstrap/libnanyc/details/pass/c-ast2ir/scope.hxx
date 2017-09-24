@@ -52,11 +52,11 @@ inline bool Scope::visitAST(AST::Node& node) {
 
 inline void Scope::addDebugCurrentPosition(uint line, uint offset) {
 	if (context.debuginfo and
-		(not config::removeRedundantDbgOffset or offset != context.pPreviousDbgOffset
-		 or line != context.pPreviousDbgLine)) {
+		(not config::removeRedundantDbgOffset or offset != context.m_previousDbgOffset
+		 or line != context.m_previousDbgLine)) {
 		ir::emit::dbginfo::position(context.ircode, line, offset);
-		context.pPreviousDbgOffset = offset;
-		context.pPreviousDbgLine = line;
+		context.m_previousDbgOffset = offset;
+		context.m_previousDbgLine = line;
 	}
 }
 
@@ -66,8 +66,8 @@ inline void Scope::resetLocalCounters(uint32_t localvarStart) {
 	// 1: reserved for namespace lookup
 	nextVarID = localvarStart;
 	// force debug info
-	context.pPreviousDbgOffset = 0;
-	context.pPreviousDbgLine = 0;
+	context.m_previousDbgOffset = 0;
+	context.m_previousDbgLine = 0;
 }
 
 

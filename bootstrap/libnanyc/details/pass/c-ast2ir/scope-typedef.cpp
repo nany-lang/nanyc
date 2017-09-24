@@ -39,7 +39,7 @@ bool Scope::visitASTTypedef(AST::Node& node) {
 	uint32_t bpoffsiz = ir::emit::pragma::blueprintSize(irout);
 	uint32_t bpoffsck = ir::emit::increaseStacksize(irout);
 	// making sure that debug info are available
-	context.pPreviousDbgLine = (uint32_t) - 1; // forcing debug infos
+	context.invalidateLastDebugLine(); // forcing debug infos
 	ir::emit::dbginfo::filename(irout, context.dbgSourceFilename);
 	scope.emitDebugpos(node);
 	uint32_t returntype = 1u; // already allocated
