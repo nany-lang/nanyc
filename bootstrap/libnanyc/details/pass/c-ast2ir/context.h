@@ -1,6 +1,5 @@
 #pragma once
 #include "libnanyc.h"
-#include <yuni/core/noncopyable.h>
 #include "details/ir/sequence.h"
 #include "details/reporting/report.h"
 #include "details/grammar/nany.h"
@@ -20,9 +19,10 @@ namespace Producer {
 class Scope;
 
 //! Context for ir generation
-struct Context final : public Yuni::NonCopyable<Context> {
-	//! Default constructor
-	explicit Context(AnyString filename, Sequence&, Logs::Report, bool ignoreAtoms);
+struct Context final {
+	Context(AnyString filename, Sequence&, Logs::Report, bool ignoreAtoms);
+	Context(const Context&) = delete;
+	Context& operator = (const Context&) = delete;
 
 	/*!
 	** \brief Generate opcode for using a namespace
