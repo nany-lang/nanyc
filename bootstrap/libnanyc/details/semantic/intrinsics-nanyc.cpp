@@ -6,6 +6,7 @@
 #endif
 #include "details/ir/emit.h"
 #include "ref-unref.h"
+#include <limits>
 
 using namespace Yuni;
 
@@ -51,11 +52,39 @@ bool intrinsicMemcheckerHold(Analyzer& seq, uint32_t lvid) {
 	return true;
 }
 
+template<class T> bool intrinsicNanycTypeSizeT(Analyzer& seq, uint32_t lvid) {
+	static_assert(sizeof(T) >= sizeof(uint16_t) and sizeof(T) <= sizeof(uint64_t), "size mistmatch");
+	ny::CType ctype;
+	if (std::numeric_limits<T>::is_signed) {
+		switch (sizeof(T)) {
+			case sizeof(uint64_t): ctype = ny::CType::t_i64; break;
+			case sizeof(uint32_t): ctype = ny::CType::t_i32; break;
+			case sizeof(uint16_t): ctype = ny::CType::t_i16; break;
+		}
+	}
+	else {
+		switch (sizeof(T)) {
+			case sizeof(uint64_t): ctype = ny::CType::t_u64; break;
+			case sizeof(uint32_t): ctype = ny::CType::t_u32; break;
+			case sizeof(uint16_t): ctype = ny::CType::t_u16; break;
+		}
+	}
+	auto& libtype = seq.cdeftable.atoms().core.object[(uint32_t) ctype];
+	seq.cdeftable.substitute(lvid).mutateToAtom(libtype.pointer());
+	if (seq.canGenerateCode())
+		ir::emit::constantu64(seq.out, lvid, 0);
+	return true;
+}
+
 using BuiltinIntrinsic = bool (*)(Analyzer&, uint32_t);
 
 static const std::unordered_map<AnyString, std::pair<uint32_t, BuiltinIntrinsic>> builtinDispatch = {
 	{"__reinterpret",            { 2, &intrinsicReinterpret }},
 	{"__nanyc_memchecker_hold",  { 2, &intrinsicMemcheckerHold }},
+	{"__nanyc_type_size_t",      { 0, &intrinsicNanycTypeSizeT<size_t> }},
+	{"__nanyc_type_ssize_t",     { 0, &intrinsicNanycTypeSizeT<ssize_t> }},
+	{"__nanyc_type_uintptr_t",   { 0, &intrinsicNanycTypeSizeT<uintptr_t> }},
+	{"__nanyc_type_intptr_t",    { 0, &intrinsicNanycTypeSizeT<intptr_t> }},
 };
 
 } // anonymous namespace

@@ -10,44 +10,46 @@ namespace std.c;
 
 
 //! Unsigned integer with width of exactly 8 bits
-public typedef u8: __u8;
+public typedef uint8_t: u8;
 
 //! Unsigned integer with width of exactly 16 bits
-public typedef u16: __u16;
+public typedef uint16_t: u16;
 
 //! Unsigned integer with width of exactly 32 bits
-public typedef u32: __u32;
+public typedef uint32_t: u32;
 
 //! Unsigned integer with width of exactly 64 bits
-public typedef u64: __u64;
-
+public typedef uint64_t: u64;
 
 //! Signed integer with width of exactly 8 bits
-public typedef i8: __i8;
+public typedef int8_t: i8;
 
 //! Signed integer with width of exactly 16 bits
-public typedef i16: __i16;
+public typedef int16_t: i16;
 
 //! Signed integer with width of exactly 32 bits
-public typedef i32: __i32;
+public typedef int32_t: i32;
 
 //! Signed integer with width of exactly 64 bits
-public typedef i64: __i64;
+public typedef int64_t: i64;
 
+//! Floating Point Data Type single precision (32 bits, -3.4E38 .. 3.4E38)
+public typedef float: f32;
 
+//! Floating Point Data Type single precision (64 bits, -1.7E308 .. 1.7E308)
+public typedef double: f64;
 
 //! Alias for the standard C ssize_t
-// public typedef ssize_t: __i64;
+public typedef ssize_t: typeof(!!__nanyc_type_ssize_t());
 
 //! Alias for the standard C size_t
-// public typedef size_t: __u64;
-
-//! Alias for the standard C ptrdiff_t
-// public typedef ptrdiff_t: __i64;
+public typedef size_t: typeof(!!__nanyc_type_size_t());
 
 //! Alias for the standard C intptr_t
-// public typedef intptr_t: __i64;
+public typedef intptr_t: typeof(!!__nanyc_type_intptr_t()); // probably i32 or i64
 
+//! Alias for the standard C uintptr_t
+public typedef uintptr_t: typeof(!!__nanyc_type_uintptr_t()); // probably u32 or u64
 
 //! Pointer
 public typedef ptr: __pointer;
