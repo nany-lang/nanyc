@@ -18,7 +18,7 @@ struct Intrinsic final {
 	//! C-Callback
 	void* callback = nullptr;
 	//! Intrinsic ID
-	uint32_t id = (uint32_t) - 1;
+	const uint32_t id;
 	//! The return type
 	CType rettype = CType::t_void;
 	//! The total number of parameters

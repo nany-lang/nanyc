@@ -183,90 +183,40 @@ struct Executor final {
 		for (uint32_t i = 0; i != paramCount; ++i) {
 			auto r = parameters[i];
 			switch (intrinsic.params[i]) {
-				case CType::t_u64:
-						dcArgLongLong(dyncall, static_cast<DClonglong>(r.u64));
-					break;
-				case CType::t_i64:
-					dcArgLongLong(dyncall, static_cast<DClonglong>(r.i64));
-					break;
-				case CType::t_u32:
-					dcArgInt(dyncall, static_cast<DCint>(r.u64));
-					break;
-				case CType::t_i32:
-					dcArgInt(dyncall, static_cast<DCint>(r.i64));
-					break;
-				case CType::t_ptr:
-					dcArgPointer(dyncall, reinterpret_cast<DCpointer>(r.u64));
-					break;
-				case CType::t_u16:
-					dcArgShort(dyncall, static_cast<DCshort>(r.u64));
-					break;
-				case CType::t_i16:
-					dcArgShort(dyncall, static_cast<DCshort>(r.i64));
-					break;
-				case CType::t_u8:
-					dcArgChar(dyncall, static_cast<DCchar>(r.u64));
-					break;
-				case CType::t_i8:
-					dcArgChar(dyncall, static_cast<DCchar>(r.i64));
-					break;
-				case CType::t_f32:
-					dcArgFloat(dyncall, static_cast<DCfloat>(r.f64));
-					break;
-				case CType::t_f64:
-					dcArgDouble(dyncall, static_cast<DCdouble>(r.f64));
-					break;
-				case CType::t_bool:
-					dcArgBool(dyncall, static_cast<DCbool>(r.u64));
-					break;
+				case CType::t_u64:  dcArgLongLong(dyncall, static_cast<DClonglong>(r.u64)); break;
+				case CType::t_i64:  dcArgLongLong(dyncall, static_cast<DClonglong>(r.i64)); break;
+				case CType::t_u32:  dcArgInt(dyncall, static_cast<DCint>(r.u64)); break;
+				case CType::t_i32:  dcArgInt(dyncall, static_cast<DCint>(r.i64)); break;
+				case CType::t_ptr:  dcArgPointer(dyncall, reinterpret_cast<DCpointer>(r.u64)); break;
+				case CType::t_u16:  dcArgShort(dyncall, static_cast<DCshort>(r.u64)); break;
+				case CType::t_i16:  dcArgShort(dyncall, static_cast<DCshort>(r.i64)); break;
+				case CType::t_u8:   dcArgChar(dyncall, static_cast<DCchar>(r.u64)); break;
+				case CType::t_i8:   dcArgChar(dyncall, static_cast<DCchar>(r.i64)); break;
+				case CType::t_f32:  dcArgFloat(dyncall, static_cast<DCfloat>(r.f64)); break;
+				case CType::t_f64:  dcArgDouble(dyncall, static_cast<DCdouble>(r.f64)); break;
+				case CType::t_bool: dcArgBool(dyncall, static_cast<DCbool>(r.u64)); break;
 				case CType::t_void:
-				case CType::t_any:
-					throw ICE(__LINE__, "invalid intrinsic parameter type");
+				case CType::t_any:  throw ICE(__LINE__, "invalid intrinsic parameter type");
 			}
 		}
 		paramCount = 0;
+		ny::vm::Register& ret = registers[opr.lvid];
+		auto* cb = (DCpointer) intrinsic.callback;
 		switch (intrinsic.rettype) {
-			case CType::t_u64:
-				registers[opr.lvid].u64 = static_cast<uint64_t>(dcCallLongLong(dyncall, intrinsic.callback));
-				break;
-			case CType::t_i64:
-				registers[opr.lvid].i64 = static_cast<int64_t>(dcCallLongLong(dyncall, intrinsic.callback));
-				break;
-			case CType::t_u32:
-				registers[opr.lvid].u64 = static_cast<uint64_t>(dcCallInt(dyncall, intrinsic.callback));
-				break;
-			case CType::t_i32:
-				registers[opr.lvid].i64 = static_cast<int64_t>(dcCallInt(dyncall, intrinsic.callback));
-				break;
-			case CType::t_ptr:
-				registers[opr.lvid].u64 = reinterpret_cast<uint64_t>(dcCallPointer(dyncall, intrinsic.callback));
-				break;
-			case CType::t_u16:
-				registers[opr.lvid].u64 = static_cast<uint64_t>(dcCallShort(dyncall, intrinsic.callback));
-				break;
-			case CType::t_i16:
-				registers[opr.lvid].i64 = static_cast<int64_t>(dcCallShort(dyncall, intrinsic.callback));
-				break;
-			case CType::t_u8:
-				registers[opr.lvid].u64 = static_cast<uint64_t>(dcCallChar(dyncall, intrinsic.callback));
-				break;
-			case CType::t_i8:
-				registers[opr.lvid].i64 = static_cast<int64_t>(dcCallChar(dyncall, intrinsic.callback));
-				break;
-			case CType::t_f32:
-				registers[opr.lvid].f64 = static_cast<float>(dcCallFloat(dyncall, intrinsic.callback));
-				break;
-			case CType::t_f64:
-				registers[opr.lvid].f64 = static_cast<double>(dcCallDouble(dyncall, intrinsic.callback));
-				break;
-			case CType::t_bool:
-				registers[opr.lvid].u64 = (dcCallBool(dyncall, intrinsic.callback) ? 1 : 0);
-				break;
-			case CType::t_void:
-				dcCallVoid(dyncall, intrinsic.callback);
-				break;
-			case CType::t_any:
-				throw ICE(__LINE__, "invalid intrinsic return type");
+			case CType::t_u64:  ret.u64 = static_cast<uint64_t>(dcCallLongLong(dyncall, cb)); break;
+			case CType::t_i64:  ret.i64 = static_cast<int64_t>(dcCallLongLong(dyncall, cb)); break;
+			case CType::t_u32:  ret.u64 = static_cast<uint64_t>(dcCallInt(dyncall, cb)); break;
+			case CType::t_i32:  ret.i64 = static_cast<int64_t>(dcCallInt(dyncall, cb)); break;
+			case CType::t_ptr:  ret.u64 = reinterpret_cast<uint64_t>(dcCallPointer(dyncall, cb)); break;
+			case CType::t_u16:  ret.u64 = static_cast<uint64_t>(dcCallShort(dyncall, cb)); break;
+			case CType::t_i16:  ret.i64 = static_cast<int64_t>(dcCallShort(dyncall, cb)); break;
+			case CType::t_u8:   ret.u64 = static_cast<uint64_t>(dcCallChar(dyncall, cb)); break;
+			case CType::t_i8:   ret.i64 = static_cast<int64_t>(dcCallChar(dyncall, cb)); break;
+			case CType::t_f32:  ret.f64 = static_cast<float>(dcCallFloat(dyncall, cb)); break;
+			case CType::t_f64:  ret.f64 = static_cast<double>(dcCallDouble(dyncall, cb)); break;
+			case CType::t_bool: ret.u64 = (dcCallBool(dyncall, cb) ? 1 : 0); break;
+			case CType::t_void: dcCallVoid(dyncall, cb); break;
+			case CType::t_any:  throw ICE(__LINE__, "invalid intrinsic return type");
 		}
 	}
 
