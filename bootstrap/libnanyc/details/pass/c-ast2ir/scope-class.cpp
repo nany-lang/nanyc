@@ -14,7 +14,7 @@ struct ClassInspector final {
 
 	ClassInspector(Scope& parentscope, uint32_t lvid);
 
-	bool inspect(AST::Node& node);
+	bool inspectClassDefinition(AST::Node& node);
 	bool inspectBody(AST::Node& node);
 
 	//! Parent scope
@@ -66,7 +66,7 @@ bool ClassInspector::inspectClassname(AST::Node& node) {
 }
 
 
-bool ClassInspector::inspect(AST::Node& node) {
+bool ClassInspector::inspectClassDefinition(AST::Node& node) {
 	scope.emitDebugpos(node);
 	// exit status
 	bool success = true;
@@ -115,7 +115,7 @@ bool ClassInspector::inspectBody(AST::Node& node) {
 	auto& irout = scope.ircode();
 	// evaluate the whole function, and grab the node body for continuing evaluation
 	{
-		success = inspect(node);
+		success = inspectClassDefinition(node);
 		auto& operands = irout.at<isa::Op::blueprint>(bpoffset);
 		operands.name = irout.stringrefs.ref(classname);
 	}
