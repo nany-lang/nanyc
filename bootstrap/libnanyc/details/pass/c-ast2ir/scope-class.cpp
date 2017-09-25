@@ -148,8 +148,8 @@ bool Scope::visitASTClass(AST::Node& node, uint32_t* localvar) {
 	uint32_t lvid = 0;
 	if (localvar) // create the lvid before the new scope
 		*localvar = (lvid = nextvar());
-	auto classbuilder = std::make_unique<ClassInspector>(*this, lvid);
-	return classbuilder->inspectBody(node);
+	ClassInspector inspector(*this, lvid);
+	return inspector.inspectBody(node);
 }
 
 
