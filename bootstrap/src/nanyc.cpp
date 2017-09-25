@@ -31,6 +31,8 @@ int main(int argc, const char** argv) {
 	nyvm_opts_init_defaults(&vmopts);
 	nycompile_opts_t copts;
 	memset(&copts, 0x0, sizeof(nycompile_opts_t));
+	copts.entrypoint.c_str = "main";
+	copts.entrypoint.len = 4;
 	int firstarg = argc; // end of the list
 	for (int i = 1; i < argc; ++i) {
 		const char* const carg = argv[i];
