@@ -4,12 +4,10 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace ir {
 namespace Producer {
 namespace {
-
 
 struct ClassInspector final {
 	using ClassnameType = CString<config::maxSymbolNameLength, false>;
@@ -36,7 +34,7 @@ private:
 	bool inspectClassname(AST::Node&);
 	void createDefaultOperators();
 
-}; // class ClassInspector
+}; // struct ClassInspector
 
 
 ClassInspector::ClassInspector(Scope& parentscope, uint32_t lvid)
@@ -60,7 +58,6 @@ ClassInspector::ClassInspector(Scope& parentscope, uint32_t lvid)
 	scope.context.invalidateLastDebugLine();
 	ir::emit::dbginfo::filename(irout, scope.context.dbgSourceFilename);
 }
-
 
 bool ClassInspector::inspectClassname(AST::Node& node) {
 	classname = scope.getSymbolNameFromASTNode(node);
@@ -113,7 +110,6 @@ bool ClassInspector::inspect(AST::Node& node) {
 	return success;
 }
 
-
 bool ClassInspector::inspectBody(AST::Node& node) {
 	bool success = true;
 	auto& irout = scope.ircode();
@@ -136,9 +132,7 @@ bool ClassInspector::inspectBody(AST::Node& node) {
 	return success;
 }
 
-
 } // anonymous namespace
-
 
 bool Scope::visitASTClass(AST::Node& node, uint32_t* localvar) {
 	assert(node.rule == AST::rgClass);
@@ -151,7 +145,6 @@ bool Scope::visitASTClass(AST::Node& node, uint32_t* localvar) {
 	ClassInspector inspector(*this, lvid);
 	return inspector.inspectBody(node);
 }
-
 
 } // namespace Producer
 } // namespace ir

@@ -6,14 +6,11 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace ir {
 namespace Producer {
 
-
 namespace {
-
 
 bool varValueInitialization(Scope& scope, uint32_t& localvar, AST::Node& varAssign,
 		AST::Node& varnodeDecl, const AnyString& varname) {
@@ -36,7 +33,6 @@ bool varValueInitialization(Scope& scope, uint32_t& localvar, AST::Node& varAssi
 	}
 	return true;
 }
-
 
 bool generateTypeofForClassVar(Scope& scope, uint32_t& lvid, AST::Node& varAssign) {
 	// typeof (+2)
@@ -62,7 +58,6 @@ bool generateTypeofForClassVar(Scope& scope, uint32_t& lvid, AST::Node& varAssig
 	}
 	return scope.visitASTExprTypeof(*typeofn, lvid);
 }
-
 
 bool generateInitFuncForClassVar(Scope& scope, const AnyString& varname, uint32_t lvid,
 		AST::Node& varAssign) {
@@ -90,7 +85,6 @@ bool generateInitFuncForClassVar(Scope& scope, const AnyString& varname, uint32_
 	scope.context.reuse.func.callparam->children.clear();
 	return success;
 }
-
 
 bool emitVarInClass(Scope& scope, const AnyString& varname, AST::Node& node, AST::Node* varType,
 					AST::Node* varAssign, bool ref, bool constant) {
@@ -135,7 +129,6 @@ bool emitVarInClass(Scope& scope, const AnyString& varname, AST::Node& node, AST
 	return generateInitFuncForClassVar(scope, varname, mbvar, *varAssign);
 }
 
-
 bool emitVarInFunc(Scope& scope, const AnyString& varname, AST::Node& node, AST::Node* varType,
 		AST::Node* varAssign, bool ref, bool constant) {
 	auto& irout = scope.ircode();
@@ -174,7 +167,6 @@ bool emitVarInFunc(Scope& scope, const AnyString& varname, AST::Node& node, AST:
 	ir::emit::namealias(irout, varlvid, varname);
 	return true;
 }
-
 
 bool emitProperty(Scope& scope, const AnyString& varname, AST::Node& node, AST::Node* /*varType*/,
 		AST::Node& varAssign, bool ref) {
@@ -265,9 +257,7 @@ bool emitProperty(Scope& scope, const AnyString& varname, AST::Node& node, AST::
 	return success;
 }
 
-
 } // namespace
-
 
 bool Scope::visitASTVar(AST::Node& node) {
 	assert(node.rule == AST::rgVar);
@@ -359,7 +349,6 @@ bool Scope::visitASTVar(AST::Node& node) {
 	}
 	return false;
 }
-
 
 } // namespace Producer
 } // namespace ir
