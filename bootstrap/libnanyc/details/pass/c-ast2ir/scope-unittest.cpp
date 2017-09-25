@@ -45,7 +45,7 @@ bool Scope::visitASTUnitTest(AST::Node& node) {
 	if (unlikely(context.ignoreAtoms))
 		return true;
 	if (!context.reuse.unittest.node)
-		context.prepareReuseForUnittest();
+		context.reuse.prepareReuseForUnittest();
 	context.reuse.unittest.funcname->text = testname;
 	context.reuse.unittest.funcbody->children.push_back(scope);
 	bool success = visitASTFunc(*(context.reuse.unittest.node));

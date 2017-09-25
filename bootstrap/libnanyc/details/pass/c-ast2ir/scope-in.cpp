@@ -70,7 +70,7 @@ bool Scope::visitASTExprIn(AST::Node& node, uint32_t& localvar, ShortString128& 
 	if (unlikely(!container))
 		return ice(node) << "invalid view container expr";
 	if (!context.reuse.inset.node)
-		context.prepareReuseForIn();
+		context.reuse.prepareReuseForIn();
 	ShortString128 viewname;
 	viewname << "^view^" << requestedViewName;
 	context.reuse.inset.container->children.clear();

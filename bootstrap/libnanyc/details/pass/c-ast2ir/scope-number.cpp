@@ -192,7 +192,7 @@ bool generateNumberCode(Scope& scope, uint32_t& localvar, const DefT& numdef, AS
 	}
 	else {
 		if (!scope.context.reuse.literal.node)
-			scope.context.prepareReuseForLiterals();
+			scope.context.reuse.prepareReuseForLiterals();
 		assert(not cn.empty());
 		scope.context.reuse.literal.classname->text = cn;
 		ShortString16 lvidstr;

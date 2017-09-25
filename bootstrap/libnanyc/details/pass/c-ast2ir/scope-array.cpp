@@ -12,7 +12,7 @@ namespace Producer {
 bool Scope::visitASTArray(AST::Node& node, uint32_t& localvar) {
 	assert(node.rule == AST::rgArray);
 	if (unlikely(!context.reuse.shorthandArray.node))
-		context.prepareReuseForShorthandArray();
+		context.reuse.prepareReuseForShorthandArray();
 	auto& typeofcall = *context.reuse.shorthandArray.typeofcall;
 	for (auto& child : node.children) {
 		switch (child.rule) {
