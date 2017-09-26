@@ -837,6 +837,14 @@ uint64_t Thread::execute(uint32_t atomid, uint32_t instanceid) {
 	catch (const InvalidDtor&) {
 		machine.cerrexception("invalid destructor");
 	}
+	catch (const InvalidCast&) {
+		machine.cerrexception("invalid cast");
+	}
+	catch (const ny::vm::memory::UnknownPointer& e) {
+		yuni::String msg("unknown pointer ");
+		msg << e.pointer << " atomid:" << e.atomid << " %" << e.lvid;
+		machine.cerrexception(msg);
+	}
 	catch (const ICE& e) {
 		machine.cerrexception(yuni::String("ICE '") << e.file << ':' << e.line << ": " << e.msg);
 	}
@@ -845,6 +853,9 @@ uint64_t Thread::execute(uint32_t atomid, uint32_t instanceid) {
 	}
 	catch (const std::exception& e) {
 		machine.cerrexception(e.what());
+	}
+	catch (const char* e) {
+		machine.cerrexception(e);
 	}
 	catch (...) {
 		machine.cerrexception("unhandled c++ exception");
