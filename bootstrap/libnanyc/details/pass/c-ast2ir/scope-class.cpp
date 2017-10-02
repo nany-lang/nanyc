@@ -142,7 +142,8 @@ bool ClassInspector::inspectBody(AST::Node& node) {
 
 bool Scope::visitASTClass(AST::Node& node, uint32_t* localvar) {
 	assert(node.rule == AST::rgClass);
-	assert(not node.children.empty());
+	if (unlikely(node.children.empty()))
+		return false;
 	if (unlikely(context.ignoreAtoms))
 		return true;
 	uint32_t lvid = 0;
