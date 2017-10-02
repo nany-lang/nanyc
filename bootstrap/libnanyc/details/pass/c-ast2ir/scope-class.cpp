@@ -4,19 +4,17 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace ir {
 namespace Producer {
 namespace {
-
 
 struct ClassInspector final {
 	using ClassnameType = CString<config::maxSymbolNameLength, false>;
 
 	ClassInspector(Scope& parentscope, uint32_t lvid);
 
-	bool inspect(AST::Node& node);
+	bool inspectClassDefinition(AST::Node& node);
 	bool inspectBody(AST::Node& node);
 
 	//! Parent scope
@@ -36,7 +34,7 @@ private:
 	bool inspectClassname(AST::Node&);
 	void createDefaultOperators();
 
-}; // class ClassInspector
+}; // struct ClassInspector
 
 
 ClassInspector::ClassInspector(Scope& parentscope, uint32_t lvid)
@@ -61,7 +59,6 @@ ClassInspector::ClassInspector(Scope& parentscope, uint32_t lvid)
 	ir::emit::dbginfo::filename(irout, scope.context.dbgSourceFilename);
 }
 
-
 bool ClassInspector::inspectClassname(AST::Node& node) {
 	classname = scope.getSymbolNameFromASTNode(node);
 	return not classname.empty()
@@ -69,7 +66,7 @@ bool ClassInspector::inspectClassname(AST::Node& node) {
 }
 
 
-bool ClassInspector::inspect(AST::Node& node) {
+bool ClassInspector::inspectClassDefinition(AST::Node& node) {
 	scope.emitDebugpos(node);
 	// exit status
 	bool success = true;
@@ -113,13 +110,12 @@ bool ClassInspector::inspect(AST::Node& node) {
 	return success;
 }
 
-
 bool ClassInspector::inspectBody(AST::Node& node) {
 	bool success = true;
 	auto& irout = scope.ircode();
 	// evaluate the whole function, and grab the node body for continuing evaluation
 	{
-		success = inspect(node);
+		success = inspectClassDefinition(node);
 		auto& operands = irout.at<isa::Op::blueprint>(bpoffset);
 		operands.name = irout.stringrefs.ref(classname);
 	}
@@ -136,9 +132,7 @@ bool ClassInspector::inspectBody(AST::Node& node) {
 	return success;
 }
 
-
 } // anonymous namespace
-
 
 bool Scope::visitASTClass(AST::Node& node, uint32_t* localvar) {
 	assert(node.rule == AST::rgClass);
@@ -148,10 +142,9 @@ bool Scope::visitASTClass(AST::Node& node, uint32_t* localvar) {
 	uint32_t lvid = 0;
 	if (localvar) // create the lvid before the new scope
 		*localvar = (lvid = nextvar());
-	auto classbuilder = std::make_unique<ClassInspector>(*this, lvid);
-	return classbuilder->inspectBody(node);
+	ClassInspector inspector(*this, lvid);
+	return inspector.inspectBody(node);
 }
-
 
 } // namespace Producer
 } // namespace ir
