@@ -103,6 +103,7 @@ ubuntu-17.04-amd64:
 
 the gathering master:
     stage: artifacts
+    image: alpine:latest
     variables:
         GIT_STRATEGY: none
     script:
@@ -116,6 +117,7 @@ the gathering master:
 
 the gathering:
     stage: artifacts
+    image: alpine:latest
     variables:
         GIT_STRATEGY: none
     script:
