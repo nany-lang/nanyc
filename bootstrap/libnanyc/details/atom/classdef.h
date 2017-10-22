@@ -62,8 +62,6 @@ public:
 	bool isAny() const;
 	//! Get if the type is a class
 	bool isClass() const;
-	//! Get if the type is a given class
-	bool isClass(const AnyString& name) const;
 
 	//! Get if is a variable
 	bool isVariable() const;

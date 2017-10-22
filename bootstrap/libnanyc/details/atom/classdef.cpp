@@ -55,10 +55,4 @@ bool Classdef::isClass() const {
 	return isLinkedToAtom() and (atom->type == Atom::Type::classdef);
 }
 
-
-bool Classdef::isClass(const AnyString& name) const {
-	return isClass() and (atom->name() == name);
-}
-
-
 } // namespace ny
