@@ -6,8 +6,8 @@ template<class T>
 static T nyinx_strlen(nyvmthread_t*, void* string) {
 	size_t len = string ? strlen(reinterpret_cast<const char*>(string)) : 0u;
 	return (sizeof(size_t) == sizeof(T) or len < std::numeric_limits<T>::max())
-		   ? static_cast<T>(len)
-		   : static_cast<T>(-1);
+		? static_cast<T>(len)
+		: static_cast<T>(-1);
 }
 
 namespace ny {

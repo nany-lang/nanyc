@@ -1,15 +1,12 @@
 #pragma once
 #include "ast.h"
 
-
 namespace ny {
 namespace AST {
-
 
 inline yuni::Ref<Node> createNodeIdentifier(const AnyString& name) {
 	return yuni::make_ref<Node>(rgIdentifier, name);
 }
-
 
 template<class S> bool appendEntityAsString(S& out, const Node& node) {
 	assert(node.rule == rgEntity);

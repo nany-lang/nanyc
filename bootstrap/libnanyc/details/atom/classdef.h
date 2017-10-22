@@ -13,12 +13,9 @@
 #include "details/reporting/report.h"
 #include "details/atom/ctype.h"
 
-
 namespace ny {
 
-
 struct Atom;
-
 
 //! Class definition
 struct Classdef final
@@ -62,8 +59,6 @@ public:
 	bool isAny() const;
 	//! Get if the type is a class
 	bool isClass() const;
-	//! Get if the type is a given class
-	bool isClass(const AnyString& name) const;
 
 	//! Get if is a variable
 	bool isVariable() const;
@@ -98,7 +93,6 @@ public:
 	void import(const Classdef& rhs);
 	//@}
 
-
 	//! \name Info
 	//@{
 	/*!
@@ -111,7 +105,6 @@ public:
 	void print(Logs::Report&, const ClassdefTableView& table) const;
 	//@}
 
-
 	//! \name Operators
 	//@{
 	//! Comparison
@@ -121,7 +114,6 @@ public:
 	//! Assignment
 	Classdef& operator = (const Classdef&) = delete;
 	//@}
-
 
 public:
 	//! Inner builtin type (custom type if == CType::t_any)
@@ -150,12 +142,10 @@ public:
 	}
 	origins;
 
-
 private:
 	template<class T, class TableT> void doPrint(T& out, const TableT& table) const;
 
 }; // struct Classdef
-
 
 } // namespace ny
 

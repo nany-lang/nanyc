@@ -3,7 +3,6 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 
 void ClassdefOverloads::print(String& out, const ClassdefTableView& table, bool clearBefore) const {
@@ -15,6 +14,5 @@ void ClassdefOverloads::print(String& out, const ClassdefTableView& table, bool 
 		out << '\n';
 	}
 }
-
 
 } // namespace ny

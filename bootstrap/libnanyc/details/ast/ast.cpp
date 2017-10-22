@@ -2,10 +2,8 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace AST {
-
 
 Ref<Node> createNodeFunc(Ref<Node>& funcname) {
 	auto func = make_ref<Node>(rgFunction);
@@ -30,7 +28,6 @@ Ref<Node> createNodeFunc(Ref<Node>& funcname) {
 	}
 	return func;
 }
-
 
 Ref<Node> createNodeFuncCrefParam(Ref<Node>& funcname, const AnyString& paramname) {
 	auto func = createNodeFunc(funcname);

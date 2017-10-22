@@ -6,38 +6,31 @@
 #include <iostream>
 #endif
 
-
 namespace ny {
 namespace ir {
-
 
 inline void Sequence::reserve(uint32_t count) {
 	if (m_capacity < count)
 		grow(count);
 }
 
-
 inline uint32_t Sequence::opcodeCount() const {
 	return m_size;
 }
 
-
 inline uint32_t Sequence::capacity() const {
 	return m_capacity;
 }
-
 
 inline const Instruction& Sequence::at(uint32_t offset) const {
 	assert(offset < m_size);
 	return m_body[offset];
 }
 
-
 inline Instruction& Sequence::at(uint32_t offset) {
 	assert(offset < m_size);
 	return m_body[offset];
 }
-
 
 template<isa::Op O> inline isa::Operand<O>& Sequence::at(uint32_t offset) {
 	assert(offset < m_size);
@@ -45,84 +38,17 @@ template<isa::Op O> inline isa::Operand<O>& Sequence::at(uint32_t offset) {
 	return reinterpret_cast<isa::Operand<O>&>(m_body[offset]);
 }
 
-
 template<isa::Op O> inline const isa::Operand<O>& Sequence::at(uint32_t offset) const {
 	assert(offset < m_size);
 	static_assert(sizeof(Instruction) >= sizeof(isa::Operand<O>), "m_size mismatch");
 	return reinterpret_cast<isa::Operand<O>&>(m_body[offset]);
 }
 
-
-inline uint32_t Sequence::offsetOf(const Instruction& instr) const {
-	assert(m_size > 0 and m_capacity > 0);
-	assert(&instr >= m_body);
-	assert(&instr <  m_body + m_size);
-	auto start = reinterpret_cast<std::uintptr_t>(m_body);
-	auto end   = reinterpret_cast<std::uintptr_t>(&instr);
-	assert((end - start) / sizeof(Instruction) < 512 * 1024 * 1024); // arbitrary
-	uint32_t r = static_cast<uint32_t>(((end - start) / sizeof(Instruction)));
-	assert(r < m_size);
-	return r;
-}
-
-
-inline bool Sequence::isCursorValid(const Instruction& instr) const {
-	return (m_size > 0 and m_capacity > 0)
-		   and (&instr >= m_body)
-		   and (&instr <  m_body + m_size);
-}
-
-
 template<isa::Op O>
 inline uint32_t Sequence::offsetOf(const isa::Operand<O>& instr) const {
 	static_assert(sizeof(Instruction) >= sizeof(isa::Operand<O>), "m_size mismatch");
 	return offsetOf(ir::Instruction::fromOpcode(instr));
 }
-
-
-inline void Sequence::invalidateCursor(const Instruction*& cursor) const {
-	cursor = m_body + m_size;
-}
-
-
-inline void Sequence::invalidateCursor(Instruction*& cursor) const {
-	cursor = m_body + m_size;
-}
-
-
-inline bool Sequence::jumpToLabelForward(const Instruction*& cursor, uint32_t label) const {
-	const auto* const end = m_body + m_size;
-	const Instruction* instr = cursor;
-	while (++instr < end) {
-		if (instr->opcodes[0] == static_cast<uint32_t>(ir::isa::Op::label)) {
-			auto& operands = (*instr).to<ir::isa::Op::label>();
-			if (operands.label == label) {
-				cursor = instr;
-				return true;
-			}
-		}
-	}
-	// not found - the cursor is alreayd invalidated
-	return false;
-}
-
-
-inline bool Sequence::jumpToLabelBackward(const Instruction*& cursor, uint32_t label) const {
-	const auto* const base = m_body;
-	const Instruction* instr = cursor;
-	while (instr-- > base) {
-		if (instr->opcodes[0] == static_cast<uint32_t>(ir::isa::Op::label)) {
-			auto& operands = (*instr).to<ir::isa::Op::label>();
-			if (operands.label == label) {
-				cursor = instr;
-				return true;
-			}
-		}
-	}
-	// not found - invalidate
-	return false;
-}
-
 
 template<class T> inline void Sequence::each(T& visitor, uint32_t offset) {
 	if (likely(offset < m_size)) {
@@ -139,7 +65,6 @@ template<class T> inline void Sequence::each(T& visitor, uint32_t offset) {
 	}
 }
 
-
 template<class T> inline void Sequence::each(T& visitor, uint32_t offset) const {
 	if (likely(offset < m_size)) {
 		const auto* it = m_body + offset;
@@ -155,7 +80,6 @@ template<class T> inline void Sequence::each(T& visitor, uint32_t offset) const 
 	}
 }
 
-
 template<isa::Op O> inline isa::Operand<O>& Sequence::emit() {
 	if (unlikely(m_capacity < m_size + 1))
 		grow(m_size + 1);
@@ -165,7 +89,6 @@ template<isa::Op O> inline isa::Operand<O>& Sequence::emit() {
 	result.opcode = static_cast<uint32_t>(O);
 	return result;
 }
-
 
 } // namespace ir
 } // namespace ny

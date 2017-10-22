@@ -21,7 +21,6 @@ Logs::Report error(const AST::Node&);
 //! Generate a new error report
 void error(const AST::Node&, const AnyString& msg);
 
-
 //! Generate a new warning report
 Logs::Report warning();
 
@@ -46,16 +45,10 @@ Logs::Report trace();
 //! Generate a new verbose report
 Logs::Report verbose();
 
-
 //! Emit ICE for unknown node
 bool unexpectedNode(const AST::Node&, const AnyString& extra = nullptr);
 
-
-
-
-
 namespace Logs {
-
 
 //! Get the current user handler
 void* userHandlerPointer();
@@ -66,7 +59,6 @@ void* userHandlerPointer();
 template<class T> T* userHandler() {
 	return reinterpret_cast<T*>(userHandlerPointer());
 }
-
 
 //! Callback for generating reporting
 typedef Report (*Callback)(void*, Logs::Level);
@@ -118,7 +110,6 @@ public:
 private:
 	State previousState;
 }; // class Handler
-
 
 } // namespace Logs
 } // namespace ny

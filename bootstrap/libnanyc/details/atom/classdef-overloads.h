@@ -2,13 +2,10 @@
 #include "libnanyc.h"
 #include <vector>
 
-
 namespace ny {
-
 
 struct ClassdefTableView;
 struct Atom;
-
 
 struct ClassdefOverloads final {
 	bool empty() const;
@@ -24,7 +21,6 @@ private:
 	std::vector<std::reference_wrapper<Atom>> m_overloads;
 
 }; // class ClassdefFollow
-
 
 } // namespace ny
 

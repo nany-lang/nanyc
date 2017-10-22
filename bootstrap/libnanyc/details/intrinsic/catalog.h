@@ -8,10 +8,8 @@
 #include <memory>
 #include <stdarg.h>
 
-
 namespace ny {
 namespace intrinsic {
-
 
 struct Catalog final {
 	//! Default constructor
@@ -37,7 +35,6 @@ struct Catalog final {
 
 	const Catalog& operator = (const Catalog&) = delete;
 
-
 private:
 	using Name = yuni::CString<40,false>;
 
@@ -49,7 +46,6 @@ private:
 	std::unordered_map<Name, uint32_t> m_names;
 
 }; // struct Catalog
-
 
 } // namespace intrinsic
 } // namespace ny

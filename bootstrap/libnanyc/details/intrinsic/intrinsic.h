@@ -6,10 +6,8 @@
 #include <array>
 #include "details/atom/ctype.h"
 
-
 namespace ny {
 namespace intrinsic {
-
 
 //! Definition of a single user-defined intrinsic
 struct Intrinsic final {
@@ -27,7 +25,6 @@ struct Intrinsic final {
 	std::array<CType, config::maxPushedParameters> params;
 
 }; // struct Intrinsic
-
 
 } // namespace intrinsic
 } // namespace ny

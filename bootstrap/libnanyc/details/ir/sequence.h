@@ -13,11 +13,8 @@
 # undef alloca
 #endif
 
-
-
 namespace ny {
 namespace ir {
-
 
 struct Sequence final {
 	Sequence() = default;
@@ -128,7 +125,6 @@ private:
 	Instruction* m_body = nullptr;
 
 }; // Sequence
-
 
 } // namespace ir
 } // namespace ny

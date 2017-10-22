@@ -1,7 +1,6 @@
 #include "details/vm/machine.h"
 #include "details/vm/thread.h"
 
-
 namespace ny {
 namespace vm {
 

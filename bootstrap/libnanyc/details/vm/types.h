@@ -2,7 +2,6 @@
 #include "libnanyc.h"
 #include <exception>
 
-
 namespace ny {
 namespace vm {
 
@@ -12,13 +11,11 @@ union Register {
 	double f64;
 };
 
-
 struct CodeAbort final : public std::exception {
 	virtual const char* what() const throw() {
 		return "";
 	}
 };
-
 
 } // namespace vm
 } // namespace ny

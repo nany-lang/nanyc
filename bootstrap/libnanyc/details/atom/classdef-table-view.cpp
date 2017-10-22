@@ -2,14 +2,11 @@
 
 using namespace Yuni;
 
-
 namespace ny {
-
 
 void ClassdefTableView::mergeSubstitutes() {
 	table.mergeSubstitutes();
 }
-
 
 void ClassdefTableView::printClassdef(Yuni::String& out, const CLID& clid, const Classdef& cdef) const {
 	out.write("    ", 4);
@@ -35,7 +32,6 @@ void ClassdefTableView::printClassdef(Yuni::String& out, const CLID& clid, const
 	}
 }
 
-
 void ClassdefTableView::print(Yuni::String& out, bool clearBefore) const {
 	if (clearBefore)
 		out.clear();
@@ -55,6 +51,5 @@ void ClassdefTableView::print(Yuni::String& out, bool clearBefore) const {
 		}
 	}
 }
-
 
 } // namespace ny

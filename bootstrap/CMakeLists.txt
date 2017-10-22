@@ -27,8 +27,8 @@ include("cmake/build-settings.cmake")
 include("cmake/compilation-database.cmake")
 include("cmake/arch-platform.cmake")
 
-include("cmake/libdyncall.cmake")
 include("cmake/libyuni.cmake")
+include("cmake/libdyncall.cmake")
 include("cmake/grammar.cmake")
 
 add_subdirectory(tools)

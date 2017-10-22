@@ -23,21 +23,13 @@ variables:
     tags:
         - linux
 
-centos-7.3-amd64-debug:
+centos-7.4-amd64-debug:
     <<: *debug-build-linux
-    image: registry.gitlab.com/nany-lang/nanyc/build/centos:7.3-amd64
-
-debian-8-amd64-debug:
-    <<: *debug-build-linux
-    image: registry.gitlab.com/nany-lang/nanyc/build/debian:8-amd64
+    image: registry.gitlab.com/nany-lang/nanyc/build/centos:7.4-amd64
 
 debian-9-amd64-debug:
     <<: *debug-build-linux
     image: registry.gitlab.com/nany-lang/nanyc/build/debian:9-amd64
-
-ubuntu-16.04-amd64-debug:
-    <<: *debug-build-linux
-    image: registry.gitlab.com/nany-lang/nanyc/build/ubuntu:16.04-amd64
 
 ubuntu-17.04-amd64-debug:
     <<: *debug-build-linux
@@ -82,17 +74,9 @@ ubuntu-17.04-amd64-debug:
     tags:
         - linux
 
-debian-8-amd64:
-    <<: *build-pkg-linux-deb
-    image: registry.gitlab.com/nany-lang/nanyc/build/debian:8-amd64
-
 debian-9-amd64:
     <<: *build-pkg-linux-deb
     image: registry.gitlab.com/nany-lang/nanyc/build/debian:9-amd64
-
-ubuntu-16.04-amd64:
-    <<: *build-pkg-linux-deb
-    image: registry.gitlab.com/nany-lang/nanyc/build/ubuntu:16.04-amd64
 
 ubuntu-17.04-amd64:
     <<: *build-pkg-linux-deb

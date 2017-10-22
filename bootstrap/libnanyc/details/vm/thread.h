@@ -3,7 +3,6 @@
 #include "details/vm/io.h"
 #include "libnanyc-config.h"
 
-
 namespace ny {
 namespace vm {
 

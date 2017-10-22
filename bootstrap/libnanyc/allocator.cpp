@@ -3,7 +3,6 @@
 #include "libnanyc-config.h"
 #include <yuni/core/string.h>
 
-
 namespace {
 
 void import_allocator_cf(nyallocator_t* allocator, const nyallocator_opts_t* opts) {

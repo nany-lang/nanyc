@@ -6,11 +6,10 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace vm {
-namespace {
 
+namespace {
 
 template<class T> uint32_t sizeFromCapacity(uint32_t capacity) {
 	uint32_t bytes = static_cast<uint32_t>(sizeof(T)); // the Chunk itself
@@ -19,15 +18,12 @@ template<class T> uint32_t sizeFromCapacity(uint32_t capacity) {
 	return bytes;
 }
 
-
 } // anonymous namespace
-
 
 Stack::Stack() {
 	pushNewChunk(1); // not null for boundaries checking
 	current->remains -= 1u;
 }
-
 
 Stack::~Stack() {
 	free(reserve);
@@ -40,7 +36,6 @@ Stack::~Stack() {
 	}
 	while (c);
 }
-
 
 void Stack::dump(const AnyString& action, uint32_t count) const {
 	if (current) {
@@ -55,7 +50,6 @@ void Stack::dump(const AnyString& action, uint32_t count) const {
 	else
 		std::cout << "== stack == <null>\n";
 }
-
 
 void Stack::pushNewChunk(uint32_t count) {
 	#if NANY_vm_STACK_TRACES != 0
@@ -88,7 +82,6 @@ void Stack::pushNewChunk(uint32_t count) {
 	assert(count <= chunk->remains);
 }
 
-
 void Stack::popChunk() {
 	auto* previous = current->previous;
 	if (!reserve) {
@@ -105,7 +98,6 @@ void Stack::popChunk() {
 	current = previous;
 	// 'current' may be null here at the very last scope, when the program stops
 }
-
 
 } // namespace vm
 } // namespace ny
