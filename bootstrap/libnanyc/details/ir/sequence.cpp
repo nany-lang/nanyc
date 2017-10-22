@@ -158,5 +158,63 @@ void Sequence::increaseAllLVID(uint32_t inc, uint32_t greaterThan, uint32_t offs
 	each(walker, offset);
 }
 
+void Sequence::invalidateCursor(const Instruction*& cursor) const {
+	cursor = m_body + m_size;
+}
+
+void Sequence::invalidateCursor(Instruction*& cursor) const {
+	cursor = m_body + m_size;
+}
+
+bool Sequence::jumpToLabelForward(const Instruction*& cursor, uint32_t label) const {
+	const auto* const end = m_body + m_size;
+	const Instruction* instr = cursor;
+	while (++instr < end) {
+		if (instr->opcodes[0] == static_cast<uint32_t>(ir::isa::Op::label)) {
+			auto& operands = (*instr).to<ir::isa::Op::label>();
+			if (operands.label == label) {
+				cursor = instr;
+				return true;
+			}
+		}
+	}
+	// not found - the cursor is alreayd invalidated
+	return false;
+}
+
+bool Sequence::jumpToLabelBackward(const Instruction*& cursor, uint32_t label) const {
+	const auto* const base = m_body;
+	const Instruction* instr = cursor;
+	while (instr-- > base) {
+		if (instr->opcodes[0] == static_cast<uint32_t>(ir::isa::Op::label)) {
+			auto& operands = (*instr).to<ir::isa::Op::label>();
+			if (operands.label == label) {
+				cursor = instr;
+				return true;
+			}
+		}
+	}
+	// not found - invalidate
+	return false;
+}
+
+bool Sequence::isCursorValid(const Instruction& instr) const {
+	return (m_size > 0 and m_capacity > 0)
+		and (&instr >= m_body)
+		and (&instr <  m_body + m_size);
+}
+
+uint32_t Sequence::offsetOf(const Instruction& instr) const {
+	assert(m_size > 0 and m_capacity > 0);
+	assert(&instr >= m_body);
+	assert(&instr <  m_body + m_size);
+	auto start = reinterpret_cast<std::uintptr_t>(m_body);
+	auto end   = reinterpret_cast<std::uintptr_t>(&instr);
+	assert((end - start) / sizeof(Instruction) < 512 * 1024 * 1024); // arbitrary
+	uint32_t r = static_cast<uint32_t>(((end - start) / sizeof(Instruction)));
+	assert(r < m_size);
+	return r;
+}
+
 } // namespace ir
 } // namespace ny
