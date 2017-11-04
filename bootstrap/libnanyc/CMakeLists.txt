@@ -291,6 +291,7 @@ add_library(libnanyc ${mode_libnany}
 	"details/utils/stringrefs.h"
 	"details/utils/stringrefs.hxx"
 	"details/vm/allocator.h"
+	"details/vm/exception.h"
 	"details/vm/io.cpp"
 	"details/vm/io.h"
 	"details/vm/machine.cpp"

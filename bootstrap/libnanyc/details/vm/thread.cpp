@@ -5,6 +5,7 @@
 #include "details/vm/stack.h"
 #include "details/vm/stacktrace.h"
 #include "details/atom/ctype.h"
+#include "details/vm/exception.h"
 #include <iostream>
 
 
@@ -22,37 +23,6 @@ namespace vm {
 namespace {
 
 constexpr bool printOpcodes = false;
-
-struct InvalidLabel final {
-	InvalidLabel(uint32_t atomid, uint32_t label): atomid(atomid), label(label) {}
-	uint32_t atomid;
-	uint32_t label;
-};
-
-struct DivideByZero final {
-};
-
-struct Assert final {
-};
-
-struct UnexpectedOpcode final {
-	UnexpectedOpcode(const AnyString& name): name(name) {}
-	AnyString name;
-};
-
-struct InvalidDtor final {
-	InvalidDtor(const Atom&) {}
-};
-
-struct ICE final {
-	ICE(uint32_t line, const char* msg): line(line), msg(msg) {}
-	const char* file = __FILE__;
-	uint32_t line;
-	const char* msg;
-};
-
-struct InvalidCast final {
-};
 
 template<class To, class From> To castMe(From from) {
 	return static_cast<To>(from);
