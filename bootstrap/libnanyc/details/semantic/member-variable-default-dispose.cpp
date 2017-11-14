@@ -6,6 +6,29 @@ using namespace Yuni;
 namespace ny {
 namespace semantic {
 
+namespace {
+
+void complainInvalidAtom(Atom& subatom, const Classdef& cdef) {
+	auto e = ice();
+	e << "invalid atom from " << cdef.clid << " for disposing member variable '";
+	subatom.retrieveFullname(e.data().message);
+	e << '\'';
+}
+
+bool categorizeAtomChildren(Atom& subatom, std::vector<std::reference_wrapper<Atom>>& atomvars, Atom*& userDefinedDispose) {
+	if (subatom.isMemberVariable()) {
+		atomvars.emplace_back(std::ref(subatom));
+	}
+	else
+	{
+		if (subatom.isDtor())
+			userDefinedDispose = &subatom;
+	}
+	return true; // next
+}
+
+} // namespace
+
 void produceMemberVarDefaultDispose(Analyzer& analyzer) {
 	assert(analyzer.canGenerateCode());
 	assert(analyzer.frame != nullptr);
@@ -17,15 +40,7 @@ void produceMemberVarDefaultDispose(Analyzer& analyzer) {
 	std::vector<std::reference_wrapper<Atom>> atomvars;
 	Atom* userDefinedDispose = nullptr;
 	parentAtom.eachChild([&](Atom & subatom) -> bool {
-		if (subatom.isMemberVariable()) {
-			atomvars.emplace_back(std::ref(subatom));
-		}
-		else
-		{
-			if (subatom.isDtor())
-				userDefinedDispose = &subatom;
-		}
-		return true; // next
+		return categorizeAtomChildren(subatom, atomvars, userDefinedDispose);
 	});
 	if (atomvars.empty() and userDefinedDispose == nullptr)
 		return;
@@ -65,10 +80,7 @@ void produceMemberVarDefaultDispose(Analyzer& analyzer) {
 		origin.field  = subatom.varinfo.effectiveFieldIndex;
 		auto* typeAtom = cdeftable.findClassdefAtom(cdef);
 		if (unlikely(nullptr == typeAtom)) {
-			auto ce = (ice() << "invalid atom from " << cdef.clid);
-			ce << " for disposing member variable '";
-			subatom.retrieveFullname(ce.data().message);
-			ce << '\'';
+			complainInvalidAtom(subatom, cdef);
 			continue;
 		}
 		if (0 == typeAtom->classinfo.dtor.atomid) {
