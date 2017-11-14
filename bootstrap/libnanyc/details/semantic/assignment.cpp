@@ -16,6 +16,42 @@ enum class AssignStrategy {
 	deepcopy,
 };
 
+bool complainInvalidLvid() {
+	ice() << "invalid lvid for variable assignment";
+	return false;
+}
+
+bool complainSyntheticObjectsAreImmutable(uint32_t atomid, uint32_t lhs, uint32_t rhs) {
+	auto e = error() << "synthetic objects are immutable";
+	if (debugmode)
+		e << ' ' << CLID{atomid, lhs} << " = " << CLID{atomid, rhs};
+	return false;
+}
+
+bool complainCantAssignSyntheticObject(uint32_t atomid, uint32_t lhs, uint32_t rhs) {
+	auto e = error() << "can not assign synthetic objects";
+	if (debugmode)
+		e << ' ' << CLID{atomid, lhs} << " = " << CLID{atomid, rhs};
+	return false;
+}
+
+bool complainInvalidAtomLeftSideAssign() {
+	ice() << "invalid atom for left-side assignment";
+	return false;
+}
+
+bool complainInvalidAtomRightSideAssign() {
+	ice() << "invalid atom for right-side assignment";
+	return false;
+}
+
+bool complainInvalidSelf(const Classdef& cdeflhs, const Classdef& cdefrhs) {
+	auto e = ice() << "invalid member assignment with invalid 'self'";
+	if (debugmode)
+		e << " (as %" << cdeflhs.clid << " = %" << cdefrhs.clid << ')';
+	return false;
+}
+
 } // namespace
 
 bool Analyzer::instanciateAssignment(AtomStackFrame& frame, uint32_t lhs, uint32_t rhs,
@@ -24,19 +60,13 @@ bool Analyzer::instanciateAssignment(AtomStackFrame& frame, uint32_t lhs, uint32
 	// lhs and rhs can not be null, but they can be identical, to force a clone
 	// when required for example
 	if (unlikely(lhs == 0 or rhs == 0 or lhs == rhs))
-		return (ice() << "invalid lvid for variable assignment");
+		return complainInvalidLvid();
 	if (unlikely(not frame.verify(lhs) or not frame.verify(rhs)))
 		return false;
-	if (checktype and unlikely(frame.lvids(lhs).synthetic)) {
-		if (debugmode)
-			return (error() << "synthetic objects are immutable " << CLID{frame.atomid, lhs} << " = " << CLID{frame.atomid, rhs});
-		return (error() << "synthetic objects are immutable");
-	}
-	if (checktype and unlikely(frame.lvids(rhs).synthetic)) {
-		if (debugmode)
-			return (error() << "can not assign synthetic objects " << CLID{frame.atomid, lhs} << " = " << CLID{frame.atomid, rhs});
-		return (error() << "can not assign synthetic objects");
-	}
+	if (checktype and unlikely(frame.lvids(lhs).synthetic))
+		return complainSyntheticObjectsAreImmutable(frame.atomid, lhs, rhs);
+	if (checktype and unlikely(frame.lvids(rhs).synthetic))
+		return complainCantAssignSyntheticObject(frame.atomid, lhs, rhs);
 	// current atom id
 	auto atomid   = frame.atomid;
 	// LHS cdef
@@ -71,7 +101,7 @@ bool Analyzer::instanciateAssignment(AtomStackFrame& frame, uint32_t lhs, uint32
 		if (not cdefrhs.isBuiltin()) {
 			auto* rhsAtom = cdeftable.findClassdefAtom(cdefrhs);
 			if (unlikely(nullptr == rhsAtom))
-				return (ice() << "invalid atom for left-side assignment");
+				return complainInvalidAtomLeftSideAssign();
 			cdeftable.substitute(lhs).mutateToAtom(rhsAtom);
 		}
 		else
@@ -103,12 +133,8 @@ bool Analyzer::instanciateAssignment(AtomStackFrame& frame, uint32_t lhs, uint32
 		frame.lvids(lhs).autorelease = true;
 	auto& origin = frame.lvids(lhs).origin.varMember;
 	bool isMemberVariable = (origin.atomid != 0);
-	if (isMemberVariable and unlikely(origin.self == 0)) {
-		auto ce = (ice() << "invalid member assignment with invalid 'self'");
-		if (debugmode)
-			ce << " (as %" << cdeflhs.clid << " = %" << cdefrhs.clid << ')';
-		return false;
-	}
+	if (isMemberVariable and unlikely(origin.self == 0))
+		return complainInvalidSelf(cdeflhs, cdefrhs);
 	ir::emit::trace(out, canGenerateCode(), [&]() {
 		String comment;
 		switch (strategy) {
@@ -162,7 +188,7 @@ bool Analyzer::instanciateAssignment(AtomStackFrame& frame, uint32_t lhs, uint32
 		case AssignStrategy::deepcopy: {
 			auto* rhsAtom = cdeftable.findClassdefAtom(cdefrhs);
 			if (unlikely(nullptr == rhsAtom))
-				return (ice() << "invalid atom for left-side assignment");
+				return complainInvalidAtomRightSideAssign();
 			// 'clone' operator
 			if (0 == rhsAtom->classinfo.clone.atomid) {
 				if (unlikely(not instanciateAtomClassClone(*rhsAtom, lhs, rhs)))
