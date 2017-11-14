@@ -52,6 +52,25 @@ bool complainInvalidSelf(const Classdef& cdeflhs, const Classdef& cdefrhs) {
 	return false;
 }
 
+auto traceAssignStrategy(AssignStrategy strategy, const Classdef& cdeflhs, const ClassdefTableView& cdeftable, uint32_t lhs, uint32 rhs) -> yuni::String {
+	String comment;
+	switch (strategy) {
+		case AssignStrategy::rawregister:
+			comment << "raw copy";
+			break;
+		case AssignStrategy::ref:
+			comment << "assign ref";
+			break;
+		case AssignStrategy::deepcopy:
+			comment << "deep copy";
+			break;
+	}
+	comment << " %" << lhs << " = %" << rhs << " aka '";
+	cdeflhs.print(comment, cdeftable, false);
+	comment << '\'';
+	return comment;
+}
+
 } // namespace
 
 bool Analyzer::instanciateAssignment(AtomStackFrame& frame, uint32_t lhs, uint32_t rhs,
@@ -136,22 +155,7 @@ bool Analyzer::instanciateAssignment(AtomStackFrame& frame, uint32_t lhs, uint32
 	if (isMemberVariable and unlikely(origin.self == 0))
 		return complainInvalidSelf(cdeflhs, cdefrhs);
 	ir::emit::trace(out, canGenerateCode(), [&]() {
-		String comment;
-		switch (strategy) {
-			case AssignStrategy::rawregister:
-				comment << "raw copy ";
-				break;
-			case AssignStrategy::ref:
-				comment << "assign ref ";
-				break;
-			case AssignStrategy::deepcopy:
-				comment << "deep copy ";
-				break;
-		}
-		comment << "%" << lhs << " = %" << rhs << " aka '";
-		cdeflhs.print(comment, cdeftable, false);
-		comment << '\'';
-		return comment;
+		return traceAssignStrategy(strategy, cdeflhs, cdeftable, lhs, rhs);
 	});
 	switch (strategy) {
 		case AssignStrategy::rawregister: {
