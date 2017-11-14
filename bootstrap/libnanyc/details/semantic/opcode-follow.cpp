@@ -2,10 +2,8 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace semantic {
-
 
 void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::follow>& operands) {
 	// in 'signature only' mode (resolving defined parameter types), all
@@ -18,7 +16,6 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::follow>& operands) {
 		spare.instance = true;
 	}
 }
-
 
 } // namespace semantic
 } // namespace ny

@@ -2,10 +2,8 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace semantic {
-
 
 void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::push>& operands) {
 	bool verified = (frame->verify(operands.lvid));
@@ -25,7 +23,6 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::push>& operands) {
 	}
 }
 
-
 void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::tpush>& operands) {
 	frame->verify(operands.lvid);
 	if (0 == operands.name)
@@ -35,7 +32,6 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::tpush>& operands) {
 		pushedparams.gentypes.named.emplace_back(name, operands.lvid, currentLine, currentOffset);
 	}
 }
-
 
 } // namespace semantic
 } // namespace ny

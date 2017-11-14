@@ -3,10 +3,8 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace semantic {
-
 
 void produceMemberVarDefaultDispose(Analyzer& analyzer) {
 	assert(analyzer.canGenerateCode());
@@ -81,7 +79,6 @@ void produceMemberVarDefaultDispose(Analyzer& analyzer) {
 		ir::emit::unref(out, reglvid, classinfo.dtor.atomid);
 	}
 }
-
 
 } // namespace semantic
 } // namespace ny

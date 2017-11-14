@@ -2,10 +2,8 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace semantic {
-
 
 void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::jzraise>& operands) {
 	uint32_t label = operands.label;
@@ -26,7 +24,6 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::jzraise>& operands) {
 	}
 	ir::emit::label(out, label);
 }
-
 
 } // namespace semantic
 } // namespace ny

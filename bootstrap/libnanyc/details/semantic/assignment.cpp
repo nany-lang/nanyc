@@ -20,17 +20,13 @@ bool Analyzer::instanciateAssignment(AtomStackFrame& frame, uint32_t lhs, uint32
 		return false;
 	if (checktype and unlikely(frame.lvids(lhs).synthetic)) {
 		if (debugmode)
-			return (error() << "synthetic objects are immutable "
-					<< CLID{frame.atomid, lhs} << " = " << CLID{frame.atomid, rhs});
-		else
-			return (error() << "synthetic objects are immutable");
+			return (error() << "synthetic objects are immutable " << CLID{frame.atomid, lhs} << " = " << CLID{frame.atomid, rhs});
+		return (error() << "synthetic objects are immutable");
 	}
 	if (checktype and unlikely(frame.lvids(rhs).synthetic)) {
 		if (debugmode)
-			return (error() << "can not assign synthetic objects "
-					<< CLID{frame.atomid, lhs} << " = " << CLID{frame.atomid, rhs});
-		else
-			return (error() << "can not assign synthetic objects");
+			return (error() << "can not assign synthetic objects " << CLID{frame.atomid, lhs} << " = " << CLID{frame.atomid, rhs});
+		return (error() << "can not assign synthetic objects");
 	}
 	// current atom id
 	auto atomid   = frame.atomid;
@@ -203,7 +199,6 @@ bool Analyzer::instanciateAssignment(AtomStackFrame& frame, uint32_t lhs, uint32
 	return true;
 }
 
-
 bool Analyzer::instanciateAssignment(const ir::isa::Operand<ir::isa::Op::call>& operands) {
 	assert(frame != nullptr);
 	if (unlikely(pushedparams.func.indexed.size() != 1))
@@ -217,7 +212,7 @@ bool Analyzer::instanciateAssignment(const ir::isa::Operand<ir::isa::Op::call>& 
 	//  %y = %x."="
 	//  %z = resolve %y."^()"
 	uint32_t lhs = frame->lvids(operands.ptr2func).referer;
-	if (likely(0 != lhs)) {
+	if (likely(lhs != 0)) {
 		lhs  = frame->lvids(lhs).referer;
 		uint32_t alias = frame->lvids(lhs).alias;
 		if (alias != 0)
@@ -242,7 +237,6 @@ bool Analyzer::instanciateAssignment(const ir::isa::Operand<ir::isa::Op::call>& 
 	}
 	return true;
 }
-
 
 } // namespace semantic
 } // namespace ny

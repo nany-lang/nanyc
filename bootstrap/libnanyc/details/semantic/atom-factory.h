@@ -5,13 +5,10 @@
 #include "details/atom/atom.h"
 #include "func-overload-match.h"
 
-
 namespace ny {
 namespace semantic {
 
-
 struct Analyzer;
-
 
 struct Settings final {
 	Settings(Atom& atom, ClassdefTableView& cdeftable,
@@ -56,14 +53,12 @@ struct Settings final {
 
 }; // struct Settings
 
-
 /*!
 ** \brief Instanciate atom
 */
 bool instanciateAtom(Settings& info);
 
 bool instanciateAtomParameterTypes(Settings& info);
-
 
 /*!
 ** \brief Post-processing for resetting types on 'stackalloc' opcodes
@@ -73,7 +68,6 @@ bool instanciateAtomParameterTypes(Settings& info);
 */
 void updateTypesInAllStackallocOp(ir::Sequence&, ClassdefTableView&, uint32_t atomid);
 
-
 /*!
 ** \brief Try to resolve strict parameter types
 **
@@ -82,7 +76,6 @@ void updateTypesInAllStackallocOp(ir::Sequence&, ClassdefTableView&, uint32_t at
 ** This is required for func overloading deduction
 */
 bool resolveStrictParameterTypes(ny::compiler::Compdb&, Atom& atom, Settings* = nullptr);
-
 
 } // namespace semantic
 } // namespace ny

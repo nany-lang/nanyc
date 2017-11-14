@@ -4,13 +4,10 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace semantic {
 
-
 namespace {
-
 
 const Classdef* getExpectedReturnType(Atom& atom, ClassdefTableView& cdeftable) {
 	if (not atom.returnType.clid.isVoid()) {
@@ -21,7 +18,6 @@ const Classdef* getExpectedReturnType(Atom& atom, ClassdefTableView& cdeftable) 
 	return nullptr;
 }
 
-
 const Classdef* getActualExprType(uint32_t lvid, uint32_t atomid, const ClassdefTableView& cdeftable) {
 	if (lvid != 0) {
 		auto& cdef = cdeftable.classdefFollowClassMember(CLID{atomid, lvid});
@@ -31,9 +27,7 @@ const Classdef* getActualExprType(uint32_t lvid, uint32_t atomid, const Classdef
 	return nullptr;
 }
 
-
 } // namespace
-
 
 void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::ret>& operands) {
 	if (unlikely(frame->atom.type != Atom::Type::funcdef))
@@ -72,7 +66,7 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::ret>& operands) {
 					}
 					case TypeCheck::Match::equal: {
 						return (void) complain::returnTypeImplicitConversion(cdefPreviousReturn, *actualType, marker.line,
-								marker.offset);
+							marker.offset);
 					}
 					case TypeCheck::Match::none: {
 						return (void) complain::returnMultipleTypes(cdefPreviousReturn, *actualType, marker.line, marker.offset);
@@ -86,7 +80,7 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::ret>& operands) {
 		}
 	}
 	else {
-		if (!actualType and !expectedType) {
+		if (actualType == nullptr and expectedType == nullptr) {
 			// both void
 		}
 		else {
@@ -157,7 +151,6 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::ret>& operands) {
 		}
 	}
 }
-
 
 } // namespace semantic
 } // namespace ny

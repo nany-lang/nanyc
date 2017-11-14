@@ -2,10 +2,8 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace semantic {
-
 
 void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::self>& operands) {
 	// we can have at least 2 patterns:
@@ -28,7 +26,6 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::self>& operands) {
 			ice() << "invalid 'self' opcode";
 	}
 }
-
 
 } // namespace semantic
 } // namespace ny
