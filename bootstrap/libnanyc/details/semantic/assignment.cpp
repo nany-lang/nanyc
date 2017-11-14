@@ -8,6 +8,15 @@ using namespace Yuni;
 namespace ny {
 namespace semantic {
 
+namespace {
+
+enum class AssignStrategy {
+	rawregister,
+	ref,
+	deepcopy,
+};
+
+} // namespace
 
 bool Analyzer::instanciateAssignment(AtomStackFrame& frame, uint32_t lhs, uint32_t rhs,
 		bool canDisposeLHS,
@@ -70,9 +79,6 @@ bool Analyzer::instanciateAssignment(AtomStackFrame& frame, uint32_t lhs, uint32
 	}
 	bool lhsCanBeAcquired = canBeAcquired(*this, cdeflhs);
 	// Determining the strategy for copying the two values
-	enum class AssignStrategy {
-		rawregister, ref, deepcopy,
-	};
 	// deep copy by default
 	auto strategy = AssignStrategy::deepcopy;
 	if (lhsCanBeAcquired) {
