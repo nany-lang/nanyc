@@ -6,10 +6,15 @@ configuration:
   - debug
   - release
 
+image:
+- Visual Studio 2017
+
 environment:
   matrix:
   - BUILD_TYPE: cmake
-    VS_VERSION: Visual Studio 14 2015
+    VS_VERSION: Visual Studio 15 2017
+
+
 
 # scripts that run after cloning repository
 install:
