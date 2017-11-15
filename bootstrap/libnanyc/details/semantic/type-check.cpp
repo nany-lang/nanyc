@@ -3,14 +3,11 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace semantic {
 namespace TypeCheck {
 
-
 namespace { // anonymous
-
 
 Match isAtomSimilarTo(Analyzer& seq, Atom& atom, Atom& to) {
 	if (&atom == &to) // identity
@@ -85,9 +82,7 @@ Match isAtomSimilarTo(Analyzer& seq, Atom& atom, Atom& to) {
 	return Match::none;
 }
 
-
-} // anonymous namespace
-
+} // namespace
 
 Match isSimilarTo(Analyzer& seq, const Classdef& from, const Classdef& to, bool allowImplicit) {
 	// identity
@@ -134,7 +129,6 @@ Match isSimilarTo(Analyzer& seq, const Classdef& from, const Classdef& to, bool 
 	}
 	return similarity;
 }
-
 
 } // namespace TypeCheck
 } // namespace semantic

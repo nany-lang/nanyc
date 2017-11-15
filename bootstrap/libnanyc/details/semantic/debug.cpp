@@ -2,10 +2,8 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace semantic {
-
 
 void debugPrintIRSequence(const String& symbolName, const ir::Sequence& irseq,
 						  const ClassdefTableView& table, uint32_t offset) {
@@ -23,7 +21,6 @@ void debugPrintIRSequence(const String& symbolName, const ir::Sequence& irseq,
 	entry.info(); // for beauty
 }
 
-
 void debugPrintSourceOpcodeSequence(const ClassdefTableView& table, const Atom& atom, const char* usertxt) {
 	String text;
 	text << usertxt << table.keyword(atom) << ' '; // ex: func
@@ -31,7 +28,6 @@ void debugPrintSourceOpcodeSequence(const ClassdefTableView& table, const Atom& 
 	uint32_t offset = atom.opcodes.offset;
 	debugPrintIRSequence(text, *atom.opcodes.ircode, table, offset);
 }
-
 
 void debugPrintClassdefs(const AtomStackFrame& frame, const ClassdefTableView& table) {
 	// new entry
@@ -58,7 +54,6 @@ void debugPrintClassdefs(const AtomStackFrame& frame, const ClassdefTableView& t
 			entry << "    " << clid << ": !!INVALID CLID";
 	}
 }
-
 
 } // namespace semantic
 } // namespace ny

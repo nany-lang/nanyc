@@ -6,13 +6,10 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace semantic {
 
-
 namespace {
-
 
 inline void callIf(Analyzer& analyzer, bool& flag, void (*callback)(Analyzer&)) {
 	if (flag) {
@@ -20,7 +17,6 @@ inline void callIf(Analyzer& analyzer, bool& flag, void (*callback)(Analyzer&)) 
 		callback(analyzer);
 	}
 }
-
 
 bool bodyStart(Analyzer& seq) {
 	assert(seq.frame != nullptr);
@@ -80,7 +76,6 @@ bool bodyStart(Analyzer& seq) {
 	return success;
 }
 
-
 void codegen(Analyzer& seq, bool onoff) {
 	auto& refcount = seq.codeGenerationLock;
 	if (onoff) {
@@ -90,7 +85,6 @@ void codegen(Analyzer& seq, bool onoff) {
 	else
 		++refcount;
 }
-
 
 void blueprintSize(Analyzer& seq, uint32_t opcodeCount) {
 	if (0 == seq.layerDepthLimit) {
@@ -106,7 +100,6 @@ void blueprintSize(Analyzer& seq, uint32_t opcodeCount) {
 		*seq.cursor = &seq.currentSequence.at(startOffset + opcodeCount - 1 - 1);
 	}
 }
-
 
 void shortcircuitMutateToBool(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::pragma>& operands) {
 	uint32_t lvid = operands.value.shortcircuitMutate.lvid;
@@ -133,9 +126,7 @@ void shortcircuitMutateToBool(Analyzer& seq, const ir::isa::Operand<ir::isa::Op:
 		ir::emit::copy(seq.out, lvid, source);
 }
 
-
 } // anonymous namespace
-
 
 void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::pragma>& operands) {
 	switch (operands.pragma) {
@@ -180,7 +171,6 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::pragma>& operands) {
 			break;
 	}
 }
-
 
 } // namespace semantic
 } // namespace ny

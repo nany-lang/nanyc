@@ -18,8 +18,8 @@ namespace ny {
 namespace ir {
 namespace Producer {
 
-class Scope;
-class Context;
+struct Scope;
+struct Context;
 
 } // namespace Producer
 } // namespace ir

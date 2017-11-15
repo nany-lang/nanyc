@@ -13,7 +13,7 @@ namespace ir {
 namespace Producer {
 
 // forward declaration
-class Scope;
+struct Scope;
 
 //! Context for ir generation
 struct Context final {

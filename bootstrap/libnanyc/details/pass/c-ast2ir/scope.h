@@ -5,7 +5,6 @@
 #include <yuni/core/flags.h>
 #include "details/atom/ctype.h"
 
-
 namespace ny {
 namespace ir {
 namespace Producer {
@@ -34,7 +33,6 @@ struct Attributes final {
 
 	//! Ctor
 	Attributes(AST::Node& node): node(node) {}
-
 	//! Attributes presence
 	Yuni::Flags<Flag> flags;
 	//! builtinalias: or | and | ...
@@ -55,12 +53,8 @@ struct OnScopeFail final {
 	uint32_t var;
 };
 
-
-/*!
-** \brief Scope for ir generation (requires a context or another scope)
-*/
-class Scope final {
-public:
+//! Scope for ir generation (requires a context or another scope)
+struct Scope final {
 	enum class Kind : uint32_t {
 		undefined,
 		kfunc,
@@ -70,7 +64,6 @@ public:
 		uint32_t offsetPragma = 0;
 		uint32_t offsetStackalloc = 0;
 	};
-
 
 public:
 	//! \name Constructor & Destructor
@@ -160,9 +153,8 @@ public:
 	void addDebugCurrentPosition(uint line, uint offset);
 
 	bool generateIfStmt(AST::Node& expr, AST::Node& thenc, AST::Node* elsec = nullptr,
-						uint32_t* customjmpthenOffset = nullptr);
+		uint32_t* customjmpthenOffset = nullptr);
 	bool generateIfExpr(uint32_t& ifret, AST::Node& expr, AST::Node& thenc, AST::Node& elsec);
-
 
 	//! \name Utilities
 	//@{
@@ -214,20 +206,14 @@ public:
 	//! 'on scope fail' offsets for exit jmp
 	std::vector<OnScopeFail> onScopeFailExitLabels;
 	//! Nakama
-	friend class Context;
+	friend struct Context;
 
 private:
 	void doEmitTmplParameters();
 	void emitExprAttributes(uint32_t& localvar);
 	bool fetchAttributes(AST::Node&);
 	void updateOnScopeFailExitLabels();
-
-}; // class Scope
-
-
-
-
-
+}; // Scope
 
 } // namespace Producer
 } // namespace ir

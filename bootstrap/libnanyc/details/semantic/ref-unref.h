@@ -3,11 +3,9 @@
 #include "details/ir/emit.h"
 #include <cassert>
 
-
 namespace ny {
 namespace semantic {
 namespace {
-
 
 inline bool canBeAcquired(const Analyzer& sb, const Classdef& cdef) {
 	bool success = not cdef.isBuiltinOrVoid();
@@ -20,17 +18,14 @@ inline bool canBeAcquired(const Analyzer& sb, const Classdef& cdef) {
 	return success;
 }
 
-
 inline bool canBeAcquired(const Analyzer& sb, const CLID& clid) {
 	return canBeAcquired(sb, sb.cdeftable.classdef(clid));
 }
-
 
 inline bool canBeAcquired(const Analyzer& sb, uint32_t lvid) {
 	assert(sb.frame != nullptr);
 	return canBeAcquired(sb, CLID{sb.frame->atomid, lvid});
 }
-
 
 inline void acquireObject(Analyzer& sb, uint32_t lvid) {
 	assert(lvid > 1 and "can not acquire the returned value");
@@ -40,19 +35,16 @@ inline void acquireObject(Analyzer& sb, uint32_t lvid) {
 	sb.frame->lvids(lvid).autorelease = true;
 }
 
-
 inline void tryToAcquireObject(Analyzer& sb, uint32_t lvid) {
 	if (canBeAcquired(sb, lvid))
 		acquireObject(sb, lvid);
 }
-
 
 template<class T>
 inline void tryToAcquireObject(Analyzer& sb, uint32_t lvid, const T& type) {
 	if (canBeAcquired(sb, type))
 		acquireObject(sb, lvid);
 }
-
 
 inline void tryUnrefObject(Analyzer& sb, uint32_t lvid) {
 	auto* frame = sb.frame;
@@ -80,7 +72,6 @@ inline void tryUnrefObject(Analyzer& sb, uint32_t lvid) {
 			ir::emit::unref(sb.out, lvid, atom->classinfo.dtor.atomid);
 	}
 }
-
 
 } // namespace
 } // namespace semantic

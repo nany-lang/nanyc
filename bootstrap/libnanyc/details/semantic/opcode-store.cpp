@@ -3,10 +3,8 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace semantic {
-
 
 void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::storeConstant>& operands) {
 	assert(frame != nullptr);
@@ -14,7 +12,6 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::storeConstant>& operand
 	if (canGenerateCode())
 		ir::emit::constantu64(out, operands.lvid, operands.value.u64);
 }
-
 
 void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::store>& operands) {
 	assert(frame != nullptr);
@@ -32,7 +29,6 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::store>& operands) {
 		ir::emit::copy(out, operands.lvid, operands.source);
 }
 
-
 void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::storeText>& operands) {
 	if (canGenerateCode()) {
 		uint32_t sid = ir::emit::constantText(out, operands.lvid, currentSequence.stringrefs[operands.text]);
@@ -41,7 +37,6 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::storeText>& operands) {
 		lvidinfo.text_sid  = sid;
 	}
 }
-
 
 } // namespace semantic
 } // namespace ny

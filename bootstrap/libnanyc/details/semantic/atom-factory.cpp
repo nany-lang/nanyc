@@ -13,13 +13,10 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace semantic {
 
-
 namespace {
-
 
 void complainMissingErrorHandlers(const Atom& atom, const ny::AtomRaisedErrors& errors) {
 	auto err = (error() << "error handlers required from definition of '");
@@ -94,7 +91,6 @@ void prepareSignature(Signature& signature, Settings& settings) {
 	}
 }
 
-
 bool duplicateAtomForSpecialization(Settings& settings, Atom& atom) {
 	// create a new atom with non-generic parameters / from a contextual atom
 	// (generic or anonymous class) and re-map from the parent
@@ -122,7 +118,6 @@ bool duplicateAtomForSpecialization(Settings& settings, Atom& atom) {
 	return resolveStrictParameterTypes(settings.compdb, newAtom, &settings);
 }
 
-
 //! Prepare the first local registers from the parameter types
 void substituteParameterTypes(ClassdefTableView& cdeftable, Atom& atom, const Signature& signature) {
 	// magic constant +2
@@ -145,7 +140,6 @@ void substituteParameterTypes(ClassdefTableView& cdeftable, Atom& atom, const Si
 	for (uint32_t i = 0; i != count; ++i)
 		substitute(signature.tmplparams[i]);
 }
-
 
 ir::Sequence* translateAndInstanciateASTIRCode(Settings& settings, Signature& signature) {
 	auto& atomRequested = settings.atom.get();
@@ -239,7 +233,6 @@ ir::Sequence* translateAndInstanciateASTIRCode(Settings& settings, Signature& si
 	return nullptr;
 }
 
-
 bool instanciateRecursiveAtom(Settings& settings) {
 	Atom& atom = settings.atom.get();
 	if (unlikely(not atom.isFunction()))
@@ -254,7 +247,6 @@ bool instanciateRecursiveAtom(Settings& settings) {
 	}
 	return true;
 }
-
 
 bool resolveTypesBeforeBodyStart(ny::compiler::Compdb& compdb, Atom& atom, Settings* originalInfo) {
 	ClassdefTableView cdeftblView{compdb.cdeftable};
@@ -283,9 +275,7 @@ bool resolveTypesBeforeBodyStart(ny::compiler::Compdb& compdb, Atom& atom, Setti
 	}
 }
 
-
-} // anonymous namespace
-
+} // namespace
 
 bool resolveStrictParameterTypes(ny::compiler::Compdb& compdb, Atom& atom, Settings* originalInfo) {
 	switch (atom.type) {
@@ -328,7 +318,6 @@ bool resolveStrictParameterTypes(ny::compiler::Compdb& compdb, Atom& atom, Setti
 	return success;
 }
 
-
 bool Analyzer::instanciateAtomClassClone(Atom& atom, uint32_t lvid, uint32_t rhs) {
 	assert(not signatureOnly);
 	assert(atom.isClass());
@@ -369,7 +358,6 @@ bool Analyzer::instanciateAtomClassClone(Atom& atom, uint32_t lvid, uint32_t rhs
 	}
 	return false;
 }
-
 
 bool Analyzer::instanciateAtomClassDestructor(Atom& atom, uint32_t lvid) {
 	assert(not signatureOnly);
@@ -418,7 +406,6 @@ bool Analyzer::instanciateAtomClassDestructor(Atom& atom, uint32_t lvid) {
 	return false;
 }
 
-
 Atom* Analyzer::instanciateAtomClass(Atom& atom) {
 	assert(atom.isClass());
 	// mark the atom being instanciated as 'instanciated'. For classes with gen. type parameters
@@ -462,7 +449,6 @@ Atom* Analyzer::instanciateAtomClass(Atom& atom) {
 	return &resAtom;
 }
 
-
 bool Analyzer::instanciateAtomFunc(uint32_t& instanceid, Atom& funcAtom, uint32_t retlvid, uint32_t p1,
 		uint32_t p2) {
 	assert(funcAtom.isFunction() or funcAtom.isTypeAlias());
@@ -501,7 +487,6 @@ bool Analyzer::instanciateAtomFunc(uint32_t& instanceid, Atom& funcAtom, uint32_
 	return instok;
 }
 
-
 bool Analyzer::doInstanciateAtomFunc(std::unique_ptr<Logs::Message>& subreport, Settings& settings,
 		uint32_t retlvid) {
 	// even within a typeof, any new instanciation must see their code generated
@@ -534,7 +519,6 @@ bool Analyzer::doInstanciateAtomFunc(std::unique_ptr<Logs::Message>& subreport, 
 	}
 	return true;
 }
-
 
 bool Analyzer::getReturnTypeForRecursiveFunc(const Atom& atom, Classdef& rettype) const {
 	// looking for the parent sequence builder currently generating ir for this atom
@@ -592,7 +576,6 @@ bool Analyzer::getReturnTypeForRecursiveFunc(const Atom& atom, Classdef& rettype
 	return true;
 }
 
-
 bool instanciateAtomParameterTypes(Settings& settings) {
 	// Despite the location of this code, no real code instanciation
 	// of any sort will be done (the code is the same, that's why).
@@ -644,7 +627,6 @@ bool instanciateAtomParameterTypes(Settings& settings) {
 	return true;
 }
 
-
 bool instanciateAtom(Settings& settings) {
 	try {
 		Signature signature;
@@ -681,7 +663,6 @@ bool instanciateAtom(Settings& settings) {
 	}
 	return false;
 }
-
 
 } // namespace semantic
 } // namespace ny
