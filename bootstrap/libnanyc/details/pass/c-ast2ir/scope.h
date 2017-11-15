@@ -54,8 +54,7 @@ struct OnScopeFail final {
 };
 
 //! Scope for ir generation (requires a context or another scope)
-class Scope final {
-public:
+struct Scope final {
 	enum class Kind : uint32_t {
 		undefined,
 		kfunc,
@@ -207,15 +206,14 @@ public:
 	//! 'on scope fail' offsets for exit jmp
 	std::vector<OnScopeFail> onScopeFailExitLabels;
 	//! Nakama
-	friend class Context;
+	friend struct Context;
 
 private:
 	void doEmitTmplParameters();
 	void emitExprAttributes(uint32_t& localvar);
 	bool fetchAttributes(AST::Node&);
 	void updateOnScopeFailExitLabels();
-
-}; // class Scope
+}; // Scope
 
 } // namespace Producer
 } // namespace ir
