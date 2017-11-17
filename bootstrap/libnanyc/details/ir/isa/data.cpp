@@ -4,9 +4,7 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace ir {
-namespace isa {
+namespace ny::ir::isa {
 
 String print(const Sequence& ircode, const ny::ir::Instruction& instr, const ny::AtomMap* atommap) {
 	String text;
@@ -128,6 +126,4 @@ AnyString opname(ny::ir::isa::Op opcode) {
 	throw "internal error";
 }
 
-} // namespace isa
-} // namespace ir
-} // namespace ny
+} // namespace ny::ir::isa

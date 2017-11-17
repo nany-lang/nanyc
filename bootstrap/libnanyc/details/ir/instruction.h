@@ -3,8 +3,7 @@
 #include "details/ir/isa/opcodes.h"
 #include "details/ir/isa/data.h"
 
-namespace ny {
-namespace ir {
+namespace ny::ir {
 
 struct Instruction final {
 	uint32_t opcodes[4];
@@ -31,5 +30,4 @@ struct Instruction final {
 
 }; // struct Instruction
 
-} // namespace ir
-} // namespace ny
+} // ny::ir

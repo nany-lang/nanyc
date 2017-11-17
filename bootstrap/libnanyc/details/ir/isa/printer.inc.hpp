@@ -7,15 +7,9 @@
 #include "details/atom/visibility.h"
 #include "details/atom/ctype.h"
 
+namespace ny::ir::isa {
 
-namespace ny
-{
-namespace ir
-{
-namespace isa
-{
-namespace // anonymous
-{
+namespace {
 
 template<class S> struct Printer final {
 	S& out;
@@ -718,7 +712,6 @@ template<class S> struct Printer final {
 	}
 };
 
-} // anonymous namespace
-} // namespace isa
-} // namespace ir
-} // namespace ny
+} // namespace
+
+} // ny::ir::isa

@@ -4,17 +4,11 @@
 #include <iosfwd>
 #include <yuni/core/string.h>
 
-namespace ny {
-struct AtomMap;
-namespace ir {
-struct Sequence;
-struct Instruction;
-}
-}
+namespace ny     { struct AtomMap; }
+namespace ny::ir { struct Sequence; }
+namespace ny::ir { struct Instruction; }
 
-namespace ny {
-namespace ir {
-namespace isa {
+namespace ny::ir::isa {
 
 enum class Pragma : uint32_t {
 	//! Unknown pragma / invalid
@@ -1012,6 +1006,4 @@ print(const Sequence& sequence, const ny::ir::isa::Operand<O>& operands, const A
 
 void printExtract(YString& out, const Sequence&, uint32_t offset, const AtomMap* = nullptr);
 
-} // namespace isa
-} // namespace ir
-} // namespace ny
+} // namespace ny::ir::isa

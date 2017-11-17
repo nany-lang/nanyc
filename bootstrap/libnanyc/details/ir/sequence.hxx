@@ -6,8 +6,7 @@
 #include <iostream>
 #endif
 
-namespace ny {
-namespace ir {
+namespace ny::ir {
 
 inline void Sequence::reserve(uint32_t count) {
 	if (m_capacity < count)
@@ -90,5 +89,4 @@ template<isa::Op O> inline isa::Operand<O>& Sequence::emit() {
 	return result;
 }
 
-} // namespace ir
-} // namespace ny
+} // ny::ir

@@ -2,8 +2,7 @@
 #include <yuni/yuni.h>
 #include <cstdint>
 
-namespace ny {
-namespace ir {
+namespace ny::ir {
 
 //! Constant for declaring classdef with several overloads
 static constexpr yuint64 kClassdefHasOverloads = (yuint64) - 1;
@@ -11,16 +10,11 @@ static constexpr yuint64 kClassdefHasOverloads = (yuint64) - 1;
 //! Magic dust for blueprints
 static constexpr yuint64 blueprintMagicDust = 0x123456789ABCDEF;
 
-} // namespace ir
-} // namespace ny
+} // ny::ir
 
-namespace ny {
-namespace ir {
-namespace Producer {
+namespace ny::ir::Producer {
 
 struct Scope;
 struct Context;
 
-} // namespace Producer
-} // namespace ir
-} // namespace ny
+} // ny::ir::Producer

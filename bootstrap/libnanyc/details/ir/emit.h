@@ -4,9 +4,7 @@
 #include "details/atom/visibility.h"
 #include "details/atom/ctype.h"
 
-namespace ny {
-namespace ir {
-namespace emit {
+namespace ny::ir::emit {
 namespace {
 
 struct IRCodeRef final {
@@ -514,14 +512,9 @@ inline void trace(IRCodeRef ref) {
 }
 
 } // namespace
-} // namespace emit
-} // namespace ir
-} // namespace ny
+} // ny::ir::emit
 
-namespace ny {
-namespace ir {
-namespace emit {
-namespace on {
+namespace ny::ir::emit::on {
 namespace {
 
 inline void scopefail(IRCodeRef ref, uint32_t lvid, uint32_t label) {
@@ -531,15 +524,9 @@ inline void scopefail(IRCodeRef ref, uint32_t lvid, uint32_t label) {
 }
 
 } // namespace
-} // namespace on
-} // namespace emit
-} // namespace ir
-} // namespace ny
+} // ny::ir::emit::on
 
-namespace ny {
-namespace ir {
-namespace emit {
-namespace type {
+namespace ny::ir::emit::type {
 namespace {
 
 inline void isself(IRCodeRef ref, uint32_t lvid) {
@@ -581,15 +568,9 @@ inline void ensureResolved(IRCodeRef ref, uint32_t lvid) {
 }
 
 } // namespace
-} // namespace type
-} // namespace emit
-} // namespace ir
-} // namespace ny
+} // ny::ir::emit::type
 
-namespace ny {
-namespace ir {
-namespace emit {
-namespace blueprint {
+namespace ny::ir::emit::blueprint {
 namespace {
 
 template<ir::isa::Blueprint KindT>
@@ -693,15 +674,9 @@ inline uint32_t tparam(IRCodeRef ref, uint32_t lvid) {
 }
 
 } // namespace
-} // namespace blueprint
-} // namespace emit
-} // namespace ir
-} // namespace ny
+} // ny::ir::emit::blueprint
 
-namespace ny {
-namespace ir {
-namespace emit {
-namespace memory {
+namespace ny::ir::emit::memory {
 namespace {
 
 inline uint32_t allocate(IRCodeRef ref, uint32_t lvid, uint32_t regsize) {
@@ -802,15 +777,9 @@ inline void hold(IRCodeRef ref, uint32_t lvid, uint32_t size) {
 }
 
 } // namespace
-} // namespace memory
-} // namespace emit
-} // namespace ir
-} // namespace ny
+} // ny::ir::emit::memory
 
-namespace ny {
-namespace ir {
-namespace emit {
-namespace pragma {
+namespace ny::ir::emit::pragma {
 namespace {
 
 inline auto& make(IRCodeRef& ref, ir::isa::Pragma value) {
@@ -875,15 +844,9 @@ inline uint32_t blueprintSize(IRCodeRef ref) {
 }
 
 } // namespace
-} // namespace pragma
-} // namespace emit
-} // namespace ir
-} // namespace ny
+} // ny::ir::emit::pragma
 
-namespace ny {
-namespace ir {
-namespace emit {
-namespace dbginfo {
+namespace ny::ir::emit::dbginfo {
 namespace {
 
 //! Emit a debug filename opcode
@@ -898,14 +861,9 @@ inline void position(IRCodeRef ref, uint32_t line, uint32_t offset) {
 }
 
 } // namespace
-} // namespace dbginfo
-} // namespace emit
-} // namespace ir
-} // namespace ny
+} // ny::ir::emit::dbginfo
 
-namespace ny {
-namespace ir {
-namespace emit {
+namespace ny::ir::emit {
 namespace {
 
 struct ScopeLocker final {
@@ -933,6 +891,4 @@ struct CodegenLocker final {
 };
 
 } // namespace
-} // namespace emit
-} // namespace ir
-} // namespace ny
+} // ny::ir::emit

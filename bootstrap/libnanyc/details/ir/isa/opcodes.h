@@ -10,9 +10,7 @@
 #include <iostream>
 #endif
 
-namespace ny {
-namespace ir {
-namespace isa { //!< Instruction Set Architecture
+namespace ny::ir::isa { //!< Instruction Set Architecture
 
 enum class Op : std::uint32_t {
 	//! nop opcode (or unknown)
@@ -241,6 +239,4 @@ enum class Op : std::uint32_t {
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::nop) \
 	} \
 
-	} // namespace isa
-	} // namespace ir
-	} // namespace ny
+} // ny::ir::isa

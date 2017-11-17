@@ -13,8 +13,7 @@
 # undef alloca
 #endif
 
-namespace ny {
-namespace ir {
+namespace ny::ir {
 
 struct Sequence final {
 	Sequence() = default;
@@ -126,7 +125,6 @@ private:
 
 }; // Sequence
 
-} // namespace ir
-} // namespace ny
+} // ny::ir
 
 #include "sequence.hxx"
