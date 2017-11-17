@@ -4,11 +4,9 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace ir {
 namespace isa {
-
 
 String print(const Sequence& ircode, const ny::ir::Instruction& instr, const ny::AtomMap* atommap) {
 	String text;
@@ -18,7 +16,6 @@ String print(const Sequence& ircode, const ny::ir::Instruction& instr, const ny:
 	text.trimRight();
 	return text;
 }
-
 
 void printExtract(YString& out, const Sequence& ircode, uint32_t offset, const AtomMap* atommap) {
 	uint32_t context = 6;
@@ -35,7 +32,6 @@ void printExtract(YString& out, const Sequence& ircode, uint32_t offset, const A
 	}
 	out.trimRight();
 }
-
 
 AnyString opname(ny::ir::isa::Op opcode) {
 	switch (opcode) {
@@ -131,7 +127,6 @@ AnyString opname(ny::ir::isa::Op opcode) {
 	}
 	throw "internal error";
 }
-
 
 } // namespace isa
 } // namespace ir

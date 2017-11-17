@@ -10,12 +10,9 @@
 #include <iostream>
 #endif
 
-
-
 namespace ny {
 namespace ir {
 namespace isa { //!< Instruction Set Architecture
-
 
 enum class Op : std::uint32_t {
 	//! nop opcode (or unknown)
@@ -124,9 +121,6 @@ enum class Op : std::uint32_t {
 };
 
 
-
-
-
 #if LIBNANYC_IR_PRINT_OPCODES != 0
 #define __LIBNANYC_IR_PRINT_OPCODE(OPCODE) std::cout << " -- opc " << (void*) this << " -- " << opc << " as " << #OPCODE << std::endl;
 #else
@@ -140,7 +134,6 @@ enum class Op : std::uint32_t {
 		(VISITOR).visit(reinterpret_cast<PREFIX<(OPCODE)>&>((IT))); \
 		break; \
 	}
-
 
 #define LIBNANYC_IR_VISIT_SEQUENCE(PREFIX,VISITOR, IT) \
 	uint32_t opc = (IT).opcodes[0]; \
@@ -247,9 +240,6 @@ enum class Op : std::uint32_t {
 			\
 			LIBNANYC_IR_VISIT_OPCODE(PREFIX, VISITOR, IT, isa::Op::nop) \
 	} \
-
-
-
 
 	} // namespace isa
 	} // namespace ir
