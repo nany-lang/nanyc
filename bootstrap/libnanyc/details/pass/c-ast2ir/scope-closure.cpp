@@ -3,11 +3,9 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace ir {
 namespace Producer {
-
 
 bool Scope::visitASTExprClosure(AST::Node& node, uint32_t& localvar) {
 	assert(node.rule == AST::rgFunction);
@@ -65,7 +63,6 @@ bool Scope::visitASTExprClosure(AST::Node& node, uint32_t& localvar) {
 	targetBody.children.clear();
 	return success;
 }
-
 
 } // namespace Producer
 } // namespace ir

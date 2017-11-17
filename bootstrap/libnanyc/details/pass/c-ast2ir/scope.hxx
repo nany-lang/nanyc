@@ -3,17 +3,14 @@
 #include "libnanyc-config.h"
 #include "details/ir/emit.h"
 
-
 namespace ny {
 namespace ir {
 namespace Producer {
-
 
 inline Scope::Scope(Context& context)
 	: context(context)
 	, broadcastNextVarID(false) {
 }
-
 
 inline Scope::Scope(Scope& scope)
 	: context(scope.context)
@@ -21,7 +18,6 @@ inline Scope::Scope(Scope& scope)
 	, kind(scope.kind)
 	, parentScope(&scope) {
 }
-
 
 inline Scope::~Scope() {
 	if (broadcastNextVarID) {
@@ -34,21 +30,17 @@ inline Scope::~Scope() {
 		checkForUnknownAttributes();
 }
 
-
 inline Sequence& Scope::ircode() {
 	return context.ircode;
 }
-
 
 inline AnyString Scope::acquireString(const AnyString& string) {
 	return context.ircode.stringrefs.refstr(string);
 }
 
-
 inline bool Scope::visitAST(AST::Node& node) {
 	return visitASTStmt(node);
 }
-
 
 inline void Scope::addDebugCurrentPosition(uint line, uint offset) {
 	if (context.debuginfo and
@@ -60,7 +52,6 @@ inline void Scope::addDebugCurrentPosition(uint line, uint offset) {
 	}
 }
 
-
 inline void Scope::resetLocalCounters(uint32_t localvarStart) {
 	// 0: null
 	// 1: reserved for namespace lookup
@@ -70,45 +61,37 @@ inline void Scope::resetLocalCounters(uint32_t localvarStart) {
 	context.m_previousDbgLine = 0;
 }
 
-
 inline uint32_t Scope::nextvar() {
 	return ++nextVarID;
 }
 
-
 inline uint32_t Scope::reserveLocalVariable() {
 	return ++nextVarID;
 }
-
 
 inline uint32_t Scope::createLocalBuiltinVoid(AST::Node& node) {
 	emitDebugpos(node);
 	return ir::emit::alloc(context.ircode, nextvar(), CType::t_void);
 }
 
-
 inline uint32_t Scope::createLocalBuiltinAny(AST::Node& node) {
 	emitDebugpos(node);
 	return ir::emit::alloc(context.ircode, nextvar());
 }
-
 
 inline uint32_t Scope::createLocalBuiltinFloat(AST::Node& node, CType type, double value) {
 	emitDebugpos(node);
 	return ir::emit::allocf64(context.ircode, nextvar(), type, value);
 }
 
-
 inline uint32_t Scope::createLocalBuiltinInt(AST::Node& node, CType type, yuint64 value) {
 	emitDebugpos(node);
 	return ir::emit::allocu64(context.ircode, nextvar(), type, value);
 }
 
-
 inline bool Scope::hasDebuginfo() const {
 	return context.debuginfo;
 }
-
 
 inline bool Scope::isWithinClass() const {
 	Scope* scope = parentScope;
@@ -127,12 +110,10 @@ inline bool Scope::isWithinClass() const {
 	return false;
 }
 
-
 inline void Scope::emitDebugpos(AST::Node* node) {
 	if (node)
 		emitDebugpos(*node);
 }
-
 
 inline bool Scope::visitASTExprSubDot(AST::Node& node, uint32_t& localvar) {
 	emitTmplParametersIfAny();
@@ -140,23 +121,19 @@ inline bool Scope::visitASTExprSubDot(AST::Node& node, uint32_t& localvar) {
 	return visitASTExprContinuation(node, localvar);
 }
 
-
 inline void Scope::emitTmplParametersIfAny() {
 	if (lastPushedTmplParams.get())
 		doEmitTmplParameters();
 }
-
 
 inline void Scope::moveAttributes(Scope& scope) {
 	attributes = nullptr;
 	std::swap(attributes, scope.attributes);
 }
 
-
 inline bool Scope::visitASTAttributes(AST::Node& node) {
 	return node.children.empty() or fetchAttributes(node);
 }
-
 
 } // namespace Producer
 } // namespace ir

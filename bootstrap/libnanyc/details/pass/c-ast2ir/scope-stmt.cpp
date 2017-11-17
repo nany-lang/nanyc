@@ -4,11 +4,9 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace ir {
 namespace Producer {
-
 
 bool Scope::visitASTStmt(AST::Node& orignode) {
 	auto& node = (orignode.rule == AST::rgExpr
@@ -98,7 +96,6 @@ bool Scope::visitASTStmt(AST::Node& orignode) {
 			return unexpectedNode(node, "[ir/stmt]");
 	}
 }
-
 
 } // namespace Producer
 } // namespace ir

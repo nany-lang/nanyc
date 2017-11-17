@@ -3,11 +3,9 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace ir {
 namespace Producer {
-
 
 bool Scope::visitASTExprIntrinsic(AST::Node& node, uint32_t& localvar) {
 	assert(node.rule == AST::rgIntrinsic);
@@ -52,7 +50,6 @@ bool Scope::visitASTExprIntrinsic(AST::Node& node, uint32_t& localvar) {
 	ir::emit::intrinsic(irout, localvar, intrinsicname);
 	return success;
 }
-
 
 } // namespace Producer
 } // namespace ir

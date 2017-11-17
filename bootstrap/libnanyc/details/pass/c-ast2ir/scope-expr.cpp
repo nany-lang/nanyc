@@ -3,20 +3,17 @@
 
 using namespace Yuni;
 
-
-
 namespace ny {
 namespace ir {
 namespace Producer {
 
 namespace {
 
-
 bool visitScope(Scope& scope, AST::Node& node, bool allowScope) {
-	return allowScope ? scope.visitASTExprScope(node)
-		   : unexpectedNode(node, "invalid scope declaration [expr/continuation]");
+	return allowScope
+		? scope.visitASTExprScope(node)
+		: unexpectedNode(node, "invalid scope declaration [expr/continuation]");
 }
-
 
 bool visitASTExprRegister(Scope& scope, AST::Node& node, uint32_t& localvar) {
 	assert(not node.text.empty());
@@ -25,9 +22,7 @@ bool visitASTExprRegister(Scope& scope, AST::Node& node, uint32_t& localvar) {
 	return node.children.empty() or scope.visitASTExprContinuation(node, localvar);
 }
 
-
 } // anonymous
-
 
 bool Scope::visitASTExprIdentifier(AST::Node& node, uint32_t& localvar) {
 	// value fetching
@@ -60,7 +55,6 @@ bool Scope::visitASTExprIdentifier(AST::Node& node, uint32_t& localvar) {
 	return visitASTExprContinuation(node, localvar);
 }
 
-
 bool Scope::visitASTExprIdOperator(AST::Node& node, uint32_t& localvar) {
 	if (unlikely((node.children.size() != 1) or (node.children[0].rule != AST::rgFunctionKindOpname)))
 		return unexpectedNode(node, "[expr/operator]");
@@ -73,7 +67,6 @@ bool Scope::visitASTExprIdOperator(AST::Node& node, uint32_t& localvar) {
 	localvar = rid;
 	return true;
 }
-
 
 bool Scope::visitASTExprContinuation(AST::Node& node, uint32_t& localvar, bool allowScope) {
 	bool success = true;
@@ -167,7 +160,6 @@ bool Scope::visitASTExprContinuation(AST::Node& node, uint32_t& localvar, bool a
 	return success;
 }
 
-
 void Scope::emitExprAttributes(uint32_t& localvar) {
 	assert(!!attributes);
 	auto& attrs = *attributes;
@@ -182,7 +174,6 @@ void Scope::emitExprAttributes(uint32_t& localvar) {
 		ir::emit::pragma::synthetic(irout, localvar, false);
 	}
 }
-
 
 bool Scope::visitASTExpr(AST::Node& orignode, uint32_t& localvar, bool allowScope) {
 	assert(not orignode.children.empty());
@@ -241,7 +232,6 @@ bool Scope::visitASTExpr(AST::Node& orignode, uint32_t& localvar, bool allowScop
 	}
 	return r;
 }
-
 
 } // namespace Producer
 } // namespace ir

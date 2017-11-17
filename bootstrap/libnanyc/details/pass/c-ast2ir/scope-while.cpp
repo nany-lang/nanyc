@@ -4,11 +4,9 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace ir {
 namespace Producer {
-
 
 bool Scope::visitASTExprWhile(AST::Node& node) {
 	assert(node.rule == AST::rgWhile);
@@ -99,7 +97,6 @@ bool Scope::visitASTExprDoWhile(AST::Node& node) {
 	ir::emit::jnz(irout, condlvid, 0, labelWhile);
 	return success;
 }
-
 
 } // namespace Producer
 } // namespace ir

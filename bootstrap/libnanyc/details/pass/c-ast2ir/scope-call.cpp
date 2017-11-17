@@ -5,21 +5,17 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace ir {
 namespace Producer {
 
-
 namespace {
-
 
 bool isShortcircuit(AST::Node& node, AST::Node* parent) {
 	return parent != nullptr and parent->rule == AST::rgIdentifier
 		and node.children.size() == 2
 		and (parent->text == "^and" or parent->text == "^or");
 }
-
 
 bool emitFunCallNoParameter(Scope& scope, uint32_t functor, uint32_t& localvar) {
 	auto& irout = scope.ircode();
@@ -32,7 +28,6 @@ bool emitFunCallNoParameter(Scope& scope, uint32_t functor, uint32_t& localvar) 
 	ir::emit::jzraise(irout, scope.nextvar());
 	return true;
 }
-
 
 bool emitFuncCallWithParameters(Scope& scope, uint32_t functor, uint32_t& localvar, AST::Node& node) {
 	auto& irout = scope.ircode();
@@ -50,7 +45,6 @@ bool emitFuncCallWithParameters(Scope& scope, uint32_t functor, uint32_t& localv
 	ir::emit::jzraise(irout, scope.nextvar());
 	return success;
 }
-
 
 bool emitShortCircuitFuncCall(Scope& scope, uint32_t functor, uint32_t& localvar, AST::Node& node) {
 	auto& irout = scope.ircode();
@@ -90,9 +84,7 @@ bool emitShortCircuitFuncCall(Scope& scope, uint32_t functor, uint32_t& localvar
 	return success;
 }
 
-
 } // namespace
-
 
 bool Scope::visitASTExprCallParameters(AST::Node& node, ShortcircuitUpdate* shortcircuit) {
 	assert(node.rule == AST::rgCall);
@@ -196,7 +188,6 @@ bool Scope::visitASTExprCallParameters(AST::Node& node, ShortcircuitUpdate* shor
 	return true;
 }
 
-
 bool Scope::visitASTExprCall(AST::Node* node, uint32_t& localvar, AST::Node* parent) {
 	assert(!node or node->rule == AST::rgCall);
 	emitDebugpos(node ? node : parent);
@@ -215,7 +206,6 @@ bool Scope::visitASTExprCall(AST::Node* node, uint32_t& localvar, AST::Node* par
 		? emitFuncCallWithParameters(*this, functor, localvar, *node)
 		: emitShortCircuitFuncCall(*this, functor, localvar, *node);
 }
-
 
 } // namespace Producer
 } // namespace ir

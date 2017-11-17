@@ -4,11 +4,9 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace ir {
 namespace Producer {
-
 
 void Scope::emitDebugpos(AST::Node& node) {
 	if (node.offset > 0) {
@@ -23,7 +21,6 @@ void Scope::emitDebugpos(AST::Node& node) {
 	}
 }
 
-
 void Scope::doEmitTmplParameters() {
 	assert(lastPushedTmplParams.get());
 	if (not lastPushedTmplParams->empty()) {
@@ -37,7 +34,6 @@ void Scope::doEmitTmplParameters() {
 	}
 	lastPushedTmplParams = nullptr;
 }
-
 
 AnyString Scope::getSymbolNameFromASTNode(AST::Node& node) {
 	assert(node.rule == AST::rgSymbolName);
@@ -54,7 +50,6 @@ AnyString Scope::getSymbolNameFromASTNode(AST::Node& node) {
 	}
 	return identifier.text;
 }
-
 
 void Scope::checkForUnknownAttributes() const {
 	assert(!!attributes);
@@ -76,7 +71,6 @@ void Scope::checkForUnknownAttributes() const {
 	}
 }
 
-
 void Scope::updateOnScopeFailExitLabels() {
 	auto& irout = ircode();
 	uint32_t label = ir::emit::label(irout, nextvar());
@@ -92,7 +86,6 @@ void Scope::updateOnScopeFailExitLabels() {
 	onScopeFailExitLabels.clear();
 	onScopeFailExitLabels.shrink_to_fit();
 }
-
 
 } // namespace Producer
 } // namespace ir

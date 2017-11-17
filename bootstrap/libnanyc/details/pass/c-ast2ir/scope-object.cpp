@@ -4,11 +4,9 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace ir {
 namespace Producer {
-
 
 bool Scope::visitASTExprObject(AST::Node& node, uint32_t& localvar) {
 	assert(node.rule == AST::rgObject);
@@ -98,7 +96,6 @@ bool Scope::visitASTExprObject(AST::Node& node, uint32_t& localvar) {
 	classbody.children.clear();
 	return success;
 }
-
 
 } // namespace Producer
 } // namespace ir

@@ -4,11 +4,9 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace ir {
 namespace Producer {
-
 
 bool Scope::visitASTFor(AST::Node& node) {
 	// Name of the target ref for each element in the container
@@ -77,7 +75,6 @@ bool Scope::visitASTFor(AST::Node& node) {
 	}
 	return success;
 }
-
 
 } // namespace Producer
 } // namespace ir

@@ -5,11 +5,9 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace ir {
 namespace Producer {
-
 
 bool Scope::visitASTUnitTest(AST::Node& node) {
 	assert(node.rule == AST::rgUnittest);
@@ -54,7 +52,6 @@ bool Scope::visitASTUnitTest(AST::Node& node) {
 	context.reuse.unittest.funcname->text.clear();
 	return success;
 }
-
 
 } // namespace Producer
 } // namespace ir

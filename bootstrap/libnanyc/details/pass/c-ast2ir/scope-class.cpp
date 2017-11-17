@@ -36,7 +36,6 @@ private:
 
 }; // struct ClassInspector
 
-
 ClassInspector::ClassInspector(Scope& parentscope, uint32_t lvid)
 	: scope{parentscope}
 	, lvid{lvid} {
@@ -64,7 +63,6 @@ bool ClassInspector::inspectClassname(AST::Node& node) {
 	return not classname.empty()
 		   and checkForValidIdentifierName(node, classname, IdNameFlag::isType);
 }
-
 
 bool ClassInspector::inspectClassDefinition(AST::Node& node) {
 	scope.emitDebugpos(node);

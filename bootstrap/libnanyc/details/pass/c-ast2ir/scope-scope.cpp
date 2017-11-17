@@ -4,11 +4,9 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace ir {
 namespace Producer {
-
 
 bool Scope::visitASTExprScope(AST::Node& node) {
 	if (unlikely(kind != Kind::kfunc)) {
@@ -28,7 +26,6 @@ bool Scope::visitASTExprScope(AST::Node& node) {
 		success &= scope.visitASTStmt(child);
 	return success;
 }
-
 
 } // namespace Producer
 } // namespace ir

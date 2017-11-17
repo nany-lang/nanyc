@@ -3,14 +3,11 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace ir {
 namespace Producer {
 
-
 namespace {
-
 
 bool appendSingleType(Scope& scope, AST::Node& expr, ir::Sequence& out, uint32_t& previous) {
 	scope.emitDebugpos(expr);
@@ -24,9 +21,7 @@ bool appendSingleType(Scope& scope, AST::Node& expr, ir::Sequence& out, uint32_t
 	return ok;
 }
 
-
 } // namespace
-
 
 bool Scope::visitASTExprTypeof(AST::Node& node, uint32_t& localvar) {
 	assert(node.rule == AST::rgTypeof);
@@ -55,7 +50,6 @@ bool Scope::visitASTExprTypeof(AST::Node& node, uint32_t& localvar) {
 	localvar = previous;
 	return success;
 }
-
 
 } // namespace Producer
 } // namespace ir

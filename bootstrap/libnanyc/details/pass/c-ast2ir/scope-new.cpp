@@ -6,11 +6,9 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace ir {
 namespace Producer {
-
 
 bool Scope::visitASTExprNew(AST::Node& node, uint32_t& localvar) {
 	assert(node.rule == AST::rgNew);
@@ -104,7 +102,6 @@ bool Scope::visitASTExprNew(AST::Node& node, uint32_t& localvar) {
 	ir::emit::identify(irout, lvidcall, "^new", pointer);
 	return visitASTExprCall(call, lvidcall);
 }
-
 
 } // namespace Producer
 } // namespace ir

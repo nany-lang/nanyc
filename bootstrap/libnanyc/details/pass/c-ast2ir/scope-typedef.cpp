@@ -4,11 +4,9 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace ir {
 namespace Producer {
-
 
 bool Scope::visitASTTypedef(AST::Node& node) {
 	assert(node.rule == AST::rgTypedef);
@@ -60,7 +58,6 @@ bool Scope::visitASTTypedef(AST::Node& node) {
 	irout.at<isa::Op::stacksize>(bpoffsck).add = scope.nextVarID + 1u;
 	return success;
 }
-
 
 } // namespace Producer
 } // namespace ir

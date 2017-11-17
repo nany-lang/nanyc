@@ -3,14 +3,11 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace ir {
 namespace Producer {
 
-
 namespace {
-
 
 bool onScopeExit(Scope& scope, AST::Node& node, AST::Node& scopeNode) {
 	if (!scope.context.reuse.scope.exit.node)
@@ -33,7 +30,6 @@ bool onScopeExit(Scope& scope, AST::Node& node, AST::Node& scopeNode) {
 	return true;
 }
 
-
 bool onScope(Scope& scope, AST::Node& node) {
 	AST::Node* scopeNode = nullptr;
 	AST::Node* scopeFail = nullptr;
@@ -51,9 +47,7 @@ bool onScope(Scope& scope, AST::Node& node) {
 		: onScopeExit(scope, node, *scopeNode);
 }
 
-
 } // namespace
-
 
 bool Scope::visitASTExprOn(AST::Node& node, uint32_t& /*localvar*/, bool isStmt) {
 	assert(node.rule == AST::rgOn);
@@ -72,7 +66,6 @@ bool Scope::visitASTExprOn(AST::Node& node, uint32_t& /*localvar*/, bool isStmt)
 	}
 	return success;
 }
-
 
 } // namespace Producer
 } // namespace ir
