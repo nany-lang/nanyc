@@ -5,9 +5,7 @@
 #include <yuni/core/flags.h>
 #include "details/atom/ctype.h"
 
-namespace ny {
-namespace ir {
-namespace Producer {
+namespace ny::ir::Producer {
 
 /*!
 ** \brief List of all attributes
@@ -215,8 +213,6 @@ private:
 	void updateOnScopeFailExitLabels();
 }; // Scope
 
-} // namespace Producer
-} // namespace ir
-} // namespace ny
+} // ny::ir::Producer
 
 #include "scope.hxx"

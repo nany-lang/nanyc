@@ -4,9 +4,7 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace ir {
-namespace Producer {
+namespace ny::ir::Producer {
 
 bool Scope::generateIfStmt(AST::Node& expr, AST::Node& thenc, AST::Node* elseptr,
 		uint32_t* customjmpthenOffset) {
@@ -202,6 +200,4 @@ bool Scope::visitASTExprIfExpr(AST::Node& node, uint32_t& localvar) {
 	return generateIfExpr(localvar, *condition, *ifthen, *ifelse);
 }
 
-} // namespace Producer
-} // namespace ir
-} // namespace ny
+} // ny::ir::Producer

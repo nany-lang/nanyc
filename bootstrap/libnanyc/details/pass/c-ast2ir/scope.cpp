@@ -4,9 +4,7 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace ir {
-namespace Producer {
+namespace ny::ir::Producer {
 
 void Scope::emitDebugpos(AST::Node& node) {
 	if (node.offset > 0) {
@@ -87,6 +85,4 @@ void Scope::updateOnScopeFailExitLabels() {
 	onScopeFailExitLabels.shrink_to_fit();
 }
 
-} // namespace Producer
-} // namespace ir
-} // namespace ny
+} // ny::ir::Producer

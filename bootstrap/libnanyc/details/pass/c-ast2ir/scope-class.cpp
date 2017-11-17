@@ -4,9 +4,8 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace ir {
-namespace Producer {
+namespace ny::ir::Producer {
+
 namespace {
 
 struct ClassInspector final {
@@ -145,6 +144,4 @@ bool Scope::visitASTClass(AST::Node& node, uint32_t* localvar) {
 	return inspector.inspectBody(node);
 }
 
-} // namespace Producer
-} // namespace ir
-} // namespace ny
+} // namespace ny::ir::Producer

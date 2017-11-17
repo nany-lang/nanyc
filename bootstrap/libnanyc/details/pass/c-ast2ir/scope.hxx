@@ -3,9 +3,7 @@
 #include "libnanyc-config.h"
 #include "details/ir/emit.h"
 
-namespace ny {
-namespace ir {
-namespace Producer {
+namespace ny::ir::Producer {
 
 inline Scope::Scope(Context& context)
 	: context(context)
@@ -135,6 +133,4 @@ inline bool Scope::visitASTAttributes(AST::Node& node) {
 	return node.children.empty() or fetchAttributes(node);
 }
 
-} // namespace Producer
-} // namespace ir
-} // namespace ny
+} // ny::ir::Producer

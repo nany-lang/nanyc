@@ -3,9 +3,7 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace ir {
-namespace Producer {
+namespace ny::ir::Producer {
 
 bool Scope::visitASTExprIn(AST::Node& node, uint32_t& localvar, ShortString128& elementname) {
 	// lvid representing the input container
@@ -106,6 +104,4 @@ bool Scope::visitASTExprIn(AST::Node& node, uint32_t& localvar) {
 	return visitASTExprIn(node, localvar, elementname);
 }
 
-} // namespace Producer
-} // namespace ir
-} // namespace ny
+} // ny::ir::Producer

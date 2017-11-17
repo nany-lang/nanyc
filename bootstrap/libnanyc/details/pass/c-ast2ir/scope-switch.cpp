@@ -5,9 +5,7 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace ir {
-namespace Producer {
+namespace ny::ir::Producer {
 
 bool Scope::visitASTExprSwitch(AST::Node& node) {
 	assert(node.rule == AST::rgSwitch);
@@ -87,6 +85,4 @@ bool Scope::visitASTExprSwitch(AST::Node& node) {
 	return success;
 }
 
-} // namespace Producer
-} // namespace ir
-} // namespace ny
+} // ny::ir::Producer

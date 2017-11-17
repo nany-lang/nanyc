@@ -5,9 +5,7 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace ir {
-namespace Producer {
+namespace ny::ir::Producer {
 
 bool Scope::visitASTUnitTest(AST::Node& node) {
 	assert(node.rule == AST::rgUnittest);
@@ -53,6 +51,4 @@ bool Scope::visitASTUnitTest(AST::Node& node) {
 	return success;
 }
 
-} // namespace Producer
-} // namespace ir
-} // namespace ny
+} // ny::ir::Producer

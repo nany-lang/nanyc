@@ -5,9 +5,7 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace ir {
-namespace Producer {
+namespace ny::ir::Producer {
 
 namespace {
 
@@ -306,6 +304,4 @@ bool Scope::visitASTExprNumber(AST::Node& node, uint32_t& localvar) {
 		: generateNumberCode<true> (*this, localvar, numdef, node);
 }
 
-} // namespace Producer
-} // namespace ir
-} // namespace ny
+} // ny::ir::Producer

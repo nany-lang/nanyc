@@ -1,14 +1,10 @@
 #pragma once
 #include "context.h"
 
-namespace ny {
-namespace ir {
-namespace Producer {
+namespace ny::ir::Producer {
 
 inline void Context::invalidateLastDebugLine() {
 	m_previousDbgLine = (uint32_t) - 1; // forcing debug infos
 }
 
-} // namespace Producer
-} // namespace ir
-} // namespace ny
+} // namespace ny::ir::Producer

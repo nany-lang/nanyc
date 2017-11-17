@@ -3,9 +3,7 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace ir {
-namespace Producer {
+namespace ny::ir::Producer {
 
 void Reuse::prepareReuseForStrings() {
 	// new (+2)
@@ -464,6 +462,4 @@ void Reuse::prepareReuseForScopeExit() {
 	scope.exit.body = &body;
 }
 
-} // namespace Producer
-} // namespace ir
-} // namespace ny
+} // ny::ir::Producer

@@ -3,9 +3,7 @@
 #include "details/grammar/nany.h"
 #include <exception>
 
-namespace ny {
-namespace ir {
-namespace Producer {
+namespace ny::ir::Producer {
 
 struct Error: public std::exception {
 	Error(const AST::Node& node, const char* = "");
@@ -23,6 +21,4 @@ struct UnexpectedNode final: public Error {
 	using Error::Error;
 };
 
-} // namespace Producer
-} // namespace ir
-} // namespace ny
+} // ny::ir::Producer
