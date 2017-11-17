@@ -3,8 +3,8 @@
 #include "details/ir/emit.h"
 #include <cassert>
 
-namespace ny {
-namespace semantic {
+namespace ny::semantic {
+
 namespace {
 
 inline bool canBeAcquired(const Analyzer& sb, const Classdef& cdef) {
@@ -74,5 +74,5 @@ inline void tryUnrefObject(Analyzer& sb, uint32_t lvid) {
 }
 
 } // namespace
-} // namespace semantic
-} // namespace ny
+
+} // ny::semantic

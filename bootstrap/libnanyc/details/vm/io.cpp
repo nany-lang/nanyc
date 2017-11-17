@@ -5,8 +5,7 @@
 #include <cstring>
 
 
-namespace ny {
-namespace vm {
+namespace ny::vm {
 
 namespace {
 
@@ -149,5 +148,4 @@ nyio_err_t io_add_mountpoint(nyvmthread_t* vmtx, const char* path, uint32_t len,
 	return success ? nyioe_ok : nyioe_failed;
 }
 
-} // namespace vm
-} // namespace ny
+} // namespace ny::vm

@@ -2,8 +2,7 @@
 #include "stack-frame.h"
 #include "details/errors/errors.h"
 
-namespace ny {
-namespace semantic {
+namespace ny::semantic {
 
 DelayedReportOnRaise::DelayedReportOnRaise(Atom& atom)
 	: m_atom(atom) {
@@ -44,5 +43,4 @@ void AtomStackFrame::addRaisedErrors(yuni::String&& type, DelayedReportOnRaise::
 	m_delayedErrorsOnRaise->addRaisedErrors(std::move(type), std::move(origins));
 }
 
-} // namespace semantic
-} // namespace ny
+} // ny::semantic

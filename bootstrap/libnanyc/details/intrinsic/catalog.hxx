@@ -3,8 +3,7 @@
 #include <yuni/core/static/types.h>
 #include "details/atom/ctype.h"
 
-namespace ny {
-namespace intrinsic {
+namespace ny::intrinsic {
 
 template<class T> struct CTypeToNanyType {};
 
@@ -117,5 +116,4 @@ inline const Intrinsic& Catalog::operator [] (uint32_t id) const {
 	return m_intrinsics[id];
 }
 
-} // namespace intrinsic
-} // namespace ny
+} // ny::intrinsic

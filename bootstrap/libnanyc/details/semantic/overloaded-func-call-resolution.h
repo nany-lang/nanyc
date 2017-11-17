@@ -9,22 +9,15 @@
 #include <memory>
 #include <vector>
 
-
-namespace ny {
-namespace semantic {
-
+namespace ny::semantic {
 
 struct Analyzer;
 
-
-/*!
-** \brief Helper for resolving func call
-*/
+//! Helper for resolving func call
 class OverloadedFuncCallResolver final {
 public:
 	typedef decltype(FuncOverloadMatch::result.params)  ParameterTypesRequested;
 	typedef std::pair<ParameterTypesRequested, ParameterTypesRequested> ParameterTypesRequestedPair;
-
 
 public:
 	OverloadedFuncCallResolver(Analyzer* parent, Logs::Report report, FuncOverloadMatch& overloadMatch,
@@ -38,7 +31,6 @@ public:
 
 	bool resolve(const std::vector<std::reference_wrapper<Atom>>& solutions);
 
-
 public:
 	//! The result of the func call resolution (if any)
 	Atom* atom = nullptr;
@@ -49,7 +41,6 @@ public:
 
 	bool canGenerateCode = true;
 	bool canGenerateErrors = true;
-
 
 public:
 	// total number of suitable solutions (<= suitable.size())
@@ -91,6 +82,4 @@ private:
 
 }; // class OverloadedFuncCallResolver
 
-
-} // namespace semantic
-} // namespace ny
+} // ny::semantic

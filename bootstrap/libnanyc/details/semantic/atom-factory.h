@@ -5,8 +5,7 @@
 #include "details/atom/atom.h"
 #include "func-overload-match.h"
 
-namespace ny {
-namespace semantic {
+namespace ny::semantic {
 
 struct Analyzer;
 
@@ -77,5 +76,4 @@ void updateTypesInAllStackallocOp(ir::Sequence&, ClassdefTableView&, uint32_t at
 */
 bool resolveStrictParameterTypes(ny::compiler::Compdb&, Atom& atom, Settings* = nullptr);
 
-} // namespace semantic
-} // namespace ny
+} // ny::semantic

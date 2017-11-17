@@ -24,14 +24,10 @@ static void* nyinx_digest_md5(nyvmthread_t* vm, const char* string, uint64_t len
 	return nullptr;
 }
 
-namespace ny {
-namespace intrinsic {
-namespace import {
+namespace ny::intrinsic::import {
 
 void digest(ny::intrinsic::Catalog& intrinsics) {
 	intrinsics.emplace("__nanyc_digest_md5", nyinx_digest_md5);
 }
 
-} // namespace import
-} // namespace intrinsic
-} // namespace ny
+} // ny::intrinsic::import

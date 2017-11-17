@@ -3,8 +3,7 @@
 #include "details/ir/isa/data.h"
 #include "exception.h"
 
-namespace ny {
-namespace complain {
+namespace ny::complain {
 
 void Error::complain() const {
 	error() << msg;
@@ -27,5 +26,4 @@ Opcode::Opcode(const ny::ir::Sequence& ircode, const ir::Instruction& operands, 
 	msg << " '" << ny::ir::isa::print(ircode, operands) << '\'';
 }
 
-} // namespace complain
-} // namespace ny
+} // ny::complain

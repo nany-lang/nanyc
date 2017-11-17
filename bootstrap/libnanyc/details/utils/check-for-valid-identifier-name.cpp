@@ -8,9 +8,7 @@
 
 using namespace Yuni;
 
-
 namespace ny {
-
 
 static const std::unordered_set<AnyString> reservedKeywords = {
 	"self", "override", "new", "is",
@@ -68,11 +66,9 @@ static const std::unordered_map<AnyString, AnyString> opnormalize = {
 	{ "self--", "^self--" }, { "--self", "^--self" },
 };
 
-
 bool complainEmptyNode(const AST::Node& node) {
 	return (error(node) << "invalid empty name");
 }
-
 
 bool complainInvalidIdentifierNameWithUnderscore(const AST::Node& node, const AnyString& name) {
 	auto err = error(node);
@@ -81,14 +77,12 @@ bool complainInvalidIdentifierNameWithUnderscore(const AST::Node& node, const An
 	return false;
 }
 
-
 bool complainIdentifierTooLong(const AST::Node& node, const AnyString& name) {
 	auto err = error(node) << "identifier name too long";
 	auto& location = err.message.origins.location;
 	location.pos.offsetEnd = location.pos.offset + name.size();
 	return false;
 }
-
 
 bool complainNotValidOperator(const AST::Node& node, const AnyString& name, const char* what) {
 	auto err = (error(node)
@@ -98,7 +92,6 @@ bool complainNotValidOperator(const AST::Node& node, const AnyString& name, cons
 	return false;
 }
 
-
 bool complainReservedKeyword(const AST::Node& node, const AnyString& name) {
 	auto err = error(node) << "'" << name << "' is a reserved keyword";
 	auto& location = err.message.origins.location;
@@ -106,14 +99,12 @@ bool complainReservedKeyword(const AST::Node& node, const AnyString& name) {
 	return false;
 }
 
-
 void warnNonAscii(const AST::Node& node, const AnyString& name) {
 	auto wrn = warning(node)
 			   << "invalid identifier name: the name contains non-ascii characters";
 	auto& location = wrn.message.origins.location;
 	location.pos.offsetEnd = location.pos.offset + name.size();
 }
-
 
 AnyString normalizeOperatorName(AnyString name) {
 	// to deal with grammar's potential glitches when eating tokens
@@ -129,7 +120,6 @@ AnyString normalizeOperatorName(AnyString name) {
 	assert(false and "unknown identifier for normalization");
 	return name;
 }
-
 
 // operator / type
 bool checkForValidIdentifierName(const AST::Node& node, const AnyString& name, Flags<IdNameFlag> flags) {
@@ -173,5 +163,4 @@ bool checkForValidIdentifierName(const AST::Node& node, const AnyString& name, F
 	return true;
 }
 
-
-} // namespace ny
+} // ny

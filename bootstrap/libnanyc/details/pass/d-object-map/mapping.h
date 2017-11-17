@@ -9,8 +9,7 @@
 #include "details/ir/instruction.h"
 
 
-namespace ny {
-namespace Pass {
+namespace ny::Pass {
 
 
 struct MappingOptions final {
@@ -33,5 +32,4 @@ struct MappingOptions final {
 bool map(Atom& parent, ClassdefTable&, Yuni::Mutex&, ir::Sequence&, MappingOptions&);
 
 
-} // namespace Pass
-} // namespace ny
+} // namespace ny::Pass

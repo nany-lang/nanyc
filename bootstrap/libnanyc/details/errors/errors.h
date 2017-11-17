@@ -1,12 +1,9 @@
 #pragma once
 #include "../reporting/report.h"
 
+namespace ny::AST { class Node; }
 
 namespace ny {
-
-// forward declarations
-namespace AST { class Node; }
-
 
 //! Generate a new error report
 Logs::Report error();
@@ -48,7 +45,9 @@ Logs::Report verbose();
 //! Emit ICE for unknown node
 bool unexpectedNode(const AST::Node&, const AnyString& extra = nullptr);
 
-namespace Logs {
+} // ny
+
+namespace ny::Logs {
 
 //! Get the current user handler
 void* userHandlerPointer();
@@ -111,5 +110,4 @@ private:
 	State previousState;
 }; // class Handler
 
-} // namespace Logs
-} // namespace ny
+} // ny::Logs

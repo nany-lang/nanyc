@@ -8,8 +8,7 @@
 #include <memory>
 #include <stdarg.h>
 
-namespace ny {
-namespace intrinsic {
+namespace ny::intrinsic {
 
 struct Catalog final {
 	//! Default constructor
@@ -47,7 +46,6 @@ private:
 
 }; // struct Catalog
 
-} // namespace intrinsic
-} // namespace ny
+} // ny::intrinsic
 
 #include "catalog.hxx"

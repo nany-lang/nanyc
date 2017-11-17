@@ -2,13 +2,9 @@
 
 using namespace Yuni;
 
-
-namespace ny {
-namespace semantic {
-
+namespace ny::semantic {
 
 namespace {
-
 
 void funcOrClassOrType(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
 	seq.pushedparams.clear();
@@ -83,7 +79,6 @@ void funcOrClassOrType(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::bluepr
 	}
 }
 
-
 void unit(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
 	assert(seq.frame != nullptr);
 	seq.pushedparams.clear();
@@ -100,7 +95,6 @@ void unit(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::blueprint>& operand
 	seq.frame->offsetOpcodeBlueprint = seq.currentSequence.offsetOf(**seq.cursor);
 }
 
-
 void parameter(Analyzer& seq, uint32_t lvid, bool isvar, uint32_t nameindex) {
 	assert(seq.frame != nullptr);
 	auto& cdef = seq.cdeftable.substitute(lvid);
@@ -112,7 +106,6 @@ void parameter(Analyzer& seq, uint32_t lvid, bool isvar, uint32_t nameindex) {
 	const auto& name = seq.currentSequence.stringrefs[nameindex];
 	seq.declareNamedVariable(name, lvid, false);
 }
-
 
 void asSelf(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
 	// -- with automatic variable assignment for operator new
@@ -131,7 +124,6 @@ void asSelf(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::blueprint>& opera
 	(*frame.selfParameters)[varname].first = lvid;
 }
 
-
 void vardef(Analyzer& seq, uint32_t lvid, uint32_t sid) {
 	if (seq.frame != nullptr) {
 		if (seq.frame->atom.isClass()) {
@@ -147,9 +139,7 @@ void vardef(Analyzer& seq, uint32_t lvid, uint32_t sid) {
 	seq.pushedparams.clear();
 }
 
-
-} // anonymous namespace
-
+} // namespace
 
 void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
 	auto kind = static_cast<ir::isa::Blueprint>(operands.kind);
@@ -186,6 +176,4 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::blueprint>& operands) {
 	}
 }
 
-
-} // namespace semantic
-} // namespace ny
+} // ny::semantic

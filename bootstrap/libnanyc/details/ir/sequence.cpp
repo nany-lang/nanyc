@@ -5,8 +5,7 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace ir {
+namespace ny::ir {
 
 Sequence::Sequence(const Sequence& other, uint32_t offset)
 		: stringrefs(other.stringrefs) {
@@ -216,5 +215,4 @@ uint32_t Sequence::offsetOf(const Instruction& instr) const {
 	return r;
 }
 
-} // namespace ir
-} // namespace ny
+} // ny::ir

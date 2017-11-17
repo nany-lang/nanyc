@@ -1,7 +1,6 @@
 #include "catalog.h"
 
-namespace ny {
-namespace intrinsic {
+namespace ny::intrinsic {
 
 Catalog::Catalog() {
 	m_intrinsics.reserve(128);
@@ -16,5 +15,4 @@ Intrinsic& Catalog::makeIntrinsic(const AnyString& name, void* callback) {
 	return intrinsic;
 }
 
-} // namespace intrinsic
-} // namespace ny
+} // ny::intrinsic

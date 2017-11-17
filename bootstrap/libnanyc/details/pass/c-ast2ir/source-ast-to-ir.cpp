@@ -4,9 +4,7 @@
 
 using namespace Yuni;
 
-
-namespace ny {
-namespace compiler {
+namespace ny::compiler {
 
 bool passTransformASTToIR(ny::compiler::Source& source, Logs::Report& report, const nycompile_opts_t& opts) {
 	if (unlikely(!source.parsing.rootnode))
@@ -42,5 +40,4 @@ bool passTransformASTToIR(ny::compiler::Source& source, Logs::Report& report, co
 	return success;
 }
 
-} // namespace compiler
-} // namespace ny
+} // ny::compiler

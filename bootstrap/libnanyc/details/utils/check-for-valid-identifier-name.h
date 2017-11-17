@@ -3,8 +3,6 @@
 #include "details/grammar/nany.h"
 #include <yuni/core/flags.h>
 
-
-
 namespace ny {
 
 enum class IdNameFlag {
@@ -16,19 +14,11 @@ enum class IdNameFlag {
 	isInClass,
 };
 
-
-/*!
-** \brief Determine if an identifier is acceptable
-*/
+//! Determine if an identifier is acceptable
 bool checkForValidIdentifierName(const AST::Node& node, const AnyString& name,
-								 Yuni::Flags<IdNameFlag> flags = nullptr);
+	Yuni::Flags<IdNameFlag> flags = nullptr);
 
-
-/*!
-** \brief Normalize an operator identifier (ex: 'and' to '^and')
-*/
+//! Normalize an operator identifier (ex: 'and' to '^and')
 AnyString normalizeOperatorName(AnyString name);
 
-
-
-} // namespace ny
+} // ny

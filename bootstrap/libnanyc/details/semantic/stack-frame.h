@@ -6,8 +6,7 @@
 #include <cassert>
 #include <vector>
 
-namespace ny {
-namespace semantic {
+namespace ny::semantic {
 
 struct DelayedReportOnRaise final {
 	struct RaiseOrigins final {
@@ -156,7 +155,6 @@ private:
 	std::unique_ptr<DelayedReportOnRaise> m_delayedErrorsOnRaise;
 };
 
-} // namespace semantic
-} // namespace ny
+} // ny::semantic
 
 #include "stack-frame.hxx"

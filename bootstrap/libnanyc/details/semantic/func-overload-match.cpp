@@ -9,10 +9,7 @@
 
 using namespace Yuni;
 
-
-namespace ny {
-namespace semantic {
-
+namespace ny::semantic {
 
 FuncOverloadMatch::FuncOverloadMatch(Analyzer* seq)
 	: seq(seq) {
@@ -21,7 +18,6 @@ FuncOverloadMatch::FuncOverloadMatch(Analyzer* seq)
 	input.params.named.reserve(config::maxPushedParameters);
 	result.params.reserve(config::maxPushedParameters);
 }
-
 
 void FuncOverloadMatch::clear() {
 	input.rettype.clear();
@@ -33,7 +29,6 @@ void FuncOverloadMatch::clear() {
 	result.tmplparams.clear();
 	result.funcToCall = nullptr;
 }
-
 
 void FuncOverloadMatch::printInputParameters(String& out) const {
 	auto& table = seq->cdeftable;
@@ -66,7 +61,6 @@ void FuncOverloadMatch::printInputParameters(String& out) const {
 	paramprinter(input.params);
 	out << ')';
 }
-
 
 void FuncOverloadMatch::complainParamTypeMismatch(bool isGenType, const Classdef& cdef, const Atom& atom,
 		uint32_t i, const Classdef& paramdef) {
@@ -108,7 +102,6 @@ void FuncOverloadMatch::complainParamTypeMismatch(bool isGenType, const Classdef
 	}
 }
 
-
 template<bool withErrorReporting, bool isTmpl>
 inline TypeCheck::Match FuncOverloadMatch::pushParameter(Atom& atom, uint32_t index, const CLID& clid) {
 	// force reset
@@ -131,7 +124,6 @@ inline TypeCheck::Match FuncOverloadMatch::pushParameter(Atom& atom, uint32_t in
 	}
 	return resultinfo.strategy;
 }
-
 
 template<bool withErrorReporting>
 inline TypeCheck::Match FuncOverloadMatch::validateAtom(Atom& atom, bool allowImplicit) {
@@ -316,11 +308,9 @@ inline TypeCheck::Match FuncOverloadMatch::validateAtom(Atom& atom, bool allowIm
 	return TypeCheck::Match::strictEqual;
 }
 
-
 TypeCheck::Match FuncOverloadMatch::validate(Atom& atom, bool allowImplicit) {
 	return validateAtom<false>(atom, allowImplicit);
 }
-
 
 TypeCheck::Match FuncOverloadMatch::validateWithErrReport(Atom& atom, bool allowImplicit) {
 	assert(report != nullptr);
@@ -329,6 +319,4 @@ TypeCheck::Match FuncOverloadMatch::validateWithErrReport(Atom& atom, bool allow
 	return match;
 }
 
-
-} // namespace semantic
-} // namespace ny
+} // ny::semantic

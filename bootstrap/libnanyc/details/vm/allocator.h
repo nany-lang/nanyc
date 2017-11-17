@@ -3,9 +3,7 @@
 #include "libnanyc.h"
 #include <cassert>
 
-namespace ny {
-namespace vm {
-namespace memory {
+namespace ny::vm::memory {
 
 struct PointerMismatch final {
 	PointerMismatch(void* pointer, size_t oldsize, size_t newsize, uint32_t atomid, uint32_t lvid)
@@ -152,6 +150,4 @@ struct Allocator final {
 	}
 };
 
-} // memory
-} // vm
-} // ny
+} // ny::vm::memory

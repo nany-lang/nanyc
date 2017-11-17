@@ -2,8 +2,7 @@
 #include "details/errors/errors.h"
 #include "details/ir/isa/data.h"
 
-namespace ny {
-namespace complain {
+namespace ny::complain {
 
 bool exception() {
 	return (ice() << "unknown exception");
@@ -37,5 +36,4 @@ bool inconsistentGenericTypeParameterIndex() {
 	return (ice() << "generic type parameter index inconsistent with size()");
 }
 
-} // namespace complain
-} // namespace ny
+} // ny::complain

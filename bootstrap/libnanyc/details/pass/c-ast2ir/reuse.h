@@ -4,9 +4,7 @@
 #include "details/grammar/nany.h"
 #include <array>
 
-namespace ny {
-namespace ir {
-namespace Producer {
+namespace ny::ir::Producer {
 
 struct Reuse final {
 	//! re-use objects for string declaration
@@ -172,6 +170,4 @@ struct Reuse final {
 	scope;
 };
 
-} // namespace Producer
-} // namespace ir
-} // namespace ny
+} // ny::ir::Producer

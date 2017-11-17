@@ -3,9 +3,7 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace semantic {
-namespace TypeCheck {
+namespace ny::semantic::TypeCheck {
 
 namespace { // anonymous
 
@@ -130,6 +128,4 @@ Match isSimilarTo(Analyzer& seq, const Classdef& from, const Classdef& to, bool 
 	return similarity;
 }
 
-} // namespace TypeCheck
-} // namespace semantic
-} // namespace ny
+} // ny::semantic::TypeCheck

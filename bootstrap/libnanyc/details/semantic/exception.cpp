@@ -2,8 +2,7 @@
 
 using namespace yuni;
 
-namespace ny {
-namespace semantic {
+namespace ny::semantic {
 
 InvalidAtom::InvalidAtom(const char* context, const Atom* atom, const Classdef* cdef) {
 	if (context)
@@ -16,5 +15,4 @@ InvalidAtom::InvalidAtom(const char* context, const Atom* atom, const Classdef* 
 		msg << " (from " << cdef->clid << ')';
 }
 
-} // namespace semantic
-} // namespace ny
+} // ny::semantic

@@ -7,16 +7,9 @@
 #include "details/errors/errors.h"
 #include "stack-frame.h"
 
+namespace ny::semantic { class OverloadedFuncCallResolver; }
 
-
-
-namespace ny {
-namespace semantic {
-
-class OverloadedFuncCallResolver;
-
-namespace complain {
-
+namespace ny::semantic::complain {
 
 //! Invalid classdef (ICE)
 bool classdef(const Classdef&, const char* usertxt);
@@ -63,7 +56,6 @@ bool selfMissingForPropertyCall(const Atom& property, uint32_t self);
 //! Parameter type has vanished for some reason...
 bool parameterTypeHasVanished(const Analyzer&, uint32_t);
 
-
 //! Return type mismatch
 bool returnTypeMismatch(const Classdef& expected, const Classdef& usertype);
 
@@ -76,9 +68,6 @@ bool returnTypeMissing(const Classdef* expected, const Classdef* usertype);
 
 //! Multiple types for return
 bool returnMultipleTypes(const Classdef& expected, const Classdef& usertype, uint32_t line, uint32_t offset);
-
-
-
 
 //! Circular reference for typedef
 bool typedefCircularReference(const Atom& original, const Atom& responsible);
@@ -98,9 +87,4 @@ bool multipleOverloads(uint32_t lvid);
 bool multipleOverloads(uint32_t lvid, const std::vector<std::reference_wrapper<Atom>>& solutions
 	, OverloadedFuncCallResolver& resolver);
 
-
-
-
-} // namespace complain
-} // namespace semantic
-} // namespace ny
+} // ny::semantic::complain

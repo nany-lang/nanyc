@@ -17,14 +17,10 @@
 #include "details/atom/visibility.h"
 #include "details/atom/ctype.h"
 
-namespace ny {
-
-struct AtomMap;
-struct ClassdefTable;
-struct ClassdefTableView;
-namespace ir { struct Sequence; }
-
-} // namespace ny
+namespace ny { struct AtomMap; }
+namespace ny { struct ClassdefTable; }
+namespace ny { struct ClassdefTableView; }
+namespace ny::ir { struct Sequence; }
 
 namespace ny {
 
@@ -548,6 +544,6 @@ private:
 
 }; // class Atom
 
-} // namespace ny
+} // ny
 
 #include "atom.hxx"

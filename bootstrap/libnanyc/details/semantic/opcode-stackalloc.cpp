@@ -2,10 +2,7 @@
 
 using namespace Yuni;
 
-
-namespace ny {
-namespace semantic {
-
+namespace ny::semantic {
 
 void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::stackalloc>& operands) {
 	assert(frame != nullptr);
@@ -38,6 +35,4 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::stackalloc>& operands) 
 	}
 }
 
-
-} // namespace semantic
-} // namespace ny
+} // ny::semantic

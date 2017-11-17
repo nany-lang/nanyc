@@ -2,10 +2,7 @@
 #include "semantic-analysis.h"
 #include "atom-factory.h"
 
-
-namespace ny {
-namespace semantic {
-
+namespace ny::semantic {
 
 bool OverloadedFuncCallResolver::resolve(const std::vector<std::reference_wrapper<Atom>>& solutions) {
 	// DEFINITION: suitable solution:
@@ -174,6 +171,4 @@ bool OverloadedFuncCallResolver::resolve(const std::vector<std::reference_wrappe
 	return (1 == suitableCount);
 }
 
-
-} // namespace semantic
-} // namespace ny
+} // ny::semantic

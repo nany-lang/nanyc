@@ -2,10 +2,7 @@
 
 using namespace Yuni;
 
-
-namespace ny {
-namespace semantic {
-
+namespace ny::semantic {
 
 void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::stacksize>& operands) {
 	if (frame) {
@@ -18,6 +15,4 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::stacksize>& operands) {
 	}
 }
 
-
-} // namespace semantic
-} // namespace ny
+} // ny::semantic

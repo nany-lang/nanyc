@@ -3,11 +3,7 @@
 
 using namespace Yuni;
 
-
-namespace ny {
-namespace ir {
-namespace Producer {
-
+namespace ny::ir::Producer {
 
 bool Scope::visitASTExprIn(AST::Node& node, uint32_t& localvar, ShortString128& elementname) {
 	// lvid representing the input container
@@ -102,14 +98,10 @@ bool Scope::visitASTExprIn(AST::Node& node, uint32_t& localvar, ShortString128& 
 	return success;
 }
 
-
 bool Scope::visitASTExprIn(AST::Node& node, uint32_t& localvar) {
 	// Name of the target ref for each element in the container (ignored here)
 	ShortString128 elementname;
 	return visitASTExprIn(node, localvar, elementname);
 }
 
-
-} // namespace Producer
-} // namespace ir
-} // namespace ny
+} // ny::ir::Producer

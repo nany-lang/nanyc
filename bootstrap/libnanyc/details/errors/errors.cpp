@@ -6,8 +6,7 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace Logs {
+namespace ny::Logs {
 
 struct InternalState final {
 	void* userdefined = nullptr;
@@ -66,8 +65,7 @@ void* userHandlerPointer() {
 	return localMetadataHandler.userdefined;
 }
 
-} // namespace Logs
-} // namespace ny
+} // ny::Logs
 
 namespace ny {
 

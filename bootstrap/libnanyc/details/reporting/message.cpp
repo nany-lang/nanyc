@@ -4,8 +4,7 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace Logs {
+namespace ny::Logs {
 
 namespace {
 
@@ -51,5 +50,4 @@ void Message::Origin::Location::resetFromAtom(const Atom& atom) {
 }
 
 
-} // namespace Logs
-} // namespace ny
+} // ny::Logs

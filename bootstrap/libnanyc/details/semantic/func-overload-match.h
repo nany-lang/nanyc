@@ -6,13 +6,9 @@
 #include <functional>
 #include <vector>
 
-
-namespace ny {
-namespace semantic {
-
+namespace ny::semantic {
 
 struct Analyzer;
-
 
 class FuncOverloadMatch final {
 public:
@@ -56,7 +52,6 @@ public:
 	*/
 	void printInputParameters(YString& out) const;
 
-
 public:
 	struct Input final {
 		//! The return type
@@ -91,7 +86,6 @@ public:
 
 	Logs::Report* report = nullptr;
 
-
 private:
 	template<bool withErrorReporting>
 	TypeCheck::Match validateAtom(Atom& atom, bool allowImplicit);
@@ -106,8 +100,4 @@ private:
 
 }; // class FuncOverloadMatch
 
-
-
-
-} // namespace semantic
-} // namespace ny
+} // ny::semantic

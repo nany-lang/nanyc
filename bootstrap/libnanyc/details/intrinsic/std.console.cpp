@@ -31,9 +31,7 @@ static bool nyinx_console_err_has_colors(nyvmthread_t*) {
 	return nyfalse;
 }
 
-namespace ny {
-namespace intrinsic {
-namespace import {
+namespace ny::intrinsic::import {
 
 void console(ny::intrinsic::Catalog& intrinsics) {
 	intrinsics.emplace("__nanyc_console_out",  nyinx_console_out);
@@ -44,6 +42,4 @@ void console(ny::intrinsic::Catalog& intrinsics) {
 	intrinsics.emplace("__nanyc_console_err_has_colors",  nyinx_console_err_has_colors);
 }
 
-} // namespace import
-} // namespace intrinsic
-} // namespace ny
+} // ny::intrinsic::import

@@ -5,14 +5,9 @@
 
 using namespace Yuni;
 
-
-namespace ny {
-namespace ir {
-namespace Producer {
-
+namespace ny::ir::Producer {
 
 namespace {
-
 
 struct NumberDef final {
 	// Is the number signed or unsigned ?
@@ -23,18 +18,15 @@ struct NumberDef final {
 	uint bits = 32;
 	// Sign of the number: ' ', '+', '-'
 	char sign = ' ';
-
 	//! The first part of the number
 	uint64_t part1 = 0;
 	//! Second part of the number
 	AnyString part2; // the second part may have additional zero
 };
 
-
 constexpr bool validNumberOfBits(uint32_t bits) {
 	return bits == 32 or bits == 64 or bits == 16 or bits == 8;
 }
-
 
 bool convertASTNumberToDouble(double& value, uint64 part1, const AnyString& part2, char sign) {
 	if (part1 == 0 and part2.empty()) // obvious zero value
@@ -53,7 +45,6 @@ bool convertASTNumberToDouble(double& value, uint64 part1, const AnyString& part
 	}
 	return true;
 }
-
 
 template<bool BuiltinT, class DefT>
 bool generateNumberCode(Scope& scope, uint32_t& localvar, const DefT& numdef, AST::Node& node) {
@@ -167,13 +158,13 @@ bool generateNumberCode(Scope& scope, uint32_t& localvar, const DefT& numdef, AS
 			}
 			if (unlikely(invalidcast)) {
 				error(node) << "invalid " << ((numdef.isUnsigned) ? "unsigned " : "signed ")
-							<< numdef.bits << "bits integer";
+					<< numdef.bits << "bits integer";
 				return false;
 			}
 		}
 		uint64_t number = (not negate)
-						  ? numdef.part1
-						  : (uint64_t)( - static_cast<int64_t>(numdef.part1)); // reinterpret to avoid unwanted type promotion
+			? numdef.part1
+			: (uint64_t)( - static_cast<int64_t>(numdef.part1)); // reinterpret to avoid unwanted type promotion
 		hardcodedlvid = scope.createLocalBuiltinInt(node, type, number);
 	}
 	else {
@@ -206,9 +197,7 @@ bool generateNumberCode(Scope& scope, uint32_t& localvar, const DefT& numdef, AS
 	}
 }
 
-
-} // anonymous namespace
-
+} // namespace
 
 bool Scope::visitASTExprNumber(AST::Node& node, uint32_t& localvar) {
 	assert(node.rule == AST::rgNumber);
@@ -311,11 +300,8 @@ bool Scope::visitASTExprNumber(AST::Node& node, uint32_t& localvar) {
 	}
 	assert(numdef.bits == 64 or numdef.bits == 32 or numdef.bits == 16 or numdef.bits == 8);
 	return (not builtin)
-		   ? generateNumberCode<false>(*this, localvar, numdef, node)
-		   : generateNumberCode<true> (*this, localvar, numdef, node);
+		? generateNumberCode<false>(*this, localvar, numdef, node)
+		: generateNumberCode<true> (*this, localvar, numdef, node);
 }
 
-
-} // namespace Producer
-} // namespace ir
-} // namespace ny
+} // ny::ir::Producer

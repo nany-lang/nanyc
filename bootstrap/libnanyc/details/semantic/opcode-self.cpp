@@ -2,8 +2,7 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace semantic {
+namespace ny::semantic {
 
 void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::self>& operands) {
 	// we can have at least 2 patterns:
@@ -27,5 +26,4 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::self>& operands) {
 	}
 }
 
-} // namespace semantic
-} // namespace ny
+} // ny::semantic

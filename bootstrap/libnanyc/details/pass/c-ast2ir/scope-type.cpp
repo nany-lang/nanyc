@@ -4,11 +4,7 @@
 
 using namespace Yuni;
 
-
-namespace ny {
-namespace ir {
-namespace Producer {
-
+namespace ny::ir::Producer {
 
 bool Scope::visitASTExprTypeDecl(AST::Node& node, uint32_t& localvar) {
 	assert(node.rule == AST::rgTypeDecl);
@@ -38,7 +34,6 @@ bool Scope::visitASTExprTypeDecl(AST::Node& node, uint32_t& localvar) {
 	ir::emit::CodegenLocker codegenDisabler{ircode()};
 	return scope.visitASTExpr(node, localvar);
 }
-
 
 bool Scope::visitASTType(AST::Node& node, uint32_t& localvar) {
 	assert(node.rule == AST::rgType);
@@ -99,7 +94,4 @@ bool Scope::visitASTType(AST::Node& node, uint32_t& localvar) {
 	return success;
 }
 
-
-} // namespace Producer
-} // namespace ir
-} // namespace ny
+} // ny::ir::Producer

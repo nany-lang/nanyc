@@ -2,9 +2,7 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace ir {
-namespace Producer {
+namespace ny::ir::Producer {
 
 Context::Context(AnyString filename, Sequence& ircode, Logs::Report report, bool ignoreAtoms)
 	: ignoreAtoms(ignoreAtoms)
@@ -61,6 +59,4 @@ void Context::generateLineIndexes(const AnyString& content) {
 	}
 }
 
-} // namespace Producer
-} // namespace ir
-} // namespace ny
+} // namespace ny::ir::Producer

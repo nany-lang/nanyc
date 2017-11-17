@@ -2,10 +2,7 @@
 
 using namespace Yuni;
 
-
-namespace ny {
-namespace vm {
-
+namespace ny::vm {
 
 Stacktrace<true>::Stacktrace() {
 	uint32_t capacity = 64;
@@ -16,11 +13,9 @@ Stacktrace<true>::Stacktrace() {
 	topframe   = baseframe;
 }
 
-
 Stacktrace<true>::~Stacktrace() {
 	::free(baseframe);
 }
-
 
 void Stacktrace<true>::grow() {
 	auto offbase     = reinterpret_cast<std::uintptr_t>(baseframe);
@@ -33,7 +28,6 @@ void Stacktrace<true>::grow() {
 	topframe   = baseframe + size;
 	upperLimit = baseframe + newcapacity;
 }
-
 
 /*
 void Stacktrace<true>::dump(const nyprogram_cf_t& cf, const AtomMap& map) const noexcept {
@@ -77,5 +71,4 @@ void Stacktrace<true>::dump(const nyprogram_cf_t& cf, const AtomMap& map) const 
 }
 */
 
-} // namespace vm
-} // namespace ny
+} // ny::vm

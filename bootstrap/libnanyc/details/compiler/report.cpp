@@ -2,9 +2,7 @@
 #include "details/errors/errors.h"
 #include "details/atom/classdef-table-view.h"
 
-namespace ny {
-namespace compiler {
-namespace report {
+namespace ny::compiler::report {
 
 namespace {
 
@@ -68,6 +66,4 @@ void raisedErrorsForAllAtoms(ny::compiler::Compdb& compdb, ny::Logs::Report& rep
 	tr << count << " found)";
 }
 
-} // namespace report
-} // namespace compiler
-} // namespace ny
+} // ny::compiler::report

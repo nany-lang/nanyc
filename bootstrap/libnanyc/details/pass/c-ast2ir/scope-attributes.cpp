@@ -7,14 +7,9 @@
 
 using namespace Yuni;
 
-
-namespace ny {
-namespace ir {
-namespace Producer {
-
+namespace ny::ir::Producer {
 
 namespace {
-
 
 struct AttributeContext final {
 	AttributeContext(AST::Node& node)
@@ -28,7 +23,6 @@ struct AttributeContext final {
 	AST::Node* nodevalue = nullptr;
 };
 
-
 inline AST::Node* getNodeValue(AST::Node& node) {
 	switch (node.children.size()) {
 		case 1: return nullptr;
@@ -37,11 +31,9 @@ inline AST::Node* getNodeValue(AST::Node& node) {
 	throw UnexpectedNode(node, "invalid attribute parameter node");
 }
 
-
 void nodiscard(AST::Node&, AttributeContext&) {
 	// not implemented
 }
-
 
 void per(AST::Node& node, AttributeContext& ctx) {
 	AST::appendEntityAsString(ctx.value, *ctx.nodevalue);
@@ -53,22 +45,18 @@ void per(AST::Node& node, AttributeContext& ctx) {
 		throw AttributeError{node, "invalid attribute value (expecting 'thread' or 'process')"};
 }
 
-
 void nosuggest(AST::Node&, AttributeContext& ctx) {
 	ctx.attributes.flags += Attributes::Flag::doNotSuggest;
 }
-
 
 void threadproc(AST::Node&, AttributeContext& ctx) {
 	ctx.attributes.flags += Attributes::Flag::threadproc;
 }
 
-
 void builtinalias(AST::Node&, AttributeContext& ctx) {
 	ctx.attributes.builtinAlias = ctx.nodevalue;
 	ctx.attributes.flags += Attributes::Flag::builtinAlias;
 }
-
 
 void shortcircuit(AST::Node& node, AttributeContext& ctx) {
 	AST::appendEntityAsString(ctx.value, *ctx.nodevalue);
@@ -79,14 +67,11 @@ void shortcircuit(AST::Node& node, AttributeContext& ctx) {
 		ctx.attributes.flags += Attributes::Flag::shortcircuit;
 }
 
-
 void synthetic(AST::Node&, AttributeContext& ctx) {
 	ctx.attributes.flags += Attributes::Flag::pushSynthetic;
 }
 
-
 } // namespace
-
 
 bool Scope::fetchAttributes(AST::Node& node) {
 	assert(node.rule == AST::rgAttributes);
@@ -148,7 +133,4 @@ bool Scope::fetchAttributes(AST::Node& node) {
 	return false;
 }
 
-
-} // namespace Producer
-} // namespace ir
-} // namespace ny
+} // ny::ir::Producer

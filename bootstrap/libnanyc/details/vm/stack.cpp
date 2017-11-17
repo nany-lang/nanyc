@@ -6,9 +6,7 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace vm {
-
+namespace ny::vm {
 namespace {
 
 template<class T> uint32_t sizeFromCapacity(uint32_t capacity) {
@@ -99,5 +97,4 @@ void Stack::popChunk() {
 	// 'current' may be null here at the very last scope, when the program stops
 }
 
-} // namespace vm
-} // namespace ny
+} // namespace ny::vm

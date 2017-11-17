@@ -4,10 +4,7 @@
 
 using namespace Yuni;
 
-
-namespace ny {
-namespace semantic {
-
+namespace ny::semantic {
 
 void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::allocate>& operands) {
 	if (not frame->verify(operands.atomid))
@@ -43,6 +40,4 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::allocate>& operands) {
 	}
 }
 
-
-} // namespace semantic
-} // namespace ny
+} // ny::semantic

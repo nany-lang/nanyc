@@ -6,12 +6,9 @@
 #include <memory>
 #include "details/atom/ctype.h"
 
-
 namespace ny {
 
-
 struct Atom;
-
 
 class Signature final {
 public:
@@ -64,7 +61,6 @@ public:
 
 }; // class Signature
 
-
-} // namespace ny
+} // ny
 
 #include "signature.hxx"

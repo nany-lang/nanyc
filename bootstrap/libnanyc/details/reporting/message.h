@@ -7,13 +7,9 @@
 #include <iosfwd>
 #include <memory>
 
-
 namespace ny { struct Atom; }
 
-
-namespace ny {
-namespace Logs {
-
+namespace ny::Logs {
 
 struct Message final: Yuni::NonCopyable<Message> {
 	Message(Level level)
@@ -74,6 +70,4 @@ public:
 
 }; // struct Message
 
-
-} // namespace Logs
-} // namespace ny
+} // ny::Logs

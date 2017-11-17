@@ -4,11 +4,7 @@
 
 using namespace Yuni;
 
-
-namespace ny {
-namespace ir {
-namespace Producer {
-
+namespace ny::ir::Producer {
 
 bool Scope::generateIfStmt(AST::Node& expr, AST::Node& thenc, AST::Node* elseptr,
 		uint32_t* customjmpthenOffset) {
@@ -83,7 +79,6 @@ bool Scope::generateIfStmt(AST::Node& expr, AST::Node& thenc, AST::Node* elseptr
 	return success;
 }
 
-
 bool Scope::generateIfExpr(uint32_t& ifret, AST::Node& expr, AST::Node& thenc, AST::Node& elsec) {
 	// output sequence
 	auto& irout = ircode();
@@ -152,7 +147,6 @@ bool Scope::generateIfExpr(uint32_t& ifret, AST::Node& expr, AST::Node& thenc, A
 	return success;
 }
 
-
 bool Scope::visitASTExprIfStmt(AST::Node& node) {
 	assert(node.rule == AST::rgIf);
 	AST::Node* condition = nullptr;
@@ -177,7 +171,6 @@ bool Scope::visitASTExprIfStmt(AST::Node& node) {
 		return (error(node) << "invalid if-then node");
 	return generateIfStmt(*condition, *ifthen, ifelse);
 }
-
 
 bool Scope::visitASTExprIfExpr(AST::Node& node, uint32_t& localvar) {
 	assert(node.rule == AST::rgIf);
@@ -207,7 +200,4 @@ bool Scope::visitASTExprIfExpr(AST::Node& node, uint32_t& localvar) {
 	return generateIfExpr(localvar, *condition, *ifthen, *ifelse);
 }
 
-
-} // namespace Producer
-} // namespace ir
-} // namespace ny
+} // ny::ir::Producer

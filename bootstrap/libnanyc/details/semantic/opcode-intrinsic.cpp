@@ -5,13 +5,9 @@
 
 using namespace Yuni;
 
-
-namespace ny {
-namespace semantic {
-
+namespace ny::semantic {
 
 namespace {
-
 
 bool verifyParameters(Analyzer& analyzer, const AnyString& name) {
 	auto& pushedparams = analyzer.pushedparams;
@@ -30,7 +26,6 @@ bool verifyParameters(Analyzer& analyzer, const AnyString& name) {
 	}
 	return true;
 }
-
 
 bool translateIntrinsic(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::intrinsic>& operands) {
 	AnyString name = seq.currentSequence.stringrefs[operands.intrinsic];
@@ -79,9 +74,7 @@ bool translateIntrinsic(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::intri
 	return success;
 }
 
-
 } // namespace
-
 
 void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::intrinsic>& operands) {
 	assert(frame != nullptr);
@@ -93,6 +86,4 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::intrinsic>& operands) {
 	pushedparams.clear();
 }
 
-
-} // namespace semantic
-} // namespace ny
+} // ny::semantic

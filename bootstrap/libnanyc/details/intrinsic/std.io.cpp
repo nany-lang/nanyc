@@ -352,9 +352,7 @@ static bool nyinx_io_mount_local(nyvmthread_t* vm, const char* path, uint32_t le
 	return false;
 }
 
-namespace ny {
-namespace intrinsic {
-namespace import {
+namespace ny::intrinsic::import {
 
 void io(ny::intrinsic::Catalog& intrinsics) {
 	intrinsics.emplace("__nanyc_io_set_cwd",  nyinx_io_set_cwd);
@@ -390,6 +388,4 @@ void io(ny::intrinsic::Catalog& intrinsics) {
 	intrinsics.emplace("__nanyc_io_mount_local",   nyinx_io_mount_local);
 }
 
-} // namespace import
-} // namespace intrinsic
-} // namespace ny
+} // ny::intrinsic::import

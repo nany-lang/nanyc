@@ -2,8 +2,7 @@
 #include "libnanyc.h"
 #include "details/atom/atom-map.h"
 
-namespace ny {
-namespace vm {
+namespace ny::vm {
 
 template<bool Enabled>
 struct Stacktrace final {
@@ -38,7 +37,6 @@ private:
 
 }; // class Stacktrace
 
-} // namespace vm
-} // namespace ny
+} // ny::vm
 
 #include "stacktrace.hxx"

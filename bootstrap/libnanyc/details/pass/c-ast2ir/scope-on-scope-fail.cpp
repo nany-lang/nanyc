@@ -3,14 +3,9 @@
 
 using namespace Yuni;
 
-
-namespace ny {
-namespace ir {
-namespace Producer {
-
+namespace ny::ir::Producer {
 
 namespace {
-
 
 bool extractParameterDetails(Scope& scope, AST::Node& node, uint32_t& lvid, AnyString& name) {
 	bool isRef = false;
@@ -71,7 +66,6 @@ bool extractParameterDetails(Scope& scope, AST::Node& node, uint32_t& lvid, AnyS
 	return true;
 }
 
-
 bool findParameter(Scope& scope, AST::Node& node, uint32_t& lvid, AnyString& name) {
 	bool hasParameter = false;
 	for (auto& child: node.children) {
@@ -90,9 +84,7 @@ bool findParameter(Scope& scope, AST::Node& node, uint32_t& lvid, AnyString& nam
 	return true;
 }
 
-
 } // namespace
-
 
 bool Scope::visitASTExprOnScopeFail(AST::Node& scopeNode, AST::Node& scopeFailNode) {
 	assert(scopeNode.rule == AST::rgScope);
@@ -140,7 +132,4 @@ bool Scope::visitASTExprOnScopeFail(AST::Node& scopeNode, AST::Node& scopeFailNo
 	return true;
 }
 
-
-} // namespace Producer
-} // namespace ir
-} // namespace ny
+} // ny::ir::Producer

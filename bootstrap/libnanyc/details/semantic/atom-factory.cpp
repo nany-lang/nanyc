@@ -13,8 +13,7 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace semantic {
+namespace ny::semantic {
 
 namespace {
 
@@ -664,5 +663,4 @@ bool instanciateAtom(Settings& settings) {
 	return false;
 }
 
-} // namespace semantic
-} // namespace ny
+} // ny::semantic

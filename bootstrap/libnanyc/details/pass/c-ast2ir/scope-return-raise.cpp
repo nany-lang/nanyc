@@ -4,11 +4,7 @@
 
 using namespace Yuni;
 
-
-namespace ny {
-namespace ir {
-namespace Producer {
-
+namespace ny::ir::Producer {
 
 bool Scope::visitASTExprRaise(AST::Node& node) {
 	assert(node.rule == AST::rgRaise);
@@ -32,7 +28,6 @@ bool Scope::visitASTExprRaise(AST::Node& node) {
 	}
 	return success;
 }
-
 
 bool Scope::visitASTExprReturn(AST::Node& node) {
 	assert(node.rule == AST::rgReturn);
@@ -61,7 +56,4 @@ bool Scope::visitASTExprReturn(AST::Node& node) {
 	return success;
 }
 
-
-} // namespace Producer
-} // namespace ir
-} // namespace ny
+} // ny::ir::Producer

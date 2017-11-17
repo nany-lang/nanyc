@@ -6,13 +6,9 @@
 
 using namespace Yuni;
 
-
-namespace ny {
-namespace semantic {
-
+namespace ny::semantic {
 
 namespace {
-
 
 void markLocalErrorHandlersAsUsed(Analyzer& seq, Atom& funccall) {
 	funccall.funcinfo.raisedErrors.each([&](const Atom& type, auto& origins) {
@@ -21,11 +17,9 @@ void markLocalErrorHandlersAsUsed(Analyzer& seq, Atom& funccall) {
 	});
 }
 
-
 void propagateRaisedErrors(Atom& localfunc, Atom& funccal) {
 	localfunc.funcinfo.raisedErrors.add(funccal.funcinfo.raisedErrors);
 }
-
 
 void raisedErrorsFromFuncCall(Analyzer& seq, Atom& funccall) {
 	auto& localfunc = seq.frame->atom;
@@ -44,7 +38,6 @@ void raisedErrorsFromFuncCall(Analyzer& seq, Atom& funccall) {
 	else
 		propagateRaisedErrors(localfunc, funccall);
 }
-
 
 template<class P, class O>
 bool fetchPushedParameters(const P& pushedparams, O& overloadMatch, const AtomStackFrame& frame) {
@@ -75,7 +68,6 @@ bool fetchPushedParameters(const P& pushedparams, O& overloadMatch, const AtomSt
 	}
 	return true;
 }
-
 
 bool emitFuncCall(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::call>& operands) {
 	// alias (to make it local)
@@ -220,7 +212,6 @@ bool emitFuncCall(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::call>& oper
 	}
 }
 
-
 //! Generate short circuit jumps
 bool generateShortCircuitInstrs(Analyzer& seq, uint32_t retlvid) {
 	assert(seq.canGenerateCode());
@@ -278,7 +269,6 @@ bool generateShortCircuitInstrs(Analyzer& seq, uint32_t retlvid) {
 	seq.shortcircuit.label = 0; // reset
 	return true;
 }
-
 
 bool emitPropsetCall(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::call>& operands) {
 	if (unlikely(seq.pushedparams.func.indexed.size() != 1))
@@ -341,9 +331,7 @@ bool emitPropsetCall(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::call>& o
 	return true;
 }
 
-
-} // anonymous namespace
-
+} // namespace
 
 void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::call>& operands) {
 	// A 'call' can represent several language features.
@@ -383,6 +371,4 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::call>& operands) {
 	}
 }
 
-
-} // namespace semantic
-} // namespace ny
+} // ny::semantic

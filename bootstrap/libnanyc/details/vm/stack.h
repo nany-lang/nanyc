@@ -3,8 +3,7 @@
 
 #define NANY_vm_STACK_TRACES 0
 
-namespace ny {
-namespace vm {
+namespace ny::vm {
 
 //! Stack implementation
 class Stack final {
@@ -55,7 +54,6 @@ private:
 #endif
 };
 
-} // namespace vm
-} // namespace ny
+} // namespace ny::vm
 
 #include "stack.hxx"

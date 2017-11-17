@@ -4,18 +4,11 @@
 #include <iosfwd>
 #include <yuni/core/string.h>
 
+namespace ny     { struct AtomMap; }
+namespace ny::ir { struct Sequence; }
+namespace ny::ir { struct Instruction; }
 
-namespace ny {
-struct AtomMap;
-namespace ir {
-struct Sequence;
-struct Instruction;
-}
-}
-
-namespace ny {
-namespace ir {
-namespace isa {
+namespace ny::ir::isa {
 
 enum class Pragma : uint32_t {
 	//! Unknown pragma / invalid
@@ -44,7 +37,6 @@ enum class Pragma : uint32_t {
 	synthetic,
 };
 static const constexpr uint32_t PragmaCount = 1 + (uint32_t) Pragma::synthetic;
-
 
 /*!
 ** \internal the total number of items must currently be < 2^4 (see data struct)
@@ -80,9 +72,7 @@ enum class TypeQualifier : uint32_t {
 };
 static const constexpr uint32_t TypeQualifierCount = 1 + (uint32_t) TypeQualifier::constant;
 
-
 template<ny::ir::isa::Op O> struct Operand final {};
-
 
 template<> struct Operand<ny::ir::isa::Op::nop> final {
 	uint32_t opcode;
@@ -892,6 +882,7 @@ template<> struct Operand<ny::ir::isa::Op::identify> final {
 		c(lvid, self);
 	}
 };
+
 template<> struct Operand<ny::ir::isa::Op::identifyset> final { // MUST be identical to 'identify'
 	uint32_t opcode;
 	uint32_t lvid;
@@ -1003,7 +994,6 @@ template<> struct Operand<ny::ir::isa::Op::raise> final {
 	}
 };
 
-
 AnyString opname(ny::ir::isa::Op opcode);
 
 Yuni::String print(const Sequence&, const ny::ir::Instruction&, const AtomMap* = nullptr);
@@ -1016,7 +1006,4 @@ print(const Sequence& sequence, const ny::ir::isa::Operand<O>& operands, const A
 
 void printExtract(YString& out, const Sequence&, uint32_t offset, const AtomMap* = nullptr);
 
-
-} // namespace isa
-} // namespace ir
-} // namespace ny
+} // namespace ny::ir::isa

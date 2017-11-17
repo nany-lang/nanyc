@@ -2,8 +2,7 @@
 #include "libnanyc.h"
 #include <exception>
 
-namespace ny {
-namespace vm {
+namespace ny::vm {
 
 union Register {
 	uint64_t u64;
@@ -17,5 +16,4 @@ struct CodeAbort final : public std::exception {
 	}
 };
 
-} // namespace vm
-} // namespace ny
+} // namespace ny::vm

@@ -1,8 +1,7 @@
 #pragma once
 #include "ast.h"
 
-namespace ny {
-namespace AST {
+namespace ny::AST {
 
 inline yuni::Ref<Node> createNodeIdentifier(const AnyString& name) {
 	return yuni::make_ref<Node>(rgIdentifier, name);
@@ -42,5 +41,4 @@ inline void nodeCopyOffsetTextAndOriginalNode(AST::Node& dest, const AST::Node& 
 	dest.text      = source.text;
 }
 
-} // namespace AST
-} // namespace ny
+} // ny::AST

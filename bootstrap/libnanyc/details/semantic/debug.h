@@ -7,8 +7,7 @@
 #include "details/errors/errors.h"
 #include "stack-frame.h"
 
-namespace ny {
-namespace semantic {
+namespace ny::semantic {
 
 //! Print (to report) an IR sequence
 void debugPrintIRSequence(const YString& symbolName, const ir::Sequence&, const ClassdefTableView&,
@@ -20,5 +19,4 @@ void debugPrintSourceOpcodeSequence(const ClassdefTableView&, const Atom&, const
 //! Print all type defintions (classdef) available in the current frame
 void debugPrintClassdefs(const AtomStackFrame&, const ClassdefTableView&);
 
-} // namespace semantic
-} // namespace ny
+} // ny::semantic

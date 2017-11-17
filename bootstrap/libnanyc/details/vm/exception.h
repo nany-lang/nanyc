@@ -1,8 +1,7 @@
 #pragma once
 #include <cstdint>
 
-namespace ny {
-namespace vm {
+namespace ny::vm {
 
 struct InvalidLabel final {
 	InvalidLabel(uint32_t atomid, uint32_t label): atomid(atomid), label(label) {}
@@ -35,5 +34,4 @@ struct ICE final {
 struct InvalidCast final {
 };
 
-} // vm
-} // ny
+} // ny::vm

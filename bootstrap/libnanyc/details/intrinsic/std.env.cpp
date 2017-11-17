@@ -59,9 +59,7 @@ static bool nyinx_env_exists(nyvmthread_t*, const char* name, uint32_t nlen) {
 	return false;
 }
 
-namespace ny {
-namespace intrinsic {
-namespace import {
+namespace ny::intrinsic::import {
 
 void env(ny::intrinsic::Catalog& intrinsics) {
 	intrinsics.emplace("__nanyc_env_set",    nyinx_env_set);
@@ -72,6 +70,4 @@ void env(ny::intrinsic::Catalog& intrinsics) {
 	intrinsics.emplace("__nanyc_env_exists", nyinx_env_exists);
 }
 
-} // namespace import
-} // namespace intrinsic
-} // namespace ny
+} // ny::intrinsic::import

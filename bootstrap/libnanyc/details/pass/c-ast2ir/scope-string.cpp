@@ -6,14 +6,9 @@
 
 using namespace Yuni;
 
-
-namespace ny {
-namespace ir {
-namespace Producer {
-
+namespace ny::ir::Producer {
 
 namespace {
-
 
 bool convertCharExtended(char& irout, char c) {
 	switch (c) {
@@ -55,9 +50,7 @@ bool convertCharExtended(char& irout, char c) {
 	return true;
 }
 
-
-} // anonymous namespace
-
+} // namespace
 
 bool Scope::visitASTExprChar(AST::Node& node, uint32_t& localvar) {
 	char c /*= '\0'*/;
@@ -105,7 +98,6 @@ bool Scope::visitASTExprChar(AST::Node& node, uint32_t& localvar) {
 	return success;
 }
 
-
 bool Scope::visitASTExprStringLiteral(AST::Node& node, uint32_t& localvar) {
 	// when called, this rule represents an internal cstring
 	// thus, this function can not be called by an user-defined string
@@ -113,7 +105,6 @@ bool Scope::visitASTExprStringLiteral(AST::Node& node, uint32_t& localvar) {
 	localvar = ir::emit::alloctext(ircode(), nextvar(), node.text);
 	return true;
 }
-
 
 bool Scope::visitASTExprString(AST::Node& node, uint32_t& localvar) {
 	assert(node.rule == AST::rgString);
@@ -206,7 +197,4 @@ bool Scope::visitASTExprString(AST::Node& node, uint32_t& localvar) {
 	return true;
 }
 
-
-} // namespace Producer
-} // namespace ir
-} // namespace ny
+} // namespace ny::ir::Producer

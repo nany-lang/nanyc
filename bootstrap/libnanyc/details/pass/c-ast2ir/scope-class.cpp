@@ -4,9 +4,8 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace ir {
-namespace Producer {
+namespace ny::ir::Producer {
+
 namespace {
 
 struct ClassInspector final {
@@ -36,7 +35,6 @@ private:
 
 }; // struct ClassInspector
 
-
 ClassInspector::ClassInspector(Scope& parentscope, uint32_t lvid)
 	: scope{parentscope}
 	, lvid{lvid} {
@@ -64,7 +62,6 @@ bool ClassInspector::inspectClassname(AST::Node& node) {
 	return not classname.empty()
 		   and checkForValidIdentifierName(node, classname, IdNameFlag::isType);
 }
-
 
 bool ClassInspector::inspectClassDefinition(AST::Node& node) {
 	scope.emitDebugpos(node);
@@ -147,6 +144,4 @@ bool Scope::visitASTClass(AST::Node& node, uint32_t* localvar) {
 	return inspector.inspectBody(node);
 }
 
-} // namespace Producer
-} // namespace ir
-} // namespace ny
+} // namespace ny::ir::Producer

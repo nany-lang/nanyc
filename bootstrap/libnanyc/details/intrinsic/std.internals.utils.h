@@ -2,8 +2,7 @@
 #include <yuni/core/string.h>
 #include <nanyc/nanyc.h>
 
-namespace ny {
-namespace intrinsic {
+namespace ny::intrinsic {
 
 struct FromNanycString final { ///< Non Zero-terminated string
 	FromNanycString(const char* data, uint32_t size)
@@ -97,5 +96,4 @@ template<class S> inline void* makeInterimNanycString(nyvmthread_t* tx, S& strin
 	return makeInterimNanycString(tx, cstr, size, capacity);
 }
 
-} // namespace intrinsic
-} // namespace ny
+} // ny::intrinsic

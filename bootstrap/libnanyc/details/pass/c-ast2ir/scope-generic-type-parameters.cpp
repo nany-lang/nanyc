@@ -6,9 +6,7 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace ir {
-namespace Producer {
+namespace ny::ir::Producer {
 
 namespace {
 
@@ -132,6 +130,4 @@ bool Scope::visitASTExprTemplate(AST::Node& node, uint32_t& localvar) {
 	return true;
 }
 
-} // namespace Producer
-} // namespace ir
-} // namespace ny
+} // ny::ir::Producer

@@ -4,11 +4,7 @@
 
 using namespace Yuni;
 
-
-namespace Yuni {
-namespace Extension {
-namespace CString {
-
+namespace Yuni::Extension::CString {
 
 template<>
 void Append<YString, ny::Signature>::Perform(String& out, const ny::Signature& rhs) {
@@ -39,14 +35,9 @@ void Append<YString, ny::Signature>::Perform(String& out, const ny::Signature& r
 	out << ')';
 }
 
-
-} // namespace CString
-} // namespace Extension
-} // namespace Yuni
-
+} // Yuni::Extension::CString
 
 namespace ny {
-
 
 void Signature::Parameters::resize(uint count) {
 	m_types.clear();
@@ -56,7 +47,6 @@ void Signature::Parameters::resize(uint count) {
 	    m_types.emplace_back(std::make_unique<Paramtype>());
 	m_types.shrink_to_fit();*/
 }
-
 
 inline void Signature::Parameters::hash(size_t& seed) const {
 	uint count = (uint) m_types.size();
@@ -69,7 +59,6 @@ inline void Signature::Parameters::hash(size_t& seed) const {
 		Yuni::HashCombine(seed, static_cast<uint8_t>(element.qualifiers.nullable));
 	}
 }
-
 
 size_t Signature::hash() const {
 	size_t seed = 0;
@@ -85,7 +74,6 @@ size_t Signature::hash() const {
 	return seed;
 }
 
-
 bool Signature::Parameters::operator == (const Signature::Parameters& rhs) const {
 	uint32_t count = (uint32_t) m_types.size();
 	if (count == (uint32_t) rhs.m_types.size()) {
@@ -97,9 +85,7 @@ bool Signature::Parameters::operator == (const Signature::Parameters& rhs) const
 	return true;
 }
 
-
-} // namespace ny
-
+} // ny
 
 std::ostream& operator << (std::ostream& out, const ny::Signature& rhs) {
 	String s;

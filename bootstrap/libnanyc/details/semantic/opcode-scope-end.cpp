@@ -4,10 +4,7 @@
 
 using namespace Yuni;
 
-
-namespace ny {
-namespace semantic {
-
+namespace ny::semantic {
 
 void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::scope>& /*operands*/) {
 	if (frame != nullptr)
@@ -15,7 +12,6 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::scope>& /*operands*/) {
 	if (canGenerateCode())
 		ir::emit::scopeBegin(out);
 }
-
 
 void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::end>& /*operands*/) {
 	if (frame != nullptr) {
@@ -45,6 +41,4 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::end>& /*operands*/) {
 	}
 }
 
-
-} // namespace semantic
-} // namespace ny
+} // ny::semantic

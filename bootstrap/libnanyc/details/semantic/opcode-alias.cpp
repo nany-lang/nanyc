@@ -4,8 +4,7 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace semantic {
+namespace ny::semantic {
 
 void Analyzer::declareNamedVariable(const AnyString& name, uint32_t lvid, bool autoreleased) {
 	assert(frame != nullptr);
@@ -44,5 +43,4 @@ void Analyzer::declareNamedVariable(const AnyString& name, uint32_t lvid, bool a
 // inline void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::namealias>& operands)
 // see .h
 
-} // namespace semantic
-} // namespace ny
+} // ny::semantic

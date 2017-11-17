@@ -8,9 +8,7 @@
 #include <map>
 #include <cassert>
 
-namespace ny {
-namespace ir {
-namespace Producer {
+namespace ny::ir::Producer {
 
 // forward declaration
 struct Scope;
@@ -70,9 +68,7 @@ private:
 	AnyString pFilename;
 }; // struct Context
 
-} // namespace Producer
-} // namespace ir
-} // namespace ny
+} // namespace ny::ir::Producer
 
 #include "scope.h"
 #include "context.hxx"

@@ -1,13 +1,9 @@
 #pragma once
 #include "details/atom/classdef-table-view.h"
 
+namespace ny::semantic { struct Analyzer; }
 
-namespace ny {
-namespace semantic {
-
-struct Analyzer;
-
-namespace TypeCheck {
+namespace ny::semantic::TypeCheck {
 
 enum class Match {
 	//! The two types do not match
@@ -17,7 +13,6 @@ enum class Match {
 	//! The two types have the same public interface
 	equal,
 };
-
 
 /*!
 ** \brief Try to tell if 2 types are similar
@@ -29,7 +24,4 @@ enum class Match {
 */
 Match isSimilarTo(Analyzer&, const Classdef& A, const Classdef& B, bool allowImplicit = false);
 
-
-} // namespace TypeCheck
-} // namespace semantic
-} // namespace ny
+} // ny::semantic::TypeCheck

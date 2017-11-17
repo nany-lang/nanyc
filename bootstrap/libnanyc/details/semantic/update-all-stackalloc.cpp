@@ -2,13 +2,9 @@
 
 using namespace Yuni;
 
-
-namespace ny {
-namespace semantic {
-
+namespace ny::semantic {
 
 namespace {
-
 
 struct PostProcessStackAllocWalker final {
 	PostProcessStackAllocWalker(ClassdefTableView& table, uint32_t atomid)
@@ -43,15 +39,11 @@ struct PostProcessStackAllocWalker final {
 	ir::Instruction** cursor = nullptr;
 };
 
-
-} // anonymous namespace
-
+} // namespace
 
 void updateTypesInAllStackallocOp(ir::Sequence& out, ClassdefTableView& table, uint32_t atomid) {
 	PostProcessStackAllocWalker walker{table, atomid};
 	out.each(walker);
 }
 
-
-} // namespace semantic
-} // namespace ny
+} // ny::semantic

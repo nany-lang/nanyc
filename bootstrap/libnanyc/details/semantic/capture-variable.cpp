@@ -3,10 +3,7 @@
 
 using namespace Yuni;
 
-
-namespace ny {
-namespace semantic {
-
+namespace ny::semantic {
 
 void Analyzer::captureVariables(Atom& atom) {
 	// Try to capture variables from a list of potentiel candidates created by the mapping
@@ -121,7 +118,6 @@ void Analyzer::captureVariables(Atom& atom) {
 	});
 }
 
-
 bool Analyzer::pushCapturedVarsAsParameters(const Atom& atomclass) {
 	atomclass.eachChild([&](Atom & child) -> bool {
 		if (child.isCapturedVariable()) {
@@ -148,7 +144,6 @@ bool Analyzer::pushCapturedVarsAsParameters(const Atom& atomclass) {
 	return true;
 }
 
-
 bool Analyzer::identifyCapturedVar(const ir::isa::Operand<ir::isa::Op::identify>& operands,
 		const AnyString& name) {
 	AnyString captureName;
@@ -160,6 +155,4 @@ bool Analyzer::identifyCapturedVar(const ir::isa::Operand<ir::isa::Op::identify>
 	return identify(operands, captureName, false);
 }
 
-
-} // namespace semantic
-} // namespace ny
+} // ny::semantic
