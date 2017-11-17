@@ -1,12 +1,10 @@
 #pragma once
 #include <yuni/core/string.h>
 
-namespace ny { namespace ir { struct Instruction; }}
-namespace ny { namespace ir { struct Sequence; }}
+namespace ny::ir { struct Instruction; }
+namespace ny::ir { struct Sequence; }
 
-
-namespace ny {
-namespace complain {
+namespace ny::complain {
 
 bool exception();
 bool exception(const std::exception&);
@@ -19,5 +17,4 @@ bool invalidRecursiveAtom(const AnyString& atom);
 
 bool inconsistentGenericTypeParameterIndex();
 
-} // namespace complain
-} // namespace ny
+} // ny::complain

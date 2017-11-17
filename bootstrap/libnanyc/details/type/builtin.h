@@ -3,9 +3,7 @@
 #include <yuni/string.h>
 #include <nany/nany.h>
 
-namespace ny {
-namespace Type {
-namespace Builtin {
+namespace ny::Type::Builtin {
 
 template<class T> struct TypeToEnumValue final {
 };
@@ -44,6 +42,4 @@ NY_DECLARE_BUILTIN(float,    nyt_f32,  sizeof(float));
 
 #undef NY_DECLARE_BUILTIN
 
-} // namespace Builtin
-} // namespace Type
-} // namespace ny
+} // ny::Type::Builtin

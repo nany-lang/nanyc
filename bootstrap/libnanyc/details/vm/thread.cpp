@@ -17,8 +17,7 @@
 #  define NYVM_NOINLINE
 #endif
 
-namespace ny {
-namespace vm {
+namespace ny::vm {
 
 namespace {
 
@@ -833,5 +832,4 @@ uint64_t Thread::execute(uint32_t atomid, uint32_t instanceid) {
 	return 120;
 }
 
-} // namespace vm
-} // namespace ny
+} // namespace ny::vm

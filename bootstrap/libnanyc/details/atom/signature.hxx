@@ -52,9 +52,7 @@ template<> struct hash<ny::Signature> {
 
 } // std
 
-namespace Yuni {
-namespace Extension {
-namespace CString {
+namespace Yuni::Extension::CString {
 
 template<class YString>
 class Append<YString, ny::Signature> final {
@@ -62,8 +60,6 @@ public:
 	static void Perform(String& out, const ny::Signature& rhs);
 };
 
-} // namespace CString
-} // namespace Extension
-} // namespace Yuni
+} // Yuni::Extension::CString
 
 std::ostream& operator << (std::ostream& out, const ny::Signature& rhs);

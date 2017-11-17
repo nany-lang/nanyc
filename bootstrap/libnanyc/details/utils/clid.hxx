@@ -69,9 +69,7 @@ template<> struct hash<ny::CLID> final {
 
 } // namespace std
 
-namespace Yuni {
-namespace Extension {
-namespace CString {
+namespace Yuni::Extension::CString {
 
 template<class CStringT>
 class Append<CStringT, ny::CLID> final {
@@ -81,6 +79,4 @@ public:
 	}
 };
 
-} // namespace CString
-} // namespace Extension
-} // namespace Yuni
+} // Yuni::Extension::CString

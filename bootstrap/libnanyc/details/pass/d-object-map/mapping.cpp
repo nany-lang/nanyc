@@ -6,8 +6,7 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace Pass {
+namespace ny::Pass {
 
 namespace {
 
@@ -722,5 +721,4 @@ bool map(Atom& parent, ClassdefTable& cdeftable, Mutex& mutex, ir::Sequence& irc
 	return false;
 }
 
-} // namespace Pass
-} // namespace ny
+} // namespace ny::Pass

@@ -4,8 +4,7 @@
 #include <limits>
 #include "nany/memalloc.h"
 
-namespace ny {
-namespace Memory {
+namespace ny::Memory {
 
 //! C++ memory allocator based on the user-defined allocator
 template<class T>
@@ -79,5 +78,4 @@ private:
 
 }; // class Allocator
 
-} // namespace Memory
-} // namespace ny
+} // ny::Memory

@@ -4,8 +4,7 @@
 #include "message.h"
 #include "levels.h"
 
-namespace ny {
-namespace Logs {
+namespace ny::Logs {
 
 class EmptyReport;
 
@@ -86,7 +85,6 @@ public:
 	template<class T> EmptyReport& operator << (const T& value);
 };
 
-} // namespace Logs
-} // namespace ny
+} // ny::Logs
 
 #include "report.hxx"

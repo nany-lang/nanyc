@@ -1,8 +1,7 @@
 #include "details/vm/machine.h"
 #include "details/vm/thread.h"
 
-namespace ny {
-namespace vm {
+namespace ny::vm {
 
 Machine::Machine(const nyvm_opts_t& opts, const ny::Program& program)
 	: opts(opts)
@@ -46,5 +45,4 @@ void Machine::cerrexception(const AnyString& string) {
 	opts.cerr.flush(&opts.cerr);
 }
 
-} // namespace vm
-} // namespace ny
+} // namespace ny::vm

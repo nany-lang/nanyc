@@ -1,8 +1,7 @@
 #pragma once
 #include <cstdint>
 
-namespace ny {
-namespace Logs {
+namespace ny::Logs {
 
 enum class Level : std::uint8_t {
 	ICE,
@@ -28,5 +27,4 @@ inline bool isError(Level level) {
 	return false;
 }
 
-} // namespace Logs
-} // namespace ny
+} // ny::Logs

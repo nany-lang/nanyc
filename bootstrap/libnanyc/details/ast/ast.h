@@ -3,8 +3,7 @@
 #include <yuni/core/string.h>
 #include "details/grammar/nany.h"
 
-namespace ny {
-namespace AST {
+namespace ny::AST {
 
 //! Create a new node 'identifier' ()
 yuni::Ref<Node> createNodeIdentifier(const AnyString& name);
@@ -27,7 +26,6 @@ void nodeCopyOffsetAndOriginalNode(AST::Node& dest, const AST::Node& source);
 //! Copy the offset + text and originalNode attributes
 void nodeCopyOffsetTextAndOriginalNode(AST::Node& dest, const AST::Node& source);
 
-} // namespace AST
-} // namespace ny
+} // ny::AST
 
 #include "ast.hxx"

@@ -1,8 +1,7 @@
 #pragma once
 #include "details/compiler/compiler.h"
 
-namespace ny {
-namespace compiler {
+namespace ny::compiler {
 
 namespace {
 
@@ -16,5 +15,4 @@ bool makeASTFromSource(ny::compiler::Source& source) {
 
 } // namespace
 
-} // namespace compiler
-} // namespace ny
+} // ny::compiler

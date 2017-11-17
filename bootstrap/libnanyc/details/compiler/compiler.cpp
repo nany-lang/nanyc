@@ -20,8 +20,7 @@
 #include <memory>
 #include <unordered_map>
 
-namespace ny {
-namespace compiler {
+namespace ny::compiler {
 
 namespace {
 
@@ -264,5 +263,4 @@ nyprogram_t* compile(nycompile_opts_t& opts) {
 	return nullptr;
 }
 
-} // namespace compiler
-} // namespace ny
+} // ny::compiler

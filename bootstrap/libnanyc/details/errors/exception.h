@@ -2,13 +2,10 @@
 #include <yuni/core/string.h>
 #include <exception>
 
+namespace ny::ir { struct Instruction; }
+namespace ny::ir { struct Sequence; }
 
-namespace ny { namespace ir { struct Instruction; }}
-namespace ny { namespace ir { struct Sequence; }}
-
-
-namespace ny {
-namespace complain {
+namespace ny::complain {
 
 struct Error: std::exception {
 	Error() = default;
@@ -32,5 +29,4 @@ struct SilentFall final: Error {
 	void complain() const override {}
 };
 
-} // namespace complain
-} // namespace ny
+} // ny::complain

@@ -4,9 +4,7 @@
 
 using namespace Yuni;
 
-namespace Yuni {
-namespace Extension {
-namespace CString {
+namespace Yuni::Extension::CString {
 
 template<>
 void Append<YString, ny::Signature>::Perform(String& out, const ny::Signature& rhs) {
@@ -37,9 +35,7 @@ void Append<YString, ny::Signature>::Perform(String& out, const ny::Signature& r
 	out << ')';
 }
 
-} // namespace CString
-} // namespace Extension
-} // namespace Yuni
+} // Yuni::Extension::CString
 
 namespace ny {
 

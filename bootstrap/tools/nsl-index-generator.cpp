@@ -86,8 +86,8 @@ public:
 		hxx << '\n';
 		hxx << "// !!! FILE AUTOMATICALLY GENERATED !!!\n";
 		hxx << '\n';
-		hxx << "namespace ny {\n";
-		hxx << "namespace compiler {\n";
+		hxx << "namespace ny::compiler {\n";
+		hxx << '\n';
 		hxx << "namespace {\n";
 		hxx << '\n';
 		hxx << "constexpr uint32_t corefilesCount = " << filenames.size() << ";\n";
@@ -96,8 +96,8 @@ public:
 		writeSetOfFiles("registerNSLCoreFiles", filenames);
 		hxx << '\n';
 		hxx << "} // namespace\n";
-		hxx << "} // namespace compiler\n";
-		hxx << "} // namespace ny\n";
+		hxx << '\n';
+		hxx << "} // ny::compiler\n";
 	}
 
 	void write() {

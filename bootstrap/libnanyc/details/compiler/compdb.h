@@ -9,8 +9,7 @@
 #include <memory>
 #include <cassert>
 
-namespace ny {
-namespace compiler {
+namespace ny::compiler {
 
 struct Source final {
 	Source() = default;
@@ -57,5 +56,4 @@ struct Compdb final {
 	yuni::Mutex mutex;
 };
 
-} // namespace compiler
-} // namespace ny
+} // ny::compiler

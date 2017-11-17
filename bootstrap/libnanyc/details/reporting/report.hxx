@@ -1,8 +1,7 @@
 #pragma once
 #include "report.h"
 
-namespace ny {
-namespace Logs {
+namespace ny::Logs {
 
 inline Report::Report(Message& message)
 	: message(message) {
@@ -59,5 +58,4 @@ inline Report::operator bool () const {
 	return message.level >= Level::warning;
 }
 
-} // namespace Logs
-} // namespace ny
+} // ny::Logs

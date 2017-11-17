@@ -2,8 +2,7 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace vm {
+namespace ny::vm {
 
 Stacktrace<true>::Stacktrace() {
 	uint32_t capacity = 64;
@@ -72,5 +71,4 @@ void Stacktrace<true>::dump(const nyprogram_cf_t& cf, const AtomMap& map) const 
 }
 */
 
-} // namespace vm
-} // namespace ny
+} // ny::vm

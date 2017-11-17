@@ -61,6 +61,6 @@ public:
 
 }; // class Signature
 
-} // namespace ny
+} // ny
 
 #include "signature.hxx"

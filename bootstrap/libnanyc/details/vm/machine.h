@@ -2,8 +2,7 @@
 #include <nanyc/vm.h>
 #include "details/program/program.h"
 
-namespace ny {
-namespace vm {
+namespace ny::vm {
 
 struct Machine final {
 	Machine(const nyvm_opts_t&, const ny::Program&);
@@ -21,5 +20,4 @@ struct Machine final {
 	const ny::Program& program;
 };
 
-} // namespace vm
-} // namespace ny
+} // namespace ny::vm

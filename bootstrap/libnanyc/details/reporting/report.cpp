@@ -2,8 +2,7 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace Logs {
+namespace ny::Logs {
 
 Report Report::fromErrLevel(Level level) {
 	switch (level) {
@@ -65,5 +64,4 @@ Report Report::subgroup() {
 	return Report{message.createEntry(Level::none)};
 }
 
-} // namespace Logs
-} // namespace ny
+} // ny::Logs

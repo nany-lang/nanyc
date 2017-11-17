@@ -2,6 +2,7 @@
 #include "libnanyc.h"
 
 namespace ny {
+
 namespace {
 
 constexpr uint32_t localvarVoid = 0;
@@ -20,4 +21,5 @@ inline bool isValidLocalvar(uint32_t localvar) {
 }
 
 } // namespace
-} // namespace ny
+
+} // ny

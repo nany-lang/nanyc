@@ -5,8 +5,7 @@
 #include <array>
 
 
-namespace ny {
-namespace vm {
+namespace ny::vm {
 
 struct Mountpoints final {
 	struct Entry final {
@@ -56,5 +55,4 @@ const char* io_get_cwd(nyvmthread_t* vmtx, uint32_t* length);
 nyio_err_t io_set_cwd(nyvmthread_t*, const char*, uint32_t);
 nyio_err_t io_add_mountpoint(nyvmthread_t*, const char*, uint32_t, nyio_adapter_t*);
 
-} // namespace vm
-} // namespace ny
+} // namespace ny::vm

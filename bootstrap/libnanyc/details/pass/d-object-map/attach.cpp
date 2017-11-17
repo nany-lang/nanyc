@@ -6,8 +6,7 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace compiler {
+namespace ny::compiler {
 
 bool attach(ny::compiler::Compdb& compdb, ny::compiler::Source& source) {
 	auto& sequence = source.sequence();
@@ -17,5 +16,4 @@ bool attach(ny::compiler::Compdb& compdb, ny::compiler::Source& source) {
 	return Pass::map(cdeftable.atoms.root, cdeftable, mutex, sequence, options);
 }
 
-} // namespace compiler
-} // namespace ny
+} // ny::compiler

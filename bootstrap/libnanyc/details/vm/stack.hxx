@@ -2,8 +2,7 @@
 #include "stack.h"
 #include <cstring>
 
-namespace ny {
-namespace vm {
+namespace ny::vm {
 
 inline Register* Stack::push(uint32_t count) {
 	#if NANY_vm_STACK_TRACES != 0
@@ -36,5 +35,4 @@ inline void Stack::pop(uint32_t count) {
 		popChunk();
 }
 
-} // namespace vm
-} // namespace ny
+} // namespace ny::vm

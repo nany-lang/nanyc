@@ -11,9 +11,8 @@
 
 using namespace Yuni;
 
+namespace ny::compiler {
 
-namespace ny {
-namespace compiler {
 namespace {
 
 inline AST::Node* nodeAppend(AST::Node& parent, enum AST::Rule rule) {
@@ -568,7 +567,7 @@ void dumpAST(Logs::Report& report, const AST::Node& node, const char* text) {
 	report.trace() << text << '\n' << out;
 }
 
-} // anonymous namespace
+} // namespace
 
 bool passDuplicateAndNormalizeAST(ny::compiler::Source& source, Logs::Report& report, UsesCallback uses, void* userdata) {
 	auto& parser = source.parsing.parser;
@@ -587,5 +586,4 @@ bool passDuplicateAndNormalizeAST(ny::compiler::Source& source, Logs::Report& re
 	return success;
 }
 
-} // namespace compiler
-} // namespace ny
+} // ny::compiler

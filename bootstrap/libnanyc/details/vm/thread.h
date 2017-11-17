@@ -3,8 +3,7 @@
 #include "details/vm/io.h"
 #include "libnanyc-config.h"
 
-namespace ny {
-namespace vm {
+namespace ny::vm {
 
 struct Thread final {
 	Thread(Machine&);
@@ -20,5 +19,4 @@ struct Thread final {
 	ny::vm::Machine& machine;
 };
 
-} // namespace vm
-} // namespace ny
+} // namespace ny::vm
