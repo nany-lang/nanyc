@@ -8,14 +8,10 @@ static bool nyinx_os_process_execute(nyvmthread_t*, const char* cmd, uint32_t le
 	return Process::Execute(AnyString{cmd, len}, timeout);
 }
 
-namespace ny {
-namespace intrinsic {
-namespace import {
+namespace ny::intrinsic::import {
 
 void process(ny::intrinsic::Catalog& intrinsics) {
 	intrinsics.emplace("__nanyc_os_execute",   nyinx_os_process_execute);
 }
 
-} // namespace import
-} // namespace intrinsic
-} // namespace ny
+} // ny::intrinsic::import

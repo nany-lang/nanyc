@@ -4,9 +4,7 @@
 
 namespace ny { class Project; }
 
-namespace ny {
-namespace intrinsic {
-namespace import {
+namespace ny::intrinsic::import {
 
 //! Import intrinsics related to string manipulation
 void string(ny::intrinsic::Catalog&);
@@ -39,6 +37,4 @@ inline void all(intrinsic::Catalog& intrinsics) {
 	ny::intrinsic::import::digest(intrinsics);
 }
 
-} // namespace import
-} // namespace intrinsic
-} // namespace ny
+} // ny::intrinsic::import

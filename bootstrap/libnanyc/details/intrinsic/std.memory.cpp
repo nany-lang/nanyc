@@ -10,15 +10,11 @@ static T nyinx_strlen(nyvmthread_t*, void* string) {
 		: static_cast<T>(-1);
 }
 
-namespace ny {
-namespace intrinsic {
-namespace import {
+namespace ny::intrinsic::import {
 
 void memory(ny::intrinsic::Catalog& intrinsics) {
 	intrinsics.emplace("strlen32",  nyinx_strlen<uint32_t>);
 	intrinsics.emplace("strlen64",  nyinx_strlen<uint64_t>);
 }
 
-} // namespace import
-} // namespace intrinsic
-} // namespace ny
+} // ny::intrinsic::import

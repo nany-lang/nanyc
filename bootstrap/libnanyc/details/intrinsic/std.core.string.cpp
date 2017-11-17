@@ -23,9 +23,7 @@ static uint32_t nyinx_string_append_ptr(nyvmthread_t*, void* string, void* ptr) 
 	return str.size();
 }
 
-namespace ny {
-namespace intrinsic {
-namespace import {
+namespace ny::intrinsic::import {
 
 void string(ny::intrinsic::Catalog& intrinsics) {
 	intrinsics.emplace("__nanyc.string.append.u8",   nyinx_string_append<uint8_t>);
@@ -41,6 +39,4 @@ void string(ny::intrinsic::Catalog& intrinsics) {
 	intrinsics.emplace("__nanyc.string.append.ptr",  nyinx_string_append_ptr);
 }
 
-} // namespace import
-} // namespace intrinsic
-} // namespace ny
+} // ny::intrinsic::import
