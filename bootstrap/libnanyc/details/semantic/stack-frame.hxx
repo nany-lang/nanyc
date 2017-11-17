@@ -1,8 +1,7 @@
 #pragma once
 #include "stack-frame.h"
 
-namespace ny {
-namespace semantic {
+namespace ny::semantic {
 
 inline void LVIDInfo::fillLogEntryWithLocation(Logs::Report& entry) const {
 	auto& origins = entry.origins();
@@ -57,5 +56,4 @@ inline const LVIDInfo& AtomStackFrame::lvids(uint32_t i) const {
 	return m_locallvids[i];
 }
 
-} // namespace semantic
-} // namespace ny
+} // ny::semantic

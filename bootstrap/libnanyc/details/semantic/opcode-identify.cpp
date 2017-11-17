@@ -7,8 +7,7 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace semantic {
+namespace ny::semantic {
 
 namespace {
 
@@ -505,5 +504,4 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::identifyset>& operands)
 	visit(newopc);
 }
 
-} // namespace semantic
-} // namespace ny
+} // ny::semantic

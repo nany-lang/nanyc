@@ -12,8 +12,7 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace semantic {
+namespace ny::semantic {
 
 Logs::Report emitReportEntry(void* self, Logs::Level);
 void retriveReportMetadata(void* self, Logs::Level, const AST::Node*, Yuni::String&, uint32_t&, uint32_t&);
@@ -227,5 +226,4 @@ void Analyzer::complainNoErrorHandler(const Atom& type, const Atom* call, const 
 	frame->addRaisedErrors(std::move(typenm), std::move(report));
 }
 
-} // namespace semantic
-} // namespace ny
+} // ny::semantic

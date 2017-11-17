@@ -2,8 +2,7 @@
 #include "semantic-analysis.h"
 #include "details/ir/emit.h"
 
-namespace ny {
-namespace semantic {
+namespace ny::semantic {
 
 inline void Analyzer::pushNewFrame(Atom& atom) {
 	auto* newframe = new AtomStackFrame(atom, frame);
@@ -29,5 +28,4 @@ inline void Analyzer::releaseAllScopedVariables() {
 	releaseScopedVariables(0 /*all scopes*/);
 }
 
-} // namespace semantic
-} // namespace ny
+} // ny::semantic

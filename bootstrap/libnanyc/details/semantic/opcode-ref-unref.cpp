@@ -4,8 +4,7 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace semantic {
+namespace ny::semantic {
 
 void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::ref>& operands) {
 	if (not frame->verify(operands.lvid))
@@ -24,5 +23,4 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::unref>& operands) {
 	tryUnrefObject(*this, operands.lvid);
 }
 
-} // namespace semantic
-} // namespace ny
+} // ny::semantic

@@ -4,8 +4,7 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace semantic {
+namespace ny::semantic {
 
 void produceMemberVarDefaultInitialization(Analyzer& analyzer) {
 	assert(analyzer.canGenerateCode());
@@ -148,5 +147,4 @@ void produceMemberVarDefaultInitialization(Analyzer& analyzer) {
 	}
 }
 
-} // namespace semantic
-} // namespace ny
+} // ny::semantic

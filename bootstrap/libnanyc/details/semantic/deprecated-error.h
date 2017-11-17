@@ -7,12 +7,9 @@
 #include "details/errors/errors.h"
 #include "stack-frame.h"
 
-namespace ny {
-namespace semantic {
+namespace ny::semantic { class OverloadedFuncCallResolver; }
 
-class OverloadedFuncCallResolver;
-
-namespace complain {
+namespace ny::semantic::complain {
 
 //! Invalid classdef (ICE)
 bool classdef(const Classdef&, const char* usertxt);
@@ -90,6 +87,4 @@ bool multipleOverloads(uint32_t lvid);
 bool multipleOverloads(uint32_t lvid, const std::vector<std::reference_wrapper<Atom>>& solutions
 	, OverloadedFuncCallResolver& resolver);
 
-} // namespace complain
-} // namespace semantic
-} // namespace ny
+} // ny::semantic::complain

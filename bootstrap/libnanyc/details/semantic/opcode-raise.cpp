@@ -3,8 +3,7 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace semantic {
+namespace ny::semantic {
 
 void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::raise>& operands) {
 	auto& localfunc = frame->atom;
@@ -41,5 +40,4 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::raise>& operands) {
 	ir::emit::raise(out, operands.lvid, labelid, atomError->atomid);
 }
 
-} // namespace semantic
-} // namespace ny
+} // ny::semantic

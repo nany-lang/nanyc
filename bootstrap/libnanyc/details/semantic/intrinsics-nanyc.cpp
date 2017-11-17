@@ -10,9 +10,7 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace semantic {
-namespace intrinsic {
+namespace ny::semantic::intrinsic {
 
 namespace {
 
@@ -87,7 +85,7 @@ static const std::unordered_map<AnyString, std::pair<uint32_t, BuiltinIntrinsic>
 	{"__nanyc_type_intptr_t",    { 0, &intrinsicNanycTypeSizeT<intptr_t> }},
 };
 
-} // anonymous namespace
+} // namespace
 
 Tribool::Value nanycSpecifics(Analyzer& analyzer, const AnyString& name, uint32_t lvid, bool produceError) {
 	assert(not name.empty());
@@ -107,6 +105,4 @@ Tribool::Value nanycSpecifics(Analyzer& analyzer, const AnyString& name, uint32_
 	return ((it->second.second))(analyzer, lvid) ? Tribool::Value::yes : Tribool::Value::no;
 }
 
-} // namespace intrinsic
-} // namespace semantic
-} // namespace ny
+} // ny::semantic::intrinsic

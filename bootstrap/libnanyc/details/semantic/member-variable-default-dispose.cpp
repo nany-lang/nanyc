@@ -3,8 +3,7 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace semantic {
+namespace ny::semantic {
 
 namespace {
 
@@ -92,5 +91,4 @@ void produceMemberVarDefaultDispose(Analyzer& analyzer) {
 	}
 }
 
-} // namespace semantic
-} // namespace ny
+} // ny::semantic

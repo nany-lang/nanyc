@@ -6,8 +6,7 @@
 #include <functional>
 #include <vector>
 
-namespace ny {
-namespace semantic {
+namespace ny::semantic {
 
 struct Analyzer;
 
@@ -101,5 +100,4 @@ private:
 
 }; // class FuncOverloadMatch
 
-} // namespace semantic
-} // namespace ny
+} // ny::semantic

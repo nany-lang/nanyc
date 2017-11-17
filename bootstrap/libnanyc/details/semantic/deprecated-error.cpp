@@ -4,10 +4,7 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace semantic {
-namespace complain {
-
+namespace ny::semantic::complain {
 
 bool classdef(const Classdef& cdef, const char* usertxt) {
 	auto entry = (ice() << usertxt << ": " << cdef.clid << ' ');
@@ -360,7 +357,9 @@ bool parameterTypeHasVanished(const Analyzer& seq, uint32_t i) {
 	return false;
 }
 
-} // complain
+} // ny::semantic::complain
+
+namespace ny::semantic {
 
 Logs::Report emitReportEntry(void* self, Logs::Level level) {
 	auto& sb = *(reinterpret_cast<Analyzer*>(self));
@@ -568,5 +567,4 @@ void Analyzer::complainInvalidParametersAfterSignatureMatching(Atom& atom,
 	overloadMatch.validateWithErrReport(atom);
 }
 
-} // namespace semantic
-} // namespace ny
+} // ny::semantic

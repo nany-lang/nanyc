@@ -9,8 +9,7 @@
 #include <memory>
 #include <vector>
 
-namespace ny {
-namespace semantic {
+namespace ny::semantic {
 
 struct Analyzer;
 
@@ -83,5 +82,4 @@ private:
 
 }; // class OverloadedFuncCallResolver
 
-} // namespace semantic
-} // namespace ny
+} // ny::semantic

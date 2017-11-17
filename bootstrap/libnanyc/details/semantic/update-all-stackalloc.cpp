@@ -2,8 +2,7 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace semantic {
+namespace ny::semantic {
 
 namespace {
 
@@ -47,5 +46,4 @@ void updateTypesInAllStackallocOp(ir::Sequence& out, ClassdefTableView& table, u
 	out.each(walker);
 }
 
-} // namespace semantic
-} // namespace ny
+} // ny::semantic

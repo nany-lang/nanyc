@@ -1,7 +1,6 @@
 #pragma once
 
-namespace ny {
-namespace semantic {
+namespace ny::semantic {
 
 struct Analyzer;
 
@@ -14,5 +13,4 @@ void produceMemberVarDefaultDispose(Analyzer&);
 //! Generate the clone function of the current class
 void produceMemberVarDefaultClone(Analyzer&);
 
-} // namespace semantic
-} // namespace ny
+} // ny::semantic

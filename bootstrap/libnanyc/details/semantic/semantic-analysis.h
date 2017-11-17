@@ -11,8 +11,7 @@
 #include <vector>
 #include <tuple>
 
-namespace ny {
-namespace semantic {
+namespace ny::semantic {
 
 struct Settings;
 class OverloadedFuncCallResolver;
@@ -384,7 +383,6 @@ public:
 
 }; // struct Analyzer
 
-} // namespace semantic
-} // namespace ny
+} // ny::semantic
 
 #include "semantic-analysis.hxx"

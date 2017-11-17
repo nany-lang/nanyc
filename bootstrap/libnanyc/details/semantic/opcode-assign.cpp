@@ -2,8 +2,7 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace semantic {
+namespace ny::semantic {
 
 void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::assign>& operands) {
 	assert(frame != nullptr);
@@ -23,5 +22,4 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::assign>& operands) {
 		frame->invalidate(operands.lhs);
 }
 
-} // namespace semantic
-} // namespace ny
+} // ny::semantic

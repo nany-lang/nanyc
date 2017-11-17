@@ -3,8 +3,7 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace semantic {
+namespace ny::semantic {
 
 void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::classdefsizeof>& operands) {
 	if (canGenerateCode()) {
@@ -26,5 +25,4 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::classdefsizeof>& operan
 	}
 }
 
-} // namespace semantic
-} // namespace ny
+} // ny::semantic

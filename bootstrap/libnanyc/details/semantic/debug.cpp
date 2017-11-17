@@ -2,8 +2,7 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace semantic {
+namespace ny::semantic {
 
 void debugPrintIRSequence(const String& symbolName, const ir::Sequence& irseq,
 						  const ClassdefTableView& table, uint32_t offset) {
@@ -55,5 +54,4 @@ void debugPrintClassdefs(const AtomStackFrame& frame, const ClassdefTableView& t
 	}
 }
 
-} // namespace semantic
-} // namespace ny
+} // ny::semantic

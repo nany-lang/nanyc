@@ -6,8 +6,7 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace semantic {
+namespace ny::semantic {
 
 namespace {
 
@@ -126,7 +125,7 @@ void shortcircuitMutateToBool(Analyzer& seq, const ir::isa::Operand<ir::isa::Op:
 		ir::emit::copy(seq.out, lvid, source);
 }
 
-} // anonymous namespace
+} // namespace
 
 void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::pragma>& operands) {
 	switch (operands.pragma) {
@@ -172,5 +171,4 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::pragma>& operands) {
 	}
 }
 
-} // namespace semantic
-} // namespace ny
+} // ny::semantic

@@ -3,8 +3,7 @@
 
 using namespace Yuni;
 
-namespace ny {
-namespace semantic {
+namespace ny::semantic {
 
 void Analyzer::captureVariables(Atom& atom) {
 	// Try to capture variables from a list of potentiel candidates created by the mapping
@@ -156,5 +155,4 @@ bool Analyzer::identifyCapturedVar(const ir::isa::Operand<ir::isa::Op::identify>
 	return identify(operands, captureName, false);
 }
 
-} // namespace semantic
-} // namespace ny
+} // ny::semantic
