@@ -4,7 +4,6 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace semantic {
 namespace complain {
@@ -18,12 +17,10 @@ bool classdef(const Classdef& cdef, const char* usertxt) {
 	return false;
 }
 
-
 bool unknownIntrinsic(const AnyString& name) {
 	error() << "unknown intrinsic '!!" << name << '\'';
 	return false;
 }
-
 
 bool classNotInstanciated(const Atom& atom) {
 	auto err = ice();
@@ -35,7 +32,6 @@ bool classNotInstanciated(const Atom& atom) {
 	return false;
 }
 
-
 bool classOrFuncExpected(const Classdef& cdef) {
 	auto e = (error() << "class or function expected, got '");
 	auto* seq = Logs::userHandler<Analyzer>();
@@ -45,12 +41,10 @@ bool classOrFuncExpected(const Classdef& cdef) {
 	return false;
 }
 
-
 bool classRequired() {
 	error() << "type class required";
 	return false;
 }
-
 
 bool canNotAllocateClassNullAtom(const Classdef& cdef, uint32_t lvid) {
 	auto* seq = Logs::userHandler<Analyzer>();
@@ -67,7 +61,6 @@ bool canNotAllocateClassNullAtom(const Classdef& cdef, uint32_t lvid) {
 	return false;
 }
 
-
 bool invalidClassSelf(const AnyString& identifier) {
 	auto entry = ice();
 	entry << "identify: invalid 'self' object for '" << identifier;
@@ -81,18 +74,15 @@ bool invalidClassSelf(const AnyString& identifier) {
 	return false;
 }
 
-
 bool noproperty(const AnyString& identifier) {
 	error() << "no property found for '" << identifier << '\'';
 	return false;
 }
 
-
 bool ambigousPropertyCall(const AnyString& identifier) {
 	error() << "ambigous property call for '" << identifier << '\'';
 	return false;
 }
-
 
 bool invalidTypedef(const Classdef& cdef) {
 	auto entry = (error() << "invalid typedef definition");
@@ -100,7 +90,6 @@ bool invalidTypedef(const Classdef& cdef) {
 		entry << " (got null atom, " << cdef.clid << ')';
 	return false;
 }
-
 
 bool returnTypeMismatch(const Classdef& expected, const Classdef& usertype) {
 	auto err = (error() << "type mismatch in 'return' statement");
@@ -119,7 +108,6 @@ bool returnTypeMismatch(const Classdef& expected, const Classdef& usertype) {
 	}
 	return false;
 }
-
 
 bool returnTypeImplicitConversion(const Classdef& expected, const Classdef& usertype, uint32_t line,
 								  uint32_t offset) {
@@ -144,7 +132,6 @@ bool returnTypeImplicitConversion(const Classdef& expected, const Classdef& user
 	return false;
 }
 
-
 bool returnTypeMissing(const Classdef* expected, const Classdef* usertype) {
 	if (expected) {
 		String tstr;
@@ -159,7 +146,6 @@ bool returnTypeMissing(const Classdef* expected, const Classdef* usertype) {
 		ice() << "mismatch return";
 	return false;
 }
-
 
 bool returnMultipleTypes(const Classdef& expected, const Classdef& usertype, uint32_t line, uint32_t offset) {
 	auto err = (error() << "multiple incompatible types for 'return'");
@@ -183,7 +169,6 @@ bool returnMultipleTypes(const Classdef& expected, const Classdef& usertype, uin
 	return false;
 }
 
-
 bool typedefCircularReference(const Atom& original, const Atom& responsible) {
 	auto err = (error() << "cannot resolve type alias '");
 	auto* seq = Logs::userHandler<Analyzer>();
@@ -198,7 +183,6 @@ bool typedefCircularReference(const Atom& original, const Atom& responsible) {
 	return false;
 }
 
-
 bool typedefNotResolved(const Atom& original) {
 	auto err = (error() << "cannot resolve type alias '");
 	auto* seq = Logs::userHandler<Analyzer>();
@@ -207,7 +191,6 @@ bool typedefNotResolved(const Atom& original) {
 	err << '\'';
 	return false;
 }
-
 
 bool typedefRefDeclaredAfter(const Atom& original, const Atom& responsible) {
 	auto err = (error() << "cannot resolve type alias");
@@ -225,14 +208,12 @@ bool typedefRefDeclaredAfter(const Atom& original, const Atom& responsible) {
 	return false;
 }
 
-
 bool multipleDefinitions(const Atom& atom, const AnyString& deffor) {
 	auto err = (error() << atom.keyword() << ' ');
 	atom.retrieveFullname(err.data().message);
 	err << ": multiple definition for " << deffor;
 	return false;
 }
-
 
 bool redeclared(const AnyString& name, uint32_t previousDeclaration) {
 	auto err = (error() << "redeclaration of '" << name << '\'');
@@ -250,7 +231,6 @@ bool redeclared(const AnyString& name, uint32_t previousDeclaration) {
 	}
 	return false;
 }
-
 
 bool multipleOverloads(uint32_t lvid) {
 	auto* seq = Logs::userHandler<Analyzer>();
@@ -281,7 +261,6 @@ bool multipleOverloads(uint32_t lvid) {
 	}
 	return false;
 }
-
 
 bool multipleOverloads(uint32_t lvid, const std::vector<std::reference_wrapper<Atom>>& solutions
 		, OverloadedFuncCallResolver& resolver) {
@@ -346,7 +325,6 @@ bool multipleOverloads(uint32_t lvid, const std::vector<std::reference_wrapper<A
 	return false;
 }
 
-
 bool typesDoNotMatch(const Classdef& from, const Classdef& to) {
 	auto* seq = Logs::userHandler<Analyzer>();
 	auto err = error();
@@ -359,7 +337,6 @@ bool typesDoNotMatch(const Classdef& from, const Classdef& to) {
 	err << '\'';
 	return false;
 }
-
 
 bool selfMissingForPropertyCall(const Atom& property, uint32_t self) {
 	auto e = ice();
@@ -375,7 +352,6 @@ bool selfMissingForPropertyCall(const Atom& property, uint32_t self) {
 	return false;
 }
 
-
 bool parameterTypeHasVanished(const Analyzer& seq, uint32_t i) {
 	auto& frame = *seq.frame;
 	auto e = ice();
@@ -384,9 +360,7 @@ bool parameterTypeHasVanished(const Analyzer& seq, uint32_t i) {
 	return false;
 }
 
-
-} // namespace complain
-
+} // complain
 
 Logs::Report emitReportEntry(void* self, Logs::Level level) {
 	auto& sb = *(reinterpret_cast<Analyzer*>(self));
@@ -419,7 +393,6 @@ Logs::Report emitReportEntry(void* self, Logs::Level level) {
 	return entry;
 }
 
-
 void retriveReportMetadata(void* self, Logs::Level, const AST::Node*, String& filename, uint32_t& line,
 						   uint32_t& offset) {
 	auto& sb = *(reinterpret_cast<Analyzer*>(self));
@@ -428,12 +401,10 @@ void retriveReportMetadata(void* self, Logs::Level, const AST::Node*, String& fi
 	offset   = sb.currentOffset;
 }
 
-
 bool Analyzer::complainBuiltinIntrinsicDoesNotAccept(const AnyString& name, const AnyString& what) {
 	error() << "builtin intrinsic '" << name << "' does not accept " << what;
 	return false;
 }
-
 
 bool Analyzer::complainIntrinsicWithNamedParameters(const AnyString& name) {
 	assert(not pushedparams.func.named.empty() and "Uh ?");
@@ -446,12 +417,10 @@ bool Analyzer::complainIntrinsicWithNamedParameters(const AnyString& name) {
 	return false;
 }
 
-
 bool Analyzer::complainIntrinsicWithGenTypeParameters(const AnyString& name) {
 	error() << "intrinsic '" << name << "': generic type parameters are not allowed";
 	return false;
 }
-
 
 bool Analyzer::complainIntrinsicParameterCount(const AnyString& name, uint32_t count) {
 	uint32_t c = static_cast<uint32_t>(pushedparams.func.indexed.size());
@@ -464,7 +433,6 @@ bool Analyzer::complainIntrinsicParameterCount(const AnyString& name, uint32_t c
 	err << " (got " << c << " instead of " << count << ')';
 	return false;
 }
-
 
 bool Analyzer::complainIntrinsicParameter(const AnyString& name, uint32_t pindex, const Classdef& got,
 		const AnyString& expected) {
@@ -491,7 +459,6 @@ bool Analyzer::complainIntrinsicParameter(const AnyString& name, uint32_t pindex
 	return false;
 }
 
-
 bool Analyzer::complainOperand(const ir::Instruction& operands, AnyString msg) {
 	success = false;
 	auto message = ice();
@@ -505,7 +472,6 @@ bool Analyzer::complainOperand(const ir::Instruction& operands, AnyString msg) {
 	currentSequence.invalidateCursor(*cursor);
 	return false;
 }
-
 
 void Analyzer::complainUnusedVariable(const AtomStackFrame& frame, uint32_t lvid) const {
 	auto& lvidinfo = frame.lvids(lvid);
@@ -521,7 +487,6 @@ void Analyzer::complainUnusedVariable(const AtomStackFrame& frame, uint32_t lvid
 	}
 }
 
-
 bool Analyzer::complainInvalidMemberRequestNonClass(const AnyString& name, CType kind) const {
 	assert(not name.empty());
 	success = false;
@@ -534,12 +499,10 @@ bool Analyzer::complainInvalidMemberRequestNonClass(const AnyString& name, CType
 	return false;
 }
 
-
 bool Analyzer::complainUnknownBuiltinType(const AnyString& name) const {
 	error() << "unknown builtin type '" << name << '\'';
 	return false;
 }
-
 
 bool Analyzer::complainInvalidSelfRefForVariableAssignment(uint32_t lvid) const {
 	assert(frame != nullptr);
@@ -549,7 +512,6 @@ bool Analyzer::complainInvalidSelfRefForVariableAssignment(uint32_t lvid) const 
 	return false;
 }
 
-
 bool Analyzer::complainMissingOperator(Atom& atom, const AnyString& name) const {
 	auto ce = (ice() << "missing operator '" << name << "' for '");
 	ce << atom.keyword() << ' ';
@@ -557,7 +519,6 @@ bool Analyzer::complainMissingOperator(Atom& atom, const AnyString& name) const 
 	ce << '\'';
 	return false;
 }
-
 
 bool Analyzer::complainInvalidType(const char* origin, const Classdef& from, const Classdef& to) {
 	auto err = (error() << origin << "cannot convert '");
@@ -572,7 +533,6 @@ bool Analyzer::complainInvalidType(const char* origin, const Classdef& from, con
 	return false;
 }
 
-
 bool Analyzer::complainCannotCall(Atom& atom, FuncOverloadMatch& overloadMatch) {
 	auto err = (error() << "cannot call '" << cdeftable.keyword(atom) << ' ');
 	atom.retrieveCaption(err.data().message, cdeftable);
@@ -582,7 +542,6 @@ bool Analyzer::complainCannotCall(Atom& atom, FuncOverloadMatch& overloadMatch) 
 	overloadMatch.validateWithErrReport(atom);
 	return false;
 }
-
 
 void Analyzer::complainPushedSynthetic(const CLID& clid, uint32_t paramindex,
 		const AnyString& paramname) {
@@ -598,7 +557,6 @@ void Analyzer::complainPushedSynthetic(const CLID& clid, uint32_t paramindex,
 		err << "' for parameter '" << paramname << '\'';
 }
 
-
 void Analyzer::complainInvalidParametersAfterSignatureMatching(Atom& atom,
 		FuncOverloadMatch& overloadMatch) {
 	// fail - try again to produce error message, hint, and any suggestion
@@ -609,7 +567,6 @@ void Analyzer::complainInvalidParametersAfterSignatureMatching(Atom& atom,
 	overloadMatch.report = &err;
 	overloadMatch.validateWithErrReport(atom);
 }
-
 
 } // namespace semantic
 } // namespace ny

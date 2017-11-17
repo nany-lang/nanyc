@@ -3,10 +3,8 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace semantic {
-
 
 void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::typeisobject>& operands) {
 	assert(frame != nullptr);
@@ -31,7 +29,6 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::typeisobject>& operands
 	if (unlikely(not ok))
 		frame->invalidate(operands.lvid);
 }
-
 
 } // namespace semantic
 } // namespace ny

@@ -1,7 +1,6 @@
 #pragma once
 #include "details/atom/classdef-table-view.h"
 
-
 namespace ny {
 namespace semantic {
 
@@ -18,7 +17,6 @@ enum class Match {
 	equal,
 };
 
-
 /*!
 ** \brief Try to tell if 2 types are similar
 **
@@ -28,7 +26,6 @@ enum class Match {
 ** \note B: Only a well-known classdef, with no interface and no follow-ups (and a valid atom)
 */
 Match isSimilarTo(Analyzer&, const Classdef& A, const Classdef& B, bool allowImplicit = false);
-
 
 } // namespace TypeCheck
 } // namespace semantic

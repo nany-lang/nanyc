@@ -4,10 +4,8 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace semantic {
-
 
 void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::allocate>& operands) {
 	if (not frame->verify(operands.atomid))
@@ -42,7 +40,6 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::allocate>& operands) {
 		acquireObject(*this, operands.lvid);
 	}
 }
-
 
 } // namespace semantic
 } // namespace ny

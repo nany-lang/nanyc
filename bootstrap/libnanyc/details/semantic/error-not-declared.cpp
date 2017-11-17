@@ -7,14 +7,11 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace semantic {
 namespace complain {
 
-
 namespace {
-
 
 uint32_t LevenshteinDistance(const AnyString& source, const AnyString& target) {
 	if (source.empty())
@@ -54,16 +51,13 @@ uint32_t LevenshteinDistance(const AnyString& source, const AnyString& target) {
 	return matrix[source.size()][target.size()];
 }
 
-
 bool stringsAreCloseEnough(uint& note, const AnyString& a, const AnyString& b) {
 	note = LevenshteinDistance(a, b) + (uint) a.size();
 	note += (uint) Math::Abs((::ssize_t) a.size() - (::ssize_t) b.size());
 	return (note <= 8);
 }
 
-
 } // namespace
-
 
 bool notDeclaredInThisScope(const Atom* self, const Atom& atom, const AnyString& name) {
 	assert(not name.empty());
@@ -198,7 +192,6 @@ bool notDeclaredInThisScope(const Atom* self, const Atom& atom, const AnyString&
 	}
 	return false;
 }
-
 
 } // namespace complain
 } // namespace semantic

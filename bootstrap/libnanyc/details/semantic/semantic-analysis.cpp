@@ -12,10 +12,8 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace semantic {
-
 
 Logs::Report emitReportEntry(void* self, Logs::Level);
 void retriveReportMetadata(void* self, Logs::Level, const AST::Node*, Yuni::String&, uint32_t&, uint32_t&);
@@ -41,7 +39,6 @@ Analyzer::Analyzer(Logs::Report report, ClassdefTableView& cdeftable, ny::compil
 	pushedparams.gentypes.named.reserve(8);
 }
 
-
 Analyzer::~Analyzer() {
 	if (config::traces::allTypeDefinitions) {
 		for (auto* f = frame; f != nullptr; f = f->previous)
@@ -53,7 +50,6 @@ Analyzer::~Analyzer() {
 		frm = previous;
 	}
 }
-
 
 void Analyzer::releaseScopedVariables(int scope, bool forget) {
 	if (unlikely(!frame))
@@ -94,7 +90,6 @@ void Analyzer::releaseScopedVariables(int scope, bool forget) {
 	}
 }
 
-
 uint32_t Analyzer::createLocalVariables(uint32_t count) {
 	assert(count > 0);
 	assert(canGenerateCode());
@@ -118,7 +113,6 @@ uint32_t Analyzer::createLocalVariables(uint32_t count) {
 	return startOffset;
 }
 
-
 inline void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::namealias>& operands) {
 	const auto& name = currentSequence.stringrefs[operands.name];
 	declareNamedVariable(name, operands.lvid);
@@ -126,17 +120,14 @@ inline void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::namealias>& oper
 		frame->lvids(operands.lvid).synthetic = false;
 }
 
-
 inline void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::debugfile>& operands) {
 	currentFilename = currentSequence.stringrefs[operands.filename].c_str();
 }
-
 
 inline void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::debugpos>& operands) {
 	currentLine   = operands.line;
 	currentOffset = operands.offset;
 }
-
 
 inline void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::nop>&) {
 	// duplicate nop as well since they can be used to insert code
@@ -145,12 +136,10 @@ inline void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::nop>&) {
 		ir::emit::nop(out);
 }
 
-
 inline void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::label>& operands) {
 	if (canGenerateCode())
 		/*uint32_t lbl =*/ ir::emit::label(out, operands.label);
 }
-
 
 inline void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::qualifiers>& operands) {
 	assert(static_cast<uint32_t>(operands.qualifier) < ir::isa::TypeQualifierCount);
@@ -166,24 +155,20 @@ inline void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::qualifiers>& ope
 	}
 }
 
-
 inline void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::jmp>& opc) {
 	if (canGenerateCode())
 		out->emit<ir::isa::Op::jmp>() = opc;
 }
-
 
 inline void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::jz>& opc) {
 	if (canGenerateCode())
 		out->emit<ir::isa::Op::jz>() = opc;
 }
 
-
 inline void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::jnz>& opc) {
 	if (canGenerateCode())
 		out->emit<ir::isa::Op::jnz>() = opc;
 }
-
 
 inline void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::comment>& opc) {
 	if (debugmode and canGenerateCode()) {
@@ -193,12 +178,10 @@ inline void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::comment>& opc) {
 	}
 }
 
-
 template<ir::isa::Op O>
 void Analyzer::visit(const ir::isa::Operand<O>& operands) {
 	complainOperand(ir::Instruction::fromOpcode(operands));
 }
-
 
 bool Analyzer::translateOpcodes(uint32_t offset) {
 	#if LIBNANYC_IR_PRINT_OPCODES != 0
@@ -211,14 +194,12 @@ bool Analyzer::translateOpcodes(uint32_t offset) {
 	return success;
 }
 
-
 void Analyzer::PushedParameters::clear() {
 	func.indexed.clear();
 	func.named.clear();
 	gentypes.indexed.clear();
 	gentypes.named.clear();
 }
-
 
 void Analyzer::complainNoErrorHandler(const Atom& type, const Atom* call, const std::vector<AtomRaisedErrors::Origin>& origins) {
 	if (unlikely(frame == nullptr)) {
@@ -245,7 +226,6 @@ void Analyzer::complainNoErrorHandler(const Atom& type, const Atom* call, const 
 	}
 	frame->addRaisedErrors(std::move(typenm), std::move(report));
 }
-
 
 } // namespace semantic
 } // namespace ny

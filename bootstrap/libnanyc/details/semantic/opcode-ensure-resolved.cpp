@@ -3,10 +3,8 @@
 
 using namespace Yuni;
 
-
 namespace ny {
 namespace semantic {
-
 
 void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::ensureresolved>& operands) {
 	bool ok = [&]() -> bool {
@@ -74,7 +72,6 @@ void Analyzer::visit(const ir::isa::Operand<ir::isa::Op::ensureresolved>& operan
 		frame->invalidate(operands.lvid);
 	pushedparams.clear();
 }
-
 
 } // namespace semantic
 } // namespace ny

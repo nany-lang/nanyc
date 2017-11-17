@@ -11,14 +11,11 @@
 #include <vector>
 #include <tuple>
 
-
 namespace ny {
 namespace semantic {
 
-
 struct Settings;
 class OverloadedFuncCallResolver;
-
 
 struct IndexedParameter final {
 	IndexedParameter(uint32_t lvid, uint line, uint offset)
@@ -29,7 +26,6 @@ struct IndexedParameter final {
 	uint32_t offset;
 };
 
-
 struct NamedParameter final {
 	NamedParameter(const AnyString& name, uint32_t lvid, uint line, uint offset)
 		: name(name), lvid(lvid), line(line), offset(offset) {
@@ -39,7 +35,6 @@ struct NamedParameter final {
 	uint32_t line;
 	uint32_t offset;
 };
-
 
 struct OnScopeFailHandlers final {
 	struct Handler {
@@ -199,7 +194,6 @@ struct Analyzer final {
 
 	bool translateOpcodes(uint32_t offset);
 
-
 	//! \name Type checking
 	//@{
 	/*!
@@ -210,7 +204,6 @@ struct Analyzer final {
 	*/
 	Atom& resolveTypeAlias(Atom& atom, const Classdef*& cdefout);
 
-
 	/*!
 	** \brief Determine if an atom is fully typed and retrieve its return type into the signature
 	**
@@ -219,7 +212,6 @@ struct Analyzer final {
 	*/
 	bool getReturnTypeForRecursiveFunc(const Atom& atom, Classdef&) const;
 	//@}
-
 
 	//! \name Helpers for propgram memory management
 	//@{
@@ -238,7 +230,6 @@ struct Analyzer final {
 	//! Emit 'unred' opcodes for all variables available in all scopes
 	void releaseAllScopedVariables();
 	//@}
-
 
 	//! \name Misc Code generation
 	//@{
@@ -273,7 +264,6 @@ struct Analyzer final {
 	void instanciateInstrinsicCall();
 	//@}
 
-
 	//! \name Errors
 	//@{
 	void complainNoErrorHandler(const Atom& type, const Atom* call, const std::vector<AtomRaisedErrors::Origin>&);
@@ -305,7 +295,6 @@ struct Analyzer final {
 	void complainPushedSynthetic(const CLID&, uint32_t paramindex, const AnyString& paramname = nullptr);
 	void complainInvalidParametersAfterSignatureMatching(Atom&, FuncOverloadMatch& overloadMatch);
 	//@}
-
 
 public:
 	bool doInstanciateAtomFunc(std::unique_ptr<Logs::Message>& subreport, Settings& info, uint32_t retlvid);
@@ -394,7 +383,6 @@ public:
 	ir::Instruction** cursor = nullptr;
 
 }; // struct Analyzer
-
 
 } // namespace semantic
 } // namespace ny
