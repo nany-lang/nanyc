@@ -1,9 +1,6 @@
 #pragma once
 #include <cstdint>
 
-
-
-
 namespace ny {
 namespace Logs {
 
@@ -20,7 +17,6 @@ enum class Level : std::uint8_t {
 	none,
 };
 
-
 inline bool isError(Level level) {
 	switch (level) {
 		default:
@@ -31,8 +27,6 @@ inline bool isError(Level level) {
 	}
 	return false;
 }
-
-
 
 } // namespace Logs
 } // namespace ny

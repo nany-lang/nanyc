@@ -6,12 +6,9 @@
 #include <memory>
 #include "details/atom/ctype.h"
 
-
 namespace ny {
 
-
 struct Atom;
-
 
 class Signature final {
 public:
@@ -63,7 +60,6 @@ public:
 	Parameters tmplparams;
 
 }; // class Signature
-
 
 } // namespace ny
 

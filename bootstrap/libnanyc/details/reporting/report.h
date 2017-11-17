@@ -4,15 +4,10 @@
 #include "message.h"
 #include "levels.h"
 
-
-
 namespace ny {
 namespace Logs {
 
-
 class EmptyReport;
-
-
 
 class Report final {
 public:
@@ -79,15 +74,10 @@ public:
 	operator bool () const;
 	//@}
 
-
 public:
 	Message& message;
 
 }; // class Report
-
-
-
-
 
 class EmptyReport final {
 public:
@@ -95,9 +85,6 @@ public:
 
 	template<class T> EmptyReport& operator << (const T& value);
 };
-
-
-
 
 } // namespace Logs
 } // namespace ny

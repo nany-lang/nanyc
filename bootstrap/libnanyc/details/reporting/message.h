@@ -7,13 +7,10 @@
 #include <iosfwd>
 #include <memory>
 
-
 namespace ny { struct Atom; }
-
 
 namespace ny {
 namespace Logs {
-
 
 struct Message final: Yuni::NonCopyable<Message> {
 	Message(Level level)
@@ -73,7 +70,6 @@ public:
 	mutable yuni::Mutex m_mutex;
 
 }; // struct Message
-
 
 } // namespace Logs
 } // namespace ny

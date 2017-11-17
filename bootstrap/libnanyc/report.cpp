@@ -3,7 +3,6 @@
 #include "details/reporting/message.h"
 #include <string.h>
 
-
 #ifndef YUNI_OS_WINDOWS
 #define SEP " \u205E "
 #else
