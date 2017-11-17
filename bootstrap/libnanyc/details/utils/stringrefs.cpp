@@ -2,15 +2,12 @@
 
 using namespace Yuni;
 
-
 namespace ny {
-
 
 StringRefs::StringRefs() {
 	m_storage.emplace_back(); // keep the element 0 empty
 	m_index.emplace(AnyString(), 0);
 }
-
 
 StringRefs::StringRefs(const StringRefs& other) {
 	uint32_t ix = 0;
@@ -20,7 +17,6 @@ StringRefs::StringRefs(const StringRefs& other) {
 		++ix;
 	}
 }
-
 
 StringRefs& StringRefs::operator = (const StringRefs& other) {
 	if (&other != this) {
@@ -36,14 +32,12 @@ StringRefs& StringRefs::operator = (const StringRefs& other) {
 	return *this;
 }
 
-
 void StringRefs::clear() {
 	m_index.clear();
 	m_storage.clear();
 	m_storage.emplace_back(); // keep the element 0 empty (as invalid)
 	m_index.emplace(AnyString(), 0);
 }
-
 
 uint32_t StringRefs::keepString(const AnyString& text) {
 	uint32_t ix = static_cast<uint32_t>(m_storage.size());
@@ -52,5 +46,4 @@ uint32_t StringRefs::keepString(const AnyString& text) {
 	return ix;
 }
 
-
-} // namespace ny
+} // ny

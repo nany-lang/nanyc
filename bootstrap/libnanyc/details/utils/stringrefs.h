@@ -4,9 +4,7 @@
 #include <yuni/string.h>
 #include <deque>
 
-
 namespace ny {
-
 
 //! Container for minimizing memory use of duplicate strings
 struct StringRefs final {
@@ -42,7 +40,6 @@ private:
 
 }; // struct StringRefs
 
-
-} // namespace ny
+} // ny
 
 #include "stringrefs.hxx"

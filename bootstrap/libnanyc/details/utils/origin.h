@@ -1,8 +1,6 @@
 #pragma once
 #include <yuni/yuni.h>
 
-
-
 namespace ny {
 
 class Origin final {
@@ -14,7 +12,4 @@ public:
 
 }; // class Origin
 
-
-
-
-} // namespace ny
+} // ny

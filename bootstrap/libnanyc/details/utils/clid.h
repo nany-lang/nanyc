@@ -3,9 +3,6 @@
 #include <yuni/core/string.h>
 #include <functional> // std::hash
 
-
-
-
 namespace ny {
 
 class CLID final {
@@ -57,13 +54,7 @@ private:
 
 }; // class CLID
 
-
-
-
-} // namespace ny
-
-
-
+} // ny
 
 std::ostream& operator << (std::ostream& out, const ny::CLID& rhs);
 
