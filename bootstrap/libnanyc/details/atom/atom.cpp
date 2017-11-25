@@ -57,41 +57,39 @@ Flags<Atom::Category> findCategory(Atom* parent, Atom::Type type, const AnyStrin
 	Flags<Atom::Category> category;
 	if (parent and parent->type == Atom::Type::classdef)
 		category += Atom::Category::classParent;
-	if (unlikely(name.empty()))
+	if (name.first() != '^')
 		return category;
 	switch (type) {
 		case Atom::Type::funcdef: {
-			if (name[0] == '^') {
-				category += Atom::Category::special;
-				if (category(Atom::Category::classParent)) {
-					if (name == "^new" or name == "^default-new")
-						category += Atom::Category::ctor;
-					else if (name == "^clone")
-						category += Atom::Category::clone;
-					else if (name == "^#user-dispose")
-						category += Atom::Category::dtor;
-					else if (name.startsWith("^view^"))
-						category += Atom::Category::view;
-					else if (name.startsWith("^default-var-%"))
-						category += Atom::Category::defvarInit;
-					else {
-						category += Atom::Category::funcoperator;
-						if (name == "^()")
-							category += Atom::Category::functor;
-					}
-				}
+			category += Atom::Category::special;
+			if (category(Atom::Category::classParent)) {
+				if (name == "^new" or name == "^default-new")
+					category += Atom::Category::ctor;
+				else if (name == "^clone")
+					category += Atom::Category::clone;
+				else if (name == "^#user-dispose")
+					category += Atom::Category::dtor;
+				else if (name.startsWith("^view^"))
+					category += Atom::Category::view;
+				else if (name.startsWith("^default-var-%"))
+					category += Atom::Category::defvarInit;
 				else {
-					if (name.startsWith("^unittest^"))
-						category += Atom::Category::unittest;
-					else
-						category += Atom::Category::funcoperator;
+					category += Atom::Category::funcoperator;
+					if (name == "^()")
+						category += Atom::Category::functor;
 				}
-				if (category(Atom::Category::funcoperator)) {
-					if (name.startsWith("^propget^"))
-						category += Atom::Category::propget;
-					else if (name.startsWith("^propset^"))
-						category += Atom::Category::propset;
-				}
+			}
+			else {
+				if (name.startsWith("^unittest^"))
+					category += Atom::Category::unittest;
+				else
+					category += Atom::Category::funcoperator;
+			}
+			if (category(Atom::Category::funcoperator)) {
+				if (name.startsWith("^propget^"))
+					category += Atom::Category::propget;
+				else if (name.startsWith("^propset^"))
+					category += Atom::Category::propset;
 			}
 			break;
 		}
