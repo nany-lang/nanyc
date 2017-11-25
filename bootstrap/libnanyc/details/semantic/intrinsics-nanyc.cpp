@@ -14,6 +14,10 @@ namespace ny::semantic::intrinsic {
 
 namespace {
 
+inline Tribool::Value toTribool(bool flag) {
+	return flag ? Tribool::Value::yes : Tribool::Value::no;
+}
+
 bool intrinsicReinterpret(Analyzer& seq, uint32_t lvid) {
 	assert(seq.pushedparams.func.indexed.size() == 2);
 	uint32_t lhs    = seq.pushedparams.func.indexed[0].lvid;
@@ -102,7 +106,7 @@ Tribool::Value nanycSpecifics(Analyzer& analyzer, const AnyString& name, uint32_
 		return Tribool::Value::no;
 	analyzer.frame->lvids(lvid).synthetic = false;
 	// intrinsic builtin found !
-	return ((it->second.second))(analyzer, lvid) ? Tribool::Value::yes : Tribool::Value::no;
+	return toTribool(((it->second.second))(analyzer, lvid));
 }
 
 } // ny::semantic::intrinsic
