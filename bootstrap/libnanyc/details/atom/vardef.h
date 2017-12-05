@@ -6,10 +6,13 @@
 
 namespace ny {
 
-struct Vardef final : public Yuni::NonCopyable<Vardef> {
+struct Vardef final {
 	Vardef() = default;
-	Vardef(Vardef&& other): clid{other.clid} {}
+	Vardef(const CLID& clid): clid{clid} {}
+	Vardef(CLID&& clid): clid(std::move(clid)) {}
+	Vardef(Vardef&& other): clid{std::move(other.clid)} {}
 	Vardef& operator = (const Vardef&) = default;
+	Vardef& operator = (const CLID& clid) { this->clid = clid; return *this; }
 	Vardef& operator = (Vardef&&) = default;
 
 	CLID clid;
