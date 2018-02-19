@@ -8,14 +8,17 @@
 #include "ref-unref.h"
 #include <limits>
 
-using namespace Yuni;
+#if defined(_MSC_VER)
+#include <BaseTsd.h>
+using ssize_t = SSIZE_T;
+#endif
 
 namespace ny::semantic::intrinsic {
 
 namespace {
 
-inline Tribool::Value toTribool(bool flag) {
-	return flag ? Tribool::Value::yes : Tribool::Value::no;
+inline yuni::Tribool::Value toTribool(bool flag) {
+	return flag ? yuni::Tribool::Value::yes : yuni::Tribool::Value::no;
 }
 
 bool intrinsicReinterpret(Analyzer& seq, uint32_t lvid) {
@@ -91,19 +94,19 @@ static const std::unordered_map<AnyString, std::pair<uint32_t, BuiltinIntrinsic>
 
 } // namespace
 
-Tribool::Value nanycSpecifics(Analyzer& analyzer, const AnyString& name, uint32_t lvid, bool produceError) {
+yuni::Tribool::Value nanycSpecifics(Analyzer& analyzer, const AnyString& name, uint32_t lvid, bool produceError) {
 	assert(not name.empty());
 	assert(analyzer.frame != nullptr);
 	auto it = builtinDispatch.find(name);
 	if (unlikely(it == builtinDispatch.end())) {
 		if (produceError)
 			complain::unknownIntrinsic(name);
-		return Tribool::Value::indeterminate;
+		return yuni::Tribool::Value::indeterminate;
 	}
 	// checking for parameters
 	uint32_t count = it->second.first;
 	if (unlikely(not analyzer.checkForIntrinsicParamCount(name, count)))
-		return Tribool::Value::no;
+		return yuni::Tribool::Value::no;
 	analyzer.frame->lvids(lvid).synthetic = false;
 	// intrinsic builtin found !
 	return toTribool(((it->second.second))(analyzer, lvid));
