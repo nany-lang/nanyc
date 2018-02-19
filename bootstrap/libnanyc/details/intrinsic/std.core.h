@@ -2,8 +2,6 @@
 #include "libnanyc.h"
 #include "details/intrinsic/catalog.h"
 
-namespace ny { class Project; }
-
 namespace ny::intrinsic::import {
 
 //! Import intrinsics related to string manipulation
