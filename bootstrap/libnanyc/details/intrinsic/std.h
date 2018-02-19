@@ -23,7 +23,7 @@ template<class T> inline T* vm_allocateraw(nyvmthread_t* const /*vm*/, size_t si
 	return ptr;
 }
 
-template<class T> inline void vm_deallocate(nyvmthread_t* const vm, T* object) {
+template<class T> inline void vm_deallocate(nyvmthread_t* const /*vm*/, T* object) {
 	assert(object != nullptr);
 	object->~T();
 	free(object); // sizeof(T);
