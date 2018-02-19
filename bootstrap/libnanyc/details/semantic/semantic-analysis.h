@@ -38,13 +38,13 @@ struct NamedParameter final {
 struct OnScopeFailHandlers final {
 	struct Handler {
 		Handler() = default;
-		Handler(uint32_t lvid, uint32_t label, uint32_t scope)
+		Handler(uint32_t lvid, uint32_t label, int32_t scope)
 			: lvid(lvid)
 			, label(label)
 			, scope(scope) {
 		}
 
-		void reset(uint32_t newlvid, uint32_t newlabel, uint32_t newscope) {
+		void reset(uint32_t newlvid, uint32_t newlabel, int32_t newscope) {
 			lvid  = newlvid;
 			label = newlabel;
 			used  = false;
@@ -66,7 +66,7 @@ struct OnScopeFailHandlers final {
 		uint32_t lvid = 0;
 		uint32_t label = 0;
 		bool used = false;
-		uint32_t scope = 0;
+		int32_t scope = 0;
 	};
 
 	auto& any() { return m_any; }
@@ -107,7 +107,7 @@ struct OnScopeFailHandlers final {
 		return find(atom) != nullptr;
 	}
 
-	auto& add(const Atom* atom, uint32_t lvid, uint32_t label, uint32_t scope) {
+	auto& add(const Atom* atom, uint32_t lvid, uint32_t label, int32_t scope) {
 		m_handlers.emplace_back(atom, Handler(lvid, label, scope));
 		return std::get<Handler>(m_handlers.back());
 	}
@@ -126,7 +126,7 @@ struct OnScopeFailHandlers final {
 			and std::get<const Atom*>(m_handlers.back()) == atom;
 	}
 
-	uint32_t scope() const {
+	int32_t scope() const {
 		assert(not empty());
 		auto& handler = (not m_any.empty()) ?  m_any : std::get<Handler>(m_handlers[0]);
 		return handler.scope;
