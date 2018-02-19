@@ -9,30 +9,10 @@ namespace ny::semantic {
 
 namespace {
 
-bool verifyParameters(Analyzer& analyzer, const AnyString& name) {
-	auto& pushedparams = analyzer.pushedparams;
-	// named parameters are not accepted
-	if (unlikely(not pushedparams.func.named.empty()))
-		return analyzer.complainIntrinsicWithNamedParameters(name);
-	// generic type parameters are not accepted
-	if (unlikely(not pushedparams.gentypes.indexed.empty() or not pushedparams.gentypes.named.empty()))
-		return analyzer.complainIntrinsicWithGenTypeParameters(name);
-	// checking if one parameter was already flag as 'error'
-	auto& frame = *analyzer.frame;
-	uint32_t count = static_cast<uint32_t>(pushedparams.func.indexed.size());
-	for (uint32_t i = 0u; i != count; ++i) {
-		if (unlikely(not frame.verify(pushedparams.func.indexed[i].lvid)))
-			return false;
-	}
-	return true;
-}
-
 bool translateIntrinsic(Analyzer& seq, const ir::isa::Operand<ir::isa::Op::intrinsic>& operands) {
 	AnyString name = seq.currentSequence.stringrefs[operands.intrinsic];
 	if (unlikely(name.empty()))
 		return (error() << "invalid empty intrinsic name");
-	if (unlikely(not verifyParameters(seq, name)))
-		return false;
 	switch (intrinsic::langOrNanycSpecifics(seq, name, operands.lvid, false)) {
 		case Tribool::Value::yes:
 			return true;

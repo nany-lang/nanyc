@@ -55,7 +55,7 @@ public:
 	event;
 
 private:
-	friend class Scope;
+	friend struct Scope;
 	static Logs::Report emitReportEntry(void*, Logs::Level level);
 	static void retriveReportMetadata(void*, Logs::Level, const AST::Node*, Yuni::String&, uint32_t&, uint32_t&);
 

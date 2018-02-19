@@ -8,11 +8,18 @@
 #include "ref-unref.h"
 #include <limits>
 
-using namespace Yuni;
+#if defined(_MSC_VER)
+#include <BaseTsd.h>
+using ssize_t = SSIZE_T;
+#endif
 
 namespace ny::semantic::intrinsic {
 
 namespace {
+
+inline yuni::Tribool::Value toTribool(bool flag) {
+	return flag ? yuni::Tribool::Value::yes : yuni::Tribool::Value::no;
+}
 
 bool intrinsicReinterpret(Analyzer& seq, uint32_t lvid) {
 	assert(seq.pushedparams.func.indexed.size() == 2);
@@ -77,32 +84,32 @@ template<class T> bool intrinsicNanycTypeSizeT(Analyzer& seq, uint32_t lvid) {
 using BuiltinIntrinsic = bool (*)(Analyzer&, uint32_t);
 
 static const std::unordered_map<AnyString, std::pair<uint32_t, BuiltinIntrinsic>> builtinDispatch = {
-	{"__reinterpret",            { 2, &intrinsicReinterpret }},
 	{"__nanyc_memchecker_hold",  { 2, &intrinsicMemcheckerHold }},
+	{"__nanyc_type_intptr_t",    { 0, &intrinsicNanycTypeSizeT<intptr_t> }},
 	{"__nanyc_type_size_t",      { 0, &intrinsicNanycTypeSizeT<size_t> }},
 	{"__nanyc_type_ssize_t",     { 0, &intrinsicNanycTypeSizeT<ssize_t> }},
 	{"__nanyc_type_uintptr_t",   { 0, &intrinsicNanycTypeSizeT<uintptr_t> }},
-	{"__nanyc_type_intptr_t",    { 0, &intrinsicNanycTypeSizeT<intptr_t> }},
+	{"__reinterpret",            { 2, &intrinsicReinterpret }},
 };
 
 } // namespace
 
-Tribool::Value nanycSpecifics(Analyzer& analyzer, const AnyString& name, uint32_t lvid, bool produceError) {
+yuni::Tribool::Value nanycSpecifics(Analyzer& analyzer, const AnyString& name, uint32_t lvid, bool produceError) {
 	assert(not name.empty());
 	assert(analyzer.frame != nullptr);
 	auto it = builtinDispatch.find(name);
 	if (unlikely(it == builtinDispatch.end())) {
 		if (produceError)
 			complain::unknownIntrinsic(name);
-		return Tribool::Value::indeterminate;
+		return yuni::Tribool::Value::indeterminate;
 	}
 	// checking for parameters
 	uint32_t count = it->second.first;
 	if (unlikely(not analyzer.checkForIntrinsicParamCount(name, count)))
-		return Tribool::Value::no;
+		return yuni::Tribool::Value::no;
 	analyzer.frame->lvids(lvid).synthetic = false;
 	// intrinsic builtin found !
-	return ((it->second.second))(analyzer, lvid) ? Tribool::Value::yes : Tribool::Value::no;
+	return toTribool(((it->second.second))(analyzer, lvid));
 }
 
 } // ny::semantic::intrinsic

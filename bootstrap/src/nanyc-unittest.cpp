@@ -17,6 +17,7 @@
 #include <memory>
 #include <random>
 #include "libnanyc.h"
+#include "../libnanyc/libnanyc-traces.h"
 
 
 namespace ny {
@@ -424,6 +425,8 @@ void prepare(App& app, int argc, char** argv) {
 	app.importFilenames(filenames);
 	app.opts.with_nsl_unittests = app.withnsl ? nytrue : nyfalse;
 	if (not app.inExecutorMode()) {
+		if (ny::config::traces::hasSome())
+			throw std::runtime_error("debug traces in output programs will make all tests fail");
 		if (unlikely(app.loops > 100))
 			throw "number of loops greater than hard-limit '100'";
 		if (unlikely(app.timeout_s == 0))
@@ -452,7 +455,7 @@ int main(int argc, char** argv) {
 		std::cerr << "error: " << e << '\n';
 	}
 	catch (const std::exception& e) {
-		std::cerr << "exception: " << e.what() << '\n';
+		std::cerr << "error: " << e.what() << '\n';
 	}
 	catch (int e) {
 		return e;

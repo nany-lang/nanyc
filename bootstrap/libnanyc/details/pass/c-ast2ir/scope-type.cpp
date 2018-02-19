@@ -22,11 +22,14 @@ bool Scope::visitASTExprTypeDecl(AST::Node& node, uint32_t& localvar) {
 			}
 		}
 		else {
-			// anonymous / inline class definitnio
-			if (identifier.rule == AST::rgClass) {
-				//error(identifier) << "anonymous classes are not supported yet";
-				//return false;
-				return visitASTClass(identifier, &localvar);
+			switch (identifier.rule) {
+				case AST::rgClass: { // anonymous / inline class definitnio
+					//error(identifier) << "anonymous classes are not supported yet";
+					//return false;
+					return visitASTClass(identifier, &localvar);
+				}
+				default:
+					break;
 			}
 		}
 	}

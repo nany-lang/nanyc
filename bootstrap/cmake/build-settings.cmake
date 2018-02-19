@@ -71,3 +71,8 @@ set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
 set(CMAKE_MACOSX_RPATH 1)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	# warning: nested namespace definition is a C++1z extension
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c++1z-extensions")
+endif()
