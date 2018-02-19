@@ -86,14 +86,12 @@ bool emitIdentifyForSingleResult(Analyzer& seq, bool isLocalVar, const Classdef&
 		origin.atomid = atom.atomid;
 		origin.field  = atom.varinfo.effectiveFieldIndex;
 		if (seq.canGenerateCode()) {
-			// read the address
 			assert(self != 0 and "'self can be null only for type resolution'");
 			ir::emit::fieldget(seq.out, operands.lvid, self, atom.varinfo.effectiveFieldIndex);
 			tryToAcquireObject(seq, operands.lvid, cdefvar);
 		}
 	}
 	else {
-		// override the typeinfo
 		auto& spare = seq.cdeftable.substitute(operands.lvid);
 		spare.import(cdef);
 		spare.mutateToAtom(&atom);
