@@ -84,12 +84,12 @@ template<class T> bool intrinsicNanycTypeSizeT(Analyzer& seq, uint32_t lvid) {
 using BuiltinIntrinsic = bool (*)(Analyzer&, uint32_t);
 
 static const std::unordered_map<AnyString, std::pair<uint32_t, BuiltinIntrinsic>> builtinDispatch = {
-	{"__reinterpret",            { 2, &intrinsicReinterpret }},
 	{"__nanyc_memchecker_hold",  { 2, &intrinsicMemcheckerHold }},
+	{"__nanyc_type_intptr_t",    { 0, &intrinsicNanycTypeSizeT<intptr_t> }},
 	{"__nanyc_type_size_t",      { 0, &intrinsicNanycTypeSizeT<size_t> }},
 	{"__nanyc_type_ssize_t",     { 0, &intrinsicNanycTypeSizeT<ssize_t> }},
 	{"__nanyc_type_uintptr_t",   { 0, &intrinsicNanycTypeSizeT<uintptr_t> }},
-	{"__nanyc_type_intptr_t",    { 0, &intrinsicNanycTypeSizeT<intptr_t> }},
+	{"__reinterpret",            { 2, &intrinsicReinterpret }},
 };
 
 } // namespace
