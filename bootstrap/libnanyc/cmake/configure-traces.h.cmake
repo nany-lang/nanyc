@@ -48,5 +48,11 @@ static constexpr bool properties = all or false;
 //! Export all raised errors per atom
 static constexpr bool raisedErrorSummary = all or false;
 
+static constexpr bool hasSome() {
+	return ast or astBeforeNormalize or astAfterNormalize or atomTable or preAtomTable
+		or allTypeDefinitions or classdefTable or sourceOpcodeSequence or generatedOpcodeSequence
+		or properties or raisedErrorSummary;
+}
+
 } // ny::config::traces
 // vim: set ft=cpp:
