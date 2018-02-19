@@ -452,7 +452,7 @@ int main(int argc, char** argv) {
 		std::cerr << "error: " << e << '\n';
 	}
 	catch (const std::exception& e) {
-		std::cerr << "exception: " << e.what() << '\n';
+		std::cerr << "error: " << e.what() << '\n';
 	}
 	catch (int e) {
 		return e;
