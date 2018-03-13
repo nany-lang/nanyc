@@ -4,36 +4,18 @@
 #include "details/utils/clid.h"
 #include "type.h"
 
-
 namespace ny {
 
-
-class Vardef final : public Yuni::NonCopyable<Vardef> {
-public:
-	//! \name Constructors
-	//@{
-	//! Default constructor
+struct Vardef final {
 	Vardef() = default;
-	//! Move constructor
-	Vardef(Vardef&& other): clid{other.clid} {}
-	//@}
-
-
-	//! \name Operators
-	//@{
-	//! Copy operator
+	Vardef(const CLID& clid): clid{clid} {}
+	Vardef(CLID&& clid): clid(std::move(clid)) {}
+	Vardef(Vardef&& other): clid{std::move(other.clid)} {}
 	Vardef& operator = (const Vardef&) = default;
-	//! Move operator
+	Vardef& operator = (const CLID& clid) { this->clid = clid; return *this; }
 	Vardef& operator = (Vardef&&) = default;
-	//@}
 
-
-public:
-	//! Attached type (class id)
-	// (this value may be changed)
 	CLID clid;
+};
 
-}; // class Vardef
-
-
-} // namespace ny
+} // ny
