@@ -161,16 +161,16 @@ public class File {
 		-> new u32(str.m_cstr, str.size.pod);
 
 	view (cref filter)
-		-> makeViewLineByLine(filter, 256u, 2u * 1024u * 1024u * 1024u);
+		-> make_view_linebyline(filter, 256u, 2u * 1024u * 1024u * 1024u);
 
 	view lines(cref filter)
-		-> makeViewLineByLine(filter, 256u, 2u * 1024u * 1024u * 1024u);
+		-> make_view_linebyline(filter, 256u, 2u * 1024u * 1024u * 1024u);
 
 	view lines(cref filter, chunk: u32)
-		-> makeViewLineByLine(filter, chunk, 2u * 1024u * 1024u * 1024u);
+		-> make_view_linebyline(filter, chunk, 2u * 1024u * 1024u * 1024u);
 
 	view lines(cref filter, chunk: u32, limit: u32)
-		-> makeViewLineByLine(filter, chunk, limit);
+		-> make_view_linebyline(filter, chunk, limit);
 
 	operator += (cref str: string): ref File {
 		write(str);
@@ -192,7 +192,7 @@ private:
 		return false;
 	}
 
-	func makeViewLineByLine(cref filter, chunk: u32, limit: u32): ref {
+	func make_view_linebyline(cref filter, chunk: u32, limit: u32): ref {
 		ref m_parentFile = self;
 		ref m_parentFilter = filter;
 		ref m_parentChunk = chunk;
