@@ -17,18 +17,18 @@ public func canonicalize(cref path: string, cref root: string): ref string
 
 //! Get the absolute path
 public func absolute(cref path: string): ref string
-	-> if isAbsolute(path)
+	-> if is_absolute(path)
 		then new string(path)
 		else ((std.io.folder.cwd += '/') += path);
 
 //! Get the absolute path (with a given root path)
 public func absolute(cref path: string, cref root: string): ref string
-	-> if isAbsolute(path)
+	-> if is_absolute(path)
 		then new string(path)
 		else ((new string(root) += '/') += path);
 
 //! Get if a path is absolute
-public func isAbsolute(cref path: string): bool
+public func is_absolute(cref path: string): bool
 	-> path.first == '/';
 
 //! Get if a path is relative to a current folder
