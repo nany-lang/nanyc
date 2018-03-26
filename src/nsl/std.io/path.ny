@@ -153,7 +153,7 @@ public func extension(cref path: string, withDot: bool): ref string {
 }
 
 //! Get if a path contains an extension
-public func hasExtension(cref path: string): bool {
+public func has_extension(cref path: string): bool {
 	var size = path.size;
 	if size != 0u then {
 		var offset = size - 1u;

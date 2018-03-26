@@ -11,7 +11,7 @@ unittest std.io.path.extension {
 		var expectHas = (not withDot.empty);
 		ref expectDot = withDot;
 		ref expectNoDot = expect;
-		var has   = std.io.path.hasExtension(file);
+		var has   = std.io.path.has_extension(file);
 		var dot   = std.io.path.extension(file);
 		var nodot = std.io.path.extension(file, withDot: false);
 		if has != expectHas or dot != expectDot or nodot != expectNoDot then {
