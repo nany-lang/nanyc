@@ -32,7 +32,7 @@ public func is_absolute(cref path: string): bool
 	-> path.first == '/';
 
 //! Get if a path is relative to a current folder
-public func isRelative(cref path: string): bool
+public func is_relative(cref path: string): bool
 	-> path.first != '/';
 
 
