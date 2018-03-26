@@ -49,7 +49,7 @@ public func create(cref path: string): bool {
 //	-> new bool(!!__nanyc_io_folder_move(path.pod, to.pod, __false));
 
 //! Move the contents of a folder to another location
-//public func moveContents(cref path: string, cref to: string): bool
+//public func move_contents(cref path: string, cref to: string): bool
 //	-> new bool(!!__nanyc_io_folder_move(path.pod, to.pod, __true));
 
 //! Remove the folder and its content

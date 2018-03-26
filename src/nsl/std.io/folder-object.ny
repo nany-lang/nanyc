@@ -44,8 +44,8 @@ public class Folder {
 		-> std.io.folder.move(path, to);
 
 	//! Move the contents of a folder to another location
-	func moveContents(cref to: string): bool
-		-> std.io.folder.moveContents(path, to);
+	func move_contents(cref to: string): bool
+		-> std.io.folder.move_contents(path, to);
 
 	//! Remove the folder and its content
 	func erase: bool
