@@ -16,7 +16,7 @@ public func entries(cref path: string): ref Folder {
 */
 var cwd -> {
 	get: new string(!!__nanyc_io_get_cwd),
-	set: setCurrentWorkingFolder(value)
+	set: set_cwd(value)
 };
 
 //! Get if a node exists and is a folder
@@ -81,7 +81,7 @@ public func read(cref path: string): ref string {
 	return content;
 }
 
-func setCurrentWorkingFolder(cref path: string): bool {
+func set_cwd(cref path: string): bool {
 	var cn = std.io.path.canonicalize(path);
 	return new bool(!!__nanyc_io_set_cwd(cn.m_cstr, cn.m_size));
 }
