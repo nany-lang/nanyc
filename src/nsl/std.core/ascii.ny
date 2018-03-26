@@ -72,6 +72,10 @@ class Ascii {
 		return if lowercase_alpha then new u8(m_value - 97__u8) else 0u8;
 	}
 
+	func to_uppercase_alpha {
+		return if uppercase_alpha then new u8(m_value - 65__u8) else 0u8;
+	}
+
 internal:
 	func reset(value: __u8)    { m_value = value; }
 	func reset(cref value: u8) { m_value = value.pod; }
