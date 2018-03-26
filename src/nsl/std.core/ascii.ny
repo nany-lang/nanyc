@@ -41,7 +41,7 @@ class Ascii {
 		-> m_value >= 48__u8 and m_value <= 57__u8;
 
 	func toDigit
-		-> if isDigit then new u8(m_value - 48__u8) else 0u8;
+		-> if digit then new u8(m_value - 48__u8) else 0u8;
 
 	//! Get if the ascii is a space (real space or tab)
 	var tab
