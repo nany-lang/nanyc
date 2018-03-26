@@ -15,7 +15,7 @@ public func entries(cref path: string): ref Folder {
 ** \note: The current working directory is per-thread
 */
 var cwd -> {
-	get: new string(!!__nanyc_io_get_cwd),
+	get: get_cwd(),
 	set: set_cwd(value)
 };
 
@@ -79,6 +79,10 @@ public func read(cref path: string): ref string {
 			content << "[+] " << f.name << "\n";
 	}
 	return content;
+}
+
+func get_cwd: string {
+	return new string(!!__nanyc_io_get_cwd);
 }
 
 func set_cwd(cref path: string): bool {
