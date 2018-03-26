@@ -61,8 +61,10 @@ private:
 	var m_object = null;
 }
 
-public func optional<:T:>: ref
-	-> new std.Optional<:T:>;
+public func optional<:T:>: ref {
+	return new std.Optional<:T:>;
+}
 
-public func optional(ref object)
-	-> new std.Optional<:typeof(object):>(object);
+public func optional(ref object): ref {
+	return new std.Optional<:typeof(object):>(object);
+}

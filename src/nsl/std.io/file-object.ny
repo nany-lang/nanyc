@@ -95,8 +95,9 @@ public class File {
 			!!__nanyc_io_file_seek_cur(m_fd, current.pod);
 	}
 
-	func rewind
-		-> seek(set: 0u64);
+	func rewind {
+		seek(set: 0u64);
+	}
 
 	func flush {
 		if m_fd != null then
@@ -109,11 +110,13 @@ public class File {
 			else 0__u64;
 	}
 
-	func readline: ref string
-		-> readline(256u, 2u * 1024u * 1024u * 1024u);
+	func readline: ref string {
+		return readline(256u, 2u * 1024u * 1024u * 1024u);
+	}
 
-	func readline(chunk: u32): ref string
-		-> readline(chunk, 2u * 1024u * 1024u * 1024u);
+	func readline(chunk: u32): ref string {
+		return readline(chunk, 2u * 1024u * 1024u * 1024u);
+	}
 
 	func readline(chunk: u32, limit: u32): ref string {
 		ref str = new string;

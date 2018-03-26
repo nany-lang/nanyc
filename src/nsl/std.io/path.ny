@@ -7,32 +7,38 @@
 namespace std.io.path;
 
 //! Make the path absolute and normalize it
-public func canonicalize(cref path: string): ref string
-	-> normalize(absolute(path));
+public func canonicalize(cref path: string): ref string {
+	return normalize(absolute(path));
+}
 
 //! Make the path absolute and normalize it
-public func canonicalize(cref path: string, cref root: string): ref string
-	-> normalize(absolute(path, root));
+public func canonicalize(cref path: string, cref root: string): ref string {
+	return normalize(absolute(path, root));
+}
 
 //! Get the absolute path
-public func absolute(cref path: string): ref string
-	-> if is_absolute(path)
+public func absolute(cref path: string): ref string {
+	return if is_absolute(path)
 		then new string(path)
 		else ((std.io.folder.cwd += '/') += path);
+}
 
 //! Get the absolute path (with a given root path)
-public func absolute(cref path: string, cref root: string): ref string
-	-> if is_absolute(path)
+public func absolute(cref path: string, cref root: string): ref string {
+	return if is_absolute(path)
 		then new string(path)
 		else ((new string(root) += '/') += path);
+}
 
 //! Get if a path is absolute
-public func is_absolute(cref path: string): bool
-	-> path.first == '/';
+public func is_absolute(cref path: string): bool {
+	return path.first == '/';
+}
 
 //! Get if a path is relative to a current folder
-public func is_relative(cref path: string): bool
-	-> path.first != '/';
+public func is_relative(cref path: string): bool {
+	return path.first != '/';
+}
 
 //! Simplifies a pth by removing all navigation elements
 public func normalize(cref path: string): ref string {
@@ -109,8 +115,9 @@ public func normalize(cref path: string): ref string {
 }
 
 //! Get the extension of a path (with the dot)
-public func extension(cref path: string): ref string
-	-> extension(path, withDot: true);
+public func extension(cref path: string): ref string {
+	return extension(path, withDot: true);
+}
 
 //! Get the extension of a path (with or without the dot)
 public func extension(cref path: string, withDot: bool): ref string {

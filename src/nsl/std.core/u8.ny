@@ -20,8 +20,9 @@ public class u8 {
 
 	#[nosuggest] operator new (self pod: __u8);
 
-	func as<:T:>
-		-> new T(!!as(#[__nanyc_synthetic] typeof(std.asBuiltin(new T)), pod));
+	func as<:T:>: ref {
+		return new T(!!as(#[__nanyc_synthetic] typeof(std.asBuiltin(new T)), pod));
+	}
 
 	operator ++self: ref u8 {
 		pod = !!inc(pod);

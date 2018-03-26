@@ -7,36 +7,42 @@
 namespace std.io.file;
 
 //! Get if a node exists and is a file
-public func exists(cref path: string): bool
-	-> new bool(!!__nanyc_io_file_exists(path.m_cstr, path.size.pod));
+public func exists(cref path: string): bool {
+	return new bool(!!__nanyc_io_file_exists(path.m_cstr, path.size.pod));
+}
 
 //! Get if a file is empty (size is zero)
-public func empty(cref path: string): ref bool
-	-> (std.io.file.size(path) == 0u64);
+public func empty(cref path: string): ref bool {
+	return (std.io.file.size(path) == 0u64);
+}
 
 //! Get the size (in bytes) of a file
-public func size(cref path: string): u64
-	-> new u64(!!__nanyc_io_file_size(path.m_cstr, path.size.pod));
+public func size(cref path: string): u64 {
+	return new u64(!!__nanyc_io_file_size(path.m_cstr, path.size.pod));
+}
 
 //! Resize a file in bytes
-public func resize(cref path: string, size: u64): bool
-	-> new bool(!!__nanyc_io_file_resize(path.m_cstr, path.size.pod, size.pod));
+public func resize(cref path: string, size: u64): bool {
+	return new bool(!!__nanyc_io_file_resize(path.m_cstr, path.size.pod, size.pod));
+}
 
 //! Copy a file and its content to another location
 //public func copy(cref path: string, cref to: string): bool
-//	-> new bool(!!__nanyc_io_file_copy(path.m_cstr, path.size.pod, to.m_cstr, to.size.pod, __false));
+//	return new bool(!!__nanyc_io_file_copy(path.m_cstr, path.size.pod, to.m_cstr, to.size.pod, __false));
 
 //! Move a file and its content to another location
 //public func move(cref path: string, cref to: string): bool
-//	-> new bool(!!__nanyc_io_file_move(path.m_cstr, path.size.pod, to.m_cstr, to.size.pod, __false));
+//	return new bool(!!__nanyc_io_file_move(path.m_cstr, path.size.pod, to.m_cstr, to.size.pod, __false));
 
 //! Remove the file
-public func erase(cref path: string): bool
-	-> new bool(!!__nanyc_io_file_erase(path.m_cstr, path.size.size));
+public func erase(cref path: string): bool {
+	return new bool(!!__nanyc_io_file_erase(path.m_cstr, path.size.size));
+}
 
 //! Truncate a file
-public func clear(cref path: string): bool
-	-> std.io.file.resize(path, 0u64);
+public func clear(cref path: string): bool {
+	return std.io.file.resize(path, 0u64);
+}
 
 //! Read the content of a file in memory
 public func read(cref path: string): ref string {
@@ -56,23 +62,30 @@ public func append(cref path: string, cref content: string): bool {
 	return new bool(r);
 }
 
-public func open(cref ro: string): ref std.io.File
-	-> new std.io.File(ro: ro);
+public func open(cref ro: string): ref std.io.File {
+	return new std.io.File(ro: ro);
+}
 
-public func open(cref rw: string): ref std.io.File
-	-> new std.io.File(rw: rw);
+public func open(cref rw: string): ref std.io.File {
+	return new std.io.File(rw: rw);
+}
 
-public func open(cref rw: string, truncate: bool): ref std.io.File
-	-> new std.io.File(rw: rw, truncate: truncate);
+public func open(cref rw: string, truncate: bool): ref std.io.File {
+	return new std.io.File(rw: rw, truncate: truncate);
+}
 
-public func open(cref rw: string, append: bool): ref std.io.File
-	-> new std.io.File(rw: rw, append: append);
+public func open(cref rw: string, append: bool): ref std.io.File {
+	return new std.io.File(rw: rw, append: append);
+}
 
-public func open(cref wo: string): ref std.io.File
-	-> new std.io.File(wo: wo);
+public func open(cref wo: string): ref std.io.File {
+	return new std.io.File(wo: wo);
+}
 
-public func open(cref wo: string, truncate: bool): ref std.io.File
-	-> new std.io.File(wo: wo, truncate: truncate);
+public func open(cref wo: string, truncate: bool): ref std.io.File {
+	return new std.io.File(wo: wo, truncate: truncate);
+}
 
-public func open(cref wo: string, append: bool): ref std.io.File
-	-> new std.io.File(wo: wo, append: append);
+public func open(cref wo: string, append: bool): ref std.io.File {
+	return new std.io.File(wo: wo, append: append);
+}

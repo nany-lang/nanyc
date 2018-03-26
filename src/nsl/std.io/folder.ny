@@ -6,8 +6,9 @@
 
 namespace std.io.folder;
 
-public func entries(cref path: string): ref Folder
-	-> new Folder(path);
+public func entries(cref path: string): ref Folder {
+	return new Folder(path);
+}
 
 /*!
 ** \brief Current working folder (CWD)
@@ -15,11 +16,13 @@ public func entries(cref path: string): ref Folder
 */
 var cwd -> {
 	get: new string(!!__nanyc_io_get_cwd),
-	set: setCurrentWorkingFolder(value) };
+	set: setCurrentWorkingFolder(value)
+};
 
 //! Get if a node exists and is a folder
-public func exists(cref path: string): bool
-	-> new bool(!!__nanyc_io_folder_exists(path.m_cstr, path.size.pod));
+public func exists(cref path: string): bool {
+	return new bool(!!__nanyc_io_folder_exists(path.m_cstr, path.size.pod));
+}
 
 //! Get if a folder is empty (no content)
 public func empty(cref path: string): bool {
@@ -29,8 +32,9 @@ public func empty(cref path: string): bool {
 }
 
 //! Create the folder (and sub folders) if it does not exist
-public func create(cref path: string): bool
-	-> new bool(!!__nanyc_io_folder_create(path.m_cstr, path.size.pod));
+public func create(cref path: string): bool {
+	return new bool(!!__nanyc_io_folder_create(path.m_cstr, path.size.pod));
+}
 
 //! Copy a folder and its content to another location
 //public func copy(cref path: string, cref to: string): bool
@@ -49,19 +53,22 @@ public func create(cref path: string): bool
 //	-> new bool(!!__nanyc_io_folder_move(path.pod, to.pod, __true));
 
 //! Remove the folder and its content
-public func erase(cref path: string): bool
-	-> new bool(!!__nanyc_io_folder_erase(path.m_cstr, path.size.pod));
+public func erase(cref path: string): bool {
+	return new bool(!!__nanyc_io_folder_erase(path.m_cstr, path.size.pod));
+}
 
 //! Remove the contents of the folder
-public func clear(cref path: string): bool
-	-> new bool(!!__nanyc_io_folder_clear(path.m_cstr, path.size.pod));
+public func clear(cref path: string): bool {
+	return new bool(!!__nanyc_io_folder_clear(path.m_cstr, path.size.pod));
+}
 
 /*!
 ** \brief Get the size (in bytes) of a folder
 ** \param path Absolute or relative path
 */
-public func size(cref path: string): u64
-	-> new u64(!!__nanyc_io_folder_size(path.m_cstr, path.size.pod));
+public func size(cref path: string): u64 {
+	return new u64(!!__nanyc_io_folder_size(path.m_cstr, path.size.pod));
+}
 
 public func read(cref path: string): ref string {
 	ref content = "";
