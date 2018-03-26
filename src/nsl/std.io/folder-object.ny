@@ -82,36 +82,6 @@ public class Folder {
 		-> makeViewFromFolder(filter, recursive: recursive, files: files, folders: folders);
 
 public:
-	class Element {
-		//! The path of the current element
-		var filename -> m_fullname;
-		//! Name of the current element
-		var name -> m_name;
-		//! The size in bytes of the current element (0 if not a file)
-		var size -> m_size;
-		//! Extension of the element
-		var extension -> std.io.path.extension(m_name);
-
-		//! Get if the element is a file
-		var isFile -> m_kind;
-		//! Get if the element is a folder
-		var isFolder -> not m_kind;
-
-	private:
-		func importFromIterator(p: __pointer) {
-			m_fullname.clear();
-			m_fullname.appendCString(!!__nanyc_io_folder_iterator_fullpath(p));
-			m_name.clear();
-			m_name.appendCString(!!__nanyc_io_folder_iterator_name(p));
-			m_size = new u64(!!__nanyc_io_folder_iterator_size(p));
-			m_kind = true;
-		}
-		var m_fullname = "";
-		var m_name = "";
-		var m_size = 0u64;
-		var m_kind = true; // TODO use appropriate enum here: true: file
-	}
-
 	func makeViewFromFolder(cref filter, recursive: bool, files: bool, folders: bool): ref {
 		ref m_parentFolder = self;
 		ref m_parentFilter = filter;
@@ -152,7 +122,7 @@ public:
 						-> m_element;
 
 					var m_iterator = null;
-					var m_element = new Element;
+					var m_element = new ViewEntry;
 				};
 			}
 
@@ -164,4 +134,34 @@ public:
 
 private:
 	var path = "";
+}
+
+public class ViewEntry {
+	//! The path of the current element
+	var filename -> m_fullname;
+	//! Name of the current element
+	var name -> m_name;
+	//! The size in bytes of the current element (0 if not a file)
+	var size -> m_size;
+	//! Extension of the element
+	var extension -> std.io.path.extension(m_name);
+
+	//! Get if the element is a file
+	var isFile -> m_kind;
+	//! Get if the element is a folder
+	var isFolder -> not m_kind;
+
+private:
+	func importFromIterator(p: __pointer) {
+		m_fullname.clear();
+		m_fullname.appendCString(!!__nanyc_io_folder_iterator_fullpath(p));
+		m_name.clear();
+		m_name.appendCString(!!__nanyc_io_folder_iterator_name(p));
+		m_size = new u64(!!__nanyc_io_folder_iterator_size(p));
+		m_kind = true;
+	}
+	var m_fullname = "";
+	var m_name = "";
+	var m_size = 0u64;
+	var m_kind = true; // TODO use appropriate enum here: true: file
 }
