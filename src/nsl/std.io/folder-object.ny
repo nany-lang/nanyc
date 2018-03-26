@@ -60,29 +60,29 @@ public class Folder {
 
 	//! Get a view on all files and folders of the path (not recursive)
 	view (ref filter)
-		-> makeViewFromFolder(filter, recursive: false, files: true, folders: true);
+		-> make_folder_view(filter, recursive: false, files: true, folders: true);
 
 	//! Get a view on all files and folders of the path (recursive)
 	view recursive(ref filter)
-		-> makeViewFromFolder(filter, recursive: true, files: true, folders: true);
+		-> make_folder_view(filter, recursive: true, files: true, folders: true);
 
 	view subfolders(ref filter)
-		-> makeViewFromFolder(filter, recursive: false, files: false, folders: true);
+		-> make_folder_view(filter, recursive: false, files: false, folders: true);
 
 	view subfolders(ref filter, recursive: bool)
-		-> makeViewFromFolder(filter, recursive: recursive, files: false, folders: true);
+		-> make_folder_view(filter, recursive: recursive, files: false, folders: true);
 
 	view files(ref filter)
-		-> makeViewFromFolder(filter, recursive: false, files: true, folders: false);
+		-> make_folder_view(filter, recursive: false, files: true, folders: false);
 
 	view files(ref filter, recursive: bool)
-		-> makeViewFromFolder(filter, recursive: recursive, files: true, folders: false);
+		-> make_folder_view(filter, recursive: recursive, files: true, folders: false);
 
 	view entries(ref filter, recursive: bool, files: bool, folders: bool)
-		-> makeViewFromFolder(filter, recursive: recursive, files: files, folders: folders);
+		-> make_folder_view(filter, recursive: recursive, files: files, folders: folders);
 
 public:
-	func makeViewFromFolder(cref filter, recursive: bool, files: bool, folders: bool): ref {
+	func make_folder_view(cref filter, recursive: bool, files: bool, folders: bool): ref {
 		ref m_parentFolder = self;
 		ref m_parentFilter = filter;
 		ref m_parentRecursive = recursive;
@@ -127,7 +127,7 @@ public:
 			}
 
 			view (filter): ref
-				-> m_parentFolder.makeViewFromFolder(func (cref i) -> m_parentFilter(i) and filter(i),
+				-> m_parentFolder.make_folder_view(func (cref i) -> m_parentFilter(i) and filter(i),
 					m_parentRecursive, m_parentFiles, m_parentFolders);
 		};
 	}
