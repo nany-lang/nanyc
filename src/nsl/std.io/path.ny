@@ -126,8 +126,8 @@ public func extension(cref path: string, withDot: bool): ref string {
 	if size != 0u then {
 		var offset = size - 1u;
 		var p = path.m_cstr + offset.pod;
-		var sep = '/'.asU8.pod;
-		var dot = '.'.asU8.pod;
+		var sep = '/'.as_u8.pod;
+		var dot = '.'.as_u8.pod;
 		do {
 			var r8 = !!load.u8(p);
 			if dot == r8 then {
@@ -158,8 +158,8 @@ public func has_extension(cref path: string): bool {
 	if size != 0u then {
 		var offset = size - 1u;
 		var p = path.m_cstr + offset.pod;
-		var sep = '/'.asU8.pod;
-		var dot = '.'.asU8.pod;
+		var sep = '/'.as_u8.pod;
+		var dot = '.'.as_u8.pod;
 		do {
 			var r8 = !!load.u8(p);
 			if dot == r8 then

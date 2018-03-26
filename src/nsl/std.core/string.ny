@@ -164,7 +164,7 @@ public class string {
 		var newsize = oldsize + 1__u32;
 		if m_capacity < newsize then
 			doGrow(newsize);
-		!!store.u8(m_cstr + oldsize, ascii.asU8.pod);
+		!!store.u8(m_cstr + oldsize, ascii.as_u8.pod);
 		m_size = newsize;
 	}
 
@@ -290,7 +290,7 @@ public class string {
 		var p = m_cstr;
 		if oldsize != 0__u32 then
 			std.memory.copyOverlap(p + 1__u32, p, 1__u64);
-		!!store.u8(p, ascii.asU8.pod);
+		!!store.u8(p, ascii.as_u8.pod);
 		m_size = newsize;
 	}
 
@@ -330,7 +330,7 @@ public class string {
 	func fill(cref ascii: std.Ascii) {
 		if m_size != 0__u32 then {
 			assert(m_cstr != null);
-			std.memory.fill(m_cstr, 0__u64 + m_size, ascii.asU8.pod);
+			std.memory.fill(m_cstr, 0__u64 + m_size, ascii.as_u8.pod);
 		}
 	}
 
@@ -482,7 +482,7 @@ public class string {
 			var p = m_cstr;
 			var ascii = new std.Ascii;
 			do {
-				ascii.asU8 = !!load.u8(p + i.pod);
+				ascii.as_u8 = !!load.u8(p + i.pod);
 				if not predicate(ascii) then {
 					if i != 0u then {
 						m_size = m_size - i.pod;
@@ -507,7 +507,7 @@ public class string {
 			var ascii = new std.Ascii;
 			do {
 				size -= 1u;
-				ascii.asU8 = !!load.u8(p + size.pod);
+				ascii.as_u8 = !!load.u8(p + size.pod);
 				if not predicate(ascii) then {
 					m_size = size.pod + 1__u32;
 					return;

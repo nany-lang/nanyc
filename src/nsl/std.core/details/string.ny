@@ -14,7 +14,7 @@ func isBlank(cref base): ref bool {
 		var p = base.m_cstr;
 		var ascii = new std.Ascii;
 		do {
-			ascii.asU8 = !!load.u8(p + i.pod);
+			ascii.as_u8 = !!load.u8(p + i.pod);
 			if not ascii.blank then
 				return false;
 			if (i += 1u) == size then
@@ -29,7 +29,7 @@ func contains(cref base, cref ascii: std.Ascii): ref bool {
 	if base.m_size != 0__u32 then {
 		var i = 0u;
 		var size = base.m_size;
-		var needle = ascii.asU8.pod;
+		var needle = ascii.as_u8.pod;
 		var p = base.m_cstr;
 		do {
 			if needle == !!load.u8(p + i.pod) then
@@ -64,7 +64,7 @@ func index(cref base, offset: u32, cref ascii: std.Ascii): u32 {
 	var size = base.m_size;
 	if offset < size then {
 		var p = base.m_cstr + offset.pod;
-		var needle = ascii.asU8.pod;
+		var needle = ascii.as_u8.pod;
 		do {
 			if needle == !!load.u8(p) then
 				return offset;
@@ -82,7 +82,7 @@ func index(cref base, offset: u32, ref predicate): u32 {
 		var p = base.m_cstr + offset.pod;
 		var ascii = new std.Ascii;
 		do {
-			ascii.asU8 = !!load.u8(p);
+			ascii.as_u8 = !!load.u8(p);
 			if predicate(ascii) then
 				return offset;
 			offset += 1u;
@@ -100,7 +100,7 @@ func lastIndex(cref base, offset: u32, cref ascii: std.Ascii): u32 {
 			offset = size - 1u;
 
 		var p = base.m_cstr + offset.pod;
-		var needle = ascii.asU8.pod;
+		var needle = ascii.as_u8.pod;
 		do {
 			if needle == !!load.u8(p) then
 				return offset;
@@ -119,7 +119,7 @@ func countUp(cref base, cref ascii: std.Ascii): u32 {
 	if base.m_size != 0__u32 then {
 		var i = 0u;
 		var size = base.m_size;
-		var needle = ascii.asU8.pod;
+		var needle = ascii.as_u8.pod;
 		do {
 			if needle == !!load.u8(base.m_cstr + i.pod) then
 				c += 1u;
@@ -187,7 +187,7 @@ func makeViewBytes(ref base, ref filter): ref {
 			ref accept = m_parentFilter;
 			return new class {
 				func findFirst: bool
-					-> (not origstr.empty) and (accept(origstr.at(0u).asU8) or next());
+					-> (not origstr.empty) and (accept(origstr.at(0u).as_u8) or next());
 
 				func next: bool {
 					do {
@@ -195,11 +195,11 @@ func makeViewBytes(ref base, ref filter): ref {
 						if not (m_index < origstr.size) then
 							return false;
 					}
-					while not accept(origstr.at(m_index).asU8);
+					while not accept(origstr.at(m_index).as_u8);
 					return true;
 				}
 
-				func get: ref -> origstr.at(m_index).asU8;
+				func get: ref -> origstr.at(m_index).as_u8;
 
 				var m_index = 0u;
 			};
