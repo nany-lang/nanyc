@@ -41,7 +41,7 @@ public func create(cref path: string): bool {
 //	-> new bool(!!__nanyc_io_folder_copy(path.pod, to.pod, __false));
 
 //! Copy the contents of a folder to another location
-//public func copyContents(cref path: string, cref to: string): bool
+//public func copy_contents(cref path: string, cref to: string): bool
 //	-> new bool(!!__nanyc_io_folder_copy(path.pod, to.pod, __true));
 
 //! Move a folder and its content to another location

@@ -36,8 +36,8 @@ public class Folder {
 		-> std.io.folder.copy(path, to);
 
 	//! Copy the contents of a folder to another location
-	func copyContents(cref to: string): bool
-		-> std.io.folder.copyContents(path, to);
+	func copy_contents(cref to: string): bool
+		-> std.io.folder.copy_contents(path, to);
 
 	//! Move a folder and its content to another location
 	func move(cref to: string): bool
