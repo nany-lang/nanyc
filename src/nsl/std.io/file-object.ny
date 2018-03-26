@@ -11,31 +11,31 @@ public class File {
 	operator new;
 
 	operator new(cref ro: string) {
-		doOpen(ro, __true, __false, __false, __false);
+		do_open(ro, __true, __false, __false, __false);
 	}
 
 	operator new(cref rw: string) {
-		doOpen(rw, __true, __true, __false, __false);
+		do_open(rw, __true, __true, __false, __false);
 	}
 
 	operator new(cref rw: string, truncate: bool) {
-		doOpen(rw, __true, __true, __false, truncate.pod);
+		do_open(rw, __true, __true, __false, truncate.pod);
 	}
 
 	operator new(cref rw: string, append: bool) {
-		doOpen(rw, __true, __true, append.pod, __false);
+		do_open(rw, __true, __true, append.pod, __false);
 	}
 
 	operator new(cref wo: string) {
-		doOpen(wo, __false, __true, __false, __false);
+		do_open(wo, __false, __true, __false, __false);
 	}
 
 	operator new(cref wo: string, truncate: bool) {
-		doOpen(wo, __false, __true, __false, truncate.pod);
+		do_open(wo, __false, __true, __false, truncate.pod);
 	}
 
 	operator new(cref wo: string, append: bool) {
-		doOpen(wo, __false, __true, append.pod, __false);
+		do_open(wo, __false, __true, append.pod, __false);
 	}
 
 	operator dispose {
@@ -44,25 +44,25 @@ public class File {
 	}
 
 	func open(cref ro: string): ref bool
-		-> doOpen(ro, __true, __false, __false, __false);
+		-> do_open(ro, __true, __false, __false, __false);
 
 	func open(cref rw: string): ref bool
-		-> doOpen(rw, __true, __true, __false, __false);
+		-> do_open(rw, __true, __true, __false, __false);
 
 	func open(cref rw: string, truncate: bool): ref bool
-		-> doOpen(rw, __true, __true, __false, truncate.pod);
+		-> do_open(rw, __true, __true, __false, truncate.pod);
 
 	func open(cref rw: string, append: bool): ref bool
-		-> doOpen(rw, __true, __true, append.pod, __false);
+		-> do_open(rw, __true, __true, append.pod, __false);
 
 	func open(cref wo: string): ref bool
-		-> doOpen(wo, __false, __true, __false, __false);
+		-> do_open(wo, __false, __true, __false, __false);
 
 	func open(cref wo: string, truncate: bool): ref bool
-		-> doOpen(wo, __true, __true, __false, truncate.pod);
+		-> do_open(wo, __true, __true, __false, truncate.pod);
 
 	func open(cref wo: string, append: bool): ref bool
-		-> doOpen(wo, __true, __true, append.pod, __false);
+		-> do_open(wo, __true, __true, append.pod, __false);
 
 	func close {
 		if m_fd != null then {
@@ -178,7 +178,7 @@ public class File {
 	}
 
 private:
-	func doOpen(cref filename: string, readm: __bool, writem: __bool, appendm: __bool, truncatem: __bool): ref bool {
+	func do_open(cref filename: string, readm: __bool, writem: __bool, appendm: __bool, truncatem: __bool): ref bool {
 		// close the file first
 		if m_fd != null then
 			!!__nanyc_io_file_close(m_fd);
