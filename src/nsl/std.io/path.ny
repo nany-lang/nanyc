@@ -6,7 +6,6 @@
 
 namespace std.io.path;
 
-
 //! Make the path absolute and normalize it
 public func canonicalize(cref path: string): ref string
 	-> normalize(absolute(path));
@@ -35,20 +34,16 @@ public func is_absolute(cref path: string): bool
 public func is_relative(cref path: string): bool
 	-> path.first != '/';
 
-
 //! Simplifies a pth by removing all navigation elements
 public func normalize(cref path: string): ref string {
 	// if the input path is 1 ascii long, nothing really to
 	// (it can be empty or '/' or '.' or whatever)
 	if path.size <= 1u then
 		return new string(path);
-
 	ref np = new string;
 	var pathWasAbsolute = (path.at(0u) == '/');
-
 	if pathWasAbsolute then
 		np += '/';
-
 	for part in path:split('/') do {
 		if part.size == 0u then {
 			// multiple slashes - like './'
@@ -104,7 +99,6 @@ public func normalize(cref path: string): ref string {
 		else
 			np << part << '/';
 	}
-
 	if not np.empty then {
 		if np.size != 1u and np.last == '/' then
 			np.removeLastAscii();
@@ -141,7 +135,6 @@ public func extension(cref path: string, withDot: bool): ref string {
 			}
 			if sep == r8 then
 				return ext;
-
 			if offset == 0u then
 				return ext; // break
 			offset -= 1u;
@@ -166,7 +159,6 @@ public func hasExtension(cref path: string): bool {
 				return true;
 			if sep == r8 then
 				return false;
-
 			if offset == 0u then
 				return false; // break
 			offset -= 1u;

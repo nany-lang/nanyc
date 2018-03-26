@@ -6,7 +6,6 @@
 
 namespace std.io;
 
-
 public class Folder {
 	operator new;
 	operator new(self cref path: string);
@@ -59,7 +58,6 @@ public class Folder {
 	func read: ref string
 		-> std.io.folder.read(path);
 
-
 	//! Get a view on all files and folders of the path (not recursive)
 	view (ref filter)
 		-> makeViewFromFolder(filter, recursive: false, files: true, folders: true);
@@ -82,7 +80,6 @@ public class Folder {
 
 	view entries(ref filter, recursive: bool, files: bool, folders: bool)
 		-> makeViewFromFolder(filter, recursive: recursive, files: files, folders: folders);
-
 
 public:
 	class Element {
@@ -109,7 +106,6 @@ public:
 			m_size = new u64(!!__nanyc_io_folder_iterator_size(p));
 			m_kind = true;
 		}
-
 		var m_fullname = "";
 		var m_name = "";
 		var m_size = 0u64;

@@ -6,7 +6,6 @@
 
 namespace std.io.file;
 
-
 //! Get if a node exists and is a file
 public func exists(cref path: string): bool
 	-> new bool(!!__nanyc_io_file_exists(path.m_cstr, path.size.pod));

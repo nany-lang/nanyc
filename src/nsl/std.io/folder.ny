@@ -6,7 +6,6 @@
 
 namespace std.io.folder;
 
-
 public func entries(cref path: string): ref Folder
 	-> new Folder(path);
 

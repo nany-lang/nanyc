@@ -6,7 +6,6 @@
 
 namespace std.io;
 
-
 /*!
 ** \brief Try to mount a local folder
 **

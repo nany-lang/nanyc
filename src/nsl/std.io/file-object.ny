@@ -127,7 +127,6 @@ public class File {
 			var numread = read(str.m_cstr + offset, 0__u64 + chunk.pod);
 			if numread == 0__u64 then
 				return str;
-
 			str.resize(offset + !!__reinterpret(numread, #[__nanyc_synthetic] __u32));
 			var linefeed = str.index(offset, '\n');
 			if linefeed < str.size then
@@ -142,14 +141,12 @@ public class File {
 				!!__nanyc_io_file_seek(m_fd, cursor);
 				return str;
 			}
-
 			offset = offset + chunk.pod;
 			capacity += chunk;
 		}
 		while capacity < limit;
 		return str;
 	}
-
 
 	func write(buffer: __pointer, size: __u32): __u32 {
 		return if m_fd != null
@@ -159,7 +156,6 @@ public class File {
 
 	func write(cref str: string): u32
 		-> new u32(str.m_cstr, str.size.pod);
-
 
 	view (cref filter)
 		-> makeViewLineByLine(filter, 256u, 2u * 1024u * 1024u * 1024u);
@@ -173,19 +169,16 @@ public class File {
 	view lines(cref filter, chunk: u32, limit: u32)
 		-> makeViewLineByLine(filter, chunk, limit);
 
-
 	operator += (cref str: string): ref File {
 		write(str);
 		return self;
 	}
-
 
 private:
 	func doOpen(cref filename: string, readm: __bool, writem: __bool, appendm: __bool, truncatem: __bool): ref bool {
 		// close the file first
 		if m_fd != null then
 			!!__nanyc_io_file_close(m_fd);
-
 		if not filename.empty then {
 			var fd = !!__nanyc_io_file_open(filename.m_cstr, filename.size.pod, readm, writem, appendm, truncatem);
 			m_fd = fd;

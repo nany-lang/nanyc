@@ -20,9 +20,6 @@ public func assert(expr: cref bool);
 #[__nanyc_builtinalias: assert, nosuggest]
 public func assert(expr: __bool);
 
-
-
-
 //! Print a string to stdout
 public func print(cref text: string) {
 	if not text.empty then
@@ -34,7 +31,6 @@ public func print(cref value) {
 	print((new string) << value);
 }
 
-
 //! Print a string to stderr
 public func printerr(cref text: string) {
 	if not text.empty then
@@ -45,7 +41,6 @@ public func printerr(cref text: string) {
 public func printerr(cref value) {
 	printerr((new string) << value);
 }
-
 
 public operator + (cref lhs, cref rhs): any
 	-> (new typeof(lhs) (lhs)) += rhs;
