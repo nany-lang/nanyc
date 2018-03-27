@@ -348,6 +348,9 @@ public class string {
 	func contains(cref ascii: std.Ascii): bool
 		-> std.details.string.contains(self, ascii);
 
+	func contains(cref needle: string): bool
+		-> std.details.string.index(self, 0u, needle) < m_size;
+
 	func index(cref ascii: std.Ascii): u32
 		-> std.details.string.index(self, 0u, ascii);
 
