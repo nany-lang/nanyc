@@ -143,12 +143,6 @@ func ends_with(cref base, cref suffix: string): bool {
 func left(cref base, bytes: u32): ref
 	-> if bytes.pod < m_size then new string(self, bytes) else new string();
 
-func make_trimmed(cref base): ref {
-	var newstr = new typeof(base)(base);
-	newstr.trim();
-	return newstr;
-}
-
 func make_view_ascii(ref base, ref filter): ref {
 	ref m_parentString = base;
 	ref m_parentFilter = filter;
