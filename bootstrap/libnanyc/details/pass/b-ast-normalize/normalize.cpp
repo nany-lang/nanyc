@@ -383,7 +383,7 @@ bool ASTReplicator::generateErrorFromErrorNode(const AST::Node& node) {
 		msg << AnyString{node.text, 0, 64} << "...";
 	else
 		msg << node.text;
-	msg << '"';
+	msg << "\" (offset: " << node.offset << ')';
 	return false;
 }
 
