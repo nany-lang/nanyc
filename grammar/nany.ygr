@@ -15,7 +15,7 @@ wp: hidden
 	[ \t\n\r]* ((tk-comment-line | tk-comment-block) [ \t\n\r]*)*
 
 punc: hidden
-	[!"#$%&'()*+,\\-./:;<=>?@[\]^_`{|}~]
+	[!"#$%&'()*+,\\-./:;<=>?@[\]^`{|}~]
 
 sp: notext, hidden
 	([ \t\r\n] | punc^) wp
