@@ -150,10 +150,10 @@ public class File {
 		return str;
 	}
 
-	func write(buffer: __pointer, size: __u32): __u32 {
+	func write(buffer: __pointer, size: __u32): u32 {
 		return if m_fd != null
-			then !!__nanyc_io_file_write(m_fd, buffer, size)
-			else 0__u32;
+			then new u32(!!__nanyc_io_file_write(m_fd, buffer, size))
+			else 0u32;
 	}
 
 	func write(cref str: string): u32
