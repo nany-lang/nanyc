@@ -156,8 +156,9 @@ public class File {
 			else 0u32;
 	}
 
-	func write(cref str: string): u32
-		-> new u32(str.m_cstr, str.size.pod);
+	func write(cref str: string): u32 {
+		return write(str.m_cstr, str.size.pod);
+	}
 
 	view (cref filter)
 		-> make_view_linebyline(filter, 256u, 2u * 1024u * 1024u * 1024u);
