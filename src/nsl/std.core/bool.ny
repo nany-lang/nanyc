@@ -16,6 +16,7 @@ class bool
 	operator new;
 	operator new(self pod: __bool) {}
 
+private:
 	var pod: __bool = __false;
 }
 
