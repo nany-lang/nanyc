@@ -380,7 +380,7 @@ bool ASTReplicator::generateErrorFromErrorNode(const AST::Node& node) {
 	auto msg = (report.error() << "parse error: ");
 	msg << '"';
 	if (node.text.size() > 43)
-		msg << AnyString{node.text, 40} << "...";
+		msg << AnyString{node.text, 0, 40} << "...";
 	else
 		msg << node.text;
 	msg << '"';
