@@ -459,28 +459,32 @@ public class string {
 	}
 
 	//! Remove whitespace from both sides of the string
-	func trim {
-		return trim(func (cref ascii) -> ascii.blank);
+	func trim: ref string {
+		trim(func (cref ascii) -> ascii.blank);
+		return self;
 	}
 
 	//! Remove all ascii matching the predicate from both sides of the string
-	func trim(cref predicate) {
+	func trim(cref predicate): ref string {
 		trim_right(predicate);
 		trim_left(predicate);
+		return self;
 	}
 
 	//! Remove whitespace from the right side of the string
-	func trim_right {
+	func trim_right: ref string {
 		trim_right(func (cref ascii) -> ascii.blank);
+		return self;
 	}
 
 	//! Remove whitespace from the left side of the string
-	func trim_left {
-		return trim_left(func (cref ascii) -> ascii.blank);
+	func trim_left: ref string {
+		trim_left(func (cref ascii) -> ascii.blank);
+		return self;
 	}
 
 	//! Remove all ascii matching the predicate from the left side of the string
-	func trim_left(cref predicate) {
+	func trim_left(cref predicate): ref string {
 		var size = new u32(m_size);
 		if size != 0u32 then {
 			var i = 0u32;
@@ -493,19 +497,20 @@ public class string {
 						m_size = m_size - i.pod;
 						std.memory.copyOverlap(m_cstr, m_cstr + i.pod, 0__u64 + m_size);
 					}
-					return;
+					return self;
 				}
 				if (i += 1u) == size then {
 					m_size = 0__u32;
-					return;
+					return self;
 				}
 			}
 			while __true;
 		}
+		return self;
 	}
 
 	//! Remove all ascii matching the predicate from the right side of the string
-	func trim_right(cref predicate) {
+	func trim_right(cref predicate): ref string {
 		var size = new u32(m_size);
 		if size != 0u32 then {
 			var p = m_cstr;
@@ -515,15 +520,16 @@ public class string {
 				ascii.as_u8 = !!load.u8(p + size.pod);
 				if not predicate(ascii) then {
 					m_size = size.pod + 1__u32;
-					return;
+					return self;
 				}
 				if size == 0u32 then {
 					m_size = 0__u32;
-					return;
+					return self;
 				}
 			}
 			while __true;
 		}
+		return self;
 	}
 
 	/*!
