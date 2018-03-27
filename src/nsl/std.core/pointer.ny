@@ -32,7 +32,7 @@ class pointer<:T:> {
 	}
 
 	//! Get if the pointer is null
-	func isNull: bool {
+	func is_null: bool {
 		return new bool(m_ptr == null);
 	}
 
