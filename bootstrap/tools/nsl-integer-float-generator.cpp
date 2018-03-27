@@ -41,7 +41,7 @@ void writeFile(const AnyString& filename, AnyString content) {
 
 void addFuncAs(Clob& o) {
 	o << "\tfunc as<:T:>: ref {\n";
-	o << "\t\treturn new T(!!as(#[__nanyc_synthetic] typeof(std.asBuiltin(new T)), pod));\n";
+	o << "\t\treturn new T(!!as(#[__nanyc_synthetic] typeof(std.as_builtin(new T)), pod));\n";
 	o << "\t}\n\n";
 }
 

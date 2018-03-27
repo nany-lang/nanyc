@@ -21,7 +21,7 @@ public class f32 {
 	#[nosuggest] operator new(self pod: __f32);
 
 	func as<:T:>: ref {
-		return new T(!!as(#[__nanyc_synthetic] typeof(std.asBuiltin(new T)), pod));
+		return new T(!!as(#[__nanyc_synthetic] typeof(std.as_builtin(new T)), pod));
 	}
 
 	operator ++self: ref f32 {
