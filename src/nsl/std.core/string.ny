@@ -462,13 +462,13 @@ public class string {
 
 	//! Remove all ascii matching the predicate from both sides of the string
 	func trim(cref predicate) {
-		trimRight(predicate);
+		trim_right(predicate);
 		trimLeft(predicate);
 	}
 
 	//! Remove whitespace from the right side of the string
-	func trimRight
-		-> trimRight(func (cref ascii) -> ascii.blank);
+	func trim_right
+		-> trim_right(func (cref ascii) -> ascii.blank);
 
 	//! Remove whitespace from the left side of the string
 	func trimLeft
@@ -500,7 +500,7 @@ public class string {
 	}
 
 	//! Remove all ascii matching the predicate from the right side of the string
-	func trimRight(cref predicate) {
+	func trim_right(cref predicate) {
 		var size = new u32(m_size);
 		if size != 0u32 then {
 			var p = m_cstr;
