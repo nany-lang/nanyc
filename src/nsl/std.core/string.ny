@@ -546,45 +546,45 @@ public class string {
 	** \TODO UTF8 support (UTF8cpp?)
 	*/
 	view (ref filter): ref
-		-> std.details.string.makeViewAscii(self, filter);
+		-> std.details.string.make_view_ascii(self, filter);
 
 	//! View on each ascii
 	view ascii(ref filter): ref
-		-> std.details.string.makeViewAscii(self, filter);
+		-> std.details.string.make_view_ascii(self, filter);
 
 	//! View on each ascii as u8
 	view bytes(ref filter): ref
-		-> std.details.string.makeViewBytes(self, filter);
+		-> std.details.string.make_view_bytes(self, filter);
 
 	//! Split the string
 	view split(ref filter): ref
-		-> std.details.string.makeViewSplit(self, filter, 1u, func (cref ascii) -> ascii.blank);
+		-> std.details.string.make_view_split(self, filter, 1u, func (cref ascii) -> ascii.blank);
 
 	//! Split the string
 	view split(ref filter, cref separator: std.Ascii): ref {
 		ref sep = separator;
-		return std.details.string.makeViewSplit(self, filter, 1u, func (cref ascii) -> ascii == sep);
+		return std.details.string.make_view_split(self, filter, 1u, func (cref ascii) -> ascii == sep);
 	}
 
 	//! Split the string
 	view split(ref filter, ref pattern: string): ref
-		-> std.details.string.makeViewSplit(self, filter, pattern.size, pattern);
+		-> std.details.string.make_view_split(self, filter, pattern.size, pattern);
 
 	//! Split the string
 	view split(ref filter, ref predicate): ref
-		-> std.details.string.makeViewSplit(self, filter, 1u, predicate);
+		-> std.details.string.make_view_split(self, filter, 1u, predicate);
 
 	//! Split the string
 	view lines(ref filter): ref
-		-> std.details.string.makeViewSplitByLines(self, filter);
+		-> std.details.string.make_view_split_by_line(self, filter);
 
 	//! Find occurences
 	view index(ref filter, cref pattern): ref
-		-> std.details.string.makeViewIndex(filter, 0u, pattern);
+		-> std.details.string.make_view_index(filter, 0u, pattern);
 
 	//! Find occurences
 	view index(ref filter, offset: u32, cref pattern): ref
-		-> std.details.string.makeViewIndex(filter, offset, pattern);
+		-> std.details.string.make_view_index(filter, offset, pattern);
 
 	/*!
 	** \brief Extend the string by appending a value (see 'append')

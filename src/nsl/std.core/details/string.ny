@@ -149,7 +149,7 @@ func make_trimmed(cref base): ref {
 	return newstr;
 }
 
-func makeViewAscii(ref base, ref filter): ref {
+func make_view_ascii(ref base, ref filter): ref {
 	ref m_parentString = base;
 	ref m_parentFilter = filter;
 	return new class {
@@ -178,7 +178,7 @@ func makeViewAscii(ref base, ref filter): ref {
 	};
 }
 
-func makeViewBytes(ref base, ref filter): ref {
+func make_view_bytes(ref base, ref filter): ref {
 	ref m_parentString = base;
 	ref m_parentFilter = filter;
 	return new class {
@@ -207,7 +207,7 @@ func makeViewBytes(ref base, ref filter): ref {
 	};
 }
 
-func makeViewSplit(ref base, ref filter, separatorLength: u32, ref predicate): ref {
+func make_view_split(ref base, ref filter, separatorLength: u32, ref predicate): ref {
 	ref m_parentString = base;
 	ref m_parentFilter = filter;
 	ref m_parentPredicate = predicate;
@@ -248,7 +248,7 @@ func makeViewSplit(ref base, ref filter, separatorLength: u32, ref predicate): r
 	};
 }
 
-func makeViewSplitByLines(ref base, ref filter): ref {
+func make_view_split_by_line(ref base, ref filter): ref {
 	ref m_parentString = base;
 	ref m_parentFilter = filter;
 	return new class {
@@ -287,7 +287,7 @@ func makeViewSplitByLines(ref base, ref filter): ref {
 	};
 }
 
-func makeViewIndex(ref base, ref filter, offset: u32, ref pattern): ref {
+func make_view_index(ref base, ref filter, offset: u32, ref pattern): ref {
 	ref m_parentString = base;
 	ref m_parentFilter = filter;
 	ref m_parentPattern = pattern;
