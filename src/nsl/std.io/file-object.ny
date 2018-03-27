@@ -140,7 +140,6 @@ public class File {
 				// TODO fix signed / unsigned convertions...
 				var oldcursor = !!__nanyc_io_file_tell(m_fd);
 				var cursor = !!__nanyc_io_file_tell(m_fd) - numread + linefeed.pod + 1__u32;
-				print("... reposition: str: \(str.size), from \(oldcursor) to \(cursor)\n");
 				!!__nanyc_io_file_seek(m_fd, cursor);
 				return str;
 			}
