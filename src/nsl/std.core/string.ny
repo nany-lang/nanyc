@@ -107,16 +107,16 @@ public class string {
 	//! Increase the capacity of the container if necessary
 	func reserve(bytes: u32) {
 		if m_capacity < bytes.pod then
-			doGrow(bytes.pod);
+			do_grow(bytes.pod);
 	}
 
 	#[nosuggest] func reserve(bytes: __u32) {
 		if m_capacity < bytes then
-			doGrow(bytes);
+			do_grow(bytes);
 	}
 
 	func squeeze
-		-> doSqueeze();
+		-> do_squeeze();
 
 	//! Assign a new value to the string
 	func assign(cref text) {
@@ -148,7 +148,7 @@ public class string {
 			var oldsize = m_size;
 			var newsize = oldsize + size;
 			if m_capacity < newsize then
-				doGrow(newsize);
+				do_grow(newsize);
 			std.memory.copy(m_cstr + oldsize, str, 0__u64 + size);
 			m_size = newsize;
 		}
@@ -163,7 +163,7 @@ public class string {
 		var oldsize = m_size;
 		var newsize = oldsize + 1__u32;
 		if m_capacity < newsize then
-			doGrow(newsize);
+			do_grow(newsize);
 		!!store.u8(m_cstr + oldsize, ascii.as_u8.pod);
 		m_size = newsize;
 	}
@@ -208,7 +208,7 @@ public class string {
 	#[nosuggest] func append(n: __pointer) {
 		if n != null then {
 			if m_capacity < m_size + 64__u32 then
-				doGrow(m_size + 64__u32);
+				do_grow(m_size + 64__u32);
 			m_size = m_size + !!__nanyc.string.append.ptr(m_cstr + m_size, n);
 		}
 		else
@@ -216,52 +216,52 @@ public class string {
 	}
 
 	#[nosuggest] func append(n: __i8) {
-		if m_capacity < m_size + 64__u32 then doGrow(m_size + 64__u32);
+		if m_capacity < m_size + 64__u32 then do_grow(m_size + 64__u32);
 		m_size = m_size + !!__nanyc.string.append.i8(m_cstr + m_size, n);
 	}
 
 	#[nosuggest] func append(n: __i16) {
-		if m_capacity < m_size + 64__u32 then doGrow(m_size + 64__u32);
+		if m_capacity < m_size + 64__u32 then do_grow(m_size + 64__u32);
 		m_size = m_size + !!__nanyc.string.append.i16(m_cstr + m_size, n);
 	}
 
 	#[nosuggest] func append(n: __i32) {
-		if m_capacity < m_size + 64__u32 then doGrow(m_size + 64__u32);
+		if m_capacity < m_size + 64__u32 then do_grow(m_size + 64__u32);
 		m_size = m_size + !!__nanyc.string.append.i32(m_cstr + m_size, n);
 	}
 
 	#[nosuggest] func append(n: __i64) {
-		if m_capacity < m_size + 64__u32 then doGrow(m_size + 64__u32);
+		if m_capacity < m_size + 64__u32 then do_grow(m_size + 64__u32);
 		m_size = m_size + !!__nanyc.string.append.i64(m_cstr + m_size, n);
 	}
 
 	#[nosuggest] func append(n: __u8) {
-		if m_capacity < m_size + 64__u32 then doGrow(m_size + 64__u32);
+		if m_capacity < m_size + 64__u32 then do_grow(m_size + 64__u32);
 		m_size = m_size + !!__nanyc.string.append.u8(m_cstr + m_size, n);
 	}
 
 	#[nosuggest] func append(n: __u16) {
-		if m_capacity < m_size + 64__u32 then doGrow(m_size + 64__u32);
+		if m_capacity < m_size + 64__u32 then do_grow(m_size + 64__u32);
 		m_size = m_size + !!__nanyc.string.append.u16(m_cstr + m_size, n);
 	}
 
 	#[nosuggest] func append(n: __u32) {
-		if m_capacity < m_size + 64__u32 then doGrow(m_size + 64__u32);
+		if m_capacity < m_size + 64__u32 then do_grow(m_size + 64__u32);
 		m_size = m_size + !!__nanyc.string.append.u32(m_cstr + m_size, n);
 	}
 
 	#[nosuggest] func append(n: __u64) {
-		if m_capacity < m_size + 64__u32 then doGrow(m_size + 64__u32);
+		if m_capacity < m_size + 64__u32 then do_grow(m_size + 64__u32);
 		m_size = m_size + !!__nanyc.string.append.u64(m_cstr + m_size, n);
 	}
 
 	#[nosuggest] func append(n: __f32) {
-		if m_capacity < m_size + 64__u32 then doGrow(m_size + 64__u32);
+		if m_capacity < m_size + 64__u32 then do_grow(m_size + 64__u32);
 		m_size = m_size + !!__nanyc.string.append.f32(m_cstr + m_size, n);
 	}
 
 	#[nosuggest] func append(n: __f64) {
-		if m_capacity < m_size + 64__u32 then doGrow(m_size + 64__u32);
+		if m_capacity < m_size + 64__u32 then do_grow(m_size + 64__u32);
 		m_size = m_size + !!__nanyc.string.append.f64(m_cstr + m_size, n);
 	}
 
@@ -285,7 +285,7 @@ public class string {
 		var oldsize = m_size;
 		var newsize = oldsize + 1__u32;
 		if m_capacity < newsize then
-			doGrow(newsize);
+			do_grow(newsize);
 
 		var p = m_cstr;
 		if oldsize != 0__u32 then
@@ -314,7 +314,7 @@ public class string {
 			if offset < oldsize then {
 				var newsize = oldsize + size;
 				if m_capacity < newsize then
-					doGrow(newsize);
+					do_grow(newsize);
 
 				var p = m_cstr + offset;
 				std.memory.copyOverlap(dst: p + size, src: p, size: 0__u64 + (oldsize - offset));
@@ -631,7 +631,7 @@ public class string {
 
 private:
 	//! Increase the inner storage
-	func doGrow(newsize: __u32) {
+	func do_grow(newsize: __u32) {
 		var oldcapa = new u32(m_capacity);
 		var newcapa = oldcapa;
 		do {
@@ -644,7 +644,7 @@ private:
 		m_cstr = std.memory.reallocate(m_cstr, 0u64 + oldcapa, 0u64 + newcapa);
 	}
 
-	func doSqueeze {
+	func do_squeeze {
 		if m_size == 0__u32 then {
 			std.memory.dispose(m_cstr, 0__u64 + m_capacity);
 			m_capacity = 0__u32;
