@@ -526,7 +526,7 @@ public class string {
 	** \see blank
 	*/
 	var trimmed
-		-> std.details.string.makeTrimmed(self);
+		-> std.details.string.make_trimmed(self);
 
 	//! Get the ascii at offset 'i' (without any check)
 	func at(cref i: u32): ref std.Ascii {
