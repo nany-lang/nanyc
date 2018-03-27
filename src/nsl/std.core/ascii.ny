@@ -49,11 +49,11 @@ class Ascii {
 		-> new bool(m_value == 32__u8);
 
 	//! Get if the ascii is a lower case letter
-	var lower
+	var lowercase_alpha
 		-> new bool(m_value >= 97__u8 and m_value <= 122__u8);
 
 	//! Get if the ascii is an upper case letter
-	var upper
+	var uppercase_alpha
 		-> new bool(m_value >= 65__u8 and m_value <= 90__u8);
 
 	//! Get if the ascii is a letter (lower case or upper case)
