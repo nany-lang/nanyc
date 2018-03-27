@@ -439,12 +439,14 @@ public class string {
 	}
 
 	//! Get a new string with the first N characters
-	func left(bytes: u32): ref string
-		-> std.details.string.left(self, bytes);
+	func left(bytes: u32): ref string {
+		return std.details.string.left(self, bytes);
+	}
 
 	//! Get the Nth part of the string
-	func part(index: u32): ref string
-		-> part(index, func (cref ascii) -> ascii.blank);
+	func part(index: u32): ref string {
+		return part(index, func (cref ascii) -> ascii.blank);
+	}
 
 	//! Get the Nth part of the string
 	func part(index: u32, cref separator): ref string {
@@ -457,8 +459,9 @@ public class string {
 	}
 
 	//! Remove whitespace from both sides of the string
-	func trim
-		-> trim(func (cref ascii) -> ascii.blank);
+	func trim {
+		return trim(func (cref ascii) -> ascii.blank);
+	}
 
 	//! Remove all ascii matching the predicate from both sides of the string
 	func trim(cref predicate) {
@@ -467,12 +470,14 @@ public class string {
 	}
 
 	//! Remove whitespace from the right side of the string
-	func trim_right
-		-> trim_right(func (cref ascii) -> ascii.blank);
+	func trim_right {
+		trim_right(func (cref ascii) -> ascii.blank);
+	}
 
 	//! Remove whitespace from the left side of the string
-	func trim_left
-		-> trim_left(func (cref ascii) -> ascii.blank);
+	func trim_left {
+		return trim_left(func (cref ascii) -> ascii.blank);
+	}
 
 	//! Remove all ascii matching the predicate from the left side of the string
 	func trim_left(cref predicate) {
@@ -545,20 +550,24 @@ public class string {
 	** \brief View on each UTF8 character
 	** \TODO UTF8 support (UTF8cpp?)
 	*/
-	view (ref filter): ref
-		-> std.details.string.make_view_ascii(self, filter);
+	view (ref filter): ref {
+		return std.details.string.make_view_ascii(self, filter);
+	}
 
 	//! View on each ascii
-	view ascii(ref filter): ref
-		-> std.details.string.make_view_ascii(self, filter);
+	view ascii(ref filter): ref {
+		return std.details.string.make_view_ascii(self, filter);
+	}
 
 	//! View on each ascii as u8
-	view bytes(ref filter): ref
-		-> std.details.string.make_view_bytes(self, filter);
+	view bytes(ref filter): ref {
+		return std.details.string.make_view_bytes(self, filter);
+	}
 
 	//! Split the string with blanks as separator
-	view split_by_blanks(ref filter): ref
-		-> std.details.string.make_view_split(self, filter, 1u, func (cref ascii) -> ascii.blank);
+	view split_by_blanks(ref filter): ref {
+		return std.details.string.make_view_split(self, filter, 1u, func (cref ascii) -> ascii.blank);
+	}
 
 	//! Split the string
 	view split_by(ref filter, cref separator: std.Ascii): ref {
@@ -567,24 +576,29 @@ public class string {
 	}
 
 	//! Split the string
-	view split_by(ref filter, ref pattern: string): ref
-		-> std.details.string.make_view_split(self, filter, pattern.size, pattern);
+	view split_by(ref filter, ref pattern: string): ref {
+		return std.details.string.make_view_split(self, filter, pattern.size, pattern);
+	}
 
 	//! Split the string
-	view split_by(ref filter, ref predicate): ref
-		-> std.details.string.make_view_split(self, filter, 1u, predicate);
+	view split_by(ref filter, ref predicate): ref {
+		return std.details.string.make_view_split(self, filter, 1u, predicate);
+	}
 
 	//! Split the string
-	view split_by_lines(ref filter): ref
-		-> std.details.string.make_view_split_by_line(self, filter);
+	view split_by_lines(ref filter): ref {
+		return std.details.string.make_view_split_by_line(self, filter);
+	}
 
 	//! Find occurences
-	view index(ref filter, cref pattern): ref
-		-> std.details.string.make_view_index(filter, 0u, pattern);
+	view index(ref filter, cref pattern): ref {
+		return std.details.string.make_view_index(filter, 0u, pattern);
+	}
 
 	//! Find occurences
-	view index(ref filter, offset: u32, cref pattern): ref
-		-> std.details.string.make_view_index(filter, offset, pattern);
+	view index(ref filter, offset: u32, cref pattern): ref {
+		return std.details.string.make_view_index(filter, offset, pattern);
+	}
 
 	/*!
 	** \brief Extend the string by appending a value (see 'append')
@@ -598,8 +612,9 @@ public class string {
 	/*!
 	** \brief Get the ascii at offset 'i' ('\0' if 'i' is out of bound)
 	*/
-	operator [] (cref i: u32)
-		-> new std.Ascii(if i < m_size then !!load.u8(m_cstr + i.pod) else 0__u8);
+	operator [] (cref i: u32): std.Ascii {
+		return new std.Ascii(if i < m_size then !!load.u8(m_cstr + i.pod) else 0__u8);
+	}
 
 
 private:
