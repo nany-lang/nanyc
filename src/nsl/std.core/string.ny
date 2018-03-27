@@ -380,8 +380,8 @@ public class string {
 		-> new u32(m_size);
 
 	//! Determines whether the string begins with the characters of another string
-	func startsWith(cref prefix: string): bool
-		-> std.details.string.startsWith(self, prefix);
+	func starts_with(cref prefix: string): bool
+		-> std.details.string.starts_with(self, prefix);
 
 	//! Determines whether the string ends with the characters of another string
 	func endsWith(cref suffix: string): bool

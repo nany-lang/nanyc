@@ -129,7 +129,7 @@ func countUp(cref base, cref ascii: std.Ascii): u32 {
 	return c;
 }
 
-func startsWith(cref base, cref prefix: string): ref bool {
+func starts_with(cref base, cref prefix: string): ref bool {
 	return (base.m_size != 0__u32 and prefix.m_size <= base.m_size)
 		and std.memory.equals(base.m_cstr, prefix.m_cstr, 0__u64 + prefix.m_size);
 }
