@@ -50,7 +50,7 @@ public func normalize(cref path: string): ref string {
 	var pathWasAbsolute = (path.at(0u) == '/');
 	if pathWasAbsolute then
 		np += '/';
-	for part in path:split('/') do {
+	for part in path:split_by('/') do {
 		if part.size == 0u then {
 			// multiple slashes - like './'
 		}

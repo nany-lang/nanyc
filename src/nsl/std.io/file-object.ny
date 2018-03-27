@@ -163,13 +163,13 @@ public class File {
 	view (cref filter)
 		-> make_view_linebyline(filter, 256u, 2u * 1024u * 1024u * 1024u);
 
-	view lines(cref filter)
+	view split_by_lines(cref filter)
 		-> make_view_linebyline(filter, 256u, 2u * 1024u * 1024u * 1024u);
 
-	view lines(cref filter, chunk: u32)
+	view split_by_lines(cref filter, chunk: u32)
 		-> make_view_linebyline(filter, chunk, 2u * 1024u * 1024u * 1024u);
 
-	view lines(cref filter, chunk: u32, limit: u32)
+	view split_by_lines(cref filter, chunk: u32, limit: u32)
 		-> make_view_linebyline(filter, chunk, limit);
 
 	operator += (cref str: string): ref File {

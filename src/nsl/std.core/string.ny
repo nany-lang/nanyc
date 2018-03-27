@@ -556,26 +556,26 @@ public class string {
 	view bytes(ref filter): ref
 		-> std.details.string.make_view_bytes(self, filter);
 
-	//! Split the string
-	view split(ref filter): ref
+	//! Split the string with blanks as separator
+	view split_by_blanks(ref filter): ref
 		-> std.details.string.make_view_split(self, filter, 1u, func (cref ascii) -> ascii.blank);
 
 	//! Split the string
-	view split(ref filter, cref separator: std.Ascii): ref {
+	view split_by(ref filter, cref separator: std.Ascii): ref {
 		ref sep = separator;
 		return std.details.string.make_view_split(self, filter, 1u, func (cref ascii) -> ascii == sep);
 	}
 
 	//! Split the string
-	view split(ref filter, ref pattern: string): ref
+	view split_by(ref filter, ref pattern: string): ref
 		-> std.details.string.make_view_split(self, filter, pattern.size, pattern);
 
 	//! Split the string
-	view split(ref filter, ref predicate): ref
+	view split_by(ref filter, ref predicate): ref
 		-> std.details.string.make_view_split(self, filter, 1u, predicate);
 
 	//! Split the string
-	view lines(ref filter): ref
+	view split_by_lines(ref filter): ref
 		-> std.details.string.make_view_split_by_line(self, filter);
 
 	//! Find occurences
