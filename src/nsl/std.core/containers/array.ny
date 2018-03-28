@@ -125,7 +125,6 @@ public class Array<:T:> {
 	var last
 		-> at(new u32(m_size) - 1u); // TODO use a safer function
 
-
 	view (cref filter): ref {
 		ref m_parentArray = self;
 		ref m_parentFilter = filter;
@@ -165,7 +164,6 @@ public class Array<:T:> {
 		};
 	}
 
-
 private:
 	//! Increase the inner storage
 	func doGrow(newsize: u32) {
@@ -176,7 +174,6 @@ private:
 				else (if newcapa < 4096u then newcapa * 2u else newcapa += 4096u));
 		}
 		while newcapa < newsize;
-
 		var sizeof = !!sizeof(#[__nanyc_synthetic] T);
 		if true then {
 			// T is ref
@@ -186,7 +183,6 @@ private:
 		else {
 			// T is an object stored inside the array - create a new array
 			var newItems = std.memory.allocate(0u64 + newcapa * sizeof);
-
 			// release the old ones
 			var size = new u32(m_size);
 			if size != 0u then
@@ -198,24 +194,19 @@ private:
 				do {
 					var oldAddr = !!load.ptr(oldP.m_ptr);
 					ref oldItem = !!__reinterpret(oldAddr, #[__nanyc_synthetic] T);
-
 					// copying
 					ref newelem = new T(oldItem);
 					!!ref(newelem);
 					!!store.ptr(newP.m_ptr, !!pointer(newelem));
-
 					// deleting the old one
 					!!unref(oldItem);
-
 					oldP += 1u;
 					newP += 1u;
 				}
 				while (i -= 1u) != 0u;
-
 				// delete the old array
 				std.memory.dispose(oldItems, sizeof * oldcapa);
 			}
-
 			m_capacity = newcapa.pod;
 			m_items = newItems;
 		}
@@ -233,7 +224,6 @@ private:
 		}
 		while (i -= 1u) != 0u;
 	}
-
 
 internal:
 	// note: u32 by default to have a consistent behavior accross all operating systems

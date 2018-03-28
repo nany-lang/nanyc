@@ -26,8 +26,9 @@ public class f64 {
 
 	#[nosuggest] operator new(self pod: __f64);
 
-	func as<:T:>
-		-> new T(!!as(#[__nanyc_synthetic] typeof(std.asBuiltin(new T)), pod));
+	func as<:T:>: ref {
+		return new T(!!as(#[__nanyc_synthetic] typeof(std.as_builtin(new T)), pod));
+	}
 
 	operator ++self: ref f64 {
 		pod = !!finc(pod);

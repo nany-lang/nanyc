@@ -23,7 +23,7 @@ class Ascii {
 	}
 
 	//! Integer representation
-	var asU8 -> { get: new u8(m_value), set: reset(value) };
+	var as_u8 -> { get: new u8(m_value), set: reset(value) };
 
 	//! Get if the ascii is null (\0)
 	var zero
@@ -40,9 +40,6 @@ class Ascii {
 	var digit
 		-> m_value >= 48__u8 and m_value <= 57__u8;
 
-	func toDigit
-		-> if isDigit then new u8(m_value - 48__u8) else 0u8;
-
 	//! Get if the ascii is a space (real space or tab)
 	var tab
 		-> new bool(m_value == 9__u8);
@@ -52,11 +49,11 @@ class Ascii {
 		-> new bool(m_value == 32__u8);
 
 	//! Get if the ascii is a lower case letter
-	var lower
+	var lowercase_alpha
 		-> new bool(m_value >= 97__u8 and m_value <= 122__u8);
 
 	//! Get if the ascii is an upper case letter
-	var upper
+	var uppercase_alpha
 		-> new bool(m_value >= 65__u8 and m_value <= 90__u8);
 
 	//! Get if the ascii is a letter (lower case or upper case)
@@ -66,6 +63,18 @@ class Ascii {
 	//! Get if the ascii is a valid value
 	var valid
 		-> new bool(m_value < 127__u8);
+
+	func to_digit() {
+		return if digit then new u8(m_value - 48__u8) else 0u8;
+	}
+
+	func to_lowercase_alpha {
+		return if lowercase_alpha then new u8(m_value - 97__u8) else 0u8;
+	}
+
+	func to_uppercase_alpha {
+		return if uppercase_alpha then new u8(m_value - 65__u8) else 0u8;
+	}
 
 internal:
 	func reset(value: __u8)    { m_value = value; }

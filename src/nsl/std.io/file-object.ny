@@ -11,31 +11,31 @@ public class File {
 	operator new;
 
 	operator new(cref ro: string) {
-		doOpen(ro, __true, __false, __false, __false);
+		do_open(ro, __true, __false, __false, __false);
 	}
 
 	operator new(cref rw: string) {
-		doOpen(rw, __true, __true, __false, __false);
+		do_open(rw, __true, __true, __false, __false);
 	}
 
 	operator new(cref rw: string, truncate: bool) {
-		doOpen(rw, __true, __true, __false, truncate.pod);
+		do_open(rw, __true, __true, __false, truncate.pod);
 	}
 
 	operator new(cref rw: string, append: bool) {
-		doOpen(rw, __true, __true, append.pod, __false);
+		do_open(rw, __true, __true, append.pod, __false);
 	}
 
 	operator new(cref wo: string) {
-		doOpen(wo, __false, __true, __false, __false);
+		do_open(wo, __false, __true, __false, __false);
 	}
 
 	operator new(cref wo: string, truncate: bool) {
-		doOpen(wo, __false, __true, __false, truncate.pod);
+		do_open(wo, __false, __true, __false, truncate.pod);
 	}
 
 	operator new(cref wo: string, append: bool) {
-		doOpen(wo, __false, __true, append.pod, __false);
+		do_open(wo, __false, __true, append.pod, __false);
 	}
 
 	operator dispose {
@@ -44,25 +44,25 @@ public class File {
 	}
 
 	func open(cref ro: string): ref bool
-		-> doOpen(ro, __true, __false, __false, __false);
+		-> do_open(ro, __true, __false, __false, __false);
 
 	func open(cref rw: string): ref bool
-		-> doOpen(rw, __true, __true, __false, __false);
+		-> do_open(rw, __true, __true, __false, __false);
 
 	func open(cref rw: string, truncate: bool): ref bool
-		-> doOpen(rw, __true, __true, __false, truncate.pod);
+		-> do_open(rw, __true, __true, __false, truncate.pod);
 
 	func open(cref rw: string, append: bool): ref bool
-		-> doOpen(rw, __true, __true, append.pod, __false);
+		-> do_open(rw, __true, __true, append.pod, __false);
 
 	func open(cref wo: string): ref bool
-		-> doOpen(wo, __false, __true, __false, __false);
+		-> do_open(wo, __false, __true, __false, __false);
 
 	func open(cref wo: string, truncate: bool): ref bool
-		-> doOpen(wo, __true, __true, __false, truncate.pod);
+		-> do_open(wo, __true, __true, __false, truncate.pod);
 
 	func open(cref wo: string, append: bool): ref bool
-		-> doOpen(wo, __true, __true, append.pod, __false);
+		-> do_open(wo, __true, __true, append.pod, __false);
 
 	func close {
 		if m_fd != null then {
@@ -95,8 +95,9 @@ public class File {
 			!!__nanyc_io_file_seek_cur(m_fd, current.pod);
 	}
 
-	func rewind
-		-> seek(set: 0u64);
+	func rewind {
+		seek(set: 0u64);
+	}
 
 	func flush {
 		if m_fd != null then
@@ -109,11 +110,13 @@ public class File {
 			else 0__u64;
 	}
 
-	func readline: ref string
-		-> readline(256u, 2u * 1024u * 1024u * 1024u);
+	func readline: ref string {
+		return readline(256u, 2u * 1024u * 1024u * 1024u);
+	}
 
-	func readline(chunk: u32): ref string
-		-> readline(chunk, 2u * 1024u * 1024u * 1024u);
+	func readline(chunk: u32): ref string {
+		return readline(chunk, 2u * 1024u * 1024u * 1024u);
+	}
 
 	func readline(chunk: u32, limit: u32): ref string {
 		ref str = new string;
@@ -127,7 +130,6 @@ public class File {
 			var numread = read(str.m_cstr + offset, 0__u64 + chunk.pod);
 			if numread == 0__u64 then
 				return str;
-
 			str.resize(offset + !!__reinterpret(numread, #[__nanyc_synthetic] __u32));
 			var linefeed = str.index(offset, '\n');
 			if linefeed < str.size then
@@ -138,11 +140,9 @@ public class File {
 				// TODO fix signed / unsigned convertions...
 				var oldcursor = !!__nanyc_io_file_tell(m_fd);
 				var cursor = !!__nanyc_io_file_tell(m_fd) - numread + linefeed.pod + 1__u32;
-				print("... reposition: str: \(str.size), from \(oldcursor) to \(cursor)\n");
 				!!__nanyc_io_file_seek(m_fd, cursor);
 				return str;
 			}
-
 			offset = offset + chunk.pod;
 			capacity += chunk;
 		}
@@ -150,42 +150,38 @@ public class File {
 		return str;
 	}
 
-
-	func write(buffer: __pointer, size: __u32): __u32 {
+	func write(buffer: __pointer, size: __u32): u32 {
 		return if m_fd != null
-			then !!__nanyc_io_file_write(m_fd, buffer, size)
-			else 0__u32;
+			then new u32(!!__nanyc_io_file_write(m_fd, buffer, size))
+			else 0u32;
 	}
 
-	func write(cref str: string): u32
-		-> new u32(str.m_cstr, str.size.pod);
-
+	func write(cref str: string): u32 {
+		return write(str.m_cstr, str.size.pod);
+	}
 
 	view (cref filter)
-		-> makeViewLineByLine(filter, 256u, 2u * 1024u * 1024u * 1024u);
+		-> make_view_linebyline(filter, 256u, 2u * 1024u * 1024u * 1024u);
 
-	view lines(cref filter)
-		-> makeViewLineByLine(filter, 256u, 2u * 1024u * 1024u * 1024u);
+	view split_by_lines(cref filter)
+		-> make_view_linebyline(filter, 256u, 2u * 1024u * 1024u * 1024u);
 
-	view lines(cref filter, chunk: u32)
-		-> makeViewLineByLine(filter, chunk, 2u * 1024u * 1024u * 1024u);
+	view split_by_lines(cref filter, chunk: u32)
+		-> make_view_linebyline(filter, chunk, 2u * 1024u * 1024u * 1024u);
 
-	view lines(cref filter, chunk: u32, limit: u32)
-		-> makeViewLineByLine(filter, chunk, limit);
-
+	view split_by_lines(cref filter, chunk: u32, limit: u32)
+		-> make_view_linebyline(filter, chunk, limit);
 
 	operator += (cref str: string): ref File {
 		write(str);
 		return self;
 	}
 
-
 private:
-	func doOpen(cref filename: string, readm: __bool, writem: __bool, appendm: __bool, truncatem: __bool): ref bool {
+	func do_open(cref filename: string, readm: __bool, writem: __bool, appendm: __bool, truncatem: __bool): ref bool {
 		// close the file first
 		if m_fd != null then
 			!!__nanyc_io_file_close(m_fd);
-
 		if not filename.empty then {
 			var fd = !!__nanyc_io_file_open(filename.m_cstr, filename.size.pod, readm, writem, appendm, truncatem);
 			m_fd = fd;
@@ -196,7 +192,7 @@ private:
 		return false;
 	}
 
-	func makeViewLineByLine(cref filter, chunk: u32, limit: u32): ref {
+	func make_view_linebyline(cref filter, chunk: u32, limit: u32): ref {
 		ref m_parentFile = self;
 		ref m_parentFilter = filter;
 		ref m_parentChunk = chunk;

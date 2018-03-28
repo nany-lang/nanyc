@@ -6,7 +6,6 @@
 
 namespace std.io;
 
-
 public class Folder {
 	operator new;
 	operator new(self cref path: string);
@@ -37,16 +36,16 @@ public class Folder {
 		-> std.io.folder.copy(path, to);
 
 	//! Copy the contents of a folder to another location
-	func copyContents(cref to: string): bool
-		-> std.io.folder.copyContents(path, to);
+	func copy_contents(cref to: string): bool
+		-> std.io.folder.copy_contents(path, to);
 
 	//! Move a folder and its content to another location
 	func move(cref to: string): bool
 		-> std.io.folder.move(path, to);
 
 	//! Move the contents of a folder to another location
-	func moveContents(cref to: string): bool
-		-> std.io.folder.moveContents(path, to);
+	func move_contents(cref to: string): bool
+		-> std.io.folder.move_contents(path, to);
 
 	//! Remove the folder and its content
 	func erase: bool
@@ -59,64 +58,31 @@ public class Folder {
 	func read: ref string
 		-> std.io.folder.read(path);
 
-
 	//! Get a view on all files and folders of the path (not recursive)
 	view (ref filter)
-		-> makeViewFromFolder(filter, recursive: false, files: true, folders: true);
+		-> make_folder_view(filter, recursive: false, files: true, folders: true);
 
 	//! Get a view on all files and folders of the path (recursive)
 	view recursive(ref filter)
-		-> makeViewFromFolder(filter, recursive: true, files: true, folders: true);
+		-> make_folder_view(filter, recursive: true, files: true, folders: true);
 
 	view subfolders(ref filter)
-		-> makeViewFromFolder(filter, recursive: false, files: false, folders: true);
+		-> make_folder_view(filter, recursive: false, files: false, folders: true);
 
 	view subfolders(ref filter, recursive: bool)
-		-> makeViewFromFolder(filter, recursive: recursive, files: false, folders: true);
+		-> make_folder_view(filter, recursive: recursive, files: false, folders: true);
 
 	view files(ref filter)
-		-> makeViewFromFolder(filter, recursive: false, files: true, folders: false);
+		-> make_folder_view(filter, recursive: false, files: true, folders: false);
 
 	view files(ref filter, recursive: bool)
-		-> makeViewFromFolder(filter, recursive: recursive, files: true, folders: false);
+		-> make_folder_view(filter, recursive: recursive, files: true, folders: false);
 
 	view entries(ref filter, recursive: bool, files: bool, folders: bool)
-		-> makeViewFromFolder(filter, recursive: recursive, files: files, folders: folders);
-
+		-> make_folder_view(filter, recursive: recursive, files: files, folders: folders);
 
 public:
-	class Element {
-		//! The path of the current element
-		var filename -> m_fullname;
-		//! Name of the current element
-		var name -> m_name;
-		//! The size in bytes of the current element (0 if not a file)
-		var size -> m_size;
-		//! Extension of the element
-		var extension -> std.io.path.extension(m_name);
-
-		//! Get if the element is a file
-		var isFile -> m_kind;
-		//! Get if the element is a folder
-		var isFolder -> not m_kind;
-
-	private:
-		func importFromIterator(p: __pointer) {
-			m_fullname.clear();
-			m_fullname.appendCString(!!__nanyc_io_folder_iterator_fullpath(p));
-			m_name.clear();
-			m_name.appendCString(!!__nanyc_io_folder_iterator_name(p));
-			m_size = new u64(!!__nanyc_io_folder_iterator_size(p));
-			m_kind = true;
-		}
-
-		var m_fullname = "";
-		var m_name = "";
-		var m_size = 0u64;
-		var m_kind = true; // TODO use appropriate enum here: true: file
-	}
-
-	func makeViewFromFolder(cref filter, recursive: bool, files: bool, folders: bool): ref {
+	func make_folder_view(cref filter, recursive: bool, files: bool, folders: bool): ref {
 		ref m_parentFolder = self;
 		ref m_parentFilter = filter;
 		ref m_parentRecursive = recursive;
@@ -156,16 +122,46 @@ public:
 						-> m_element;
 
 					var m_iterator = null;
-					var m_element = new Element;
+					var m_element = new ViewEntry;
 				};
 			}
 
 			view (filter): ref
-				-> m_parentFolder.makeViewFromFolder(func (cref i) -> m_parentFilter(i) and filter(i),
+				-> m_parentFolder.make_folder_view(func (cref i) -> m_parentFilter(i) and filter(i),
 					m_parentRecursive, m_parentFiles, m_parentFolders);
 		};
 	}
 
 private:
 	var path = "";
+}
+
+public class ViewEntry {
+	//! The path of the current element
+	var filename -> m_fullname;
+	//! Name of the current element
+	var name -> m_name;
+	//! The size in bytes of the current element (0 if not a file)
+	var size -> m_size;
+	//! Extension of the element
+	var extension -> std.io.path.extension(m_name);
+
+	//! Get if the element is a file
+	var isFile -> m_kind;
+	//! Get if the element is a folder
+	var isFolder -> not m_kind;
+
+private:
+	func importFromIterator(p: __pointer) {
+		m_fullname.clear();
+		m_fullname.appendCString(!!__nanyc_io_folder_iterator_fullpath(p));
+		m_name.clear();
+		m_name.appendCString(!!__nanyc_io_folder_iterator_name(p));
+		m_size = new u64(!!__nanyc_io_folder_iterator_size(p));
+		m_kind = true;
+	}
+	var m_fullname = "";
+	var m_name = "";
+	var m_size = 0u64;
+	var m_kind = true; // TODO use appropriate enum here: true: file
 }

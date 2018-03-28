@@ -32,8 +32,9 @@ class pointer<:T:> {
 	}
 
 	//! Get if the pointer is null
-	func isNull: ref bool
-		-> new bool(m_ptr == null);
+	func is_null: bool {
+		return new bool(m_ptr == null);
+	}
 
 	//! Reset the pointer to null
 	func clear {

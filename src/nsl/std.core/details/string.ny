@@ -14,7 +14,7 @@ func isBlank(cref base): ref bool {
 		var p = base.m_cstr;
 		var ascii = new std.Ascii;
 		do {
-			ascii.asU8 = !!load.u8(p + i.pod);
+			ascii.as_u8 = !!load.u8(p + i.pod);
 			if not ascii.blank then
 				return false;
 			if (i += 1u) == size then
@@ -29,7 +29,7 @@ func contains(cref base, cref ascii: std.Ascii): ref bool {
 	if base.m_size != 0__u32 then {
 		var i = 0u;
 		var size = base.m_size;
-		var needle = ascii.asU8.pod;
+		var needle = ascii.as_u8.pod;
 		var p = base.m_cstr;
 		do {
 			if needle == !!load.u8(p + i.pod) then
@@ -64,7 +64,7 @@ func index(cref base, offset: u32, cref ascii: std.Ascii): u32 {
 	var size = base.m_size;
 	if offset < size then {
 		var p = base.m_cstr + offset.pod;
-		var needle = ascii.asU8.pod;
+		var needle = ascii.as_u8.pod;
 		do {
 			if needle == !!load.u8(p) then
 				return offset;
@@ -82,7 +82,7 @@ func index(cref base, offset: u32, ref predicate): u32 {
 		var p = base.m_cstr + offset.pod;
 		var ascii = new std.Ascii;
 		do {
-			ascii.asU8 = !!load.u8(p);
+			ascii.as_u8 = !!load.u8(p);
 			if predicate(ascii) then
 				return offset;
 			offset += 1u;
@@ -100,7 +100,7 @@ func lastIndex(cref base, offset: u32, cref ascii: std.Ascii): u32 {
 			offset = size - 1u;
 
 		var p = base.m_cstr + offset.pod;
-		var needle = ascii.asU8.pod;
+		var needle = ascii.as_u8.pod;
 		do {
 			if needle == !!load.u8(p) then
 				return offset;
@@ -119,7 +119,7 @@ func countUp(cref base, cref ascii: std.Ascii): u32 {
 	if base.m_size != 0__u32 then {
 		var i = 0u;
 		var size = base.m_size;
-		var needle = ascii.asU8.pod;
+		var needle = ascii.as_u8.pod;
 		do {
 			if needle == !!load.u8(base.m_cstr + i.pod) then
 				c += 1u;
@@ -129,12 +129,12 @@ func countUp(cref base, cref ascii: std.Ascii): u32 {
 	return c;
 }
 
-func startsWith(cref base, cref prefix: string): ref bool {
+func starts_with(cref base, cref prefix: string): ref bool {
 	return (base.m_size != 0__u32 and prefix.m_size <= base.m_size)
 		and std.memory.equals(base.m_cstr, prefix.m_cstr, 0__u64 + prefix.m_size);
 }
 
-func endsWith(cref base, cref suffix: string): bool {
+func ends_with(cref base, cref suffix: string): bool {
 	var fsize = suffix.m_size;
 	return (base.m_size != 0__u32 and fsize <= base.m_size)
 		and std.memory.equals(base.m_cstr + m_size - fsize, prefix.m_cstr, 0__u64 + fsize);
@@ -143,13 +143,7 @@ func endsWith(cref base, cref suffix: string): bool {
 func left(cref base, bytes: u32): ref
 	-> if bytes.pod < m_size then new string(self, bytes) else new string();
 
-func makeTrimmed(cref base): ref {
-	var newstr = new typeof(base)(base);
-	newstr.trim();
-	return newstr;
-}
-
-func makeViewAscii(ref base, ref filter): ref {
+func make_view_ascii(ref base, ref filter): ref {
 	ref m_parentString = base;
 	ref m_parentFilter = filter;
 	return new class {
@@ -178,7 +172,7 @@ func makeViewAscii(ref base, ref filter): ref {
 	};
 }
 
-func makeViewBytes(ref base, ref filter): ref {
+func make_view_bytes(ref base, ref filter): ref {
 	ref m_parentString = base;
 	ref m_parentFilter = filter;
 	return new class {
@@ -187,7 +181,7 @@ func makeViewBytes(ref base, ref filter): ref {
 			ref accept = m_parentFilter;
 			return new class {
 				func findFirst: bool
-					-> (not origstr.empty) and (accept(origstr.at(0u).asU8) or next());
+					-> (not origstr.empty) and (accept(origstr.at(0u).as_u8) or next());
 
 				func next: bool {
 					do {
@@ -195,11 +189,11 @@ func makeViewBytes(ref base, ref filter): ref {
 						if not (m_index < origstr.size) then
 							return false;
 					}
-					while not accept(origstr.at(m_index).asU8);
+					while not accept(origstr.at(m_index).as_u8);
 					return true;
 				}
 
-				func get: ref -> origstr.at(m_index).asU8;
+				func get: ref -> origstr.at(m_index).as_u8;
 
 				var m_index = 0u;
 			};
@@ -207,7 +201,7 @@ func makeViewBytes(ref base, ref filter): ref {
 	};
 }
 
-func makeViewSplit(ref base, ref filter, separatorLength: u32, ref predicate): ref {
+func make_view_split(ref base, ref filter, separatorLength: u32, ref predicate): ref {
 	ref m_parentString = base;
 	ref m_parentFilter = filter;
 	ref m_parentPredicate = predicate;
@@ -248,7 +242,7 @@ func makeViewSplit(ref base, ref filter, separatorLength: u32, ref predicate): r
 	};
 }
 
-func makeViewSplitByLines(ref base, ref filter): ref {
+func make_view_split_by_line(ref base, ref filter): ref {
 	ref m_parentString = base;
 	ref m_parentFilter = filter;
 	return new class {
@@ -287,7 +281,7 @@ func makeViewSplitByLines(ref base, ref filter): ref {
 	};
 }
 
-func makeViewIndex(ref base, ref filter, offset: u32, ref pattern): ref {
+func make_view_index(ref base, ref filter, offset: u32, ref pattern): ref {
 	ref m_parentString = base;
 	ref m_parentFilter = filter;
 	ref m_parentPattern = pattern;
@@ -322,4 +316,29 @@ func makeViewIndex(ref base, ref filter, offset: u32, ref pattern): ref {
 			};
 		}
 	};
+}
+
+#[nosuggest] public func nanyc_internal_create_string(ptr: __pointer): ref string {
+	ref content = new string;
+	// pointer to a special per-thread struct
+	if ptr != null then {
+		var size = !!load.u64(ptr);
+		if size != 0__u64 then {
+			var capacity = !!load.u64(ptr + 8__u32);
+			var newptr   = !!load.ptr(ptr + 16__u32);
+			// avoid false asserts when the memory checker is active
+			!!__nanyc_memchecker_hold(newptr, capacity);
+			// this func should return a std.Clob (which has 64bits size)
+			if (capacity < 4294967295__u32) {
+				content.adopt(newptr,
+					!!__reinterpret(size, #[__nanyc_synthetic] __u32),
+					!!__reinterpret(capacity, #[__nanyc_synthetic] __u32));
+			}
+			else
+				std.memory.dispose(newptr, capacity);
+		}
+	}
+	//else
+	//   error
+	return content;
 }

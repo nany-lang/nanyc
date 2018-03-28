@@ -12,7 +12,7 @@ public func hash(x: u32): u32
 public func hash(cref str: string): u32 {
 	var h = 37u;
 	for c in str:ascii do
-		h = (h * 54059u) xor (c.asU8 * 76963u);
+		h = (h * 54059u) xor (c.as_u8 * 76963u);
 	return h;
 }
 

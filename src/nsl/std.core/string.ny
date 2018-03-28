@@ -107,16 +107,16 @@ public class string {
 	//! Increase the capacity of the container if necessary
 	func reserve(bytes: u32) {
 		if m_capacity < bytes.pod then
-			doGrow(bytes.pod);
+			do_grow(bytes.pod);
 	}
 
 	#[nosuggest] func reserve(bytes: __u32) {
 		if m_capacity < bytes then
-			doGrow(bytes);
+			do_grow(bytes);
 	}
 
 	func squeeze
-		-> doSqueeze();
+		-> do_squeeze();
 
 	//! Assign a new value to the string
 	func assign(cref text) {
@@ -148,7 +148,7 @@ public class string {
 			var oldsize = m_size;
 			var newsize = oldsize + size;
 			if m_capacity < newsize then
-				doGrow(newsize);
+				do_grow(newsize);
 			std.memory.copy(m_cstr + oldsize, str, 0__u64 + size);
 			m_size = newsize;
 		}
@@ -163,8 +163,8 @@ public class string {
 		var oldsize = m_size;
 		var newsize = oldsize + 1__u32;
 		if m_capacity < newsize then
-			doGrow(newsize);
-		!!store.u8(m_cstr + oldsize, ascii.asU8.pod);
+			do_grow(newsize);
+		!!store.u8(m_cstr + oldsize, ascii.as_u8.pod);
 		m_size = newsize;
 	}
 
@@ -208,7 +208,7 @@ public class string {
 	#[nosuggest] func append(n: __pointer) {
 		if n != null then {
 			if m_capacity < m_size + 64__u32 then
-				doGrow(m_size + 64__u32);
+				do_grow(m_size + 64__u32);
 			m_size = m_size + !!__nanyc.string.append.ptr(m_cstr + m_size, n);
 		}
 		else
@@ -216,52 +216,52 @@ public class string {
 	}
 
 	#[nosuggest] func append(n: __i8) {
-		if m_capacity < m_size + 64__u32 then doGrow(m_size + 64__u32);
+		if m_capacity < m_size + 64__u32 then do_grow(m_size + 64__u32);
 		m_size = m_size + !!__nanyc.string.append.i8(m_cstr + m_size, n);
 	}
 
 	#[nosuggest] func append(n: __i16) {
-		if m_capacity < m_size + 64__u32 then doGrow(m_size + 64__u32);
+		if m_capacity < m_size + 64__u32 then do_grow(m_size + 64__u32);
 		m_size = m_size + !!__nanyc.string.append.i16(m_cstr + m_size, n);
 	}
 
 	#[nosuggest] func append(n: __i32) {
-		if m_capacity < m_size + 64__u32 then doGrow(m_size + 64__u32);
+		if m_capacity < m_size + 64__u32 then do_grow(m_size + 64__u32);
 		m_size = m_size + !!__nanyc.string.append.i32(m_cstr + m_size, n);
 	}
 
 	#[nosuggest] func append(n: __i64) {
-		if m_capacity < m_size + 64__u32 then doGrow(m_size + 64__u32);
+		if m_capacity < m_size + 64__u32 then do_grow(m_size + 64__u32);
 		m_size = m_size + !!__nanyc.string.append.i64(m_cstr + m_size, n);
 	}
 
 	#[nosuggest] func append(n: __u8) {
-		if m_capacity < m_size + 64__u32 then doGrow(m_size + 64__u32);
+		if m_capacity < m_size + 64__u32 then do_grow(m_size + 64__u32);
 		m_size = m_size + !!__nanyc.string.append.u8(m_cstr + m_size, n);
 	}
 
 	#[nosuggest] func append(n: __u16) {
-		if m_capacity < m_size + 64__u32 then doGrow(m_size + 64__u32);
+		if m_capacity < m_size + 64__u32 then do_grow(m_size + 64__u32);
 		m_size = m_size + !!__nanyc.string.append.u16(m_cstr + m_size, n);
 	}
 
 	#[nosuggest] func append(n: __u32) {
-		if m_capacity < m_size + 64__u32 then doGrow(m_size + 64__u32);
+		if m_capacity < m_size + 64__u32 then do_grow(m_size + 64__u32);
 		m_size = m_size + !!__nanyc.string.append.u32(m_cstr + m_size, n);
 	}
 
 	#[nosuggest] func append(n: __u64) {
-		if m_capacity < m_size + 64__u32 then doGrow(m_size + 64__u32);
+		if m_capacity < m_size + 64__u32 then do_grow(m_size + 64__u32);
 		m_size = m_size + !!__nanyc.string.append.u64(m_cstr + m_size, n);
 	}
 
 	#[nosuggest] func append(n: __f32) {
-		if m_capacity < m_size + 64__u32 then doGrow(m_size + 64__u32);
+		if m_capacity < m_size + 64__u32 then do_grow(m_size + 64__u32);
 		m_size = m_size + !!__nanyc.string.append.f32(m_cstr + m_size, n);
 	}
 
 	#[nosuggest] func append(n: __f64) {
-		if m_capacity < m_size + 64__u32 then doGrow(m_size + 64__u32);
+		if m_capacity < m_size + 64__u32 then do_grow(m_size + 64__u32);
 		m_size = m_size + !!__nanyc.string.append.f64(m_cstr + m_size, n);
 	}
 
@@ -285,12 +285,12 @@ public class string {
 		var oldsize = m_size;
 		var newsize = oldsize + 1__u32;
 		if m_capacity < newsize then
-			doGrow(newsize);
+			do_grow(newsize);
 
 		var p = m_cstr;
 		if oldsize != 0__u32 then
 			std.memory.copyOverlap(p + 1__u32, p, 1__u64);
-		!!store.u8(p, ascii.asU8.pod);
+		!!store.u8(p, ascii.as_u8.pod);
 		m_size = newsize;
 	}
 
@@ -314,7 +314,7 @@ public class string {
 			if offset < oldsize then {
 				var newsize = oldsize + size;
 				if m_capacity < newsize then
-					doGrow(newsize);
+					do_grow(newsize);
 
 				var p = m_cstr + offset;
 				std.memory.copyOverlap(dst: p + size, src: p, size: 0__u64 + (oldsize - offset));
@@ -330,7 +330,7 @@ public class string {
 	func fill(cref ascii: std.Ascii) {
 		if m_size != 0__u32 then {
 			assert(m_cstr != null);
-			std.memory.fill(m_cstr, 0__u64 + m_size, ascii.asU8.pod);
+			std.memory.fill(m_cstr, 0__u64 + m_size, ascii.as_u8.pod);
 		}
 	}
 
@@ -347,6 +347,9 @@ public class string {
 	//! Get if the string contains a given ascii
 	func contains(cref ascii: std.Ascii): bool
 		-> std.details.string.contains(self, ascii);
+
+	func contains(cref needle: string): bool
+		-> std.details.string.index(self, 0u, needle) < m_size;
 
 	func index(cref ascii: std.Ascii): u32
 		-> std.details.string.index(self, 0u, ascii);
@@ -380,12 +383,12 @@ public class string {
 		-> new u32(m_size);
 
 	//! Determines whether the string begins with the characters of another string
-	func startsWith(cref prefix: string): bool
-		-> std.details.string.startsWith(self, prefix);
+	func starts_with(cref prefix: string): bool
+		-> std.details.string.starts_with(self, prefix);
 
 	//! Determines whether the string ends with the characters of another string
-	func endsWith(cref suffix: string): bool
-		-> endsWith(self, suffix);
+	func ends_with(cref suffix: string): bool
+		-> ends_with(self, suffix);
 
 	//! Remove the 'count' ascii from the end of the string
 	func chop(bytes: u32) {
@@ -439,12 +442,14 @@ public class string {
 	}
 
 	//! Get a new string with the first N characters
-	func left(bytes: u32): ref string
-		-> std.details.string.left(self, bytes);
+	func left(bytes: u32): ref string {
+		return std.details.string.left(self, bytes);
+	}
 
 	//! Get the Nth part of the string
-	func part(index: u32): ref string
-		-> part(index, func (cref ascii) -> ascii.blank);
+	func part(index: u32): ref string {
+		return part(index, func (cref ascii) -> ascii.blank);
+	}
 
 	//! Get the Nth part of the string
 	func part(index: u32, cref separator): ref string {
@@ -457,68 +462,77 @@ public class string {
 	}
 
 	//! Remove whitespace from both sides of the string
-	func trim
-		-> trim(func (cref ascii) -> ascii.blank);
+	func trim: ref string {
+		trim(func (cref ascii) -> ascii.blank);
+		return self;
+	}
 
 	//! Remove all ascii matching the predicate from both sides of the string
-	func trim(cref predicate) {
-		trimRight(predicate);
-		trimLeft(predicate);
+	func trim(cref predicate): ref string {
+		trim_right(predicate);
+		trim_left(predicate);
+		return self;
 	}
 
 	//! Remove whitespace from the right side of the string
-	func trimRight
-		-> trimRight(func (cref ascii) -> ascii.blank);
+	func trim_right: ref string {
+		trim_right(func (cref ascii) -> ascii.blank);
+		return self;
+	}
 
 	//! Remove whitespace from the left side of the string
-	func trimLeft
-		-> trimLeft(func (cref ascii) -> ascii.blank);
+	func trim_left: ref string {
+		trim_left(func (cref ascii) -> ascii.blank);
+		return self;
+	}
 
 	//! Remove all ascii matching the predicate from the left side of the string
-	func trimLeft(cref predicate) {
+	func trim_left(cref predicate): ref string {
 		var size = new u32(m_size);
 		if size != 0u32 then {
 			var i = 0u32;
 			var p = m_cstr;
 			var ascii = new std.Ascii;
 			do {
-				ascii.asU8 = !!load.u8(p + i.pod);
+				ascii.as_u8 = !!load.u8(p + i.pod);
 				if not predicate(ascii) then {
 					if i != 0u then {
 						m_size = m_size - i.pod;
 						std.memory.copyOverlap(m_cstr, m_cstr + i.pod, 0__u64 + m_size);
 					}
-					return;
+					return self;
 				}
 				if (i += 1u) == size then {
 					m_size = 0__u32;
-					return;
+					return self;
 				}
 			}
 			while __true;
 		}
+		return self;
 	}
 
 	//! Remove all ascii matching the predicate from the right side of the string
-	func trimRight(cref predicate) {
+	func trim_right(cref predicate): ref string {
 		var size = new u32(m_size);
 		if size != 0u32 then {
 			var p = m_cstr;
 			var ascii = new std.Ascii;
 			do {
 				size -= 1u;
-				ascii.asU8 = !!load.u8(p + size.pod);
+				ascii.as_u8 = !!load.u8(p + size.pod);
 				if not predicate(ascii) then {
 					m_size = size.pod + 1__u32;
-					return;
+					return self;
 				}
 				if size == 0u32 then {
 					m_size = 0__u32;
-					return;
+					return self;
 				}
 			}
 			while __true;
 		}
+		return self;
 	}
 
 	/*!
@@ -526,7 +540,13 @@ public class string {
 	** \see blank
 	*/
 	var trimmed
-		-> std.details.string.makeTrimmed(self);
+		-> (new typeof(self)(self)).trim();
+
+	var trimmed_left
+		-> (new typeof(self)(self)).trim_left();
+
+	var trimmed_right
+		-> (new typeof(self)(self)).trim_right();
 
 	//! Get the ascii at offset 'i' (without any check)
 	func at(cref i: u32): ref std.Ascii {
@@ -545,46 +565,55 @@ public class string {
 	** \brief View on each UTF8 character
 	** \TODO UTF8 support (UTF8cpp?)
 	*/
-	view (ref filter): ref
-		-> std.details.string.makeViewAscii(self, filter);
+	view (ref filter): ref {
+		return std.details.string.make_view_ascii(self, filter);
+	}
 
 	//! View on each ascii
-	view ascii(ref filter): ref
-		-> std.details.string.makeViewAscii(self, filter);
+	view ascii(ref filter): ref {
+		return std.details.string.make_view_ascii(self, filter);
+	}
 
 	//! View on each ascii as u8
-	view bytes(ref filter): ref
-		-> std.details.string.makeViewBytes(self, filter);
+	view bytes(ref filter): ref {
+		return std.details.string.make_view_bytes(self, filter);
+	}
 
-	//! Split the string
-	view split(ref filter): ref
-		-> std.details.string.makeViewSplit(self, filter, 1u, func (cref ascii) -> ascii.blank);
-
-	//! Split the string
-	view split(ref filter, cref separator: std.Ascii): ref {
-		ref sep = separator;
-		return std.details.string.makeViewSplit(self, filter, 1u, func (cref ascii) -> ascii == sep);
+	//! Split the string with blanks as separator
+	view split_by_blanks(ref filter): ref {
+		return std.details.string.make_view_split(self, filter, 1u, func (cref ascii) -> ascii.blank);
 	}
 
 	//! Split the string
-	view split(ref filter, ref pattern: string): ref
-		-> std.details.string.makeViewSplit(self, filter, pattern.size, pattern);
+	view split_by(ref filter, cref separator: std.Ascii): ref {
+		ref sep = separator;
+		return std.details.string.make_view_split(self, filter, 1u, func (cref ascii) -> ascii == sep);
+	}
 
 	//! Split the string
-	view split(ref filter, ref predicate): ref
-		-> std.details.string.makeViewSplit(self, filter, 1u, predicate);
+	view split_by(ref filter, ref pattern: string): ref {
+		return std.details.string.make_view_split(self, filter, pattern.size, pattern);
+	}
 
 	//! Split the string
-	view lines(ref filter): ref
-		-> std.details.string.makeViewSplitByLines(self, filter);
+	view split_by(ref filter, ref predicate): ref {
+		return std.details.string.make_view_split(self, filter, 1u, predicate);
+	}
+
+	//! Split the string
+	view split_by_lines(ref filter): ref {
+		return std.details.string.make_view_split_by_line(self, filter);
+	}
 
 	//! Find occurences
-	view index(ref filter, cref pattern): ref
-		-> std.details.string.makeViewIndex(filter, 0u, pattern);
+	view index(ref filter, cref pattern): ref {
+		return std.details.string.make_view_index(filter, 0u, pattern);
+	}
 
 	//! Find occurences
-	view index(ref filter, offset: u32, cref pattern): ref
-		-> std.details.string.makeViewIndex(filter, offset, pattern);
+	view index(ref filter, offset: u32, cref pattern): ref {
+		return std.details.string.make_view_index(filter, offset, pattern);
+	}
 
 	/*!
 	** \brief Extend the string by appending a value (see 'append')
@@ -598,13 +627,14 @@ public class string {
 	/*!
 	** \brief Get the ascii at offset 'i' ('\0' if 'i' is out of bound)
 	*/
-	operator [] (cref i: u32)
-		-> new std.Ascii(if i < m_size then !!load.u8(m_cstr + i.pod) else 0__u8);
+	operator [] (cref i: u32): std.Ascii {
+		return new std.Ascii(if i < m_size then !!load.u8(m_cstr + i.pod) else 0__u8);
+	}
 
 
 private:
 	//! Increase the inner storage
-	func doGrow(newsize: __u32) {
+	func do_grow(newsize: __u32) {
 		var oldcapa = new u32(m_capacity);
 		var newcapa = oldcapa;
 		do {
@@ -617,7 +647,7 @@ private:
 		m_cstr = std.memory.reallocate(m_cstr, 0u64 + oldcapa, 0u64 + newcapa);
 	}
 
-	func doSqueeze {
+	func do_squeeze {
 		if m_size == 0__u32 then {
 			std.memory.dispose(m_cstr, 0__u64 + m_capacity);
 			m_capacity = 0__u32;

@@ -15,7 +15,7 @@ wp: hidden
 	[ \t\n\r]* ((tk-comment-line | tk-comment-block) [ \t\n\r]*)*
 
 punc: hidden
-	[!"#$%&'()*+,\\-./:;<=>?@[\]^_`{|}~]
+	[!"#$%&'()*+,\\-./:;<=>?@[\]^`{|}~]
 
 sp: notext, hidden
 	([ \t\r\n] | punc^) wp
@@ -640,11 +640,11 @@ if: notext, important
 
 while: notext, important
 	tk-while
-		(expr wp tk-do wp expr-with-semicolon (wp tk-else wp expr-with-semicolon)?)
+		(expr wp tk-do expr-with-semicolon (wp tk-else wp expr-with-semicolon)?)
 		| error-eol
 
 do-while: notext, important
-	tk-do wp
+	tk-do
 		(expr-with-semicolon wp tk-while expr wp tk-semicolon?)
 		| error-eol
 
