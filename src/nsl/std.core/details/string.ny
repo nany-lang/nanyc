@@ -317,3 +317,28 @@ func make_view_index(ref base, ref filter, offset: u32, ref pattern): ref {
 		}
 	};
 }
+
+#[nosuggest] public func nanyc_internal_create_string(ptr: __pointer): ref string {
+	ref content = new string;
+	// pointer to a special per-thread struct
+	if ptr != null then {
+		var size = !!load.u64(ptr);
+		if size != 0__u64 then {
+			var capacity = !!load.u64(ptr + 8__u32);
+			var newptr   = !!load.ptr(ptr + 16__u32);
+			// avoid false asserts when the memory checker is active
+			!!__nanyc_memchecker_hold(newptr, capacity);
+			// this func should return a std.Clob (which has 64bits size)
+			if (capacity < 4294967295__u32) {
+				content.adopt(newptr,
+					!!__reinterpret(size, #[__nanyc_synthetic] __u32),
+					!!__reinterpret(capacity, #[__nanyc_synthetic] __u32));
+			}
+			else
+				std.memory.dispose(newptr, capacity);
+		}
+	}
+	//else
+	//   error
+	return content;
+}

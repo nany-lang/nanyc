@@ -15,5 +15,5 @@ public func md5(ptr: std.c.ptr, size: u64): ref string
 
 public func md5(ptr: std.c.ptr, size: __u64): ref string {
 	var p = !!__nanyc_digest_md5(ptr, size);
-	return std.memory.nanyc_internal_create_string(p);
+	return std.details.string.nanyc_internal_create_string(p);
 }

@@ -47,7 +47,7 @@ public func clear(cref path: string): bool {
 //! Read the content of a file in memory
 public func read(cref path: string): ref string {
 	var ptr = !!__nanyc_io_file_get_contents(path.m_cstr, path.size.pod);
-	return std.memory.nanyc_internal_create_string(ptr);
+	return std.details.string.nanyc_internal_create_string(ptr);
 }
 
 //! Write the content to a file
