@@ -622,10 +622,10 @@ object: notext
 // --- IF ---
 
 if-then: notext
-	wp (tk-then wp)? expr-with-semicolon | error-semicolon
+	wp tk-then? expr-with-semicolon | error-semicolon
 
 if-else: notext
-	wp tk-else wp expr-with-semicolon
+	wp tk-else expr-with-semicolon
 
 if: notext, important
 	tk-if
@@ -640,7 +640,7 @@ if: notext, important
 
 while: notext, important
 	tk-while
-		(expr wp tk-do expr-with-semicolon (wp tk-else wp expr-with-semicolon)?)
+		(expr wp tk-do expr-with-semicolon (wp tk-else expr-with-semicolon)?)
 		| error-eol
 
 do-while: notext, important
@@ -659,7 +659,7 @@ for-do: notext
 	tk-do expr-with-semicolon
 
 for-else: notext
-	tk-else wp expr-with-semicolon
+	tk-else expr-with-semicolon
 
 for: notext, important
 	tk-for
