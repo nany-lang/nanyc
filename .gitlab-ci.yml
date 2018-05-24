@@ -1,114 +1,116 @@
 stages:
-    - build
-    - packages
-    - artifacts
+  - build
+  - packages
+  - artifacts
 
 variables:
-    CLICOLOR_FORCE: 1
-    GIT_SUBMODULE_STRATEGY: recursive
-    NANYC_VERSION: '0.4.0'
-    VERBOSE: '1'
+  CLICOLOR_FORCE: 1
+  GIT_SUBMODULE_STRATEGY: recursive
+  VERBOSE: '1'
 
+before_script:
+  - export NANYC_VERSION="${CI_COMMIT_TAG:-0.0.0}.${CI_PIPELINE_ID}";
 
 # build
 
 .debug-build-linux: &debug-build-linux
-    stage: build
-    script:
-        - mkdir -p build/bootstrap
-        - cd build/bootstrap
-        - cmake ../../bootstrap -DCMAKE_BUILD_TYPE=debug
-        - cmake --build . --config debug --target all -- -j $(nproc)
-        - cmake --build . --config debug --target check
-    tags:
-        - linux
+  stage: build
+  script:
+    - mkdir -p build/bootstrap
+    - cd build/bootstrap
+    - cmake ../../bootstrap -DCMAKE_BUILD_TYPE=debug -DNANYC_VERSION=${NANYC_VERSION}
+    - cmake --build . --config debug --target all -- -j $(nproc)
+    - cmake --build . --config debug --target check
+  tags:
+    - linux
 
 centos-7.4-amd64-debug:
-    <<: *debug-build-linux
-    image: registry.gitlab.com/nany-lang/nanyc/build/centos:7.4-amd64
+  <<: *debug-build-linux
+  image: registry.gitlab.com/nany-lang/nanyc/build/centos:7.4-amd64
 
 debian-9-amd64-debug:
-    <<: *debug-build-linux
-    image: registry.gitlab.com/nany-lang/nanyc/build/debian:9-amd64
+  <<: *debug-build-linux
+  image: registry.gitlab.com/nany-lang/nanyc/build/debian:9-amd64
 
-ubuntu-17.04-amd64-debug:
-    <<: *debug-build-linux
-    image: registry.gitlab.com/nany-lang/nanyc/build/ubuntu:17.04-amd64
+ubuntu-18.04-amd64-debug:
+  <<: *debug-build-linux
+  image: registry.gitlab.com/nany-lang/nanyc/build/ubuntu:18.04-amd64
 
 
 # packages
 
 .build-pkg-linux-deb: &build-pkg-linux-deb
-    stage: packages
-    script:
-        - ARCH=$(dpkg --print-architecture)
-        - . /etc/os-release
-        - read ID_VERSION _ <<< "$VERSION"
-        - echo "system ${ID}-${ID_VERSION} ($ARCH)"
-        - mkdir -p build/bootstrap
-        - mkdir -p build/packages
-        - cd build/bootstrap
-        - cmake ../../bootstrap -DCMAKE_BUILD_TYPE=release
-            -DCMAKE_INSTALL_BINDIR=usr/bin
-            -DCMAKE_INSTALL_INCLUDEDIR=usr/include
-            -DCMAKE_INSTALL_LIBDIR=usr/lib
-            -DCMAKE_INSTALL_PREFIX=/
-            -DNANYC_COLLECTION_SYSTEM_PATH=/usr/share/nanyc/${NANYC_VERSION}/nsl
-            -DWITH_PACKAGE_DEB=ON
-        - cmake --build . --config release --target all -- -j $(nproc)
-        - make_package() {
-            COM=$1;
-            target=../packages/${ID}-${ID_VERSION}/${COM}-${NANYC_VERSION}-${ARCH};
-            export DESTDIR=${target};
-            cmake -DCOMPONENT="${COM}" -P cmake_install.cmake;
-            dpkg -b ${target};
-          }
-        - make_package libnanyc
-        - make_package nanyc
-        - make_package nanyc-nsl-digest-md5
-        - make_package nanyc-nsl-selftest
-    artifacts:
-        paths:
-            - build/packages/*/*.deb
-        expire_in: 4 hours
-    tags:
-        - linux
+  stage: packages
+  script:
+    - ARCH=$(dpkg --print-architecture)
+    - . /etc/os-release
+    - read ID_VERSION _ <<< "$VERSION"
+    - echo "system ${ID}-${ID_VERSION} ($ARCH)"
+    - mkdir -p build/bootstrap
+    - mkdir -p build/packages
+    - cd build/bootstrap
+    - cmake ../../bootstrap -DCMAKE_BUILD_TYPE=release
+      -DCMAKE_INSTALL_BINDIR=usr/bin
+      -DCMAKE_INSTALL_INCLUDEDIR=usr/include
+      -DCMAKE_INSTALL_LIBDIR=usr/lib
+      -DCMAKE_INSTALL_PREFIX=/
+      -DNANYC_COLLECTION_SYSTEM_PATH=/usr/share/nanyc/${NANYC_VERSION}/nsl
+      -DNANYC_VERSION=${NANYC_VERSION}
+      -DWITH_PACKAGE_DEB=ON
+    - cmake --build . --config release --target all -- -j $(nproc)
+    - make_package() {
+      COM=$1;
+      target=../packages/${ID}-${ID_VERSION}/${COM}-${NANYC_VERSION}-${ARCH};
+      export DESTDIR=${target};
+      cmake -DCOMPONENT="${COM}" -P cmake_install.cmake;
+      dpkg -b ${target};
+      }
+    - make_package libnanyc
+    - make_package nanyc
+    - make_package nanyc-nsl-digest-md5
+    - make_package nanyc-nsl-selftest
+  artifacts:
+    paths:
+      - build/packages/*/*.deb
+    expire_in: 4 hours
+  tags:
+    - linux
 
 debian-9-amd64:
-    <<: *build-pkg-linux-deb
-    image: registry.gitlab.com/nany-lang/nanyc/build/debian:9-amd64
+  <<: *build-pkg-linux-deb
+  image: registry.gitlab.com/nany-lang/nanyc/build/debian:9-amd64
 
-ubuntu-17.04-amd64:
-    <<: *build-pkg-linux-deb
-    image: registry.gitlab.com/nany-lang/nanyc/build/ubuntu:17.04-amd64
+ubuntu-18.04-amd64:
+  <<: *build-pkg-linux-deb
+  image: registry.gitlab.com/nany-lang/nanyc/build/ubuntu:18.04-amd64
 
 
 # artifacts
 
 the gathering master:
-    stage: artifacts
-    image: alpine:latest
-    variables:
-        GIT_STRATEGY: none
-    script:
-        - echo Gather all artifacts in one spot
-    only:
-        - master@nany-lang/nanyc
-    artifacts:
-        paths:
-            - build/packages/*/*.deb
-        expire_in: 3 months
+  stage: artifacts
+  image: alpine:latest
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - echo Gather all artifacts in one spot
+  only:
+    - master@nany-lang/nanyc
+  artifacts:
+    paths:
+      - build/packages/*/*.deb
+    expire_in: 3 months
 
 the gathering:
-    stage: artifacts
-    image: alpine:latest
-    variables:
-        GIT_STRATEGY: none
-    script:
-        - echo Gather all artifacts in one spot
-    except:
-        - master@nany-lang/nanyc
-    artifacts:
-        paths:
-            - build/packages/*/*.deb
-        expire_in: 1 day
+  stage: artifacts
+  image: alpine:latest
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - echo Gather all artifacts in one spot
+  except:
+    - master@nany-lang/nanyc
+  artifacts:
+    paths:
+      - build/packages/*/*.deb
+    expire_in: 1 day
