@@ -6,9 +6,10 @@ stages:
 variables:
   CLICOLOR_FORCE: 1
   GIT_SUBMODULE_STRATEGY: recursive
-  NANYC_VERSION: '0.4.0'
   VERBOSE: '1'
 
+before_script:
+  - export NANYC_VERSION="${CI_COMMIT_TAG:-0.0.0}.${CI_PIPELINE_ID}";
 
 # build
 
@@ -17,7 +18,7 @@ variables:
   script:
     - mkdir -p build/bootstrap
     - cd build/bootstrap
-    - cmake ../../bootstrap -DCMAKE_BUILD_TYPE=debug
+    - cmake ../../bootstrap -DCMAKE_BUILD_TYPE=debug -DNANYC_VERSION=${NANYC_VERSION}
     - cmake --build . --config debug --target all -- -j $(nproc)
     - cmake --build . --config debug --target check
   tags:
@@ -54,6 +55,7 @@ ubuntu-17.04-amd64-debug:
       -DCMAKE_INSTALL_LIBDIR=usr/lib
       -DCMAKE_INSTALL_PREFIX=/
       -DNANYC_COLLECTION_SYSTEM_PATH=/usr/share/nanyc/${NANYC_VERSION}/nsl
+      -DNANYC_VERSION=${NANYC_VERSION}
       -DWITH_PACKAGE_DEB=ON
     - cmake --build . --config release --target all -- -j $(nproc)
     - make_package() {
