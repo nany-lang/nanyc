@@ -22,12 +22,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - nsl: C: add typedefs for floating point data types
 
 ### Changed
+- ci: add ubuntu-18.04-lts
 - language: `;` is now mandatory after a namespace declaration
 - nanyc: Start using "changelog" based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 - nanyc: the version is now carried by the git tag (0.0.0 otherwise)
 - tests: `nanyc-unittests` does no longer require an empty filename for running the NSL Selftest
 
 ### Removed
+- ci: remove ubuntu 17.04 in favor of ubuntu 18.04
 - TravisCI is no longer supported
 
 ### Fixed

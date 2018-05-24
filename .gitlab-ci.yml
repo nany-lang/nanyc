@@ -32,9 +32,9 @@ debian-9-amd64-debug:
   <<: *debug-build-linux
   image: registry.gitlab.com/nany-lang/nanyc/build/debian:9-amd64
 
-ubuntu-17.04-amd64-debug:
+ubuntu-18.04-amd64-debug:
   <<: *debug-build-linux
-  image: registry.gitlab.com/nany-lang/nanyc/build/ubuntu:17.04-amd64
+  image: registry.gitlab.com/nany-lang/nanyc/build/ubuntu:18.04-amd64
 
 
 # packages
@@ -80,9 +80,9 @@ debian-9-amd64:
   <<: *build-pkg-linux-deb
   image: registry.gitlab.com/nany-lang/nanyc/build/debian:9-amd64
 
-ubuntu-17.04-amd64:
+ubuntu-18.04-amd64:
   <<: *build-pkg-linux-deb
-  image: registry.gitlab.com/nany-lang/nanyc/build/ubuntu:17.04-amd64
+  image: registry.gitlab.com/nany-lang/nanyc/build/ubuntu:18.04-amd64
 
 
 # artifacts
