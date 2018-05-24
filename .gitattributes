@@ -1,2 +1,2 @@
 *.ny linguist-language=Nany
-/docs/changelogs/* merge=union
+/changelog.md merge=union
